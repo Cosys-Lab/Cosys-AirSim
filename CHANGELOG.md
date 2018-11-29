@@ -1,6 +1,26 @@
 # What's new
 
-Below is highly summerized curated list of important changes. This does not include minor/less important changes or bug fixes or things like documentation update. This list updated every few months. For full list of changes, please review [commit history](https://github.com/Microsoft/AirSim/commits/master).
+Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. This list updated every few months. For complete detailed changes, please review [commit history](https://github.com/Microsoft/AirSim/commits/master).
+
+### November, 2018
+* Added Weather Effects and [APIs](docs/apis.md#weather-apis)
+* Added [Time of Day API](docs/apis.md#time-of-day-api)
+* An experimental integration of [AirSim on Unity](https://github.com/Microsoft/AirSim/tree/master/Unity) is now available. Learn more in [Unity blog post](https://blogs.unity3d.com/2018/11/14/airsim-on-unity-experiment-with-autonomous-vehicle-simulation). 
+* [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
+* Highly efficient [NoDisplay view mode](https://github.com/Microsoft/AirSim/blob/master/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
+* [Enable/disable sensors](https://github.com/Microsoft/AirSim/pull/1479) via settings
+* [Lidar Sensor](docs/lidar.md)
+* [Support for Flysky FS-SM100 RC](https://github.com/Microsoft/AirSim/commit/474214364676b6631c01b3ed79d00c83ba5bccf5) USB adapter
+* Case Study: [Formula Student Technion Driverless](https://github.com/Microsoft/AirSim/wiki/technion)
+* [Multi-Vehicle Capability](docs/multi_vehicle.md)
+* [Custom speed units](https://github.com/Microsoft/AirSim/pull/1181)
+* [ROS publisher](https://github.com/Microsoft/AirSim/pull/1135)
+* [simSetObjectPose API](https://github.com/Microsoft/AirSim/pull/1161)
+* [Character Control APIs](https://github.com/Microsoft/AirSim/blob/master/PythonClient/airsim/client.py#L137) (works on TalkingHeads binaries in release)
+* [Arducopter Solo Support](https://github.com/Microsoft/AirSim/pull/1387)
+* [Linux install without sudo access](https://github.com/Microsoft/AirSim/pull/1434)
+* [Kinect like ROS publisher](https://github.com/Microsoft/AirSim/pull/1298)
+
 
 ### June, 2018
 * Development workflow doc
@@ -77,4 +97,17 @@ Below is highly summerized curated list of important changes. This does not incl
 * The [reinforcement learning example](docs/reinforcement_learning.md) with AirSim
 * New built-in flight controller called [simple_flight](docs/simple_flight.md) that "just works" without any additional setup. It is also now *default*. 
 * AirSim now also generates [depth as well as disparity images](docs/image_apis.md) that is in camera plan. 
-* We also have official Linux build now! If you have been using AirSim with PX4, you might want to read the [release notes](docs/release_notes.md).
+* We also have official Linux build now!
+
+## Sep 2017
+- We have added [car model](docs/using_car.md)!
+
+## Aug 2017
+- [simple_flight](docs/simple_flight.md) is now default flight controller for drones. If you want to use PX4, you will need to modify settings.json as per [PX4 setup doc](docs/px4_setup.md).
+- Linux build is official and currently uses Unreal 4.17 due to various bug fixes required
+- ImageType enum has breaking changes with several new additions and clarifying existing ones
+- SubWindows are now configurable from settings.json
+- PythonClient is now complete and has parity with C++ APIs. Some of these would have breaking changes.
+
+## Feb 2017
+- First release!
