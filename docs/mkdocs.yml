@@ -127,6 +127,7 @@ nav:
       - "Multiple Vehicles": 'docs/multi_vehicle.md'
       - "Sensors": 'docs/sensors.md'
       - "LIDAR": 'docs/lidar.md'
+      - "Echo": 'docs/echo.md'
       - "ROS": 'docs/ros.md'
       - "Playing Logs": 'docs/playback.md'
     - "Design":

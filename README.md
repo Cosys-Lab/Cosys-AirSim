@@ -14,6 +14,11 @@ Cars in AirSim
 
 [![AirSim Car Demo Video](docs/images/car_demo_video.png)](https://youtu.be/gnz1X3UNM5Y)
 
+## CoSys-Lab Modifications
+* [Echo sensor type](docs/echo.md)
+* Use engine-time for frequency updaters and timestamps instead of real-time. Useful for when performance of the simulation is less then realtime. Currently only usable on the echo sensor type.
+* ClearPath Husky vehicle type. A small robot vehicle. Still requires proper implementation of skid-steering vehicle model.
+
 ## What's New
 * A ROS wrapper for multirotors is available. See [airsim_ros_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_ros_pkgs) for the ROS API, and [airsim_tutorial_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_tutorial_pkgs) for tutorials. 
 * [Added sensor APIs for Barometer, IMU, GPS, Magnetometer, Distance Sensor](https://microsoft.github.io/AirSim/docs/sensors.md) 
