@@ -16,6 +16,7 @@ Cars in AirSim
 
 ## CoSys-Lab Modifications
 * [Echo sensor type](docs/echo.md)
+* Allow hot-reload of plugin through Unreal Editor
 * Use engine-time for frequency updaters and timestamps instead of real-time. Useful for when performance of the simulation is less then realtime. Currently only usable on the echo sensor type.
 * ClearPath Husky vehicle type. A small robot vehicle. Still requires proper implementation of skid-steering vehicle model.
 
