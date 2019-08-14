@@ -36,11 +36,11 @@ public:
         updateOutput();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        LidarBase::update();
+        LidarBase::update(delta);
 
-        freq_limiter_.update();
+        freq_limiter_.update(delta);
 
         if (freq_limiter_.isWaitComplete()) {
             updateOutput();

@@ -40,9 +40,9 @@ public:
         initPhysicsBody(body_ptr);
     }
 
-    virtual void update() override
+    virtual void update(float delta) override
     {
-        PhysicsEngineBase::update();
+        PhysicsEngineBase::update(delta);
 
         for (PhysicsBody* body_ptr : *this) {
             updatePhysics(*body_ptr);

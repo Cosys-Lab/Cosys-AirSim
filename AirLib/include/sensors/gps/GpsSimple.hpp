@@ -46,19 +46,19 @@ public: //methods
         addOutputToDelayLine(eph_filter.getOutput(), epv_filter.getOutput());
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        GpsBase::update();
+        GpsBase::update(delta);
 
-        freq_limiter_.update();
-        eph_filter.update();
-        epv_filter.update();
+        freq_limiter_.update(delta);
+        eph_filter.update(delta);
+        epv_filter.update(delta);
 
         if (freq_limiter_.isWaitComplete()) {   //update output
             addOutputToDelayLine(eph_filter.getOutput(), epv_filter.getOutput());
         }
 
-        delay_line_.update();
+        delay_line_.update(delta);
 
         if (freq_limiter_.isWaitComplete())
             setOutput(delay_line_.getOutput());

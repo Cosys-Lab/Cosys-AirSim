@@ -51,9 +51,9 @@ public:
         output_ = initial_output_;
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
         TTimeDelta dt = clock()->updateSince(last_time_);
 

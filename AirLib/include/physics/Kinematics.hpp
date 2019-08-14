@@ -46,9 +46,9 @@ public:
         current_ = initial_;
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
         //nothing to do because next state should be updated 
         //by physics engine. The reason is that final state

@@ -167,11 +167,11 @@ void CarPawnSimApi::reset()
 }
 
 //physics tick
-void CarPawnSimApi::update()
+void CarPawnSimApi::update(float delta)
 {
-    vehicle_api_->update();
+    vehicle_api_->update(delta);
 
-    PawnSimApi::update();
+    PawnSimApi::update(delta);
 }
 
 //*** End: UpdatableState implementation ***//

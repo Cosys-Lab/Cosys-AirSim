@@ -19,8 +19,9 @@ if [ "$(uname)" == "Darwin" ]; then
     ./GenerateProjectFiles.sh "$SCRIPT_DIR/Blocks.uproject"
     popd >/dev/null
 else
-    echo "Not implemented"
-    exit 1
+    pushd "$UnrealDir/Engine/Build/BatchFiles/Linux/" >/dev/null
+    ./GenerateProjectFiles.sh "$SCRIPT_DIR/Blocks.uproject"
+    popd >/dev/null
 fi
 
 popd >/dev/null

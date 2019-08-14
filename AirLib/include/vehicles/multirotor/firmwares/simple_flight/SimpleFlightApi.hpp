@@ -50,9 +50,9 @@ public: //VehicleApiBase implementation
 
         firmware_->reset();
     }
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        MultirotorApiBase::update();
+        MultirotorApiBase::update(delta);
 
         //update controller which will update actuator control signal
         firmware_->update();

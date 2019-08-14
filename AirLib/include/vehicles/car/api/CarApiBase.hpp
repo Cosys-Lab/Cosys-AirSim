@@ -86,11 +86,11 @@ public:
         //reset sensors last after their ground truth has been reset
         getSensors().reset();
     }
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        VehicleApiBase::update();
+        VehicleApiBase::update(delta);
 
-        getSensors().update();
+        getSensors().update(delta);
     }
     void reportState(StateReporter& reporter) override
     {

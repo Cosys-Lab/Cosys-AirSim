@@ -84,7 +84,7 @@ public:
         current_ = initial_;
     }
 
-    virtual void update()
+    virtual void update(float delta = 0)
     {
         updateState(current_, home_geo_point_);
     }

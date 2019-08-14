@@ -73,7 +73,7 @@ void PawnSimApi::pawnTick(float dt)
     //default behavior is to call update every tick
     //for custom physics engine, this method should be overridden and update should be
     //called from every physics tick
-    update();
+    update(dt);
     updateRenderedState(dt);
     updateRendering(dt);
 }
@@ -298,12 +298,12 @@ void PawnSimApi::reset()
     environment_->reset();
 }
 
-void PawnSimApi::update()
+void PawnSimApi::update(float delta)
 {
     //sync environment from kinematics
     environment_->setPosition(kinematics_->getPose().position);
-    environment_->update();
-    VehicleSimApiBase::update();
+    environment_->update(delta);
+    VehicleSimApiBase::update(delta);
 }
 
 void PawnSimApi::reportState(msr::airlib::StateReporter& reporter)

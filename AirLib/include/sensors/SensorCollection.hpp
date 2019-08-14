@@ -77,12 +77,12 @@ public:
         }
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
         for (auto& pair : sensors_) {
-            pair.second->update();
+            pair.second->update(delta);
         }
     }
 

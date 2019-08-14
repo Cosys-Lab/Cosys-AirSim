@@ -39,12 +39,12 @@ public:
             member->reset();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
         for (TUpdatableObjectPtr& member : members_)
-            member->update();
+            member->update(delta);
     }
 
     virtual void reportState(StateReporter& reporter) override
