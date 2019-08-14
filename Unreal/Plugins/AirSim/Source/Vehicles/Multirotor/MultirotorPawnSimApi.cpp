@@ -147,13 +147,13 @@ void MultirotorPawnSimApi::reset()
 }
 
 //this is high frequency physics tick, flier gets ticked at rendering frame rate
-void MultirotorPawnSimApi::update()
+void MultirotorPawnSimApi::update(float delta)
 {
     //environment update for current position
-    PawnSimApi::update();
+    PawnSimApi::update(delta);
 
     //update forces on vertices
-    phys_vehicle_->update();
+    phys_vehicle_->update(delta);
 
     //update to controller must be done after kinematics have been updated by physics engine
 }

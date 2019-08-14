@@ -22,9 +22,9 @@ public:
     {
         UpdatableObject::reset();
     }
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
     }
 
     //this method is called at every render tick when we want to transfer state from

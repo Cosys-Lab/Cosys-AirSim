@@ -12,15 +12,16 @@ namespace msr { namespace airlib {
 
 class FrequencyLimiter : UpdatableObject {
 public:
-    FrequencyLimiter(real_T frequency = Utils::max<float>(), real_T startup_delay = 0)
+    FrequencyLimiter(real_T frequency = Utils::max<float>(), real_T startup_delay = 0, bool use_sim_time = false)
     {
-        initialize(frequency, startup_delay);
+        initialize(frequency, startup_delay, use_sim_time);
     }
 
-    void initialize(real_T frequency = Utils::max<float>(), real_T startup_delay = 0)
+    void initialize(real_T frequency = Utils::max<float>(), real_T startup_delay = 0, bool use_sim_time = false)
     {
         frequency_ = frequency;
         startup_delay_ = startup_delay;
+		use_sim_time_ = use_sim_time;
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -47,36 +48,67 @@ public:
         startup_complete_ = false;
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
-        elapsed_total_sec_ = clock()->elapsedSince(first_time_);
-        elapsed_interval_sec_ = clock()->elapsedSince(last_time_);
-        ++update_count_;
+		if (use_sim_time_) {
+			elapsed_total_sec_ += delta;
+			elapsed_interval_sec_ += delta;
+			++update_count_;
 
-        //if startup_delay_ > 0 then we consider startup_delay_ as the first interval
-        //that needs to be complete
-        if (!startup_complete_) {
-            if (Utils::isDefinitelyGreaterThan(startup_delay_, 0.0f)) {
-                //see if we have spent startup_delay_ time yet
-                interval_complete_ = elapsed_interval_sec_ >= startup_delay_;
-            }
-            else //no special startup delay is needed
-                startup_complete_ = true;
-        }
-        
-        //if startup is complete, we will do regular intervals from now one
-        if (startup_complete_)
-            interval_complete_ = elapsed_interval_sec_ >= interval_size_sec_;
-        
-        //when any interval is done, reset the state and repeat
-        if (interval_complete_) {
-            last_elapsed_interval_sec_ = elapsed_interval_sec_;
-            last_time_ = clock()->nowNanos();
-            elapsed_interval_sec_ = 0;
-            startup_complete_ = true;
-        }
+			//if startup_delay_ > 0 then we consider startup_delay_ as the first interval
+			//that needs to be complete
+			if (!startup_complete_) {
+				if (Utils::isDefinitelyGreaterThan(startup_delay_, 0.0f)) {
+					//see if we have spent startup_delay_ time yet
+					interval_complete_ = elapsed_interval_sec_ >= startup_delay_;
+				}
+				else //no special startup delay is needed
+					startup_complete_ = true;
+			}
+
+			//if startup is complete, we will do regular intervals from now one
+			if (startup_complete_)
+				interval_complete_ = elapsed_interval_sec_ >= interval_size_sec_;
+
+			//when any interval is done, reset the state and repeat
+			if (interval_complete_) {
+				last_elapsed_interval_sec_ = elapsed_interval_sec_;
+				last_time_ += (elapsed_interval_sec_ * 1e9f);
+				elapsed_interval_sec_ = 0;
+				startup_complete_ = true;
+			}
+
+		}
+		else {
+			elapsed_total_sec_ = clock()->elapsedSince(first_time_);
+			elapsed_interval_sec_ = clock()->elapsedSince(last_time_);
+			++update_count_;
+
+			//if startup_delay_ > 0 then we consider startup_delay_ as the first interval
+			//that needs to be complete
+			if (!startup_complete_) {
+				if (Utils::isDefinitelyGreaterThan(startup_delay_, 0.0f)) {
+					//see if we have spent startup_delay_ time yet
+					interval_complete_ = elapsed_interval_sec_ >= startup_delay_;
+				}
+				else //no special startup delay is needed
+					startup_complete_ = true;
+			}
+
+			//if startup is complete, we will do regular intervals from now one
+			if (startup_complete_)
+				interval_complete_ = elapsed_interval_sec_ >= interval_size_sec_;
+
+			//when any interval is done, reset the state and repeat
+			if (interval_complete_) {
+				last_elapsed_interval_sec_ = elapsed_interval_sec_;
+				last_time_ = clock()->nowNanos();
+				elapsed_interval_sec_ = 0;
+				startup_complete_ = true;
+			}
+		}       
     }
     //*** End: UpdatableState implementation ***//
 
@@ -111,6 +143,11 @@ public:
         return update_count_;
     }
 
+	TTimePoint getLastTime() const
+	{
+		return last_time_;
+	}
+
 private:
     real_T interval_size_sec_;
     TTimeDelta elapsed_total_sec_;
@@ -121,6 +158,7 @@ private:
     real_T startup_delay_;
     bool interval_complete_;
     bool startup_complete_;
+	bool use_sim_time_;
     TTimePoint last_time_, first_time_;
 
 };

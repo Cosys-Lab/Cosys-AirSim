@@ -35,16 +35,16 @@ public:
             physics_engine_->reset();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
         ClockFactory::get()->step();
 
         //first update our objects
-        UpdatableContainer::update();
+        UpdatableContainer::update(delta);
 
         //now update kinematics state
         if (physics_engine_)
-            physics_engine_->update();
+            physics_engine_->update(delta);
     }
 
     virtual void reportState(StateReporter& reporter) override

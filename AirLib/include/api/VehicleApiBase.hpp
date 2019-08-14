@@ -13,6 +13,7 @@
 #include "common/ImageCaptureBase.hpp"
 #include "sensors/SensorCollection.hpp"
 #include "sensors/lidar/LidarBase.hpp"
+#include "sensors/echo/EchoBase.hpp"
 #include "sensors/imu/ImuBase.hpp"
 #include "sensors/barometer/BarometerBase.hpp"
 #include "sensors/magnetometer/MagnetometerBase.hpp"
@@ -42,9 +43,9 @@ public:
     {
         UpdatableObject::reset();
     }
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+		UpdatableObject::update(delta);
     }
 
     virtual void cancelLastTask()
@@ -129,6 +130,29 @@ public:
 
         return lidar->getOutput();
     }
+
+	// Echo APIs
+	virtual EchoData getEchoData(const std::string& echo_name) const
+	{
+		const EchoBase* echo = nullptr;
+
+		// Find echo with the given name (for empty input name, return the first one found)
+		// Not efficient but should suffice given small number of echos
+		uint count_echos = getSensors().size(SensorBase::SensorType::Echo);
+		for (uint i = 0; i < count_echos; i++)
+		{
+			const EchoBase* current_echo = static_cast<const EchoBase*>(getSensors().getByType(SensorBase::SensorType::Echo, i));
+			if (current_echo != nullptr && (current_echo->getName() == echo_name || echo_name == ""))
+			{
+				echo = current_echo;
+				break;
+			}
+		}
+		if (echo == nullptr)
+			throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", echo_name.c_str()));
+
+		return echo->getOutput();
+	}
 
     // IMU API
     virtual ImuBase::Output getImuData(const std::string& imu_name) const

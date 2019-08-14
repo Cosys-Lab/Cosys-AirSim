@@ -27,6 +27,7 @@ public: //types
 	static constexpr char const * kVehicleTypeArduCopterSolo = "arducoptersolo";
 	static constexpr char const * kVehicleTypeSimpleFlight = "simpleflight";
     static constexpr char const * kVehicleTypePhysXCar = "physxcar";
+	static constexpr char const * kVehicleTypeCPHusky = "cphusky";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
@@ -219,6 +220,31 @@ public: //types
         bool draw_debug_points = false;
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
     };
+
+	struct EchoSetting : SensorSetting {
+
+		// shared defaults
+		uint number_of_traces = 1000;					// Amount of traces (rays) being cast
+		float attenuation_per_distance = 1.0f;			// Attenuation of signal wrt distance traveled (dB/m)
+		float attenuation_per_reflection = 1.0f;        // Attenuation of signal wrt reflections (dB)
+		float attenuation_limit = 40.0f;                // Attenuation at which the signal is considered dissipated (dB)
+		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
+		float sensor_diameter = 0.5;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
+		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+
+		Vector3r position = VectorMath::nanVector();
+		Rotation rotation = Rotation::nanRotation();
+
+		bool draw_reflected_points = true;				// Draw debug points in world where reflected points are captured by the sensor
+		bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the sensor
+		bool draw_initial_points = false;		     	// Draw the points of the initial half sphere where the traces (rays) are cast
+		bool draw_bounce_lines = false;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
+		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+
+		bool engine_time = true;						// If false, real-time simulation will be used for timestamps and measurement frequency
+														// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+		std::string data_frame = AirSimSettings::kSensorLocalFrame;
+	};
 
     struct VehicleSetting {
         //required
@@ -744,6 +770,12 @@ private:
         physx_car_setting->vehicle_type = kVehicleTypePhysXCar;
         vehicles[physx_car_setting->vehicle_name] = std::move(physx_car_setting);
 
+		//create default robot vehicle
+		auto cphusky_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+		cphusky_setting->vehicle_name = "CPHusky";
+		cphusky_setting->vehicle_type = kVehicleTypeCPHusky;
+		vehicles[cphusky_setting->vehicle_name] = std::move(cphusky_setting);
+
         //create default computer vision vehicle
         auto cv_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
         cv_setting->vehicle_name = "ComputerVision";
@@ -780,6 +812,8 @@ private:
             PawnPath("Class'/AirSim/VehicleAdv/Vehicle/VehicleAdvPawn.VehicleAdvPawn_C'"));
         pawn_paths.emplace("DefaultCar",
             PawnPath("Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"));
+		pawn_paths.emplace("CPHusky",
+			PawnPath("Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"));
         pawn_paths.emplace("DefaultQuadrotor",
             PawnPath("Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"));
         pawn_paths.emplace("DefaultComputerVision",
@@ -1045,7 +1079,9 @@ private:
 
         if (std::isnan(camera_director.follow_distance)) {
             if (simmode_name == "Car")
-                camera_director.follow_distance = -8;
+				camera_director.follow_distance = -8;
+			else if(simmode_name == "CPHusky")
+				camera_director.follow_distance = -2;
             else
                 camera_director.follow_distance = -3;
         }
@@ -1056,6 +1092,8 @@ private:
         if (std::isnan(camera_director.position.z())) {
             if (simmode_name == "Car")
                 camera_director.position.z() = -4;
+			else if (simmode_name == "CPHusky")
+				camera_director.position.z() = -2;
             else
                 camera_director.position.z() = -2;
         }
@@ -1132,7 +1170,7 @@ private:
 
     static void initializeLidarSetting(LidarSetting& lidar_setting, const Settings& settings_json)
     {
-        lidar_setting.number_of_channels = settings_json.getInt("NumberOfChannels", lidar_setting.number_of_channels);
+		lidar_setting.number_of_channels = settings_json.getInt("NumberOfChannels", lidar_setting.number_of_channels);
         lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
         lidar_setting.points_per_second = settings_json.getInt("PointsPerSecond", lidar_setting.points_per_second);
         lidar_setting.horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
@@ -1147,6 +1185,29 @@ private:
         lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
     }
+
+    static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
+	{
+		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
+		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
+		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
+		echo_setting.attenuation_limit = settings_json.getFloat("AttenuationLimit", echo_setting.attenuation_limit);
+		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
+		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
+		echo_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", echo_setting.pause_after_measurement);
+
+		echo_setting.draw_reflected_points = settings_json.getBool("DrawReflectedPoints", echo_setting.draw_reflected_points);
+		echo_setting.draw_reflected_lines = settings_json.getBool("DrawReflectedLines", echo_setting.draw_reflected_lines);
+		echo_setting.draw_initial_points = settings_json.getBool("DrawInitialPoints", echo_setting.draw_initial_points);
+		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
+		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
+
+		echo_setting.engine_time = settings_json.getBool("EngineTime", echo_setting.engine_time);
+		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
+
+		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
+		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);
+	}
 
     static std::unique_ptr<SensorSetting> createSensorSetting(
         SensorBase::SensorType sensor_type, const std::string& sensor_name,
@@ -1172,6 +1233,9 @@ private:
             break;
         case SensorBase::SensorType::Lidar:
             sensor_setting = std::unique_ptr<SensorSetting>(new LidarSetting());
+            break;
+        case SensorBase::SensorType::Echo:
+            sensor_setting = std::unique_ptr<SensorSetting>(new EchoSetting());
             break;
         default:
             throw std::invalid_argument("Unexpected sensor type");
@@ -1206,6 +1270,9 @@ private:
             break;
         case SensorBase::SensorType::Lidar:
             initializeLidarSetting(*static_cast<LidarSetting*>(sensor_setting), settings_json);
+            break;
+		case SensorBase::SensorType::Echo:
+            initializeEchoSetting(*static_cast<EchoSetting*>(sensor_setting), settings_json);
             break;
         default:
             throw std::invalid_argument("Unexpected sensor type");
@@ -1244,7 +1311,7 @@ private:
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
             sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", true);
         }
-        else if (simmode_name == "Car") {
+        else if (simmode_name == "Car" || simmode_name == "CPHusky") {
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
         }
         else {

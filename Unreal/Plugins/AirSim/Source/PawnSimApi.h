@@ -69,7 +69,7 @@ public: //implementation of VehicleSimApiBase
     virtual void initialize() override;
 
     virtual void reset() override;
-    virtual void update() override;
+    virtual void update(float delta = 0) override;
 
     virtual const UnrealImageCapture* getImageCapture() const override;
     virtual std::vector<ImageCaptureBase::ImageResponse> getImages(const std::vector<ImageCaptureBase::ImageRequest>& request) const override;

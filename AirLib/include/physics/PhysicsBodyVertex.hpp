@@ -55,9 +55,9 @@ public:
         current_wrench_ = Wrench::zero();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
         setWrench(current_wrench_);
     }

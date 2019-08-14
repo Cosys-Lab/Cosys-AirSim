@@ -1,0 +1,31 @@
+{
+    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SettingsVersion": 1.2,
+    "SimMode": "CPHusky",
+	"Vehicles": {
+		"CPHusky": {
+			"VehicleType": "CPHusky",
+			"AutoCreate": true,
+			"Sensors": {
+				"SonarSensor1": {
+					"SensorType": 7,
+					"Enabled" : true,
+					"NumberOfTraces": 5000,
+					"AttenuationPerDistance": 8,
+					"AttenuationPerReflection": 3,
+					"AttenuationLimit": 50,
+					"MeasurementFrequency": 10,
+					"SensorDiameter": 0.5,
+					"X": 0.45, "Y": 0, "Z": -0.5,
+					"Roll": 0, "Pitch": 0, "Yaw" : 0,
+					"DrawReflectedPoints": true,
+					"DrawReflectedLines": true,
+					"DrawOtherPoints": true,
+					"DrawOtherLines": false,
+					"DrawSensor": true,
+					"DataFrame": "SensorLocalFrame"
+				}	
+			}
+		}
+	}
+}

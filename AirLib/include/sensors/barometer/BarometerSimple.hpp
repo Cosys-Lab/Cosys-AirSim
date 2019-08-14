@@ -50,17 +50,17 @@ public:
         delay_line_.push_back(getOutputInternal());
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        BarometerBase::update();
+        BarometerBase::update(delta);
 
-        freq_limiter_.update();
+        freq_limiter_.update(delta);
 
         if (freq_limiter_.isWaitComplete()) { 
             delay_line_.push_back(getOutputInternal());
         }
 
-        delay_line_.update();
+        delay_line_.update(delta);
 
         if (freq_limiter_.isWaitComplete())
             setOutput(delay_line_.getOutput());

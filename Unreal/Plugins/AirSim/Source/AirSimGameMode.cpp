@@ -63,12 +63,13 @@ AAirSimGameMode::AAirSimGameMode(const FObjectInitializer& ObjectInitializer)
 //    return nullptr;
 //}
 
-void AAirSimGameMode::StartPlay() 
+void AAirSimGameMode::StartPlay()
 {
-    Super::StartPlay();
+	Super::StartPlay();
 
-    //UGameUserSettings* game_settings = GetGameUserSettings();
-    //game_settings->SetFullscreenMode(EWindowMode::WindowedFullscreen);
-    //game_settings->ApplySettings(true);
+	//UGameUserSettings* game_settings = GetGameUserSettings();
+	//game_settings->SetFullscreenMode(EWindowMode::WindowedFullscreen);
+	//game_settings->ApplySettings(true);
 }
+
 

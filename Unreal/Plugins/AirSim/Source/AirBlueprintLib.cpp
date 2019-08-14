@@ -364,14 +364,30 @@ bool UAirBlueprintLib::HasObstacle(const AActor* actor, const FVector& start, co
 }
 
 bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
-    FHitResult& hit, const AActor* ignore_actor, ECollisionChannel collision_channel)
+	FHitResult& hit, const AActor* ignore_actor, ECollisionChannel collision_channel)
+{
+	hit = FHitResult(ForceInit);
+
+	FCollisionQueryParams trace_params;
+	if (ignore_actor != nullptr)
+		trace_params.AddIgnoredActor(ignore_actor);
+	
+	return actor->GetWorld()->LineTraceSingleByChannel(hit, start, end, collision_channel, trace_params);
+}
+
+bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
+    FHitResult& hit, std::vector<AActor*> ignore_actors, ECollisionChannel collision_channel, bool trace_complex)
 {
     hit = FHitResult(ForceInit);
 
     FCollisionQueryParams trace_params;
-    trace_params.AddIgnoredActor(actor);
-    if (ignore_actor != nullptr)
-        trace_params.AddIgnoredActor(ignore_actor);
+	trace_params.bTraceComplex = trace_complex;
+
+    for (AActor* &ignore_actor : ignore_actors) {
+        if (ignore_actor != nullptr){
+            trace_params.AddIgnoredActor(ignore_actor);
+        }
+    }
 
     return actor->GetWorld()->LineTraceSingleByChannel(hit, start, end, collision_channel, trace_params);
 }
@@ -406,10 +422,10 @@ void UAirBlueprintLib::FollowActor(AActor* follower, const AActor* followee, con
     if (fixed_z)
         next_location.Z = fixed_z_val;
 
-    if (GetObstacle(follower, next_location, actor_location, hit, followee)) {
+    if (GetObstacle(follower, next_location, actor_location, hit, followee, ECC_Visibility)) {
         next_location = hit.ImpactPoint + offset;
 
-        if (GetObstacle(follower, next_location, actor_location, hit, followee)) {
+        if (GetObstacle(follower, next_location, actor_location, hit, followee, ECC_Visibility)) {
             float next_z = next_location.Z;
             next_location = hit.ImpactPoint - offset;
             next_location.Z = next_z;

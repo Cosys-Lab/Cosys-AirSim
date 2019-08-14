@@ -19,7 +19,7 @@ public:
     virtual CarApiBase::CarState getCarState() const override;
 
     virtual void reset() override;
-    virtual void update() override;
+    virtual void update(float delta = 0) override;
 
     virtual msr::airlib::GeoPoint getHomeGeoPoint() const override;
 

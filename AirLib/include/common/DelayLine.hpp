@@ -43,9 +43,9 @@ public:
         last_value_ = T();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
         if (!times_.empty() && 
             ClockBase::elapsedBetween(clock()->nowNanos(), times_.front()) >= delay_) {

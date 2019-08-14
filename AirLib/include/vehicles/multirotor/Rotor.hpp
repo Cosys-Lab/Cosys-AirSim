@@ -78,19 +78,19 @@ public: //methods
         setOutput(output_, params_, control_signal_filter_, turning_direction_);
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
         //update environmental factors before we call base
         updateEnvironmentalFactors();
 
         //this will in turn call setWrench
-        PhysicsBodyVertex::update();
+        PhysicsBodyVertex::update(delta);
 
         //update our state
         setOutput(output_, params_, control_signal_filter_, turning_direction_);
 
         //update filter - this should be after so that first output is same as initial
-        control_signal_filter_.update();
+        control_signal_filter_.update(delta);
     }
 
     virtual void reportState(StateReporter& reporter) override

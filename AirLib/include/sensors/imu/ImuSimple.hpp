@@ -37,9 +37,9 @@ public:
         updateOutput();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        ImuBase::update();
+        ImuBase::update(delta);
 
         updateOutput();
     }

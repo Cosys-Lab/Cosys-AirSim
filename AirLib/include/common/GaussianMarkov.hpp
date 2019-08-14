@@ -41,7 +41,7 @@ public:
         rand_.reset();
     }
     
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
         /*
         Ref:
@@ -52,7 +52,7 @@ public:
             John H Wall, 2007, eq 2.5, pg 13, http://etd.auburn.edu/handle/10415/945
         */
 
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
         
         TTimeDelta dt = clock()->updateSince(last_time_);
 

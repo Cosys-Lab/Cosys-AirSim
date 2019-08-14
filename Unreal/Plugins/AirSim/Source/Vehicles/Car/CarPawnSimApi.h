@@ -30,7 +30,7 @@ public:
         const CarPawnApi::CarControls&  keyboard_controls, UWheeledVehicleMovementComponent* movement);
 
     virtual void reset() override;
-    virtual void update() override;
+    virtual void update(float delta = 0) override;
 
     virtual std::string getRecordFileLine(bool is_header_line) const override;
 

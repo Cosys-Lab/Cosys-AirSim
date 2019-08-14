@@ -83,9 +83,9 @@ public: //methods
     }
 
     //update sensors in PX4 stack
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        MultirotorApiBase::update();
+        MultirotorApiBase::update(delta);
 
         if (sensors_ == nullptr || connection_ == nullptr || !connection_->isOpen())
             return;

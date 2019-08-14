@@ -555,7 +555,7 @@ void ASimModeBase::setupVehiclesAndCamera()
         //TODO: better handle no FPV vehicles scenario
         getVehicleSimApi()->possess();
         CameraDirector->initializeForBeginPlay(getInitialViewMode(), getVehicleSimApi()->getPawn(),
-            getVehicleSimApi()->getCamera("fpv"), getVehicleSimApi()->getCamera("back_center"), nullptr);
+            getVehicleSimApi()->getCamera("fpv"), getVehicleSimApi()->getCamera("front_center"), getVehicleSimApi()->getCamera("back_center"));
     }
     else
         CameraDirector->initializeForBeginPlay(getInitialViewMode(), nullptr, nullptr, nullptr, nullptr);
@@ -668,7 +668,7 @@ void ASimModeBase::drawLidarDebugPoints()
                             uu_point,
                             5,              //size
                             FColor::Green,
-                            true,           //persistent (never goes away)
+                            false,           //persistent (never goes away)
                             0.1             //point leaves a trail on moving object
                         );
                     }

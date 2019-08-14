@@ -50,15 +50,15 @@ public:
         report_freq_.reset();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
         
         TTimeDelta dt = clock()->updateSince(last_time_);
 
         if (enabled_) {
             dt_stats_.insert(dt);
-            report_freq_.update();
+            report_freq_.update(delta);
             is_wait_complete = is_wait_complete || report_freq_.isWaitComplete();
         }
     }

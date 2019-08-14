@@ -17,9 +17,9 @@ public:
         UpdatableObject::reset();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
     }
 
     virtual void reportState(StateReporter& reporter) override

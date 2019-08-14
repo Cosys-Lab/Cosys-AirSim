@@ -34,7 +34,7 @@ public:
 
         reset_called = true;
     }
-    virtual void update()
+    virtual void update(float delta)
     {
         if (!reset_called)
             throw std::runtime_error("reset() must be called first before update()");

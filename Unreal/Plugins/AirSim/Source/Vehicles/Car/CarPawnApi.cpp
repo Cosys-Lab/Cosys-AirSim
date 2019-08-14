@@ -87,9 +87,9 @@ void CarPawnApi::reset()
     }, true);
 }
 
-void CarPawnApi::update()
+void CarPawnApi::update(float delta)
 {
-    msr::airlib::CarApiBase::update();
+    msr::airlib::CarApiBase::update(delta);
 }
 
 msr::airlib::GeoPoint CarPawnApi::getHomeGeoPoint() const

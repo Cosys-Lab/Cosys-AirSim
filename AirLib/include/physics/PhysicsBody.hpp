@@ -115,17 +115,17 @@ public: //methods
         }
     }
 
-    virtual void update() override
+    virtual void update(float delta) override
     {
-        UpdatableObject::update();
+        UpdatableObject::update(delta);
 
         //update individual vertices - each vertex takes control signal as input and
         //produces force and thrust as output
         for (uint vertex_index = 0; vertex_index < wrenchVertexCount(); ++vertex_index) {
-            getWrenchVertex(vertex_index).update();
+            getWrenchVertex(vertex_index).update(delta);
         }
         for (uint vertex_index = 0; vertex_index < dragVertexCount(); ++vertex_index) {
-            getDragVertex(vertex_index).update();
+            getDragVertex(vertex_index).update(delta);
         }
     }
 

@@ -35,10 +35,10 @@ public:
         resetSensors();
     }
 
-    virtual void update() override
+    virtual void update(float delta = 0) override
     {
         //update forces on vertices that we will use next
-        PhysicsBody::update();
+        PhysicsBody::update(delta);
 
         //Note that controller gets updated after kinematics gets updated in updateKinematics
         //otherwise sensors will have values from previous cycle causing lags which will appear
