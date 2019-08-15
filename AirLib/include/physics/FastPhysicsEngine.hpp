@@ -40,7 +40,7 @@ public:
         initPhysicsBody(body_ptr);
     }
 
-    virtual void update(float delta) override
+    virtual void update(float delta = 0) override
     {
         PhysicsEngineBase::update(delta);
 

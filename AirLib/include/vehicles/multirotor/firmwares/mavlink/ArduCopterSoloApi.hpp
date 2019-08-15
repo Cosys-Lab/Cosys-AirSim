@@ -16,10 +16,11 @@ public:
 		closeAllConnection();
 	}
 
-	virtual void update()
+	virtual void update(float delta = 0)
 	{
 		if (sensors_ == nullptr)
 			return;
+		unused(delta);
 
 		// send GPS and other sensor updates
 		const auto gps = getGps();

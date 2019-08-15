@@ -86,6 +86,7 @@ public:
 
     virtual void update(float delta = 0)
     {
+		unused(delta);
         updateState(current_, home_geo_point_);
     }
     //*** End: UpdatableState implementation ***//

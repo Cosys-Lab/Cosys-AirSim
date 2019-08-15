@@ -115,7 +115,7 @@ public: //methods
         }
     }
 
-    virtual void update(float delta) override
+    virtual void update(float delta = 0) override
     {
         UpdatableObject::update(delta);
 
