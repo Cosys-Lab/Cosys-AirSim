@@ -337,19 +337,19 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 		VehicleInputData.setAnalogRightThrust(-v_b / 100);
 	}
 	else if (theta_norm < 0) {
-		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), -v_a / 100, v_b / 100, (v_a + v_b) / 100);
+		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), -v_a / 100, -v_b / 100, (v_a + v_b) / 100);
 		VehicleInputData.setAnalogLeftThrust(-v_a / 100);
 		VehicleInputData.setAnalogRightThrust(v_b / 100);
 	}
 	else if (theta_norm < 90)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), v_a / 100, v_b / 100, (v_a + v_b) / 100);
+		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), -v_a / 100, -v_b / 100, (v_a + v_b) / 100);
 		VehicleInputData.setAnalogLeftThrust(v_a / 100);
 		VehicleInputData.setAnalogRightThrust(v_b / 100);
 	}
 	else 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), v_a / 100, -v_b / 100, (v_a + v_b) / 100);
+		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), -v_a / 100, -v_b / 100, (v_a + v_b) / 100);
 		VehicleInputData.setAnalogLeftThrust(v_a / 100);
 		VehicleInputData.setAnalogRightThrust(-v_b / 100);
 	}

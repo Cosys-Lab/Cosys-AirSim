@@ -83,9 +83,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Skid Setup")
 		SkidVehicleDriveControlMethod SkidControlMethod;
 
-	UPROPERTY(EditAnywhere, Category = "Skid Setup")
-		bool bUseDualBreak;
-
 	/** Maximum steering versus forward speed (km/h) */
 	UPROPERTY(EditAnywhere, Category = SteeringSetup)
 		FRuntimeFloatCurve SteeringCurve;
