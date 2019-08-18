@@ -19,11 +19,6 @@ USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitia
 	RightBrakeRate.RiseRate = 6.f;
 	RightBrakeRate.FallRate = 10.f;
 
-	SkidControlMethod = SkidVehicleDriveControlMethod::SingleStick;
-
-	SkidControlModel = SkidVehicleDriveControlModel::STANDARD;
-
-
 	PxVehicleEngineData DefEngineData;
 	EngineSetup.MOI = DefEngineData.mMOI;
 	EngineSetup.MaxRPM = OmegaToRPM(DefEngineData.mMaxOmega);
@@ -242,118 +237,42 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 	if (PVehicleDrive == NULL)
 		return;
 
-	PxVehicleDriveTankRawInputData VehicleInputData((PxVehicleDriveTankControlModel::Enum)SkidControlModel);
+	PxVehicleDriveTankRawInputData VehicleInputData(PxVehicleDriveTankControlModel::eSPECIAL);
 
-	//switch (SkidControlModel)
-	//{
-	//case SkidVehicleDriveControlModel::STANDARD:
-
-	//	switch (SkidControlMethod)
-	//	{
-	//	case SkidVehicleDriveControlMethod::SingleStick: {
-
-	//		float scaledSteering = SteeringInput * 100;
-	//		float scaledThrottle = ThrottleInput * 100;
-	//		float invSteering = -scaledSteering;
-	//		float v = (100 - FMath::Abs(invSteering)) * (scaledThrottle / 100) + scaledThrottle;
-	//		float w = (100 - FMath::Abs(scaledThrottle))* (invSteering / 100) + invSteering;
-	//		float r = (v + w) / 2.f;
-	//		float l = (v - w) / 2.f;
-	//		UE_LOG(LogTemp, Warning, TEXT("SteeringInput:  %+0.3f, ThrottleInput:  %+.3f, v: %+.3f, w: %+.3f, r: %+.3f, l: %+.3f"), SteeringInput, ThrottleInput, v, w, r, l);
-	//		VehicleInputData.setAnalogLeftThrust(l / 100.f);
-	//		VehicleInputData.setAnalogRightThrust(r / 100.f);
-	//		VehicleInputData.setAnalogLeftBrake(BrakeInput);
-	//		VehicleInputData.setAnalogRightBrake(BrakeInput);
-	//		if (ThrottleInput != 0)
-	//		{
-	//			VehicleInputData.setAnalogAccel(ThrottleInput);
-	//		}
-	//		else
-	//		{
-	//			if (scaledSteering != 0) {
-	//				VehicleInputData.setAnalogAccel(abs(scaledSteering));
-	//			}
-	//			else {
-	//				VehicleInputData.setAnalogAccel(0);
-	//			}
-	//		}
-	//	}
-	//	break;
-	//	case SkidVehicleDriveControlMethod::DualStick:
-
-	//		float range = sqrt(LeftThrust*LeftThrust + RightThrust * RightThrust) * 100;
-	//		float theta = tanhf(RightThrust / LeftThrust);
-	//		float theta_norm = fmod(theta + 180, 360) - 180;
-	//		float v_a = range * (45 - fmod(theta_norm, 90)) / 45;
-	//		float v_b = FMath::Min(FMath::Min(100.0f, 2 * range + v_a), 2 * range - v_a);
-	//		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, range: %+.3f, theta_norm: %+.3f, v_a: %+.3f, v_b: %+.3f"), LeftThrust, RightThrust, range, theta_norm, v_a, v_b);
-	//		if (theta_norm < -90)
-	//		{
-	//			VehicleInputData.setAnalogLeftThrust(-v_a / 100);
-	//			VehicleInputData.setAnalogRightThrust(-v_b / 100);
-	//		}
-	//		else if (theta_norm < 0) {
-	//			VehicleInputData.setAnalogLeftThrust(-v_a / 100);
-	//			VehicleInputData.setAnalogRightThrust(v_b / 100);
-	//		}
-	//		else if (theta_norm < 90)
-	//		{
-	//			VehicleInputData.setAnalogLeftThrust(v_a / 100);
-	//			VehicleInputData.setAnalogRightThrust(v_b / 100);
-	//		}
-	//		else {
-	//			VehicleInputData.setAnalogLeftThrust(v_a / 100);
-	//			VehicleInputData.setAnalogRightThrust(-v_b / 100);
-	//		}
-	//		VehicleInputData.setAnalogAccel((v_a + v_b) / 100);
-	//		break;
-	//	default:
-	//		break;
-	//	}
-
-	//	break;
-	//case SkidVehicleDriveControlModel::SPECIAL:
-
-	//		VehicleInputData.setAnalogLeftThrust(LeftThrust);
-	//		VehicleInputData.setAnalogRightThrust(RightThrust);
-	//		VehicleInputData.setAnalogLeftBrake(BrakeInput);
-	//		VehicleInputData.setAnalogRightBrake(BrakeInput);
-	//		VehicleInputData.setAnalogAccel(ThrottleInput);
-
-	//	break;
-	//default:
-	//	break;
-	//}
-
-	float range = sqrt(LeftThrust*LeftThrust + RightThrust * RightThrust) * 100;
-	float theta = atan2(RightThrust, LeftThrust) / PI * 180;
-	float theta_norm = fmod(theta + 180, 360) - 180;
-	float v_a = range * (45 - fmod(theta_norm, 90)) / 45;
-	float v_b = FMath::Min(FMath::Min(100.0f, 2 * range + v_a), 2 * range - v_a);
-	if (theta_norm < -90)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), -v_a / 100, -v_b / 100, (v_a + v_b) / 100);
-		VehicleInputData.setAnalogLeftThrust(-v_a / 100);
-		VehicleInputData.setAnalogRightThrust(-v_b / 100);
+	float range = FMath::Min((float)sqrt(LeftThrust*LeftThrust + RightThrust * RightThrust) * 100, 100.0f);
+	float theta = atan2(LeftThrust, RightThrust) / PI * 180;
+	float modResult = fmod(theta, 90);
+	if (modResult < 0) {
+		modResult += 90;
 	}
-	else if (theta_norm < 0) {
-		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), -v_a / 100, v_b / 100, (v_a + v_b) / 100);
-		VehicleInputData.setAnalogLeftThrust(-v_a / 100);
-		VehicleInputData.setAnalogRightThrust(v_b / 100);
-	}
-	else if (theta_norm < 90)
+	float aThrust = range * (45 - modResult) / 45;
+
+	float bThrust = FMath::Min(FMath::Min(100.0f, 2 * range + aThrust), 2 * range - aThrust);
+
+	float LeftThrust_final, RightThrust_final;
+	if (theta < -90)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), v_a / 100, v_b / 100, (v_a + v_b) / 100);
-		VehicleInputData.setAnalogLeftThrust(v_a / 100);
-		VehicleInputData.setAnalogRightThrust(v_b / 100);
+		LeftThrust_final = -bThrust / 100;
+		RightThrust_final = -aThrust / 100;
+	}
+	else if (theta < 0) {
+		LeftThrust_final = aThrust / 100;
+		RightThrust_final = -bThrust / 100;
+	}
+	else if (theta < 90)
+	{
+		LeftThrust_final = bThrust / 100;
+		RightThrust_final = aThrust / 100;
 	}
 	else 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), v_a / 100, -v_b / 100, (v_a + v_b) / 100);
-		VehicleInputData.setAnalogLeftThrust(v_a / 100);
-		VehicleInputData.setAnalogRightThrust(-v_b / 100);
+		LeftThrust_final = aThrust / 100;
+		RightThrust_final = -bThrust / 100;
 	}
-	VehicleInputData.setAnalogAccel((v_a + v_b) / 100);
+	VehicleInputData.setAnalogLeftThrust(LeftThrust_final);
+    VehicleInputData.setAnalogRightThrust(RightThrust_final);
+	VehicleInputData.setAnalogAccel(range/100);
+	UE_LOG(LogTemp, Warning, TEXT("range: %+0.3f, Theta: %+0.3f, LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), range, theta, LeftThrust_final, RightThrust_final, range/100);
 
 	if (!PVehicleDrive->mDriveDynData.getUseAutoGears())
 	{
@@ -411,50 +330,70 @@ void USkidVehicleMovementComponent::PostEditChangeProperty(struct FPropertyChang
 
 void USkidVehicleMovementComponent::SetAcceleration(float OtherAcceleration)
 {
+#if WITH_PHYSX_VEHICLES
 	this->Acceleration = OtherAcceleration;
+#endif
 }
 
 void USkidVehicleMovementComponent::SetLeftBreak(float OtherLeftBreak)
 {
+#if WITH_PHYSX_VEHICLES
 	this->LeftBreak = OtherLeftBreak;
+#endif
 }
 
 void USkidVehicleMovementComponent::SetRightBreak(float OtherRightBreak)
 {
+#if WITH_PHYSX_VEHICLES
 	this->RightBreak = OtherRightBreak;
+#endif
 }
 
 void USkidVehicleMovementComponent::SetLeftThrust(float OtherLeftThrust)
 {
+#if WITH_PHYSX_VEHICLES
 	this->LeftThrust = OtherLeftThrust;
+#endif
 }
 
 void USkidVehicleMovementComponent::SetRightThrust(float OtherRightThrust)
 {
+#if WITH_PHYSX_VEHICLES
 	this->RightThrust = OtherRightThrust;
+#endif
 }
 
 float USkidVehicleMovementComponent::GetAcceleration() const
 {
+#if WITH_PHYSX_VEHICLES
 	return Acceleration;
+#endif
 }
 
 float USkidVehicleMovementComponent::GetLeftBreak() const
 {
+#if WITH_PHYSX_VEHICLES
 	return LeftBreak;
+#endif
 }
 
 float USkidVehicleMovementComponent::GetRightBreak() const
 {
+#if WITH_PHYSX_VEHICLES
 	return RightBreak;
+#endif
 }
 
 float USkidVehicleMovementComponent::GetLeftThrust() const
 {
+#if WITH_PHYSX_VEHICLES
 	return LeftThrust;
+#endif
 }
 
 float USkidVehicleMovementComponent::GetRightThrust() const
 {
+#if WITH_PHYSX_VEHICLES
 	return RightThrust;
+#endif
 }

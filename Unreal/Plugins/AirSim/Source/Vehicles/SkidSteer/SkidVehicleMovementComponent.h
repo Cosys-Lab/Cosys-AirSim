@@ -9,20 +9,6 @@
 #include "UObject/ObjectMacros.h"
 #include "SkidVehicleMovementComponent.generated.h"
 
-UENUM(BlueprintType)
-enum class SkidVehicleDriveControlModel : uint8
-{
-	STANDARD = 0, //Left/Right thrust range [0,1]
-	SPECIAL //Left/Right thrust range [-1,1]
-};
-
-UENUM(BlueprintType)
-enum class SkidVehicleDriveControlMethod : uint8
-{
-	SingleStick,
-	DualStick,
-};
-
 UCLASS(ClassGroup = (Physics), meta = (BlueprintSpawnableComponent), hidecategories = (PlanarMovement, "Components|Movement|Planar", Activation, "Components|Activation"))
 class AIRSIM_API USkidVehicleMovementComponent : public UWheeledVehicleMovementComponent
 {
@@ -73,15 +59,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Skid Setup")
 		uint32 NumOfWheels;
-
-
-
-
-	UPROPERTY(EditAnywhere, Category = "Skid Setup")
-		SkidVehicleDriveControlModel SkidControlModel;
-
-	UPROPERTY(EditAnywhere, Category = "Skid Setup")
-		SkidVehicleDriveControlMethod SkidControlMethod;
 
 	/** Maximum steering versus forward speed (km/h) */
 	UPROPERTY(EditAnywhere, Category = SteeringSetup)
