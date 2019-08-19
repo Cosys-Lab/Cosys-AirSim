@@ -211,6 +211,10 @@ public: //types
         float horizontal_FOV_start = 0;                   // degrees
         float horizontal_FOV_end = 359;                   // degrees
 
+		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+		bool engine_time = true;						// If false, real-time simulation will be used for timestamps and measurement frequency
+														// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+
         // defaults specific to a mode
         float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
         float vertical_FOV_lower = Utils::nan<float>();   // drones -45, car -10
@@ -1176,6 +1180,9 @@ private:
         lidar_setting.horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
         lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
         lidar_setting.data_frame = settings_json.getString("DataFrame", lidar_setting.data_frame);
+
+		lidar_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", lidar_setting.pause_after_measurement);
+		lidar_setting.engine_time = settings_json.getBool("EngineTime", lidar_setting.engine_time);
 
         lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);
         lidar_setting.vertical_FOV_lower = settings_json.getFloat("VerticalFOVLower", lidar_setting.vertical_FOV_lower);

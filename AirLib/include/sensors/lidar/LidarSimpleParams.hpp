@@ -23,10 +23,13 @@ struct LidarSimpleParams {
     uint horizontal_rotation_frequency = 10;  // rotations/sec
     real_T horizontal_FOV_start = 0;
     real_T horizontal_FOV_end = 359;
-    real_T vertical_FOV_upper = -15;             // drones -15, car +10
-    real_T vertical_FOV_lower = -45;             // drones -45, car -10
-
-    Pose relative_pose {
+    real_T vertical_FOV_upper = -15;          // drones -15, car +10
+    real_T vertical_FOV_lower = -45;          // drones -45, car -10
+	bool pause_after_measurement = false;	  // Pause the simulation after each measurement. Useful for API interaction to be synced
+	bool engine_time = false;				  // If false, real-time simulation will be used for timestamps and measurement frequency
+											  // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+    
+	Pose relative_pose {
         Vector3r(0,0,-1),                     // position - a little above vehicle (especially for cars) or Vector3r::Zero()
         Quaternionr::Identity()               // orientation - by default Quaternionr(1, 0, 0, 0) 
         };                       
@@ -48,6 +51,9 @@ struct LidarSimpleParams {
 
         horizontal_FOV_start = settings.horizontal_FOV_start;
         horizontal_FOV_end = settings.horizontal_FOV_end;
+
+		pause_after_measurement = settings.pause_after_measurement;
+		engine_time = settings.engine_time;
 
         // By default, for multirotors the lidars FOV point downwards;
         // for cars, the lidars FOV is more forward facing.

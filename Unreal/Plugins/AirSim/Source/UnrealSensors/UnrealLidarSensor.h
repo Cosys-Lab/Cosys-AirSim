@@ -23,6 +23,8 @@ protected:
     virtual void getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
         msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud) override;
 
+	virtual void pause();
+
 private:
     using Vector3r = msr::airlib::Vector3r;
     using VectorMath = msr::airlib::VectorMath;
