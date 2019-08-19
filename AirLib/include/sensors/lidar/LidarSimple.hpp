@@ -22,7 +22,7 @@ public:
         params_.initializeFromSettings(setting);
 
         //initialize frequency limiter
-        freq_limiter_.initialize(params_.update_frequency, params_.startup_delay);
+        freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, params_.engine_time);
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -32,7 +32,7 @@ public:
 
         freq_limiter_.reset();
         last_time_ = clock()->nowNanos();
-
+		previous_time_ = clock()->nowNanos();
         updateOutput();
     }
 
@@ -43,7 +43,12 @@ public:
         freq_limiter_.update(delta);
 
         if (freq_limiter_.isWaitComplete()) {
+			last_time_ = freq_limiter_.getLastTime();
+			previous_time_ = freq_limiter_.getPreviousTime();
             updateOutput();
+			if (params_.pause_after_measurement) {
+				pause();
+			}
         }
     }
 
@@ -70,11 +75,13 @@ protected:
     virtual void getPointCloud(const Pose& lidar_pose, const Pose& vehicle_pose, 
         TTimeDelta delta_time, vector<real_T>& point_cloud) = 0;
 
+	virtual void pause() = 0;
+
     
 private: //methods
     void updateOutput()
     {
-        TTimeDelta delta_time = clock()->updateSince(last_time_);
+        TTimeDelta delta_time = clock()->elapsedBetween(last_time_, previous_time_);
 
         point_cloud_.clear();
 
@@ -96,10 +103,8 @@ private: //methods
 
         LidarData output;
         output.point_cloud = point_cloud_;
-        output.time_stamp = clock()->nowNanos();
-        output.pose = lidar_pose;            
-
-        last_time_ = output.time_stamp;
+        output.time_stamp = last_time_;
+        output.pose = lidar_pose;  
 
         setOutput(output);
     }
@@ -109,7 +114,7 @@ private:
     vector<real_T> point_cloud_;
 
     FrequencyLimiter freq_limiter_;
-    TTimePoint last_time_;
+    TTimePoint last_time_, previous_time_;
 };
 
 }} //namespace

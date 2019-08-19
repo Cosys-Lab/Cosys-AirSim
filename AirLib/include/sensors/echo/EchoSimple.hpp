@@ -22,7 +22,7 @@ public:
         params_.initializeFromSettings(setting);
 
         //initialize frequency limiter
-		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, true);
+		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, params_.engine_time);
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -31,11 +31,9 @@ public:
         EchoBase::reset();
 
 		freq_limiter_.reset();
-
 		last_time_ = clock()->nowNanos();
 
-		updateOutput();
-        
+		updateOutput();        
     }
 
 	virtual void update(float delta = 0) override
@@ -85,6 +83,8 @@ protected:
 private:
 	void updateOutput()
 	{
+		point_cloud_.clear();
+
 		const GroundTruth& ground_truth = getGroundTruth();
 
 		// calculate the pose before obtaining the point-cloud. Before/after is a bit arbitrary
@@ -97,10 +97,6 @@ private:
 		//    Do we need to convert pose to Global NED frame before returning to clients?
 
 		Pose echo_pose = params_.relative_pose + ground_truth.kinematics->pose;
-
-		point_cloud_.clear();
-
-
 		double start = FPlatformTime::Seconds();
 		getPointCloud(params_.relative_pose, // relative echo pose
 			ground_truth.kinematics->pose,   // relative vehicle pose			
