@@ -75,7 +75,7 @@ public:
 			//when any interval is done, reset the state and repeat
 			if (interval_complete_) {
 				last_elapsed_interval_sec_ = elapsed_interval_sec_;
-				last_time_ += (elapsed_interval_sec_ * 1e9f);
+				last_time_ = clock()->addTo(last_time_, elapsed_interval_sec_);
 				elapsed_interval_sec_ = 0;
 				startup_complete_ = true;
 			}
