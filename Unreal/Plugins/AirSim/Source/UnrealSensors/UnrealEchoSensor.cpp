@@ -101,8 +101,14 @@ void UnrealEchoSensor::updatePose(const msr::airlib::Pose& echo_pose, const msr:
 }
 
 // Pause Unreal simulation
-void UnrealEchoSensor::pause() {
-	UAirBlueprintLib::setUnrealClockSpeed(actor_, 0);
+void UnrealEchoSensor::pause(const bool is_paused) {
+	if (is_paused) {
+		saved_clockspeed_ = UAirBlueprintLib::getUnrealClockSpeed(actor_);
+		UAirBlueprintLib::setUnrealClockSpeed(actor_, 0);
+	}
+	else {
+		UAirBlueprintLib::setUnrealClockSpeed(actor_, saved_clockspeed_);
+	}	
 }
 
 // simulate signal propagation via Unreal ray-tracing.

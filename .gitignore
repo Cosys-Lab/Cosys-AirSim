@@ -54,6 +54,8 @@ obj/
 *.suo
 *_BuiltData.uasset
 
+Unreal/Environments/Blocks/Content/*
+
 # Visual Studio 2015 cache/options directory
 .vs/
 .vscode/
@@ -369,3 +371,4 @@ ros/devel/
 ros/logs/
 ros/.catkin_workspace
 ros/src/CMakeLists.txt
+/.idea/
