@@ -39,16 +39,19 @@ public:
 	virtual void update(float delta = 0) override
 	{
 		EchoBase::update(delta);
-
+		UAirBlueprintLib::LogMessageString("time: ", "delta" + std::to_string(delta), LogDebugLevel::Informational);
 		freq_limiter_.update(delta);
 
+		if (last_tick_measurement_ && params_.pause_after_measurement == false && params_.engine_time) {
+			pause(false);
+			last_tick_measurement_ = false;
+		}
 		if (freq_limiter_.isWaitComplete())
 		{
 			last_time_ = freq_limiter_.getLastTime();
+			if(params_.engine_time || params_.pause_after_measurement)pause(true);
 			updateOutput();
-			if (params_.pause_after_measurement) {
-				pause();
-			}
+			if (params_.engine_time)last_tick_measurement_ = true;
 		}		
 
     }
@@ -78,7 +81,7 @@ protected:
 
 	virtual void updatePose(const Pose& echo_pose, const Pose& vehicle_pose) = 0;
 
-	virtual void pause() = 0;
+	virtual void pause(const bool is_paused) = 0;
 
 private:
 	void updateOutput()
@@ -108,6 +111,7 @@ private:
 		output.point_cloud = point_cloud_;
 		output.time_stamp = last_time_;
 		output.pose = echo_pose;
+		UAirBlueprintLib::LogMessageString("stamp: ", "timestamp: " + std::to_string(last_time_), LogDebugLevel::Informational);
 
 		setOutput(output);
 	}
@@ -118,6 +122,7 @@ private:
     FrequencyLimiter freq_limiter_;
     TTimePoint last_time_;
 	TTimePoint last_measurement;
+	bool last_tick_measurement_ = false;
 };
 
 }} //namespace
