@@ -39,7 +39,6 @@ public:
 	virtual void update(float delta = 0) override
 	{
 		EchoBase::update(delta);
-		UAirBlueprintLib::LogMessageString("time: ", "delta" + std::to_string(delta), LogDebugLevel::Informational);
 		freq_limiter_.update(delta);
 
 		if (last_tick_measurement_ && params_.pause_after_measurement == false && params_.engine_time) {
