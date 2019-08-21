@@ -104,18 +104,13 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
     return;
 }
 
-// Pause Unreal simulation
-void UnrealLidarSensor::pause() {
-	UAirBlueprintLib::setUnrealClockSpeed(actor_, 0);
-}
-
 // simulate shooting a laser via Unreal ray-tracing.
 bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
     const uint32 laser, const float horizontal_angle, const float vertical_angle, 
     const msr::airlib::LidarSimpleParams params, Vector3r &point)
 {
     // start position
-    Vector3r start = VectorMath::add(lidar_pose, vehicle_pose).position;
+    Vector3r start = lidar_pose.position + vehicle_pose.position;
 
     // We need to compose rotations here rather than rotate a vector by a quaternion
     // Hence using coordOrientationAdd(..) rather than rotateQuaternion(..)
@@ -136,7 +131,7 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
     Vector3r end = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * params.range + start;
    
     FHitResult hit_result = FHitResult(ForceInit);
-	bool is_hit = UAirBlueprintLib::GetObstacle(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, {}, ECC_Visibility, true);
+    bool is_hit = UAirBlueprintLib::GetObstacle(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actor_, ECC_Visibility);
 
     if (is_hit)
     {
