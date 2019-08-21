@@ -22,7 +22,7 @@ public:
         params_.initializeFromSettings(setting);
 
         //initialize frequency limiter
-		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, true);
+		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, params_.engine_time);
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -31,26 +31,26 @@ public:
         EchoBase::reset();
 
 		freq_limiter_.reset();
-
 		last_time_ = clock()->nowNanos();
 
-		updateOutput();
-        
+		updateOutput();        
     }
 
 	virtual void update(float delta = 0) override
 	{
 		EchoBase::update(delta);
-
 		freq_limiter_.update(delta);
 
+		if (last_tick_measurement_ && params_.pause_after_measurement == false && params_.engine_time) {
+			pause(false);
+			last_tick_measurement_ = false;
+		}
 		if (freq_limiter_.isWaitComplete())
 		{
 			last_time_ = freq_limiter_.getLastTime();
+			if(params_.engine_time || params_.pause_after_measurement)pause(true);
 			updateOutput();
-			if (params_.pause_after_measurement) {
-				pause();
-			}
+			if (params_.engine_time)last_tick_measurement_ = true;
 		}		
 
     }
@@ -80,11 +80,13 @@ protected:
 
 	virtual void updatePose(const Pose& echo_pose, const Pose& vehicle_pose) = 0;
 
-	virtual void pause() = 0;
+	virtual void pause(const bool is_paused) = 0;
 
 private:
 	void updateOutput()
 	{
+		point_cloud_.clear();
+
 		const GroundTruth& ground_truth = getGroundTruth();
 
 		// calculate the pose before obtaining the point-cloud. Before/after is a bit arbitrary
@@ -97,10 +99,6 @@ private:
 		//    Do we need to convert pose to Global NED frame before returning to clients?
 
 		Pose echo_pose = params_.relative_pose + ground_truth.kinematics->pose;
-
-		point_cloud_.clear();
-
-
 		double start = FPlatformTime::Seconds();
 		getPointCloud(params_.relative_pose, // relative echo pose
 			ground_truth.kinematics->pose,   // relative vehicle pose			
@@ -112,6 +110,7 @@ private:
 		output.point_cloud = point_cloud_;
 		output.time_stamp = last_time_;
 		output.pose = echo_pose;
+		UAirBlueprintLib::LogMessageString("stamp: ", "timestamp: " + std::to_string(last_time_), LogDebugLevel::Informational);
 
 		setOutput(output);
 	}
@@ -122,6 +121,7 @@ private:
     FrequencyLimiter freq_limiter_;
     TTimePoint last_time_;
 	TTimePoint last_measurement;
+	bool last_tick_measurement_ = false;
 };
 
 }} //namespace
