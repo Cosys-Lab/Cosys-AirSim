@@ -33,6 +33,7 @@ private:
 	using VectorMath = msr::airlib::VectorMath;
 
 	void generateSampleDirections();
+	void generateSpreadDirections();
 	bool traceDirection(const msr::airlib::Pose& echo_pose, const msr::airlib::Pose& vehicle_pose,
 		Vector3r direction, const msr::airlib::EchoSimpleParams params, Vector3r &point, float &signal_attenuation_final);
     void bounceTrace(FVector &trace_start_position, FVector &trace_end_position, const FHitResult &trace_hit_result,

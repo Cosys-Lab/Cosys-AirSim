@@ -376,20 +376,16 @@ bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, co
 }
 
 bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
-    FHitResult& hit, std::vector<AActor*> ignore_actors, ECollisionChannel collision_channel, bool trace_complex)
+	FHitResult& hit, TArray<AActor*>& ignore_actors, ECollisionChannel collision_channel, bool trace_complex)
 {
-    hit = FHitResult(ForceInit);
+	hit = FHitResult(ForceInit);
 
-    FCollisionQueryParams trace_params;
+	FCollisionQueryParams trace_params;
 	trace_params.bTraceComplex = trace_complex;
 
-    for (AActor* &ignore_actor : ignore_actors) {
-        if (ignore_actor != nullptr){
-            trace_params.AddIgnoredActor(ignore_actor);
-        }
-    }
+	trace_params.AddIgnoredActors(ignore_actors);
 
-    return actor->GetWorld()->LineTraceSingleByChannel(hit, start, end, collision_channel, trace_params);
+	return actor->GetWorld()->LineTraceSingleByChannel(hit, start, end, collision_channel, trace_params);
 }
 
 bool UAirBlueprintLib::GetLastObstaclePosition(const AActor* actor, const FVector& start, const FVector& end,
