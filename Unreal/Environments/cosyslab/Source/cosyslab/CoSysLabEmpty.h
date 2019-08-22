@@ -7,9 +7,9 @@
 /**
  * 
  */
-class COSYSLAB_API MyClass
+class COSYSLAB_API CoSysLabEmpty
 {
 public:
-	MyClass();
-	~MyClass();
+	CoSysLabEmpty();
+	~CoSysLabEmpty();
 };

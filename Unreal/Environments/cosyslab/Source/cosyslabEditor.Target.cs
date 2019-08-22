@@ -3,12 +3,12 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class cosyslabEditorTarget : TargetRules
+public class CoSysLabEditorTarget : TargetRules
 {
-	public cosyslabEditorTarget(TargetInfo Target) : base(Target)
+	public CoSysLabEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 
-		ExtraModuleNames.AddRange( new string[] { "cosyslab" } );
+		ExtraModuleNames.AddRange( new string[] { "CoSysLab" } );
 	}
 }

@@ -16,11 +16,11 @@ fi
 if [ "$(uname)" == "Darwin" ]; then
     # Call UnrealEngine shell scrpit
     pushd "$UnrealDir/Engine/Build/BatchFiles/Mac/" >/dev/null
-    ./GenerateProjectFiles.sh "$SCRIPT_DIR/cosyslab.uproject"
+    ./GenerateProjectFiles.sh "$SCRIPT_DIR/CoSysLab.uproject"
     popd >/dev/null
 else
     pushd "$UnrealDir/Engine/Build/BatchFiles/Linux/" >/dev/null
-    ./GenerateProjectFiles.sh "$SCRIPT_DIR/cosyslab.uproject"
+    ./GenerateProjectFiles.sh "$SCRIPT_DIR/CoSysLab.uproject"
     popd >/dev/null
 fi
 

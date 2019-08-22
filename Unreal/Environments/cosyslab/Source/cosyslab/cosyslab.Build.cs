@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class cosyslab : ModuleRules
+public class CoSysLab : ModuleRules
 {
-	public cosyslab(ReadOnlyTargetRules Target) : base(Target)
+	public CoSysLab(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	

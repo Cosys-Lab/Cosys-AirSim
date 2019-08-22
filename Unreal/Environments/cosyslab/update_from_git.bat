@@ -5,7 +5,7 @@ set ROOT_DIR=%~dp0
 
 set AirSimPath=%1
 
-REM default path works for cosyslab environment
+REM default path works for CoSysLab environment
 if "%AirSimPath%"=="" set "AirSimPath=..\..\.."
 
 IF NOT EXIST "%AirSimPath%" (
@@ -17,8 +17,8 @@ echo Using AirSimPath = %AirSimPath%
 
 robocopy /MIR "%AirSimPath%\Unreal\Plugins\AirSim" Plugins\AirSim /XD temp *. /njh /njs /ndl /np
 robocopy /MIR "%AirSimPath%\AirLib" Plugins\AirSim\Source\AirLib /XD temp *. /njh /njs /ndl /np
-robocopy  /njh /njs /ndl /np "%AirSimPath%\Unreal\Environments\cosyslab" "." *.bat 
-robocopy  /njh /njs /ndl /np "%AirSimPath%\Unreal\Environments\cosyslab" "." *.sh  
+robocopy  /njh /njs /ndl /np "%AirSimPath%\Unreal\Environments\CoSysLab" "." *.bat 
+robocopy  /njh /njs /ndl /np "%AirSimPath%\Unreal\Environments\CoSysLab" "." *.sh  
 rem robocopy /njh /njs /ndl /np "%AirSimPath%" "." *.gitignore
 
 cmd /c clean.bat

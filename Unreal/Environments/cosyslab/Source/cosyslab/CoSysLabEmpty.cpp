@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MyClass.h"
+#include "CoSysLabEmpty.h"
 
-MyClass::MyClass()
+CoSysLabEmpty::CoSysLabEmpty()
 {
 }
 
-MyClass::~MyClass()
+CoSysLabEmpty::~CoSysLabEmpty()
 {
 }
