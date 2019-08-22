@@ -13,6 +13,7 @@ Plugins/
 /*.pri
 /CMakeLists.txt
 /Makefile
+/Content/*
 
 # avoid checking uproject because this is usually just version change
 *.uproject
