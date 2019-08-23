@@ -26,7 +26,7 @@ protected:
 
 	virtual void updatePose(const msr::airlib::Pose& echo_pose, const msr::airlib::Pose& vehicle_pose);
 
-	virtual void pause();
+	virtual void pause(const bool is_paused);
 
 private:
 	using Vector3r = msr::airlib::Vector3r;
@@ -46,6 +46,7 @@ private:
 private:
 	AActor* actor_;
 	const NedTransform* ned_transform_;
+	float saved_clockspeed_ = 1;
 	msr::airlib::vector<msr::airlib::Vector3r> sample_directions_;
 	AActor* physical_sensor_actor_object_;
 

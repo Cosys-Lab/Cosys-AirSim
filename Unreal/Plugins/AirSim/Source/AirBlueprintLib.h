@@ -182,6 +182,7 @@ public:
     static UClass* LoadClass(const std::string& name);
 
     static void setUnrealClockSpeed(const AActor* context, float clock_speed);
+	static float getUnrealClockSpeed(const AActor* context);
     static IImageWrapperModule* getImageWrapperModule();
     static void CompressImageArray(int32 width, int32 height, const TArray<FColor> &src, TArray<uint8> &dest);
 

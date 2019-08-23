@@ -198,6 +198,19 @@ void UAirBlueprintLib::setUnrealClockSpeed(const AActor* context, float clock_sp
     }, true);
 }
 
+float UAirBlueprintLib::getUnrealClockSpeed(const AActor* context)
+{
+	UAirBlueprintLib::RunCommandOnGameThread([context]() {
+		auto* world_settings = context->GetWorldSettings();
+		if (world_settings)
+			return world_settings->TimeDilation;
+		else
+			LogMessageString("Failed:", "WorldSettings was nullptr", LogDebugLevel::Failure);
+			return 1.0f;
+	}, true);
+	return 1.0f;
+}
+
 float UAirBlueprintLib::GetWorldToMetersScale(const AActor* context)
 {
     float w2m = 100.f;
