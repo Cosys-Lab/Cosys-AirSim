@@ -210,6 +210,11 @@ public: //types
         uint horizontal_rotation_frequency = 10;          // rotations/sec
         float horizontal_FOV_start = 0;                   // degrees
         float horizontal_FOV_end = 359;                   // degrees
+		float update_frequency = 10;				      // how frequently to update the data in Hz
+		bool limit_points = true;						  // limit the amount of points per measurement to 100000
+		bool pause_after_measurement = false;			  // Pause the simulation after each measurement. Useful for API interaction to be synced
+		bool engine_time = false;						  // If false, real-time simulation will be used for timestamps and measurement frequency
+												          // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 
         // defaults specific to a mode
         float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
@@ -218,6 +223,7 @@ public: //types
         Rotation rotation = Rotation::nanRotation();
 
         bool draw_debug_points = false;
+
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
     };
 
@@ -231,7 +237,10 @@ public: //types
 		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
 		float sensor_diameter = 0.5;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
 		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+		bool engine_time = true;						// If false, real-time simulation will be used for timestamps and measurement frequency
+												        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 
+		// defaults specific to a mode
 		Vector3r position = VectorMath::nanVector();
 		Rotation rotation = Rotation::nanRotation();
 
@@ -241,8 +250,6 @@ public: //types
 		bool draw_bounce_lines = false;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
 
-		bool engine_time = true;						// If false, real-time simulation will be used for timestamps and measurement frequency
-														// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 		std::string data_frame = AirSimSettings::kSensorLocalFrame;
 	};
 
@@ -1174,7 +1181,12 @@ private:
         lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
         lidar_setting.points_per_second = settings_json.getInt("PointsPerSecond", lidar_setting.points_per_second);
         lidar_setting.horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
+		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
+		lidar_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", lidar_setting.pause_after_measurement);
+		lidar_setting.engine_time = settings_json.getBool("EngineTime", lidar_setting.engine_time);
+		lidar_setting.limit_points = settings_json.getBool("LimitPoints", lidar_setting.limit_points);
         lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
+
         lidar_setting.data_frame = settings_json.getString("DataFrame", lidar_setting.data_frame);
 
         lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);
@@ -1195,6 +1207,7 @@ private:
 		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
 		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
 		echo_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", echo_setting.pause_after_measurement);
+		echo_setting.engine_time = settings_json.getBool("EngineTime", echo_setting.engine_time);
 
 		echo_setting.draw_reflected_points = settings_json.getBool("DrawReflectedPoints", echo_setting.draw_reflected_points);
 		echo_setting.draw_reflected_lines = settings_json.getBool("DrawReflectedLines", echo_setting.draw_reflected_lines);
@@ -1202,7 +1215,6 @@ private:
 		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
 
-		echo_setting.engine_time = settings_json.getBool("EngineTime", echo_setting.engine_time);
 		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
 
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
