@@ -26,7 +26,7 @@ protected:
 
 	virtual void updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose);
 
-	virtual void pause();
+	virtual void pause(const bool is_paused);
 
 private:
 	using Vector3r = msr::airlib::Vector3r;
@@ -37,8 +37,8 @@ private:
 	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
 	bool traceDirection(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose,
 		Vector3r direction, const msr::airlib::EchoSimpleParams &sensor_params, Vector3r &point, float &signal_attenuation_final);
-	bool traceDirection2(Vector3r trace_start, Vector3r trace_direction, float &signal_attenuation,
-		const msr::airlib::EchoSimpleParams &sensor_params, msr::airlib::vector<Vector3r> &points);
+	void traceDirection2(FVector trace_start_position, FVector trace_direction, float &signal_attenuation,
+		const msr::airlib::EchoSimpleParams &sensor_params, TArray<AActor*> ignore_actors, TArray<FVector> &points);
     void bounceTrace(FVector &trace_start_position, FVector &trace_end_position, const FHitResult &trace_hit_result,
         float &signal_attenuation, float max_attenuation, const msr::airlib::EchoSimpleParams &sensor_params);
     FVector Vector3rToFVector(const Vector3r &input_vector);
@@ -47,10 +47,13 @@ private:
 private:
 	AActor* actor_;
 	const NedTransform* ned_transform_;
+	float saved_clockspeed_;
 	msr::airlib::vector<msr::airlib::Vector3r> sample_directions_;
 	msr::airlib::vector<msr::airlib::Vector3r> spread_directions_;
-	AActor* physical_sensor_actor_object_;
+	AActor* physical_sensor_obj_;
 
-	const float attenuation_per_distance;
-	const float attenuation_per_reflection;
+	const float attenuation_per_distance_;
+	const float attenuation_per_reflection_;
+	const float attenuation_limit_;
+	const FString sensor_name_;
 };
