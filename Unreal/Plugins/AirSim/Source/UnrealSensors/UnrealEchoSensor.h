@@ -21,12 +21,12 @@ public:
 		AActor* actor, const NedTransform* ned_transform);
 
 protected:
-	virtual void getPointCloud(const msr::airlib::Pose& echo_pose, const msr::airlib::Pose& vehicle_pose, 
+	virtual void getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose,
 		msr::airlib::vector<msr::airlib::real_T>& point_cloud) override;
 
-	virtual void updatePose(const msr::airlib::Pose& echo_pose, const msr::airlib::Pose& vehicle_pose);
+	virtual void updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose);
 
-	virtual void pause(const bool is_paused);
+	virtual void pause();
 
 private:
 	using Vector3r = msr::airlib::Vector3r;
@@ -34,20 +34,23 @@ private:
 
 	void generateSampleDirections();
 	void generateSpreadDirections();
-	bool traceDirection(const msr::airlib::Pose& echo_pose, const msr::airlib::Pose& vehicle_pose,
-		Vector3r direction, const msr::airlib::EchoSimpleParams params, Vector3r &point, float &signal_attenuation_final);
+	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
+	bool traceDirection(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose,
+		Vector3r direction, const msr::airlib::EchoSimpleParams &sensor_params, Vector3r &point, float &signal_attenuation_final);
+	bool traceDirection2(Vector3r trace_start, Vector3r trace_direction, float &signal_attenuation,
+		const msr::airlib::EchoSimpleParams &sensor_params, msr::airlib::vector<Vector3r> &points);
     void bounceTrace(FVector &trace_start_position, FVector &trace_end_position, const FHitResult &trace_hit_result,
-        float &signal_attenuation, float max_attenuation, const msr::airlib::EchoSimpleParams &params);
-    void bounceTrace2(FVector &trace_start_position, FVector &trace_end_position, const FHitResult &trace_hit_result,
-        float &signal_attenuation, float max_attenuation, const msr::airlib::EchoSimpleParams &params);
+        float &signal_attenuation, float max_attenuation, const msr::airlib::EchoSimpleParams &sensor_params);
     FVector Vector3rToFVector(const Vector3r &input_vector);
 
 
 private:
 	AActor* actor_;
 	const NedTransform* ned_transform_;
-	float saved_clockspeed_ = 1;
 	msr::airlib::vector<msr::airlib::Vector3r> sample_directions_;
+	msr::airlib::vector<msr::airlib::Vector3r> spread_directions_;
 	AActor* physical_sensor_actor_object_;
 
+	const float attenuation_per_distance;
+	const float attenuation_per_reflection;
 };
