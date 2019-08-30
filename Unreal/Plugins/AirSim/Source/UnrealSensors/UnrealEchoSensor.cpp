@@ -47,11 +47,15 @@ void UnrealEchoSensor::generateSampleDirections()
 void UnrealEchoSensor::generateSpreadDirections()
 {
 	float opening_angle = 10;  // deg
-	int num_spread_traces = 0;
+	int num_spread_traces = 1;
 	sampleSphereCap(num_spread_traces, opening_angle, spread_directions_);
 }
 
 void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
+	point_cloud.clear();
+
+	// Add point in frontal direction
+	point_cloud.emplace(point_cloud.begin(), Vector3r(1, 0, 0));
 
 	//Convert opening angle to plane coordinates
 	float x_limit = FMath::Cos(FMath::DegreesToRadians(opening_angle) / 2);
@@ -64,7 +68,6 @@ void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr:
 	int num_sphere_points = FMath::CeilToInt(num_points * 1 / surface_ratio);
 
 	// Generate points on the sphere, retain those within the opening angle
-	point_cloud.clear();
 	float offset = 2.0f / num_sphere_points;
 	float increment = PI * (3.0f - FMath::Sqrt(5.0f));
 	for (auto i = 1; i <= num_sphere_points; ++i)
@@ -73,15 +76,16 @@ void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr:
 		float r = FMath::Sqrt(1 - FMath::Pow(y, 2));
 		float phi = ((i + 1) % num_sphere_points) * increment;
 		float x = FMath::Cos(phi) * r;
-		if (x >= x_limit)
+		if (point_cloud.size() == num_points)
+		{
+			return;
+		}
+		else if (x >= x_limit)
 		{
 			float z = FMath::Sin(phi) * r;
 			point_cloud.emplace_back(Vector3r(x, y, z));
 		}
 	}
-
-	// Add point in frontal direction
-	point_cloud.emplace(point_cloud.begin(), Vector3r(1, 0, 0));
 }
 
 // Set echo object in correct pose in physical world
@@ -89,6 +93,8 @@ void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const ms
 {
 	physical_sensor_obj_->SetActorLocation(ned_transform_->fromLocalNed(VectorMath::add(sensor_pose, vehicle_pose).position));
 	physical_sensor_obj_->SetActorRotation(ned_transform_->fromNed(vehicle_pose.orientation).Rotator());
+
+	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
 }
 
 // Pause Unreal simulation
@@ -180,7 +186,7 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 
 	// set the physical echo mesh in the correct location in the world
 	updatePose(sensor_pose, vehicle_pose);
-	FVector trace_start_position = ned_transform_->fromLocalNed(VectorMath::add(sensor_pose, vehicle_pose).position);
+	FVector trace_start_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 
 	// shoot traces (rays)
 	point_cloud.clear();
@@ -189,33 +195,19 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 		Vector3r sample_direction = sample_directions_[direction_count];
 		FVector trace_direction = Vector3rToFVector(VectorMath::rotateVector(sample_direction, VectorMath::rotateQuaternion(vehicle_pose.orientation, sensor_pose.orientation, 1), 1));
 
+		int bounce_depth = 0;
 		float signal_attenuation = 0.0f;
-		TArray<FVector> points;
 
 		// shoot trace and get the impact point and remaining attenuation, if any returns
 		TArray<AActor*> ignore_actors = { physical_sensor_obj_ };
-		traceDirection2(trace_start_position, trace_direction, signal_attenuation, sensor_params, ignore_actors, points);
-
-		for (auto point_count = 0; point_count < points.Num(); ++point_count) {
-			Vector3r point_vehicle_frame = ned_transform_->toLocalNed(points[point_count]);
-			point_vehicle_frame = VectorMath::transformToBodyFrame(point_vehicle_frame, sensor_pose + vehicle_pose, true);
-
-			point_cloud.emplace_back(point_vehicle_frame.x());
-			point_cloud.emplace_back(point_vehicle_frame.y());
-			point_cloud.emplace_back(point_vehicle_frame.z());
-			point_cloud.emplace_back(signal_attenuation);
-		}
+		traceDirection2(trace_start_position, trace_direction, bounce_depth, signal_attenuation, sensor_params, ignore_actors, point_cloud);		
 	}
-	// TODO to improve performance, fill the "point_cloud" list directly instead of first filling the "point" list and then moving the data
-	// or atleast convert "point" to "point_cloud" in one go
 
 	return;
 }
 
-void UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector trace_direction, float &signal_attenuation, const msr::airlib::EchoSimpleParams &sensor_params,
-	TArray<AActor*> ignore_actors, TArray<FVector> &points) {
-	// TODO pass as function arguments instead of constructing local variables in each function's scope
-
+void UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
+	const msr::airlib::EchoSimpleParams &sensor_params, TArray<AActor*> ignore_actors, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
 	// Trace initial emission
 	float trace_length = ned_transform_->fromNed((attenuation_limit_ - signal_attenuation) / attenuation_per_distance_);
 	FVector trace_end_position = trace_start_position + trace_direction * trace_length;
@@ -227,18 +219,22 @@ void UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector tra
 	}
 
 	// DEBUG
-	if (sensor_params.draw_initial_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / sensor_params.measurement_frequency);
+	if (sensor_params.draw_initial_points && bounce_depth == 0) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / sensor_params.measurement_frequency);
 
 	// Check for end conditions -> signal hits sensor || signal dissipates
 	if (trace_hit_result.GetActor()->GetActorLabel().Equals(sensor_name_)) 
 	{
 		// DEBUG
 		if (sensor_params.draw_reflected_lines) DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params.measurement_frequency);
+		if (sensor_params.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.TraceStart, 5, FColor::Red, false, 1 / sensor_params.measurement_frequency);
 
-		// DEBUG
-		if (sensor_params.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.TraceStart, 6, FColor::Red, false, 1 / sensor_params.measurement_frequency);
+		Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
+		point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
 
-		points.Emplace(trace_hit_result.ImpactPoint);
+		point_cloud.emplace_back(point_sensor_frame.x());
+		point_cloud.emplace_back(point_sensor_frame.y());
+		point_cloud.emplace_back(point_sensor_frame.z());
+		point_cloud.emplace_back(signal_attenuation);
 
 		return;
 	}
@@ -251,41 +247,53 @@ void UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector tra
 	}
 
 	bounceTrace(trace_start_position, trace_end_position, trace_hit_result, signal_attenuation, attenuation_limit_, sensor_params);
+	bounce_depth++;
+
 	if (signal_attenuation >= attenuation_limit_) {
 		return;
 	}
 
 	// Recursively cast scattered rays (this includes ray in frontal direction)
+	trace_direction = trace_end_position - trace_start_position;
+	VectorMath::Quaternionf trace_direction_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
+	trace_direction_quat.norm();
+
 	for (auto spread_count = 0u; spread_count < spread_directions_.size(); ++spread_count) {
 		// Rotate according to current trace
-		trace_direction = trace_end_position - trace_start_position;
-		VectorMath::Quaternionf trace_direction_quat(0, trace_direction.X, trace_direction.Y, trace_direction.Z);
-		trace_direction_quat.normalize();
+		//trace_direction.Normalize();
+		// VectorMath::Quaternionf trace_direction_quat = VectorMath::Quaternionf(0, trace_direction.X, trace_direction.Y, trace_direction.Z);
+		// TODO fix this rotation
 
 		Vector3r spread_trace = spread_directions_[spread_count];
 		FVector spread_trace_direction = Vector3rToFVector(VectorMath::rotateVector(spread_trace, trace_direction_quat, true));
 
-		traceDirection2(trace_start_position, spread_trace_direction, signal_attenuation, sensor_params, TArray<AActor*>{}, points);
+		DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_start_position + spread_trace_direction * 100, FColor::Green, false, 1 / sensor_params.measurement_frequency);
+
+		traceDirection2(trace_start_position, spread_trace_direction, bounce_depth, signal_attenuation, sensor_params, TArray<AActor*>{}, point_cloud);
 	}
 }
 
 void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace_end_position,	const FHitResult &trace_hit_result,
     float &signal_attenuation, float max_attenuation, const msr::airlib::EchoSimpleParams &sensor_params) {
 
+	// Attenuate signal
+	float distance_traveled = ned_transform_->toNed(FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint));
+	signal_attenuation += distance_traveled * sensor_params.attenuation_per_distance;
+	signal_attenuation += sensor_params.attenuation_per_reflection;
+
+	// Reflect signal 
 	float trace_length = ned_transform_->fromNed((max_attenuation - signal_attenuation) / sensor_params.attenuation_per_distance);
 	FVector trace_direction = (trace_hit_result.ImpactPoint - trace_start_position).MirrorByVector(trace_hit_result.ImpactNormal);
 	trace_direction.Normalize();
 	trace_start_position = trace_hit_result.ImpactPoint;
 	trace_end_position = trace_start_position + (trace_direction * trace_length);
 
-	// Beam spread attenuation
-	float distance_traveled = ned_transform_->toNed(FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint));
-	// Atmospheric attenuation
-	signal_attenuation += distance_traveled * sensor_params.attenuation_per_distance;
-	signal_attenuation += sensor_params.attenuation_per_reflection;
 }
 
 FVector UnrealEchoSensor::Vector3rToFVector(const Vector3r &input_vector){
 	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
 }
 
+msr::airlib::Vector3r UnrealEchoSensor::FVectorToVector3r(const FVector &input_vector) {
+	return Vector3r(input_vector.X, input_vector.Y, -input_vector.Z);
+}
