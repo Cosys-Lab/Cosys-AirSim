@@ -75,6 +75,7 @@ public:
 			//when any interval is done, reset the state and repeat
 			if (interval_complete_) {
 				last_elapsed_interval_sec_ = elapsed_interval_sec_;
+				previous_time_ = last_time_;
 				last_time_ = clock()->addTo(last_time_, elapsed_interval_sec_);
 				elapsed_interval_sec_ = 0;
 				startup_complete_ = true;
@@ -104,6 +105,7 @@ public:
 			//when any interval is done, reset the state and repeat
 			if (interval_complete_) {
 				last_elapsed_interval_sec_ = elapsed_interval_sec_;
+				previous_time_ = last_time_;
 				last_time_ = clock()->nowNanos();
 				elapsed_interval_sec_ = 0;
 				startup_complete_ = true;
@@ -148,6 +150,11 @@ public:
 		return last_time_;
 	}
 
+	TTimePoint getPreviousTime() const
+	{
+		return previous_time_;
+	}
+
 private:
     real_T interval_size_sec_;
     TTimeDelta elapsed_total_sec_;
@@ -159,7 +166,7 @@ private:
     bool interval_complete_;
     bool startup_complete_;
 	bool use_sim_time_;
-    TTimePoint last_time_, first_time_;
+    TTimePoint last_time_, first_time_, previous_time_;
 
 };
 

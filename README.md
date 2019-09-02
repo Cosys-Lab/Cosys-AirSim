@@ -16,9 +16,10 @@ Cars in AirSim
 
 ## CoSys-Lab Modifications
 * [Echo sensor type](docs/echo.md)
+* Fixed LIDAR not tracing correctly
 * Allow hot-reload of plugin through Unreal Editor
-* Use engine-time for frequency updaters and timestamps instead of real-time. Useful for when performance of the simulation is less then realtime. Currently only usable on the echo sensor type.
-* ClearPath Husky vehicle type. A small robot vehicle. Still requires proper implementation of skid-steering vehicle model.
+* Allow usage engine-time for frequency updaters and timestamps instead of real-time. Useful for when performance of the simulation is less then realtime. Currently only usable on the echo sensor type.
+* ClearPath Husky vehicle type. A small robot vehicle using skid-steering.
 
 ## What's New
 * A ROS wrapper for multirotors is available. See [airsim_ros_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_ros_pkgs) for the ROS API, and [airsim_tutorial_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_tutorial_pkgs) for tutorials. 
