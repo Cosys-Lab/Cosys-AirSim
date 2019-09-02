@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Based on the work by Leon Rosengarten and Boone Adkins.
+// https://github.com/b-adkins/UE4-TankVehiclePlugin
 
 
 #include "SkidVehicle.h"
@@ -37,22 +38,50 @@ void ASkidVehicle::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void ASkidVehicle::SetRightThrust(float RightThrust)
+class USkidVehicleMovementComponent* ASkidVehicle::GetSkidVehicleMovement() const
+{
+	class USkidVehicleMovementComponent* SkidMovmentComponent = Cast<USkidVehicleMovementComponent>(GetVehicleMovement());
+	return SkidMovmentComponent;
+}
+
+
+
+void ASkidVehicle::SetXJoy(float nJoyX)
 {
 	USkidVehicleMovementComponent* SkidMovmentComponent = Cast<USkidVehicleMovementComponent>(GetVehicleMovement());
 
 	if (SkidMovmentComponent)
 	{
-		SkidMovmentComponent->SetRightThrust(RightThrust);
+		SkidMovmentComponent->SetXJoy(nJoyX);
 	}
 }
 
-void ASkidVehicle::SetLeftThrust(float LeftThrust)
+void ASkidVehicle::SetYJoy(float nJoyY)
 {
 	USkidVehicleMovementComponent* SkidMovmentComponent = Cast<USkidVehicleMovementComponent>(GetVehicleMovement());
 
 	if (SkidMovmentComponent)
 	{
-		SkidMovmentComponent->SetLeftThrust(LeftThrust);
+		SkidMovmentComponent->SetYJoy(nJoyY);
+	}
+}
+
+void ASkidVehicle::SetBreaksOn()
+{
+	USkidVehicleMovementComponent* SkidMovmentComponent = Cast<USkidVehicleMovementComponent>(GetVehicleMovement());
+
+	if (SkidMovmentComponent)
+	{
+		SkidMovmentComponent->SetBreaksOn();
+	}
+}
+
+void ASkidVehicle::SetBreaksOff()
+{
+	USkidVehicleMovementComponent* SkidMovmentComponent = Cast<USkidVehicleMovementComponent>(GetVehicleMovement());
+
+	if (SkidMovmentComponent)
+	{
+		SkidMovmentComponent->SetBreaksOff();
 	}
 }

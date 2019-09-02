@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Based on the work by Leon Rosengarten and Boone Adkins.
+// https://github.com/b-adkins/UE4-TankVehiclePlugin
 
 #pragma once
 
@@ -26,10 +27,10 @@ public:
 		void SetRightBreak(float RightBreak);
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
-		void SetLeftThrust(float LeftThrust);
+		void SetYJoy(float nJoyY);
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
-		void SetRightThrust(float RightThrust);
+		void SetXJoy(float nJoyX);
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
 		float GetAcceleration() const;
@@ -41,10 +42,17 @@ public:
 		float GetRightBreak() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
-		float GetLeftThrust() const;
+		float GetYJoy() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
-		float GetRightThrust() const;
+		float GetXJoy() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
+		void SetBreaksOn();
+
+	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
+		void SetBreaksOff();
+
 
 public:
 
@@ -101,9 +109,11 @@ protected:
 	UPROPERTY(Transient)
 		float RightBreak;
 	UPROPERTY(Transient)
-		float LeftThrust;
+		float nJoyX;
 	UPROPERTY(Transient)
-		float RightThrust;
+		float nJoyY;
+	UPROPERTY(Transient)
+		bool toggleBreak;
 
 private:
 

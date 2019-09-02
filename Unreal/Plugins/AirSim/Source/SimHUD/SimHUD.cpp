@@ -5,7 +5,7 @@
 
 #include "Vehicles/Multirotor/SimModeWorldMultiRotor.h"
 #include "Vehicles/Car/SimModeCar.h"
-#include "Vehicles/CPHusky/SimModeCPHusky.h"
+#include "Vehicles/SkidSteer/SimModeSkidVehicle.h"
 #include "Vehicles/ComputerVision/SimModeComputerVision.h"
 
 #include "common/AirSimSettings.hpp"
@@ -297,8 +297,8 @@ void ASimHUD::createSimMode()
     else if (simmode_name == "Car")
         simmode_ = this->GetWorld()->SpawnActor<ASimModeCar>(FVector::ZeroVector,
 			FRotator::ZeroRotator, simmode_spawn_params);
-	else if (simmode_name == "CPHusky")
-		simmode_ = this->GetWorld()->SpawnActor<ASimModeCPHusky>(FVector::ZeroVector,
+	else if (simmode_name == "SkidVehicle")
+		simmode_ = this->GetWorld()->SpawnActor<ASimModeSkidVehicle>(FVector::ZeroVector,
 			FRotator::ZeroRotator, simmode_spawn_params);
     else if (simmode_name == "ComputerVision")
         simmode_ = this->GetWorld()->SpawnActor<ASimModeComputerVision>(FVector::ZeroVector,

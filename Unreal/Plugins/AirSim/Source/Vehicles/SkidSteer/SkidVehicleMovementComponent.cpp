@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Based on the work by Leon Rosengarten and Boone Adkins.
+// https://github.com/b-adkins/UE4-TankVehiclePlugin
 
 
 #include "SkidVehicleMovementComponent.h"
@@ -239,46 +240,81 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 
 	PxVehicleDriveTankRawInputData VehicleInputData(PxVehicleDriveTankControlModel::eSPECIAL);
 
-	float range = FMath::Min((float)sqrt(LeftThrust*LeftThrust + RightThrust * RightThrust) * 100, 100.0f);
-	float theta = atan2(LeftThrust, RightThrust) / PI * 180;
-	float modResult = fmod(theta, 90);
-	if (modResult < 0) {
-		modResult += 90;
-	}
-	float aThrust = range * (45 - modResult) / 45;
+	float accel = FMath::Min((float)sqrt(nJoyX*nJoyX + nJoyY * nJoyY) , 1.0f);
 
-	float bThrust = FMath::Min(FMath::Min(100.0f, 2 * range + aThrust), 2 * range - aThrust);
+	// Differential Steering Joystick Algorithm
+	// ========================================
+	//   by Calvin Hass
+	//   https://www.impulseadventure.com/elec/
+	//
+	// Converts a single dual-axis joystick into a differential
+	// drive motor control, with support for both drive, turn
+	// and pivot operations.
+	//
 
-	float LeftThrust_final, RightThrust_final;
-	if (theta < -90)
-	{
-		LeftThrust_final = -bThrust / 100;
-		RightThrust_final = -aThrust / 100;
+	// INPUTS
+	//	nJoyX;              // Joystick X input                     (-1..+1)
+	//	nJoyY;              // Joystick Y input                     (-1..+1)
+
+	// OUTPUTS
+	float     nMotMixL;           // Motor (left)  mixed output           (-1..+1)
+	float     nMotMixR;           // Motor (right) mixed output           (-1..+1)
+
+	// CONFIG
+	// - fPivYLimt  : The threshold at which the pivot action starts
+	//                This threshold is measured in units on the Y-axis
+	//                away from the X-axis (Y=0). A greater value will assign
+	//                more of the joystick's range to pivot actions.
+	//                Allowable range: (0..+1)
+	float fPivYLimit = 0.2;
+
+	// TEMP VARIABLES
+	float   nMotPremixL;    // Motor (left)  premixed output        (-1..+1)
+	float   nMotPremixR;    // Motor (right) premixed output        (-1..+1)
+	float   nPivSpeed;      // Pivot Speed                          (-1..+1)
+	float   fPivScale;      // Balance scale b/w drive and pivot    (   0..1   )
+
+
+	// Calculate Drive Turn output due to Joystick X input
+	if (nJoyY >= 0) {
+		// Forward
+		nMotPremixL = (nJoyX >= 0) ? 1 : (1 + nJoyX);
+		nMotPremixR = (nJoyX >= 0) ? (1 - nJoyX) : 1;
 	}
-	else if (theta < 0) {
-		LeftThrust_final = aThrust / 100;
-		RightThrust_final = -bThrust / 100;
+	else {
+		// Reverse
+		nMotPremixL = (nJoyX >= 0) ? (1 - nJoyX) : 1;
+		nMotPremixR = (nJoyX >= 0) ? 1 : (1 + nJoyX);
 	}
-	else if (theta < 90)
-	{
-		LeftThrust_final = bThrust / 100;
-		RightThrust_final = aThrust / 100;
-	}
-	else 
-	{
-		LeftThrust_final = aThrust / 100;
-		RightThrust_final = -bThrust / 100;
-	}
-	VehicleInputData.setAnalogLeftThrust(LeftThrust_final);
-    VehicleInputData.setAnalogRightThrust(RightThrust_final);
-	VehicleInputData.setAnalogAccel(range/100);
-	UE_LOG(LogTemp, Warning, TEXT("range: %+0.3f, Theta: %+0.3f, LeftThrust: %+0.3f, RightThrust: %+.3f, acc: %+.3f"), range, theta, LeftThrust_final, RightThrust_final, range/100);
+
+	// Scale Drive output due to Joystick Y input (throttle)
+	nMotPremixL = nMotPremixL * nJoyY / 1;
+	nMotPremixR = nMotPremixR * nJoyY / 1;
+
+	// Now calculate pivot amount
+	// - Strength of pivot (nPivSpeed) based on Joystick X input
+	// - Blending of pivot vs drive (fPivScale) based on Joystick Y input
+	nPivSpeed = nJoyX;
+	fPivScale = (abs(nJoyY) > fPivYLimit) ? 0.0 : (1.0 - abs(nJoyY) / fPivYLimit);
+
+	// Calculate final mix of Drive and Pivot
+	nMotMixL = (1.0 - fPivScale)*nMotPremixL + fPivScale * (nPivSpeed);
+	nMotMixR = (1.0 - fPivScale)*nMotPremixR + fPivScale * (-nPivSpeed);
+   
+	VehicleInputData.setAnalogLeftThrust(nMotMixL);
+	VehicleInputData.setAnalogRightThrust(nMotMixR);
+	VehicleInputData.setAnalogAccel(accel);
 
 	if (!PVehicleDrive->mDriveDynData.getUseAutoGears())
 	{
 		VehicleInputData.setGearUp(bRawGearUpInput);
 		VehicleInputData.setGearDown(bRawGearDownInput);
 	}
+
+	// Toggle on/off digital (hand) break
+	VehicleInputData.setDigitalLeftBrake(toggleBreak);
+	VehicleInputData.setDigitalRightBrake(toggleBreak);
+	if(toggleBreak)VehicleInputData.setAnalogAccel(0);
 
 	// Convert from our curve to PxFixedSizeLookupTable
 
@@ -349,17 +385,17 @@ void USkidVehicleMovementComponent::SetRightBreak(float OtherRightBreak)
 #endif
 }
 
-void USkidVehicleMovementComponent::SetLeftThrust(float OtherLeftThrust)
+void USkidVehicleMovementComponent::SetYJoy(float OtherNJoyY)
 {
 #if WITH_PHYSX_VEHICLES
-	this->LeftThrust = OtherLeftThrust;
+	this->nJoyY = OtherNJoyY;
 #endif
 }
 
-void USkidVehicleMovementComponent::SetRightThrust(float OtherRightThrust)
+void USkidVehicleMovementComponent::SetXJoy(float OtherNJoyX)
 {
 #if WITH_PHYSX_VEHICLES
-	this->RightThrust = OtherRightThrust;
+	this->nJoyX = OtherNJoyX;
 #endif
 }
 
@@ -384,16 +420,30 @@ float USkidVehicleMovementComponent::GetRightBreak() const
 #endif
 }
 
-float USkidVehicleMovementComponent::GetLeftThrust() const
+float USkidVehicleMovementComponent::GetYJoy() const
 {
 #if WITH_PHYSX_VEHICLES
-	return LeftThrust;
+	return nJoyY;
 #endif
 }
 
-float USkidVehicleMovementComponent::GetRightThrust() const
+float USkidVehicleMovementComponent::GetXJoy() const
 {
 #if WITH_PHYSX_VEHICLES
-	return RightThrust;
+	return nJoyX;
+#endif
+}
+
+void USkidVehicleMovementComponent::SetBreaksOn()
+{
+#if WITH_PHYSX_VEHICLES
+	this->toggleBreak = true;
+#endif
+}
+
+void USkidVehicleMovementComponent::SetBreaksOff()
+{
+#if WITH_PHYSX_VEHICLES
+	this->toggleBreak = false;
 #endif
 }

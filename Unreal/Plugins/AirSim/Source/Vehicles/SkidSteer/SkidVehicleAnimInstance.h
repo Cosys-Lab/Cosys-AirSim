@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Based on the work by Leon Rosengarten and Boone Adkins.
+// https://github.com/b-adkins/UE4-TankVehiclePlugin
 
 #pragma once
 

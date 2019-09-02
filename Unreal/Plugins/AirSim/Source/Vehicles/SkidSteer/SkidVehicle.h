@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Based on the work by Leon Rosengarten and Boone Adkins.
+// https://github.com/b-adkins/UE4-TankVehiclePlugin
 
 #pragma once
 
@@ -27,12 +28,20 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	class USkidVehicleMovementComponent* GetSkidVehicleMovement() const;
+
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
-		void SetLeftThrust(float LeftThrust);
+		void SetXJoy(float XThrust);
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
-		void SetRightThrust(float RightThrust);
+		void SetYJoy(float YThrust);
+
+	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
+		void SetBreaksOn();
+
+	UFUNCTION(BlueprintCallable, Category = "Game|Components|SkidVehicleMovement")
+		void SetBreaksOff();
 };
 

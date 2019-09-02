@@ -1,43 +1,43 @@
-#include "CPHuskyPawnSimApi.h"
+#include "SkidVehiclePawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
-#include "CPHuskyPawnApi.h"
+#include "SkidVehiclePawnApi.h"
 #include <exception>
 
 using namespace msr::airlib;
 
-CPHuskyPawnSimApi::CPHuskyPawnSimApi(const Params& params,
-	const CPHuskyPawnApi::CarControls&  keyboard_controls, UWheeledVehicleMovementComponent* movement)
+SkidVehiclePawnSimApi::SkidVehiclePawnSimApi(const Params& params,
+	const SkidVehiclePawnApi::CarControls&  keyboard_controls, USkidVehicleMovementComponent* movement)
 	: PawnSimApi(params), params_(params),
 	keyboard_controls_(keyboard_controls)
 {
 }
 
-void CPHuskyPawnSimApi::initialize()
+void SkidVehiclePawnSimApi::initialize()
 {
 	PawnSimApi::initialize();
 
-	createVehicleApi(static_cast<ACPHuskyPawn*>(params_.pawn), params_.home_geopoint);
+	createVehicleApi(static_cast<ASkidVehiclePawn*>(params_.pawn), params_.home_geopoint);
 
 	//TODO: should do reset() here?
-	joystick_controls_ = CPHuskyPawnApi::CarControls();
+	joystick_controls_ = SkidVehiclePawnApi::CarControls();
 }
 
-void CPHuskyPawnSimApi::createVehicleApi(ACPHuskyPawn* pawn, const msr::airlib::GeoPoint& home_geopoint)
+void SkidVehiclePawnSimApi::createVehicleApi(ASkidVehiclePawn* pawn, const msr::airlib::GeoPoint& home_geopoint)
 {
 	//create vehicle params
 	std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());
-	vehicle_api_ = std::unique_ptr<CarApiBase>(new CPHuskyPawnApi(pawn, getGroundTruthKinematics(), home_geopoint,
+	vehicle_api_ = std::unique_ptr<CarApiBase>(new SkidVehiclePawnApi(pawn, getGroundTruthKinematics(), home_geopoint,
 		getVehicleSetting(), sensor_factory,
 		(*getGroundTruthKinematics()), (*getGroundTruthEnvironment())));
 }
 
-std::string CPHuskyPawnSimApi::getRecordFileLine(bool is_header_line) const
+std::string SkidVehiclePawnSimApi::getRecordFileLine(bool is_header_line) const
 {
 	std::string common_line = PawnSimApi::getRecordFileLine(is_header_line);
 	if (is_header_line) {
 		return common_line +
-			"Throttle\tSteering\tBrake\tGear\tHandbrake\tRPM\tSpeed\t";
+			"Throttle\tSteering\tBrake\tGear\tRPM\tSpeed\t";
 	}
 
 	const msr::airlib::Kinematics::State* kinematics = getGroundTruthKinematics();
@@ -48,7 +48,6 @@ std::string CPHuskyPawnSimApi::getRecordFileLine(bool is_header_line) const
 		.append(std::to_string(current_controls_.steering)).append("\t")
 		.append(std::to_string(current_controls_.brake)).append("\t")
 		.append(std::to_string(state.gear)).append("\t")
-		.append(std::to_string(state.handbrake)).append("\t")
 		.append(std::to_string(state.rpm)).append("\t")
 		.append(std::to_string(state.speed)).append("\t")
 		;
@@ -57,7 +56,7 @@ std::string CPHuskyPawnSimApi::getRecordFileLine(bool is_header_line) const
 }
 
 //these are called on render ticks
-void CPHuskyPawnSimApi::updateRenderedState(float dt)
+void SkidVehiclePawnSimApi::updateRenderedState(float dt)
 {
 	PawnSimApi::updateRenderedState(dt);
 
@@ -67,7 +66,7 @@ void CPHuskyPawnSimApi::updateRenderedState(float dt)
 	if (getRemoteControlID() >= 0)
 		vehicle_api_->setRCData(getRCData());
 }
-void CPHuskyPawnSimApi::updateRendering(float dt)
+void SkidVehiclePawnSimApi::updateRendering(float dt)
 {
 	PawnSimApi::updateRendering(dt);
 
@@ -85,7 +84,7 @@ void CPHuskyPawnSimApi::updateRendering(float dt)
 	}
 }
 
-void CPHuskyPawnSimApi::updateCarControls()
+void SkidVehiclePawnSimApi::updateCarControls()
 {
 	auto rc_data = getRCData();
 
@@ -154,12 +153,11 @@ void CPHuskyPawnSimApi::updateCarControls()
 	UAirBlueprintLib::LogMessageString("Accel: ", std::to_string(current_controls_.throttle), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessageString("Break: ", std::to_string(current_controls_.brake), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessageString("Steering: ", std::to_string(current_controls_.steering), LogDebugLevel::Informational);
-	UAirBlueprintLib::LogMessageString("Handbrake: ", std::to_string(current_controls_.handbrake), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessageString("Target Gear: ", std::to_string(current_controls_.manual_gear), LogDebugLevel::Informational);
 }
 
 //*** Start: UpdatableState implementation ***//
-void CPHuskyPawnSimApi::reset()
+void SkidVehiclePawnSimApi::reset()
 {
 	PawnSimApi::reset();
 
@@ -167,7 +165,7 @@ void CPHuskyPawnSimApi::reset()
 }
 
 //physics tick
-void CPHuskyPawnSimApi::update(float delta)
+void SkidVehiclePawnSimApi::update(float delta)
 {
 	vehicle_api_->update(delta);
 
