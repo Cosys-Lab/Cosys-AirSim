@@ -14,13 +14,15 @@ struct EchoSimpleParams {
     // default settings
     // TODO: enable reading of these params from AirSim settings
 
-    uint number_of_traces = 1000;           // Amount of traces (rays) being cast 
+    uint number_of_traces;					// Amount of traces (rays) being cast 
+	uint number_of_spread_traces;			// Amount of scattered traces created by an incoming trace
+	float spread_opening_angle;				// Beam width of the scattered traces
 	real_T attenuation_per_distance;		// Attenuation of signal wrt distance traveled (dB/m)
 	real_T attenuation_per_reflection;		// Attenuation of signal wrt reflections (dB)
 	real_T attenuation_limit;				// Attenuation at which the signal is considered dissipated (dB)
-	real_T measurement_frequency = 10;		// The frequency of the sensor (measurements/s)
-	real_T sensor_diameter = 0.5;			// The diameter of the sensor plane used to capture the reflecting traces (meter)
-	bool pause_after_measurement = false;	// Pause the simulation after each measurement. Useful for API interaction to be synced
+	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
+	real_T sensor_diameter;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
+	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
 
 	std::string name = "EchoSensor";
 
@@ -29,13 +31,14 @@ struct EchoSimpleParams {
         Quaternionr::Identity()             // orientation - by default Quaternionr(1, 0, 0, 0) 
         };                       
 
-	bool draw_reflected_points = true;		// Draw debug points in world where reflected points are captured by the echo sensor
-	bool draw_reflected_lines = false;		// Draw debug lines in world from reflected points to the echo sensor
-	bool draw_initial_points = false;		// Draw the points of the initial half sphere where the traces (rays) are cast
-	bool draw_bounce_lines = false;			// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
-	bool draw_sensor = false;				// Draw the physical sensor in the world on the vehicle
+	bool draw_reflected_points;				// Draw debug points in world where reflected points are captured by the echo sensor
+	bool draw_reflected_lines;				// Draw debug lines in world from reflected points to the echo sensor
+	bool draw_reflected_paths;				// Draw debug lines for the full path of reflected points to the sensor
+	bool draw_initial_points;				// Draw the points of the initial half sphere where the traces (rays) are cast
+	bool draw_bounce_lines;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
+	bool draw_sensor;						// Draw the physical sensor in the world on the vehicle
 
-	bool engine_time = true;				// If false, real-time simulation will be used for timestamps and measurement frequency
+	bool engine_time;						// If false, real-time simulation will be used for timestamps and measurement frequency
 											// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
     std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
@@ -47,6 +50,8 @@ struct EchoSimpleParams {
         std::string simmode_name = AirSimSettings::singleton().simmode_name;
 
 		number_of_traces = settings.number_of_traces;
+		number_of_spread_traces = settings.number_of_spread_traces;
+		spread_opening_angle = settings.spread_opening_angle;
 		attenuation_per_distance = settings.attenuation_per_distance;
 		attenuation_per_reflection = settings.attenuation_per_reflection;
 		attenuation_limit = settings.attenuation_limit;
@@ -80,6 +85,7 @@ struct EchoSimpleParams {
            
         draw_reflected_points = settings.draw_reflected_points;
 		draw_reflected_lines = settings.draw_reflected_lines;
+		draw_reflected_paths = settings.draw_reflected_paths;
 		draw_initial_points = settings.draw_initial_points;
 		draw_bounce_lines = settings.draw_bounce_lines;
 		draw_sensor = settings.draw_sensor;
