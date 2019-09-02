@@ -140,6 +140,8 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 
 bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
 	const msr::airlib::EchoSimpleParams &sensor_params, TArray<AActor*> ignore_actors, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
+	// TODO find solution for passing ignore_actors and sensor_params objects
+	// TODO implement minimum distance before applying beam spread
 	// Trace initial emission
 	float trace_length = ned_transform_->fromNed((attenuation_limit_ - signal_attenuation) / attenuation_per_distance_);
 	FVector trace_end_position = trace_start_position + trace_direction * trace_length;
@@ -178,25 +180,26 @@ bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		return true;
 	}
 
-	bounceTrace(trace_start_position, trace_end_position, trace_hit_result, signal_attenuation, attenuation_limit_, sensor_params);
+	float distance_traveled = bounceTrace(trace_start_position, trace_direction, trace_hit_result, signal_attenuation, sensor_params);
 	bounce_depth++;
 
 	if (signal_attenuation >= attenuation_limit_) {
 		return false;
 	}
 
-	// Recursively cast scattered rays
-	trace_direction = trace_end_position - trace_start_position;
-	VectorMath::Quaternionf trace_direction_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
-	trace_direction_quat.norm();
+	// Recursively cast (scattered) reflections
+	VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
+	trace_rotation_quat.norm();
 
 	bool beam_hit = false;
-	for (auto spread_count = 0u; spread_count < spread_directions_.size(); ++spread_count) {
+	float min_spread_distance = 1; // TODO make class property or user setting
+	int num_spread_traces = (distance_traveled >= min_spread_distance) ? spread_directions_.size() : 1;
+	for (int spread_count = 0; spread_count < num_spread_traces; ++spread_count) {
 		// Rotate spread traces with respect to the current bounced trace
 		Vector3r spread_trace = spread_directions_[spread_count];
-		FVector spread_trace_direction = Vector3rToFVector(VectorMath::rotateVector(spread_trace, trace_direction_quat, true));
+		FVector spread_trace_direction = Vector3rToFVector(VectorMath::rotateVector(spread_trace, trace_rotation_quat, true));
 
-		beam_hit |= traceDirection2(trace_start_position, spread_trace_direction, bounce_depth, signal_attenuation, sensor_params, TArray<AActor*>{}, point_cloud);
+		beam_hit |= traceDirection(trace_start_position, spread_trace_direction, bounce_depth, signal_attenuation, sensor_params, TArray<AActor*>{}, point_cloud);
 	}
 
 	// DRAW DEBUG
@@ -205,8 +208,8 @@ bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 	return beam_hit;
 }
 
-void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace_end_position,	const FHitResult &trace_hit_result,
-    float &signal_attenuation, float max_attenuation, const msr::airlib::EchoSimpleParams &sensor_params) {
+float UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace_direction,	const FHitResult &trace_hit_result,
+    float &signal_attenuation, const msr::airlib::EchoSimpleParams &sensor_params) {
 
 	// Attenuate signal
 	float distance_traveled = ned_transform_->toNed(FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint));
@@ -214,11 +217,11 @@ void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 	signal_attenuation += sensor_params.attenuation_per_reflection;
 
 	// Reflect signal 
-	float trace_length = ned_transform_->fromNed((max_attenuation - signal_attenuation) / sensor_params.attenuation_per_distance);
-	FVector trace_direction = (trace_hit_result.ImpactPoint - trace_start_position).MirrorByVector(trace_hit_result.ImpactNormal);
+	trace_direction = (trace_hit_result.ImpactPoint - trace_start_position).MirrorByVector(trace_hit_result.ImpactNormal);
 	trace_direction.Normalize();
 	trace_start_position = trace_hit_result.ImpactPoint;
-	trace_end_position = trace_start_position + (trace_direction * trace_length);
+
+	return distance_traveled;
 
 }
 

@@ -37,8 +37,8 @@ private:
 	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
 	bool traceDirection(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
 		const msr::airlib::EchoSimpleParams &sensor_params, TArray<AActor*> ignore_actors, msr::airlib::vector<msr::airlib::real_T> &points);
-    void bounceTrace(FVector &trace_start_position, FVector &trace_end_position, const FHitResult &trace_hit_result,
-        float &signal_attenuation, float max_attenuation, const msr::airlib::EchoSimpleParams &sensor_params);
+    float bounceTrace(FVector &trace_start_position, FVector &trace_direction, const FHitResult &trace_hit_result,
+        float &signal_attenuation, const msr::airlib::EchoSimpleParams &sensor_params);
     FVector Vector3rToFVector(const Vector3r &input_vector);
 	Vector3r FVectorToVector3r(const FVector &input_vector);
 
