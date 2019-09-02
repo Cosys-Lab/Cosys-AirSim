@@ -111,77 +111,6 @@ void UnrealEchoSensor::pause(const bool is_paused) {
 	}
 }
 
-// simulate signal propagation via Unreal ray-tracing.
-bool UnrealEchoSensor::traceDirection(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose,
-	Vector3r direction,	const msr::airlib::EchoSimpleParams &sensor_params, Vector3r &point, float &signal_attenuation_final)
-{
-	const float attenuation_per_distance = sensor_params.attenuation_per_distance;
-	const float attenuation_per_reflection = sensor_params.attenuation_per_reflection;
-	const float max_attenuation = sensor_params.attenuation_limit;
-	const FString sensor_name = sensor_params.name.c_str();
-	float signal_attenuation = 0.0f;
-	TArray<AActor*> ignore_actors = { physical_sensor_obj_ };
-
-	// Trace initial emission
-	FVector trace_start_position = ned_transform_->fromLocalNed(VectorMath::add(sensor_pose, vehicle_pose).position);
-	FVector trace_direction = Vector3rToFVector(VectorMath::rotateVector(direction, VectorMath::rotateQuaternion(vehicle_pose.orientation, sensor_pose.orientation, 1), 1));
-	float trace_length = ned_transform_->fromNed((max_attenuation - signal_attenuation) / attenuation_per_distance);
-	FVector trace_end_position = trace_start_position + trace_direction * trace_length;
-
-	FHitResult trace_hit_result = FHitResult(ForceInit);
-	bool trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors, ECC_Visibility, true);
-	if(!trace_hit) return false;
-
-	if (sensor_params.draw_initial_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / sensor_params.measurement_frequency);
-
-	bounceTrace(trace_start_position, trace_end_position, trace_hit_result, signal_attenuation, max_attenuation, sensor_params);
-
-	// Trace reflections until signal fades
-	FColor debug_line_color;
-	while (signal_attenuation < max_attenuation)
-	{
-		trace_hit_result = FHitResult(ForceInit);
-		trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, TArray<AActor*>{}, ECC_Visibility, true);
-		
-	    if(!trace_hit)
-		{
-			return false;
-		}
-        // If the ray/trace hits the physical sensor object, the impact becomes a valid point for the reflector pointcloud. This also stops the cycle
-		else if (trace_hit_result.GetActor()->GetActorLabel().Equals(sensor_name))  // Check if the trace intersects the sensor
-		{
-			if (sensor_params.draw_reflected_lines)
-				DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params.measurement_frequency);
-			if (sensor_params.draw_reflected_points)
-				DrawDebugPoint(actor_->GetWorld(), trace_hit_result.TraceStart, 6, FColor::Red, false, 1 / sensor_params.measurement_frequency);
-
-			// decide the frame for the point-cloud
-			if (sensor_params.data_frame == AirSimSettings::kVehicleInertialFrame) {
-				point = ned_transform_->toLocalNed(trace_hit_result.TraceStart);
-			}
-			else if (sensor_params.data_frame == AirSimSettings::kSensorLocalFrame) {
-				Vector3r point_v_i = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
-				point = VectorMath::transformToBodyFrame(point_v_i, sensor_pose + vehicle_pose, true);
-			}
-			else {
-				throw std::runtime_error("Unknown requested data frame");
-			}
-
-			return true;
-		}
-
-		if(sensor_params.draw_bounce_lines){
-			uint8 color_scale = static_cast<uint8>(255 * signal_attenuation / max_attenuation);
-			debug_line_color = FColor(color_scale, color_scale, color_scale);
-			DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, debug_line_color, false, 0.2f);
-		}
-
-		bounceTrace(trace_start_position, trace_end_position, trace_hit_result,  signal_attenuation, max_attenuation, sensor_params);
-	}
-
-	return false;
-}
-
 // returns a point-cloud for the tick
 void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
 {
@@ -203,13 +132,13 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 
 		// shoot trace and get the impact point and remaining attenuation, if any returns
 		TArray<AActor*> ignore_actors = { physical_sensor_obj_ };
-		traceDirection2(trace_start_position, trace_direction, bounce_depth, signal_attenuation, sensor_params, ignore_actors, point_cloud);		
+		traceDirection(trace_start_position, trace_direction, bounce_depth, signal_attenuation, sensor_params, ignore_actors, point_cloud);		
 	}
 
 	return;
 }
 
-bool UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
+bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
 	const msr::airlib::EchoSimpleParams &sensor_params, TArray<AActor*> ignore_actors, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
 	// Trace initial emission
 	float trace_length = ned_transform_->fromNed((attenuation_limit_ - signal_attenuation) / attenuation_per_distance_);
