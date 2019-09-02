@@ -39,15 +39,18 @@ void UnrealEchoSensor::generateSampleDirections()
 {
 	msr::airlib::EchoSimpleParams sensor_params = getParams();
 
+	int num_traces = sensor_params.number_of_traces;
 	float opening_angle = 180;  // deg, full hemisphere
-	sampleSphereCap(sensor_params.number_of_traces, opening_angle, sample_directions_);
+	sampleSphereCap(num_traces, opening_angle, sample_directions_);
 }
 
 // initializes information based on echo configuration
 void UnrealEchoSensor::generateSpreadDirections()
 {
-	float opening_angle = 10;  // deg
-	int num_spread_traces = 1;
+	msr::airlib::EchoSimpleParams sensor_params = getParams();
+
+	int num_spread_traces = sensor_params.number_of_spread_traces;
+	float opening_angle = sensor_params.spread_opening_angle;  // deg
 	sampleSphereCap(num_spread_traces, opening_angle, spread_directions_);
 }
 
@@ -206,25 +209,32 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 	return;
 }
 
-void UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
+bool UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
 	const msr::airlib::EchoSimpleParams &sensor_params, TArray<AActor*> ignore_actors, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
 	// Trace initial emission
 	float trace_length = ned_transform_->fromNed((attenuation_limit_ - signal_attenuation) / attenuation_per_distance_);
 	FVector trace_end_position = trace_start_position + trace_direction * trace_length;
 
+	// DRAW DEBUG
+	if (sensor_params.draw_bounce_lines) {
+		uint8 color_scale = static_cast<uint8>(255 * signal_attenuation / attenuation_limit_);
+		FColor debug_line_color = FColor(color_scale, color_scale, color_scale);
+		DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_end_position, debug_line_color, false, 0.2f);
+	}
+
 	FHitResult trace_hit_result = FHitResult(ForceInit);
 	bool trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors, ECC_Visibility, true);
 	if (!trace_hit) {
-		return;
+		return false;
 	}
 
-	// DEBUG
+	// DRAW DEBUG
 	if (sensor_params.draw_initial_points && bounce_depth == 0) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / sensor_params.measurement_frequency);
 
 	// Check for end conditions -> signal hits sensor || signal dissipates
 	if (trace_hit_result.GetActor()->GetActorLabel().Equals(sensor_name_)) 
 	{
-		// DEBUG
+		// DRAW DEBUG
 		if (sensor_params.draw_reflected_lines) DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params.measurement_frequency);
 		if (sensor_params.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.TraceStart, 5, FColor::Red, false, 1 / sensor_params.measurement_frequency);
 
@@ -236,41 +246,34 @@ void UnrealEchoSensor::traceDirection2(FVector trace_start_position, FVector tra
 		point_cloud.emplace_back(point_sensor_frame.z());
 		point_cloud.emplace_back(signal_attenuation);
 
-		return;
-	}
-
-	// DEBUG
-	if (sensor_params.draw_bounce_lines) {
-		uint8 color_scale = static_cast<uint8>(255 * signal_attenuation / attenuation_limit_);
-		FColor debug_line_color = FColor(color_scale, color_scale, color_scale);
-		DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, debug_line_color, false, 0.2f);
+		return true;
 	}
 
 	bounceTrace(trace_start_position, trace_end_position, trace_hit_result, signal_attenuation, attenuation_limit_, sensor_params);
 	bounce_depth++;
 
 	if (signal_attenuation >= attenuation_limit_) {
-		return;
+		return false;
 	}
 
-	// Recursively cast scattered rays (this includes ray in frontal direction)
+	// Recursively cast scattered rays
 	trace_direction = trace_end_position - trace_start_position;
 	VectorMath::Quaternionf trace_direction_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
 	trace_direction_quat.norm();
 
+	bool beam_hit = false;
 	for (auto spread_count = 0u; spread_count < spread_directions_.size(); ++spread_count) {
-		// Rotate according to current trace
-		//trace_direction.Normalize();
-		// VectorMath::Quaternionf trace_direction_quat = VectorMath::Quaternionf(0, trace_direction.X, trace_direction.Y, trace_direction.Z);
-		// TODO fix this rotation
-
+		// Rotate spread traces with respect to the current bounced trace
 		Vector3r spread_trace = spread_directions_[spread_count];
 		FVector spread_trace_direction = Vector3rToFVector(VectorMath::rotateVector(spread_trace, trace_direction_quat, true));
 
-		DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_start_position + spread_trace_direction * 100, FColor::Green, false, 1 / sensor_params.measurement_frequency);
-
-		traceDirection2(trace_start_position, spread_trace_direction, bounce_depth, signal_attenuation, sensor_params, TArray<AActor*>{}, point_cloud);
+		beam_hit |= traceDirection2(trace_start_position, spread_trace_direction, bounce_depth, signal_attenuation, sensor_params, TArray<AActor*>{}, point_cloud);
 	}
+
+	// DRAW DEBUG
+	if (beam_hit && sensor_params.draw_reflected_paths) DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params.measurement_frequency);
+
+	return beam_hit;
 }
 
 void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace_end_position,	const FHitResult &trace_hit_result,
