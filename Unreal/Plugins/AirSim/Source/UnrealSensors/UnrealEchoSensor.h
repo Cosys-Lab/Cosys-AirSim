@@ -35,10 +35,10 @@ private:
 	void generateSampleDirections();
 	void generateSpreadDirections();
 	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
-	bool traceDirection(FVector trace_start_position, FVector trace_direction, int bounce_depth, float signal_attenuation,
-		const msr::airlib::EchoSimpleParams &sensor_params, TArray<AActor*> ignore_actors, msr::airlib::vector<msr::airlib::real_T> &points);
-    float bounceTrace(FVector &trace_start_position, FVector &trace_direction, const FHitResult &trace_hit_result,
-        float &signal_attenuation, const msr::airlib::EchoSimpleParams &sensor_params);
+	bool traceDirection(FVector trace_start_position, FVector trace_end_position, int bounce_depth, float signal_attenuation,
+		msr::airlib::vector<msr::airlib::real_T> &points);
+    float bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length,
+		const FHitResult &trace_hit_result, float &signal_attenuation);
     FVector Vector3rToFVector(const Vector3r &input_vector);
 	Vector3r FVectorToVector3r(const FVector &input_vector);
 
@@ -49,9 +49,11 @@ private:
 	float saved_clockspeed_;
 	msr::airlib::vector<msr::airlib::Vector3r> sample_directions_;
 	msr::airlib::vector<msr::airlib::Vector3r> spread_directions_;
-	AActor* physical_sensor_obj_;
 	msr::airlib::Pose sensor_reference_frame_;
+	AActor* physical_sensor_obj_;
+	TArray<AActor*> ignore_actors_;
 
+	const msr::airlib::EchoSimpleParams sensor_params_;
 	const float attenuation_per_distance_;
 	const float attenuation_per_reflection_;
 	const float attenuation_limit_;
