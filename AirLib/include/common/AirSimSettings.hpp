@@ -28,6 +28,7 @@ public: //types
 	static constexpr char const * kVehicleTypeSimpleFlight = "simpleflight";
     static constexpr char const * kVehicleTypePhysXCar = "physxcar";
 	static constexpr char const * kVehicleTypeCPHusky = "cphusky";
+	static constexpr char const * kVehicleTypePioneer = "pioneer";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
@@ -783,6 +784,12 @@ private:
 		cphusky_setting->vehicle_type = kVehicleTypeCPHusky;
 		vehicles[cphusky_setting->vehicle_name] = std::move(cphusky_setting);
 
+		//create default robot vehicle
+		auto pioneer_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+		pioneer_setting->vehicle_name = "Pioneer";
+		pioneer_setting->vehicle_type = kVehicleTypePioneer;
+		vehicles[pioneer_setting->vehicle_name] = std::move(pioneer_setting);
+
         //create default computer vision vehicle
         auto cv_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
         cv_setting->vehicle_name = "ComputerVision";
@@ -821,6 +828,8 @@ private:
             PawnPath("Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"));
 		pawn_paths.emplace("CPHusky",
 			PawnPath("Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"));
+		pawn_paths.emplace("Pioneer",
+			PawnPath("Class'/AirSim/VehicleAdv/Pioneer/PioneerPawn.PioneerPawn_C'"));
         pawn_paths.emplace("DefaultQuadrotor",
             PawnPath("Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"));
         pawn_paths.emplace("DefaultComputerVision",
@@ -1087,7 +1096,7 @@ private:
         if (std::isnan(camera_director.follow_distance)) {
             if (simmode_name == "Car")
 				camera_director.follow_distance = -8;
-			else if(simmode_name == "CPHusky")
+			else if(simmode_name == "SkidVehicle")
 				camera_director.follow_distance = -2;
             else
                 camera_director.follow_distance = -3;
@@ -1099,7 +1108,7 @@ private:
         if (std::isnan(camera_director.position.z())) {
             if (simmode_name == "Car")
                 camera_director.position.z() = -4;
-			else if (simmode_name == "CPHusky")
+			else if (simmode_name == "SkidVehicle")
 				camera_director.position.z() = -2;
             else
                 camera_director.position.z() = -2;
@@ -1323,7 +1332,7 @@ private:
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
             sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", true);
         }
-        else if (simmode_name == "Car" || simmode_name == "CPHusky") {
+        else if (simmode_name == "Car" || simmode_name == "SkidVehicle") {
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
         }
         else {

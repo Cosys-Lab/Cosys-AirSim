@@ -169,6 +169,7 @@ SimMode determines which simulation mode will be used. Below are currently suppo
 - `"Multirotor"`: Use multirotor simulation
 - `"Car"`: Use car simulation
 - `"ComputerVision"`: Use only camera, no vehicle or physics
+- `"SkidVehicle"`: use skid-steering vehicle simulation
 
 ## ViewMode 
 The ViewMode determines which camera to use as default and how camera will follow the vehicle. For multirotors, the default ViewMode is `"FlyWithMe"` while for cars the default ViewMode is `"SpringArmChase"`.
@@ -266,7 +267,7 @@ The `Gimbal` element allows to freeze camera orientation for pitch, roll and/or 
 Each simulation mode will go through the list of vehicles specified in this setting and create the ones that has `"AutoCreate": true`. Each vehicle specified in this setting has key which becomes the name of the vehicle. If `"Vehicles"` element is missing then this list is populated with default car named "PhysXCar" and default multirotor named "SimpleFlight".
 
 ### Common Vehicle Setting
-- `VehicleType`: This could be either `PhysXCar`, `SimpleFlight`, `PX4Multirotor` or `ComputerVision`. There is no default value therefore this element must be specified.
+- `VehicleType`: This could be either `PhysXCar`, `SimpleFlight`, `PX4Multirotor` or `ComputerVision`. For Skid Steering SimMode, you can use `CPHusky` or `Pioneer`. There is no default value therefore this element must be specified.
 - `PawnPath`: This allows to override the pawn blueprint to use for the vehicle. For example, you may create new pawn blueprint derived from ACarPawn for a warehouse robot in your own project outside the AirSim code and then specify its path here. See also [PawnPaths](#PawnPaths).
 - `DefaultVehicleState`: Possible value for multirotors is `Armed` or `Disarmed`.
 - `AutoCreate`: If true then this vehicle would be spawned (if supported by selected sim mode).

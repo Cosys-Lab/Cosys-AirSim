@@ -1,37 +1,35 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "SimModeCPHusky.h"
+#include "SimModeSkidVehicle.h"
 #include "ConstructorHelpers.h"
 
 #include "AirBlueprintLib.h"
 #include "common/AirSimSettings.hpp"
-#include "CPHuskyPawnSimApi.h"
+#include "SkidVehiclePawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "common/EarthUtils.hpp"
 #include "vehicles/car/api/CarRpcLibServer.hpp"
 
 
-void ASimModeCPHusky::BeginPlay()
+void ASimModeSkidVehicle::BeginPlay()
 {
 	Super::BeginPlay();
 
 	initializePauseState();
 }
 
-void ASimModeCPHusky::initializePauseState()
+void ASimModeSkidVehicle::initializePauseState()
 {
 	pause_period_ = 0;
 	pause_period_start_ = 0;
 	pause(false);
 }
 
-bool ASimModeCPHusky::isPaused() const
+bool ASimModeSkidVehicle::isPaused() const
 {
 	return current_clockspeed_ == 0;
 }
 
-void ASimModeCPHusky::pause(bool is_paused)
+void ASimModeSkidVehicle::pause(bool is_paused)
 {
 	if (is_paused)
 		current_clockspeed_ = 0;
@@ -41,14 +39,14 @@ void ASimModeCPHusky::pause(bool is_paused)
 	UAirBlueprintLib::setUnrealClockSpeed(this, current_clockspeed_);
 }
 
-void ASimModeCPHusky::continueForTime(double seconds)
+void ASimModeSkidVehicle::continueForTime(double seconds)
 {
 	pause_period_start_ = ClockFactory::get()->nowNanos();
 	pause_period_ = seconds;
 	pause(false);
 }
 
-void ASimModeCPHusky::setupClockSpeed()
+void ASimModeSkidVehicle::setupClockSpeed()
 {
 	current_clockspeed_ = getSettings().clock_speed;
 
@@ -57,7 +55,7 @@ void ASimModeCPHusky::setupClockSpeed()
 	UAirBlueprintLib::LogMessageString("Clock Speed: ", std::to_string(current_clockspeed_), LogDebugLevel::Informational);
 }
 
-void ASimModeCPHusky::Tick(float DeltaSeconds)
+void ASimModeSkidVehicle::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
@@ -73,7 +71,7 @@ void ASimModeCPHusky::Tick(float DeltaSeconds)
 
 //-------------------------------- overrides -----------------------------------------------//
 
-std::unique_ptr<msr::airlib::ApiServerBase> ASimModeCPHusky::createApiServer() const
+std::unique_ptr<msr::airlib::ApiServerBase> ASimModeSkidVehicle::createApiServer() const
 {
 #ifdef AIRLIB_NO_RPC
 	return ASimModeBase::createApiServer();
@@ -83,53 +81,64 @@ std::unique_ptr<msr::airlib::ApiServerBase> ASimModeCPHusky::createApiServer() c
 #endif
 }
 
-void ASimModeCPHusky::getExistingVehiclePawns(TArray<AActor*>& pawns) const
+void ASimModeSkidVehicle::getExistingVehiclePawns(TArray<AActor*>& pawns) const
 {
 	UAirBlueprintLib::FindAllActor<TVehiclePawn>(this, pawns);
 }
 
-bool ASimModeCPHusky::isVehicleTypeSupported(const std::string& vehicle_type) const
+bool ASimModeSkidVehicle::isVehicleTypeSupported(const std::string& vehicle_type) const
 {
-	return vehicle_type == AirSimSettings::kVehicleTypeCPHusky;
+	return ((vehicle_type == AirSimSettings::kVehicleTypeCPHusky) ||
+		(vehicle_type == AirSimSettings::kVehicleTypePioneer));
 }
 
-std::string ASimModeCPHusky::getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const
+std::string ASimModeSkidVehicle::getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const
 {
 	//decide which derived BP to use
 	std::string pawn_path = vehicle_setting.pawn_path;
-	if (pawn_path == "")
-		pawn_path = "CPHusky";
+	if (pawn_path == "") {
+		if (vehicle_setting.vehicle_type == "cphusky") {
+			pawn_path = "CPHusky";
+		}
+		else if (vehicle_setting.vehicle_type == "pioneer") {
+			pawn_path = "Pioneer";
+		}
+		else {
+			pawn_path = "CPHusky";
+		}
+	}
+
 
 	return pawn_path;
 }
 
-PawnEvents* ASimModeCPHusky::getVehiclePawnEvents(APawn* pawn) const
+PawnEvents* ASimModeSkidVehicle::getVehiclePawnEvents(APawn* pawn) const
 {
 	return static_cast<TVehiclePawn*>(pawn)->getPawnEvents();
 }
-const common_utils::UniqueValueMap<std::string, APIPCamera*> ASimModeCPHusky::getVehiclePawnCameras(
+const common_utils::UniqueValueMap<std::string, APIPCamera*> ASimModeSkidVehicle::getVehiclePawnCameras(
 	APawn* pawn) const
 {
 	return (static_cast<const TVehiclePawn*>(pawn))->getCameras();
 }
-void ASimModeCPHusky::initializeVehiclePawn(APawn* pawn)
+void ASimModeSkidVehicle::initializeVehiclePawn(APawn* pawn)
 {
 	auto vehicle_pawn = static_cast<TVehiclePawn*>(pawn);
 	vehicle_pawn->initializeForBeginPlay(getSettings().engine_sound);
 }
-std::unique_ptr<PawnSimApi> ASimModeCPHusky::createVehicleSimApi(
+std::unique_ptr<PawnSimApi> ASimModeSkidVehicle::createVehicleSimApi(
 	const PawnSimApi::Params& pawn_sim_api_params) const
 {
 	auto vehicle_pawn = static_cast<TVehiclePawn*>(pawn_sim_api_params.pawn);
-	auto vehicle_sim_api = std::unique_ptr<PawnSimApi>(new CPHuskyPawnSimApi(pawn_sim_api_params,
+	auto vehicle_sim_api = std::unique_ptr<PawnSimApi>(new SkidVehiclePawnSimApi(pawn_sim_api_params,
 		vehicle_pawn->getKeyBoardControls(), vehicle_pawn->getVehicleMovementComponent()));
 	vehicle_sim_api->initialize();
 	vehicle_sim_api->reset();
 	return vehicle_sim_api;
 }
-msr::airlib::VehicleApiBase* ASimModeCPHusky::getVehicleApi(const PawnSimApi::Params& pawn_sim_api_params,
+msr::airlib::VehicleApiBase* ASimModeSkidVehicle::getVehicleApi(const PawnSimApi::Params& pawn_sim_api_params,
 	const PawnSimApi* sim_api) const
 {
-	const auto car_sim_api = static_cast<const CPHuskyPawnSimApi*>(sim_api);
+	const auto car_sim_api = static_cast<const SkidVehiclePawnSimApi*>(sim_api);
 	return car_sim_api->getVehicleApi();
 }
