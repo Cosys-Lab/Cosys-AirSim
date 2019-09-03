@@ -1,10 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WheeledVehicleMovementComponent4W.h"
+#include "SkidVehicleMovementComponent.h"
 
-#include "CPHuskyPawn.h"
-#include "CPHuskyPawnApi.h"
+#include "SkidVehiclePawn.h"
+#include "SkidVehiclePawnApi.h"
 #include "PawnEvents.h"
 #include "PawnSimApi.h"
 #include "vehicles/car/api/CarApiBase.hpp"
@@ -12,7 +12,7 @@
 #include "common/Common.hpp"
 #include "common/CommonStructs.hpp"
 
-class CPHuskyPawnSimApi : public PawnSimApi
+class SkidVehiclePawnSimApi : public PawnSimApi
 {
 public:
 	typedef msr::airlib::Utils Utils;
@@ -22,12 +22,12 @@ public:
 
 public:
 	virtual void initialize() override;
-	virtual ~CPHuskyPawnSimApi() = default;
+	virtual ~SkidVehiclePawnSimApi() = default;
 
 	//VehicleSimApiBase interface
 	//implements game interface to update pawn
-	CPHuskyPawnSimApi(const Params& params,
-		const CPHuskyPawnApi::CarControls&  keyboard_controls, UWheeledVehicleMovementComponent* movement);
+	SkidVehiclePawnSimApi(const Params& params,
+		const SkidVehiclePawnApi::CarControls&  keyboard_controls, USkidVehicleMovementComponent* movement);
 
 	virtual void reset() override;
 	virtual void update(float delta = 0) override;
@@ -48,7 +48,7 @@ public:
 	}
 
 private:
-	void createVehicleApi(ACPHuskyPawn* pawn, const msr::airlib::GeoPoint& home_geopoint);
+	void createVehicleApi(ASkidVehiclePawn* pawn, const msr::airlib::GeoPoint& home_geopoint);
 	void updateCarControls();
 
 private:
@@ -58,8 +58,8 @@ private:
 	std::vector<std::string> vehicle_api_messages_;
 
 	//storing reference from pawn
-	const CPHuskyPawnApi::CarControls& keyboard_controls_;
+	const SkidVehiclePawnApi::CarControls& keyboard_controls_;
 
-	CPHuskyPawnApi::CarControls joystick_controls_;
-	CPHuskyPawnApi::CarControls current_controls_;
+	SkidVehiclePawnApi::CarControls joystick_controls_;
+	SkidVehiclePawnApi::CarControls current_controls_;
 };

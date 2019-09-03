@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "SimMode/SimModeBase.h"
-#include "CPHuskyPawn.h"
+#include "SkidVehiclePawn.h"
 #include "common/Common.hpp"
 #include "api/VehicleSimApiBase.hpp"
-#include "SimModeCPHusky.generated.h"
+
+#include "SimModeSkidVehicle.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AIRSIM_API ASimModeCPHusky : public ASimModeBase
+class AIRSIM_API ASimModeSkidVehicle : public ASimModeBase
 {
 	GENERATED_BODY()
 	
@@ -31,7 +31,7 @@ private:
 	typedef common_utils::Utils Utils;
 	typedef msr::airlib::TTimePoint TTimePoint;
 	typedef msr::airlib::TTimeDelta TTimeDelta;
-	typedef ACPHuskyPawn TVehiclePawn;
+	typedef ASkidVehiclePawn TVehiclePawn;
 	typedef msr::airlib::VehicleSimApiBase VehicleSimApiBase;
 	typedef msr::airlib::VectorMath VectorMath;
 	typedef msr::airlib::Vector3r Vector3r;
