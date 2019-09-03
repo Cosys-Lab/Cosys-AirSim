@@ -15,10 +15,11 @@ Cars in AirSim
 [![AirSim Car Demo Video](docs/images/car_demo_video.png)](https://youtu.be/gnz1X3UNM5Y)
 
 ## CoSys-Lab Modifications
-* [Echo sensor type](docs/echo.md)
-* LIDAR sensor update: Fixed LIDAR not tracing correctly
-* Allow hot-reload of plugin through Unreal Editor
-* Allow usage of engine-time for frequency updaters and timestamps instead of real-time. Useful for heavy performance sensor modalities. Currently only usable on the echo and LIDAR sensor types.
+* Added [CoSysLab environment](docs/cosysenv.md)
+* Added [Echo sensor type](docs/echo.md)
+* Updated LIDAR sensor: Fixed not tracing correctly
+* Added option to hot-reload plugin through Unreal Editor (faster development)
+* Added usage of engine-time for frequency updaters and timestamps instead of real-time. Useful for heavy performance sensor modalities. Currently only usable on the Echo and LIDAR sensor types.
 * Added skid steering sim-mode and vehicle type based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 
 ## What's New
