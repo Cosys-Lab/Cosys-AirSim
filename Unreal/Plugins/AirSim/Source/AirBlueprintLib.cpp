@@ -389,11 +389,12 @@ bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, co
 }
 
 bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
-	FHitResult& hit, TArray<AActor*>& ignore_actors, ECollisionChannel collision_channel, bool trace_complex)
+	FHitResult& hit, TArray<AActor*>& ignore_actors, ECollisionChannel collision_channel, bool trace_complex, bool get_material)
 {
 	hit = FHitResult(ForceInit);
 
 	FCollisionQueryParams trace_params;
+	trace_params.bReturnPhysicalMaterial = get_material;
 	trace_params.bTraceComplex = trace_complex;
 
 	trace_params.AddIgnoredActors(ignore_actors);
