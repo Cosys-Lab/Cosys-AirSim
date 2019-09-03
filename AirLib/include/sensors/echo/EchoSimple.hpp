@@ -110,6 +110,8 @@ private:
 		output.point_cloud = point_cloud_;
 		output.time_stamp = last_time_;
 		output.pose = echo_pose;
+		UAirBlueprintLib::LogMessageString("stamp: ", "timestamp: " + std::to_string(last_time_), LogDebugLevel::Informational);
+
 		setOutput(output);
 	}
 private:
@@ -118,6 +120,7 @@ private:
 
     FrequencyLimiter freq_limiter_;
     TTimePoint last_time_;
+	TTimePoint last_measurement;
 	bool last_tick_measurement_ = false;
 };
 

@@ -81,7 +81,7 @@ public:
 	static bool GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
 		FHitResult& hit, const AActor* ignore_actor = nullptr, ECollisionChannel collision_channel = ECC_Visibility);
 	static bool GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
-		FHitResult& hit, TArray<AActor*>& ignore_actors, ECollisionChannel collision_channel = ECC_Visibility, bool trace_complex = false);
+		FHitResult& hit, TArray<AActor*>& ignore_actors, ECollisionChannel collision_channel = ECC_Visibility, bool trace_complex = false, bool get_material = false);
     static bool GetLastObstaclePosition(const AActor* actor, const FVector& start, const FVector& end,
         FHitResult& hit, const AActor* ignore_actor = nullptr, ECollisionChannel collision_channel = ECC_Visibility);
     static void FollowActor(AActor* follower, const AActor* followee, const FVector& offset, bool fixed_z = false, float fixed_z_val = 2.0f);

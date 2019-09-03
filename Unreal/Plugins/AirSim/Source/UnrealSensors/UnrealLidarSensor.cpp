@@ -40,17 +40,6 @@ void UnrealLidarSensor::createLasers()
     }
 }
 
-// Pause Unreal simulation
-void UnrealLidarSensor::pause(const bool is_paused) {
-	if (is_paused) {
-		saved_clockspeed_ = UAirBlueprintLib::getUnrealClockSpeed(actor_);
-		UAirBlueprintLib::setUnrealClockSpeed(actor_, 0);
-	}
-	else {
-		UAirBlueprintLib::setUnrealClockSpeed(actor_, saved_clockspeed_);
-	}
-}
-
 // returns a point-cloud for the tick
 void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
     const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
@@ -64,11 +53,11 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
     // since SensorBase mechanism uses the elapsed clock time instead of the tick delta-time.
     constexpr float MAX_POINTS_IN_SCAN = 1e+5f;
     uint32 total_points_to_scan = FMath::RoundHalfFromZero(params.points_per_second * delta_time);
-    if (params.limit_points && total_points_to_scan > MAX_POINTS_IN_SCAN)
+    if (total_points_to_scan > MAX_POINTS_IN_SCAN)
     {
         total_points_to_scan = MAX_POINTS_IN_SCAN;
         UAirBlueprintLib::LogMessageString("Lidar: ", "Capping number of points to scan", LogDebugLevel::Failure);
-	}
+    }
 
     // calculate number of points needed for each laser/channel
     const uint32 points_to_scan_with_one_laser = FMath::RoundHalfFromZero(total_points_to_scan / float(number_of_lasers));
@@ -142,9 +131,13 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
     Vector3r end = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * params.range + start;
    
     FHitResult hit_result = FHitResult(ForceInit);
-    bool is_hit = UAirBlueprintLib::GetObstacle(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actor_, ECC_Visibility);
-
-    if (is_hit)
+	bool is_hit = UAirBlueprintLib::GetObstacle(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, TArray<AActor*>{ actor_ }, ECC_Visibility, true, true);
+	bool ignoreMaterial = false;
+	if (hit_result.PhysMaterial != nullptr) {
+		if (hit_result.PhysMaterial.Get()->GetFName().ToString().Contains("Lidar_Ignore_PhysicalMaterial"))
+			ignoreMaterial = true;
+	}
+    if (is_hit && !ignoreMaterial)
     {
         if (false && UAirBlueprintLib::IsInGameThread())
         {
