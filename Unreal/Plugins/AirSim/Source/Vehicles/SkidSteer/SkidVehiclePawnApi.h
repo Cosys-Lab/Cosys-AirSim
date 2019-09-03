@@ -1,16 +1,16 @@
 #pragma once
 
 #include "vehicles/car/api/CarApiBase.hpp"
-#include "WheeledVehicleMovementComponent4W.h"
+#include "SkidVehicleMovementComponent.h"
 #include "physics/Kinematics.hpp"
-#include "CPHuskyPawn.h"
+#include "SkidVehiclePawn.h"
 
 
-class CPHuskyPawnApi : public msr::airlib::CarApiBase {
+class SkidVehiclePawnApi : public msr::airlib::CarApiBase {
 public:
 	typedef msr::airlib::ImageCaptureBase ImageCaptureBase;
 
-	CPHuskyPawnApi(ACPHuskyPawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics, const msr::airlib::GeoPoint& home_geopoint,
+	SkidVehiclePawnApi(ASkidVehiclePawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics, const msr::airlib::GeoPoint& home_geopoint,
 		const msr::airlib::AirSimSettings::VehicleSetting* vehicle_setting, std::shared_ptr<msr::airlib::SensorFactory> sensor_factory,
 		const msr::airlib::Kinematics::State& state, const msr::airlib::Environment& environment);
 
@@ -29,13 +29,13 @@ public:
 
 	virtual const CarApiBase::CarControls& getCarControls() const override;
 
-	virtual ~CPHuskyPawnApi();
+	virtual ~SkidVehiclePawnApi();
 
 private:
-	UWheeledVehicleMovementComponent* movement_;
+	USkidVehicleMovementComponent* movement_;
 	bool api_control_enabled_ = false;
 	CarControls last_controls_;
-	ACPHuskyPawn* pawn_;
+	ASkidVehiclePawn* pawn_;
 	const msr::airlib::Kinematics::State* pawn_kinematics_;
 	msr::airlib::GeoPoint  home_geopoint_;
 };

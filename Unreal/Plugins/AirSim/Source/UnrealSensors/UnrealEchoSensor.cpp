@@ -28,6 +28,7 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting,
 	}
 
 	generateSampleDirections();
+	generateSpreadDirections();
 }
 
 // initializes information based on echo configuration
@@ -56,6 +57,12 @@ void UnrealEchoSensor::generateSampleDirections()
 			sample_directions_.emplace_back(Vector3r(x, y, z));
 		}
 	}	
+}
+
+// initializes information based on echo configuration
+void UnrealEchoSensor::generateSpreadDirections()
+{
+	msr::airlib::EchoSimpleParams params = getParams();
 }
 
 // returns a point-cloud for the tick
@@ -120,6 +127,7 @@ bool UnrealEchoSensor::traceDirection(	const msr::airlib::Pose& echo_pose, const
 	const float max_attenuation = params.attenuation_limit;
 	const FString sensor_name = params.name.c_str();
 	float signal_attenuation = 0.0f;
+	TArray<AActor*> ignore_actors = { physical_sensor_actor_object_ };
 
 	// Trace initial emission
 	FVector trace_start_position = ned_transform_->fromLocalNed(VectorMath::add(echo_pose, vehicle_pose).position);
@@ -129,7 +137,7 @@ bool UnrealEchoSensor::traceDirection(	const msr::airlib::Pose& echo_pose, const
 
 	FHitResult trace_hit_result = FHitResult(ForceInit);
 	// The physical sensor object itself has to be ignored as otherwise the trace would pottentially instantly collide with the sensor
-	bool trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, { physical_sensor_actor_object_ }, ECC_Visibility, true);
+	bool trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors, ECC_Visibility, true);
 	if(!trace_hit) return false;
 
 	if (params.draw_initial_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / params.measurement_frequency);
@@ -141,7 +149,7 @@ bool UnrealEchoSensor::traceDirection(	const msr::airlib::Pose& echo_pose, const
 	while (signal_attenuation < max_attenuation)
 	{
 		trace_hit_result = FHitResult(ForceInit);
-		trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, {}, ECC_Visibility, true);
+		trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, TArray<AActor*>{}, ECC_Visibility, true);
 		
 	    if(!trace_hit)
 		{

@@ -54,6 +54,9 @@ obj/
 *.suo
 *_BuiltData.uasset
 
+Unreal/Environments/Blocks/Content/*
+settings.json
+
 # Visual Studio 2015 cache/options directory
 .vs/
 .vscode/

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WheeledVehicle.h"
+#include "Vehicles/SkidSteer/SkidVehicle.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "UObject/ConstructorHelpers.h"
@@ -16,7 +16,7 @@
 #include "PawnEvents.h"
 #include "PIPCamera.h"
 
-#include "CPHuskyPawn.generated.h"
+#include "SkidVehiclePawn.generated.h"
 
 class UPhysicalMaterial;
 class UCameraComponent;
@@ -26,12 +26,12 @@ class UInputComponent;
 class UAudioComponent;
 
 UCLASS(config = Game)
-class ACPHuskyPawn : public AWheeledVehicle
+class AIRSIM_API ASkidVehiclePawn : public ASkidVehicle
 {
 	GENERATED_BODY()
-
+	
 public:
-	ACPHuskyPawn();
+	ASkidVehiclePawn();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float Delta) override;
@@ -46,26 +46,24 @@ public:
 	{
 		return &pawn_events_;
 	}
-	UWheeledVehicleMovementComponent* getVehicleMovementComponent() const;
+	USkidVehicleMovementComponent* getVehicleMovementComponent() const;
 	const msr::airlib::CarApiBase::CarControls& getKeyBoardControls() const
 	{
 		return keyboard_controls_;
 	}
 
+	UPROPERTY(BluePrintReadWrite) USceneComponent* camera_front_center_base_;
+	UPROPERTY(BluePrintReadWrite) USceneComponent* camera_front_left_base_;
+	UPROPERTY(BluePrintReadWrite) USceneComponent* camera_front_right_base_;
+	UPROPERTY(BluePrintReadWrite) USceneComponent* camera_driver_base_;
+	UPROPERTY(BluePrintReadWrite) USceneComponent* camera_back_center_base_;
+
 private:
 	void updateHUDStrings();
-	void setupVehicleMovementComponent();
 	void updateInCarHUD();
 	void updatePhysicsMaterial();
 
 	void setupInputBindings();
-	void onMoveForward(float Val);
-	void onMoveRight(float Val);
-	void onHandbrakePressed();
-	void onHandbrakeReleased();
-	void onFootBrake(float Val);
-	void onReversePressed();
-	void onReverseReleased();
 
 private:
 	typedef msr::airlib::AirSimSettings AirSimSettings;
@@ -78,11 +76,7 @@ private:
 	UPhysicalMaterial* slippery_mat_;
 	UPhysicalMaterial* non_slippery_mat_;
 
-	UPROPERTY() USceneComponent* camera_front_center_base_;
-	UPROPERTY() USceneComponent* camera_front_left_base_;
-	UPROPERTY() USceneComponent* camera_front_right_base_;
-	UPROPERTY() USceneComponent* camera_driver_base_;
-	UPROPERTY() USceneComponent* camera_back_center_base_;
+
 
 	UPROPERTY() APIPCamera* camera_front_center_;
 	UPROPERTY() APIPCamera* camera_front_left_;
@@ -95,6 +89,10 @@ private:
 	UAudioComponent* engine_sound_audio_;
 
 	msr::airlib::CarApiBase::CarControls keyboard_controls_;
+	void onMoveX(float Val);
+	void onMoveY(float Val);
+	void onBreakPressed();
+	void onBreakReleased();
 
 	FText last_speed_;
 	FText last_gear_;
