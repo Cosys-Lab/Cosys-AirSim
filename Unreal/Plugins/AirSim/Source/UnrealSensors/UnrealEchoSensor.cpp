@@ -139,10 +139,10 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 
 bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, int bounce_depth, float signal_attenuation,
 	msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
-	// TODO cull traces which won't be able to reach the sensor anyway
 
 	FHitResult trace_hit_result = FHitResult(ForceInit);
 	bool trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
+	if (bounce_depth == 0) ignore_actors_ = TArray<AActor*>{};  // Make sure to uningore the sensor to receive reflections
 
 	// DRAW DEBUG
 	if (sensor_params_.draw_bounce_lines) {
@@ -162,7 +162,7 @@ bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 	if (trace_hit_result.GetActor()->GetActorLabel().Equals(sensor_name_))
 	{
 		// DRAW DEBUG
-		if (sensor_params_.draw_reflected_lines) DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+		if (sensor_params_.draw_reflected_lines || sensor_params_.draw_reflected_paths) DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
 		if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.TraceStart, 5, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
 
 		Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
@@ -175,8 +175,7 @@ bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 
 		return true;
 	}
-
-	// TODO This is ugly, find a better implementation
+	
 	FVector trace_direction;
 	float trace_length;
 	float distance_traveled = bounceTrace(trace_start_position, trace_direction, trace_length, trace_hit_result, signal_attenuation);
@@ -189,7 +188,6 @@ bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 	}
 
 	// Recursively cast (scattered) reflections
-	if (bounce_depth == 0) ignore_actors_ = TArray<AActor*>{};
 	VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
 	trace_rotation_quat.norm();
 	bool beam_hit = false;
@@ -227,22 +225,6 @@ float UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trac
 
 	return distance_traveled;
 }
-
-//float UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace_direction,	const FHitResult &trace_hit_result,
-//    float &signal_attenuation) {
-//
-//	// Attenuate signal
-//	float distance_traveled = ned_transform_->toNed(FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint));
-//	signal_attenuation += distance_traveled * sensor_params_.attenuation_per_distance;
-//	signal_attenuation += sensor_params_.attenuation_per_reflection;
-//
-//	// Reflect signal 
-//	trace_direction = (trace_hit_result.ImpactPoint - trace_start_position).MirrorByVector(trace_hit_result.ImpactNormal);
-//	trace_direction.Normalize();
-//	trace_start_position = trace_hit_result.ImpactPoint;
-//
-//	return distance_traveled;
-//}
 
 FVector UnrealEchoSensor::Vector3rToFVector(const Vector3r &input_vector) {
 	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
