@@ -16,23 +16,10 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	attenuation_per_distance_(getParams().attenuation_per_distance),
 	attenuation_per_reflection_(getParams().attenuation_per_reflection),
 	attenuation_limit_(getParams().attenuation_limit),
-	sensor_name_(getParams().name.c_str())
+	opening_angle_half_(FMath::DegreesToRadians(getParams().spread_opening_angle/2))
 {
-	FActorSpawnParameters spawnParams;
-	FRotator rotator = FRotator(0, 0, 0);
-	FVector position = FVector(0, 0, 0);
-	APhysicalSensorActor* physical_sensor_actor = NewObject<APhysicalSensorActor>(APhysicalSensorActor::StaticClass());
-	physical_sensor_obj_ = actor->GetWorld()->SpawnActor<AActor>(physical_sensor_actor->sensor_blueprint_, position, rotator, spawnParams);
-	physical_sensor_obj_->SetActorLabel(setting.sensor_name.c_str());
-
-	UStaticMeshComponent* sensorPlaneMesh = Cast<UStaticMeshComponent>(physical_sensor_obj_->GetComponentByClass(UStaticMeshComponent::StaticClass()));
-	sensorPlaneMesh->SetRelativeScale3D(FVector(1, setting.sensor_diameter, setting.sensor_diameter));
-	if (!setting.draw_sensor) {
-		sensorPlaneMesh->ToggleVisibility();
-	}
-
-	generateSampleDirections();
-	generateSpreadDirections();
+	generateSampleDirections();	
+	ignore_actors_ = TArray<AActor*>{};
 }
 
 // initializes information based on echo configuration
@@ -41,14 +28,6 @@ void UnrealEchoSensor::generateSampleDirections()
 	int num_traces = sensor_params_.number_of_traces;
 	float opening_angle = 180;  // deg, = full hemisphere
 	sampleSphereCap(num_traces, opening_angle, sample_directions_);
-}
-
-// initializes information based on echo configuration
-void UnrealEchoSensor::generateSpreadDirections()
-{
-	int num_spread_traces = sensor_params_.number_of_spread_traces;
-	float opening_angle = sensor_params_.spread_opening_angle;  // deg
-	sampleSphereCap(num_spread_traces, opening_angle, spread_directions_);
 }
 
 void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
@@ -92,9 +71,9 @@ void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr:
 void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
-
-	physical_sensor_obj_->SetActorLocation(ned_transform_->fromLocalNed(sensor_reference_frame_.position));
-	physical_sensor_obj_->SetActorRotation(ned_transform_->fromNed(sensor_reference_frame_.orientation).Rotator());
+	
+	// DRAW DEBUG
+	if(sensor_params_.draw_sensor) DrawDebugPoint(actor_->GetWorld(), ned_transform_->fromLocalNed(sensor_reference_frame_.position), 5, FColor::Blue, false, 1 / sensor_params_.measurement_frequency);
 }
 
 // Pause Unreal simulation
@@ -130,82 +109,94 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 		FVector trace_end_position = trace_start_position + trace_direction * trace_length;
 
 		// shoot trace and get the impact point and remaining attenuation, if any returns
-		ignore_actors_ = { physical_sensor_obj_ };
-		traceDirection(trace_start_position, trace_end_position, bounce_depth, signal_attenuation, point_cloud);
+		traceDirection(trace_start_position, trace_end_position, signal_attenuation, point_cloud);
 	}
 
 	return;
 }
 
-bool UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, int bounce_depth, float signal_attenuation,
+void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, float signal_attenuation,
 	msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
 
-	FHitResult trace_hit_result = FHitResult(ForceInit);
-	bool trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
-	if (bounce_depth == 0) ignore_actors_ = TArray<AActor*>{};  // Make sure to uningore the sensor to receive reflections
+	TArray<FVector> trace_path = TArray<FVector>{};
 
-	// DRAW DEBUG
-	if (sensor_params_.draw_bounce_lines) {
-		uint8 color_scale = static_cast<uint8>(255 * signal_attenuation / attenuation_limit_);
-		FColor debug_line_color = FColor(color_scale, color_scale, color_scale);
-		DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, debug_line_color, false, 0.2f);
-	}
+	while(signal_attenuation < attenuation_limit_) {
+		FHitResult trace_hit_result = FHitResult(ForceInit);
+		bool trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
 
-	if (!trace_hit) {
-		return false;
-	}
-
-	// DRAW DEBUG
-	if (sensor_params_.draw_initial_points && bounce_depth == 0) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / sensor_params_.measurement_frequency);
-
-	// Check for end conditions -> signal hits sensor || signal dissipates
-	if (trace_hit_result.GetActor()->GetActorLabel().Equals(sensor_name_))
-	{
 		// DRAW DEBUG
-		if (sensor_params_.draw_reflected_lines || sensor_params_.draw_reflected_paths) DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
-		if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.TraceStart, 5, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+		if (sensor_params_.draw_bounce_lines) {
+			uint8 color_scale = static_cast<uint8>(255 * signal_attenuation / attenuation_limit_);
+			FColor debug_line_color = FColor(color_scale, color_scale, color_scale);
+			DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, debug_line_color, false, 0.2f);
+		}
 
-		Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
-		point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
+		if (!trace_hit) {
+			return;
+		}
 
-		point_cloud.emplace_back(point_sensor_frame.x());
-		point_cloud.emplace_back(point_sensor_frame.y());
-		point_cloud.emplace_back(point_sensor_frame.z());
-		point_cloud.emplace_back(signal_attenuation);
+		// DRAW DEBUG
+		if (sensor_params_.draw_initial_points && signal_attenuation == 0) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / sensor_params_.measurement_frequency);
 
-		return true;
+		// Bounce trace
+		FVector trace_direction;
+		float trace_length;
+		bounceTrace(trace_start_position, trace_direction, trace_length, trace_hit_result, signal_attenuation);
+		trace_end_position = trace_start_position + trace_direction * trace_length;
+
+		FVector sensor_location = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		float distance_to_sensor = FVector::Distance(trace_start_position, sensor_location);
+
+		if (distance_to_sensor > trace_length) {
+			return;
+		}
+
+		if (sensor_params_.draw_reflected_paths) trace_path.Emplace(trace_start_position);
+
+		bool sensorInCone = locationInCone(sensor_location - trace_start_position, trace_direction, opening_angle_half_);
+		if (sensorInCone)
+		{
+			trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, sensor_location, FHitResult(ForceInit), ignore_actors_, ECC_Visibility, true);
+
+			if (!trace_hit) {  // No hit = clear LOS to sensor
+				// DRAW DEBUG
+				if (sensor_params_.draw_reflected_lines) {
+					FVector draw_location = trace_start_position + trace_direction * distance_to_sensor;
+
+					float radius = 100;
+					FVector y_axis = FVector(0, 1, 0);
+					FVector z_axis = FVector(0, 0, 1);
+					DrawDebugCircle(actor_->GetWorld(), draw_location, radius, 32, FColor::Blue, false, 1 / sensor_params_.measurement_frequency, 0u, 0.0f, y_axis, z_axis, false);
+
+					DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+				}
+
+				/*if (sensor_params_.draw_reflected_lines) DrawDebugCone(actor_->GetWorld(), trace_start_position, trace_direction, distance_to_sensor, opening_angle_half_,
+					opening_angle_half_, 16, FColor::Blue, false, 1 / sensor_params_.measurement_frequency);*/
+
+				if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_start_position, 5, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+
+				if (sensor_params_.draw_reflected_paths) {
+					DrawDebugLine(actor_->GetWorld(), sensor_location, trace_path[0], FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+					for (int trace_count = 0; trace_count < trace_path.Num()-1; trace_count++)
+					{
+						DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count+1], FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+					}
+					DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_location, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+				}
+
+				Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
+				point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
+
+				point_cloud.emplace_back(point_sensor_frame.x());
+				point_cloud.emplace_back(point_sensor_frame.y());
+				point_cloud.emplace_back(point_sensor_frame.z());
+				point_cloud.emplace_back(signal_attenuation);
+
+				return;
+			}
+		}
 	}
-	
-	FVector trace_direction;
-	float trace_length;
-	float distance_traveled = bounceTrace(trace_start_position, trace_direction, trace_length, trace_hit_result, signal_attenuation);
-	bounce_depth++;
-
-	float dist = FVector::Distance(trace_hit_result.ImpactPoint, ned_transform_->fromLocalNed(sensor_reference_frame_.position));
-	if (dist > trace_length ||
-		signal_attenuation >= attenuation_limit_) {
-		return false;
-	}
-
-	// Recursively cast (scattered) reflections
-	VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
-	trace_rotation_quat.norm();
-	bool beam_hit = false;
-	float min_spread_distance = 0.5; // TODO make class property or user setting
-	int num_spread_traces = (distance_traveled >= min_spread_distance) ? spread_directions_.size() : 1;
-	for (int spread_count = 0; spread_count < num_spread_traces; ++spread_count) {
-		// Rotate spread traces with respect to the current bounced trace
-		Vector3r spread_trace = spread_directions_[spread_count];
-		FVector spread_trace_direction = Vector3rToFVector(VectorMath::rotateVector(spread_trace, trace_rotation_quat, true));
-		FVector spread_trace_end_position = trace_start_position + spread_trace_direction * trace_length;
-
-		beam_hit |= traceDirection(trace_start_position, spread_trace_end_position, bounce_depth, signal_attenuation, point_cloud);
-	}
-
-	// DRAW DEBUG
-	if (beam_hit && sensor_params_.draw_reflected_paths) DrawDebugLine(actor_->GetWorld(), trace_hit_result.TraceStart, trace_hit_result.ImpactPoint, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
-
-	return beam_hit;
 }
 
 float UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length, const FHitResult &trace_hit_result,
@@ -223,6 +214,8 @@ float UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trac
 
 	trace_length = ned_transform_->fromNed((attenuation_limit_ - signal_attenuation) / attenuation_per_distance_);  // Maximum possible distance given the current attenuation
 
+	//TODO determine attenuation based on angle
+
 	return distance_traveled;
 }
 
@@ -232,4 +225,12 @@ FVector UnrealEchoSensor::Vector3rToFVector(const Vector3r &input_vector) {
 
 msr::airlib::Vector3r UnrealEchoSensor::FVectorToVector3r(const FVector &input_vector) {
 	return Vector3r(input_vector.X, input_vector.Y, -input_vector.Z);
+}
+
+bool UnrealEchoSensor::locationInCone(FVector location, FVector pointing_vector, const float opening_angle) {
+	// Location relative to origin
+	location.Normalize();
+	float angle_between_vectors = FMath::Acos(FVector::DotProduct(location, pointing_vector));
+
+	return angle_between_vectors <= opening_angle;
 }
