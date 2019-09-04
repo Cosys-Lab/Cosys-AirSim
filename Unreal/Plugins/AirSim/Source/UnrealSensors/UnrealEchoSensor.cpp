@@ -16,7 +16,8 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	attenuation_per_distance_(getParams().attenuation_per_distance),
 	attenuation_per_reflection_(getParams().attenuation_per_reflection),
 	attenuation_limit_(getParams().attenuation_limit),
-	opening_angle_half_(FMath::DegreesToRadians(getParams().spread_opening_angle/2))
+	opening_angle_half_(FMath::DegreesToRadians(getParams().spread_opening_angle/2)),
+	draw_time_(1.05f / sensor_params_.measurement_frequency)
 {
 	generateSampleDirections();	
 	ignore_actors_ = TArray<AActor*>{};
@@ -73,7 +74,7 @@ void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const ms
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
 	
 	// DRAW DEBUG
-	if(sensor_params_.draw_sensor) DrawDebugPoint(actor_->GetWorld(), ned_transform_->fromLocalNed(sensor_reference_frame_.position), 5, FColor::Blue, false, 1 / sensor_params_.measurement_frequency);
+	if(sensor_params_.draw_sensor) DrawDebugPoint(actor_->GetWorld(), ned_transform_->fromLocalNed(sensor_reference_frame_.position), 5, FColor::Blue, false, draw_time_);
 }
 
 // Pause Unreal simulation
@@ -126,9 +127,8 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 
 		// DRAW DEBUG
 		if (sensor_params_.draw_bounce_lines) {
-			uint8 color_scale = static_cast<uint8>(255 * signal_attenuation / attenuation_limit_);
-			FColor debug_line_color = FColor(color_scale, color_scale, color_scale);
-			DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, debug_line_color, false, 0.2f);
+			FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (signal_attenuation / attenuation_limit_));
+			DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, line_color, false, 0.2f);
 		}
 
 		if (!trace_hit) {
@@ -136,7 +136,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		}
 
 		// DRAW DEBUG
-		if (sensor_params_.draw_initial_points && signal_attenuation == 0) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, 1 / sensor_params_.measurement_frequency);
+		if (sensor_params_.draw_initial_points && signal_attenuation == 0) DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, draw_time_);
 
 		// Bounce trace
 		FVector trace_direction;
@@ -163,26 +163,28 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 				if (sensor_params_.draw_reflected_lines) {
 					FVector draw_location = trace_start_position + trace_direction * distance_to_sensor;
 
-					float radius = 100;
-					FVector y_axis = FVector(0, 1, 0);
-					FVector z_axis = FVector(0, 0, 1);
-					DrawDebugCircle(actor_->GetWorld(), draw_location, radius, 32, FColor::Blue, false, 1 / sensor_params_.measurement_frequency, 0u, 0.0f, y_axis, z_axis, false);
+					DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, draw_time_);
+					DrawDebugPoint(actor_->GetWorld(), draw_location, 5, FColor::Red, false, draw_time_);
 
-					DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+					float radius = distance_to_sensor * FMath::Tan(opening_angle_half_);
+					VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
+					Vector3r y_axis = VectorMath::rotateVector(VectorMath::right(), trace_rotation_quat, true);
+					Vector3r z_axis = VectorMath::rotateVector(VectorMath::down(), trace_rotation_quat, true);
+					DrawDebugCircle(actor_->GetWorld(), draw_location, radius, 128, FColor::Blue, false, draw_time_, 0u, 1.0f, Vector3rToFVector(y_axis), Vector3rToFVector(z_axis), false);
 				}
 
 				/*if (sensor_params_.draw_reflected_lines) DrawDebugCone(actor_->GetWorld(), trace_start_position, trace_direction, distance_to_sensor, opening_angle_half_,
-					opening_angle_half_, 16, FColor::Blue, false, 1 / sensor_params_.measurement_frequency);*/
+					opening_angle_half_, 16, FColor::Blue, false, draw_time_);*/
 
-				if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_start_position, 5, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+				if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_start_position, 5, FColor::Red, false, draw_time_);
 
 				if (sensor_params_.draw_reflected_paths) {
-					DrawDebugLine(actor_->GetWorld(), sensor_location, trace_path[0], FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+					DrawDebugLine(actor_->GetWorld(), sensor_location, trace_path[0], FColor::Red, false, draw_time_);
 					for (int trace_count = 0; trace_count < trace_path.Num()-1; trace_count++)
 					{
-						DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count+1], FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+						DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count+1], FColor::Red, false, draw_time_);
 					}
-					DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_location, FColor::Red, false, 1 / sensor_params_.measurement_frequency);
+					DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_location, FColor::Red, false, draw_time_);
 				}
 
 				Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
