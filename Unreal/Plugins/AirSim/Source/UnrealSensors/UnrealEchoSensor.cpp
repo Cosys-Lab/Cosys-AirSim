@@ -16,9 +16,10 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	attenuation_per_distance_(getParams().attenuation_per_distance),
 	attenuation_per_reflection_(getParams().attenuation_per_reflection),
 	attenuation_limit_(getParams().attenuation_limit),
-	opening_angle_half_(FMath::DegreesToRadians(getParams().spread_opening_angle/2)),
+	opening_angle_(FMath::DegreesToRadians(getParams().spread_opening_angle)),
 	draw_time_(1.05f / sensor_params_.measurement_frequency)
 {
+	//TODO determine opening angle based on angular dropoff formula and max attenuation
 	generateSampleDirections();	
 	ignore_actors_ = TArray<AActor*>{};
 }
@@ -74,7 +75,12 @@ void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const ms
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
 	
 	// DRAW DEBUG
-	if(sensor_params_.draw_sensor) DrawDebugPoint(actor_->GetWorld(), ned_transform_->fromLocalNed(sensor_reference_frame_.position), 5, FColor::Blue, false, draw_time_);
+	if (sensor_params_.draw_sensor) {
+		FVector sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Blue, false, draw_time_);
+		//FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
+		//DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_);
+	}
 }
 
 // Pause Unreal simulation
@@ -101,24 +107,22 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 	{
 		Vector3r sample_direction = sample_directions_[direction_count];
 
-		int bounce_depth = 0;
-		float signal_attenuation = 0.0f;
-
-		FVector trace_direction = Vector3rToFVector(VectorMath::rotateVector(sample_direction, VectorMath::rotateQuaternion(vehicle_pose.orientation, sensor_pose.orientation, 1), 1)); // sensor_reference_frame_.orientation
-		float trace_length = ned_transform_->fromNed((attenuation_limit_ - signal_attenuation) / attenuation_per_distance_);  // Maximum possible distance given the current attenuation
+		FVector trace_direction = Vector3rToFVector(VectorMath::rotateVector(sample_direction, sensor_reference_frame_.orientation, 1)); // sensor_reference_frame_.orientation
+		float trace_length = ned_transform_->fromNed(attenuation_limit_ / attenuation_per_distance_);  // Maximum possible distance given the current attenuation
 		trace_length /= 2 ;  // For the initial emission, make sure points have a return path (= distance/2)
 		FVector trace_end_position = trace_start_position + trace_direction * trace_length;
 
 		// shoot trace and get the impact point and remaining attenuation, if any returns
-		traceDirection(trace_start_position, trace_end_position, signal_attenuation, point_cloud);
+		traceDirection(trace_start_position, trace_end_position, point_cloud);
 	}
 
 	return;
 }
 
-void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, float signal_attenuation,
-	msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
+void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
 
+	float total_distance = 0.0f;
+	float signal_attenuation = 0.0f;
 	TArray<FVector> trace_path = TArray<FVector>{};
 
 	while(signal_attenuation < attenuation_limit_) {
@@ -128,7 +132,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		// DRAW DEBUG
 		if (sensor_params_.draw_bounce_lines) {
 			FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (signal_attenuation / attenuation_limit_));
-			DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, line_color, false, 0.2f);
+			DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, line_color, false, draw_time_);
 		}
 
 		if (!trace_hit) {
@@ -141,11 +145,11 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		// Bounce trace
 		FVector trace_direction;
 		float trace_length;
-		bounceTrace(trace_start_position, trace_direction, trace_length, trace_hit_result, signal_attenuation);
+		total_distance += bounceTrace(trace_start_position, trace_direction, trace_length, trace_hit_result, signal_attenuation);
 		trace_end_position = trace_start_position + trace_direction * trace_length;
 
-		FVector sensor_location = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
-		float distance_to_sensor = FVector::Distance(trace_start_position, sensor_location);
+		FVector sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		float distance_to_sensor = FVector::Distance(trace_start_position, sensor_position);
 
 		if (distance_to_sensor > trace_length) {
 			return;
@@ -153,50 +157,54 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 
 		if (sensor_params_.draw_reflected_paths) trace_path.Emplace(trace_start_position);
 
-		bool sensorInCone = locationInCone(sensor_location - trace_start_position, trace_direction, opening_angle_half_);
-		if (sensorInCone)
+		FVector direction_to_sensor = sensor_position - trace_start_position;
+		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
+		float receiving_angle = angleBetweenVectors(direction_to_sensor, trace_direction);
+		bool sensorInOpeningAngle = (receiving_angle < opening_angle_);
+		bool sensorHeadOn = (angleBetweenVectors(direction_to_sensor, sensor_direction) >= (PI/2));
+		if (sensorInOpeningAngle && sensorHeadOn)
 		{
-			trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, sensor_location, FHitResult(ForceInit), ignore_actors_, ECC_Visibility, true);
-
-			if (!trace_hit) {  // No hit = clear LOS to sensor
-				// DRAW DEBUG
-				if (sensor_params_.draw_reflected_lines) {
-					FVector draw_location = trace_start_position + trace_direction * distance_to_sensor;
-
-					DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, draw_time_);
-					DrawDebugPoint(actor_->GetWorld(), draw_location, 5, FColor::Red, false, draw_time_);
-
-					float radius = distance_to_sensor * FMath::Tan(opening_angle_half_);
-					VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
-					Vector3r y_axis = VectorMath::rotateVector(VectorMath::right(), trace_rotation_quat, true);
-					Vector3r z_axis = VectorMath::rotateVector(VectorMath::down(), trace_rotation_quat, true);
-					DrawDebugCircle(actor_->GetWorld(), draw_location, radius, 128, FColor::Blue, false, draw_time_, 0u, 1.0f, Vector3rToFVector(y_axis), Vector3rToFVector(z_axis), false);
-				}
-
-				/*if (sensor_params_.draw_reflected_lines) DrawDebugCone(actor_->GetWorld(), trace_start_position, trace_direction, distance_to_sensor, opening_angle_half_,
-					opening_angle_half_, 16, FColor::Blue, false, draw_time_);*/
-
-				if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_start_position, 5, FColor::Red, false, draw_time_);
-
-				if (sensor_params_.draw_reflected_paths) {
-					DrawDebugLine(actor_->GetWorld(), sensor_location, trace_path[0], FColor::Red, false, draw_time_);
-					for (int trace_count = 0; trace_count < trace_path.Num()-1; trace_count++)
-					{
-						DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count+1], FColor::Red, false, draw_time_);
-					}
-					DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_location, FColor::Red, false, draw_time_);
-				}
-
-				Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
-				point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
-
-				point_cloud.emplace_back(point_sensor_frame.x());
-				point_cloud.emplace_back(point_sensor_frame.y());
-				point_cloud.emplace_back(point_sensor_frame.z());
-				point_cloud.emplace_back(signal_attenuation);
-
-				return;
+			float received_attenuation = signal_attenuation + receptionAttenuation(receiving_angle);
+			if (received_attenuation > attenuation_limit_) {
+				continue;
 			}
+
+			trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, sensor_position, FHitResult(ForceInit), ignore_actors_, ECC_Visibility, true);
+			if (trace_hit) {  // Hit = no clear LOS to sensor
+				continue;
+			}
+
+			Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
+			point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
+
+			point_cloud.emplace_back(point_sensor_frame.x());
+			point_cloud.emplace_back(point_sensor_frame.y());
+			point_cloud.emplace_back(point_sensor_frame.z());
+			point_cloud.emplace_back(received_attenuation);
+
+			// DRAW DEBUG
+			if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_start_position, 5, FColor::Red, false, draw_time_);
+			if (sensor_params_.draw_reflected_paths) {
+				DrawDebugLine(actor_->GetWorld(), sensor_position, trace_path[0], FColor::Red, false, draw_time_);
+				for (int trace_count = 0; trace_count < trace_path.Num() - 1; trace_count++)
+				{
+					DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count + 1], FColor::Red, false, draw_time_);
+				}
+				DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_position, FColor::Red, false, draw_time_);
+			}
+			if (sensor_params_.draw_reflected_lines) {
+				FVector draw_location = trace_start_position + trace_direction * distance_to_sensor;
+
+				DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, draw_time_);
+				DrawDebugPoint(actor_->GetWorld(), draw_location, 5, FColor::Red, false, draw_time_);
+
+				float radius = distance_to_sensor * FMath::Tan(opening_angle_);
+				VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
+				Vector3r y_axis = VectorMath::rotateVector(VectorMath::right(), trace_rotation_quat, true);
+				Vector3r z_axis = VectorMath::rotateVector(VectorMath::down(), trace_rotation_quat, true);
+				DrawDebugCircle(actor_->GetWorld(), draw_location, radius, 128, FColor::Blue, false, draw_time_, 0u, 1.0f, Vector3rToFVector(y_axis), Vector3rToFVector(z_axis), false);
+			}
+			point_cloud.emplace_back(total_distance);
 		}
 	}
 }
@@ -216,8 +224,6 @@ float UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trac
 
 	trace_length = ned_transform_->fromNed((attenuation_limit_ - signal_attenuation) / attenuation_per_distance_);  // Maximum possible distance given the current attenuation
 
-	//TODO determine attenuation based on angle
-
 	return distance_traveled;
 }
 
@@ -229,10 +235,17 @@ msr::airlib::Vector3r UnrealEchoSensor::FVectorToVector3r(const FVector &input_v
 	return Vector3r(input_vector.X, input_vector.Y, -input_vector.Z);
 }
 
-bool UnrealEchoSensor::locationInCone(FVector location, FVector pointing_vector, const float opening_angle) {
+float UnrealEchoSensor::angleBetweenVectors(FVector vector1, FVector vector2) {
 	// Location relative to origin
-	location.Normalize();
-	float angle_between_vectors = FMath::Acos(FVector::DotProduct(location, pointing_vector));
+	vector1.Normalize();
+	vector2.Normalize();
 
-	return angle_between_vectors <= opening_angle;
+	return FMath::Acos(FVector::DotProduct(vector1, vector2));
+}
+
+float UnrealEchoSensor::receptionAttenuation(float reception_angle) {
+	float sigma = opening_angle_ / 10 * 3;
+
+	return (FMath::Exp(-FMath::Pow(reception_angle, 2) / (2*FMath::Pow(sigma, 2))) - 1) * attenuation_limit_;
+	//TODO invert curve
 }

@@ -34,14 +34,13 @@ private:
 
 	void generateSampleDirections();
 	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
-	void traceDirection(FVector trace_start_position, FVector trace_end_position, float signal_attenuation,
-		msr::airlib::vector<msr::airlib::real_T> &points);
+	void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T> &points);
     float bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length,
 		const FHitResult &trace_hit_result, float &signal_attenuation);
     FVector Vector3rToFVector(const Vector3r &input_vector);
 	Vector3r FVectorToVector3r(const FVector &input_vector);
-	bool locationInCone(FVector location, FVector pointing_vector, const float opening_angle);
-
+	float angleBetweenVectors(FVector vector1, FVector vector2);
+	float receptionAttenuation(float reception_angle);
 
 private:
 	AActor* actor_;
@@ -56,6 +55,6 @@ private:
 	const float attenuation_per_distance_;
 	const float attenuation_per_reflection_;
 	const float attenuation_limit_;
-	const float opening_angle_half_;
+	const float opening_angle_;
 	const float draw_time_;
 };
