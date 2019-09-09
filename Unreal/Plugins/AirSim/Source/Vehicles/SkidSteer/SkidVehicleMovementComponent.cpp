@@ -70,11 +70,11 @@ USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitia
 #endif // WITH_PHYSX
 }
 
-float FVehicleEngineData::FindPeakTorque() const
+float FindSkidPeakTorque(const FVehicleEngineData& Setup)
 {
 	// Find max torque
 	float PeakTorque = 0.f;
-	TArray<FRichCurveKey> TorqueKeys = TorqueCurve.GetRichCurveConst()->GetCopyOfKeys();
+	TArray<FRichCurveKey> TorqueKeys = Setup.TorqueCurve.GetRichCurveConst()->GetCopyOfKeys();
 	for (int32 KeyIdx = 0; KeyIdx < TorqueKeys.Num(); KeyIdx++)
 	{
 		FRichCurveKey& Key = TorqueKeys[KeyIdx];
@@ -92,7 +92,7 @@ static void GetSkidVehicleEngineSetup(const FVehicleEngineData& Setup, PxVehicle
 	PxSetup.mDampingRateZeroThrottleClutchEngaged = M2ToCm2(Setup.DampingRateZeroThrottleClutchEngaged);
 	PxSetup.mDampingRateZeroThrottleClutchDisengaged = M2ToCm2(Setup.DampingRateZeroThrottleClutchDisengaged);
 
-	float PeakTorque = Setup.FindPeakTorque(); // In Nm
+	float PeakTorque = FindSkidPeakTorque(Setup); // In Nm
 	PxSetup.mPeakTorque = M2ToCm2(PeakTorque);	// convert Nm to (kg cm^2/s^2)
 
 	// Convert from our curve to PhysX
