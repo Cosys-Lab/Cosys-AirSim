@@ -1,19 +1,17 @@
 
-# Setup CoSys-Lab Environment for AirSim  - WORK IN PROGRESS
+# Setup CoSys-Lab Environment for AirSim
 
 The CoSys-Lab environment is available in repo in folder `Unreal/Environments/CoSysLab`. 
 It has several new features to test all CoSys-Lab work done to AirSim.
 
-## (Planned) Features
-Compared to the Blocks Environment several aspects are different:
-- A large warehouse is available as testing ground. Build primarly for HySLAM project.
-- All glass surfaces are ignored by Lidar sensor.
-- Testing zone for the [Echo sensor](echo.md) is available.
-- Dynamic spawning of randomized objects on several location in the warehouse. (see below for how to create new variants) 
-- Dynamic AI humans and robots walking/driving around the warehouse. 
+## Features
+Currently the CoSys-Lab Environment is designed for testing the [Echo sensor type](echo.md) specifically. 
 
-## Create Dynamic Prop Spawner
-WIP
+## Asset Installation
+To keep this repository free of large asset files, they are stored separately on the CoSys-Lab Data Archive network share. 
+You can find the assets for this environment in _/AirSim Assets/Cosyslab environment/_. 
+
+There you can find the _Assets_ folder which you can copy to _/airsim/Unreal/Environments/CoSysLab/Content_.
 
 ## Initial Setup
 Here are quick steps to get CoSys-Lab environment up and running:
