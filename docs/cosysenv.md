@@ -9,7 +9,7 @@ Currently the CoSys-Lab Environment is designed for testing the [Echo sensor typ
 
 ## Asset Installation
 To keep this repository free of large asset files, they are stored separately on the CoSys-Lab Data Archive network share. 
-You can find the assets for this environment in _/AirSim Assets/Cosyslab environment/_. 
+You can find the assets for this environment in _/AirSim Assets/CoSysLab/_. 
 
 There you can find the _Assets_ folder which you can copy to _/airsim/Unreal/Environments/CoSysLab/Content_.
 
