@@ -19,7 +19,7 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting,
 	FVector position = FVector(0, 0, 0);
 	APhysicalSensorActor* physical_sensor_actor = NewObject<APhysicalSensorActor>(APhysicalSensorActor::StaticClass());
 	physical_sensor_actor_object_ = actor->GetWorld()->SpawnActor<AActor>(physical_sensor_actor->sensor_blueprint_, position, rotator, spawnParams);
-	physical_sensor_actor_object_->SetActorLabel(setting.sensor_name.c_str());
+	//physical_sensor_actor_object_->SetActorLabel(setting.sensor_name.c_str());
 
 	UStaticMeshComponent* sensorPlaneMesh = Cast<UStaticMeshComponent>(physical_sensor_actor_object_->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 	sensorPlaneMesh->SetRelativeScale3D(FVector(1, setting.sensor_diameter, setting.sensor_diameter));
@@ -156,7 +156,7 @@ bool UnrealEchoSensor::traceDirection(	const msr::airlib::Pose& echo_pose, const
 			return false;
 		}
         // If the ray/trace hits the physical sensor object, the impact becomes a valid point for the reflector pointcloud. This also stops the cycle
-		else if (trace_hit_result.GetActor()->GetActorLabel().Equals(sensor_name))  // Check if the trace intersects the sensor
+		else if (false)  // Check if the trace intersects the sensor
 		{
 
 			signal_attenuation_final = signal_attenuation; // Store the final signal attenuation to be stored in the data
