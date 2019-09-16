@@ -14,6 +14,12 @@ Please see [general sensors](sensors.md) for information on configruation of gen
 ```
 * Multiple lidars can be enabled on a vehicle.
 
+## Ignoring glass and other material types
+While one can set an object that should be invisible to LIDAR sensors (such as glass) to have no collision for Unreal Traces, a better solution is to use the Unreal Physics Material _Lidar_Ignore_PhysicalMaterial_. 
+When you apply this physics material to a Unreal Material (Instance) which in term is applied to an object in the world it will be detected by the LIDAR sensor and ignored. 
+
+**One has to use Material (Instances) to make it work. Assigning the Physics Material directly to an object will not work.**
+
 ## Lidar configuration
 The following parameters can be configured right now via settings json.
 
