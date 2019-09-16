@@ -21,6 +21,8 @@ struct EchoSimpleParams {
 	real_T measurement_frequency = 10;		// The frequency of the sensor (measurements/s)
 	real_T sensor_diameter = 0.5;			// The diameter of the sensor plane used to capture the reflecting traces (meter)
 	bool pause_after_measurement = false;	// Pause the simulation after each measurement. Useful for API interaction to be synced
+	bool engine_time = true;				// If false, real-time simulation will be used for timestamps and measurement frequency
+										    // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 
 	std::string name = "EchoSensor";
 
@@ -35,8 +37,7 @@ struct EchoSimpleParams {
 	bool draw_bounce_lines = false;			// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 	bool draw_sensor = false;				// Draw the physical sensor in the world on the vehicle
 
-	bool engine_time = true;				// If false, real-time simulation will be used for timestamps and measurement frequency
-											// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+
     std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
     real_T update_frequency = measurement_frequency;       // polling rate of update function, in Hz

@@ -6,6 +6,7 @@
 #include "common/Common.hpp"
 #include "NedTransform.h"
 #include "DrawDebugHelpers.h"
+#include <random>
 
 // ctor
 UnrealLidarSensor::UnrealLidarSensor(const AirSimSettings::LidarSetting& setting,
@@ -40,6 +41,17 @@ void UnrealLidarSensor::createLasers()
     }
 }
 
+// Pause Unreal simulation
+void UnrealLidarSensor::pause(const bool is_paused) {
+	if (is_paused) {
+		saved_clockspeed_ = UAirBlueprintLib::getUnrealClockSpeed(actor_);
+		UAirBlueprintLib::setUnrealClockSpeed(actor_, 0);
+	}
+	else {
+		UAirBlueprintLib::setUnrealClockSpeed(actor_, saved_clockspeed_);
+	}
+}
+
 // returns a point-cloud for the tick
 void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
     const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
@@ -53,11 +65,11 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
     // since SensorBase mechanism uses the elapsed clock time instead of the tick delta-time.
     constexpr float MAX_POINTS_IN_SCAN = 1e+5f;
     uint32 total_points_to_scan = FMath::RoundHalfFromZero(params.points_per_second * delta_time);
-    if (total_points_to_scan > MAX_POINTS_IN_SCAN)
+    if (params.limit_points && total_points_to_scan > MAX_POINTS_IN_SCAN)
     {
         total_points_to_scan = MAX_POINTS_IN_SCAN;
         UAirBlueprintLib::LogMessageString("Lidar: ", "Capping number of points to scan", LogDebugLevel::Failure);
-    }
+	}
 
     // calculate number of points needed for each laser/channel
     const uint32 points_to_scan_with_one_laser = FMath::RoundHalfFromZero(total_points_to_scan / float(number_of_lasers));
@@ -139,13 +151,30 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 	}
     if (is_hit && !ignoreMaterial)
     {
+
+		FVector impact_point = hit_result.ImpactPoint;
+
+		// If enabled add range noise
+		if (params.generate_noise) {
+			// Add noise based on normal distribution taking into account scaling of noise with distance
+			std::random_device rd2{};
+			std::mt19937 gen2{ rd2() };
+			std::normal_distribution<float> noise_dist2{ 0, params.min_noise_standard_deviation };
+			float distance_noise = noise_dist2(gen2) * (1 + ((hit_result.Distance / 100) / params.range) * (params.noise_distance_scale - 1));
+
+			Vector3r impact_point_local = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * ((hit_result.Distance / 100) + distance_noise) + start;
+			impact_point = ned_transform_->fromLocalNed(impact_point_local);
+		}
+
+		
+
         if (false && UAirBlueprintLib::IsInGameThread())
         {
             // Debug code for very specific cases.
             // Mostly shouldn't be needed. Use SimModeBase::drawLidarDebugPoints()
             DrawDebugPoint(
                 actor_->GetWorld(),
-                hit_result.ImpactPoint,
+				impact_point,
                 5,                       //size
                 FColor::Red,
                 true,                    //persistent (never goes away)
@@ -157,11 +186,11 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
         if (params.data_frame == AirSimSettings::kVehicleInertialFrame) {
             // current detault behavior; though it is probably not very useful.
             // not changing the default for now to maintain backwards-compat.
-            point = ned_transform_->toLocalNed(hit_result.ImpactPoint);
+            point = ned_transform_->toLocalNed(impact_point);
         }
         else if (params.data_frame == AirSimSettings::kSensorLocalFrame) {
             // point in vehicle intertial frame
-            Vector3r point_v_i = ned_transform_->toLocalNed(hit_result.ImpactPoint);
+            Vector3r point_v_i = ned_transform_->toLocalNed(impact_point);
 
             // tranform to lidar frame
             point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
