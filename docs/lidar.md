@@ -14,6 +14,12 @@ Please see [general sensors](sensors.md) for information on configruation of gen
 ```
 * Multiple lidars can be enabled on a vehicle.
 
+## Ignoring glass and other material types
+While one can set an object that should be invisible to LIDAR sensors (such as glass) to have no collision for Unreal Traces, a better solution is to use the Unreal Physics Material _Lidar_Ignore_PhysicalMaterial_. 
+When you apply this physics material to a Unreal Material (Instance) which in term is applied to an object in the world it will be detected by the LIDAR sensor and ignored. 
+
+**One has to use Material (Instances) to make it work. Assigning the Physics Material directly to an object will not work.**
+
 ## Lidar configuration
 The following parameters can be configured right now via settings json.
 
@@ -30,7 +36,11 @@ VerticalFOVLower          | Vertical FOV lower limit for the lidar, in degrees
 X Y Z                     | Position of the lidar relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
-
+PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
+EngineTime                | If false, real-time simulation will be used for timestamps and measurement frequency. If true the time passed in-engine will be used (for when performance doesn't allow real-time operation)
+GenerateNoise             | Generate and add range-noise based on normal distribution if set to true
+MinNoiseStandardDeviation | The standard deviation to generate the noise normal distribution, in meters. This is the minimal noise (at 0 distance)
+NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
 e.g.,
 ```
 {

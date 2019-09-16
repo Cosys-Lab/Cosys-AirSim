@@ -22,7 +22,7 @@ public:
         params_.initializeFromSettings(setting);
 
         //initialize frequency limiter
-        freq_limiter_.initialize(params_.update_frequency, params_.startup_delay);
+        freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, params_.engine_time);
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -39,12 +39,19 @@ public:
     virtual void update(float delta = 0) override
     {
         LidarBase::update(delta);
-
         freq_limiter_.update(delta);
 
-        if (freq_limiter_.isWaitComplete()) {
-            updateOutput();
-        }
+		if(last_tick_measurement_ && params_.pause_after_measurement == false && params_.engine_time) {
+			pause(false);
+			last_tick_measurement_ = false;
+		}
+		if (freq_limiter_.isWaitComplete())
+		{
+			last_time_ = freq_limiter_.getLastTime();
+			if (params_.engine_time || params_.pause_after_measurement)pause(true);
+			updateOutput();
+			if (params_.engine_time)last_tick_measurement_ = true;
+		}
     }
 
     virtual void reportState(StateReporter& reporter) override
@@ -54,6 +61,8 @@ public:
 
         reporter.writeValue("Lidar-NumChannels", params_.number_of_channels);
         reporter.writeValue("Lidar-Range", params_.range);
+		reporter.writeValue("Lidar-PointsPerSecond", params_.points_per_second);
+		reporter.writeValue("Lidar-HorizontalRotationFrequency", params_.horizontal_rotation_frequency);
         reporter.writeValue("Lidar-FOV-Upper", params_.vertical_FOV_upper);
         reporter.writeValue("Lidar-FOV-Lower", params_.vertical_FOV_lower);
     }
@@ -70,11 +79,13 @@ protected:
     virtual void getPointCloud(const Pose& lidar_pose, const Pose& vehicle_pose, 
         TTimeDelta delta_time, vector<real_T>& point_cloud) = 0;
 
+	virtual void pause(const bool is_paused) = 0;
+
     
 private: //methods
     void updateOutput()
     {
-        TTimeDelta delta_time = clock()->updateSince(last_time_);
+		TTimeDelta delta_time = freq_limiter_.getLastElapsedIntervalSec();
 
         point_cloud_.clear();
 
@@ -89,11 +100,13 @@ private: //methods
         //    ImageResponse for cameras and pose returned by getCameraInfo API.
         //    Do we need to convert pose to Global NED frame before returning to clients?
         Pose lidar_pose = params_.relative_pose + ground_truth.kinematics->pose;
+		double start = FPlatformTime::Seconds();
         getPointCloud(params_.relative_pose, // relative lidar pose
             ground_truth.kinematics->pose,   // relative vehicle pose
             delta_time, 
             point_cloud_);
-
+		double end = FPlatformTime::Seconds();
+		UAirBlueprintLib::LogMessageString("sensor: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
         LidarData output;
         output.point_cloud = point_cloud_;
         output.time_stamp = clock()->nowNanos();
@@ -110,6 +123,8 @@ private:
 
     FrequencyLimiter freq_limiter_;
     TTimePoint last_time_;
+	bool last_tick_measurement_ = false;
+
 };
 
 }} //namespace
