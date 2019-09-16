@@ -26,6 +26,10 @@ struct LidarSimpleParams {
     real_T vertical_FOV_upper = -15;             // drones -15, car +10
     real_T vertical_FOV_lower = -45;             // drones -45, car -10
 
+	bool generate_noise = false;			  // Toggle range based noise
+	real_T min_noise_standard_deviation = 0;  // Minimum noise standard deviation 
+	real_T noise_distance_scale = 1;		  // Factor to scale noise based on distance
+
     Pose relative_pose {
         Vector3r(0,0,-1),                     // position - a little above vehicle (especially for cars) or Vector3r::Zero()
         Quaternionr::Identity()               // orientation - by default Quaternionr(1, 0, 0, 0) 
@@ -48,6 +52,10 @@ struct LidarSimpleParams {
 
         horizontal_FOV_start = settings.horizontal_FOV_start;
         horizontal_FOV_end = settings.horizontal_FOV_end;
+
+		generate_noise = settings.generate_noise;
+		min_noise_standard_deviation = settings.min_noise_standard_deviation;
+		noise_distance_scale = settings.noise_distance_scale;
 
         // By default, for multirotors the lidars FOV point downwards;
         // for cars, the lidars FOV is more forward facing.

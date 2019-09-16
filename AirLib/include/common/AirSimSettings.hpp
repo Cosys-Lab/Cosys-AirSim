@@ -212,6 +212,10 @@ public: //types
         float horizontal_FOV_start = 0;                   // degrees
         float horizontal_FOV_end = 359;                   // degrees
 
+		bool generate_noise = false;					  // Toggle range based noise
+		real_T min_noise_standard_deviation = 0;		  // Minimum noise standard deviation 
+		real_T noise_distance_scale = 1;			      // Factor to scale noise based on distance
+
         // defaults specific to a mode
         float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
         float vertical_FOV_lower = Utils::nan<float>();   // drones -45, car -10
@@ -1183,6 +1187,11 @@ private:
         lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
         lidar_setting.points_per_second = settings_json.getInt("PointsPerSecond", lidar_setting.points_per_second);
         lidar_setting.horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
+
+		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
+		lidar_setting.min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", lidar_setting.min_noise_standard_deviation);
+		lidar_setting.noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", lidar_setting.noise_distance_scale);
+
         lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
         lidar_setting.data_frame = settings_json.getString("DataFrame", lidar_setting.data_frame);
 

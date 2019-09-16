@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "sensors/lidar/LidarSimple.hpp"
 #include "NedTransform.h"
+#include <random>
 
 // UnrealLidarSensor implementation that uses Ray Tracing in Unreal.
 // The implementation uses a model similar to CARLA Lidar implementation.
