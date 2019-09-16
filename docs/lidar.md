@@ -31,7 +31,7 @@ X Y Z                     | Position of the lidar relative to the vehicle (in NE
 Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
 PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
-EngineTime                | If false real-time simulation will be used for timestamps and measurement frequency. If true the time passed in-engine will be used (when performance doesn't allow real-time operation)
+EngineTime                | If false, real-time simulation will be used for timestamps and measurement frequency. If true the time passed in-engine will be used (for when performance doesn't allow real-time operation)
 GenerateNoise             | Generate and add range-noise based on normal distribution if set to true
 MinNoiseStandardDeviation | The standard deviation to generate the noise normal distribution, in meters. This is the minimal noise (at 0 distance)
 NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
