@@ -15,6 +15,7 @@ Cars in AirSim
 [![AirSim Car Demo Video](docs/images/car_demo_video.png)](https://youtu.be/gnz1X3UNM5Y)
 
 ## CoSys-Lab Modifications
+* Added [HySLAM environment](docs/hyslamenv.md)
 * Added [CoSysLab environment](docs/cosysenv.md)
 * Added [Echo sensor type](docs/echo.md)
 * Updated LIDAR sensor: Fixed not tracing correctly
