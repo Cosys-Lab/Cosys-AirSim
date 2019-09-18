@@ -42,8 +42,8 @@ struct EchoSimpleParams {
 											// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
     std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
-    real_T update_frequency = measurement_frequency;       // polling rate of update function, in Hz
-    real_T startup_delay = 0;                              // startup delay of sensor, in sec
+    real_T update_frequency;				// polling rate of update function, in Hz
+    real_T startup_delay;               // startup delay of sensor, in sec
 
     void initializeFromSettings(const AirSimSettings::EchoSetting& settings)
     {
@@ -93,6 +93,8 @@ struct EchoSimpleParams {
 		engine_time = settings.engine_time;
         data_frame = settings.data_frame;
 		update_frequency = settings.measurement_frequency;
+
+		startup_delay = 0;
     }
 };
 
