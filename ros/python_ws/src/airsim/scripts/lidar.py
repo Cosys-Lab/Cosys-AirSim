@@ -3,19 +3,15 @@
 import setup_path 
 import airsim
 import rospy
-import tf
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
 import sensor_msgs.point_cloud2 as pc2
 from sensor_msgs.msg import PointCloud2, PointField
-from roslib import message
-import random 
-import time
 import numpy as np
 
 
-def airpub():
-    pub = rospy.Publisher("airsimLidar", PointCloud2, queue_size=1)
+def lidar_airpub(frameID, pubNode, sensorName, vehicleName):
+    pub = rospy.Publisher(pubNode, PointCloud2, queue_size=1)
     rospy.init_node('airsim_lidar_pub', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
@@ -31,7 +27,7 @@ def airpub():
         pcloud = PointCloud2()
 
         # get lidar data
-        lidarData = client.getLidarData()
+        lidarData = client.getLidarData(sensorName, vehicleName)
 
         # check first if the data is from a new measurement by comparing timestamps
         if lidarData.time_stamp != lastTimestamp:
@@ -48,7 +44,7 @@ def airpub():
                 for point in points:      
                     cloud.append(list(point * np.array([1, -1, -1])))
 
-                pcloud.header.frame_id = "airSimPoseFrame"
+                pcloud.header.frame_id = frameID
                 pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
                 
                 #publish Pointcloud2 message
@@ -61,6 +57,10 @@ def airpub():
 
 if __name__ == '__main__':
     try:
-        airpub()
+        frameID = rospy.get_param('frame_id', 'airSimPoseFrame')
+        pubNode =  rospy.get_param('pub_node', 'airsimLidar')
+        sensorName =  rospy.get_param('sensor_name', 'lidar')
+        vehicleName = rospy.get_param('vehicle_name', 'vehicle')
+        lidar_airpub(frameID, pubNode, sensorName, vehicleName)
     except rospy.ROSInterruptException:
         pass

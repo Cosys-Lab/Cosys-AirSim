@@ -3,15 +3,12 @@
 import setup_path 
 import airsim
 import rospy
-import tf
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
-import numpy as np
-import time
 
 
-def airpub():
-    pub = rospy.Publisher("airsimPose", PoseStamped, queue_size=1)
+def car_pose_airpub(frameID, pubNode, vehicleName):
+    pub = rospy.Publisher(pubNode, PoseStamped, queue_size=1)
     rospy.init_node('airsim_car_pose_pub', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
@@ -22,7 +19,7 @@ def airpub():
     while not rospy.is_shutdown():
 
         # get state of the car
-        car_state = client.getCarState()
+        car_state = client.getCarState(vehicleName)
         pos = car_state.kinematics_estimated.position
         orientation = car_state.kinematics_estimated.orientation.inverse()
 
@@ -37,7 +34,7 @@ def airpub():
         simPose.pose.orientation.z = orientation.z_val
         simPose.header.stamp = rospy.Time.now()
         simPose.header.seq = 1
-        simPose.header.frame_id = "world"
+        simPose.header.frame_id = frameID
         
         # log PoseStamped message
         rospy.loginfo(simPose)
@@ -49,6 +46,9 @@ def airpub():
 
 if __name__ == '__main__':
     try:
-        airpub()
+        frameID = rospy.get_param('frame_id', 'world')
+        pubNode =  rospy.get_param('pub_node', 'airsimPose')
+        vehicleName = rospy.get_param('vehicle_name', 'vehicle')
+        car_pose_airpub(frameID, pubNode, vehicleName)
     except rospy.ROSInterruptException:
         pass

@@ -3,19 +3,13 @@
 import setup_path 
 import airsim
 import rospy
-import tf
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseStamped
-import sensor_msgs.point_cloud2 as pc2
 from sensor_msgs.msg import Imu
-from roslib import message
-import random 
-import time
 import numpy as np
 
 
-def airpub():
-    pub = rospy.Publisher("airsimIMU", Imu, queue_size=1)
+def imu_airpub(frameID, pubNode, sensorName, vehicleName):
+    pub = rospy.Publisher(pubNode, Imu, queue_size=1)
     rospy.init_node('airsim_imu_pub', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
@@ -26,11 +20,11 @@ def airpub():
     while not rospy.is_shutdown():
         
          # get data of IMU sensor
-        imuData = client.getImuData("IMU","CPHusky")
+        imuData = client.getImuData(sensorName, vehicleName)
 
         # populate Imu ros message
         imu_msg = Imu()
-        imu_msg.header.frame_id = "airSimPoseFrame"
+        imu_msg.header.frame_id = frameID
         imu_msg.orientation.x = imuData.orientation.inverse().x_val
         imu_msg.orientation.y = imuData.orientation.inverse().y_val
         imu_msg.orientation.z = imuData.orientation.inverse().z_val
@@ -55,6 +49,10 @@ def airpub():
 
 if __name__ == '__main__':
     try:
-        airpub()
+        frameID = rospy.get_param('frame_id', 'airSimPoseFrame')
+        pubNode =  rospy.get_param('pub_node', 'airsimIMU')
+        sensorName =  rospy.get_param('sensor_name', 'imu')
+        vehicleName = rospy.get_param('vehicle_name', 'vehicle')
+        imu_airpub(frameID, pubNode, sensorName, vehicleName)
     except rospy.ROSInterruptException:
         pass

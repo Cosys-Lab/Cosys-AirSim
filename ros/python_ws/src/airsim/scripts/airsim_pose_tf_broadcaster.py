@@ -1,22 +1,18 @@
 #!/usr/bin/env python
 
-import setup_path 
-import airsim
 import rospy
-import roslib
-import time
+import tf
 import tf2_ros
-from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import TransformStamped
+import geometry_msgs.msg
  
 
-def handle_airsim_pose(msg):
+def handle_airsim_pose(msg, args):
     br = tf2_ros.TransformBroadcaster()
-    t = TransformStamped()
+    t = geometry_msgs.msg.TransformStamped()
 
     t.header.stamp = rospy.Time.now()
-    t.header.frame_id = "world"
-    t.child_frame_id = "airSimPoseFrame"
+    t.header.frame_id = args[0]
+    t.child_frame_id = args[1]
     t.transform.translation.x = msg.pose.position.x
     t.transform.translation.y = msg.pose.position.y
     t.transform.translation.z = msg.pose.position.z
@@ -29,6 +25,9 @@ def handle_airsim_pose(msg):
 
 if __name__ == '__main__':
     rospy.init_node('airsim_pose_tf_broadcaster')
-    rospy.Subscriber('airsimPose',PoseStamped, handle_airsim_pose)
+    frameID = rospy.get_param('frame_id', 'world')
+    childFrameID = rospy.get_param('child_frame_id', 'airSimPoseFrame')
+    poseNode = rospy.get_param('pose_node', 'airsimPose')
+    rospy.Subscriber(poseNode, geometry_msgs.msg.PoseStamped, handle_airsim_pose, (frameID, childFrameID))
     rospy.spin()
 

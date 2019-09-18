@@ -1,0 +1,24 @@
+  <launch>
+    <node name="airsim_car_pose" pkg="airsim" type="car_pose.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="world" />
+          <param name="pub_node" type="string" value="airsimPose" />
+          <param name="vehicle_name" type="string" value="vehicle" />
+    </node>
+    <node name="airsim_car_pose_tf" pkg="airsim" type="airsim_pose_tf_broadcaster.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="world" />
+          <param name="child_frame_id" type="string" value="airSimPoseFrame" />
+          <param name="pose_node" type="string" value="airsimPose" />
+    </node>
+    <node name="airsim_imu" pkg="airsim" type="imu.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="airSimPoseFrame" />
+          <param name="pub_node" type="string" value="airsimIMU" />
+          <param name="vehicle_name" type="string" value="imu" />
+          <param name="vehicle_name" type="string" value="vehicle" />
+    </node>
+    <node name="airsim_lidar" pkg="airsim" type="lidar.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="airSimPoseFrame" />
+          <param name="pub_node" type="string" value="airsimLidar" />
+          <param name="vehicle_name" type="string" value="lidar" />
+          <param name="vehicle_name" type="string" value="vehicle" />
+    </node>
+  </launch>
