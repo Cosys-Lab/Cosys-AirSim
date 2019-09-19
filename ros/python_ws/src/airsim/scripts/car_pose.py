@@ -46,9 +46,9 @@ def car_pose_airpub(frameID, pubNode, vehicleName):
 
 if __name__ == '__main__':
     try:
-        frameID = rospy.get_param('frame_id', 'world')
-        pubNode =  rospy.get_param('pub_node', 'airsimPose')
-        vehicleName = rospy.get_param('vehicle_name', 'vehicle')
+        frameID =rospy.get_param('~frame_id', 'world')
+        pubNode = rospy.get_param('~pub_node', 'airsim/car_pose')
+        vehicleName = rospy.get_param('~vehicle_name', 'vehicle')
         car_pose_airpub(frameID, pubNode, vehicleName)
     except rospy.ROSInterruptException:
         pass

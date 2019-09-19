@@ -57,10 +57,10 @@ def lidar_airpub(frameID, pubNode, sensorName, vehicleName):
 
 if __name__ == '__main__':
     try:
-        frameID = rospy.get_param('frame_id', 'airSimPoseFrame')
-        pubNode =  rospy.get_param('pub_node', 'airsimLidar')
-        sensorName =  rospy.get_param('sensor_name', 'lidar')
-        vehicleName = rospy.get_param('vehicle_name', 'vehicle')
+        frameID = rospy.get_param('~frame_id', 'base_laser')
+        pubNode =  rospy.get_param('~pub_node', 'airsim/lidar')
+        sensorName =  rospy.get_param('~sensor_name', 'lidar')
+        vehicleName = rospy.get_param('~vehicle_name', 'vehicle')
         lidar_airpub(frameID, pubNode, sensorName, vehicleName)
     except rospy.ROSInterruptException:
         pass

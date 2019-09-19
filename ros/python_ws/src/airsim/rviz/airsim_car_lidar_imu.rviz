@@ -6,7 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Imu1
+        - /Grid1
+        - /PointCloud21
         - /Axes1
       Splitter Ratio: 0.5
     Tree Height: 768
@@ -49,23 +50,8 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 1000
       Reference Frame: <Fixed Frame>
-      Value: true
-    - Alpha: 1
-      Axes Length: 1
-      Axes Radius: 0.100000001
-      Class: rviz/Pose
-      Color: 255; 25; 0
-      Enabled: true
-      Head Length: 0.300000012
-      Head Radius: 0.100000001
-      Name: Pose
-      Shaft Length: 1
-      Shaft Radius: 0.0500000007
-      Shape: Arrow
-      Topic: /airsimPose
-      Unreliable: false
       Value: true
     - Alpha: 1
       Class: rviz_plugin_tutorials/Imu
@@ -73,14 +59,14 @@ Visualization Manager:
       Enabled: false
       History Length: 1
       Name: Imu
-      Topic: /airsimIMU
+      Topic: /airsim/imu
       Unreliable: false
       Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10.0571909
-        Min Value: -2.1411624
+        Max Value: 9.69056511
+        Min Value: -2.14358258
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -101,7 +87,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.00999999978
       Style: Points
-      Topic: /airsimLidar
+      Topic: /airsim/lidar
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -111,7 +97,7 @@ Visualization Manager:
       Length: 1
       Name: Axes
       Radius: 0.100000001
-      Reference Frame: airSimPoseFrame
+      Reference Frame: base_link
       Value: true
   Enabled: true
   Global Options:
@@ -138,25 +124,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 77.3917007
+      Distance: 323.629333
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 7.5544529
+        Y: 43.9005966
+        Z: -11.4075136
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.550397754
+      Pitch: 1.06039739
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.71858978
+      Yaw: 2.7635808
     Saved: ~
 Window Geometry:
   Displays:
@@ -174,5 +160,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1920
-  X: 1920
+  X: 0
   Y: 23

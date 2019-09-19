@@ -49,10 +49,10 @@ def imu_airpub(frameID, pubNode, sensorName, vehicleName):
 
 if __name__ == '__main__':
     try:
-        frameID = rospy.get_param('frame_id', 'airSimPoseFrame')
-        pubNode =  rospy.get_param('pub_node', 'airsimIMU')
-        sensorName =  rospy.get_param('sensor_name', 'imu')
-        vehicleName = rospy.get_param('vehicle_name', 'vehicle')
+        frameID = rospy.get_param('~frame_id', 'base_link')
+        pubNode =  rospy.get_param('~pub_node', 'airsim/imu')
+        sensorName =  rospy.get_param('~sensor_name', 'imu')
+        vehicleName = rospy.get_param('~vehicle_name', 'vehicle')
         imu_airpub(frameID, pubNode, sensorName, vehicleName)
     except rospy.ROSInterruptException:
         pass
