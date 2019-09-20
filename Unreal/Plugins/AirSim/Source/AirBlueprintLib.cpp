@@ -21,6 +21,7 @@
 #include "Engine/Engine.h"
 #include <exception>
 #include "common/common_utils/Utils.hpp"
+#include "Components/LineBatchComponent.h"
 
 /*
 //TODO: change naming conventions to same as other files?
@@ -47,6 +48,133 @@ EAppReturnType::Type UAirBlueprintLib::ShowMessage(EAppMsgType::Type message_typ
         FText::FromString(message.c_str()),
         &title_text);
 }
+
+ULineBatchComponent* GetLineBatcher(const UWorld* InWorld, bool bPersistentLines, float LifeTime, bool bDepthIsForeground)
+{
+	return (InWorld ? (bDepthIsForeground ? InWorld->ForegroundLineBatcher : ((bPersistentLines || (LifeTime > 0.f)) ? InWorld->PersistentLineBatcher : InWorld->LineBatcher)) : NULL);
+}
+
+static float GetLineLifeTime(ULineBatchComponent* LineBatcher, float LifeTime, bool bPersistent)
+{
+	return bPersistent ? -1.0f : ((LifeTime > 0.f) ? LifeTime : LineBatcher->DefaultLifeTime);
+}
+
+void UAirBlueprintLib::DrawLine(const UWorld* InWorld, FVector const& LineStart, FVector const& LineEnd, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness)
+{
+	// no debug line drawing on dedicated server
+	if (GEngine->GetNetMode(InWorld) != NM_DedicatedServer)
+	{
+		// this means foreground lines can't be persistent 
+		ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
+		if (LineBatcher != NULL)
+		{
+			float const LineLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
+			LineBatcher->DrawLine(LineStart, LineEnd, Color, DepthPriority, Thickness, LineLifeTime);
+		}
+	}
+}
+
+void UAirBlueprintLib::DrawPoint(const UWorld* InWorld, FVector const& Position, float Size, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority)
+{
+	// no debug line drawing on dedicated server
+	if (GEngine->GetNetMode(InWorld) != NM_DedicatedServer)
+	{
+		// this means foreground lines can't be persistent 
+		ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
+		if (LineBatcher != NULL)
+		{
+			const float PointLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
+			LineBatcher->DrawPoint(Position, Color.ReinterpretAsLinear(), Size, DepthPriority, PointLifeTime);
+		}
+	}
+}
+
+static void InternalDrawCircle(const UWorld* InWorld, const FMatrix& TransformMatrix, float Radius, int32 Segments, const FColor& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness = 0.f)
+{
+	// no debug line drawing on dedicated server
+	if (GEngine->GetNetMode(InWorld) != NM_DedicatedServer)
+	{
+		ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
+		if (LineBatcher != NULL)
+		{
+			const float LineLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
+
+			// Need at least 4 segments
+			Segments = FMath::Max(Segments, 4);
+			const float AngleStep = 2.f * PI / float(Segments);
+
+			const FVector Center = TransformMatrix.GetOrigin();
+			const FVector AxisY = TransformMatrix.GetScaledAxis(EAxis::Y);
+			const FVector AxisZ = TransformMatrix.GetScaledAxis(EAxis::Z);
+
+			TArray<FBatchedLine> Lines;
+			Lines.Empty(Segments);
+
+			float Angle = 0.f;
+			while (Segments--)
+			{
+				const FVector Vertex1 = Center + Radius * (AxisY * FMath::Cos(Angle) + AxisZ * FMath::Sin(Angle));
+				Angle += AngleStep;
+				const FVector Vertex2 = Center + Radius * (AxisY * FMath::Cos(Angle) + AxisZ * FMath::Sin(Angle));
+				Lines.Add(FBatchedLine(Vertex1, Vertex2, Color, LineLifeTime, Thickness, DepthPriority));
+			}
+			LineBatcher->DrawLines(Lines);
+		}
+	}
+}
+
+void UAirBlueprintLib::DrawCircle(const UWorld* InWorld, const FMatrix& TransformMatrix, float Radius, int32 Segments, const FColor& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness, bool bDrawAxis)
+{
+	// no debug line drawing on dedicated server
+	if (GEngine->GetNetMode(InWorld) != NM_DedicatedServer)
+	{
+		ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
+		if (LineBatcher != NULL)
+		{
+			const float LineLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
+
+			// Need at least 4 segments
+			Segments = FMath::Max((Segments - 2) / 2, 4);
+			InternalDrawCircle(InWorld, TransformMatrix, Radius, Segments, Color, bPersistentLines, LifeTime, DepthPriority, Thickness);
+
+			if (bDrawAxis)
+			{
+				const FVector Center = TransformMatrix.GetOrigin();
+				const FVector AxisY = TransformMatrix.GetScaledAxis(EAxis::Y);
+				const FVector AxisZ = TransformMatrix.GetScaledAxis(EAxis::Z);
+
+				TArray<FBatchedLine> Lines;
+				Lines.Empty(2);
+				Lines.Add(FBatchedLine(Center - Radius * AxisY, Center + Radius * AxisY, Color, LineLifeTime, Thickness, DepthPriority));
+				Lines.Add(FBatchedLine(Center - Radius * AxisZ, Center + Radius * AxisZ, Color, LineLifeTime, Thickness, DepthPriority));
+				LineBatcher->DrawLines(Lines);
+			}
+		}
+	}
+}
+
+void UAirBlueprintLib::DrawCircle(const UWorld* InWorld, FVector Center, float Radius, int32 Segments, const FColor& Color, bool PersistentLines, float LifeTime, uint8 DepthPriority, float Thickness, FVector YAxis, FVector ZAxis, bool bDrawAxis)
+{
+	FMatrix TM;
+	TM.SetOrigin(Center);
+	TM.SetAxis(0, FVector(1, 0, 0));
+	TM.SetAxis(1, YAxis);
+	TM.SetAxis(2, ZAxis);
+
+	DrawCircle(
+		InWorld,
+		TM,
+		Radius,
+		Segments,
+		Color,
+		PersistentLines,
+		LifeTime,
+		DepthPriority,
+		Thickness,
+		bDrawAxis
+	);
+}
+
 
 void UAirBlueprintLib::enableWorldRendering(AActor* context, bool enable)
 {
