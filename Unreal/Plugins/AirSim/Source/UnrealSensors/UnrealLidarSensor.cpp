@@ -12,7 +12,12 @@
 UnrealLidarSensor::UnrealLidarSensor(const AirSimSettings::LidarSetting& setting,
     AActor* actor, const NedTransform* ned_transform)
     : LidarSimple(setting), actor_(actor), ned_transform_(ned_transform)
-{
+{ 
+	// Seed and initiate noise
+	std::random_device rd;
+	gen_ = std::mt19937(rd());
+	dist_ = std::normal_distribution<float>(0, getParams().min_noise_standard_deviation);
+
     createLasers();
 }
 
@@ -143,7 +148,7 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
     Vector3r end = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * params.range + start;
    
     FHitResult hit_result = FHitResult(ForceInit);
-	bool is_hit = UAirBlueprintLib::GetObstacle(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, TArray<AActor*>{}, ECC_Visibility, true, true);
+	bool is_hit = UAirBlueprintLib::GetObstacle(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, TArray<AActor*>{ actor_ }, ECC_Visibility, true, true);
 	bool ignoreMaterial = false;
 	if (hit_result.PhysMaterial != nullptr) {
 		if (hit_result.PhysMaterial.Get()->GetFName().ToString().Contains("Lidar_Ignore_PhysicalMaterial"))
@@ -157,16 +162,11 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 		// If enabled add range noise
 		if (params.generate_noise) {
 			// Add noise based on normal distribution taking into account scaling of noise with distance
-			std::random_device rd2{};
-			std::mt19937 gen2{ rd2() };
-			std::normal_distribution<float> noise_dist2{ 0, params.min_noise_standard_deviation };
-			float distance_noise = noise_dist2(gen2) * (1 + ((hit_result.Distance / 100) / params.range) * (params.noise_distance_scale - 1));
+			float distance_noise = dist_(gen_) * (1 + ((hit_result.Distance / 100) / params.range) * (params.noise_distance_scale - 1));
 
 			Vector3r impact_point_local = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * ((hit_result.Distance / 100) + distance_noise) + start;
 			impact_point = ned_transform_->fromLocalNed(impact_point_local);
-		}
-
-		
+		}		
 
         if (false && UAirBlueprintLib::IsInGameThread())
         {

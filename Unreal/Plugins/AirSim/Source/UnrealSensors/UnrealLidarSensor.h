@@ -41,4 +41,6 @@ private:
 	float saved_clockspeed_ = 1;
     msr::airlib::vector<msr::airlib::real_T> laser_angles_;
     float current_horizontal_angle_ = 0.0f;
+	std::mt19937 gen_;
+	std::normal_distribution<float> dist_;
 };
