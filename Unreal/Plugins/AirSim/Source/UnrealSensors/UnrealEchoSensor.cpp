@@ -164,9 +164,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		FVector direction_to_sensor = sensor_position - trace_start_position;
 		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
 		float receiving_angle = angleBetweenVectors(direction_to_sensor, trace_direction);
-		bool sensorInOpeningAngle = (receiving_angle < opening_angle_);
-		bool sensorHeadOn = (angleBetweenVectors(direction_to_sensor, sensor_direction) >= (PI/2));
-		if (sensorInOpeningAngle && sensorHeadOn)
+		if (receiving_angle < opening_angle_)  // Sensor lies in opening angle
 		{
 			float received_attenuation = signal_attenuation + receptionAttenuation(receiving_angle);
 			if (received_attenuation > attenuation_limit_) {
