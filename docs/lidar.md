@@ -41,7 +41,6 @@ EngineTime                | If false, real-time simulation will be used for time
 GenerateNoise             | Generate and add range-noise based on normal distribution if set to true
 MinNoiseStandardDeviation | The standard deviation to generate the noise normal distribution, in meters. This is the minimal noise (at 0 distance)
 NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
-e.g.,
 ```
 {
     "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
@@ -113,6 +112,3 @@ Use `getLidarData()` API to retrieve the Lidar data.
 ### Python Examples
 [drone_lidar.py](https://github.com/Microsoft/AirSim/tree/master/PythonClient//multirotor)
 [car_lidar.py](https://github.com/Microsoft/AirSim/tree/master/PythonClient//car)
-
-## Coming soon
-* Visualization of lidar data on client side.

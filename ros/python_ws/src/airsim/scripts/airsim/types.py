@@ -189,11 +189,11 @@ class Quaternionr(MsgpackMixin):
     def get_length(self):
         return ( self.x_val**2 + self.y_val**2 + self.z_val**2 + self.w_val**2 )**0.5
 
-    def to_numpy_array(self):
-        return np.array([self.x_val, self.y_val, self.z_val, self.w_val], dtype=np.float32)
-
     def from_numpy_array(self, array):
         return Quaternionr( array[0], array[1], array[2], array[3] )
+
+    def to_numpy_array(self):
+        return np.array([self.x_val, self.y_val, self.z_val, self.w_val], dtype=np.float32)
 
 
 class Pose(MsgpackMixin):
@@ -356,6 +356,11 @@ class CameraInfo(MsgpackMixin):
     proj_mat = ProjectionMatrix()
 
 class LidarData(MsgpackMixin):
+    point_cloud = 0.0
+    time_stamp = np.uint64(0)
+    pose = Pose()
+
+class EchoData(MsgpackMixin):
     point_cloud = 0.0
     time_stamp = np.uint64(0)
     pose = Pose()

@@ -312,10 +312,12 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 	}
 
 	// Toggle on/off digital (hand) break
-	VehicleInputData.setDigitalLeftBrake(toggleBreak);
-	VehicleInputData.setDigitalRightBrake(toggleBreak);
-	if(toggleBreak)VehicleInputData.setAnalogAccel(0);
-
+	if (toggleBreak) {
+		VehicleInputData.setDigitalLeftBrake(LeftBreak);
+		VehicleInputData.setDigitalRightBrake(RightBreak);
+		VehicleInputData.setAnalogAccel(0);
+		UE_LOG(LogTemp, Warning, TEXT("Breaking %f %f "), VehicleInputData.getDigitalLeftBrake(), VehicleInputData.getDigitalRightBrake());
+	}
 	// Convert from our curve to PxFixedSizeLookupTable
 
 	PxVehiclePadSmoothingData SmoothData = {

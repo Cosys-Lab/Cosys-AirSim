@@ -663,7 +663,7 @@ void ASimModeBase::drawLidarDebugPoints()
                         else
                             throw std::runtime_error("Unknown requested data frame");
 
-                        DrawDebugPoint(
+						UAirBlueprintLib::DrawPoint(
                             this->GetWorld(),
                             uu_point,
                             5,              //size

@@ -36,6 +36,3 @@ For Windows, you can just change the code in Visual Studio, press F5 and re-run.
 
 #### Changing Code and Rebuilding on Linux
 For Linux, make code changes in AirLib or Unreal/Plugins folder and then run `./build.sh` to rebuild. This step also copies the build output to CoSysLab project. You can then follow above steps again to re-run.
-
-## Choosing Your Vehicle: Car or Multirotor
-By default AirSim spawns multirotor. You can easily change this to car and use all of AirSim goodies. Please see [using car](using_car.md) guide.
