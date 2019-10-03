@@ -76,8 +76,8 @@ A human looking AI is also available to walk dynamically between a set of self c
 In order to have more control over them, some custom blueprints were created. Their main features are that the AI themselves, the waypoints and the spawners can be assigned a group ID number. So that all functionally is grouped. 
 They also use the Seed randomisation so that they can be spawned at the same waypoints and target the same waypoints each time if the same seed value is chosen. The following blueprints are available:
 - _GroupedTargetPoint_: These are the TargetPoints (waypoints) that the AI will walk between. Their only setting is the group ID number to decide which AI group will be able to pick this waypoint to spawn AI and be the target waypoint for them.
-- _GroupedAIMannequin_: One can manually spawn an AI by placing these in the world. They need to be assigned the Group ID manually to choose which waypoints to target.
-- _GroupedAISpawner_: To automate the spawner of AI, one can use this blueprint. It will spawn Ai at the waypoints of the same group. A setting is available to configure the fill percentage. This will set the percentage of waypoints to spawn AI upon.                                                                          
+- _GroupedAI_: One can manually spawn an AI by placing these in the world. They need to be assigned the Group ID manually to choose which waypoints to target.
+- _GroupedAISpawner_: To automate the spawner of AI, one can use this blueprint. It will spawn Ai at the waypoints of the same group. A setting is available to configure the fill percentage. This will set the percentage of waypoints to spawn AI upon. On also has to chose which Skeletal Meshes and their Animation Blueprints can be chosen from.                                                                      
       
 ## Asset Installation
 To keep this repository free of large asset files, they are stored separately on the CoSys-Lab Data Archive network share. 
