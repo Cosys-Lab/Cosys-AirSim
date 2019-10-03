@@ -30,7 +30,16 @@ void SkidVehiclePawnApi::setCarControls(const CarApiBase::CarControls& controls)
 
 	movement_->SetYJoy(controls.throttle);
 	movement_->SetXJoy(controls.steering);
-	movement_->SetBrakeInput(controls.brake);
+	movement_->SetLeftBreak(controls.brake);
+	movement_->SetRightBreak(controls.brake);
+	if (controls.brake || controls.handbrake) {
+		movement_->SetBreaksOn();
+		movement_->SetYJoy(0);
+		movement_->SetXJoy(0);
+	}
+	else {
+		movement_->SetBreaksOff();
+	}
 	movement_->SetUseAutoGears(!controls.is_manual_gear);
 }
 
