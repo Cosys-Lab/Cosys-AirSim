@@ -59,9 +59,8 @@ void ALidarCamera::GenerateLidarCoordinates() {
 		float h_angle_0 = horizontal_angles_[icol];
 		for (uint32 ipx = 0; ipx < num_of_lasers_; ipx++)
 		{
-			int ind = 3 * (icol * num_of_lasers_ + ipx);
 			angle_to_xyz_lut_.push_back(FVector(FMath::Cos(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx])) * FMath::Sin(h_angle_0),
-												FMath::Cos(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx])) * FMath::Cos(h_angle_0),
+												-FMath::Cos(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx])) * FMath::Cos(h_angle_0),
 												FMath::Sin(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx]))));
 		}
 	}
