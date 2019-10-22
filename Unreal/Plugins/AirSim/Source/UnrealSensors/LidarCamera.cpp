@@ -59,8 +59,8 @@ void ALidarCamera::GenerateLidarCoordinates() {
 		float h_angle_0 = horizontal_angles_[icol];
 		for (uint32 ipx = 0; ipx < num_of_lasers_; ipx++)
 		{
-			angle_to_xyz_lut_.push_back(FVector(FMath::Cos(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx])) * FMath::Sin(h_angle_0),
-												-FMath::Cos(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx])) * FMath::Cos(h_angle_0),
+			angle_to_xyz_lut_.push_back(FVector(FMath::Cos(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx])) * FMath::Sin(msr::airlib::Utils::degreesToRadians(h_angle_0)),
+												FMath::Cos(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx])) * FMath::Cos(msr::airlib::Utils::degreesToRadians(h_angle_0)),
 												FMath::Sin(msr::airlib::Utils::degreesToRadians(vertical_angles_[ipx]))));
 		}
 	}
@@ -74,7 +74,7 @@ void ALidarCamera::BeginPlay()
 	render_target_ = NewObject<UTextureRenderTargetCube>();
 
 	render_target_->InitAutoFormat(1800);
-	capture_->TextureTarget = render_target_;
+	//capture_->TextureTarget = render_target_;
 	capture_->bAlwaysPersistRenderingState = true;
 	capture_->bCaptureEveryFrame = false;
 
@@ -90,7 +90,6 @@ void ALidarCamera::BeginPlay()
 	gimbald_rotator_ = this->GetActorRotation();
 	this->SetActorTickEnabled(true);
 	UAirBlueprintLib::LogMessageString("lidartest: ", "made it here", LogDebugLevel::Informational);
-	CaptureAndSample();
 }
 
 void ALidarCamera::Tick(float DeltaTime)
@@ -109,7 +108,14 @@ void ALidarCamera::Tick(float DeltaTime)
 
 		this->SetActorRotation(rotator);
 	}
-	//CaptureAndSample();
+
+	if (counter == 10) {
+		CaptureAndSample();
+		counter = 0;
+	}
+	else {
+		counter = counter + 1;
+	}
 	Super::Tick(DeltaTime);
 }
 
@@ -145,7 +151,8 @@ void ALidarCamera::setupCameraFromSettings()
 
 void ALidarCamera::updateCaptureComponentSetting(USceneCaptureComponent2D* capture, UTextureRenderTarget2D* render_target)
 {
-	render_target->InitAutoFormat(1920, 1080);
+	render_target->InitAutoFormat(1800, 1800);
+	capture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 	capture->FOVAngle = 120.0f;
 	capture->TextureTarget = render_target;
 	capture->bAlwaysPersistRenderingState = true;
@@ -160,14 +167,20 @@ msr::airlib::Pose ALidarCamera::getPose() const
 void ALidarCamera::CaptureAndSample() {
 	capture_->CaptureScene();
 	TArray<FColor> buffer;
-	FRenderTarget *RenderTarget = render_target_->GameThread_GetRenderTargetResource();
-	//RenderTarget->ReadPixels(buffer);
-
+	FTextureRenderTargetCubeResource* RenderTarget = (FTextureRenderTargetCubeResource*)capture_->TextureTarget->GameThread_GetRenderTargetResource();
+	FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
+	flags.SetLinearToGamma(false);
+	RenderTarget->ReadPixels(buffer, flags, FIntRect(0, 0, 0, 0));
 	for (uint32 icol = 0; icol < measurement_per_cycle_; icol++)
 	{
 		for (uint32 ipx = 0; ipx < num_of_lasers_; ipx++)
 		{
-			FVector point = 1000 * angle_to_xyz_lut_[ipx + (icol*num_of_lasers_)];
+			int Vpixel = FMath::FloorToInt((vertical_angles_[ipx] * (1800 / 2)) / 90) + 900;
+			int Hpixel = FMath::FloorToInt((horizontal_angles_[ipx] *1800) / 360) + 1350;
+			if (Hpixel >= 1800)Hpixel = Hpixel - 1800;
+			int value = buffer[Hpixel + (Vpixel * 1800)].R;
+			float distance = ((value / 255.0) * 1000.0);
+			FVector point = (distance * angle_to_xyz_lut_[ipx + (icol*num_of_lasers_)]) + this->GetActorLocation();
 			UAirBlueprintLib::DrawPoint(
 				this->GetWorld(),
 				point,

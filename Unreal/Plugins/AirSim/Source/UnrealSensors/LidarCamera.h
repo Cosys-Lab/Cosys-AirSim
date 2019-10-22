@@ -42,6 +42,7 @@ public:
 
 	msr::airlib::Pose getPose() const;
 
+	int counter = 0;
 
 	void GenerateLidarCoordinates();
 	void CaptureAndSample();
@@ -56,19 +57,19 @@ public:
 		UTextureRenderTargetCube* render_target_;
 
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
-		uint32 num_of_lasers_ = 10;
+		uint32 num_of_lasers_ = 64;
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
 		float rpm_ = 600;
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
-		uint32 measurement_per_cycle_ = 500;
+		uint32 measurement_per_cycle_ = 2048;
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
-		float horizontal_min_ = 30;
+		float horizontal_min_ = 0;
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
-		float horizontal_max_ = 200;
+		float horizontal_max_ = 360;
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
-		float vertical_min_ = -30;
+		float vertical_min_ = -16.6;
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
-		float vertical_max_ = 60;
+		float vertical_max_ = 16.6;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<USceneCaptureComponent2D*> captures_;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<UTextureRenderTarget2D*> render_targets_;

@@ -15,6 +15,7 @@ Cars in AirSim
 [![AirSim Car Demo Video](docs/images/car_demo_video.png)](https://youtu.be/gnz1X3UNM5Y)
 
 ## CoSys-Lab Modifications
+* Updated to [custom version of Unreal Engine 4.22.3](https://cosysgit.uantwerpen.be/wjansen/unrealenginemod)
 * Updated [ROS implementation](docs/ros.md)
 * Added [HySLAM environment](docs/hyslamenv.md)
 * Added [CoSysLab environment](docs/cosysenv.md)
