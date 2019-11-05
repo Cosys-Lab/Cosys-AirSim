@@ -234,28 +234,34 @@ public: //types
 
 	struct EchoSetting : SensorSetting {
 
-		// shared defaults
+		// Signal propagation settings
 		uint number_of_traces = 1000;					// Amount of traces (rays) being cast
+		uint number_of_spread_traces = 10;			    // Amount of scattered traces created by an incoming trace
+		float spread_opening_angle = 10.0f;			    // Beam width of the scattered traces
 		float attenuation_per_distance = 1.0f;			// Attenuation of signal wrt distance traveled (dB/m)
 		float attenuation_per_reflection = 1.0f;        // Attenuation of signal wrt reflections (dB)
 		float attenuation_limit = 40.0f;                // Attenuation at which the signal is considered dissipated (dB)
+
+		// Sensor settings
 		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
 		float sensor_diameter = 0.5;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
+
+		// Engine & timing settings
 		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
 		bool engine_time = true;						// If false, real-time simulation will be used for timestamps and measurement frequency
-												        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-
-		// defaults specific to a mode
-		Vector3r position = VectorMath::nanVector();
-		Rotation rotation = Rotation::nanRotation();
-
-		bool draw_reflected_points = true;				// Draw debug points in world where reflected points are captured by the sensor
-		bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the sensor
+														// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+		// Debug settings
 		bool draw_initial_points = false;		     	// Draw the points of the initial half sphere where the traces (rays) are cast
 		bool draw_bounce_lines = false;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
+		bool draw_reflected_points = true;				// Draw debug points in world where reflected points are captured by the sensor
+		bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the sensor
+		bool draw_reflected_paths = false;				// Draw debug lines for the full path of reflected points to the sensor
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
-
+		
+		// Misc
 		std::string data_frame = AirSimSettings::kSensorLocalFrame;
+		Vector3r position = VectorMath::nanVector();
+		Rotation rotation = Rotation::nanRotation();
 	};
 
     struct VehicleSetting {
@@ -1219,6 +1225,8 @@ private:
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
+		echo_setting.number_of_spread_traces = settings_json.getInt("NumberOfSpreadTraces", echo_setting.number_of_spread_traces);
+		echo_setting.spread_opening_angle = settings_json.getInt("SpreadOpeningAngle", echo_setting.spread_opening_angle);
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
 		echo_setting.attenuation_limit = settings_json.getFloat("AttenuationLimit", echo_setting.attenuation_limit);
@@ -1229,6 +1237,7 @@ private:
 
 		echo_setting.draw_reflected_points = settings_json.getBool("DrawReflectedPoints", echo_setting.draw_reflected_points);
 		echo_setting.draw_reflected_lines = settings_json.getBool("DrawReflectedLines", echo_setting.draw_reflected_lines);
+		echo_setting.draw_reflected_paths = settings_json.getBool("DrawReflectedPaths", echo_setting.draw_reflected_paths);
 		echo_setting.draw_initial_points = settings_json.getBool("DrawInitialPoints", echo_setting.draw_initial_points);
 		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
