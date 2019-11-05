@@ -10,6 +10,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# Jetbrains Project
+/.idea
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -26,6 +29,7 @@ Intermediate/
 Binaries/
 llvm-build/
 llvm-source*/
+TestBuilds/
 
 # CMake files
 CMakeFiles/
@@ -54,7 +58,6 @@ obj/
 *.suo
 *_BuiltData.uasset
 
-Unreal/Environments/Blocks/Content/*
 settings.json
 
 # Visual Studio 2015 cache/options directory
@@ -365,11 +368,4 @@ xcuserdata/
 /Unity/UnityDemo/UnityDemo.sln
 /Unity/UnityDemo/Logs/
 /Unity/UnityDemo/Assets/Plugins/AirsimWrapper.dll
-
-# ROS
-ros/.catkin_tools/
-ros/devel/
-ros/logs/
-ros/.catkin_workspace
-ros/src/CMakeLists.txt
-/.idea/
+/Builds/

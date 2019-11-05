@@ -28,6 +28,7 @@ public: //types
 	static constexpr char const * kVehicleTypeSimpleFlight = "simpleflight";
     static constexpr char const * kVehicleTypePhysXCar = "physxcar";
 	static constexpr char const * kVehicleTypeCPHusky = "cphusky";
+	static constexpr char const * kVehicleTypePioneer = "pioneer";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
@@ -210,6 +211,15 @@ public: //types
         uint horizontal_rotation_frequency = 10;          // rotations/sec
         float horizontal_FOV_start = 0;                   // degrees
         float horizontal_FOV_end = 359;                   // degrees
+		float update_frequency = 10;				      // how frequently to update the data in Hz
+		bool limit_points = true;						  // limit the amount of points per measurement to 100000
+		bool pause_after_measurement = false;			  // Pause the simulation after each measurement. Useful for API interaction to be synced
+		bool engine_time = false;						  // If false, real-time simulation will be used for timestamps and measurement frequency
+												          // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+
+		bool generate_noise = false;					  // Toggle range based noise
+		real_T min_noise_standard_deviation = 0;		  // Minimum noise standard deviation
+		real_T noise_distance_scale = 1;			      // Factor to scale noise based on distance
 
         // defaults specific to a mode
         float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
@@ -218,6 +228,7 @@ public: //types
         Rotation rotation = Rotation::nanRotation();
 
         bool draw_debug_points = false;
+
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
     };
 
@@ -783,6 +794,12 @@ private:
 		cphusky_setting->vehicle_type = kVehicleTypeCPHusky;
 		vehicles[cphusky_setting->vehicle_name] = std::move(cphusky_setting);
 
+		//create default robot vehicle
+		auto pioneer_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+		pioneer_setting->vehicle_name = "Pioneer";
+		pioneer_setting->vehicle_type = kVehicleTypePioneer;
+		vehicles[pioneer_setting->vehicle_name] = std::move(pioneer_setting);
+
         //create default computer vision vehicle
         auto cv_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
         cv_setting->vehicle_name = "ComputerVision";
@@ -821,6 +838,8 @@ private:
             PawnPath("Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"));
 		pawn_paths.emplace("CPHusky",
 			PawnPath("Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"));
+		pawn_paths.emplace("Pioneer",
+			PawnPath("Class'/AirSim/VehicleAdv/Pioneer/PioneerPawn.PioneerPawn_C'"));
         pawn_paths.emplace("DefaultQuadrotor",
             PawnPath("Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"));
         pawn_paths.emplace("DefaultComputerVision",
@@ -1087,7 +1106,7 @@ private:
         if (std::isnan(camera_director.follow_distance)) {
             if (simmode_name == "Car")
 				camera_director.follow_distance = -8;
-			else if(simmode_name == "CPHusky")
+			else if(simmode_name == "SkidVehicle")
 				camera_director.follow_distance = -2;
             else
                 camera_director.follow_distance = -3;
@@ -1099,7 +1118,7 @@ private:
         if (std::isnan(camera_director.position.z())) {
             if (simmode_name == "Car")
                 camera_director.position.z() = -4;
-			else if (simmode_name == "CPHusky")
+			else if (simmode_name == "SkidVehicle")
 				camera_director.position.z() = -2;
             else
                 camera_director.position.z() = -2;
@@ -1181,7 +1200,17 @@ private:
         lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
         lidar_setting.points_per_second = settings_json.getInt("PointsPerSecond", lidar_setting.points_per_second);
         lidar_setting.horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
+
+		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
+		lidar_setting.min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", lidar_setting.min_noise_standard_deviation);
+		lidar_setting.noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", lidar_setting.noise_distance_scale);
+
+		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
+		lidar_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", lidar_setting.pause_after_measurement);
+		lidar_setting.engine_time = settings_json.getBool("EngineTime", lidar_setting.engine_time);
+		lidar_setting.limit_points = settings_json.getBool("LimitPoints", lidar_setting.limit_points);
         lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
+
         lidar_setting.data_frame = settings_json.getString("DataFrame", lidar_setting.data_frame);
 
         lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);
@@ -1204,6 +1233,7 @@ private:
 		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
 		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
 		echo_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", echo_setting.pause_after_measurement);
+		echo_setting.engine_time = settings_json.getBool("EngineTime", echo_setting.engine_time);
 
 		echo_setting.draw_reflected_points = settings_json.getBool("DrawReflectedPoints", echo_setting.draw_reflected_points);
 		echo_setting.draw_reflected_lines = settings_json.getBool("DrawReflectedLines", echo_setting.draw_reflected_lines);
@@ -1212,7 +1242,6 @@ private:
 		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
 
-		echo_setting.engine_time = settings_json.getBool("EngineTime", echo_setting.engine_time);
 		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
 
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
@@ -1321,7 +1350,7 @@ private:
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
             sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", true);
         }
-        else if (simmode_name == "Car" || simmode_name == "CPHusky") {
+        else if (simmode_name == "Car" || simmode_name == "SkidVehicle") {
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
         }
         else {
