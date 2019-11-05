@@ -15,10 +15,12 @@ You should have these components installed and working before proceeding
 - `lidar.py`: get and publish the LIDAR sensor data as PointCloud2 messages
 - `imu.py`: get and publish the IMU sensor data as IMU messages
 - `car_control.py` : subscribe to `/cmd_vel` or another chosen topic and control the AirSim car.
+- `camera.py` : Get camera images from AirSim and publish them to ROS.
 
 ## Implemented launch files
 - `airsim_car_keyboard_control.launch`: Take over the control of the AirSim car and drive it using [teleop_twist_keyboard](http://wiki.ros.org/teleop_twist_keyboard).
 - `airsim_car_lidar_imu.launch`: Publish the car's pose and the data from the LIDAR (correctly framed to _base_laser_) and IMU sensors
+- `airsim_camera.launch`: Publish a AirSim camera with correct frame transform if needed. Has settings to configure the camera
 
 ## Setup
 

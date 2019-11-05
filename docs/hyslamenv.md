@@ -12,16 +12,47 @@ It is the main simulator environment for the HySLAM project.
     - Small dynamic changes such as random open doors.
  - All randomization is controllable by a seed to make sure you can simulate the same setup again.
  - Other animate objects such as modular conveyor belts and robotic arms are available as well.
+ - To change to a game-mode where you can simply fly through the world and not simulate, press L. You can press it again to go back to the simulation. **This will reset everything!!**
  
 ## Dynamic Object Configuration
 There are several object types to make the HySLAM environment dynamic. Here follows some simple instructions to tweak and alter their behavior.
 
 ### Seed Configuration
 To control the randomisation functionally used in the dynamic objects, a controllable seed number is used. In every level using the dynamic objects an actor has to be present of the class _SeedStorage_.
-This object will visually show the chosen seed every time the simulation is started (it can be hidden as well with a toggle).
-The seed can be controlled both in standalone and in the editor:
-- **Editor**: To control the seed in the editor, change the `Editor Seed` setting of the _SeedStorage_ actor in the level. If it is set to 0, it will generate a random seed number. But if set to anything else, it will use that number as seed for all dynamic objects. 
-- **Standalone**: To control the seed when using the simulator as standalone, use the launch parameter `-startSeed X` with X being the chosen seed value. 
+This object will visually show the chosen seed every time the simulation is started (it can be hidden as well with a toggle). There are few other toggles available as well.
+
+The seed and these other settings can be controlled both in standalone and in the editor:
+- **Editor**: 
+  - To control the seed in the editor, change the `Editor Seed` setting of the _SeedStorage_ actor in the level. If it is set to 0, it will generate a random seed number. But if set to anything else, it will use that number as seed for all dynamic objects. 
+  - To make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics) set the `Is Static` boolean to true. Default is false. 
+  - Toggle the AI in the world on and off set the `Spawn AI`. Default to true.
+- **Standalone**:
+  - To control the seed when using the simulator as standalone, use the launch parameter `-startSeed INT` with X being the chosen seed value. if not set it will chose a random one.
+  - To make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics) add a launch parameter `-isStatic BOOL` with the boolean set to true. If not set it defaults to false.
+  - Toggle the AI in the world on and off with a launch parameter the `-spawnAI BOOL`. If not set it defaults to true.
+
+Please see the code below for a basic .bat script that can be used to launch the world with the above values easily configurable.
+```
+@echo off 
+set STARTSEED=0                                & :: To control the seed use this parameter to set it. If set to 0 a random one will be chosen.
+set ISSTATIC=0                                 & :: Set to 1 to make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics)
+set SPAWNAI=1                                  & :: Toggle the AI in the world on and off 
+set /A LOG=1                                   & :: Set to 1 to open a separate window to display the contents of the log in real time
+
+if %LOG%==1 (	
+	if %STARTSEED%==0 (
+		start "" "HySLAM.exe" -LOG -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
+		) else (
+			start "" "HySLAM.exe" -LOG -startSeed %STARTSEED% -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
+			) 
+	) else (
+		if %STARTSEED%==0 (
+			start "" "HySLAM.exe" -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
+			) else (
+				start "" "HySLAM.exe" -startSeed %STARTSEED% -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
+				) 
+		)
+```  
 
 ### Dynamic Static Spawners
 Currently there are 3 dynamic static object spawners blueprints available:
