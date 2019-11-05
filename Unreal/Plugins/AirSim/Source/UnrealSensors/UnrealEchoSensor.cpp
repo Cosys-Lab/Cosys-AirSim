@@ -6,7 +6,6 @@
 #include "common/Common.hpp"
 #include "NedTransform.h"
 #include "DrawDebugHelpers.h"
-#include "PhysicalSensorActor.h"
 #include "CoreMinimal.h"
 
 // ctor
