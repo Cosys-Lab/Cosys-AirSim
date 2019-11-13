@@ -46,7 +46,7 @@ def imu_airpub(frameID, pubNode, sensorName, vehicleName):
 
 if __name__ == '__main__':
     try:
-	    rospy.init_node('airsim_imu', anonymous=True)
+        rospy.init_node('airsim_imu', anonymous=True)
         frameID = rospy.get_param('~frame_id', 'base_link')
         pubNode =  rospy.get_param('~pub_node', 'airsim/imu')
         sensorName =  rospy.get_param('~sensor_name', 'imu')

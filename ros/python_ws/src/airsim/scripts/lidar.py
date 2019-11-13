@@ -56,7 +56,7 @@ def lidar_airpub(frameID, pubNode, sensorName, vehicleName):
 
 if __name__ == '__main__':
     try:
-	    rospy.init_node('airsim_lidar', anonymous=True)
+        rospy.init_node('airsim_lidar', anonymous=True)
         frameID = rospy.get_param('~frame_id', 'base_laser')
         pubNode =  rospy.get_param('~pub_node', 'airsim/lidar')
         sensorName =  rospy.get_param('~sensor_name', 'lidar')
