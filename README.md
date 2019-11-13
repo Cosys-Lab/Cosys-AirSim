@@ -23,6 +23,8 @@ Cars in AirSim
 * Added option to hot-reload plugin through Unreal Editor (faster development)
 * Added usage of engine-time for frequency updaters and timestamps instead of real-time. Useful for heavy performance sensor modalities. Currently only usable on the Echo and LIDAR sensor types.
 * Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Updated standard camera render resolution target to  960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images)
 
 ## What's New
 * A ROS wrapper for multirotors is available. See [airsim_ros_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_ros_pkgs) for the ROS API, and [airsim_tutorial_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_tutorial_pkgs) for tutorials. 

@@ -119,7 +119,7 @@ public: //types
 
         int image_type = 0;
 
-        unsigned int width = 256, height = 144; //960 X 540
+        unsigned int width = 960, height = 540; //960 X 540
         float fov_degrees = Utils::nan<float>(); //90.0f
         int auto_exposure_method = -1;   //histogram
         float auto_exposure_speed = Utils::nan<float>(); // 100.0f;
