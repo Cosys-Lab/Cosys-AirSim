@@ -7,8 +7,7 @@ import geometry_msgs.msg
 
 
 def handle_input_command(msg, args):
-
-     # set the controls for car
+    # set the controls for car
     car_controls = airsim.CarControls()
     if (msg.linear.x < 0):
         car_controls.is_manual_gear = True
@@ -24,7 +23,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('airsim_car_control')
         inputTopic = rospy.get_param('~input_topic', 'cmd_vel')
-        vehicleName = rospy.get_param('~vehicle_name', 'vehicle')
+        vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
 
         # connect to the AirSim simulator 
         client = airsim.CarClient()

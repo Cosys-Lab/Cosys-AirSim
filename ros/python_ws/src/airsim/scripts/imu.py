@@ -10,7 +10,6 @@ import numpy as np
 
 def imu_airpub(frameID, pubNode, sensorName, vehicleName):
     pub = rospy.Publisher(pubNode, Imu, queue_size=1)
-    rospy.init_node('airsim_imu_pub', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
     # connect to the AirSim simulator 
@@ -38,8 +37,6 @@ def imu_airpub(frameID, pubNode, sensorName, vehicleName):
         imu_msg.linear_acceleration.y = -imuData.linear_acceleration.y_val
         imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
         
-        # log Imu message
-        rospy.loginfo(imu_msg)
         #publish Imu message
         pub.publish(imu_msg)
         # sleeps until next cycle 
@@ -49,10 +46,11 @@ def imu_airpub(frameID, pubNode, sensorName, vehicleName):
 
 if __name__ == '__main__':
     try:
+	    rospy.init_node('airsim_imu', anonymous=True)
         frameID = rospy.get_param('~frame_id', 'base_link')
         pubNode =  rospy.get_param('~pub_node', 'airsim/imu')
         sensorName =  rospy.get_param('~sensor_name', 'imu')
-        vehicleName = rospy.get_param('~vehicle_name', 'vehicle')
+        vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
         imu_airpub(frameID, pubNode, sensorName, vehicleName)
     except rospy.ROSInterruptException:
         pass

@@ -10,7 +10,6 @@ import numpy as np
 
 def camera_airpub(frameID, pubNode, cameraIndex, cameraType, cameraHeight, cameraWidth, cameraFrequency):
     pub = rospy.Publisher(pubNode, Image, queue_size=1)
-    rospy.init_node('airsim_camera_pub', anonymous=True)
     rate = rospy.Rate(cameraFrequency) 
 
     # connect to the AirSim simulator 
@@ -55,7 +54,6 @@ def camera_airpub(frameID, pubNode, cameraIndex, cameraType, cameraHeight, camer
 
         # publish image message    
         pub.publish(msg)
-        rospy.loginfo("Camera image published")
 
         # sleep until next cycle
         rate.sleep()
@@ -64,14 +62,15 @@ def camera_airpub(frameID, pubNode, cameraIndex, cameraType, cameraHeight, camer
 
 if __name__ == '__main__':
     try:
-        topicName = rospy.get_param('~topic_name', 'camera')
+        rospy.init_node('airsim_camera', anonymous=True)
+        topicName = rospy.get_param('~topic_name', 'airsim/camera')
         frameID = rospy.get_param('~frame_id', 'base_camera')
-        cameraIndex =  rospy.get_param('~camera_index',"1")
+        cameraIndex =  rospy.get_param('~camera_index',"front_center")
         cameraType = rospy.get_param('~camera_type', 'Scene')
-        cameraHeight = rospy.get_param('~camera_height', 360)
-        cameraWidth = rospy.get_param('~camera_width', 640)
+        cameraHeight = rospy.get_param('~camera_height', 540)
+        cameraWidth = rospy.get_param('~camera_width', 960)
         cameraFrequency = rospy.get_param('~camera_frequency', 10)
-        pubNode =  rospy.get_param('~pub_node', "airsim/" + topicName)
+        pubNode =  rospy.get_param('~pub_node', topicName)
         camera_airpub(frameID, pubNode, cameraIndex, cameraType, cameraHeight, cameraWidth, cameraFrequency)
     except rospy.ROSInterruptException:
         pass

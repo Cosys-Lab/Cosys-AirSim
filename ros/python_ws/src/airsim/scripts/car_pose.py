@@ -9,7 +9,6 @@ from geometry_msgs.msg import PoseStamped
 
 def car_pose_airpub(frameID, pubNode, vehicleName):
     pub = rospy.Publisher(pubNode, PoseStamped, queue_size=1)
-    rospy.init_node('airsim_car_pose_pub', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
     # connect to the AirSim simulator 
@@ -36,8 +35,6 @@ def car_pose_airpub(frameID, pubNode, vehicleName):
         simPose.header.seq = 1
         simPose.header.frame_id = frameID
         
-        # log PoseStamped message
-        rospy.loginfo(simPose)
         #publish PoseStamped message
         pub.publish(simPose)
         # sleeps until next cycle 
@@ -46,9 +43,10 @@ def car_pose_airpub(frameID, pubNode, vehicleName):
 
 if __name__ == '__main__':
     try:
+	    rospy.init_node('airsim_car_pose', anonymous=True)
         frameID =rospy.get_param('~frame_id', 'world')
         pubNode = rospy.get_param('~pub_node', 'airsim/car_pose')
-        vehicleName = rospy.get_param('~vehicle_name', 'vehicle')
+        vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
         car_pose_airpub(frameID, pubNode, vehicleName)
     except rospy.ROSInterruptException:
         pass

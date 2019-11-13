@@ -12,7 +12,6 @@ import numpy as np
 
 def lidar_airpub(frameID, pubNode, sensorName, vehicleName):
     pub = rospy.Publisher(pubNode, PointCloud2, queue_size=1)
-    rospy.init_node('airsim_lidar_pub', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
     # connect to the AirSim simulator 
@@ -57,10 +56,11 @@ def lidar_airpub(frameID, pubNode, sensorName, vehicleName):
 
 if __name__ == '__main__':
     try:
+	    rospy.init_node('airsim_lidar', anonymous=True)
         frameID = rospy.get_param('~frame_id', 'base_laser')
         pubNode =  rospy.get_param('~pub_node', 'airsim/lidar')
         sensorName =  rospy.get_param('~sensor_name', 'lidar')
-        vehicleName = rospy.get_param('~vehicle_name', 'vehicle')
+        vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
         lidar_airpub(frameID, pubNode, sensorName, vehicleName)
     except rospy.ROSInterruptException:
         pass

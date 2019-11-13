@@ -1,11 +1,10 @@
   <launch>
     <node name="airsim_camera" pkg="airsim" type="camera.py" respawn="false" output="screen">
           <param name="frame_id" type="string" value="base_camera" />
-          <param name="pub_node" type="string" value="airsim/camera" />
-          <param name="camera_index" type="string" value="1" />
+          <param name="camera_index" type="string" value="0" />
           <param name="camera_type" type="string" value="Scene" />
-          <param name="camera_height" type="int" value="360" />
-          <param name="camera_width" type="int" value="640" />
+          <param name="camera_height" type="int" value="540" />
+          <param name="camera_width" type="int" value="960" />
           <param name="camera_frequency" type="int" value="10" />
           <param name="topic_name" type="string" value="airsim/camera" />
 
