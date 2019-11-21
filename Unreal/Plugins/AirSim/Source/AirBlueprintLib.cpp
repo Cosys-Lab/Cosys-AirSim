@@ -516,7 +516,7 @@ bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, co
 	return actor->GetWorld()->LineTraceSingleByChannel(hit, start, end, collision_channel, trace_params);
 }
 
-bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
+bool UAirBlueprintLib::GetObstacleAdv(const AActor* actor, const FVector& start, const FVector& end,
 	FHitResult& hit, TArray<AActor*>& ignore_actors, ECollisionChannel collision_channel, bool trace_complex, bool get_material)
 {
 	hit = FHitResult(ForceInit);

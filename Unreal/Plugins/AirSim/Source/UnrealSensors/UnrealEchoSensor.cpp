@@ -130,7 +130,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 
 	while(signal_attenuation < attenuation_limit_) {
 		trace_hit_result = FHitResult(ForceInit);
-		trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
+		trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
 
 		// DRAW DEBUG
 		if (sensor_params_.draw_bounce_lines) {
@@ -171,7 +171,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 			}
 
 			hit_result_temp = FHitResult(ForceInit);
-			trace_hit = UAirBlueprintLib::GetObstacle(actor_, trace_start_position, sensor_position, hit_result_temp, ignore_actors_, ECC_Visibility, true);
+			trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, sensor_position, hit_result_temp, ignore_actors_, ECC_Visibility, true);
 			if (trace_hit) {  // Hit = no clear LOS to sensor
 				continue;
 			}

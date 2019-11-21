@@ -80,7 +80,7 @@ public:
         const AActor* ignore_actor = nullptr, ECollisionChannel collision_channel = ECC_Visibility);
 	static bool GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
 		FHitResult& hit, const AActor* ignore_actor = nullptr, ECollisionChannel collision_channel = ECC_Visibility);
-	static bool GetObstacle(const AActor* actor, const FVector& start, const FVector& end,
+	static bool GetObstacleAdv(const AActor* actor, const FVector& start, const FVector& end,
 		FHitResult& hit, TArray<AActor*>& ignore_actors, ECollisionChannel collision_channel = ECC_Visibility, bool trace_complex = false, bool get_material = false);
     static bool GetLastObstaclePosition(const AActor* actor, const FVector& start, const FVector& end,
         FHitResult& hit, const AActor* ignore_actor = nullptr, ECollisionChannel collision_channel = ECC_Visibility);
