@@ -148,7 +148,9 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 	Vector3r end = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * params.range + start;
 
 	FHitResult hit_result = FHitResult(ForceInit);
-	bool is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, TArray<AActor*>{ actor_ }, ECC_Visibility, true, true);
+	TArray<AActor*> actorArray;
+	actorArray.Add(actor_);
+	bool is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actorArray, ECC_Visibility, true, true);
 	bool ignoreMaterial = false;
 	if (hit_result.PhysMaterial != nullptr) {
 		if (hit_result.PhysMaterial.Get()->GetFName().ToString().Contains("Lidar_Ignore_PhysicalMaterial"))
