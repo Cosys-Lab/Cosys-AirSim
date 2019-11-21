@@ -3,5 +3,4 @@
           <param name="input_topic" type="string" value="cmd_vel" />
           <param name="vehicle_name" type="string" value="airsimvehicle" />
     </node>
-    <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" respawn="false" output="screen"/>
   </launch>

@@ -1,0 +1,45 @@
+  <launch>
+    <node name="airsim_car_pose" pkg="airsim" type="car_pose.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="world" />
+          <param name="pub_node" type="string" value="airsim/car_pose" />
+          <param name="vehicle_name" type="string" value="airsimvehicle" />
+    </node>
+    <node name="airsim_car_pose_tf" pkg="airsim" type="airsim_pose_tf_broadcaster.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="world" />
+          <param name="child_frame_id" type="string" value="base_link" />
+          <param name="pose_node" type="string" value="airsim/car_pose" />
+    </node>
+    <node name="airsim_imu" pkg="airsim" type="imu.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="base_link" />
+          <param name="pub_node" type="string" value="airsim/imu" />
+          <param name="sensor_name" type="string" value="imu" />
+          <param name="vehicle_name" type="string" value="airsimvehicle" />
+    </node>
+    <node name="airsim_lidar" pkg="airsim" type="lidar.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="base_laser" />
+          <param name="pub_node" type="string" value="airsim/lidar" />
+          <param name="sensor_name" type="string" value="lidar" />
+          <param name="vehicle_name" type="string" value="airsimvehicle" />
+    </node>
+    <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0.45 0 2 0 0 0 base_link base_laser 100" />
+	<node name="airsim_camera" pkg="airsim" type="camera.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="base_camera" />
+          <param name="camera_index" type="string" value="0" />
+          <param name="camera_type" type="string" value="Scene" />
+          <param name="camera_height" type="int" value="540" />
+          <param name="camera_width" type="int" value="960" />
+          <param name="camera_frequency" type="int" value="10" />
+          <param name="topic_name" type="string" value="airsim/camera" />
+    </node>
+	<node name="airsim_cameraseg" pkg="airsim" type="camera.py" respawn="false" output="screen">
+          <param name="frame_id" type="string" value="base_camera" />
+          <param name="camera_index" type="string" value="0" />
+          <param name="camera_type" type="string" value="Segmentation" />
+          <param name="camera_height" type="int" value="540" />
+          <param name="camera_width" type="int" value="960" />
+          <param name="camera_frequency" type="int" value="10" />
+          <param name="topic_name" type="string" value="airsim/cameraseg" />
+    </node>
+    <node pkg="tf" type="static_transform_publisher" name="base_to_camera_broadcaster" args="0 0 0 0 0 0 base_link base_camera 100" />
+    <node pkg="rosbag" type="record" name="rosbag_record" args="record -o ./airsim_benchmark -a"/>   
+  </launch>
