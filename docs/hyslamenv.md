@@ -34,10 +34,10 @@ The seed and these other settings can be controlled both in standalone and in th
 Please see the code below for a basic .bat script that can be used to launch the world with the above values easily configurable.
 ```
 @echo off 
-set STARTSEED=0                                & :: To control the seed use this parameter to set it. If set to 0 a random one will be chosen.
-set ISSTATIC=0                                 & :: Set to 1 to make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics)
-set SPAWNAI=1                                  & :: Toggle the AI in the world on and off 
-set /A LOG=1                                   & :: Set to 1 to open a separate window to display the contents of the log in real time
+set STARTSEED=450                              & :: To control the seed use this parameter to set it. If set to 0 a random one will be chosen.
+set ISSTATIC=0                            	   & :: Set to 1 to make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics)
+set SPAWNAI=0                           	   & :: Toggle the AI in the world on and off 
+set /A LOG=1								   & :: Set to 1 to open a separate window to display the contents of the log in real time
 
 if %LOG%==1 (	
 	if %STARTSEED%==0 (
