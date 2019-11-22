@@ -16,4 +16,3 @@ Plugins/
 /Content/*
 
 # avoid checking uproject because this is usually just version change
-*.uproject
