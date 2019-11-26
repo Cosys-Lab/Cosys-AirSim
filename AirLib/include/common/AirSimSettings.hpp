@@ -1350,9 +1350,6 @@ private:
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
             sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", true);
         }
-        else if (simmode_name == "Car" || simmode_name == "SkidVehicle") {
-            sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
-        }
         else {
             // no sensors added for other modes
         }
