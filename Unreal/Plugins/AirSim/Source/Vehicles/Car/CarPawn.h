@@ -52,6 +52,12 @@ public:
         return keyboard_controls_;
     }
 
+	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_front_center_base_;
+	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_front_left_base_;
+	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_front_right_base_;
+	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_driver_base_;
+	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_back_center_base_;
+
 private:
     void updateHUDStrings();
     void setupVehicleMovementComponent();
@@ -77,12 +83,6 @@ private:
     bool is_low_friction_;
     UPhysicalMaterial* slippery_mat_;
     UPhysicalMaterial* non_slippery_mat_;
-
-    UPROPERTY() USceneComponent* camera_front_center_base_;
-    UPROPERTY() USceneComponent* camera_front_left_base_;
-    UPROPERTY() USceneComponent* camera_front_right_base_;
-    UPROPERTY() USceneComponent* camera_driver_base_;
-    UPROPERTY() USceneComponent* camera_back_center_base_;
 
     UPROPERTY() APIPCamera* camera_front_center_;
     UPROPERTY() APIPCamera* camera_front_left_;

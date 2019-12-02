@@ -27,6 +27,7 @@ public: //types
 	static constexpr char const * kVehicleTypeArduCopterSolo = "arducoptersolo";
 	static constexpr char const * kVehicleTypeSimpleFlight = "simpleflight";
     static constexpr char const * kVehicleTypePhysXCar = "physxcar";
+	static constexpr char const * kVehicleTypeBoxCar = "boxcar";
 	static constexpr char const * kVehicleTypeCPHusky = "cphusky";
 	static constexpr char const * kVehicleTypePioneer = "pioneer";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
@@ -788,6 +789,12 @@ private:
         physx_car_setting->vehicle_type = kVehicleTypePhysXCar;
         vehicles[physx_car_setting->vehicle_name] = std::move(physx_car_setting);
 
+		//create default box vehicle
+		auto box_car_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+		box_car_setting->vehicle_name = "BoxCar";
+		box_car_setting->vehicle_type = kVehicleTypeBoxCar;
+		vehicles[box_car_setting->vehicle_name] = std::move(box_car_setting);
+
 		//create default robot vehicle
 		auto cphusky_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
 		cphusky_setting->vehicle_name = "CPHusky";
@@ -836,6 +843,8 @@ private:
             PawnPath("Class'/AirSim/VehicleAdv/Vehicle/VehicleAdvPawn.VehicleAdvPawn_C'"));
         pawn_paths.emplace("DefaultCar",
             PawnPath("Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"));
+		pawn_paths.emplace("BoxCar",
+			PawnPath("Class'/AirSim/VehicleAdv/BoxCar/BoxCarPawn.BoxCarPawn_C'"));
 		pawn_paths.emplace("CPHusky",
 			PawnPath("Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"));
 		pawn_paths.emplace("Pioneer",
@@ -1103,9 +1112,20 @@ private:
             camera_director.follow_distance = child_json.getFloat("FollowDistance", camera_director.follow_distance);
         }
 
+		msr::airlib::Settings vehicles_child;
+		std::string vehicle_type;
+		if (settings_json.getChild("Vehicles", vehicles_child)) {
+			std::vector<std::string> keys;
+			vehicles_child.getChildNames(keys);
+			msr::airlib::Settings child;
+			vehicles_child.getChild(keys.at(0), child);
+			vehicle_type = child.getString("VehicleType", "");
+		}
+		
         if (std::isnan(camera_director.follow_distance)) {
             if (simmode_name == "Car")
-				camera_director.follow_distance = -8;
+				if (vehicle_type == "BoxCar") camera_director.follow_distance = -2;
+				else camera_director.follow_distance = -8;
 			else if(simmode_name == "SkidVehicle")
 				camera_director.follow_distance = -2;
             else
@@ -1117,7 +1137,9 @@ private:
             camera_director.position.y() = 0;
         if (std::isnan(camera_director.position.z())) {
             if (simmode_name == "Car")
-                camera_director.position.z() = -4;
+				if (vehicle_type == "BoxCar")  camera_director.position.z() = -2;
+				else camera_director.position.z() = -4;
+
 			else if (simmode_name == "SkidVehicle")
 				camera_director.position.z() = -2;
             else
