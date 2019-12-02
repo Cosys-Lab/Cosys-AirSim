@@ -30,16 +30,16 @@ Cars in AirSim
 
 ## What's New
 * A ROS wrapper for multirotors is available. See [airsim_ros_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_ros_pkgs) for the ROS API, and [airsim_tutorial_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_tutorial_pkgs) for tutorials. 
-* [Added sensor APIs for Barometer, IMU, GPS, Magnetometer, Distance Sensor](https://microsoft.github.io/AirSim/docs/sensors.md) 
-* Added support for [docker in ubuntu](https://microsoft.github.io/AirSim/docs/docker_ubuntu) 
-* Added Weather Effects and [APIs](https://microsoft.github.io/AirSim/docs/apis#weather-apis)
-* Added [Time of Day API](https://microsoft.github.io/AirSim/docs/apis#time-of-day-api)
+* [Added sensor APIs for Barometer, IMU, GPS, Magnetometer, Distance Sensor](docs/sensors.md) 
+* Added support for [docker in ubuntu](docs/docker_ubuntu) 
+* Added Weather Effects and [APIs](docs/apis#weather-apis)
+* Added [Time of Day API](docs/apis#time-of-day-api)
 * An experimental integration of [AirSim on Unity](https://github.com/Microsoft/AirSim/tree/master/Unity) is now available. Learn more in [Unity blog post](https://blogs.unity3d.com/2018/11/14/airsim-on-unity-experiment-with-autonomous-vehicle-simulation).
 * [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
-* Highly efficient [NoDisplay view mode](https://microsoft.github.io/AirSim/docs/settings#viewmode) to turn off main screen rendering so you can capture images at high rate
-* [Lidar Sensor](https://microsoft.github.io/AirSim/docs/lidar)
+* Highly efficient [NoDisplay view mode](docs/settings#viewmode) to turn off main screen rendering so you can capture images at high rate
+* [Lidar Sensor](docs/lidar)
 * Case Study: [Formula Student Technion Driverless](https://github.com/Microsoft/AirSim/wiki/technion)
-* [Multi-Vehicle Capability](https://microsoft.github.io/AirSim/docs/multi_vehicle)
+* [Multi-Vehicle Capability](docs/multi_vehicle)
 * [ROS publisher](https://github.com/Microsoft/AirSim/pull/1135)
 
 For complete list of changes, view our [Changelog](CHANGELOG.md)
@@ -47,11 +47,11 @@ For complete list of changes, view our [Changelog](CHANGELOG.md)
 ## How to Get It
 
 ### Windows
-* [Download binaries](https://microsoft.github.io/AirSim/docs/use_precompiled)
-* [Build it](https://microsoft.github.io/AirSim/docs/build_windows)
+* [Download binaries](docs/use_precompiled.md)
+* [Build it](docs/build_windows.md)
 
 ### Linux
-* [Build it](https://microsoft.github.io/AirSim/docs/build_linux)
+* [Build it](docs/build_linux.md)
 
 [![Build Status](https://travis-ci.org/Microsoft/AirSim.svg?branch=master)](https://travis-ci.org/Microsoft/AirSim)
 
@@ -65,7 +65,7 @@ View our [detailed documentation](https://microsoft.github.io/AirSim/) on all as
 
 If you have remote control (RC) as shown below, you can manually control the drone in the simulator. For cars, you can use arrow keys to drive manually.
 
-[More details](https://microsoft.github.io/AirSim/docs/remote_control/)
+[More details](docs/remote_control.md)
 
 ![record screenshot](docs/images/AirSimDroneManual.gif)
 
@@ -78,9 +78,9 @@ AirSim exposes APIs so you can interact with the vehicle in the simulation progr
 
 These APIs are also available as part of a separate, independent cross-platform library, so you can deploy them on a companion computer on your vehicle. This way you can write and test your code in the simulator, and later execute it on the real vehicles. Transfer learning and related research is one of our focus areas.
 
-Note that you can use [SimMode setting](https://microsoft.github.io/AirSim/docs/settings#simmode) to specify the default vehicle or the new [ComputerVision mode](https://microsoft.github.io/AirSim/docs/image_apis#computer-vision-mode-1) so you don't get prompted each time you start AirSim.
+Note that you can use [SimMode setting](docs/settings.md) to specify the default vehicle or the new [ComputerVision mode](docs/image_apis.md) so you don't get prompted each time you start AirSim.
 
-[More details](https://microsoft.github.io/AirSim/docs/apis/)
+[More details](docs/apis.md)
 
 ### Gathering training data
 
@@ -94,11 +94,11 @@ A better way to generate training data exactly the way you want is by accessing 
 
 Yet another way to use AirSim is the so-called "Computer Vision" mode. In this mode, you don't have vehicles or physics. You can use the keyboard to move around the scene, or use APIs to position available cameras in any arbitrary pose, and collect images such as depth, disparity, surface normals or object segmentation. 
 
-[More details](https://microsoft.github.io/AirSim/docs/docs/image_apis/)
+[More details](docs/image_apis.md)
 
 ### Weather Effects
 
-Press F10 to see various options available for weather effects. You can also control the weather using [APIs](https://microsoft.github.io/AirSim/docs/apis#weather-apis). Press F1 to see other options available.
+Press F10 to see various options available for weather effects. You can also control the weather using [APIs](docs/apis.md). Press F1 to see other options available.
 
 ![record screenshot](docs/images/weather_menu.png)
 
@@ -107,7 +107,7 @@ Press F10 to see various options available for weather effects. You can also con
 - [Video - Setting up AirSim with Pixhawk Tutorial](https://youtu.be/1oY8Qu5maQQ) by Chris Lovett
 - [Video - Using AirSim with Pixhawk Tutorial](https://youtu.be/HNWdYrtw3f0) by Chris Lovett
 - [Video - Using off-the-self environments with AirSim](https://www.youtube.com/watch?v=y09VbdQWvQY) by Jim Piavis
-- [Reinforcement Learning with AirSim](https://microsoft.github.io/AirSim/docs/reinforcement_learning) by Ashish Kapoor
+- [Reinforcement Learning with AirSim](docs/reinforcement_learning.md) by Ashish Kapoor
 - [The Autonomous Driving Cookbook](https://aka.ms/AutonomousDrivingCookbook) by Microsoft Deep Learning and Robotics Garage Chapter
 - [Using TensorFlow for simple collision avoidance](https://github.com/simondlevy/AirSimTensorFlow) by Simon Levy and WLU team
 
@@ -131,14 +131,14 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
 
 Please take a look at [open issues](https://github.com/microsoft/airsim/issues) if you are looking for areas to contribute to.
 
-* [More on AirSim design](https://microsoft.github.io/AirSim/docs/design)
-* [More on code structure](https://microsoft.github.io/AirSim/docs/code_structure)
+* [More on AirSim design](docs/design.md)
+* [More on code structure](docs/code_structure.md)
 * [Contribution Guidelines](CONTRIBUTING.md)
 * [Trello Board](https://trello.com/b/1t2qCeaA/wishlist-by-community-for-community)
 
 ### Who is Using AirSim?
 
-We are maintaining a [list](https://microsoft.github.io/AirSim/docs/who_is_using) of a few projects, people and groups that we are aware of. If you would like to be featured in this list please [make a request here](https://github.com/microsoft/airsim/issues).
+We are maintaining a [list](docs/who_is_using.md) of a few projects, people and groups that we are aware of. If you would like to be featured in this list please [make a request here](https://github.com/microsoft/airsim/issues).
 
 ## Contact
 
@@ -146,7 +146,7 @@ Join the AirSim group on [Facebook](https://www.facebook.com/groups/122583246753
 
 ## FAQ
 
-If you run into problems, check the [FAQ](https://microsoft.github.io/AirSim/docs/faq) and feel free to post issues in the  [AirSim](https://github.com/Microsoft/AirSim/issues) repository.
+If you run into problems, check the [FAQ](docs/.md) and feel free to post issues in the  [AirSim](https://github.com/Microsoft/AirSim/issues) repository.
 
 ## License
 

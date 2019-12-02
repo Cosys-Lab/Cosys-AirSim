@@ -98,7 +98,7 @@ You can download it by running
 * Start unreal engine inside the container:   
    `ue4@HOSTMACHINE:~$ /home/ue4/UnrealEngine/Engine/Binaries/Linux/UE4Editor`
 * [Specifying an airsim settings.json](https://github.com/Microsoft/AirSim/blob/master/docs/docker_ubuntu.md#airsim_source-docker-image)
-* Continue with [AirSim's Linux docs](https://microsoft.github.io/AirSim/docs/build_linux/#build-unreal-environment). 
+* Continue with [AirSim's Linux docs](build_linux.md). 
 
 #### [Misc] Packaging Unreal Environments in `airsim_source` containers
 * Let's take the Blocks environment as an example.    

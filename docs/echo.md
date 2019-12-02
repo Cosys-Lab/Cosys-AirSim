@@ -39,7 +39,7 @@ DrawSensor                | Draw the physical sensor in the world on the vehicle
 e.g.,
 ```
 {
-    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SeeDocsAt": "settings_json.md",
     "SettingsVersion": 1.2,
     "SimMode": "CPHusky",
 	"Vehicles": {
