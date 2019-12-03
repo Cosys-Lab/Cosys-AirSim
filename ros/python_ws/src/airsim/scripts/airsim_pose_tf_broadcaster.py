@@ -27,7 +27,7 @@ if __name__ == '__main__':
     rospy.init_node('airsim_pose_tf_broadcaster')
     frameID = rospy.get_param('~frame_id', 'world')
     childFrameID = rospy.get_param('~child_frame_id', 'base_link')
-    poseNode = rospy.get_param('~pose_node', 'airsim/car_pose')
+    poseNode = rospy.get_param('~pose_node', 'airsim/pose')
     rospy.Subscriber(poseNode, geometry_msgs.msg.PoseStamped, handle_airsim_pose, (frameID, childFrameID))
     rospy.spin()
 
