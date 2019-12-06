@@ -29,13 +29,40 @@ void UnrealEchoSensor::generateSampleDirections()
 {
 	int num_traces = sensor_params_.number_of_traces;
 	float opening_angle = 180;  // deg, = full hemisphere
-	sampleSphereCap(num_traces, opening_angle, sample_directions_);
+
+	if (num_traces < 0)
+	{
+		sampleHorizontalSlice(num_traces, opening_angle, sample_directions_);
+	}
+	else
+	{
+		sampleSphereCap(num_traces, opening_angle, sample_directions_);
+	}
+}
+
+void UnrealEchoSensor::sampleHorizontalSlice(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
+	num_points = -num_points;
+	
+	point_cloud.clear();
+
+	float angle_step = FMath::DegreesToRadians(opening_angle / (num_points-1));
+	float angle_offset = FMath::DegreesToRadians(opening_angle / 2);
+	for (auto i = 0; i < num_points; ++i)
+	{
+		float angle = angle_step * i - angle_offset + PI/2;
+
+		float x = FMath::Sin(angle);
+		float y = FMath::Cos(angle);
+		float z = 0;
+
+		point_cloud.emplace_back(Vector3r(x, y, z));
+	}
 }
 
 void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
 	point_cloud.clear();
 
-	// Add point in frontal direction
+	// Add point in frontal directionl
 	point_cloud.emplace(point_cloud.begin(), Vector3r(1, 0, 0));
 
 	//Convert opening angle to plane coordinates

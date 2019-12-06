@@ -33,6 +33,7 @@ private:
 	using VectorMath = msr::airlib::VectorMath;
 
 	void generateSampleDirections();
+	void sampleHorizontalSlice(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
 	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
 	void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T> &points);
     float bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length,

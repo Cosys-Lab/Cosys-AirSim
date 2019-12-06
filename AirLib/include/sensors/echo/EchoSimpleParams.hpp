@@ -14,7 +14,7 @@ struct EchoSimpleParams {
     // default settings
     // TODO: enable reading of these params from AirSim settings
 
-    uint number_of_traces;					// Amount of traces (rays) being cast 
+    int number_of_traces;					// Amount of traces (rays) being cast 
 	uint number_of_spread_traces;			// Amount of scattered traces created by an incoming trace
 	float spread_opening_angle;				// Beam width of the scattered traces
 	real_T attenuation_per_distance;		// Attenuation of signal wrt distance traveled (dB/m)
