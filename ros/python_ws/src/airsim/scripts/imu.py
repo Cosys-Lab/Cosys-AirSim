@@ -23,6 +23,7 @@ def imu_airpub(frameID, pubNode, sensorName, vehicleName):
 
         # populate Imu ros message
         imu_msg = Imu()
+		imu_msg.header.stamp = rospy.Time.now()
         imu_msg.header.frame_id = frameID
         imu_msg.orientation.x = imuData.orientation.inverse().x_val
         imu_msg.orientation.y = imuData.orientation.inverse().y_val
