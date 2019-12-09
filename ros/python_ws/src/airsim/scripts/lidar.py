@@ -44,7 +44,7 @@ def lidar_airpub(frameID, pubNode, sensorName, vehicleName):
                     cloud.append(list(point * np.array([1, -1, -1])))
 
                 pcloud.header.frame_id = frameID
-				pcloud.header.stamp = rospy.Time.now()
+                pcloud.header.stamp = rospy.Time.now()
 
                 pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
                 
