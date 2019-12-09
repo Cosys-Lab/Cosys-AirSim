@@ -35,9 +35,11 @@ private:
 	void generateSampleDirections();
 	void sampleHorizontalSlice(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
 	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
+	void applySignalSpread(float &signal_attenuation, float previous_distance, float added_distance);
+	float remainingDistance(float signal_attenuation, float total_distance);
 	void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T> &points);
-    float bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length,
-		const FHitResult &trace_hit_result, float &signal_attenuation);
+    void bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length,
+		const FHitResult &trace_hit_result, float &total_distance, float &signal_attenuation);
     FVector Vector3rToFVector(const Vector3r &input_vector);
 	Vector3r FVectorToVector3r(const FVector &input_vector);
 	float angleBetweenVectors(FVector vector1, FVector vector2);
