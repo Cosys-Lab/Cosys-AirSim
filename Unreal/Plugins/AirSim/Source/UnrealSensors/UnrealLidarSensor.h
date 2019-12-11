@@ -22,7 +22,7 @@ public:
 
 protected:
     virtual void getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
-        msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud) override;
+        msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth) override;
 
 	virtual void pause(const bool is_paused);
 
@@ -33,7 +33,7 @@ private:
     void createLasers();
     bool shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
         const uint32 channel, const float horizontal_angle, const float vertical_angle, 
-        const msr::airlib::LidarSimpleParams params, Vector3r &point);
+        const msr::airlib::LidarSimpleParams params, Vector3r &point, std::string &label);
 
 private:
     AActor* actor_;

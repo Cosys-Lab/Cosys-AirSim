@@ -12,7 +12,7 @@ You should have these components installed and working before proceeding
 ## Implemented nodes
 - `pose.py`: Get and publish the pose of vehicle
 - `airsim_pose_tf_broadcaster.py`: Transform the vehicle pose to the world frame correctly with _base_link_.
-- `lidar.py`: get and publish the LIDAR sensor data as PointCloud2 messages
+- `lidar.py`: get and publish the LIDAR sensor data as PointCloud2 messages and the groundtruth labels as a new string[] message type
 - `imu.py`: get and publish the IMU sensor data as IMU messages
 - `car_control.py` : subscribe to `/cmd_vel` or another chosen topic and control the AirSim cars (Car and SkidVehicle SimModes).
 - `camera.py` : Get (up to 3 simultaneously) camera images from AirSim and publish them to ROS.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import setup_path 
-import airsim
+import airsimpy
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
@@ -12,8 +12,8 @@ def car_pose_airpub(frameID, pubNode, vehicleName):
     rate = rospy.Rate(10) # 10hz
 
     # connect to the AirSim simulator 
-    client = airsim.CarClient()
-    client.confirmConnection()
+    client = airsimpy.CarClient()
+    client.confirmConnection(rospy.get_name())
 
     while not rospy.is_shutdown():
 

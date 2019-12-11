@@ -108,6 +108,8 @@ Use `getLidarData()` API to retrieve the Lidar data.
 * Lidar Pose:
     * Lidar pose in the vehicle inertial frame (in NED, in meters)
     * Can be used to transform points to other frames.
+* Lidar Groundtruth:
+    * for each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to
 
 ### Python Examples
 [drone_lidar.py](https://github.com/Microsoft/AirSim/tree/master/PythonClient//multirotor)

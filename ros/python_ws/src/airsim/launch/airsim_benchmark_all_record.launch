@@ -18,6 +18,7 @@
       <node name="airsim_lidar" pkg="airsim" type="lidar.py" respawn="false" output="screen">
             <param name="frame_id" type="string" value="base_laser" />
             <param name="pub_node" type="string" value="airsim/lidar" />
+            <param name="pub_node_gt" type="string" value="airsim/lidargroundtruth" />
             <param name="sensor_name" type="string" value="lidar" />
             <param name="vehicle_name" type="string" value="airsimvehicle" />
       </node>

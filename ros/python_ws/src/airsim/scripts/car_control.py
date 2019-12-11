@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 import setup_path 
-import airsim
+import airsimpy
 import rospy
 import geometry_msgs.msg
 
 
 def handle_input_command(msg, args):
     # set the controls for car
-    car_controls = airsim.CarControls()
+    car_controls = airsimpy.CarControls()
     if (msg.linear.x < 0):
         car_controls.is_manual_gear = True
         car_controls.manual_gear = -1
@@ -26,8 +26,8 @@ if __name__ == '__main__':
         vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
 
         # connect to the AirSim simulator 
-        client = airsim.CarClient()
-        client.confirmConnection()
+        client = airsimpy.CarClient()
+        client.confirmConnection(rospy.get_name())
         client.enableApiControl(True)
         rospy.Subscriber(inputTopic, geometry_msgs.msg.Twist, handle_input_command, (vehicleName, client))
         rospy.spin()
