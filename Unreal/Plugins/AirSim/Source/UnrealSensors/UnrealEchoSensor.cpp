@@ -15,6 +15,7 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	attenuation_per_distance_(getParams().attenuation_per_distance),
 	attenuation_per_reflection_(getParams().attenuation_per_reflection),
 	attenuation_limit_(getParams().attenuation_limit),
+	distance_limit_(getParams().distance_limit),
 	opening_angle_(FMath::DegreesToRadians(getParams().spread_opening_angle)),
 	draw_time_(1.05f / sensor_params_.measurement_frequency)
 {
@@ -163,14 +164,18 @@ void UnrealEchoSensor::applySignalSpread(float &signal_attenuation, float previo
 }
 
 float UnrealEchoSensor::remainingDistance(float signal_attenuation, float total_distance) {
+	float distance;
+
 	if (total_distance < 1)
 	{
-		return FMath::Pow(10, -attenuation_limit_ / 20) - total_distance;
+		distance = FMath::Pow(10, -attenuation_limit_ / 20) - total_distance;
 	}
 	else
 	{
-		return total_distance * (FMath::Pow(10, (signal_attenuation - attenuation_limit_) / 20) - 1);
+		distance = total_distance * (FMath::Pow(10, (signal_attenuation - attenuation_limit_) / 20) - 1);
 	}
+
+	return FMath::Min(distance, distance_limit_);
 }
 
 void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
@@ -181,7 +186,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 	FHitResult trace_hit_result, hit_result_temp;
 	bool trace_hit;
 
-	while(signal_attenuation > attenuation_limit_) {
+	while(signal_attenuation > attenuation_limit_ && total_distance < distance_limit_) {
 		trace_hit_result = FHitResult(ForceInit);
 		trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
 
@@ -218,7 +223,8 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		float receiving_angle = angleBetweenVectors(direction_to_sensor, trace_direction);
 		if (receiving_angle < opening_angle_)  // Check if sensor lies in opening angle
 		{
-			float received_attenuation = signal_attenuation + receptionAttenuation(receiving_angle);
+			//float received_attenuation = signal_attenuation + receptionAttenuation(receiving_angle); TODO
+			float received_attenuation = signal_attenuation;
 			if (received_attenuation < attenuation_limit_) {
 				continue;
 			}
@@ -279,7 +285,7 @@ void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 	trace_direction = (trace_hit_result.ImpactPoint - trace_start_position).MirrorByVector(trace_hit_result.ImpactNormal);
 	trace_direction.Normalize();
 	trace_start_position = trace_hit_result.ImpactPoint;
-	trace_length = ned_transform_->fromNed(remainingDistance(signal_attenuation, total_distance));  // Maximum possible distance given the current attenuation
+	trace_length = ned_transform_->fromNed(remainingDistance(signal_attenuation, total_distance));
 }
 
 FVector UnrealEchoSensor::Vector3rToFVector(const Vector3r &input_vector) {

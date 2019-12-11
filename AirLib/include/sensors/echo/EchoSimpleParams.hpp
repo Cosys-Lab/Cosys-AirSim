@@ -20,6 +20,7 @@ struct EchoSimpleParams {
 	real_T attenuation_per_distance;		// Attenuation of signal wrt distance traveled (dB/m)
 	real_T attenuation_per_reflection;		// Attenuation of signal wrt reflections (dB)
 	real_T attenuation_limit;				// Attenuation at which the signal is considered dissipated (dB)
+	real_T distance_limit;					// Maximum distance the signal can travel.
 	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
 	real_T sensor_diameter;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
@@ -55,6 +56,7 @@ struct EchoSimpleParams {
 		attenuation_per_distance = settings.attenuation_per_distance;
 		attenuation_per_reflection = settings.attenuation_per_reflection;
 		attenuation_limit = settings.attenuation_limit;
+		distance_limit = settings.distance_limit;
 		measurement_frequency = settings.measurement_frequency;
 		sensor_diameter = settings.sensor_diameter;
 		pause_after_measurement = settings.pause_after_measurement;

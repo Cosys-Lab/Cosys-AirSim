@@ -58,6 +58,7 @@ private:
 	const float attenuation_per_distance_;
 	const float attenuation_per_reflection_;
 	const float attenuation_limit_;
+	const float distance_limit_;
 	const float opening_angle_;
 	const float draw_time_;
 };

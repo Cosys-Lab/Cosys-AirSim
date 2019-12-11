@@ -242,6 +242,7 @@ public: //types
 		float attenuation_per_distance = 1.0f;			// Attenuation of signal wrt distance traveled (dB/m)
 		float attenuation_per_reflection = 1.0f;        // Attenuation of signal wrt reflections (dB)
 		float attenuation_limit = 40.0f;                // Attenuation at which the signal is considered dissipated (dB)
+		float distance_limit = 100.0f;					// Maximum distance the signal can travel.
 
 		// Sensor settings
 		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
