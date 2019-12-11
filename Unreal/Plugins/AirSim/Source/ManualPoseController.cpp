@@ -12,6 +12,8 @@ void UManualPoseController::initializeForPlay()
     up_mapping_ = FInputAxisKeyMapping("inputManualArrowUp", EKeys::PageUp); down_mapping_ = FInputAxisKeyMapping("inputManualArrowDown", EKeys::PageDown); 
     left_yaw_mapping_ = FInputAxisKeyMapping("inputManualLeftYaw", EKeys::A); up_pitch_mapping_ = FInputAxisKeyMapping("inputManualUpPitch", EKeys::W);
     right_yaw_mapping_ = FInputAxisKeyMapping("inputManualRightYaw", EKeys::D); down_pitch_mapping_ = FInputAxisKeyMapping("inputManualDownPitch", EKeys::S);
+	shift_mapping_ = FInputAxisKeyMapping("inputManualShift", EKeys::LeftShift); 
+	space_mapping_ = FInputAxisKeyMapping("inputManualSpace", EKeys::SpaceBar);
 
     input_positive_ = inpute_negative_ = last_velocity_ = FVector::ZeroVector;
 }
@@ -92,7 +94,10 @@ void UManualPoseController::removeInputBindings()
         UAirBlueprintLib::RemoveAxisBinding(right_yaw_mapping_, right_yaw_binding_, actor_);
     if (down_pitch_binding_)
         UAirBlueprintLib::RemoveAxisBinding(down_pitch_mapping_, down_pitch_binding_, actor_);
-
+	if (shift_binding_)
+		UAirBlueprintLib::RemoveAxisBinding(shift_mapping_, shift_binding_, actor_);
+	if (space_binding_)
+		UAirBlueprintLib::RemoveAxisBinding(space_mapping_, space_binding_, actor_);
     clearBindings();
 }
 
@@ -110,6 +115,8 @@ void UManualPoseController::setupInputBindings()
     up_pitch_binding_ = & UAirBlueprintLib::BindAxisToKey(up_pitch_mapping_, actor_, this, &UManualPoseController::inputManualUpPitch);
     right_yaw_binding_ = & UAirBlueprintLib::BindAxisToKey(right_yaw_mapping_, actor_, this, &UManualPoseController::inputManualRightYaw);
     down_pitch_binding_ = & UAirBlueprintLib::BindAxisToKey(down_pitch_mapping_, actor_, this, &UManualPoseController::inputManualDownPitch);
+	shift_binding_ = &UAirBlueprintLib::BindAxisToKey(shift_mapping_, actor_, this, &UManualPoseController::inputManualShift);
+	space_binding_ = &UAirBlueprintLib::BindAxisToKey(space_mapping_, actor_, this, &UManualPoseController::inputManualSpace);
 }
 
 void UManualPoseController::updateDeltaPosition(float dt)
@@ -117,7 +124,7 @@ void UManualPoseController::updateDeltaPosition(float dt)
     FVector input = input_positive_ - inpute_negative_;
     if (!FMath::IsNearlyZero(input.SizeSquared())) {
         if (FMath::IsNearlyZero(acceleration_))
-            last_velocity_ = input * 1000;
+            last_velocity_ = input * acceleration_factor_;
         else
             last_velocity_ += input * (acceleration_ * dt);
         delta_position_ += actor_->GetActorRotation().RotateVector(last_velocity_ * dt);
@@ -169,4 +176,25 @@ void UManualPoseController::inputManualDownPitch(float val)
 {
     if (!FMath::IsNearlyEqual(val, 0.f))
         delta_rotation_.Add(-val, 0, 0);
+}
+void UManualPoseController::inputManualShift(float val)
+{
+	if (!FMath::IsNearlyEqual(val, 0.f)) {
+		acceleration_factor_ = 300;
+	}
+	else {
+		acceleration_factor_ = 60;
+	}
+}
+void UManualPoseController::inputManualSpace(float val)
+{
+	if (!FMath::IsNearlyEqual(val, 0.f)) {
+		hold_ = true;
+	}
+	else {
+		hold_ = false;
+	}
+}
+bool UManualPoseController::getHold() {
+	return hold_;
 }
