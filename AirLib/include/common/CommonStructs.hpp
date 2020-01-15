@@ -306,6 +306,16 @@ struct LidarData {
     {}
 };
 
+struct GPULidarData {
+
+	TTimePoint time_stamp = 0;
+	vector<real_T> point_cloud;
+	Pose pose;
+
+	GPULidarData()
+	{}
+};
+
 struct EchoData {
 
 	TTimePoint time_stamp = 0;

@@ -233,6 +233,32 @@ public: //types
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
     };
 
+
+	struct GPULidarSetting : SensorSetting {
+
+		// shared defaults
+		uint number_of_channels = 64;
+		real_T range = 10000.0f / 100;                    // meters
+		uint measurement_per_cycle_ = 2048;
+		float horizontal_rotation_frequency = 10;          // rotations/sec
+		float horizontal_FOV_start = 0;                   // degrees
+		float horizontal_FOV_end = 359;                   // degrees
+		uint resolution = 512;
+														  // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+
+		bool generate_noise = false;					  // Toggle range based noise
+		real_T min_noise_standard_deviation = 0;		  // Minimum noise standard deviation
+		real_T noise_distance_scale = 1;			      // Factor to scale noise based on distance
+
+		// defaults specific to a mode
+		float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
+		float vertical_FOV_lower = Utils::nan<float>();   // drones -45, car -10
+		Vector3r position = VectorMath::nanVector();
+		Rotation rotation = Rotation::nanRotation();
+
+		bool draw_debug_points = false;
+	};
+
 	struct EchoSetting : SensorSetting {
 
 		// Signal propagation settings
@@ -1244,6 +1270,26 @@ private:
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
     }
 
+	static void initializeGPULidarSetting(GPULidarSetting& lidar_setting, const Settings& settings_json)
+	{
+		lidar_setting.number_of_channels = settings_json.getInt("NumberOfChannels", lidar_setting.number_of_channels);
+		lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
+		lidar_setting.measurement_per_cycle_ = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle_);
+		lidar_setting.horizontal_rotation_frequency = settings_json.getFloat("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
+		lidar_setting.resolution = settings_json.getInt("Resolution", lidar_setting.resolution);
+		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
+		lidar_setting.min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", lidar_setting.min_noise_standard_deviation);
+		lidar_setting.noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", lidar_setting.noise_distance_scale);
+		lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
+		lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);
+		lidar_setting.vertical_FOV_lower = settings_json.getFloat("VerticalFOVLower", lidar_setting.vertical_FOV_lower);
+		lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);
+		lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
+
+		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
+		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
+	}
+
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
@@ -1295,6 +1341,9 @@ private:
         case SensorBase::SensorType::Lidar:
             sensor_setting = std::unique_ptr<SensorSetting>(new LidarSetting());
             break;
+		case SensorBase::SensorType::GPULidar:
+			sensor_setting = std::unique_ptr<SensorSetting>(new GPULidarSetting());
+			break;
         case SensorBase::SensorType::Echo:
             sensor_setting = std::unique_ptr<SensorSetting>(new EchoSetting());
             break;
@@ -1332,6 +1381,9 @@ private:
         case SensorBase::SensorType::Lidar:
             initializeLidarSetting(*static_cast<LidarSetting*>(sensor_setting), settings_json);
             break;
+		case SensorBase::SensorType::GPULidar:
+			initializeGPULidarSetting(*static_cast<GPULidarSetting*>(sensor_setting), settings_json);
+			break;
 		case SensorBase::SensorType::Echo:
             initializeEchoSetting(*static_cast<EchoSetting*>(sensor_setting), settings_json);
             break;

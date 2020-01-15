@@ -20,8 +20,9 @@ Cars in AirSim
 * Added [HySLAM environment](docs/hyslamenv.md)
 * Added [CoSysLab environment](docs/cosysenv.md)
 * Added [Echo sensor type](docs/echo.md)
+* Added WIP [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar. Doesn't support ignoring materials such as glass yet.
 * Updated ComputerVision mode: Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
-* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation and created additional way to add materials that the sensor will not be able to sense (ex. glass)
+* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation.
 * Added option to hot-reload plugin through Unreal Editor (faster development)
 * Added usage of engine-time for frequency updaters and timestamps instead of real-time. Useful for heavy performance sensor modalities. Currently only usable on the Echo and LIDAR sensor types.
 * Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 

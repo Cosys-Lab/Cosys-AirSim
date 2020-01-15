@@ -27,7 +27,8 @@ public:
         Magnetometer = 4,
         Distance = 5,
         Lidar = 6,
-		Echo = 7
+		Echo = 7,
+		GPULidar = 8
     };
 
     SensorBase(const std::string& sensor_name = "")

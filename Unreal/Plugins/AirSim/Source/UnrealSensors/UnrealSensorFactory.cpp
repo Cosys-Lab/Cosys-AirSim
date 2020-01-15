@@ -3,6 +3,7 @@
 #include "UnrealSensorFactory.h"
 #include "UnrealSensors/UnrealDistanceSensor.h"
 #include "UnrealSensors/UnrealLidarSensor.h"
+#include "UnrealSensors/UnrealGPULidarSensor.h"
 #include "UnrealSensors/UnrealEchoSensor.h"
 
 UnrealSensorFactory::UnrealSensorFactory(AActor* actor, const NedTransform* ned_transform)
@@ -22,6 +23,9 @@ std::unique_ptr<msr::airlib::SensorBase> UnrealSensorFactory::createSensorFromSe
     case SensorBase::SensorType::Lidar:
         return std::unique_ptr<UnrealLidarSensor>(new UnrealLidarSensor(
             *static_cast<const AirSimSettings::LidarSetting*>(sensor_setting), actor_, ned_transform_));
+	case SensorBase::SensorType::GPULidar:
+		return std::unique_ptr<UnrealGPULidarSensor>(new UnrealGPULidarSensor(
+			*static_cast<const AirSimSettings::GPULidarSetting*>(sensor_setting), actor_, ned_transform_));
     case SensorBase::SensorType::Echo:
         return std::unique_ptr<UnrealEchoSensor>(new UnrealEchoSensor(
             *static_cast<const AirSimSettings::EchoSetting*>(sensor_setting), actor_, ned_transform_));

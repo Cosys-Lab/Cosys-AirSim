@@ -27,8 +27,8 @@ MeasurementFrequency      | The frequency of the sensor (measurements/s)
 PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
 SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
 EngineTime                | If false, real-time simulation will be used for timestamps and measurement frequency. If true the time passed in-engine will be used (for when performance doesn't allow real-time operation)
-X Y Z                     | Position of the lidar relative to the vehicle (in NED, in meters)                     
-Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
+X Y Z                     | Position of the echo relative to the vehicle (in NED, in meters)                     
+Roll Pitch Yaw            | Orientation of the echo relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
 DrawReflectedPoints       | Draw debug points in world where reflected points are captured by the sensor
 DrawReflectedLines        | Draw debug lines in world from reflected points to the sensor
@@ -75,7 +75,7 @@ e.g.,
 
 ## Client API 
 Use `getEchoData()` API to retrieve the echo sensor data. 
-* The API returns a Point-Cloud as a flat array of floats and the final attenuation along with the timestamp of the capture and lidar pose.
+* The API returns a Point-Cloud as a flat array of floats and the final attenuation along with the timestamp of the capture and echo pose.
 * Point-Cloud: 
   * The floats represent [x,y,z,attenuation] for each point hit within the range in the last scan.
   * The frame for the points in the output is configurable using "DataFrame" attribute

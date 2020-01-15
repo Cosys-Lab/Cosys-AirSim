@@ -161,6 +161,9 @@ class VehicleClient:
 
     def getLidarData(self, lidar_name = '', vehicle_name = ''):
         return LidarData.from_msgpack(self.client.call('getLidarData', lidar_name, vehicle_name))
+		
+    def getGPULidarData(self, lidar_name = '', vehicle_name = ''):
+        return GPULidarData.from_msgpack(self.client.call('getGPULidarData', lidar_name, vehicle_name))
 
     def getEchoData(self, echo_name = '', vehicle_name = ''):
         return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))

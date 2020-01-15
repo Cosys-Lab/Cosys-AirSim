@@ -1,4 +1,5 @@
-  <launch>
+  <launch>  
+      <arg name="use_gpu_lidar" default="false"/>
       <node name="airsim_pose" pkg="airsim" type="pose.py" respawn="false" output="screen">
             <param name="frame_id" type="string" value="world" />
             <param name="pub_node" type="string" value="airsim/pose" />
@@ -15,12 +16,22 @@
           <param name="sensor_name" type="string" value="imu" />
           <param name="vehicle_name" type="string" value="airsimvehicle" />
     </node>
-    <node name="airsim_lidar" pkg="airsim" type="lidar.py" respawn="false" output="screen">
-          <param name="frame_id" type="string" value="base_laser" />
-          <param name="pub_node" type="string" value="airsim/lidar" />
-          <param name="pub_node_gt" type="string" value="airsim/lidargroundtruth" />
-          <param name="sensor_name" type="string" value="lidar" />
-          <param name="vehicle_name" type="string" value="airsimvehicle" />
-    </node>
+	<group unless="$(arg use_gpu_lidar)">
+		<node name="airsim_lidar" pkg="airsim" type="lidar.py" respawn="false" output="screen">
+			  <param name="frame_id" type="string" value="base_laser" />
+			  <param name="pub_node" type="string" value="airsim/lidar" />
+			  <param name="pub_node_gt" type="string" value="airsim/lidargroundtruth" />
+			  <param name="sensor_name" type="string" value="lidar" />
+			  <param name="vehicle_name" type="string" value="airsimvehicle" />
+		</node>
+    </group>
+	<group if="$(arg use_gpu_lidar)">
+		<node name="airsim_gpulidar" pkg="airsim" type="gpulidar.py" respawn="false" output="screen">
+			  <param name="frame_id" type="string" value="base_laser" />
+			  <param name="pub_node" type="string" value="airsim/lidar" />
+			  <param name="sensor_name" type="string" value="gpulidar" />
+			  <param name="vehicle_name" type="string" value="airsimvehicle" />
+		</node>
+    </group>    
     <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0 0 0 0 base_link base_laser 100" />
   </launch>

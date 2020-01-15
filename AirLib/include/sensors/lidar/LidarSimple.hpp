@@ -107,7 +107,7 @@ private: //methods
             delta_time, 
             point_cloud_, groundtruth_);
 		double end = FPlatformTime::Seconds();
-		UAirBlueprintLib::LogMessageString("sensor: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
+		UAirBlueprintLib::LogMessageString("Lidar: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
         LidarData output;
         output.point_cloud = point_cloud_;
 		output.groundtruth = groundtruth_;
