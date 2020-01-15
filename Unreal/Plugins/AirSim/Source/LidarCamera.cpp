@@ -204,9 +204,9 @@ void ALidarCamera::SampleRender(float rotation, float fov, msr::airlib::vector<m
 			float distance = depth / (cos_ver*cos_hor);
 
 			FVector point = (distance * angle_to_xyz_lut_[ipx + (icol_circle * num_of_lasers_)]);	
-			point_cloud.emplace_back(point.X);
-			point_cloud.emplace_back(point.Y);
-			point_cloud.emplace_back(-point.Z);
+			point_cloud.emplace_back(point.X / 100);
+			point_cloud.emplace_back(point.Y / 100);
+			point_cloud.emplace_back(-point.Z / 100);
 			point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
 			if (draw_debug_ && depth < (max_range_* 100) )DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
 		}
