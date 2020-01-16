@@ -14,6 +14,9 @@ Please see [general sensors](sensors.md) for information on configruation of gen
 ```
 * Multiple GPU lidars can be enabled on a vehicle. *But one has to turn off DrawDebugPoints!*
 
+## Ignoring glass and other material types
+One can set an object that should be invisible to LIDAR sensors (such as glass) by giving them an Unreal Tag called *LidarIgnore*. 
+
 ## GPU Lidar configuration
 The following parameters can be configured right now via settings json.
 
