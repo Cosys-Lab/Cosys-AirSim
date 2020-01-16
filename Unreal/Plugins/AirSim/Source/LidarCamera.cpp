@@ -9,6 +9,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ImageUtils.h"
 #include "common/AirSimSettings.hpp"
+#include "EngineUtils.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -99,6 +100,15 @@ void ALidarCamera::GenerateLidarCoordinates() {
 void ALidarCamera::BeginPlay()
 {
 	Super::BeginPlay();	
+	static const FName lidar_ignore_tag = TEXT("LidarIgnore");
+	TArray<AActor*> actors;
+	for (TActorIterator<AActor> ActorIterator(GetWorld()); ActorIterator; ++ActorIterator)
+	{
+		AActor* Actor = *ActorIterator;
+		if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))actors.Add(Actor);
+	}
+
+	capture2D_->HiddenActors = actors;
 }
 
 void ALidarCamera::Tick(float DeltaTime)
@@ -168,8 +178,8 @@ void ALidarCamera::SampleRender(float rotation, float fov, msr::airlib::vector<m
 
 	float c_x = resolution_ / 2.0f;
 	float c_y = resolution_ / 2.0f;
-	float f_x = (resolution_ / 2.0f) * FMath::Tan(FMath::DegreesToRadians(fov / 2.0f));
-	float f_y = (resolution_ / 2.0f) * FMath::Tan(FMath::DegreesToRadians(fov / 2.0f));
+	float f_x = (resolution_ / 2.0f) / FMath::Tan(FMath::DegreesToRadians(fov / 2.0f));
+	float f_y = (resolution_ / 2.0f) / FMath::Tan(FMath::DegreesToRadians(fov / 2.0f));
 
 	if (rotation > fov)rotation = fov;
 	float max_angle = FMath::Fmod(current_angle_ + rotation, 360);
