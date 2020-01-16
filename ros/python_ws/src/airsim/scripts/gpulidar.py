@@ -38,10 +38,8 @@ def gpulidar_airpub(frameID, pubNode, sensorName, vehicleName):
                 lastTimestamp = lidarData.time_stamp
                 points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
                 points = np.reshape(points, (int(points.shape[0] / 3), 3))
-                # make point cloud
-                cloud = []
-                for point in points:      
-                    cloud.append(list(point * np.array([1, -1, -1])))
+                points = points * np.array([1, -1, -1])
+                cloud = points.tolist()
 
                 timeStamp = rospy.Time.now()
                 
