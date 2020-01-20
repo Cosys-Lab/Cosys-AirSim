@@ -135,6 +135,8 @@ public: //types
         float target_gamma = Utils::nan<float>(); //1.0f; //This would be reset to kSceneTargetGamma for scene as default
         int projection_mode = 0; // ECameraProjectionMode::Perspective
         float ortho_width = Utils::nan<float>();
+
+		bool ignore_marked = false;
     };
 
     struct NoiseSetting {
@@ -247,6 +249,8 @@ public: //types
 														  // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 
 		bool generate_noise = false;					  // Toggle range based noise
+
+		bool ignore_marked = false;
 		real_T min_noise_standard_deviation = 0;		  // Minimum noise standard deviation
 		real_T noise_distance_scale = 1;			      // Factor to scale noise based on distance
 
@@ -1037,6 +1041,10 @@ private:
         capture_setting.auto_exposure_min_brightness = settings_json.getFloat("AutoExposureMinBrightness", capture_setting.auto_exposure_min_brightness);
         capture_setting.motion_blur_amount = settings_json.getFloat("MotionBlurAmount", capture_setting.motion_blur_amount);
         capture_setting.image_type = settings_json.getInt("ImageType", 0);
+
+		capture_setting.ignore_marked = settings_json.getBool("IgnoreMarked", capture_setting.ignore_marked);
+
+
         capture_setting.target_gamma = settings_json.getFloat("TargetGamma", 
             capture_setting.image_type == 0 ? CaptureSetting::kSceneTargetGamma : Utils::nan<float>());
 
@@ -1285,6 +1293,7 @@ private:
 		lidar_setting.vertical_FOV_lower = settings_json.getFloat("VerticalFOVLower", lidar_setting.vertical_FOV_lower);
 		lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);
 		lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
+		lidar_setting.ignore_marked = settings_json.getBool("IgnoreMarked", lidar_setting.ignore_marked);
 
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);

@@ -66,6 +66,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	vertical_max_ = settings.vertical_FOV_upper;
 	draw_debug_ = settings.draw_debug_points;
 	max_range_ = settings.range;
+	ignore_marked_ = settings.ignore_marked;
 
 	render_target2D_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
 	this->SetActorRelativeLocation(FVector(settings.position.x() * 100, settings.position.y() * 100, -settings.position.z() * 100));
@@ -80,6 +81,25 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	horizontal_delta_ = (horizontal_max_ - horizontal_min_) / float(measurement_per_cycle_ - 1);
 	vertical_delta_ = (FMath::Abs(vertical_min_) + vertical_max_) / num_of_lasers_;
 	target_fov_ = FMath::Abs(vertical_min_) + vertical_max_ + (2 * vertical_delta_);
+
+	static const FName lidar_ignore_tag = TEXT("LidarIgnore");
+	TArray<AActor*> actors;
+	for (TActorIterator<AActor> ActorIterator(GetWorld()); ActorIterator; ++ActorIterator)
+	{
+		AActor* Actor = *ActorIterator;
+		if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))actors.Add(Actor);
+	}
+
+	if (ignore_marked_) {
+		static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
+		for (TActorIterator<AActor> ActorIterator(GetWorld()); ActorIterator; ++ActorIterator)
+		{
+			AActor* Actor = *ActorIterator;
+			if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))actors.Add(Actor);
+		}
+	}
+
+	capture2D_->HiddenActors = actors;
 }
 
 void ALidarCamera::GenerateLidarCoordinates() {
@@ -100,15 +120,6 @@ void ALidarCamera::GenerateLidarCoordinates() {
 void ALidarCamera::BeginPlay()
 {
 	Super::BeginPlay();	
-	static const FName lidar_ignore_tag = TEXT("LidarIgnore");
-	TArray<AActor*> actors;
-	for (TActorIterator<AActor> ActorIterator(GetWorld()); ActorIterator; ++ActorIterator)
-	{
-		AActor* Actor = *ActorIterator;
-		if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))actors.Add(Actor);
-	}
-
-	capture2D_->HiddenActors = actors;
 }
 
 void ALidarCamera::Tick(float DeltaTime)

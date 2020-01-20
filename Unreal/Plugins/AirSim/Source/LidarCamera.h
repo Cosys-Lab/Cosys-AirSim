@@ -79,6 +79,8 @@ public:
 		bool draw_debug_ = true;
 	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
 		float max_range_ = 100;
+	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+		bool ignore_marked_ = false;
 
 private: //members
  
