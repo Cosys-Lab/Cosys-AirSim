@@ -239,10 +239,12 @@ public: //types
 		uint number_of_traces = 1000;					// Amount of traces (rays) being cast
 		uint number_of_spread_traces = 10;			    // Amount of scattered traces created by an incoming trace
 		float spread_opening_angle = 10.0f;			    // Beam width of the scattered traces
-		float attenuation_per_distance = 1.0f;			// Attenuation of signal wrt distance traveled (dB/m)
-		float attenuation_per_reflection = 1.0f;        // Attenuation of signal wrt reflections (dB)
-		float attenuation_limit = 40.0f;                // Attenuation at which the signal is considered dissipated (dB)
-		float distance_limit = 100.0f;					// Maximum distance the signal can travel.
+		float attenuation_per_distance = 0.0f;			// Attenuation of signal wrt distance traveled (dB/m)
+		float attenuation_per_reflection = 0.0f;        // Attenuation of signal wrt reflections (dB)
+		float attenuation_limit = -100.0f;              // Attenuation at which the signal is considered dissipated (dB)
+		float distance_limit = 10.0f;					// Maximum distance the signal can travel.
+		int reflection_limit = 3;						// Maximum times the signal can reflect.
+		float reflection_distance_limit = 0.4f;		// Maximum distance between reflection locations.
 
 		// Sensor settings
 		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
@@ -1253,6 +1255,9 @@ private:
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
 		echo_setting.attenuation_limit = settings_json.getFloat("AttenuationLimit", echo_setting.attenuation_limit);
+		echo_setting.distance_limit = settings_json.getFloat("DistanceLimit", echo_setting.distance_limit);
+		echo_setting.reflection_limit = settings_json.getFloat("ReflectionLimit", echo_setting.reflection_limit);
+		echo_setting.reflection_distance_limit = settings_json.getFloat("ReflectionDistanceLimit", echo_setting.reflection_distance_limit);
 		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
 		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
 		echo_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", echo_setting.pause_after_measurement);
