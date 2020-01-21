@@ -16,11 +16,12 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	attenuation_per_reflection_(getParams().attenuation_per_reflection),
 	attenuation_limit_(getParams().attenuation_limit),
 	distance_limit_(getParams().distance_limit),
+	reflection_limit_(getParams().reflection_limit),
+	reflection_distance_limit_(ned_transform_->fromNed(getParams().reflection_distance_limit)),
 	opening_angle_(FMath::DegreesToRadians(getParams().spread_opening_angle)),
-	draw_time_(1.05f / sensor_params_.measurement_frequency)
+	draw_time_(1.05f / sensor_params_.measurement_frequency),
+	line_thinkness_(1.0f)
 {
-	//TODO determine opening angle based on angular dropoff formula and max attenuation
-
 	generateSampleDirections();	
 	ignore_actors_ = TArray<AActor*>{};
 }
@@ -146,7 +147,7 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 	return;
 }
 
-void UnrealEchoSensor::applySignalSpread(float &signal_attenuation, float previous_distance, float added_distance) {
+void UnrealEchoSensor::applyFreeSpaceLoss(float &signal_attenuation, float previous_distance, float added_distance) {
 	float spread_attenuation;
 
 	if (previous_distance + added_distance < 1) {
@@ -164,39 +165,43 @@ void UnrealEchoSensor::applySignalSpread(float &signal_attenuation, float previo
 }
 
 float UnrealEchoSensor::remainingDistance(float signal_attenuation, float total_distance) {
-	float distance;
+	float attenuationDistance;
 
 	if (total_distance < 1)
 	{
-		distance = FMath::Pow(10, -attenuation_limit_ / 20) - total_distance;
+		attenuationDistance = FMath::Pow(10, -attenuation_limit_ / 20) - total_distance;
 	}
 	else
 	{
-		distance = total_distance * (FMath::Pow(10, (signal_attenuation - attenuation_limit_) / 20) - 1);
+		attenuationDistance = total_distance * (FMath::Pow(10, (signal_attenuation - attenuation_limit_) / 20) - 1);
 	}
 
-	return FMath::Min(distance, distance_limit_);
+	return FMath::Min(attenuationDistance, distance_limit_ - total_distance);
 }
 
 void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {
 	float total_distance = 0.0f;
 	float signal_attenuation = 0.0f;
+	int reflection_count = 0;
 	TArray<FVector> trace_path = TArray<FVector>{};
 
 	FHitResult trace_hit_result, hit_result_temp;
 	bool trace_hit;
 
-	while(signal_attenuation > attenuation_limit_ && total_distance < distance_limit_) {
+	while(total_distance < distance_limit_ && reflection_count < reflection_limit_ && signal_attenuation > attenuation_limit_) {
 		trace_hit_result = FHitResult(ForceInit);
 		trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
 
 		// DRAW DEBUG
 		if (sensor_params_.draw_bounce_lines) {
 			FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (signal_attenuation / attenuation_limit_));
-			DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, line_color, false, draw_time_);
+			DrawDebugLine
+			(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, line_color, false, draw_time_, 0, line_thinkness_);
 		}
 
-		if (!trace_hit) {
+		// Stop if nothing was hit to reflect off, or 
+		// if distance between reflections is above distance limit (after emission)
+		if (!trace_hit || (reflection_count > 0 && FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint) > reflection_distance_limit_)) {
 			return;
 		}
 
@@ -208,10 +213,12 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		float trace_length;
 		bounceTrace(trace_start_position, trace_direction, trace_length, trace_hit_result, total_distance, signal_attenuation);
 		trace_end_position = trace_start_position + trace_direction * trace_length;
+		reflection_count += 1;
 
 		FVector sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 		float distance_to_sensor = FVector::Distance(trace_start_position, sensor_position);
 
+		// Stop if signal can't travel far enough to return
 		if (distance_to_sensor > trace_length) {
 			return;
 		}
@@ -219,12 +226,10 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		if (sensor_params_.draw_reflected_paths) trace_path.Emplace(trace_start_position);
 
 		FVector direction_to_sensor = sensor_position - trace_start_position;
-		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
 		float receiving_angle = angleBetweenVectors(direction_to_sensor, trace_direction);
 		if (receiving_angle < opening_angle_)  // Check if sensor lies in opening angle
 		{
-			//float received_attenuation = signal_attenuation + receptionAttenuation(receiving_angle); TODO
-			float received_attenuation = signal_attenuation;
+			float received_attenuation = signal_attenuation + receptionAttenuation(receiving_angle);
 			if (received_attenuation < attenuation_limit_) {
 				continue;
 			}
@@ -247,17 +252,17 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 			// DRAW DEBUG
 			if (sensor_params_.draw_reflected_points) DrawDebugPoint(actor_->GetWorld(), trace_start_position, 5, FColor::Red, false, draw_time_);
 			if (sensor_params_.draw_reflected_paths) {
-				DrawDebugLine(actor_->GetWorld(), sensor_position, trace_path[0], FColor::Red, false, draw_time_);
+				DrawDebugLine(actor_->GetWorld(), sensor_position, trace_path[0], FColor::Red, false, draw_time_, 0, line_thinkness_);
 				for (int trace_count = 0; trace_count < trace_path.Num() - 1; trace_count++)
 				{
-					DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count + 1], FColor::Red, false, draw_time_);
+					DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count + 1], FColor::Red, false, draw_time_, 0, line_thinkness_);
 				}
-				DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_position, FColor::Red, false, draw_time_);
+				DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_position, FColor::Red, false, draw_time_, 0, line_thinkness_);
 			}
 			if (sensor_params_.draw_reflected_lines) {
 				FVector draw_location = trace_start_position + trace_direction * distance_to_sensor;
 
-				DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, draw_time_);
+				DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, draw_time_, 0, line_thinkness_);
 				DrawDebugPoint(actor_->GetWorld(), draw_location, 5, FColor::Red, false, draw_time_);
 
 				float radius = distance_to_sensor * FMath::Tan(opening_angle_);
@@ -275,9 +280,9 @@ void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 
 	// Attenuate signal
 	float distance_traveled = ned_transform_->toNed(FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint));
-	applySignalSpread(signal_attenuation, total_distance, distance_traveled);
-	signal_attenuation += distance_traveled * sensor_params_.attenuation_per_distance;
-	signal_attenuation += sensor_params_.attenuation_per_reflection;
+	applyFreeSpaceLoss(signal_attenuation, total_distance, distance_traveled);
+	signal_attenuation += distance_traveled * attenuation_per_distance_;
+	signal_attenuation += attenuation_per_reflection_;
 
 	total_distance += distance_traveled;
 
@@ -305,7 +310,9 @@ float UnrealEchoSensor::angleBetweenVectors(FVector vector1, FVector vector2) {
 }
 
 float UnrealEchoSensor::receptionAttenuation(float reception_angle) {
-	float sigma = opening_angle_ / 10 * 3;
+	//float sigma = opening_angle_ / 10 * 3;
 
-	return -(FMath::Exp(-FMath::Pow(reception_angle, 2) / (2*FMath::Pow(sigma, 2))) - 1) * attenuation_limit_;
+	//return -(FMath::Exp(-FMath::Pow(reception_angle, 2) / (2*FMath::Pow(sigma, 2))) - 1) * attenuation_limit_;
+	// TODO
+	return 0;
 }
