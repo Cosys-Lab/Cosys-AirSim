@@ -64,7 +64,7 @@ public:
 		reporter.writeValue("Echo-AttenuationDist", params_.attenuation_per_distance);
 		reporter.writeValue("Echo-AttenuationRefl", params_.attenuation_per_reflection);
 		reporter.writeValue("Echo-AttenuationLimit", params_.attenuation_limit);
-		reporter.writeValue("Echo-AttenuationLim", params_.measurement_frequency);
+		reporter.writeValue("Echo-MeasurementFreq", params_.measurement_frequency);
     }
     //*** End: UpdatableState implementation ***//
 
