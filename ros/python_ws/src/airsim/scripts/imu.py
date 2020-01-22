@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import setup_path 
-import airsim
+import airsimpy
 import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import Imu
@@ -12,9 +12,9 @@ def imu_airpub(frameID, pubNode, sensorName, vehicleName):
     pub = rospy.Publisher(pubNode, Imu, queue_size=1)
     rate = rospy.Rate(10) # 10hz
 
-    # connect to the AirSim simulator 
-    client = airsim.CarClient()
-    client.confirmConnection()
+    # connect to the airsimpy simulator 
+    client = airsimpy.CarClient()
+    client.confirmConnection(rospy.get_name())
 
     while not rospy.is_shutdown():
         

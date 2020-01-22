@@ -50,9 +50,12 @@ class VehicleClient:
     def getHomeGeoPoint(self, vehicle_name = ''):
         return GeoPoint.from_msgpack(self.client.call('getHomeGeoPoint', vehicle_name))
 
-    def confirmConnection(self):
+    def confirmConnection(self, name = ''):
         if self.ping():
-            print("Connected!")
+            if name == '':
+                print("Connected to AirSim API!")
+            else:
+                print(name + " connected to AirSim API!")
         else:
              print("Ping returned false!")
         server_ver = self.getServerVersion()
@@ -69,9 +72,6 @@ class VehicleClient:
         elif client_ver < client_min_ver:
             print(ver_info, file=sys.stderr)
             print("AirSim client is of older version and not supported by this server. Please upgrade!")
-        else:
-            print(ver_info)
-        print('')
 
     # time-of-day control
     def simSetTimeOfDay(self, is_enabled, start_datetime = "", is_start_datetime_dst = False, celestial_clock_speed = 1, update_interval_secs = 60, move_sun = True):
@@ -161,6 +161,9 @@ class VehicleClient:
 
     def getLidarData(self, lidar_name = '', vehicle_name = ''):
         return LidarData.from_msgpack(self.client.call('getLidarData', lidar_name, vehicle_name))
+		
+    def getGPULidarData(self, lidar_name = '', vehicle_name = ''):
+        return GPULidarData.from_msgpack(self.client.call('getGPULidarData', lidar_name, vehicle_name))
 
     def getEchoData(self, echo_name = '', vehicle_name = ''):
         return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))

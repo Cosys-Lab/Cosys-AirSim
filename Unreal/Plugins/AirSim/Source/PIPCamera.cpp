@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ImageUtils.h"
+#include "EngineUtils.h"
 
 #include <string>
 #include <exception>
@@ -271,6 +272,14 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
     else
         this->SetActorTickEnabled(false);
 
+	static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
+	TArray<AActor*> ignoreActors;
+	for (TActorIterator<AActor> ActorIterator(this->GetWorld()); ActorIterator; ++ActorIterator)
+	{
+		AActor* Actor = *ActorIterator;
+		if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))ignoreActors.Add(Actor);
+	}
+
     int image_count = static_cast<int>(Utils::toNumeric(ImageType::Count));
     for (int image_type = -1; image_type < image_count; ++image_type) {
         const auto& capture_setting = camera_setting.capture_settings.at(image_type);
@@ -285,6 +294,8 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                     image_type_to_pixel_format_map_[image_type], capture_setting, ned_transform); 
 
             setNoiseMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings, noise_setting);
+
+			if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors = ignoreActors;
         }
         else { //camera component
             updateCameraSetting(camera_, capture_setting, ned_transform);

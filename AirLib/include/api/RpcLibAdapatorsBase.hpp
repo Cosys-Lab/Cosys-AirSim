@@ -470,9 +470,11 @@ public:
 
         msr::airlib::TTimePoint time_stamp;    // timestamp
         std::vector<float> point_cloud;        // data
+		std::vector<std::string> groundtruth;  // ground truth labels
+
         Pose pose;
 
-        MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+        MSGPACK_DEFINE_MAP(time_stamp, point_cloud, groundtruth, pose);
 
         LidarData()
         {}
@@ -481,11 +483,11 @@ public:
         {
             time_stamp = s.time_stamp;
             point_cloud = s.point_cloud;
+			groundtruth = s.groundtruth;
 
             //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
             if (point_cloud.size() == 0)
                 point_cloud.push_back(0);
-
             pose = s.pose;
         }
 
@@ -495,11 +497,47 @@ public:
 
             d.time_stamp = time_stamp;
             d.point_cloud = point_cloud;
+			d.groundtruth = groundtruth;
             d.pose = pose.to();
 
             return d;
         }
     };
+
+	struct GPULidarData {
+
+		msr::airlib::TTimePoint time_stamp;    // timestamp
+		std::vector<float> point_cloud;        // data
+
+		Pose pose;
+
+		MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+
+		GPULidarData()
+		{}
+
+		GPULidarData(const msr::airlib::GPULidarData& s)
+		{
+			time_stamp = s.time_stamp;
+			point_cloud = s.point_cloud;
+
+			//TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+			if (point_cloud.size() == 0)
+				point_cloud.push_back(0);
+			pose = s.pose;
+		}
+
+		msr::airlib::GPULidarData to() const
+		{
+			msr::airlib::GPULidarData d;
+
+			d.time_stamp = time_stamp;
+			d.point_cloud = point_cloud;
+			d.pose = pose.to();
+
+			return d;
+		}
+	};
 
 	struct EchoData {
 

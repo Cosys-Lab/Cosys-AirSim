@@ -12,7 +12,8 @@ You should have these components installed and working before proceeding
 ## Implemented nodes
 - `pose.py`: Get and publish the pose of vehicle
 - `airsim_pose_tf_broadcaster.py`: Transform the vehicle pose to the world frame correctly with _base_link_.
-- `lidar.py`: get and publish the LIDAR sensor data as PointCloud2 messages
+- `lidar.py`: get and publish the LIDAR sensor data as PointCloud2 messages and the groundtruth labels as a new string[] message type
+- `gpulidar.py`: get and publish the GPU LIDAR sensor data as PointCloud2 messages
 - `imu.py`: get and publish the IMU sensor data as IMU messages
 - `car_control.py` : subscribe to `/cmd_vel` or another chosen topic and control the AirSim cars (Car and SkidVehicle SimModes).
 - `camera.py` : Get (up to 3 simultaneously) camera images from AirSim and publish them to ROS.
@@ -27,6 +28,7 @@ You should have these components installed and working before proceeding
 - `airsim_benchmark_lidar_record.launch`: Publish the vehicle pose, LIDAR, IMU sensor data and record a bag file (**make sure to set output folder yourself correctly!**)
 - `airsim_benchmark_camera_record.launch`: Publish the vehicle pose and camera images (RGB, depth(10m max), segmentation) and record a bag file (**make sure to set output folder yourself correctly!**)
 
+You can use the launch argument `use_gpu_lidar` as true or false to define the Lidar type.
 ## Setup
 
 ## Setup workspace and Airsim package

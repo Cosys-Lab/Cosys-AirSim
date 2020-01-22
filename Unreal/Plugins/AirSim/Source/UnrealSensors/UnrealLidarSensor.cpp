@@ -59,9 +59,10 @@ void UnrealLidarSensor::pause(const bool is_paused) {
 
 // returns a point-cloud for the tick
 void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
-	const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
+	const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth)
 {
 	point_cloud.clear();
+	groundtruth.clear();
 
 	msr::airlib::LidarSimpleParams params = getParams();
 	const auto number_of_lasers = params.number_of_channels;
@@ -106,12 +107,14 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 				continue;
 
 			Vector3r point;
+			std::string label;
 			// shoot laser and get the impact point, if any
-			if (shootLaser(lidar_pose, vehicle_pose, laser, horizontal_angle, vertical_angle, params, point))
+			if (shootLaser(lidar_pose, vehicle_pose, laser, horizontal_angle, vertical_angle, params, point, label))
 			{
 				point_cloud.emplace_back(point.x());
 				point_cloud.emplace_back(point.y());
 				point_cloud.emplace_back(point.z());
+				groundtruth.emplace_back(label);
 			}
 		}
 	}
@@ -124,7 +127,7 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 // simulate shooting a laser via Unreal ray-tracing.
 bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
 	const uint32 laser, const float horizontal_angle, const float vertical_angle,
-	const msr::airlib::LidarSimpleParams params, Vector3r &point)
+	const msr::airlib::LidarSimpleParams params, Vector3r &point, std::string &label)
 {
 	// start position
 	Vector3r start = VectorMath::add(lidar_pose, vehicle_pose).position;
@@ -161,6 +164,7 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 
 		FVector impact_point = hit_result.ImpactPoint;
 
+		label = TCHAR_TO_UTF8(*hit_result.Actor.Get()->GetName());
 		// If enabled add range noise
 		if (params.generate_noise) {
 			// Add noise based on normal distribution taking into account scaling of noise with distance

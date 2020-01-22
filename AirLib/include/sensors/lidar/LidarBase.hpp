@@ -28,6 +28,7 @@ public: //types
         // - in lidar local NED coordinates
         // - in meters
         vector<real_T> point_cloud;
+		vector<std::string> groundtruth;
     };
 
 public:

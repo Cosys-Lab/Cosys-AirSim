@@ -22,7 +22,6 @@ devel_isolated/
 *.cfgc
 /cfg/cpp/
 /cfg/*.py
-/src/CMakeLists.txt
 
 # Ignore generated docs
 *.dox

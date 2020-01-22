@@ -12,6 +12,7 @@
 #include "common/CommonStructs.hpp"
 #include "common/ImageCaptureBase.hpp"
 #include "sensors/SensorCollection.hpp"
+#include "sensors/lidar/GPULidarBase.hpp"
 #include "sensors/lidar/LidarBase.hpp"
 #include "sensors/echo/EchoBase.hpp"
 #include "sensors/imu/ImuBase.hpp"
@@ -130,6 +131,28 @@ public:
 
         return lidar->getOutput();
     }
+
+	virtual GPULidarData getGPULidarData(const std::string& lidar_name) const
+	{
+		const GPULidarBase* lidar = nullptr;
+
+		// Find GPU lidar with the given name (for empty input name, return the first one found)
+		// Not efficient but should suffice given small number of lidars
+		uint count_lidars = getSensors().size(SensorBase::SensorType::GPULidar);
+		for (uint i = 0; i < count_lidars; i++)
+		{
+			const GPULidarBase* current_lidar = static_cast<const GPULidarBase*>(getSensors().getByType(SensorBase::SensorType::GPULidar, i));
+			if (current_lidar != nullptr && (current_lidar->getName() == lidar_name || lidar_name == ""))
+			{
+				lidar = current_lidar;
+				break;
+			}
+		}
+		if (lidar == nullptr)
+			throw VehicleControllerException(Utils::stringf("No GPU lidar with name %s exist on vehicle", lidar_name.c_str()));
+
+		return lidar->getOutput();
+	}
 
 	// Echo APIs
 	virtual EchoData getEchoData(const std::string& echo_name) const

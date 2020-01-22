@@ -77,7 +77,7 @@ public:
 
 protected:
     virtual void getPointCloud(const Pose& lidar_pose, const Pose& vehicle_pose, 
-        TTimeDelta delta_time, vector<real_T>& point_cloud) = 0;
+        TTimeDelta delta_time, vector<real_T>& point_cloud, vector<std::string>& groundtruth) = 0;
 
 	virtual void pause(const bool is_paused) = 0;
 
@@ -88,6 +88,7 @@ private: //methods
 		TTimeDelta delta_time = freq_limiter_.getLastElapsedIntervalSec();
 
         point_cloud_.clear();
+		groundtruth_.clear();
 
         const GroundTruth& ground_truth = getGroundTruth();
 
@@ -104,11 +105,13 @@ private: //methods
         getPointCloud(params_.relative_pose, // relative lidar pose
             ground_truth.kinematics->pose,   // relative vehicle pose
             delta_time, 
-            point_cloud_);
+            point_cloud_, groundtruth_);
 		double end = FPlatformTime::Seconds();
-		UAirBlueprintLib::LogMessageString("sensor: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
+		UAirBlueprintLib::LogMessageString("Lidar: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
         LidarData output;
         output.point_cloud = point_cloud_;
+		output.groundtruth = groundtruth_;
+
         output.time_stamp = clock()->nowNanos();
         output.pose = lidar_pose;            
 
@@ -120,7 +123,8 @@ private: //methods
 private:
     LidarSimpleParams params_;
     vector<real_T> point_cloud_;
-
+	vector<std::string> groundtruth_;
+	
     FrequencyLimiter freq_limiter_;
     TTimePoint last_time_;
 	bool last_tick_measurement_ = false;

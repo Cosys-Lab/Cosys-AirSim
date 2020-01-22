@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import setup_path 
-import airsim
+import airsimpy
 import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
@@ -10,23 +10,23 @@ import os
 
 def get_camera_type(cameraType):
     if(cameraType == "Scene"):
-        cameraTypeClass = airsim.ImageType.Scene
+        cameraTypeClass = airsimpy.ImageType.Scene
     elif(cameraType == "Segmentation"):
-        cameraTypeClass = airsim.ImageType.Segmentation
+        cameraTypeClass = airsimpy.ImageType.Segmentation
     elif(cameraType == "DepthPerspective"):
-        cameraTypeClass = airsim.ImageType.DepthPerspective
+        cameraTypeClass = airsimpy.ImageType.DepthPerspective
     elif(cameraType == "DepthPlanner"):
-        cameraTypeClass = airsim.ImageType.DepthPlanner
+        cameraTypeClass = airsimpy.ImageType.DepthPlanner
     elif(cameraType == "DepthVis"):
-        cameraTypeClass = airsim.ImageType.DepthVis
+        cameraTypeClass = airsimpy.ImageType.DepthVis
     elif(cameraType == "Infrared"):
-        cameraTypeClass = airsim.ImageType.Infrared
+        cameraTypeClass = airsimpy.ImageType.Infrared
     elif(cameraType == "SurfaceNormals"):
-        cameraTypeClass = airsim.ImageType.SurfaceNormals
+        cameraTypeClass = airsimpy.ImageType.SurfaceNormals
     elif(cameraType == "DisparityNormalized"):
-        cameraTypeClass = airsim.ImageType.DisparityNormalized
+        cameraTypeClass = airsimpy.ImageType.DisparityNormalized
     else:
-        cameraTypeClass = airsim.ImageType.Scene
+        cameraTypeClass = airsimpy.ImageType.Scene
         rospy.logwarn("Camera type %s not found, setting to Scene as default", cameraType)
     return cameraTypeClass
 
@@ -101,13 +101,14 @@ def camera_airpub(frameID, pubNode1, pubNode2, pubNode3, camera2Active, camera3A
     rate = rospy.Rate(cameraFrequency) 
 
     # connect to the AirSim simulator 
-    client = airsim.CarClient()
-    client.confirmConnection()
+    client = airsimpy.CarClient()
+    
+    client.confirmConnection(rospy.get_name())
     index = 0
     while not rospy.is_shutdown():
 
         if camera2Active == 0 and camera3Active == 0:
-            responses = client.simGetImages([airsim.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False)])
+            responses = client.simGetImages([airsimpy.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False)])
             
             img_rgb_string1 = get_image_bytes(responses[0], cameraType1, MaxDepthDistance)
 
@@ -125,8 +126,8 @@ def camera_airpub(frameID, pubNode1, pubNode2, pubNode3, camera2Active, camera3A
 
         elif camera2Active == 1 and camera3Active == 0:
             responses = client.simGetImages([
-                airsim.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False),
-                airsim.ImageRequest(cameraIndex2, get_camera_type(cameraType2), is_pixels_as_float(cameraType2), False)]) 
+                airsimpy.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False),
+                airsimpy.ImageRequest(cameraIndex2, get_camera_type(cameraType2), is_pixels_as_float(cameraType2), False)]) 
 
             img_rgb_string1 = get_image_bytes(responses[0], cameraType1, MaxDepthDistance)
             img_rgb_string2 = get_image_bytes(responses[1], cameraType2, MaxDepthDistance)
@@ -147,8 +148,8 @@ def camera_airpub(frameID, pubNode1, pubNode2, pubNode3, camera2Active, camera3A
 
         elif camera2Active == 0 and camera3Active == 1:
             responses = client.simGetImages([
-                airsim.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False),
-                airsim.ImageRequest(cameraIndex3, get_camera_type(cameraType3), is_pixels_as_float(cameraType3), False)]) 
+                airsimpy.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False),
+                airsimpy.ImageRequest(cameraIndex3, get_camera_type(cameraType3), is_pixels_as_float(cameraType3), False)]) 
             
             img_rgb_string1 = get_image_bytes(responses[0], cameraType1, MaxDepthDistance)
             img_rgb_string3 = get_image_bytes(responses[1], cameraType3, MaxDepthDistance)
@@ -169,9 +170,9 @@ def camera_airpub(frameID, pubNode1, pubNode2, pubNode3, camera2Active, camera3A
 
         elif camera2Active == 1 and camera3Active == 1:    
             responses = client.simGetImages([
-                airsim.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False),
-                airsim.ImageRequest(cameraIndex2, get_camera_type(cameraType2), is_pixels_as_float(cameraType2), False),
-                airsim.ImageRequest(cameraIndex3, get_camera_type(cameraType3), is_pixels_as_float(cameraType3), False)]) 
+                airsimpy.ImageRequest(cameraIndex1, get_camera_type(cameraType1), is_pixels_as_float(cameraType1), False),
+                airsimpy.ImageRequest(cameraIndex2, get_camera_type(cameraType2), is_pixels_as_float(cameraType2), False),
+                airsimpy.ImageRequest(cameraIndex3, get_camera_type(cameraType3), is_pixels_as_float(cameraType3), False)]) 
 
             img_rgb_string1 = get_image_bytes(responses[0], cameraType1, MaxDepthDistance)
             img_rgb_string2 = get_image_bytes(responses[1], cameraType2, MaxDepthDistance)
