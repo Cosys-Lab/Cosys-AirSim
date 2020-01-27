@@ -296,6 +296,7 @@ public: //types
 		std::string data_frame = AirSimSettings::kSensorLocalFrame;
 		Vector3r position = VectorMath::nanVector();
 		Rotation rotation = Rotation::nanRotation();
+		bool ignore_marked = false;
 	};
 
     struct VehicleSetting {
@@ -1326,6 +1327,7 @@ private:
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
 
 		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
+		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
 
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);
