@@ -12,7 +12,7 @@ void UManualPoseController::initializeForPlay()
     up_mapping_ = FInputAxisKeyMapping("inputManualArrowUp", EKeys::PageUp); down_mapping_ = FInputAxisKeyMapping("inputManualArrowDown", EKeys::PageDown); 
     left_yaw_mapping_ = FInputAxisKeyMapping("inputManualLeftYaw", EKeys::A); up_pitch_mapping_ = FInputAxisKeyMapping("inputManualUpPitch", EKeys::W);
     right_yaw_mapping_ = FInputAxisKeyMapping("inputManualRightYaw", EKeys::D); down_pitch_mapping_ = FInputAxisKeyMapping("inputManualDownPitch", EKeys::S);
-	shift_mapping_ = FInputAxisKeyMapping("inputManualShift", EKeys::LeftShift); 
+	shift_mapping_ = FInputAxisKeyMapping("inputManualShift", EKeys::RightShift); 
 	space_mapping_ = FInputAxisKeyMapping("inputManualSpace", EKeys::SpaceBar);
 
     input_positive_ = inpute_negative_ = last_velocity_ = FVector::ZeroVector;
