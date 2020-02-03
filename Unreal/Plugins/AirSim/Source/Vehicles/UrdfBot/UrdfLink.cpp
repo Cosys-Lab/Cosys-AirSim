@@ -1,5 +1,4 @@
 #include "UrdfLink.h"
-#include "UrdfBotPawn.h"
 
 void FAUrdfLinkSecondaryTickFunction::ExecuteTick(float deltaTime, ELevelTick tickType, ENamedThreads::Type currentThread, const FGraphEventRef &myCompletionGraphEvent)
 {
@@ -58,10 +57,10 @@ void AUrdfLink::TickPostPhysics(float deltaSeconds, ELevelTick tickType, FAUrdfL
 void AUrdfLink::NotifyHit(class UPrimitiveComponent* myComp, class AActor* other, class UPrimitiveComponent* otherComp, bool bSelfMoved, FVector hitLocation,
     FVector hitNormal, FVector normalImpulse, const FHitResult &hit)
 {
-    if (this->owner_ != nullptr)
-    {
-        this->owner_->NotifyHit(myComp, other, otherComp, bSelfMoved, hitLocation, hitNormal, normalImpulse, hit);
-    }
+    //if (this->owner_ != nullptr)
+    //{
+    //    this->owner_->NotifyHit(myComp, other, otherComp, bSelfMoved, hitLocation, hitNormal, normalImpulse, hit);
+    //}
 }
 
 void AUrdfLink::SetCollisionComponent(UPrimitiveComponent* collisionComponent)
@@ -184,15 +183,10 @@ void AUrdfLink::ComputeForces(float deltaTime, bool inSubstep)
 
 }
 
-void AUrdfLink::SetOwningActor(AUrdfBotPawn* owner)
-{
-    this->owner_ = owner;
-}
-
-AUrdfBotPawn* AUrdfLink::GetOwningActor()
-{
-    return this->owner_;
-}
+//void AUrdfLink::SetOwningActor(AUrdfBotPawn* owner)
+//{
+//    this->owner_ = owner;
+//}
 
 TMap<FString, UrdfForceSpecification*> AUrdfLink::GetForceSpecifications() const
 {
@@ -297,7 +291,7 @@ void AUrdfLink::SetMass(float massInKg)
     this->mesh_root_->SetMassOverrideInKg(NAME_None, massInKg, true);
 }
 
-void AUrdfLink::SetMaterial(UMaterial* material)
+void AUrdfLink::SetMaterial(UMaterialInterface* material)
 {
     this->mesh_root_->SetMaterial(0, material);
 }

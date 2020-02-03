@@ -15,7 +15,7 @@
 
 #include "UrdfLink.generated.h"
 
-class UrdfBotPawn;
+//class UrdfBotPawn;
 
 USTRUCT()
 struct FAUrdfLinkSecondaryTickFunction : public FTickFunction
@@ -84,8 +84,7 @@ class AUrdfLink : public AActor
 
         void ComputeForces(float deltaTime, bool inSubstep);
 
-        void SetOwningActor(AUrdfBotPawn* owner);
-        AUrdfBotPawn* GetOwningActor();
+   /*     void SetOwningActor(AUrdfBotPawn* owner);*/
 
         void UpdateKinematics(float dt);
         msr::airlib::Pose GetPose();
@@ -93,7 +92,7 @@ class AUrdfLink : public AActor
         void SetMeshFromStaticMeshComponent(UStaticMeshComponent* mesh);
         void SetMeshFromProceduralMeshComponent(UProceduralMeshComponent* proceduralMeshComponent);
         void SetMass(float massInKg);
-        void SetMaterial(UMaterial* material);
+        void SetMaterial(UMaterialInterface* material);
         UMeshComponent* GetRootMesh();
         FVector GetPhysicsLinearVelocity();
         FVector GetPhysicsAngularVelocityInRadians();
@@ -111,7 +110,7 @@ class AUrdfLink : public AActor
         FCalculateCustomPhysics onCalculateCustomPhysics;
 
         FThreadSafeBool forceLock_;
-        class AUrdfBotPawn* owner_ = nullptr;
+        //class AUrdfBotPawn* owner_ = nullptr;
         int frameCount_;
         
         UPrimitiveComponent* collisionComponent_;

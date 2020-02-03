@@ -367,7 +367,7 @@ AUrdfLink* AUrdfBotPawn::CreateLinkFromSpecification(const UrdfLinkSpecification
     this->ResizeLink(link, collisionGeometry);
 
     link->SetMass(linkSpecification.InertialSpecification->Mass);
-    link->SetOwningActor(this);
+    //link->SetOwningActor(this);
 
     return link;
 }

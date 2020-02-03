@@ -88,6 +88,7 @@ public class AirSim : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         bEnableExceptions = true;
+        bUseRTTI = true;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ImageWrapper", "RenderCore", "RHI", "PhysXVehicles", "ProceduralMeshComponent", "Landscape", "XmlParser", "APEX", "PhysX", "PhysXVehicleLib", "Foliage" });
         PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore", "PhysX", "PhysXVehicles", "PhysXVehicleLib", "ProceduralMeshComponent"});

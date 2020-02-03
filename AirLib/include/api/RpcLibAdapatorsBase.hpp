@@ -978,6 +978,7 @@ public:
 MSGPACK_ADD_ENUM(msr::airlib::SafetyEval::SafetyViolationType_);
 MSGPACK_ADD_ENUM(msr::airlib::SafetyEval::ObsAvoidanceStrategy);
 MSGPACK_ADD_ENUM(msr::airlib::ImageCaptureBase::ImageType);
-
+MSGPACK_ADD_ENUM(msr::airlib::WorldSimApiBase::WeatherParameter);
+MSGPACK_ADD_ENUM(msr::airlib::GpsBase::GnssFixType);
 
 #endif
