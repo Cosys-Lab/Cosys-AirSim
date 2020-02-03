@@ -16,7 +16,7 @@ namespace msr { namespace airlib {
 class LidarSimple : public LidarBase {
 public:
     LidarSimple(const AirSimSettings::LidarSetting& setting = AirSimSettings::LidarSetting())
-        : LidarBase(setting.sensor_name)
+        : LidarBase(setting.sensor_name, setting.attach_link)
     {
         // initialize params
         params_.initializeFromSettings(setting);
@@ -97,7 +97,7 @@ private: //methods
         // then the pose won't be very accurate either way.
         //
         // TODO: Seems like pose is in vehicle inertial-frame (NOT in Global NED frame).
-        //    That could be a bit unintuitive but seems consistent with the position/orientation returned as part of 
+        //    That could be a bit unintuitive but seems consistent with the position/orientation returned as part of
         //    ImageResponse for cameras and pose returned by getCameraInfo API.
         //    Do we need to convert pose to Global NED frame before returning to clients?
         Pose lidar_pose = params_.relative_pose + ground_truth.kinematics->pose;
@@ -113,7 +113,7 @@ private: //methods
 		output.groundtruth = groundtruth_;
 
         output.time_stamp = clock()->nowNanos();
-        output.pose = lidar_pose;            
+        output.pose = lidar_pose;
 
         last_time_ = output.time_stamp;
 
@@ -124,7 +124,7 @@ private:
     LidarSimpleParams params_;
     vector<real_T> point_cloud_;
 	vector<std::string> groundtruth_;
-	
+
     FrequencyLimiter freq_limiter_;
     TTimePoint last_time_;
 	bool last_tick_measurement_ = false;

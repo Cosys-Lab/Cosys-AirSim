@@ -88,20 +88,15 @@ public class AirSim : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         bEnableExceptions = true;
+        bUseRTTI = true;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ImageWrapper", "RenderCore", "RHI", "PhysXVehicles", "PhysXVehicleLib", "PhysX", "APEX", "Landscape" });
-        PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ImageWrapper", "RenderCore", "RHI", "PhysXVehicles", "ProceduralMeshComponent", "Landscape", "XmlParser", "APEX", "PhysX", "PhysXVehicleLib", "Foliage" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "ProceduralMeshComponent", "UMG", "Slate", "SlateCore", "PhysX", "PhysXVehicles", "PhysXVehicleLib", "ProceduralMeshComponent"});
 
         //suppress VC++ proprietary warnings
-#if UE_4_19_OR_LATER
-        PublicDefinitions.Add("_SCL_SECURE_NO_WARNINGS=1");
-        PublicDefinitions.Add("_CRT_SECURE_NO_WARNINGS=1");
-        PublicDefinitions.Add("HMD_MODULE_INCLUDED=0");
-#else
         Definitions.Add("_SCL_SECURE_NO_WARNINGS=1");
         Definitions.Add("_CRT_SECURE_NO_WARNINGS=1");
         Definitions.Add("HMD_MODULE_INCLUDED=0");
-#endif
 
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "include"));
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "deps", "eigen3"));

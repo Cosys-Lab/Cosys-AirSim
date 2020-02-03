@@ -7,6 +7,7 @@
 #include "Vehicles/Car/SimModeCar.h"
 #include "Vehicles/SkidSteer/SimModeSkidVehicle.h"
 #include "Vehicles/ComputerVision/SimModeComputerVision.h"
+#include "Vehicles/UrdfBot/SimModeUrdfBot.h"
 
 #include "common/AirSimSettings.hpp"
 #include <stdexcept>
@@ -292,7 +293,7 @@ void ASimHUD::createSimMode()
 
     //spawn at origin. We will use this to do global NED transforms, for ex, non-vehicle objects in environment
     if (simmode_name == "Multirotor")
-        simmode_ = this->GetWorld()->SpawnActor<ASimModeWorldMultiRotor>(FVector::ZeroVector, 
+        simmode_ = this->GetWorld()->SpawnActor<ASimModeWorldMultiRotor>(FVector::ZeroVector,
             FRotator::ZeroRotator, simmode_spawn_params);
     else if (simmode_name == "Car")
         simmode_ = this->GetWorld()->SpawnActor<ASimModeCar>(FVector::ZeroVector,
@@ -303,10 +304,12 @@ void ASimHUD::createSimMode()
     else if (simmode_name == "ComputerVision")
         simmode_ = this->GetWorld()->SpawnActor<ASimModeComputerVision>(FVector::ZeroVector,
             FRotator::ZeroRotator, simmode_spawn_params);
+    else if (simmode_name == "UrdfBot")
+		simmode_ = this->GetWorld()->SpawnActor<ASimModeUrdfBot>(FVector::ZeroVector,
+			FRotator::ZeroRotator, simmode_spawn_params);
     else {
         UAirBlueprintLib::ShowMessage(EAppMsgType::Ok, std::string("SimMode is not valid: ") + simmode_name, "Error");
         UAirBlueprintLib::LogMessageString("SimMode is not valid: ", simmode_name, LogDebugLevel::Failure);
-    }
 }
 
 void ASimHUD::initializeSubWindows()

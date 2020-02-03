@@ -19,10 +19,10 @@
 #include "IImageWrapper.h"
 #include "ObjectThumbnail.h"
 #include "Engine/Engine.h"
+#include "ProceduralMeshComponent.h"
 #include <exception>
 #include "common/common_utils/Utils.hpp"
 #include "Components/LineBatchComponent.h"
-
 /*
 //TODO: change naming conventions to same as other files?
 Naming conventions in this file:
@@ -31,6 +31,7 @@ parameters -> camel_case
 */
 
 bool UAirBlueprintLib::log_messages_hidden_ = false;
+uint32_t UAirBlueprintLib::flush_on_draw_count_ = 0;
 msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType UAirBlueprintLib::mesh_naming_method_ =
     msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::OwnerName;
 IImageWrapperModule* UAirBlueprintLib::image_wrapper_module_ = nullptr;
@@ -64,7 +65,7 @@ void UAirBlueprintLib::DrawLine(const UWorld* InWorld, FVector const& LineStart,
 	// no debug line drawing on dedicated server
 	if (GEngine->GetNetMode(InWorld) != NM_DedicatedServer)
 	{
-		// this means foreground lines can't be persistent 
+		// this means foreground lines can't be persistent
 		ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
 		if (LineBatcher != NULL)
 		{
@@ -79,7 +80,7 @@ void UAirBlueprintLib::DrawPoint(const UWorld* InWorld, FVector const& Position,
 	// no debug line drawing on dedicated server
 	if (GEngine->GetNetMode(InWorld) != NM_DedicatedServer)
 	{
-		// this means foreground lines can't be persistent 
+		// this means foreground lines can't be persistent
 		ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
 		if (LineBatcher != NULL)
 		{
@@ -260,6 +261,7 @@ void UAirBlueprintLib::enableViewportRendering(AActor* context, bool enable)
 
 void UAirBlueprintLib::OnBeginPlay()
 {
+    flush_on_draw_count_ = 0;
     image_wrapper_module_ = &FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
 }
 
@@ -417,6 +419,25 @@ std::string UAirBlueprintLib::GetMeshName(ALandscapeProxy* mesh)
     return std::string(TCHAR_TO_UTF8(*(mesh->GetName())));
 }
 
+std::string UAirBlueprintLib::GetMeshName(UProceduralMeshComponent* meshComponent)
+{
+    switch (mesh_naming_method_)
+    {
+    case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::OwnerName:
+        if (meshComponent->GetOwner())
+            return std::string(TCHAR_TO_UTF8(*(meshComponent->GetOwner()->GetName())));
+        else
+            return ""; //std::string(TCHAR_TO_UTF8(*(UKismetSystemLibrary::GetDisplayName(mesh))));
+    case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::StaticMeshName:
+        if (meshComponent)
+            return std::string(TCHAR_TO_UTF8(*(meshComponent->GetName())));
+        else
+            return "";
+    default:
+        return "";
+    }
+}
+
 void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing)
 {
     for (TObjectIterator<UStaticMeshComponent> comp; comp; ++comp)
@@ -455,6 +476,10 @@ bool UAirBlueprintLib::SetMeshStencilID(const std::string& mesh_name, int object
         SetObjectStencilIDIfMatch(*comp, object_id, mesh_name, is_name_regex, name_regex, changes);
     }
     for (TObjectIterator<ALandscapeProxy> comp; comp; ++comp)
+    {
+        SetObjectStencilIDIfMatch(*comp, object_id, mesh_name, is_name_regex, name_regex, changes);
+    }
+    for (TObjectIterator<UProceduralMeshComponent> comp; comp; ++comp)
     {
         SetObjectStencilIDIfMatch(*comp, object_id, mesh_name, is_name_regex, name_regex, changes);
     }
@@ -512,7 +537,7 @@ bool UAirBlueprintLib::GetObstacle(const AActor* actor, const FVector& start, co
 	FCollisionQueryParams trace_params;
 	if (ignore_actor != nullptr)
 		trace_params.AddIgnoredActor(ignore_actor);
-	
+
 	return actor->GetWorld()->LineTraceSingleByChannel(hit, start, end, collision_channel, trace_params);
 }
 

@@ -168,7 +168,7 @@ void ASimModeBase::setTimeOfDay(bool is_enabled, const std::string& start_dateti
     float celestial_clock_speed, float update_interval_secs, bool move_sun)
 {
     bool enabled_currently = tod_enabled_;
-    
+
     if (is_enabled) {
 
         if (!sun_) {
@@ -178,7 +178,7 @@ void ASimModeBase::setTimeOfDay(bool is_enabled, const std::string& start_dateti
         else {
             sun_->GetRootComponent()->Mobility = EComponentMobility::Movable;
 
-            // this is a bit odd but given how advanceTimeOfDay() works currently, 
+            // this is a bit odd but given how advanceTimeOfDay() works currently,
             // tod_sim_clock_start_ needs to be reset here.
             tod_sim_clock_start_ = ClockFactory::get()->nowNanos();
 
@@ -485,7 +485,7 @@ void ASimModeBase::setupVehiclesAndCamera()
 
     //find all vehicle pawns
     {
-        TArray<AActor*> pawns;
+        TArray<AirsimVehicle*> pawns;
         getExistingVehiclePawns(pawns);
 
         APawn* fpv_pawn = nullptr;
@@ -524,27 +524,27 @@ void ASimModeBase::setupVehiclesAndCamera()
         }
 
         //create API objects for each pawn we have
-        for (AActor* pawn : pawns)
+        for (AirsimVehicle* pawn : pawns)
         {
-            APawn* vehicle_pawn = static_cast<APawn*>(pawn);
+			AirsimVehicle* vehicle_pawn = static_cast<AirsimVehicle*>(pawn);
 
-            initializeVehiclePawn(vehicle_pawn);
+            initializeVehiclePawn(vehicle_pawn->GetPawn());
 
             //create vehicle sim api
             const auto& ned_transform = getGlobalNedTransform();
-            const auto& pawn_ned_pos = ned_transform.toLocalNed(vehicle_pawn->GetActorLocation());
+            const auto& pawn_ned_pos = ned_transform.toLocalNed(vehicle_pawn->GetPawn()->GetActorLocation());
             const auto& home_geopoint= msr::airlib::EarthUtils::nedToGeodetic(pawn_ned_pos, getSettings().origin_geopoint);
-            const std::string vehicle_name = std::string(TCHAR_TO_UTF8(*(vehicle_pawn->GetName())));
+            const std::string vehicle_name = std::string(TCHAR_TO_UTF8(*(vehicle_pawn->GetPawn()->GetName())));
 
             PawnSimApi::Params pawn_sim_api_params(vehicle_pawn, &getGlobalNedTransform(),
-                getVehiclePawnEvents(vehicle_pawn), getVehiclePawnCameras(vehicle_pawn), pip_camera_class, 
+                getVehiclePawnEvents(vehicle_pawn->GetPawn()), getVehiclePawnCameras(vehicle_pawn->GetPawn()), pip_camera_class,
                 collision_display_template, home_geopoint, vehicle_name);
 
             auto vehicle_sim_api = createVehicleSimApi(pawn_sim_api_params);
             auto vehicle_sim_api_p = vehicle_sim_api.get();
             auto vehicle_Api = getVehicleApi(pawn_sim_api_params, vehicle_sim_api_p);
             getApiProvider()->insert_or_assign(vehicle_name, vehicle_Api, vehicle_sim_api_p);
-            if ((fpv_pawn == vehicle_pawn || !getApiProvider()->hasDefaultVehicle()) && vehicle_name != "")
+            if ((fpv_pawn == vehicle_pawn->GetPawn() || !getApiProvider()->hasDefaultVehicle()) && vehicle_name != "")
                 getApiProvider()->makeDefaultVehicle(vehicle_name);
 
             vehicle_sim_apis_.push_back(std::move(vehicle_sim_api));
@@ -563,7 +563,7 @@ void ASimModeBase::setupVehiclesAndCamera()
     checkVehicleReady();
 }
 
-void ASimModeBase::getExistingVehiclePawns(TArray<AActor*>& pawns) const
+void ASimModeBase::getExistingVehiclePawns(TArray<AirsimVehicle*>& pawns) const
 {
     //derived class should override this method to retrieve types of pawns they support
 }
