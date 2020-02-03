@@ -23,8 +23,10 @@ public class AirSim : ModuleRules
     }
     private string ProjectBinariesPath
     {
-        get { return Path.Combine(
-                Directory.GetParent(AirSimPluginPath).Parent.FullName, "Binaries");
+        get
+        {
+            return Path.Combine(
+              Directory.GetParent(AirSimPluginPath).Parent.FullName, "Binaries");
         }
     }
     private string AirSimPluginDependencyPath
@@ -47,31 +49,18 @@ public class AirSim : ModuleRules
         switch (mode)
         {
             case CompileMode.HeaderOnlyNoRpc:
-#if UE_4_19_OR_LATER
-                PublicDefinitions.Add("AIRLIB_HEADER_ONLY=1");
-                PublicDefinitions.Add("AIRLIB_NO_RPC=1");
-#else
                 Definitions.Add("AIRLIB_HEADER_ONLY=1");
                 Definitions.Add("AIRLIB_NO_RPC=1");
-#endif
                 AddLibDependency("AirLib", Path.Combine(AirLibPath, "lib"), "AirLib", Target, false);
                 break;
             case CompileMode.HeaderOnlyWithRpc:
-#if UE_4_19_OR_LATER
-                PublicDefinitions.Add("AIRLIB_HEADER_ONLY=1");
-#else
                 Definitions.Add("AIRLIB_HEADER_ONLY=1");
-#endif
                 AddLibDependency("AirLib", Path.Combine(AirLibPath, "lib"), "AirLib", Target, false);
                 LoadAirSimDependency(Target, "rpclib", "rpc");
                 break;
             case CompileMode.CppCompileNoRpc:
                 LoadAirSimDependency(Target, "MavLinkCom", "MavLinkCom");
-#if UE_4_19_OR_LATER
-                PublicDefinitions.Add("AIRLIB_NO_RPC=1");
-#else
                 Definitions.Add("AIRLIB_NO_RPC=1");
-#endif
                 break;
             case CompileMode.CppCompileWithRpc:
                 LoadAirSimDependency(Target, "rpclib", "rpc");
@@ -91,21 +80,61 @@ public class AirSim : ModuleRules
         bUseRTTI = true;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ImageWrapper", "RenderCore", "RHI", "PhysXVehicles", "ProceduralMeshComponent", "Landscape", "XmlParser", "APEX", "PhysX", "PhysXVehicleLib", "Foliage" });
-        PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore", "PhysX", "PhysXVehicles", "PhysXVehicleLib", "ProceduralMeshComponent"});
+        PrivateDependencyModuleNames.AddRange(new string[] { "ProceduralMeshComponent", "UMG", "Slate", "SlateCore", "PhysX", "PhysXVehicles", "PhysXVehicleLib", "ProceduralMeshComponent" });
 
-#if UE_4_19_OR_LATER
-        PublicDefinitions.Add("_SCL_SECURE_NO_WARNINGS=1");
-        PublicDefinitions.Add("_CRT_SECURE_NO_WARNINGS=1");
-        PublicDefinitions.Add("HMD_MODULE_INCLUDED=0");
-#else
+        //suppress VC++ proprietary warnings
         Definitions.Add("_SCL_SECURE_NO_WARNINGS=1");
         Definitions.Add("_CRT_SECURE_NO_WARNINGS=1");
         Definitions.Add("HMD_MODULE_INCLUDED=0");
-#endif
 
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "include"));
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "deps", "eigen3"));
         AddOSLibDependencies(Target);
+
+        //Type = ModuleType.External;
+
+        string VHACDDirectory = Target.UEThirdPartySourceDirectory + "VHACD/";
+        string VHACDLibPath = VHACDDirectory;
+        PublicIncludePaths.Add(VHACDDirectory + "public");
+
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            VHACDLibPath = VHACDLibPath + "lib/Win64/VS" + Target.WindowsPlatform.GetVisualStudioCompilerVersionName() + "/";
+            PublicLibraryPaths.Add(VHACDLibPath);
+
+            if (Target.Configuration == UnrealTargetConfiguration.Debug && Target.bDebugBuildsActuallyUseDebugCRT)
+            {
+                PublicAdditionalLibraries.Add("VHACDd.lib");
+            }
+            else
+            {
+                PublicAdditionalLibraries.Add("VHACD.lib");
+            }
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Mac)
+        {
+            string LibPath = VHACDDirectory + "Lib/Mac/";
+            if (Target.Configuration == UnrealTargetConfiguration.Debug && Target.bDebugBuildsActuallyUseDebugCRT)
+            {
+                PublicAdditionalLibraries.Add(LibPath + "libVHACD_LIBd.a");
+            }
+            else
+            {
+                PublicAdditionalLibraries.Add(LibPath + "libVHACD_LIB.a");
+            }
+            PublicFrameworks.AddRange(new string[] { "OpenCL" });
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Linux)
+        {
+            if (Target.LinkType == TargetLinkType.Monolithic)
+            {
+                PublicAdditionalLibraries.Add(VHACDDirectory + "Lib/Linux/" + Target.Architecture + "/libVHACD.a");
+            }
+            else
+            {
+                PublicAdditionalLibraries.Add(VHACDDirectory + "Lib/Linux/" + Target.Architecture + "/libVHACD_fPIC.a");
+            }
+        }
 
         SetupCompileMode(CompileMode.CppCompileWithRpc, Target);
     }
@@ -122,12 +151,12 @@ public class AirSim : ModuleRules
             PublicAdditionalLibraries.Add("dxguid.lib");
         }
 
-		if (Target.Platform == UnrealTargetPlatform.Linux)
-		{
-			// needed when packaging
-			PublicAdditionalLibraries.Add("stdc++");
-			PublicAdditionalLibraries.Add("supc++");
-		}
+        if (Target.Platform == UnrealTargetPlatform.Linux)
+        {
+            // needed when packaging
+            PublicAdditionalLibraries.Add("stdc++");
+            PublicAdditionalLibraries.Add("supc++");
+        }
     }
 
     static void CopyFileIfNewer(string srcFilePath, string destFolder)
@@ -159,7 +188,9 @@ public class AirSim : ModuleRules
             isLibrarySupported = true;
 
             PublicAdditionalLibraries.Add(Path.Combine(LibPath, PlatformString, ConfigurationString, LibFileName + ".lib"));
-        } else if (Target.Platform == UnrealTargetPlatform.Linux || Target.Platform == UnrealTargetPlatform.Mac) {
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Linux || Target.Platform == UnrealTargetPlatform.Mac)
+        {
             isLibrarySupported = true;
             PublicAdditionalLibraries.Add(Path.Combine(LibPath, "lib" + LibFileName + ".a"));
         }
@@ -169,11 +200,8 @@ public class AirSim : ModuleRules
             // Include path
             PublicIncludePaths.Add(Path.Combine(AirLibPath, "deps", LibName, "include"));
         }
-#if UE_4_19_OR_LATER
-        PublicDefinitions.Add(string.Format("WITH_" + LibName.ToUpper() + "_BINDING={0}", isLibrarySupported ? 1 : 0));
-#else
+
         Definitions.Add(string.Format("WITH_" + LibName.ToUpper() + "_BINDING={0}", isLibrarySupported ? 1 : 0));
-#endif
 
         return isLibrarySupported;
     }

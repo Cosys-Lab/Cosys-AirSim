@@ -15,7 +15,7 @@
 
 #include "UrdfLink.generated.h"
 
-//class UrdfBotPawn;
+class UrdfBotPawn;
 
 USTRUCT()
 struct FAUrdfLinkSecondaryTickFunction : public FTickFunction
@@ -92,7 +92,7 @@ class AUrdfLink : public AActor
         void SetMeshFromStaticMeshComponent(UStaticMeshComponent* mesh);
         void SetMeshFromProceduralMeshComponent(UProceduralMeshComponent* proceduralMeshComponent);
         void SetMass(float massInKg);
-        void SetMaterial(UMaterialInterface* material);
+        void SetMaterial(UMaterial* material);
         UMeshComponent* GetRootMesh();
         FVector GetPhysicsLinearVelocity();
         FVector GetPhysicsAngularVelocityInRadians();

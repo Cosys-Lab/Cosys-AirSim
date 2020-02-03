@@ -55,11 +55,11 @@ AUrdfBotPawn::AUrdfBotPawn()
             FString materialPath = kvp.Value->TextureFile;
             if (materialPath.Len() > 0)
             {
-                ConstructorHelpers::FObjectFinder<UMaterialInterface> material(*materialPath);
+                ConstructorHelpers::FObjectFinder<UMaterial> material(*materialPath);
 
                 if (material.Object != NULL)
                 {
-                    this->materials_.Add(materialName, static_cast<UMaterialInterface*>(material.Object));
+                    this->materials_.Add(materialName, static_cast<UMaterial*>(material.Object));
                 }
             }
         }
@@ -307,9 +307,7 @@ void AUrdfBotPawn::ConstructFromFile(FString fileName)
     UrdfLinkSpecification* rootLinkSpecification = this->FindRootNodeSpecification(links);
     this->root_component_ = this->components_[rootLinkSpecification->Name];
     this->root_component_->SetReferenceFrameLocation(this->GetActorLocation(), this->GetActorRotation());
-    this->root_component_->GetRootComponent()->AttachTo(RootComponent, NAME_None, EAttachLocation::KeepRelativeOffset); 
-
-    this->SetRootComponent(this->root_component_->GetRootComponent());
+    this->root_component_->GetRootComponent()->AttachTo(RootComponent, NAME_None, EAttachLocation::KeepRelativeOffset); //um...
 
     UPrimitiveComponent* rootCollisionComponent = this->root_component_->GetCollisionComponent();
     if (rootCollisionComponent != nullptr)
@@ -362,12 +360,18 @@ AUrdfLink* AUrdfBotPawn::CreateLinkFromSpecification(const UrdfLinkSpecification
 
     AUrdfLink* link = NewObject<AUrdfLink>(this, AUrdfLink::StaticClass(), FName(linkSpecification.Name.GetCharArray().GetData()));
 
-    this->staticMeshGenerator_.CreateUnscaledMeshForLink(linkSpecification.Name, linkSpecification.VisualSpecification->MaterialName, visualGeometry, collisionGeometry, this, link, this->materials_);
+    this->staticMeshGenerator_.CreateUnscaledMeshForLink(linkSpecification.Name, visualGeometry, collisionGeometry, this, link);
 
     this->ResizeLink(link, collisionGeometry);
 
+    if (linkSpecification.VisualSpecification->MaterialName.Len() > 0)
+    {
+        link->SetMaterial(this->materials_[linkSpecification.VisualSpecification->MaterialName]);
+    }
+
     link->SetMass(linkSpecification.InertialSpecification->Mass);
     //link->SetOwningActor(this);
+    auto ww = link->GetName();
 
     return link;
 }
@@ -413,6 +417,11 @@ void AUrdfBotPawn::AttachChildren(AUrdfLink* parentLink, const UrdfLinkSpecifica
     FRotator rotation = FRotator::ZeroRotator;
     if (jointSpecification->Type != FIXED_TYPE)
     {
+        if (!jointSpecification->Axis.Normalize())
+        {
+            int j = 0;
+        }
+
         // Rotate such that the local X axis aligns with the specified axis
         FVector unitX(1, 0, 0);
         FVector unitY(0, 1, 0);
@@ -496,7 +505,6 @@ FConstraintInstance AUrdfBotPawn::CreateConstraint(const UrdfJointSpecification 
     constraintInstance.ProfileInstance.TwistLimit.bSoftConstraint = false;
     constraintInstance.ProfileInstance.ConeLimit.bSoftConstraint = false;
     constraintInstance.ProfileInstance.AngularDrive.AngularDriveMode = EAngularDriveMode::TwistAndSwing;
-
 
     float range = 0.0f;
     switch (jointSpecification.Type)
@@ -683,6 +691,7 @@ FVector AUrdfBotPawn::MoveChildLinkForLimitedXAxisMotion(AUrdfLink* parentLink, 
     inverseTransform = -1 * transform;
 
     childLink->SetActorLocation(childLocation + transform, false, nullptr, ETeleportType::TeleportPhysics);
+    FVector ww = childLink->GetActorLocation();
 
     return inverseTransform;
 }
