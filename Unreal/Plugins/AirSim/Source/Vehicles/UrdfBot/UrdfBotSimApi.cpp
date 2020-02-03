@@ -36,10 +36,10 @@ void UrdfBotSimApi::reset()
     this->vehicle_api_->reset();
 }
 
-void UrdfBotSimApi::update()
+void UrdfBotSimApi::update(float delta)
 {
-    this->vehicle_api_->update();
-    PawnSimApi::update();
+    this->vehicle_api_->update(delta);
+    PawnSimApi::update(delta);
 }
 
 void UrdfBotSimApi::reportState(msr::airlib::StateReporter& reporter)
@@ -74,6 +74,6 @@ void UrdfBotSimApi::createVehicleApi(AUrdfBotPawn* pawn, const msr::airlib::GeoP
         return &(static_cast<AUrdfLink*>(pawn->GetLink(linkNameFstr))->GetKinematics());
     };
 
-    this->vehicle_api_ = std::unique_ptr<msr::airlib::UrdfBotApiBase>(new UrdfBotApi(pawn, getPawnKinematics(), home_geopoint, state_provider_fxn, 
+    this->vehicle_api_ = std::unique_ptr<msr::airlib::UrdfBotApiBase>(new UrdfBotApi(pawn, getGroundTruthKinematics(), home_geopoint, state_provider_fxn,
         getVehicleSetting(), sensor_factory, (*getGroundTruthEnvironment())));
 }

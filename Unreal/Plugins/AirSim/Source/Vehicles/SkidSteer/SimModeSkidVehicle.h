@@ -6,9 +6,10 @@
 #include "SimMode/SimModeBase.h"
 #include "SkidVehiclePawn.h"
 #include "common/Common.hpp"
+#include "SkidVehiclePawnSimApi.h"
 #include "api/VehicleSimApiBase.hpp"
-
 #include "Vehicles/AirSimVehicle.h"
+#include "Runtime/Engine/Public/EngineUtils.h"
 
 #include "SimModeSkidVehicle.generated.h"
 

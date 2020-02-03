@@ -147,9 +147,9 @@ void UrdfBotApi::reset()
     }
 }
 
-void UrdfBotApi::update()
+void UrdfBotApi::update(float delta)
 {
-    msr::airlib::UrdfBotApiBase::update();
+    msr::airlib::UrdfBotApiBase::update(delta);
 }
 
 msr::airlib::GeoPoint UrdfBotApi::getHomeGeoPoint() const

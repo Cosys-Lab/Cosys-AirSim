@@ -119,12 +119,6 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         getVehicleSimApi(vehicle_name)->setCameraPose(camera_pose.to());
     });
 
-    pimpl_->server.bind("readSensors", [&](const std::string& vehicle_name) ->
-        RpcLibAdapatorsBase::SensorReadings {
-        RpcLibAdapatorsBase::SensorReadings sr(getVehicleApi(vehicle_name)->getSensors());
-        return sr;
-    });
-
     pimpl_->server.bind("simRayCast", [&](const RpcLibAdapatorsBase::RayCastRequest request, const std::string& vehicle_name) -> RpcLibAdapatorsBase::RayCastResponse {
         return RpcLibAdapatorsBase::RayCastResponse(getVehicleSimApi(vehicle_name)->rayCast(request.to()));
     });

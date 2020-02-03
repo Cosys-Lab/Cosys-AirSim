@@ -512,14 +512,17 @@ void ASimModeBase::setupVehiclesAndCamera()
                     ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
                 auto vehicle_bp_class = UAirBlueprintLib::LoadClass(
                     getSettings().pawn_paths.at(getVehiclePawnPathName(vehicle_setting)).pawn_bp);
-                APawn* spawned_pawn = static_cast<APawn*>( this->GetWorld()->SpawnActor(
-                    vehicle_bp_class, &spawn_position, &spawn_rotation, pawn_spawn_params));
+				// TODO: Make the child sim modes responsible for casting the types. 
+				AActor* spawned_actor = static_cast<AActor*>(this->GetWorld()->SpawnActor(
+					vehicle_bp_class, &spawn_position, &spawn_rotation, pawn_spawn_params));
 
-                spawned_actors_.Add(spawned_pawn);
-                pawns.Add(spawned_pawn);
+				AirsimVehicle* spawned_pawn = dynamic_cast<AirsimVehicle*>(spawned_actor);
 
-                if (vehicle_setting.is_fpv_vehicle)
-                    fpv_pawn = spawned_pawn;
+				spawned_actors_.Add(spawned_pawn->GetPawn());
+				pawns.Add(spawned_pawn);
+
+				if (vehicle_setting.is_fpv_vehicle)
+					fpv_pawn = spawned_pawn->GetPawn();
             }
         }
 

@@ -15,7 +15,7 @@ void ComputerVisionPawnSimApi::initialize()
 {
     PawnSimApi::initialize();
 
-    createVehicleApi(static_cast<AComputerVisionPawn*>(params_.pawn), params_.home_geopoint);
+    createVehicleApi(static_cast<AComputerVisionPawn*>(params_.vehicle->GetPawn()), params_.home_geopoint);
 
     //TODO: should do reset() here?
 }
