@@ -1,9 +1,21 @@
 #include "UrdfBotSimApi.h"
+#include "AirBlueprintLib.h"
+#include "UnrealSensors/UnrealSensorFactory.h"
+#include "UrdfBotApi.h"
+#include <exception>
 
-UrdfBotSimApi::UrdfBotSimApi(Params params)
-    : PawnSimApi(params)
+using namespace msr::airlib;
+
+UrdfBotSimApi::UrdfBotSimApi(const Params& params)
+	: PawnSimApi(params), params_(params)
 {
-    this->createVehicleApi(static_cast<AUrdfBotPawn*>(params.vehicle->GetPawn()), params.home_geopoint);
+}
+
+void UrdfBotSimApi::initialize()
+{
+	PawnSimApi::initialize();
+
+	createVehicleApi(static_cast<AUrdfBotPawn*>(params_.vehicle->GetPawn()), params_.home_geopoint);
 }
 
 void UrdfBotSimApi::updateRenderedState(float dt)

@@ -10,7 +10,7 @@ bool StaticMeshGenerator::Initialize(UStaticMesh* boxTemplateMesh, UStaticMesh* 
     return true;
 }
 
-bool StaticMeshGenerator::CreateUnscaledMeshForLink(FString linkName, UrdfGeometry* visualGeometry, UrdfGeometry* collisionGeometry, APawn* outer, AUrdfLink* link)
+bool StaticMeshGenerator::CreateUnscaledMeshForLink(FString linkName, FString linkMaterialName, UrdfGeometry* visualGeometry, UrdfGeometry* collisionGeometry, APawn* outer, AUrdfLink* link, TMap<FString, UMaterialInterface*> materials)
 {
     FName collisionName = FName((linkName + TEXT("_collision")).GetCharArray().GetData());
 
@@ -58,6 +58,11 @@ bool StaticMeshGenerator::CreateUnscaledMeshForLink(FString linkName, UrdfGeomet
         meshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
         meshComponent->SetNotifyRigidBodyCollision(true);
 
+        if (linkMaterialName.Len() > 0)
+        {
+            meshComponent->SetMaterial(0, materials[linkMaterialName]);
+        }
+
         link->SetMeshFromStaticMeshComponent(meshComponent);
     }
     else if (geometryType == MESH)
@@ -81,6 +86,11 @@ bool StaticMeshGenerator::CreateUnscaledMeshForLink(FString linkName, UrdfGeomet
             meshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
             meshComponent->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
             meshComponent->SetNotifyRigidBodyCollision(true);
+
+            if (linkMaterialName.Len() > 0)
+            {
+                meshComponent->SetMaterial(0, materials[linkMaterialName]);
+            }
 
             link->SetMeshFromStaticMeshComponent(meshComponent);
         }
@@ -182,28 +192,32 @@ TArray<TArray<FVector>> StaticMeshGenerator::CreateCollisionVAHCD(TArray<FVector
     VHACD_Params.m_oclAcceleration = false;
     VHACD_Params.m_minVolumePerCH = minVolumePerCh; // this should be around 1 / (3 * m_resolution ^ (1/3))
 
-	double* verts = new double[3 * stlPoints.Num()];
-	double* vertPtr = verts;
-	for (int i = 0; i < stlPoints.Num(); i++)
-	{
-		FVector currentPoint = stlPoints[i];
-		*vertPtr = (double)currentPoint.X;
-		vertPtr++;
-		*vertPtr = (double)currentPoint.Y;
-		vertPtr++;
-		*vertPtr = (double)currentPoint.Z;
-		vertPtr++;
-	}
-    const unsigned int numVerts = stlPoints.Num();
-	const unsigned int* const tris = (unsigned int*)stlIndices.GetData();
-	const unsigned int numTris = stlIndices.Num() / 3;
+    double* verts = new double[3 * stlPoints.Num()];
+    double* vertPtr = verts;
+    for (int i = 0; i < stlPoints.Num(); i++)
+    {
+        FVector currentPoint = stlPoints[i];
+        *vertPtr = (double)currentPoint.X;
+        vertPtr++;
+        *vertPtr = (double)currentPoint.Y;
+        vertPtr++;
+        *vertPtr = (double)currentPoint.Z;
+        vertPtr++;
+    }
 
+    //const double* const verts = (double*)stlPoints.GetData();
+    const unsigned int numVerts = stlPoints.Num();
+    const unsigned int* const tris = (unsigned int*)stlIndices.GetData();
+    const unsigned int numTris = stlIndices.Num() / 3;
+    
     bool success = vhacdInterface->Compute(verts, numVerts, tris, numTris, VHACD_Params);
+    //bool success = vhacdInterface->Compute(verts, 3, numVerts, tris, 3, numTris, VHACD_Params);
 
     if (!success)
     {
         vhacdInterface->Clean();
         vhacdInterface->Release();
+        delete verts;
         return TArray<TArray<FVector>>();
     }
 
@@ -232,6 +246,7 @@ TArray<TArray<FVector>> StaticMeshGenerator::CreateCollisionVAHCD(TArray<FVector
 
     vhacdInterface->Clean();
     vhacdInterface->Release();
+    delete verts;
 
     return output;
 }

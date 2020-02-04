@@ -12,7 +12,7 @@
 #include "Runtime/Engine/Classes/PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Runtime/Engine/Classes/PhysicsEngine/ConstraintInstance.h"
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
-#include "Regex.h"
+#include "Runtime/Core/Public/Internationalization/Regex.h"
 
 #include "PIPCamera.h"
 #include "common/common_utils/UniqueValueMap.hpp"
@@ -55,10 +55,11 @@ class AUrdfBotPawn : public APawn, public AirsimVehicle
             FVector hitNormal, FVector normalImpulse, const FHitResult &hit) override;
 
         void InitializeForBeginPlay();
-        common_utils::UniqueValueMap<std::string, APIPCamera*> GetCameras() const;
-
-        // TODO: Can this be const?
-        PawnEvents* GetPawnEvents();
+		const common_utils::UniqueValueMap<std::string, APIPCamera*> getCameras() const;
+		PawnEvents* getPawnEvents()
+		{
+			return &pawn_events_;
+		}
 
         TMap<FString, AUrdfLink*> GetLinkComponents() const;
         AUrdfLink* GetRootLinkComponent() const;
@@ -121,7 +122,7 @@ class AUrdfBotPawn : public APawn, public AirsimVehicle
         USceneComponent* rootComponent_;
 
         UPROPERTY()
-        TMap<FString, UMaterial*> materials_;
+        TMap<FString, UMaterialInterface*> materials_;
 
         UPROPERTY()
         TMap<FString, UStaticMesh*> user_static_meshes_;

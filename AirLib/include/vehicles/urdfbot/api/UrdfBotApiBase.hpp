@@ -93,17 +93,22 @@ public:
 
         sensor_storage_.clear();
         sensors_.clear();
+        
+        addSensorsFromSettings(vehicle_setting);
 
-        // use sensors from vehicle settings; if empty list, use default sensors.
-        // note that the vehicle settings completely override the default sensor "list";
-        // there is no piecemeal add/remove/update per sensor.
-        const std::map<std::string, std::unique_ptr<AirSimSettings::SensorSetting>>& sensor_settings
-            = vehicle_setting->sensors.size() > 0 ? vehicle_setting->sensors : AirSimSettings::AirSimSettings::singleton().sensor_defaults;
-
-        sensor_factory_->createSensorsFromSettings(sensor_settings, sensors_, sensor_storage_);
-
-        this->getSensors().initialize(state_provider_fxn, &environment);
+        getSensors().initialize(state_provider_fxn, &environment);
     }
+
+	void addSensorsFromSettings(const AirSimSettings::VehicleSetting* vehicle_setting)
+	{
+		// use sensors from vehicle settings; if empty list, use default sensors.
+		// note that the vehicle settings completely override the default sensor "list";
+		// there is no piecemeal add/remove/update per sensor.
+		const std::map<std::string, std::unique_ptr<AirSimSettings::SensorSetting>>& sensor_settings
+			= vehicle_setting->sensors.size() > 0 ? vehicle_setting->sensors : AirSimSettings::AirSimSettings::singleton().sensor_defaults;
+
+		sensor_factory_->createSensorsFromSettings(sensor_settings, sensors_, sensor_storage_);
+	}
 
     // sensor helpers
     virtual const SensorCollection& getSensors() const override

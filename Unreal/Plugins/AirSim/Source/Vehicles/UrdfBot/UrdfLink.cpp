@@ -50,8 +50,6 @@ void AUrdfLink::Tick(float delta)
     this->UpdateKinematics(delta);
 }
 
-
-
 void AUrdfLink::TickPostPhysics(float deltaSeconds, ELevelTick tickType, FAUrdfLinkSecondaryTickFunction& thisTickFunction)
 {
 }
@@ -279,7 +277,7 @@ void AUrdfLink::InitPostSetMesh()
     // The default Position and Velocity iterations are set very low.
     // This can cause "bouncy" joints that should be stiff, and in extreme cases can cause joints to settle in the wrong place. 
     // 10000 is an arbitrary number that appears to work well without using too much CPU.
-    int32 cnt = 10000;
+    int32 cnt = 100000;
     this->mesh_root_->GetBodyInstance()->PositionSolverIterationCount = cnt;
     this->mesh_root_->GetBodyInstance()->VelocitySolverIterationCount = cnt;
 

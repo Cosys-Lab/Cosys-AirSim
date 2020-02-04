@@ -226,7 +226,7 @@ void APIPCamera::showToScreen()
     camera_->Activate();
     APlayerController* controller = this->GetWorld()->GetFirstPlayerController();
     controller->SetViewTarget(this);
-    UAirBlueprintLib::LogMessage(TEXT("Camera: "), GetName(), LogDebugLevel::Informational);
+    UAirBlueprintLib::LogMessage(TEXT("Active Viewport Camera: "), GetName(), LogDebugLevel::Informational);
 }
 
 void APIPCamera::disableAll()
@@ -260,6 +260,9 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
     //TODO: should we be ignoring position and orientation settings here?
 
     //TODO: can we eliminate storing NedTransform?
+
+	//this->Rename(UTF8_TO_TCHAR((camera_setting.attach_link + +"_manualCamera").c_str()));
+
     ned_transform_ = &ned_transform;
 
     gimbal_stabilization_ = Utils::clip(camera_setting.gimbal.stabilization, 0.0f, 1.0f);

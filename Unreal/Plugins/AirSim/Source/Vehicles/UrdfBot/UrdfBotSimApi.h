@@ -13,9 +13,16 @@
 class UrdfBotSimApi : public PawnSimApi
 {
 	public:
+		typedef msr::airlib::Utils Utils;
+		typedef msr::airlib::StateReporter StateReporter;
+		typedef msr::airlib::UpdatableObject UpdatableObject;
+		typedef msr::airlib::Pose Pose;
+
+	public:
+		virtual void initialize() override;
 		virtual ~UrdfBotSimApi() = default;
 
-		UrdfBotSimApi(Params params);
+		UrdfBotSimApi(const Params& params);
 
 		virtual void reset() override;
 		virtual void update(float delta = 0) override;
@@ -26,12 +33,18 @@ class UrdfBotSimApi : public PawnSimApi
 		virtual void updateRenderedState(float dt) override;
 		virtual void updateRendering(float dt) override;
 
-		msr::airlib::UrdfBotApiBase* getVehicleApi()
+		msr::airlib::UrdfBotApiBase* getVehicleApi() const
+		{
+			return vehicle_api_.get();
+		}
+
+		virtual msr::airlib::VehicleApiBase* getVehicleApiBase() const override
 		{
 			return vehicle_api_.get();
 		}
 
 	private:
+		Params params_;
 		std::unique_ptr<msr::airlib::UrdfBotApiBase> vehicle_api_;
 		std::vector<std::string> vehicle_api_messages_;
 

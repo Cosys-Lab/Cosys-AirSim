@@ -30,7 +30,7 @@ class StaticMeshGenerator
 {
     public:
         bool Initialize(UStaticMesh* boxTemplateMesh, UStaticMesh* cylinderTemplateMesh, UStaticMesh* sphereTemplateMesh, TMap<FString, UStaticMesh*> unrealMeshes);
-        bool CreateUnscaledMeshForLink(FString linkName, UrdfGeometry* visualGeometry, UrdfGeometry* collisionGeometry, APawn* outer, AUrdfLink* link);
+        bool CreateUnscaledMeshForLink(FString linkName, FString linkMaterialName, UrdfGeometry* visualGeometry, UrdfGeometry* collisionGeometry, APawn* outer, AUrdfLink* link, TMap<FString, UMaterialInterface*> materials);
 
     private:
         void ParseProceduralMeshSpecification(FString fileName, ProceduralMeshFileType fileType, bool reverseNormals, float scaleFactor, ProceduralMeshSpecification& meshSpecification);

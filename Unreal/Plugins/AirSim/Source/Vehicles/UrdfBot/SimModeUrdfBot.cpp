@@ -1,20 +1,10 @@
 #include "SimModeUrdfBot.h"
 
-ASimModeUrdfBot::ASimModeUrdfBot()
-{
-
-}
-
 void ASimModeUrdfBot::BeginPlay()
 {
     // Will call setupVehiclesAndCamera()
     Super::BeginPlay();
 
-    for (auto api : getApiProvider()->getVehicleSimApis()) {
-        api->reset();
-    }
-
-    this->checkVehicleReady();
     this->initializePauseState();
 }
 
@@ -86,6 +76,47 @@ void ASimModeUrdfBot::getExistingVehiclePawns(TArray<AirsimVehicle*>& pawns) con
         pawns.Add(static_cast<AirsimVehicle*>(*it));
     }
 }
+bool ASimModeUrdfBot::isVehicleTypeSupported(const std::string& vehicle_type) const
+{
+	return (vehicle_type == AirSimSettings::kVehicleTypeUrdfBot);
+}
+
+std::string ASimModeUrdfBot::getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const
+{
+	return "UrdfBot";
+}
+
+PawnEvents* ASimModeUrdfBot::getVehiclePawnEvents(APawn* pawn) const
+{
+	return static_cast<TVehiclePawn*>(pawn)->getPawnEvents();
+}
+
+const common_utils::UniqueValueMap<std::string, APIPCamera*> ASimModeUrdfBot::getVehiclePawnCameras(
+	APawn* pawn) const
+{
+	return (static_cast<const TVehiclePawn*>(pawn))->getCameras();
+}
+
+void ASimModeUrdfBot::initializeVehiclePawn(APawn* pawn)
+{
+	auto vehicle_pawn = static_cast<TVehiclePawn*>(pawn);
+	vehicle_pawn->InitializeForBeginPlay();
+}
+
+std::unique_ptr<PawnSimApi> ASimModeUrdfBot::createVehicleSimApi(
+	const PawnSimApi::Params& pawn_sim_api_params) const
+{
+	auto vehicle_sim_api = std::unique_ptr<PawnSimApi>(new UrdfBotSimApi(pawn_sim_api_params));
+	vehicle_sim_api->initialize();
+	vehicle_sim_api->reset();
+	return vehicle_sim_api;
+}
+msr::airlib::VehicleApiBase* ASimModeUrdfBot::getVehicleApi(const PawnSimApi::Params& pawn_sim_api_params,
+	const PawnSimApi* sim_api) const
+{
+	const auto urdf_sim_api = static_cast<const UrdfBotSimApi*>(sim_api);
+	return urdf_sim_api->getVehicleApi();
+}
 
 void ASimModeUrdfBot::initializePauseState()
 {
@@ -136,20 +167,13 @@ void ASimModeUrdfBot::setupVehiclesAndCamera()
         const auto& vehicle_setting = *vehicle_setting_pair.second;
 
         if (vehicle_setting.auto_create && vehicle_setting.vehicle_type == AirSimSettings::kVehicleTypeUrdfBot) {
-
-            // Compute initial pose
-            FVector spawn_position = uu_origin.GetLocation();
-            FRotator spawn_rotation = uu_origin.Rotator();
-            msr::airlib::Vector3r settings_position = vehicle_setting.position;
-            if (!msr::airlib::VectorMath::hasNan(settings_position))
-                spawn_position = getGlobalNedTransform().fromLocalNed(settings_position);
-            const auto& rotation = vehicle_setting.rotation;
-            if (!std::isnan(rotation.yaw))
-                spawn_rotation.Yaw = rotation.yaw;
-            if (!std::isnan(rotation.pitch))
-                spawn_rotation.Pitch = rotation.pitch;
-            if (!std::isnan(rotation.roll))
-                spawn_rotation.Roll = rotation.roll;
+			
+			//compute initial pose
+			FVector spawn_position = uu_origin.GetLocation();
+			msr::airlib::Vector3r settings_position = vehicle_setting.position;
+			if (!msr::airlib::VectorMath::hasNan(settings_position))
+				spawn_position = getGlobalNedTransform().fromGlobalNed(settings_position);
+			FRotator spawn_rotation = toFRotator(vehicle_setting.rotation, uu_origin.Rotator());
 
             // Spawn vehicle pawn
             FActorSpawnParameters pawn_spawn_params;
@@ -173,25 +197,26 @@ void ASimModeUrdfBot::setupVehiclesAndCamera()
     for (AirsimVehicle* pawn : pawns) {
         //initialize each vehicle pawn we found
         AUrdfBotPawn* vehicle_pawn = static_cast<AUrdfBotPawn*>(pawn);
-        vehicle_pawn->InitializeForBeginPlay();
+
+		initializeVehiclePawn(vehicle_pawn->GetPawn());
+
 
         //create vehicle sim api
         const auto& ned_transform = getGlobalNedTransform();
         const auto& pawn_ned_pos = ned_transform.toLocalNed(vehicle_pawn->GetActorLocation());
-        const auto& home_geopoint = msr::airlib::EarthUtils::nedToGeodetic(pawn_ned_pos, getSettings().origin_geopoint);
+		const auto& home_geopoint = msr::airlib::EarthUtils::nedToGeodetic(pawn_ned_pos, getSettings().origin_geopoint);
 
         PawnSimApi::Params params;
         params.vehicle = vehicle_pawn;
         params.global_transform = &getGlobalNedTransform();
-        params.pawn_events = vehicle_pawn->GetPawnEvents();
-        params.cameras = vehicle_pawn->GetCameras();
+		params.pawn_events = getVehiclePawnEvents(vehicle_pawn->GetPawn());
+		params.cameras = getVehiclePawnCameras(vehicle_pawn->GetPawn());
         params.pip_camera_class = pip_camera_class;
         params.collision_display_template = collision_display_template;
         params.home_geopoint = home_geopoint;
         params.vehicle_name = "UrdfBot"; // TODO: This may need to be changed for multiple vehicles.
 
-        auto vehicle_sim_api = std::unique_ptr<UrdfBotSimApi>(new UrdfBotSimApi(params));
-
+		auto vehicle_sim_api = createVehicleSimApi(params);
         for (APIPCamera* camera : vehicle_sim_api->getAllCameras()) {
             int add_index = camera_offset + camera->getIndex();
             while (this->cameras_.Num() <= add_index) {
@@ -202,10 +227,9 @@ void ASimModeUrdfBot::setupVehiclesAndCamera()
         camera_offset += vehicle_sim_api->getCameraCount();
 
         std::string vehicle_name = vehicle_sim_api->getVehicleName();
-
-        auto vehicle_api = vehicle_sim_api->getVehicleApi();
-        auto vehicle_sim_api_p = vehicle_sim_api.get();
-        getApiProvider()->insert_or_assign(vehicle_name, vehicle_api, vehicle_sim_api_p);
+		auto vehicle_sim_api_p = vehicle_sim_api.get();
+		auto vehicle_Api = getVehicleApi(params, vehicle_sim_api_p);
+        getApiProvider()->insert_or_assign(vehicle_name, vehicle_Api, vehicle_sim_api_p);
         if ((fpv_pawn == vehicle_pawn || !getApiProvider()->hasDefaultVehicle()) && vehicle_name != "")
             getApiProvider()->makeDefaultVehicle(vehicle_name);
 
@@ -224,7 +248,7 @@ void ASimModeUrdfBot::setupVehiclesAndCamera()
     UAirBlueprintLib::EnableInput(this);
     UAirBlueprintLib::BindActionToKey("inputEventCycleCameraForward", EKeys::N, this, &ASimModeUrdfBot::cycleVisibleCameraForward);
     UAirBlueprintLib::BindActionToKey("inputEventCycleCameraBackward", EKeys::P, this, &ASimModeUrdfBot::cycleVisibleCameraBackward);
-
+	
     this->cameras_[0]->showToScreen();
 }
 
