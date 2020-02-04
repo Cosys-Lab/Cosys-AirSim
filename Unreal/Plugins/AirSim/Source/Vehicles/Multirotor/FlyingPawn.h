@@ -8,10 +8,12 @@
 #include "common/common_utils/UniqueValueMap.hpp"
 #include "MultirotorPawnEvents.h"
 
+#include "Vehicles/AirSimVehicle.h"
+
 #include "FlyingPawn.generated.h"
 
 UCLASS()
-class AIRSIM_API AFlyingPawn : public APawn
+class AIRSIM_API AFlyingPawn : public APawn, public AirsimVehicle
 {
     GENERATED_BODY()
 
@@ -36,6 +38,10 @@ public:
     //called by API to set rotor speed
     void setRotorSpeed(const std::vector<MultirotorPawnEvents::RotorInfo>& rotor_infos);
 
+    virtual USceneComponent* GetComponent(FString componentName) override;
+    virtual void GetComponentReferenceTransform(FString componentName, FVector& translation, FRotator& rotation) override;
+    virtual APawn* GetPawn() override { return this; }
+    virtual bool PawnUsesNedCoords() override { return true; }
 
 private: //variables
     //Unreal components

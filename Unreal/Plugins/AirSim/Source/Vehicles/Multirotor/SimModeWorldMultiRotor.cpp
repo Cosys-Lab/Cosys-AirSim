@@ -87,9 +87,12 @@ std::unique_ptr<msr::airlib::ApiServerBase> ASimModeWorldMultiRotor::createApiSe
 #endif
 }
 
-void ASimModeWorldMultiRotor::getExistingVehiclePawns(TArray<AActor*>& pawns) const
+void ASimModeWorldMultiRotor::getExistingVehiclePawns(TArray<AirsimVehicle*>& pawns) const
 {
-    UAirBlueprintLib::FindAllActor<TVehiclePawn>(this, pawns);
+	for (TActorIterator<TVehiclePawn> it(this->GetWorld()); it; ++it)
+	{
+		pawns.Add(static_cast<AirsimVehicle*>(*it));
+	}
 }
 
 bool ASimModeWorldMultiRotor::isVehicleTypeSupported(const std::string& vehicle_type) const

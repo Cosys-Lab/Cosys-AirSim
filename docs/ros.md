@@ -18,6 +18,8 @@ You should have these components installed and working before proceeding
 - `car_control.py` : subscribe to `/cmd_vel` or another chosen topic and control the AirSim cars (Car and SkidVehicle SimModes).
 - `camera.py` : Get (up to 3 simultaneously) camera images from AirSim and publish them to ROS.
 
+[URDF Vehicles](UrdfXml.md) are implemented in the ROS API but don't have any ready made nodes. URDF is extemely dependent on which robot is build, each ROS node for it should therefore be handcrafted.
+
 ## Implemented launch files
 - `airsim_car_control.launch`: Take over the control of the AirSim car by listening on  `/cmd_vel` for input
 - `airsim_car_keyboard_control.launch`: Take over the control of the AirSim car (Car and SkidVehicle SimModes) and drive it using [teleop_twist_keyboard](http://wiki.ros.org/teleop_twist_keyboard).
@@ -64,6 +66,7 @@ Or alternativly you can use launch files such as the example ones that can be fo
 Rviz is a useful visualization tool that can display the published data. Example Rviz configuration files can be found in _AirSim/ros/python_ws/src/airsim/rviz_.
 
 # C++ 
+**THIS IS NOT MAINTAINED BY COSYS-LAB SO IS LIKELY BROKEN**
 
 Please use the documentation for the C++ wrapper that can be found separately:
 - [ROS Wrapper package](../ros/cplusplus_ws/src/airsim_ros_pkgs/README.md)

@@ -6,6 +6,8 @@
 #include "CarPawn.h"
 #include "common/Common.hpp"
 #include "api/VehicleSimApiBase.hpp"
+#include "Vehicles/AirSimVehicle.h"
+#include "Runtime/Engine/Public/EngineUtils.h"
 #include "SimModeCar.generated.h"
 
 
@@ -38,7 +40,7 @@ private:
 protected:
     virtual void setupClockSpeed() override;
     virtual std::unique_ptr<msr::airlib::ApiServerBase> createApiServer() const override;
-    virtual void getExistingVehiclePawns(TArray<AActor*>& pawns) const override;
+    virtual void getExistingVehiclePawns(TArray<AirsimVehicle*>& pawns) const override;
     virtual bool isVehicleTypeSupported(const std::string& vehicle_type) const override;
     virtual std::string getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const override;
     virtual PawnEvents* getVehiclePawnEvents(APawn* pawn) const override;

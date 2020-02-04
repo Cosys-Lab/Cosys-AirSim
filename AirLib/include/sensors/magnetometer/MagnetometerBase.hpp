@@ -12,8 +12,8 @@ namespace msr { namespace airlib {
 
 class MagnetometerBase  : public SensorBase {
 public:
-    MagnetometerBase(const std::string& sensor_name = "")
-        : SensorBase(sensor_name)
+    MagnetometerBase(const std::string& sensor_name = "", const std::string& attach_link_name = "")
+        : SensorBase(sensor_name, attach_link_name)
     {}
 
 public: //types

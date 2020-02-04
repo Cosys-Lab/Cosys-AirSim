@@ -103,6 +103,51 @@ class VehicleClient:
         responses_raw = self.client.call('simGetImages', requests, vehicle_name)
         return [ImageResponse.from_msgpack(response_raw) for response_raw in responses_raw]
 
+    def simSetCameraPose(self, camera_pose_obj, vehicle_name = ''):
+        self.client.call('simSetCameraPose', camera_pose_obj, vehicle_name)
+
+    def simRayCast(self, ray_cast_request, vehicle_name = ''):
+        response = self.client.call('simRayCast', ray_cast_request, vehicle_name)
+        return response
+
+    def simSetDrawableShapes(self, request, vehicle_name = ''):
+        self.client.call('simSetDrawableShapes', request, vehicle_name)
+
+    def addDrawableShapePoint(self, request, shape_name, reference_frame_link, x, y, z, size, color_r, color_g, color_b, color_a):
+        shape_params = [x, y, z, size, color_r, color_g, color_b, color_a]
+        new_shape = DrawableShape(reference_frame_link, 0, shape_params)
+        request.shapes[shape_name] = new_shape
+
+        return request
+
+    def addDrawableShapeSphere(self, request, shape_name, reference_frame_link, x, y, z, radius, thickness, number_of_segments, color_r, color_g, color_b, color_a):
+        shape_params = [x, y, z, radius, thickness, number_of_segments, color_r, color_g, color_b, color_a]
+        new_shape = DrawableShape(reference_frame_link, 1, shape_params)
+        request.shapes[shape_name] = new_shape
+
+        return request
+
+    def addDrawableShapeCircle(self, request, shape_name, reference_frame_link, x, y, z, normal_x, normal_y, normal_z, radius, thickness, number_of_segments, color_r, color_g, color_b, color_a):
+        shape_params = [x, y, z, normal_x, normal_y, normal_z, radius, thickness, number_of_segments, color_r, color_g, color_b, color_a]
+        new_shape = DrawableShape(reference_frame_link, 2, shape_params)
+        request.shapes[shape_name] = new_shape
+
+        return request
+
+    def addDrawableShapeBox(self, request, shape_name, reference_frame_link, x, y, z, extents_x, extents_y, extents_z, thickness, color_r, color_g, color_b, color_a):
+        shape_params = [x, y, z, extents_x, extents_y, extents_z, thickness, color_r, color_g, color_b, color_a]
+        new_shape = DrawableShape(reference_frame_link, 3, shape_params)
+        request.shapes[shape_name] = new_shape
+
+        return request
+
+    def addDrawableShapeLine(self, request, shape_name, reference_frame_link, start_x, start_y, start_z, end_x, end_y, end_z, thickness, color_r, color_g, color_b, color_a):
+        shape_params =[start_x, start_y, start_z, end_x, end_y, end_z, thickness, color_r, color_g, color_b, color_a]
+        new_shape = DrawableShape(reference_frame_link, 4, shape_params)
+        request.shapes[shape_name] = new_shape
+
+        return request
+
     def simGetCollisionInfo(self, vehicle_name = ''):
         return CollisionInfo.from_msgpack(self.client.call('simGetCollisionInfo', vehicle_name))
 
@@ -119,6 +164,12 @@ class VehicleClient:
 
     def simListSceneObjects(self, name_regex = '.*'):
         return self.client.call('simListSceneObjects', name_regex)
+
+    def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
+        return self.client.call('simSpawnStaticMeshObject', object_class_name, object_name, pose)
+
+    def simDeleteObject(self, object_name):
+        return self.client.call('simDeleteObject', object_name)
 
     def simSetSegmentationObjectID(self, mesh_name, object_id, is_name_regex = False):
         return self.client.call('simSetSegmentationObjectID', mesh_name, object_id, is_name_regex)
@@ -341,3 +392,25 @@ class CarClient(VehicleClient, object):
     def getCarState(self, vehicle_name = ''):
         state_raw = self.client.call('getCarState', vehicle_name)
         return CarState.from_msgpack(state_raw)
+
+# -----------------------------------  UrdfBot APIs ---------------------------------------------
+class UrdfBotClient(VehicleClient, object):
+    def __init__(self):
+        super(UrdfBotClient, self).__init__()
+
+    def addAngularForce(self, add_angular_force_obj, vehicle_name = ''):
+        self.client.call('addAngularForce', add_angular_force_obj, vehicle_name)
+
+    def addLinearForce(self, add_linear_force_obj, vehicle_name = ''):
+        self.client.call('addLinearForce', add_linear_force_obj, vehicle_name)
+
+    def updateForceMagnitude(self, update_force_magnitude_obj, vehicle_name = ''):
+        self.client.call('updateForceMagnitude', update_force_magnitude_obj, vehicle_name)
+
+    def updateControlledMotionComponentControlSignal(self, update_controlled_motion_component_control_signal_obj, vehicle_name=''):
+        self.client.call('updateControlledMotionComponentControlSignal', update_controlled_motion_component_control_signal_obj, vehicle_name)
+
+    def getUrdfBotState(self, vehicle_name = ''):
+        state_raw = self.client.call('getUrdfBotState', vehicle_name)
+        return UrdfBotState.from_msgpack(state_raw)
+
