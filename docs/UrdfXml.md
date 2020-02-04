@@ -3,6 +3,9 @@
 ## Overview
 The [Univeral Robot Description File](http://wiki.ros.org/urdf) (URDF) is an XML file that describes the geometry and kinematics of the robot to be simulated. With this file, it is possible to describe an arbitrary robot to be simulated inside of Unreal. The structure of the XML file and the meaning of each element node is described in detail [on this page](http://wiki.ros.org/urdf/XML). Once this file is constructed, it can be used with AirSim as described in [AirSim Settings for URDF simulation](UrdfSettings.md). Full examples of XML files can be found in the examples folder at Examples/UrdfBot. 
 
+[![URDF Demo Video](images/Arm.gif)]
+
+[![URDF Demo Video](images/Lunabot.gif)]
 ## Deviations from the standard
 Although we attempt to retain compatibility with the URDF specification, there are some deviations that must be made due to the internal workings of the Unreal engine:
 
