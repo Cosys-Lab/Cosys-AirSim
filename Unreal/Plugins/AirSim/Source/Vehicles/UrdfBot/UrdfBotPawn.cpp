@@ -186,18 +186,18 @@ void AUrdfBotPawn::InitializeForBeginPlay()
     if (urdfPath.Len() == 0)
         throw std::runtime_error("No pawn path specified. Make sure that the 'PawnPaths' member named 'UrdfBot' has member 'urdf_path' specified.");
 
-    //// TODO: change when multiple vehicles are supported.
-    //this->debug_symbol_scale_ = settings.vehicles["UrdfBot"].get()->debug_symbol_scale;
-    //this->draw_debug_ = !msr::airlib::Utils::isApproximatelyZero(this->debug_symbol_scale_);
+    // TODO: change when multiple vehicles are supported.
+    this->debug_symbol_scale_ = settings.vehicles["UrdfBot"].get()->debug_symbol_scale;
+    this->draw_debug_ = !msr::airlib::Utils::isApproximatelyZero(this->debug_symbol_scale_);
 
-    //if (this->draw_debug_ && this->debug_symbol_scale_ < 0)
-    //{
-    //    throw std::runtime_error("Debug symbol scale is < 0. Must be a positive number.");
-    //}
+    if (this->draw_debug_ && this->debug_symbol_scale_ < 0)
+    {
+        throw std::runtime_error("Debug symbol scale is < 0. Must be a positive number.");
+    }
 
     this->ConstructFromFile(urdfPath);
 
-   /* this->collision_blacklist_.Empty();
+    this->collision_blacklist_.Empty();
     for (auto &kvp : settings.vehicles["UrdfBot"].get()->collision_blacklist)
     {
         FString bot_mesh = FString(kvp.first.c_str()) + TEXT("_visual");
@@ -209,7 +209,7 @@ void AUrdfBotPawn::InitializeForBeginPlay()
         }
 
         this->collision_blacklist_[bot_mesh].Add(FRegexPattern(regex));
-    }*/
+    }
 }
 
 const common_utils::UniqueValueMap<std::string, APIPCamera*> AUrdfBotPawn::getCameras() const

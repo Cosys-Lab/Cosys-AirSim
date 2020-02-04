@@ -261,8 +261,6 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
 
     //TODO: can we eliminate storing NedTransform?
 
-	//this->Rename(UTF8_TO_TCHAR((camera_setting.attach_link + +"_manualCamera").c_str()));
-
     ned_transform_ = &ned_transform;
 
     gimbal_stabilization_ = Utils::clip(camera_setting.gimbal.stabilization, 0.0f, 1.0f);

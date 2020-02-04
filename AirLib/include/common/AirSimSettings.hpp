@@ -325,6 +325,7 @@ public: //types
         bool enable_trace = false;
         bool enable_collisions = true;
         bool is_fpv_vehicle = false;
+		float debug_symbol_scale = 0.0f;
         
         //nan means use player start
         Vector3r position = VectorMath::nanVector(); //in global NED
@@ -332,6 +333,7 @@ public: //types
 
         std::map<std::string, CameraSetting> cameras;
         std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
+		std::vector<std::pair<std::string, std::string>> collision_blacklist;
 
         RCSettings rc;
     };
@@ -782,29 +784,29 @@ private:
                 //currently keyboard is not supported so use rc as default
                 vehicle_setting->rc.remote_control_id = 0;
             }
-            //else if (vehicle_type == kVehicleTypeUrdfBot) {
-            //    vehicle_setting->debug_symbol_scale = settings_json.getFloat("DebugSymbolScale", 0.0f);
+            else if (vehicle_type == kVehicleTypeUrdfBot) {
+                vehicle_setting->debug_symbol_scale = settings_json.getFloat("DebugSymbolScale", 0.0f);
 
-            //    Settings collisionBlacklist;
+                Settings collisionBlacklist;
 
-            //    std::vector<std::string> keys;
-            //    std::string botMeshKey = "BotMesh";
-            //    std::string externalMeshRegexKey = "ExternalActorRegex";
-            //    keys.emplace_back(botMeshKey);
-            //    keys.emplace_back(externalMeshRegexKey);
+                std::vector<std::string> keys;
+                std::string botMeshKey = "BotMesh";
+                std::string externalMeshRegexKey = "ExternalActorRegex";
+                keys.emplace_back(botMeshKey);
+                keys.emplace_back(externalMeshRegexKey);
 
-            //    std::vector<std::map<std::string, std::string>> collision_blacklist_pairs = settings_json.getArrayOfKeyValuePairs("CollisionBlacklist", keys);
+                std::vector<std::map<std::string, std::string>> collision_blacklist_pairs = settings_json.getArrayOfKeyValuePairs("CollisionBlacklist", keys);
 
-            //    vehicle_setting->collision_blacklist.clear();
-            //    for (unsigned int i = 0; i < collision_blacklist_pairs.size(); i++)
-            //    {
-            //        std::pair<std::string, std::string> pair;
-            //        pair.first = collision_blacklist_pairs[i][botMeshKey];
-            //        pair.second = collision_blacklist_pairs[i][externalMeshRegexKey];
+                vehicle_setting->collision_blacklist.clear();
+                for (unsigned int i = 0; i < collision_blacklist_pairs.size(); i++)
+                {
+                    std::pair<std::string, std::string> pair;
+                    pair.first = collision_blacklist_pairs[i][botMeshKey];
+                    pair.second = collision_blacklist_pairs[i][externalMeshRegexKey];
 
-            //        vehicle_setting->collision_blacklist.emplace_back(pair);
-            //    }
-            //}
+                    vehicle_setting->collision_blacklist.emplace_back(pair);
+                }
+            }
         }
         vehicle_setting->vehicle_name = vehicle_name;
 
