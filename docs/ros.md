@@ -30,7 +30,8 @@ You should have these components installed and working before proceeding
 - `airsim_benchmark_lidar_record.launch`: Publish the vehicle pose, LIDAR, IMU sensor data and record a bag file (**make sure to set output folder yourself correctly!**)
 - `airsim_benchmark_camera_record.launch`: Publish the vehicle pose and camera images (RGB, depth(10m max), segmentation) and record a bag file (**make sure to set output folder yourself correctly!**)
 
-You can use the launch argument `use_gpu_lidar` as true or false to define the Lidar type.
+You can use the launch argument `use_gpu_lidar` as true or false to define the Lidar type, e.g. 
+```roslaunch airsim airsim_pose_imu_lidar.launch use_gpu_lidar:=true```
 ## Setup
 
 ## Setup workspace and Airsim package
