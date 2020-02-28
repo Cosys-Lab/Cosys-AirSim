@@ -43,6 +43,13 @@ class AIRSIM_API ASimModeUrdfBot : public ASimModeBase
 			const PawnSimApi* sim_api) const override;
 
     private:
+		typedef msr::airlib::ClockFactory ClockFactory;
+		typedef common_utils::Utils Utils;
+		typedef msr::airlib::TTimePoint TTimePoint;
+		typedef msr::airlib::TTimeDelta TTimeDelta;
+		typedef msr::airlib::VehicleSimApiBase VehicleSimApiBase;
+		typedef msr::airlib::VectorMath VectorMath;
+		typedef msr::airlib::Vector3r Vector3r;
         typedef AUrdfBotPawn TVehiclePawn;
 
         void cycleVisibleCameraForward();

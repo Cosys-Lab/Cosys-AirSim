@@ -5,7 +5,7 @@
 #include "UnrealSensors/UnrealLidarSensor.h"
 #include "UnrealSensors/UnrealGPULidarSensor.h"
 #include "UnrealSensors/UnrealEchoSensor.h"
-#include "vehicles/AirSimVehicle.h"
+#include "Vehicles/AirSimVehicle.h"
 
 UnrealSensorFactory::UnrealSensorFactory(AActor* actor, const NedTransform* ned_transform)
 {
