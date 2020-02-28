@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Runtime/Engine/Public/EngineUtils.h"
-#include "AirLib/include/vehicles/urdfbot/api/UrdfBotRpcLibServer.hpp"
+#include "vehicles/urdfbot/api/UrdfBotRpcLibServer.hpp"
 #include "AirBlueprintLib.h"
 #include "SimMode/SimModeWorldBase.h"
 #include "api/VehicleSimApiBase.hpp"

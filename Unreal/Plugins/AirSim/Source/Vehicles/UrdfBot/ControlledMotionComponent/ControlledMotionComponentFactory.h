@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AirLib/include/common/Settings.hpp"
+#include "common/Settings.hpp"
 #include "ControlledMotionComponent.h"
 #include "LinearActuator.h"
 #include "Servo.h"

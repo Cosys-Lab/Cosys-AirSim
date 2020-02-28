@@ -1,7 +1,7 @@
 #pragma once
 
 #include "UrdfLinkSpecification.h"
-#include "AirLib/include/vehicles/urdfbot/api/UrdfBotApiBase.hpp"
+#include "vehicles/urdfbot/api/UrdfBotApiBase.hpp"
 #include "CoreMinimal.h"
 
 enum UrdfForceSpecificationType

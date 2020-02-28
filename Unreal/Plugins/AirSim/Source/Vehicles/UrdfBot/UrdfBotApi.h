@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AirLib/include/common/VectorMath.hpp"
+#include "common/VectorMath.hpp"
 #include "vehicles/urdfbot/api/UrdfBotApiBase.hpp"
 #include "physics/Kinematics.hpp"
 #include "sensors/SensorCollection.hpp"
