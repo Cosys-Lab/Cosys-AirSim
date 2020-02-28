@@ -31,7 +31,7 @@
 
 #include "PawnEvents.h"
 
-#include "Vehicles/AirsimVehicle.h"
+#include "Vehicles/AirSimVehicle.h"
 
 #include "PhysXIncludes.h"
 #include "PhysicsPublic.h"
