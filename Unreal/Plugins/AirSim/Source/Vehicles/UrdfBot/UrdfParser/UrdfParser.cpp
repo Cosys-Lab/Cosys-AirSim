@@ -682,12 +682,14 @@ UrdfLinkCollisionSpecification* UrdfParser::ParseLinkCollisionSpecification(FXml
         }
     }
 
-    if (!hasGeometryNode)
+	if (!hasGeometryNode) {
 		if (hasNameAttribute) {
 			throw std::runtime_error("No geometry node specified for collision node " + std::string(TCHAR_TO_UTF8(*collisionSpecification->Name)) + ".");
-		}		else {
+		}
+		else {
 			throw std::runtime_error("No geometry node specified for unnamed collision node.");
 		}
+	}
 
     return collisionSpecification;
 }

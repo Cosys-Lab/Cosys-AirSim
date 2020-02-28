@@ -217,7 +217,7 @@ TArray<TArray<FVector>> StaticMeshGenerator::CreateCollisionVAHCD(TArray<FVector
     {
         vhacdInterface->Clean();
         vhacdInterface->Release();
-        delete verts;
+        delete[] verts;
         return TArray<TArray<FVector>>();
     }
 
@@ -246,7 +246,7 @@ TArray<TArray<FVector>> StaticMeshGenerator::CreateCollisionVAHCD(TArray<FVector
 
     vhacdInterface->Clean();
     vhacdInterface->Release();
-    delete verts;
+    delete[] verts;
 
     return output;
 }

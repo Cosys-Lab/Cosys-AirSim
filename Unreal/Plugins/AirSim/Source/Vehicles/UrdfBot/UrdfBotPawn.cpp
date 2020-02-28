@@ -301,7 +301,8 @@ void AUrdfBotPawn::ConstructFromFile(FString fileName)
 
     UrdfLinkSpecification* rootLinkSpecification = this->FindRootNodeSpecification(links);
     this->root_component_ = this->components_[rootLinkSpecification->Name];
-    this->root_component_->SetReferenceFrameLocation(this->GetActorLocation(), this->GetActorRotation());
+
+    this->root_component_->SetReferenceFrameLocation(rootLocation, rootRotation);
     this->root_component_->GetRootComponent()->AttachTo(RootComponent, NAME_None, EAttachLocation::KeepRelativeOffset); 
 
     this->SetRootComponent(this->root_component_->GetRootComponent());
