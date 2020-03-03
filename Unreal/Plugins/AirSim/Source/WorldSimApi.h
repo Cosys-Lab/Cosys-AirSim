@@ -6,6 +6,8 @@
 #include "SimMode/SimModeBase.h"
 #include "AirSimCharacter.h"
 #include <string>
+#include "Engine/StaticMeshActor.h"
+#include "common/Common.hpp"
 
 class WorldSimApi : public msr::airlib::WorldSimApiBase {
 public:
@@ -34,6 +36,8 @@ public:
     virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const override;
     virtual Pose getObjectPose(const std::string& object_name) const override;
     virtual bool setObjectPose(const std::string& object_name, const Pose& pose, bool teleport) override;
+    virtual bool spawnStaticMeshObject(const std::string& mesh_path, const std::string& object_name, const Pose& pose) override;
+    virtual bool deleteObject(const std::string& object_name) override;
 
     //----------- APIs to control ACharacter in scene ----------/
     virtual void charSetFaceExpression(const std::string& expression_name, float value, const std::string& character_name) override;

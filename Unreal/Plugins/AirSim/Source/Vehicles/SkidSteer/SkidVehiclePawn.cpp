@@ -240,7 +240,30 @@ void ASkidVehiclePawn::updateInCarHUD()
 	}
 }
 
+USceneComponent* ASkidVehiclePawn::GetComponent(FString componentName)
+{
+	// Debugging
+	if (componentName.Len() > 0)
+	{
+		throw std::runtime_error("Request for component " + std::string(TCHAR_TO_UTF8(*componentName)) + " in GetComponent in a pawn that does not have components.");
+	}
 
+	return this->RootComponent;
+}
+
+void ASkidVehiclePawn::GetComponentReferenceTransform(FString componentName, FVector& translation, FRotator& rotation)
+{
+	// Debugging
+	if (componentName.Len() > 0)
+	{
+		throw std::runtime_error("Request for component " + std::string(TCHAR_TO_UTF8(*componentName)) + " in GetComponent in a pawn that does not have components.");
+	}
+
+	USceneComponent* component = this->GetComponent(componentName);
+
+	translation = component->GetComponentLocation();
+	rotation = component->GetComponentRotation();
+}
 
 void ASkidVehiclePawn::updatePhysicsMaterial()
 {

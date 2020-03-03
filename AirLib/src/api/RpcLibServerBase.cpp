@@ -78,9 +78,9 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         getWorldSimApi()->continueForTime(seconds); 
     });
 
-    pimpl_->server.bind("simSetTimeOfDay", [&](bool is_enabled, const string& start_datetime, bool is_start_datetime_dst, 
+    pimpl_->server.bind("simSetTimeOfDay", [&](bool is_enabled, const string& start_datetime, bool is_start_datetime_dst,
         float celestial_clock_speed, float update_interval_secs, bool move_sun) -> void {
-        getWorldSimApi()->setTimeOfDay(is_enabled, start_datetime, is_start_datetime_dst, 
+        getWorldSimApi()->setTimeOfDay(is_enabled, start_datetime, is_start_datetime_dst,
             celestial_clock_speed, update_interval_secs, move_sun);
     });
 
@@ -91,7 +91,7 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         getWorldSimApi()->setWeatherParameter(param, val);
     });
 
-    pimpl_->server.bind("enableApiControl", [&](bool is_enabled, const std::string& vehicle_name) -> void { 
+    pimpl_->server.bind("enableApiControl", [&](bool is_enabled, const std::string& vehicle_name) -> void {
         getVehicleApi(vehicle_name)->enableApiControl(is_enabled);
     });
     pimpl_->server.bind("isApiControlEnabled", [&](const std::string& vehicle_name) -> bool { 
@@ -115,6 +115,14 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         return result;
     });
 
+    pimpl_->server.bind("simSetCameraPose", [&](const RpcLibAdapatorsBase::CameraPose camera_pose, const std::string& vehicle_name) -> void {
+        getVehicleSimApi(vehicle_name)->setCameraPose(camera_pose.to());
+    });
+
+    pimpl_->server.bind("simRayCast", [&](const RpcLibAdapatorsBase::RayCastRequest request, const std::string& vehicle_name) -> RpcLibAdapatorsBase::RayCastResponse {
+        return RpcLibAdapatorsBase::RayCastResponse(getVehicleSimApi(vehicle_name)->rayCast(request.to()));
+    });
+
     pimpl_->server.
         bind("simSetVehiclePose", [&](const RpcLibAdapatorsBase::Pose &pose, bool ignore_collision, const std::string& vehicle_name) -> void {
         getVehicleSimApi(vehicle_name)->setPose(pose.to(), ignore_collision);
@@ -125,13 +133,42 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
     });
 
     pimpl_->server.
+        bind("simXyzToGeoPoints", [&](const std::vector<RpcLibAdapatorsBase::Vector3r> &xyz_points, const std::string vehicle_name) -> std::vector<RpcLibAdapatorsBase::GeoPoint> {
+
+        //TODO: this is a lot of copying...
+        std::vector<msr::airlib::Vector3r> xyz_points_converted;
+        xyz_points_converted.reserve(xyz_points.size());
+        for (const auto &point : xyz_points)
+        {
+            xyz_points_converted.emplace_back(point.to());
+        }
+
+        std::vector<msr::airlib::GeoPoint> result_points = getVehicleSimApi(vehicle_name)->xyzToGeoPoints(xyz_points_converted);
+
+        std::vector<RpcLibAdapatorsBase::GeoPoint> output;
+        output.reserve(result_points.size());
+        for (const auto &point : result_points)
+        {
+            output.emplace_back(RpcLibAdapatorsBase::GeoPoint(point));
+        }
+
+        return output;
+    });
+
+    pimpl_->server.
         bind("simSetSegmentationObjectID", [&](const std::string& mesh_name, int object_id, bool is_name_regex) -> bool {
         return getWorldSimApi()->setSegmentationObjectID(mesh_name, object_id, is_name_regex);
     });
     pimpl_->server.
         bind("simGetSegmentationObjectID", [&](const std::string& mesh_name) -> int {
         return getWorldSimApi()->getSegmentationObjectID(mesh_name);
-    });    
+    });
+
+    pimpl_->server
+        .bind("simSetDrawableShapes", [&](const RpcLibAdapatorsBase::DrawableShapeRequest request, const std::string& vehicle_name) -> void {
+        auto converted = request.to();
+        getVehicleSimApi(vehicle_name)->setDrawShapes(converted.shapes, converted.persist_unmentioned);
+    });
 
     pimpl_->server.bind("reset", [&]() -> void {
         auto* sim_world_api = getWorldSimApi();
@@ -215,6 +252,12 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
     });
     pimpl_->server.bind("simSetObjectPose", [&](const std::string& object_name, const RpcLibAdapatorsBase::Pose& pose, bool teleport) -> bool {
         return getWorldSimApi()->setObjectPose(object_name, pose.to(), teleport);
+    });
+    pimpl_->server.bind("simSpawnStaticMeshObject", [&](const std::string& object_class_name, const std::string& object_name, const RpcLibAdapatorsBase::Pose& pose) -> bool {
+        return getWorldSimApi()->spawnStaticMeshObject(object_class_name, object_name, pose.to());
+    });
+    pimpl_->server.bind("simDeleteObject", [&](const std::string& object_name) -> bool {
+        return getWorldSimApi()->deleteObject(object_name);
     });
 
     pimpl_->server.bind("simGetGroundTruthKinematics", [&](const std::string& vehicle_name) -> RpcLibAdapatorsBase::KinematicsState {

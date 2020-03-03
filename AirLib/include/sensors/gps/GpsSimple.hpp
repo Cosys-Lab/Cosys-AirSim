@@ -18,7 +18,7 @@ namespace msr { namespace airlib {
 class GpsSimple : public GpsBase {
 public: //methods
     GpsSimple(const AirSimSettings::GpsSetting& setting = AirSimSettings::GpsSetting())
-        : GpsBase(setting.sensor_name)
+        : GpsBase(setting.sensor_name, setting.attach_link)
     {
         // initialize params
         params_.initializeFromSettings(setting);

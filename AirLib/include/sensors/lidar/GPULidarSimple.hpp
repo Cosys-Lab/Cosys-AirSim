@@ -17,7 +17,7 @@ namespace msr {
 		class GPULidarSimple : public GPULidarBase {
 		public:
 			GPULidarSimple(const AirSimSettings::GPULidarSetting& setting = AirSimSettings::GPULidarSetting())
-				: GPULidarBase(setting.sensor_name)
+				: GPULidarBase(setting.sensor_name, setting.attach_link)
 			{
 				// initialize params
 				params_.initializeFromSettings(setting);

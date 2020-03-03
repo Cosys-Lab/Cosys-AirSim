@@ -18,7 +18,7 @@ namespace msr { namespace airlib {
 class MagnetometerSimple : public MagnetometerBase {
 public: 
     MagnetometerSimple(const AirSimSettings::MagnetometerSetting& setting = AirSimSettings::MagnetometerSetting())
-        : MagnetometerBase(setting.sensor_name)
+        : MagnetometerBase(setting.sensor_name, setting.attach_link)
     {
         // initialize params
         params_.initializeFromSettings(setting);
@@ -95,7 +95,7 @@ private: //methods
             + noise_vec_.next()
             + bias_vec_;
 
-        // todo output.magnetic_field_covariance ? 
+        // todo output.magnetic_field_covariance ?
         output.time_stamp = clock()->nowNanos();
 
         return output;

@@ -45,6 +45,8 @@ public:
     virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const = 0;
     virtual Pose getObjectPose(const std::string& object_name) const = 0;
     virtual bool setObjectPose(const std::string& object_name, const Pose& pose, bool teleport) = 0;
+    virtual bool spawnStaticMeshObject(const std::string& object_class_name, const std::string& object_name, const Pose &pose) = 0;
+    virtual bool deleteObject(const std::string& object_name) = 0;
 
     //----------- APIs to control ACharacter in scene ----------/
     virtual void charSetFaceExpression(const std::string& expression_name, float value, const std::string& character_name) = 0;

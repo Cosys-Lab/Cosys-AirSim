@@ -15,6 +15,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Engine/World.h"
+#include "ProceduralMeshComponent.h"
+#include "Runtime/Foliage/Public/FoliageType.h"
 
 #include "Runtime/Landscape/Classes/LandscapeComponent.h"
 #include "common/AirSimSettings.hpp"
@@ -93,27 +95,47 @@ public:
 
     static bool IsInGameThread();
 
-    template<class T>
-    static std::string GetMeshName(T* mesh)
-    {
-        switch (mesh_naming_method_)
-        {
-        case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::OwnerName:
-            if (mesh->GetOwner())
-                return std::string(TCHAR_TO_UTF8(*(mesh->GetOwner()->GetName())));
-            else
-                return ""; //std::string(TCHAR_TO_UTF8(*(UKismetSystemLibrary::GetDisplayName(mesh))));
-        case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::StaticMeshName:
-            if (mesh->GetStaticMesh())
-                return std::string(TCHAR_TO_UTF8(*(mesh->GetStaticMesh()->GetName())));
-            else
-                return "";
-        default:
-            return "";
-        }
-    }
+	template<class T>
+	static std::string GetMeshName(T* mesh)
+	{
+		switch (mesh_naming_method_)
+		{
+		case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::OwnerName:
+			if (mesh->GetOwner())
+			{
+				// For foliage actors, need to use mesh's name in order to differentiate different meshes from each other.
+				// Otherwise, all items placed with the foliage actor will get the same ID.
+				auto owner = mesh->GetOwner();
+				if (owner->GetName().StartsWith("InstancedFoliageActor"))
+				{
+					FString meshName = mesh->GetName();
 
-    static std::string GetMeshName(ALandscapeProxy* mesh);
+					// It is expected that the user will create a blueprint class that starts with "IFA_" for each of the classes they want to differentiate.
+					// Unreal adds a _C_ into the name for blueprint created classes, which messes up the hash. Remove it as well. 
+					if (meshName.StartsWith(TEXT("IFA_")))
+					{
+						meshName = meshName.Replace(TEXT("IFA_"), TEXT("")).Replace(TEXT("_C_"), TEXT(""));
+					}
+
+					return std::string(TCHAR_TO_UTF8(*(meshName)));
+				}
+
+				return std::string(TCHAR_TO_UTF8(*(owner->GetName())));
+			}
+			else
+				return ""; //std::string(TCHAR_TO_UTF8(*(UKismetSystemLibrary::GetDisplayName(mesh))));
+		case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::StaticMeshName:
+			if (mesh)
+				return std::string(TCHAR_TO_UTF8(*(mesh->GetName())));
+			else
+				return "";
+		default:
+			return "";
+		}
+	}
+
+	static std::string GetMeshName(ALandscapeProxy* mesh);
+	static std::string GetMeshName(UProceduralMeshComponent* meshComponent);
 
     template<class UserClass>
     static FInputActionBinding& BindActionToKey(const FName action_name, const FKey in_key, UserClass* actor,
