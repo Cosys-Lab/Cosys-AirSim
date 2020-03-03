@@ -1361,13 +1361,13 @@ private:
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
-		echo_setting.number_of_spread_traces = settings_json.getInt("NumberOfSpreadTraces", echo_setting.number_of_spread_traces);
-		echo_setting.spread_opening_angle = settings_json.getInt("SpreadOpeningAngle", echo_setting.spread_opening_angle);
+		echo_setting.number_of_spread_traces = settings_json.getFloat("NumberOfSpreadTraces", echo_setting.number_of_spread_traces);
+		echo_setting.spread_opening_angle = settings_json.getFloat("SpreadOpeningAngle", echo_setting.spread_opening_angle);
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
 		echo_setting.attenuation_limit = settings_json.getFloat("AttenuationLimit", echo_setting.attenuation_limit);
 		echo_setting.distance_limit = settings_json.getFloat("DistanceLimit", echo_setting.distance_limit);
-		echo_setting.reflection_limit = settings_json.getFloat("ReflectionLimit", echo_setting.reflection_limit);
+		echo_setting.reflection_limit = settings_json.getInt("ReflectionLimit", echo_setting.reflection_limit);
 		echo_setting.reflection_distance_limit = settings_json.getFloat("ReflectionDistanceLimit", echo_setting.reflection_distance_limit);
 		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
 		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
