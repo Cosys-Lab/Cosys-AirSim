@@ -7,6 +7,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ImageUtils.h"
 #include "EngineUtils.h"
+#include "ViewMode.h"
 
 #include <string>
 #include <exception>
@@ -60,6 +61,7 @@ void APIPCamera::PostInitializeComponents()
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("InfraredCaptureComponent"));
     captures_[Utils::toNumeric(ImageType::SurfaceNormals)] = 
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("NormalsCaptureComponent"));
+	FViewMode::VertexColor(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
 }
 
 void APIPCamera::BeginPlay()

@@ -10,6 +10,8 @@
 
 #include <memory>
 #include "AirBlueprintLib.h"
+#include "ObjectPainter.h"
+
 #include "common/AirSimSettings.hpp"
 #include "common/ScalableClock.hpp"
 #include "common/SteppableClock.hpp"
@@ -51,6 +53,7 @@ ASimModeBase::ASimModeBase()
 
 void ASimModeBase::BeginPlay()
 {
+
     Super::BeginPlay();
 
     debug_reporter_.initialize(false);
@@ -69,7 +72,8 @@ void ASimModeBase::BeginPlay()
 
     setupClockSpeed();
 
-    setStencilIDs();
+	FObjectPainter::Get().Reset(this->GetLevel());
+	setStencilIDs();
     
     record_tick_count = 0;
     setupInputBindings();
