@@ -83,6 +83,9 @@ public:
 
     virtual bool isUrdf() { return false; }
 
+	bool SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex);
+	int GetMeshVertexColorID(const std::string& mesh_name);
+
 protected: //must overrides
     typedef msr::airlib::AirSimSettings AirSimSettings;
 
@@ -142,7 +145,7 @@ private:
     bool tod_move_sun_;
 
 	/** The assigned color for each object */
-	TMap<FString, FColor> Id2Color;
+	TMap<FString, uint32> Id2Color;
 	/** A list of paintable objects */
 	TMap<FString, AActor*> Id2Actor;
 
@@ -161,7 +164,7 @@ private:
     bool lidar_draw_debug_points_ = false;
 
 private:
-    void setStencilIDs();
+    void InitializeMeshVertexColorIDs();
     void initializeTimeOfDay();
     void advanceTimeOfDay();
     void setSunRotation(FRotator rotation);

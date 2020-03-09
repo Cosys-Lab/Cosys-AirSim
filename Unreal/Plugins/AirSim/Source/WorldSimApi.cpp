@@ -43,20 +43,12 @@ void WorldSimApi::setTimeOfDay(bool is_enabled, const std::string& start_datetim
 
 bool WorldSimApi::setSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex)
 {
-    bool success;
-    UAirBlueprintLib::RunCommandOnGameThread([mesh_name, object_id, is_name_regex, &success]() {
-        success = UAirBlueprintLib::SetMeshStencilID(mesh_name, object_id, is_name_regex);
-    }, true);
-    return success;
+	return simmode_->SetMeshVertexColorID(mesh_name, object_id, is_name_regex);
 }
 
 int WorldSimApi::getSegmentationObjectID(const std::string& mesh_name) const
 {
-    int result;
-    UAirBlueprintLib::RunCommandOnGameThread([&mesh_name, &result]() {
-        result = UAirBlueprintLib::GetMeshStencilID(mesh_name);
-    }, true);
-    return result;
+	return simmode_->GetMeshVertexColorID(mesh_name);
 }
 
 void WorldSimApi::printLogMessage(const std::string& message,

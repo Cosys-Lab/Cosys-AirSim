@@ -1,18 +1,105 @@
+// This class and its functions are derivatives of the work of UnrealCV, https://unrealcv.org/
+// Licensed under the MIT License.
+
 #include "ObjectPainter.h"
 #include "StaticMeshResources.h"
 #include "Components/SkinnedMeshComponent.h"
 #include "Slate/SceneViewport.h"
-#include "ColorMap.h"
 
+int32 GetChannelValue(uint32 Index)
+{
+	static int32 Values[256] = { 0 };
+	static bool Init = false;
+	if (!Init)
+	{
+		float Step = 256;
+		uint32 Iter = 0;
+		Values[0] = 0;
+		while (Step >= 1)
+		{
+			for (uint32 Value = Step - 1; Value <= 256; Value += Step * 2)
+			{
+				Iter++;
+				Values[Iter] = Value;
+			}
+			Step /= 2;
+		}
+		Init = true;
+	}
+	if (Index >= 0 && Index <= 255)
+	{
+		return Values[Index];
+	}
+	else
+	{
+		check(false);
+		return -1;
+	}
+}
 
-bool UObjectPainter::SetActorColor(FString ActorId, FColor Color, TMap<FString, FColor>* Id2Color, TMap<FString, AActor*> Id2Actor)
+void GetColors(int32 MaxVal, bool Fix1, bool Fix2, bool Fix3, TArray<FColor>& ColorMap)
+{
+	for (int32 I = 0; I <= (Fix1 ? 0 : MaxVal - 1); I++)
+	{
+		for (int32 J = 0; J <= (Fix2 ? 0 : MaxVal - 1); J++)
+		{
+			for (int32 K = 0; K <= (Fix3 ? 0 : MaxVal - 1); K++)
+			{
+				uint8 R = GetChannelValue(Fix1 ? MaxVal : I);
+				uint8 G = GetChannelValue(Fix2 ? MaxVal : J);
+				uint8 B = GetChannelValue(Fix3 ? MaxVal : K);
+				if (R != 76 && B != 76 && G != 76) {
+					FColor Color(R, G, B, 255);
+					ColorMap.Add(Color);
+				}
+			}
+		}
+	}
+}
+
+FColor GetColorFromColorMap(int32 ObjectIndex)
+{
+	static TArray<FColor> ColorMap;
+	int NumPerChannel = 255;
+	if (ColorMap.Num() == 0)
+	{
+		for (int32 MaxChannelIndex = 0; MaxChannelIndex < NumPerChannel; MaxChannelIndex++)
+		{
+			GetColors(MaxChannelIndex, false, false, true, ColorMap);
+			GetColors(MaxChannelIndex, false, true, false, ColorMap);
+			GetColors(MaxChannelIndex, false, true, true, ColorMap);
+			GetColors(MaxChannelIndex, true, false, false, ColorMap);
+			GetColors(MaxChannelIndex, true, false, true, ColorMap);
+			GetColors(MaxChannelIndex, true, true, false, ColorMap);
+			GetColors(MaxChannelIndex, true, true, true, ColorMap);
+		}
+	}
+	return ColorMap[ObjectIndex];
+}
+
+bool IsPaintable(AActor* Actor)
+{
+	TArray<UMeshComponent*> PaintableComponents;
+	Actor->GetComponents<UMeshComponent>(PaintableComponents);
+	if (PaintableComponents.Num() == 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool UObjectPainter::SetActorColor(FString ActorId, uint32 id, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*> Id2Actor)
 {
 	if (Id2Actor.Contains(ActorId))
 	{
+		FColor Color = GetColorFromColorMap(id);
 		AActor* Actor = Id2Actor[ActorId];
 		if (PaintObject(Actor, Color))
 		{
-			Id2Color->Emplace(ActorId, Color);
+			Id2Color->Emplace(ActorId, id);
 			return true;
 		}
 		else
@@ -26,7 +113,7 @@ bool UObjectPainter::SetActorColor(FString ActorId, FColor Color, TMap<FString, 
 	}
 }
 
-bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, FColor>* Id2Color, TMap<FString, AActor*>* Id2Actor)
+bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor)
 {
 	if (Actor && IsPaintable(Actor)) {
 		FString ActorId = Actor->GetHumanReadableName();
@@ -37,7 +124,7 @@ bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, FColor>* Id2C
 			uint32 ObjectIndex = Id2Actor->Num();
 			Id2Actor->Emplace(ActorId, Actor);
 			FColor NewColor = GetColorFromColorMap(ObjectIndex);
-			Id2Color->Emplace(ActorId, NewColor);
+			Id2Color->Emplace(ActorId, ObjectIndex);
 			check(PaintObject(Actor, NewColor));
 			return true;
 		}
@@ -47,24 +134,19 @@ bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, FColor>* Id2C
 	}
 }
 
-FColor UObjectPainter::GetActorColor(FString ActorId, TMap<FString, FColor> Id2Color)
+uint32 UObjectPainter::GetActorColor(FString ActorId, TMap<FString, uint32> Id2Color)
 {
-	// Make sure the object color map is initialized
 	if (Id2Color.Num() == 0)
 	{
-		FColor ObjectColor = FColor(0,0,0,0);
-		return ObjectColor;
+		return -1;
 	}
 	if (Id2Color.Contains(ActorId))
 	{
-		FColor ObjectColor = Id2Color[ActorId]; // Make sure the object exist
-		// FString Message = "%.3f %.3f %.3f %.3f";
-		return ObjectColor;
+		return Id2Color[ActorId];
 	}
 	else
 	{
-		FColor ObjectColor = FColor(0,0,0,0);
-		return ObjectColor;
+		return -1;
 	}
 }
 
@@ -81,7 +163,6 @@ void UObjectPainter::GetObjectList(TMap<FString, AActor*> Id2Actor)
 
 AActor* UObjectPainter::GetObject(FString ActorId, TMap<FString, AActor*> Id2Actor)
 {
-	/** Return the pointer of an object, return NULL if object not found */
 	if (Id2Actor.Contains(ActorId))
 	{
 		return Id2Actor[ActorId];
@@ -92,7 +173,7 @@ AActor* UObjectPainter::GetObject(FString ActorId, TMap<FString, AActor*> Id2Act
 	}
 }
 
-void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, FColor>* Id2Color, TMap<FString, AActor*>* Id2Actor)
+void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor)
 {
 
 	uint32 ObjectIndex = 0;
@@ -104,19 +185,13 @@ void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, FColor>* Id2Color, TMa
 			
 			FColor NewColor = GetColorFromColorMap(ObjectIndex);
 			Id2Actor->Emplace(ActorId, Actor);
-			Id2Color->Emplace(ActorId, NewColor);
+			Id2Color->Emplace(ActorId, ObjectIndex);
 			ObjectIndex++;
 			PaintObject(Actor, NewColor);
 		}
 	}
 }
 
-/** DisplayColor is the color that the screen will show
-If DisplayColor.R = 128, the display will show 0.5 voltage
-To achieve this, UnrealEngine will do gamma correction.
-The value on image will be 187.
-https://en.wikipedia.org/wiki/Gamma_correction#Methods_to_perform_display_gamma_correction_in_computing
-*/
 bool UObjectPainter::PaintObject(AActor* Actor, const FColor& Color, bool IsColorGammaEncoded)
 {
 	if (!Actor) return false;
@@ -141,7 +216,7 @@ bool UObjectPainter::PaintObject(AActor* Actor, const FColor& Color, bool IsColo
 		if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(MeshComponent))
 		{
 			UStaticMesh* StaticMesh;
-			StaticMesh = StaticMeshComponent->GetStaticMesh(); // This is a new function introduced in 4.14
+			StaticMesh = StaticMeshComponent->GetStaticMesh(); 
 			if (StaticMesh)
 			{
 				uint32 NumLODLevel = StaticMesh->RenderData->LODResources.Num();
@@ -155,8 +230,6 @@ bool UObjectPainter::PaintObject(AActor* Actor, const FColor& Color, bool IsColo
 					InstanceMeshLODInfo = &StaticMeshComponent->LODData[PaintingMeshLODIndex];
 
 					InstanceMeshLODInfo->ReleaseOverrideVertexColorsAndBlock();
-					// Setup OverrideVertexColors
-					// if (!InstanceMeshLODInfo->OverrideVertexColors) // TODO: Check this
 					{
 						InstanceMeshLODInfo->OverrideVertexColors = new FColorVertexBuffer;
 
@@ -167,50 +240,23 @@ bool UObjectPainter::PaintObject(AActor* Actor, const FColor& Color, bool IsColo
 					uint32 NumVertices = LODModel.GetNumVertices();
 					check(InstanceMeshLODInfo->OverrideVertexColors);
 					check(NumVertices <= InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices());
-					// StaticMeshComponent->CachePaintedDataIfNecessary();
 
 					for (uint32 ColorIndex = 0; ColorIndex < NumVertices; ++ColorIndex)
 					{
-						// LODModel.ColorVertexBuffer.VertexColor(ColorIndex) = NewColor;  // This is vertex level
 						// Need to initialize the vertex buffer first
 						uint32 NumOverrideVertexColors = InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices();
 						uint32 NumPaintedVertices = InstanceMeshLODInfo->PaintedVertices.Num();
-						// check(NumOverrideVertexColors == NumPaintedVertices);
 						InstanceMeshLODInfo->OverrideVertexColors->VertexColor(ColorIndex) = NewColor;
-						// InstanceMeshLODInfo->PaintedVertices[ColorIndex].Color = NewColor;
 					}
 					BeginInitResource(InstanceMeshLODInfo->OverrideVertexColors);
 					StaticMeshComponent->MarkRenderStateDirty();
-					// BeginUpdateResourceRHI(InstanceMeshLODInfo->OverrideVertexColors);
-
-
-					/*
-					// TODO: Need to check other LOD levels
-					// Use flood fill to paint mesh vertices
-					UE_LOG(LogUnrealCV, Warning, TEXT("%s:%s has %d vertices"), *Actor->GetActorLabel(), *StaticMeshComponent->GetName(), NumVertices);
-
-					if (LODModel.ColorVertexBuffer.GetNumVertices() == 0)
-					{
-					// Mesh doesn't have a color vertex buffer yet!  We'll create one now.
-					LODModel.ColorVertexBuffer.InitFromSingleColor(FColor(255, 255, 255, 255), LODModel.GetNumVertices());
-					}
-
-					*/
+					
 				}
 			}
 		}
 		if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(MeshComponent))
 		{
-
 			SkinnedMeshComponent->SetAllVertexColorOverride(NewColor);
-
-			//Info.OverrideVertexColors = new FColorVertexBuffer;
-			//Info.OverrideVertexColors->InitFromSingleColor(NewColor, numVerts);
-
-			//BeginInitResource(Info.OverrideVertexColors);
-
-			//SkinnedMeshComponent->MarkRenderStateDirty();
-
 		}
 	}
 	return true;

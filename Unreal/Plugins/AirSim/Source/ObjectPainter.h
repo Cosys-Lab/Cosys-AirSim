@@ -1,3 +1,6 @@
+// This class and its functions are derivatives of the work of UnrealCV, https://unrealcv.org/
+// Licensed under the MIT License.
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -17,10 +20,10 @@ class AIRSIM_API UObjectPainter : public UBlueprintFunctionLibrary
 
 public:
 
-	static bool AddNewActorColor(AActor* Actor, TMap<FString, FColor>* Id2Color, TMap<FString, AActor*>* Id2Actor);
+	static bool AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor);
 
 	/** Reset this to uninitialized state */
-	static void Reset(ULevel* InLevel, TMap<FString, FColor>* Id2Color, TMap<FString, AActor*>* Id2Actor);
+	static void Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor);
 	/** The assigned color for each object */
 	;
 	/** A list of paintable objects */
@@ -35,10 +38,7 @@ public:
 	void GetObjectList(TMap<FString, AActor*> Id2Actor);
 
 	/** Get the object color */
-	FColor GetActorColor(FString ActorId, TMap<FString, FColor> Id2Color);
+	static uint32 GetActorColor(FString ActorId, TMap<FString, uint32> Id2Color);
 
-	bool SetActorColor(FString ActorId, FColor Color, TMap<FString, FColor>* Id2Color, TMap<FString, AActor*> Id2Actor);
-private:
-	/** The level this ObjectPainter associated with */
-	ULevel* Level;
+	static bool SetActorColor(FString ActorId, uint32 id, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*> Id2Actor);
 };

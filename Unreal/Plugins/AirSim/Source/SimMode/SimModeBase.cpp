@@ -72,8 +72,7 @@ void ASimModeBase::BeginPlay()
 
     setupClockSpeed();
 
-	UObjectPainter::Reset(this->GetLevel(), &Id2Color, &Id2Actor);
-	setStencilIDs();
+	InitializeMeshVertexColorIDs();
     
     record_tick_count = 0;
     setupInputBindings();
@@ -115,16 +114,32 @@ void ASimModeBase::checkVehicleReady()
     }
 }
 
-void ASimModeBase::setStencilIDs()
-{
-    UAirBlueprintLib::SetMeshNamingMethod(getSettings().segmentation_setting.mesh_naming_method);
+void ASimModeBase::InitializeMeshVertexColorIDs()
+{     
+	UObjectPainter::Reset(this->GetLevel(), &Id2Color, &Id2Actor);
+}
 
-    if (getSettings().segmentation_setting.init_method ==
-        AirSimSettings::SegmentationSetting::InitMethodType::CommonObjectsRandomIDs) {
-     
-        UAirBlueprintLib::InitializeMeshStencilIDs(!getSettings().segmentation_setting.override_existing);
-    }
-    //else don't init
+bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex) {
+	if (is_name_regex) {
+		std::regex name_regex;
+		name_regex.assign(mesh_name, std::regex_constants::icase);
+		int changes = 0;
+		for (auto It = Id2Actor.CreateConstIterator(); It; ++It)
+		{
+			if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
+				return UObjectPainter::SetActorColor(It.Key(), object_id, &Id2Color, Id2Actor);
+				changes++;
+			}
+		}
+		return changes > 0;
+	}
+	else if (Id2Actor.Contains(mesh_name.c_str())) {
+		return UObjectPainter::SetActorColor(mesh_name.c_str(), object_id, &Id2Color, Id2Actor);
+	}
+}
+
+int ASimModeBase::GetMeshVertexColorID(const std::string& mesh_name) {
+	return UObjectPainter::GetActorColor(mesh_name.c_str(), Id2Color);
 }
 
 void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
