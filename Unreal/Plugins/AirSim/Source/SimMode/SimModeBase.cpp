@@ -136,6 +136,9 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 	else if (Id2Actor.Contains(mesh_name.c_str())) {
 		return UObjectPainter::SetActorColor(mesh_name.c_str(), object_id, &Id2Color, Id2Actor);
 	}
+	else {
+		return false;
+	}
 }
 
 int ASimModeBase::GetMeshVertexColorID(const std::string& mesh_name) {
