@@ -43,8 +43,10 @@ void GetColors(int32 MaxVal, bool Fix1, bool Fix2, bool Fix3, TArray<FColor>& Co
 				uint8 R = GetChannelValue(Fix1 ? MaxVal : I);
 				uint8 G = GetChannelValue(Fix2 ? MaxVal : J);
 				uint8 B = GetChannelValue(Fix3 ? MaxVal : K);
-				FColor Color(R, G, B, 255);
-				ColorMap.Add(Color);
+				if (R != 76 && B != 76 && G != 76) {
+					FColor Color(R, G, B, 255);
+					ColorMap.Add(Color);
+				}
 			}
 		}
 	}
@@ -92,94 +94,3 @@ bool IsPaintable(AActor* Actor)
 	}
 }
 
-/** DisplayColor is the color that the screen will show
-If DisplayColor.R = 128, the display will show 0.5 voltage
-To achieve this, UnrealEngine will do gamma correction.
-The value on image will be 187.
-https://en.wikipedia.org/wiki/Gamma_correction#Methods_to_perform_display_gamma_correction_in_computing
-*/
-bool FObjectPainter::PaintObject(AActor* Actor, const FColor& Color, bool IsColorGammaEncoded)
-{
-	if (!Actor) return false;
-
-	FColor NewColor;
-	if (IsColorGammaEncoded)
-	{
-		FLinearColor LinearColor = FLinearColor::FromPow22Color(Color);
-		NewColor = LinearColor.ToFColor(false);
-	}
-	else
-	{
-		NewColor = Color;
-	}
-
-	TArray<UMeshComponent*> PaintableComponents;
-	Actor->GetComponents<UMeshComponent>(PaintableComponents);
-
-
-	for (auto MeshComponent : PaintableComponents)
-	{
-		if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(MeshComponent))
-		{
-			UStaticMesh* StaticMesh;
-			StaticMesh = StaticMeshComponent->GetStaticMesh(); // This is a new function introduced in 4.14
-			if (StaticMesh)
-			{
-				uint32 NumLODLevel = StaticMesh->RenderData->LODResources.Num();
-				for (uint32 PaintingMeshLODIndex = 0; PaintingMeshLODIndex < NumLODLevel; PaintingMeshLODIndex++)
-				{
-					FStaticMeshLODResources& LODModel = StaticMesh->RenderData->LODResources[PaintingMeshLODIndex];
-					FStaticMeshComponentLODInfo* InstanceMeshLODInfo = NULL;
-
-					// PaintingMeshLODIndex + 1 is the minimum requirement, enlarge if not satisfied
-					StaticMeshComponent->SetLODDataCount(PaintingMeshLODIndex + 1, StaticMeshComponent->LODData.Num());
-					InstanceMeshLODInfo = &StaticMeshComponent->LODData[PaintingMeshLODIndex];
-
-					InstanceMeshLODInfo->ReleaseOverrideVertexColorsAndBlock();
-					// Setup OverrideVertexColors
-					// if (!InstanceMeshLODInfo->OverrideVertexColors) // TODO: Check this
-					{
-						InstanceMeshLODInfo->OverrideVertexColors = new FColorVertexBuffer;
-
-						FColor FillColor = FColor(255, 255, 255, 255);
-						InstanceMeshLODInfo->OverrideVertexColors->InitFromSingleColor(FColor::White, LODModel.GetNumVertices());
-					}
-
-					uint32 NumVertices = LODModel.GetNumVertices();
-					check(InstanceMeshLODInfo->OverrideVertexColors);
-					check(NumVertices <= InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices());
-					// StaticMeshComponent->CachePaintedDataIfNecessary();
-
-					for (uint32 ColorIndex = 0; ColorIndex < NumVertices; ++ColorIndex)
-					{
-						// LODModel.ColorVertexBuffer.VertexColor(ColorIndex) = NewColor;  // This is vertex level
-						// Need to initialize the vertex buffer first
-						uint32 NumOverrideVertexColors = InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices();
-						uint32 NumPaintedVertices = InstanceMeshLODInfo->PaintedVertices.Num();
-						// check(NumOverrideVertexColors == NumPaintedVertices);
-						InstanceMeshLODInfo->OverrideVertexColors->VertexColor(ColorIndex) = NewColor;
-						// InstanceMeshLODInfo->PaintedVertices[ColorIndex].Color = NewColor;
-					}
-					BeginInitResource(InstanceMeshLODInfo->OverrideVertexColors);
-					StaticMeshComponent->MarkRenderStateDirty();
-					// BeginUpdateResourceRHI(InstanceMeshLODInfo->OverrideVertexColors);
-
-
-					/*
-					// TODO: Need to check other LOD levels
-					// Use flood fill to paint mesh vertices
-					UE_LOG(LogUnrealCV, Warning, TEXT("%s:%s has %d vertices"), *Actor->GetActorLabel(), *StaticMeshComponent->GetName(), NumVertices);
-
-					if (LODModel.ColorVertexBuffer.GetNumVertices() == 0)
-					{
-					// Mesh doesn't have a color vertex buffer yet!  We'll create one now.
-					LODModel.ColorVertexBuffer.InitFromSingleColor(FColor(255, 255, 255, 255), LODModel.GetNumVertices());
-					}
-
-					*/
-				}
-			}
-		}
-	}
-	return true;
-}

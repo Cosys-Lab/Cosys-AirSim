@@ -72,7 +72,7 @@ void ASimModeBase::BeginPlay()
 
     setupClockSpeed();
 
-	FObjectPainter::Get().Reset(this->GetLevel());
+	UObjectPainter::Reset(this->GetLevel(), &Id2Color, &Id2Actor);
 	setStencilIDs();
     
     record_tick_count = 0;
@@ -380,6 +380,11 @@ bool ASimModeBase::toggleRecording()
         startRecording();
 
     return isRecording();
+}
+
+bool ASimModeBase::AddNewActor(AActor* Actor)
+{
+	return UObjectPainter::AddNewActorColor(Actor, &Id2Color, &Id2Actor);
 }
 
 void ASimModeBase::stopRecording()

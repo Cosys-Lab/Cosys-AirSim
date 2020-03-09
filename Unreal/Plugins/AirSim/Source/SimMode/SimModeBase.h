@@ -36,6 +36,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Recording")
     bool toggleRecording();
 
+	UFUNCTION(BlueprintCallable, Category = "Segmentation")
+	bool AddNewActor(AActor* Actor);
+
 public:	
     // Sets default values for this actor's properties
     ASimModeBase();
@@ -137,6 +140,11 @@ private:
     float tod_celestial_clock_speed_;
     float tod_update_interval_secs_;
     bool tod_move_sun_;
+
+	/** The assigned color for each object */
+	TMap<FString, FColor> Id2Color;
+	/** A list of paintable objects */
+	TMap<FString, AActor*> Id2Actor;
 
     std::unique_ptr<NedTransform> global_ned_transform_;
     std::unique_ptr<msr::airlib::WorldSimApiBase> world_sim_api_;
