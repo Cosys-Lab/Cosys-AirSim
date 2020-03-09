@@ -384,20 +384,6 @@ public: //types
 		MavLinkConnectionInfo connection_info;
 	};
 
-    struct SegmentationSetting {
-        enum class InitMethodType {
-            None, CommonObjectsRandomIDs
-        };
-
-        enum class MeshNamingMethodType {
-            OwnerName, StaticMeshName
-        };
-
-        InitMethodType init_method = InitMethodType::CommonObjectsRandomIDs;
-        bool override_existing = false;
-        MeshNamingMethodType mesh_naming_method = MeshNamingMethodType::OwnerName;
-    };
-
     struct TimeOfDaySetting {
         bool enabled = false;
         std::string start_datetime = "";    //format: %Y-%m-%d %H:%M:%S
@@ -421,7 +407,6 @@ public: //fields
 
     std::vector<SubwindowSetting> subwindow_settings;
     RecordingSetting recording_setting;
-    SegmentationSetting segmentation_setting;
     TimeOfDaySetting tod_setting;
 
     std::vector<std::string> warning_messages;
@@ -474,7 +459,6 @@ public: //methods
         loadSubWindowsSettings(settings_json, subwindow_settings);
         loadViewModeSettings(settings_json);
         loadRecordingSetting(settings_json, recording_setting);
-        loadSegmentationSetting(settings_json, segmentation_setting);
         loadPawnPaths(settings_json, pawn_paths);
         loadOtherSettings(settings_json);
         loadDefaultSensorSettings(simmode_name, settings_json, sensor_defaults);
@@ -972,31 +956,6 @@ private:
             paths.urdf_path = urdf_path;
 
         return paths;
-    }
-
-    static void loadSegmentationSetting(const Settings& settings_json, SegmentationSetting& segmentation_setting)
-    {
-        Settings json_parent;
-        if (settings_json.getChild("SegmentationSettings", json_parent)) {
-            std::string init_method = Utils::toLower(json_parent.getString("InitMethod", ""));
-            if (init_method == "" || init_method == "commonobjectsrandomids")
-                segmentation_setting.init_method = SegmentationSetting::InitMethodType::CommonObjectsRandomIDs;
-            else if (init_method == "none")
-                segmentation_setting.init_method = SegmentationSetting::InitMethodType::None;
-            else
-                //TODO: below exception doesn't actually get raised right now because of issue in Unreal Engine?
-                throw std::invalid_argument(std::string("SegmentationSetting init_method has invalid value in settings_json ") + init_method);
-
-            segmentation_setting.override_existing = json_parent.getBool("OverrideExisting", false);
-
-            std::string mesh_naming_method = Utils::toLower(json_parent.getString("MeshNamingMethod", ""));
-            if (mesh_naming_method == "" || mesh_naming_method == "ownername")
-                segmentation_setting.mesh_naming_method = SegmentationSetting::MeshNamingMethodType::OwnerName;
-            else if (mesh_naming_method == "staticmeshname")
-                segmentation_setting.mesh_naming_method = SegmentationSetting::MeshNamingMethodType::StaticMeshName;
-            else
-                throw std::invalid_argument(std::string("SegmentationSetting MeshNamingMethod has invalid value in settings_json ") + mesh_naming_method);
-        }
     }
 
     static void initializeNoiseSettings(std::map<int, NoiseSetting>&  noise_settings)
