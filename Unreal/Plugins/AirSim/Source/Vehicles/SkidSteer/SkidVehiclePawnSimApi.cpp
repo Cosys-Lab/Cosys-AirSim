@@ -17,7 +17,7 @@ void SkidVehiclePawnSimApi::initialize()
 {
 	PawnSimApi::initialize();
 
-	createVehicleApi(static_cast<ASkidVehiclePawn*>(params_.vehicle->GetPawn()), params_.home_geopoint);
+	createVehicleApi(static_cast<ASkidVehiclePawn*>(params_.pawn), params_.home_geopoint);
 
 	//TODO: should do reset() here?
 	joystick_controls_ = SkidVehiclePawnApi::CarControls();

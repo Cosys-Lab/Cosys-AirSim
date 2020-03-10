@@ -19,10 +19,10 @@
 #include "IImageWrapper.h"
 #include "ObjectThumbnail.h"
 #include "Engine/Engine.h"
-#include "ProceduralMeshComponent.h"
 #include <exception>
 #include "common/common_utils/Utils.hpp"
 #include "Components/LineBatchComponent.h"
+
 /*
 //TODO: change naming conventions to same as other files?
 Naming conventions in this file:
@@ -259,7 +259,6 @@ void UAirBlueprintLib::enableViewportRendering(AActor* context, bool enable)
 
 void UAirBlueprintLib::OnBeginPlay()
 {
-    flush_on_draw_count_ = 0;
     image_wrapper_module_ = &FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
 }
 
@@ -455,10 +454,6 @@ bool UAirBlueprintLib::SetMeshStencilID(const std::string& mesh_name, int object
     {
         SetObjectStencilIDIfMatch(*comp, object_id, mesh_name, is_name_regex, name_regex, changes);
     }
-    for (TObjectIterator<UProceduralMeshComponent> comp; comp; ++comp)
-    {
-        SetObjectStencilIDIfMatch(*comp, object_id, mesh_name, is_name_regex, name_regex, changes);
-    }
 
     return changes > 0;
 }
@@ -512,7 +507,7 @@ std::vector<std::string> UAirBlueprintLib::ListMatchingActors(const UObject *con
 			bool match = std::regex_match(name, compiledRegex);
 			if (match)
 				results.push_back(name);
-		}        
+		}
     }
     return results;
 }

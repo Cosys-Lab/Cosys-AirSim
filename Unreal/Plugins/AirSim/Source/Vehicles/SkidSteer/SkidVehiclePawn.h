@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "UObject/ConstructorHelpers.h"
+
 #include "physics/Kinematics.hpp"
 #include "vehicles/car/api/CarApiBase.hpp"
 #include "common/AirSimSettings.hpp"
@@ -14,7 +15,6 @@
 #include "common/common_utils/UniqueValueMap.hpp"
 #include "PawnEvents.h"
 #include "PIPCamera.h"
-#include "Vehicles/AirSimVehicle.h"
 
 #include "SkidVehiclePawn.generated.h"
 
@@ -26,7 +26,7 @@ class UInputComponent;
 class UAudioComponent;
 
 UCLASS(config = Game)
-class ASkidVehiclePawn : public ASkidVehicle, public AirsimVehicle
+class AIRSIM_API ASkidVehiclePawn : public ASkidVehicle
 {
 	GENERATED_BODY()
 	
@@ -58,12 +58,6 @@ public:
 	UPROPERTY(BluePrintReadWrite) USceneComponent* camera_driver_base_;
 	UPROPERTY(BluePrintReadWrite) USceneComponent* camera_back_center_base_;
 
-
-	virtual USceneComponent* GetComponent(FString componentName) override;
-	virtual void GetComponentReferenceTransform(FString componentName, FVector& translation, FRotator& rotation) override;
-	virtual APawn* GetPawn() override { return this; };
-	virtual bool PawnUsesNedCoords() override { return true; }
-
 private:
 	void updateHUDStrings();
 	void updateInCarHUD();
@@ -79,9 +73,10 @@ private:
 	PawnEvents pawn_events_;
 
 	bool is_low_friction_;
-	bool show_top_panel_;
 	UPhysicalMaterial* slippery_mat_;
 	UPhysicalMaterial* non_slippery_mat_;
+
+
 
 	UPROPERTY() APIPCamera* camera_front_center_;
 	UPROPERTY() APIPCamera* camera_front_left_;
@@ -104,4 +99,5 @@ private:
 	FColor	last_gear_display_color_;
 	FColor	last_gear_display_reverse_color_;
 	UStaticMeshComponent* top_panel_component_;
+	bool show_top_panel_;
 };

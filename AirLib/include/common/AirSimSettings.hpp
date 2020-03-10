@@ -31,7 +31,6 @@ public: //types
 	static constexpr char const * kVehicleTypeCPHusky = "cphusky";
 	static constexpr char const * kVehicleTypePioneer = "pioneer";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
-    static constexpr char const * kVehicleTypeUrdfBot = "urdfbot";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
@@ -64,13 +63,11 @@ public: //types
         std::string pawn_bp;
         std::string slippery_mat;
         std::string non_slippery_mat;
-        std::string urdf_path;
 
         PawnPath(const std::string& pawn_bp_val = "",
             const std::string& slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/Slippery.Slippery",
-            const std::string& non_slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/NonSlippery.NonSlippery",
-            const std::string& urdf_path_val = "")
-            : pawn_bp(pawn_bp_val), slippery_mat(slippery_mat_val), non_slippery_mat(non_slippery_mat_val), urdf_path(urdf_path_val)
+            const std::string& non_slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/NonSlippery.NonSlippery")
+            : pawn_bp(pawn_bp_val), slippery_mat(slippery_mat_val), non_slippery_mat(non_slippery_mat_val)
         {
         }
     };
@@ -170,8 +167,6 @@ public: //types
         Vector3r position = VectorMath::nanVector();
         Rotation rotation = Rotation::nanRotation();
 
-        std::string attach_link = "";
-
         GimbalSetting gimbal;
         std::map<int, CaptureSetting> capture_settings;
         std::map<int, NoiseSetting>  noise_settings;
@@ -192,7 +187,6 @@ public: //types
     struct SensorSetting {
         SensorBase::SensorType sensor_type;
         std::string sensor_name;
-        std::string attach_link = "";
         bool enabled;
     };
 
@@ -236,8 +230,6 @@ public: //types
         Vector3r position = VectorMath::nanVector(); 
         Rotation rotation = Rotation::nanRotation();
 
-        std::string attach_link = "";
-
         bool draw_debug_points = false;
 
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
@@ -261,8 +253,6 @@ public: //types
 		bool ignore_marked = false;
 		real_T min_noise_standard_deviation = 0;		  // Minimum noise standard deviation
 		real_T noise_distance_scale = 1;			      // Factor to scale noise based on distance
-
-        std::string attach_link = "";
 
 		// defaults specific to a mode
 		float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
@@ -302,8 +292,6 @@ public: //types
 		bool draw_reflected_paths = false;				// Draw debug lines for the full path of reflected points to the sensor
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
 
-		std::string attach_link = "";
-
 		// Misc
 		std::string data_frame = AirSimSettings::kSensorLocalFrame;
 		Vector3r position = VectorMath::nanVector();
@@ -325,7 +313,6 @@ public: //types
         bool enable_trace = false;
         bool enable_collisions = true;
         bool is_fpv_vehicle = false;
-		float debug_symbol_scale = 0.0f;
         
         //nan means use player start
         Vector3r position = VectorMath::nanVector(); //in global NED
@@ -333,7 +320,6 @@ public: //types
 
         std::map<std::string, CameraSetting> cameras;
         std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
-		std::vector<std::pair<std::string, std::string>> collision_blacklist;
 
         RCSettings rc;
     };
@@ -391,11 +377,6 @@ public: //types
         float celestial_clock_speed = 1;
         float update_interval_secs = 60;
         bool move_sun = true;
-    };
-
-    struct ControlledMotionComponentSetting {
-        std::string name = "";
-        std::map<std::string, std::string> configuration;
     };
 
 private: //fields
@@ -768,29 +749,6 @@ private:
                 //currently keyboard is not supported so use rc as default
                 vehicle_setting->rc.remote_control_id = 0;
             }
-            else if (vehicle_type == kVehicleTypeUrdfBot) {
-                vehicle_setting->debug_symbol_scale = settings_json.getFloat("DebugSymbolScale", 0.0f);
-
-                Settings collisionBlacklist;
-
-                std::vector<std::string> keys;
-                std::string botMeshKey = "BotMesh";
-                std::string externalMeshRegexKey = "ExternalActorRegex";
-                keys.emplace_back(botMeshKey);
-                keys.emplace_back(externalMeshRegexKey);
-
-                std::vector<std::map<std::string, std::string>> collision_blacklist_pairs = settings_json.getArrayOfKeyValuePairs("CollisionBlacklist", keys);
-
-                vehicle_setting->collision_blacklist.clear();
-                for (unsigned int i = 0; i < collision_blacklist_pairs.size(); i++)
-                {
-                    std::pair<std::string, std::string> pair;
-                    pair.first = collision_blacklist_pairs[i][botMeshKey];
-                    pair.second = collision_blacklist_pairs[i][externalMeshRegexKey];
-
-                    vehicle_setting->collision_blacklist.emplace_back(pair);
-                }
-            }
         }
         vehicle_setting->vehicle_name = vehicle_name;
 
@@ -872,13 +830,6 @@ private:
         cv_setting->vehicle_name = "ComputerVision";
         cv_setting->vehicle_type = kVehicleTypeComputerVision;
         vehicles[cv_setting->vehicle_name] = std::move(cv_setting);
-
-        //create default urdf bot vehicle
-        auto urdf_bot_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-        urdf_bot_setting->vehicle_name = "UrdfBot";
-        urdf_bot_setting->vehicle_type = kVehicleTypeUrdfBot;
-        urdf_bot_setting->is_fpv_vehicle = true; // TODO: Should this be defined somewhere else??
-        vehicles[urdf_bot_setting->vehicle_name] = std::move(urdf_bot_setting);
     }
 
     static void loadVehicleSettings(const std::string& simmode_name, const Settings& settings_json,
@@ -946,14 +897,11 @@ private:
         paths.pawn_bp = settings_json.getString("PawnBP", "");
         auto slippery_mat = settings_json.getString("SlipperyMat", "");
         auto non_slippery_mat = settings_json.getString("NonSlipperyMat", "");
-        auto urdf_path = settings_json.getString("UrdfFile", "");
 
         if (slippery_mat != "")
             paths.slippery_mat = slippery_mat;
         if (non_slippery_mat != "")
             paths.non_slippery_mat = non_slippery_mat;
-        if (urdf_path != "")
-            paths.urdf_path = urdf_path;
 
         return paths;
     }
@@ -1024,8 +972,6 @@ private:
         Settings json_gimbal;
         if (settings_json.getChild("Gimbal", json_gimbal))
             setting.gimbal = createGimbalSetting(json_gimbal);
-
-        setting.attach_link = settings_json.getString("AttachLink", "");
 
         return setting;
     }
@@ -1293,7 +1239,6 @@ private:
 
         lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
-        lidar_setting.attach_link = settings_json.getString("AttachLink", "");
     }
 
 	static void initializeGPULidarSetting(GPULidarSetting& lidar_setting, const Settings& settings_json)
@@ -1312,7 +1257,7 @@ private:
 		lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);
 		lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
 		lidar_setting.ignore_marked = settings_json.getBool("IgnoreMarked", lidar_setting.ignore_marked);
-        lidar_setting.attach_link = settings_json.getString("AttachLink", "");
+
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
 	}
@@ -1343,14 +1288,12 @@ private:
 		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
 		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
 
-        echo_setting.attach_link = settings_json.getString("AttachLink", "");
-
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);
 	}
 
     static std::unique_ptr<SensorSetting> createSensorSetting(
-        SensorBase::SensorType sensor_type, const std::string& sensor_name, const std::string& attach_link,
+        SensorBase::SensorType sensor_type, const std::string& sensor_name,
         bool enabled)
     {
         std::unique_ptr<SensorSetting> sensor_setting;
@@ -1386,7 +1329,6 @@ private:
 
         sensor_setting->sensor_type = sensor_type;
         sensor_setting->sensor_name = sensor_name;
-        sensor_setting->attach_link = attach_link;
         sensor_setting->enabled = enabled;
 
         return sensor_setting;
@@ -1440,10 +1382,9 @@ private:
                 sensors_child.getChild(key, child);
 
                 auto sensor_type = Utils::toEnum<SensorBase::SensorType>(child.getInt("SensorType", 0));
-                auto attach_link = child.getString("AttachLink", "");
                 auto enabled = child.getBool("Enabled", false);
        
-                sensors[key] = createSensorSetting(sensor_type, key, attach_link, enabled);
+                sensors[key] = createSensorSetting(sensor_type, key, enabled);
                 initializeSensorSetting(sensors[key].get(), child);
             }
         }
@@ -1454,10 +1395,10 @@ private:
         std::map<std::string, std::unique_ptr<SensorSetting>>& sensors)
     {
         if (simmode_name == "Multirotor") {
-            sensors["imu"] = createSensorSetting(SensorBase::SensorType::Imu, "imu", "", true);
-            sensors["magnetometer"] = createSensorSetting(SensorBase::SensorType::Magnetometer, "magnetometer", "", true);
-            sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", "", true);
-            sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", "", true);
+            sensors["imu"] = createSensorSetting(SensorBase::SensorType::Imu, "imu", true);
+            sensors["magnetometer"] = createSensorSetting(SensorBase::SensorType::Magnetometer, "magnetometer", true);
+            sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
+            sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", true);
         }
         else {
             // no sensors added for other modes

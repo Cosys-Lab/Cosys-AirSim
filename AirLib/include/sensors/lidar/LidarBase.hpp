@@ -10,8 +10,8 @@ namespace msr { namespace airlib {
 
 class LidarBase : public SensorBase {
 public:
-    LidarBase(const std::string& sensor_name = "", const std::string& attach_link = "")
-        : SensorBase(sensor_name, attach_link)
+    LidarBase(const std::string& sensor_name = "")
+        : SensorBase(sensor_name)
     {}
 
 public: //types

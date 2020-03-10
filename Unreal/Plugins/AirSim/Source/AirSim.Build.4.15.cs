@@ -62,8 +62,8 @@ public class AirSim : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         bEnableExceptions = true;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ProceduralMeshComponent", "RenderCore", "RHI", "RawMesh" });
-        PrivateDependencyModuleNames.AddRange(new string[] { "ProceduralMeshComponent", "RawMesh", "UMG", "Slate", "SlateCore" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "RenderCore", "RHI" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore" });
 
         //suppress VC++ proprietary warnings
         Definitions.Add("_SCL_SECURE_NO_WARNINGS=1");

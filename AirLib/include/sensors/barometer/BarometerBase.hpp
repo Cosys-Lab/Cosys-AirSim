@@ -12,8 +12,8 @@ namespace msr { namespace airlib {
 
 class BarometerBase  : public SensorBase {
 public:
-    BarometerBase(const std::string& sensor_name = "", const std::string& attach_link_name = "")
-        : SensorBase(sensor_name, attach_link_name)
+    BarometerBase(const std::string& sensor_name = "")
+        : SensorBase(sensor_name)
     {}
 
 public: //types

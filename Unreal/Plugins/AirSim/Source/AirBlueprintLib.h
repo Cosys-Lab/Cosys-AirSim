@@ -108,7 +108,7 @@ public:
 				FString meshName = mesh->GetName();
 
 				// It is expected that the user will create a blueprint class that starts with "IFA_" for each of the classes they want to differentiate.
-				// Unreal adds a _C_ into the name for blueprint created classes, which messes up the hash. Remove it as well. 
+				// Unreal adds a _C_ into the name for blueprint created classes, which messes up the hash. Remove it as well.
 				if (meshName.StartsWith(TEXT("IFA_")))
 				{
 					meshName = meshName.Replace(TEXT("IFA_"), TEXT("")).Replace(TEXT("_C_"), TEXT(""));
@@ -123,8 +123,7 @@ public:
 			return ""; //std::string(TCHAR_TO_UTF8(*(UKismetSystemLibrary::GetDisplayName(mesh))));
 	}
 
-	static std::string GetMeshName(ALandscapeProxy* mesh);
-	static std::string GetMeshName(UProceduralMeshComponent* meshComponent);
+    static std::string GetMeshName(ALandscapeProxy* mesh);
 
     template<class UserClass>
     static FInputActionBinding& BindActionToKey(const FName action_name, const FKey in_key, UserClass* actor,

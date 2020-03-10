@@ -326,40 +326,5 @@ struct EchoData {
 	{}
 };
 
-struct CameraPose {
-    std::string camera_name;
-    Vector3r translation;
-    Quaternionr rotation;
-};
-
-struct RayCastRequest {
-    Vector3r position;
-    Vector3r direction;
-    std::string reference_frame_link;
-    bool through_blocking;
-    float persist_seconds;
-};
-
-struct RayCastHit {
-    std::string collided_actor_name;
-    Vector3r hit_point;
-    Vector3r hit_normal;
-};
-
-struct RayCastResponse {
-    std::vector<RayCastHit> hits;
-};
-
-struct DrawableShape {
-    std::string reference_frame_link;
-    int type;
-    std::vector<float> shape_params;
-};
-
-struct DrawableShapeRequest {
-    std::unordered_map<std::string, DrawableShape> shapes;
-    bool persist_unmentioned;
-};
-
 }} //namespace
 #endif

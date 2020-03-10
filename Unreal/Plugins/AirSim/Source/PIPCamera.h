@@ -50,9 +50,6 @@ public:
     UTextureRenderTarget2D* getRenderTarget(const ImageType type, bool if_active);
 
     msr::airlib::Pose getPose() const;
-
-	void setIndex(int index) { this->index_ = index; }
-	int getIndex() { return this->index_; }
     
 private: //members
     UPROPERTY() TArray<USceneCaptureComponent2D*> captures_;
@@ -69,8 +66,6 @@ private: //members
     float gimbal_stabilization_;
     const NedTransform* ned_transform_;
     TMap<int, EPixelFormat> image_type_to_pixel_format_map_;
-
-	int index_ = 0; // for URDF bot camera cycling
 
 private: //methods
     typedef common_utils::Utils Utils;

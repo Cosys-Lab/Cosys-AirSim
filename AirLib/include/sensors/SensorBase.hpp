@@ -10,7 +10,6 @@
 #include "physics/Environment.hpp"
 #include "physics/Kinematics.hpp"
 
-#include <map>
 
 namespace msr { namespace airlib {
 
@@ -32,8 +31,8 @@ public:
 		GPULidar = 8
     };
 
-    SensorBase(const std::string& sensor_name = "", const std::string& attach_link_name = "")
-        : name_(sensor_name), attach_link_name_(attach_link_name)
+    SensorBase(const std::string& sensor_name = "")
+        : name_(sensor_name)
     {}
 
 protected:
@@ -58,18 +57,12 @@ public:
         return name_;
     }
 
-    const std::string& getAttachLinkName() const
-    {
-        return attach_link_name_;
-    }
-
     virtual ~SensorBase() = default;
 
 private:
     //ground truth can be shared between many sensors
     GroundTruth ground_truth_;
     std::string name_ = "";
-    std::string attach_link_name_ = "";
 };
 
 

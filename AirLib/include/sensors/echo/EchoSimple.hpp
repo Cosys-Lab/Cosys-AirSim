@@ -16,7 +16,7 @@ namespace msr { namespace airlib {
 class EchoSimple : public EchoBase {
 public:
     EchoSimple(const AirSimSettings::EchoSetting& setting = AirSimSettings::EchoSetting())
-        : EchoBase(setting.sensor_name, setting.attach_link)
+        : EchoBase(setting.sensor_name)
     {
         // initialize params
         params_.initializeFromSettings(setting);

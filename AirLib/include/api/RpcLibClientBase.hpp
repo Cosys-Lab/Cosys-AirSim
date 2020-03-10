@@ -14,7 +14,6 @@
 #include "sensors/distance/DistanceBase.hpp"
 #include "physics/Kinematics.hpp"
 #include "physics/Environment.hpp"
-#include "api/WorldSimApiBase.hpp"
 
 namespace msr { namespace airlib {
 

@@ -12,13 +12,11 @@
 #include "PIPCamera.h"
 #include "ManualPoseController.h"
 
-#include "Vehicles/AirSimVehicle.h"
-
 #include "ComputerVisionPawn.generated.h"
 
 
 UCLASS()
-class AComputerVisionPawn : public APawn, public AirsimVehicle 
+class AComputerVisionPawn : public APawn
 {
     GENERATED_BODY()
 
@@ -38,11 +36,6 @@ public:
     {
         return &pawn_events_;
     }
-
-    virtual USceneComponent* GetComponent(FString componentName) override;
-    virtual void GetComponentReferenceTransform(FString componentName, FVector& translation, FRotator& rotation) override;
-    virtual APawn* GetPawn() override { return this; }
-    virtual bool PawnUsesNedCoords() override { return true; }
 
 private:
     UPROPERTY() UClass* pip_camera_class_;
