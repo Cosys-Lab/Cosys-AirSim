@@ -3,8 +3,8 @@ strict: true
 site_name: AirSim
 site_dir: build
 docs_dir: doc_root
-repo_url: https://github.com/microsoft/airsim
-#site_url: http://microsoft.github.io/airsim
+repo_url: https://cosysgit.uantwerpen.be/sensorsimulation/airsim/
+#site_url: https://cosysgit.uantwerpen.be/sensorsimulation/airsim/
 #edit_uri: edit/master/docs
 #repo_name: GitHub
 site_description: 'Open source simulator based on Unreal Engine for autonomous vehicles from Microsoft AI & Research'
@@ -94,10 +94,8 @@ extra:
       #fonttext: 'Ubuntu'
       #fontcode: 'Ubuntu Mono'
   social:
-      - type: facebook
-        link: https://www.facebook.com/groups/1225832467530667/ 
       - type: github-alt
-        link: https://github.com/Microsoft/AirSim
+        link: https://cosysgit.uantwerpen.be/sensorsimulation/airsim/
       # - type: twitter
       #   link: https://twitter.com/hashtag/abinit
       # - type: youtube

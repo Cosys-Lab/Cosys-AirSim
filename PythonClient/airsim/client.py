@@ -254,7 +254,7 @@ class VehicleClient:
 
     # legacy handling
     # TODO: remove below legacy wrappers in future major releases
-    upgrade_api_help = "\nPlease see https://github.com/Microsoft/AirSim/blob/master/docs/upgrade_apis.md for more info."
+    upgrade_api_help = "\nPlease see https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/upgrade_apis.md for more info."
     def simGetPose(self):
         logging.warning("simGetPose API is renamed to simGetVehiclePose. Please update your code." + self.upgrade_api_help)
         return self.simGetVehiclePose()

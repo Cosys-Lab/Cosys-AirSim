@@ -15,7 +15,7 @@ These instructions apply if you are already using AirSim on Unreal Engine 4.16. 
 ### For Linux Users
 1. From your AirSim repo folder, run 'clean_rebuild.sh`.
 2. Rename or delete your existing folder for Unreal Engine.
-3. Follow step 1 and 2 to [install Unreal Engine 4.22](https://github.com/Microsoft/AirSim/blob/master/docs/build_linux.md#install-and-build).
+3. Follow step 1 and 2 to [install Unreal Engine 4.22](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/build_linux.md#install-and-build).
 
 ## Upgrading Your Custom Unreal Project
 If you have your own Unreal project created in an older version of Unreal Engine then you need to upgrade your project to Unreal 4.22. To do this, 

@@ -40,7 +40,7 @@ MinNoiseStandardDeviation | The standard deviation to generate the noise normal 
 NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
 ```
 {
-    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
     "SettingsVersion": 1.2,
 
     "SimMode": "Multirotor",

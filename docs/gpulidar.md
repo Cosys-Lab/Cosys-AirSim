@@ -39,7 +39,7 @@ NoiseDistanceScale        | To scale the noise with distance, set this parameter
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
 ```
 {
-    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
     "SettingsVersion": 1.2,
 
     "SimMode": "Multirotor",

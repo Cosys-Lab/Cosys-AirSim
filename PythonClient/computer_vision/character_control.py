@@ -1,6 +1,6 @@
 # This script expects object available in UE environment of type AAirSimCharater
 # In settings.json first activate computer vision mode: 
-# https://github.com/Microsoft/AirSim/blob/master/docs/image_apis.md#computer-vision-mode
+# https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/image_apis.md#computer-vision-mode
 
 import setup_path 
 import airsim

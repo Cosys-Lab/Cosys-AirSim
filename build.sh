@@ -12,7 +12,7 @@ if [[ ! -d "llvm-source-50" ]]; then
     if [[ -d "llvm-source-39" ]]; then
         echo "Hello there! We just upgraded AirSim to Unreal Engine 4.22."
         echo "Here are few easy steps for upgrade so everything is new and shiny :)"
-        echo "https://github.com/Microsoft/AirSim/blob/master/docs/unreal_upgrade.md"
+        echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/unreal_upgrade.md"
         exit 1
     else
         echo "The llvm-souce-50 folder was not found! Mystery indeed."
@@ -125,7 +125,7 @@ echo "If you are using your own environment, update plugin using,"
 echo "rsync -a --delete Unreal/Plugins path/to/MyUnrealProject"
 echo ""
 echo "For help see:"
-echo "https://github.com/Microsoft/AirSim/blob/master/docs/build_linux.md"
+echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/build_linux.md"
 echo "=================================================================="
 
 

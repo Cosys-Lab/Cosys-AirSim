@@ -31,7 +31,7 @@ If no sensors are specified in the `settings json`, the the following sensors ar
 ### ComputerVision
 * None
 
-Behind the scenes, 'createDefaultSensorSettings' method in [AirSimSettings.hpp](https://github.com/Microsoft/AirSim/blob/master/AirLib/include/common/AirSimSettings.hpp) which sets up the above sensors with their default parameters, depending on the sim mode specified in the `settings.json` file. 
+Behind the scenes, 'createDefaultSensorSettings' method in [AirSimSettings.hpp](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/AirLib/include/common/AirSimSettings.hpp) which sets up the above sensors with their default parameters, depending on the sim mode specified in the `settings.json` file. 
 
 ## Configuring the default sensor list
 
