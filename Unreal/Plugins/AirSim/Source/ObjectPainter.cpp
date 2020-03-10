@@ -160,8 +160,6 @@ bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2C
 				Id2Color->Emplace(It.Key(), ObjectIndex);
 				check(PaintObject(It.Value(), NewColor));
 				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s"), *It.Key(), *FString::FromInt(ObjectIndex));
-
-				return true;
 			}
 		}
 		return true;
