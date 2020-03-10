@@ -11,7 +11,6 @@
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include "UObjectIterator.h"
 #include "Camera/CameraComponent.h"
-//#include "Runtime/Foliage/Public/FoliageType.h"
 #include "MessageDialog.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
@@ -405,14 +404,6 @@ std::string UAirBlueprintLib::GetMeshName(ALandscapeProxy* mesh)
     return std::string(TCHAR_TO_UTF8(*(mesh->GetName())));
 }
 
-std::string UAirBlueprintLib::GetMeshName(UProceduralMeshComponent* meshComponent)
-{
-    if (meshComponent->GetOwner())
-        return std::string(TCHAR_TO_UTF8(*(meshComponent->GetOwner()->GetName())));
-    else
-        return ""; //std::string(TCHAR_TO_UTF8(*(UKismetSystemLibrary::GetDisplayName(mesh))));
-}
-
 void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing)
 {
     for (TObjectIterator<UStaticMeshComponent> comp; comp; ++comp)
@@ -423,10 +414,6 @@ void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing)
     {
         InitializeObjectStencilID(*comp, ignore_existing);
     }
-    //for (TObjectIterator<UFoliageType> comp; comp; ++comp)
-    //{
-    //    InitializeObjectStencilID(*comp);
-    //}
     for (TObjectIterator<ALandscapeProxy> comp; comp; ++comp)
     {
         InitializeObjectStencilID(*comp, ignore_existing);

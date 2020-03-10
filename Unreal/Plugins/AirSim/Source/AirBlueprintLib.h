@@ -15,8 +15,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Engine/World.h"
-#include "ProceduralMeshComponent.h"
-#include "Runtime/Foliage/Public/FoliageType.h"
 
 #include "Runtime/Landscape/Classes/LandscapeComponent.h"
 #include "common/AirSimSettings.hpp"

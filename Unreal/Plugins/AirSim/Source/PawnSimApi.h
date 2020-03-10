@@ -19,8 +19,6 @@
 #include "api/VehicleSimApiBase.hpp"
 #include "common/common_utils/UniqueValueMap.hpp"
 
-#include "Vehicles/AirSimVehicle.h"
-
 
 #include "PawnEvents.h"
 
