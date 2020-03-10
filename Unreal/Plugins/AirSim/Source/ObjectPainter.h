@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-
+#include "Components/MeshComponent.h"
 #include "ObjectPainter.generated.h"
 
 
@@ -20,25 +20,22 @@ class AIRSIM_API UObjectPainter : public UBlueprintFunctionLibrary
 
 public:
 
-	static bool AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor);
+	static bool AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*>* Id2Actor);
 
 	/** Reset this to uninitialized state */
-	static void Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor);
+	static void Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*>* Id2Actor);
 	/** The assigned color for each object */
 	;
 	/** A list of paintable objects */
 
 	/** Vertex paint one object with Flood-Fill */
-	static bool PaintObject(AActor* Actor, const FColor& Color, bool IsColorGammaEncoded = true);
-
-	/** Get a pointer to an object */
-	AActor* GetObject(FString ActorId, TMap<FString, AActor*> Id2Actor);
+	static bool PaintObject(UMeshComponent* Actor, const FColor& Color, bool IsColorGammaEncoded = true);
 
 	/** Return a list of actors in the level */
-	void GetObjectList(TMap<FString, AActor*> Id2Actor);
+	void GetObjectList(TMap<FString, UMeshComponent*> Id2Actor);
 
 	/** Get the object color */
 	static uint32 GetActorColor(FString ActorId, TMap<FString, uint32> Id2Color);
 
-	static bool SetActorColor(FString ActorId, uint32 id, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*> Id2Actor);
+	static bool SetActorColor(FString ActorId, uint32 id, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*> Id2Actor);
 };

@@ -486,10 +486,33 @@ std::vector<std::string> UAirBlueprintLib::ListMatchingActors(const UObject *con
     for (TActorIterator<AActor> actorIterator(world); actorIterator; ++actorIterator)
     {
         AActor *actor = *actorIterator;
-        auto name = std::string(TCHAR_TO_UTF8(*actor->GetName()));
-        bool match = std::regex_match(name, compiledRegex);
-        if (match)
-            results.push_back(name);
+		TArray<UMeshComponent*> PaintableComponents;
+		actor->GetComponents<UMeshComponent>(PaintableComponents);
+		int index = 0;
+		for (auto Component : PaintableComponents)
+		{
+			FString meshName;
+			if (PaintableComponents.Num() == 1) {
+				meshName = actor->GetName();
+			}
+			else {
+				if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Component)) {
+					meshName = StaticMeshComponent->GetStaticMesh()->GetName();
+					meshName.Append("_");
+					meshName.Append(FString::FromInt(index));
+					meshName.Append("_");
+					meshName.Append(actor->GetName());
+				}
+				if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
+					meshName = actor->GetName();
+				}
+				index++;
+			}
+			auto name = std::string(TCHAR_TO_UTF8(*meshName));
+			bool match = std::regex_match(name, compiledRegex);
+			if (match)
+				results.push_back(name);
+		}        
     }
     return results;
 }

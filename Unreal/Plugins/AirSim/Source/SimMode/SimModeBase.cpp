@@ -145,6 +145,11 @@ int ASimModeBase::GetMeshVertexColorID(const std::string& mesh_name) {
 	return UObjectPainter::GetActorColor(mesh_name.c_str(), Id2Color);
 }
 
+bool ASimModeBase::AddNewActorToSegmentation(AActor* Actor)
+{
+	return UObjectPainter::AddNewActorColor(Actor, &Id2Color, &Id2Actor);
+}
+
 void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     FRecordingThread::stopRecording();
@@ -398,11 +403,6 @@ bool ASimModeBase::toggleRecording()
         startRecording();
 
     return isRecording();
-}
-
-bool ASimModeBase::AddNewActor(AActor* Actor)
-{
-	return UObjectPainter::AddNewActorColor(Actor, &Id2Color, &Id2Actor);
 }
 
 void ASimModeBase::stopRecording()

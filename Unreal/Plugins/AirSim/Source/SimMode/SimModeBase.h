@@ -4,6 +4,7 @@
 #include "Components/SkyLightComponent.h"
 #include "Engine/DirectionalLight.h"
 #include "GameFramework/Actor.h"
+#include "Components/MeshComponent.h"
 #include "ParticleDefinitions.h"
 
 #include <string>
@@ -37,7 +38,7 @@ public:
     bool toggleRecording();
 
 	UFUNCTION(BlueprintCallable, Category = "Segmentation")
-	bool AddNewActor(AActor* Actor);
+	bool AddNewActorToSegmentation(AActor* Actor);
 
 public:	
     // Sets default values for this actor's properties
@@ -147,7 +148,7 @@ private:
 	/** The assigned color for each object */
 	TMap<FString, uint32> Id2Color;
 	/** A list of paintable objects */
-	TMap<FString, AActor*> Id2Actor;
+	TMap<FString, UMeshComponent*> Id2Actor;
 
     std::unique_ptr<NedTransform> global_ned_transform_;
     std::unique_ptr<msr::airlib::WorldSimApiBase> world_sim_api_;
