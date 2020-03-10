@@ -91,12 +91,40 @@ bool IsPaintable(AActor* Actor)
 	}
 }
 
-bool UObjectPainter::SetActorColor(FString ActorId, uint32 id, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*> Id2Actor)
+void getPaintableComponentMeshes(AActor* Actor, TMap<FString, UMeshComponent*>* PaintableComponentsMeshes)
+{
+	TArray<UMeshComponent*> PaintableComponents;
+	Actor->GetComponents<UMeshComponent>(PaintableComponents);
+	int index = 0;
+	for (auto Component : PaintableComponents)
+	{
+		if (PaintableComponents.Num() == 1) {
+			PaintableComponentsMeshes->Emplace(Actor->GetName(), Component);
+		}
+		else {
+			FString component_name;
+			if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Component)) {
+				component_name = StaticMeshComponent->GetStaticMesh()->GetName();
+				component_name.Append("_");				
+				component_name.Append(FString::FromInt(index));
+				component_name.Append("_");
+				component_name.Append(Actor->GetName());
+			}
+			if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
+				component_name = Actor->GetName();
+			}
+			PaintableComponentsMeshes->Emplace(component_name, Component);
+			index++;
+		}		
+	}
+} 
+
+bool UObjectPainter::SetActorColor(FString ActorId, uint32 id, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*> Id2Actor)
 {
 	if (Id2Actor.Contains(ActorId))
 	{
 		FColor Color = GetColorFromColorMap(id);
-		AActor* Actor = Id2Actor[ActorId];
+		UMeshComponent* Actor = Id2Actor[ActorId];
 		if (PaintObject(Actor, Color))
 		{
 			Id2Color->Emplace(ActorId, id);
@@ -113,21 +141,30 @@ bool UObjectPainter::SetActorColor(FString ActorId, uint32 id, TMap<FString, uin
 	}
 }
 
-bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor)
+bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*>* Id2Actor)
 {
 	if (Actor && IsPaintable(Actor)) {
-		FString ActorId = Actor->GetHumanReadableName();
-		if (Id2Actor->Contains(ActorId)) {
-			return false;
+		TMap<FString, UMeshComponent*> PaintableComponentsMeshes;
+		getPaintableComponentMeshes(Actor, &PaintableComponentsMeshes);
+		for (auto It = PaintableComponentsMeshes.CreateConstIterator(); It; ++It)
+		{
+			if (Id2Actor->Contains(It.Key())) {
+				FColor Color = GetColorFromColorMap(Id2Color->FindRef(It.Key()));
+				check(PaintObject(It.Value(), Color));				
+			}
+			else {
+				uint32 ObjectIndex = Id2Actor->Num();
+				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Adding new object %s with ID # %s"), *It.Key(), *FString::FromInt(ObjectIndex));
+				Id2Actor->Emplace(It.Key(), It.Value());
+				FColor NewColor = GetColorFromColorMap(ObjectIndex);
+				Id2Color->Emplace(It.Key(), ObjectIndex);
+				check(PaintObject(It.Value(), NewColor));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s"), *It.Key(), *FString::FromInt(ObjectIndex));
+
+				return true;
+			}
 		}
-		else {
-			uint32 ObjectIndex = Id2Actor->Num();
-			Id2Actor->Emplace(ActorId, Actor);
-			FColor NewColor = GetColorFromColorMap(ObjectIndex);
-			Id2Color->Emplace(ActorId, ObjectIndex);
-			check(PaintObject(Actor, NewColor));
-			return true;
-		}
+		return true;
 	}
 	else {
 		return false;
@@ -150,7 +187,7 @@ uint32 UObjectPainter::GetActorColor(FString ActorId, TMap<FString, uint32> Id2C
 	}
 }
 
-void UObjectPainter::GetObjectList(TMap<FString, AActor*> Id2Actor)
+void UObjectPainter::GetObjectList(TMap<FString, UMeshComponent*> Id2Actor)
 {
 	TArray<FString> Keys;
 	Id2Actor.GetKeys(Keys);
@@ -161,38 +198,35 @@ void UObjectPainter::GetObjectList(TMap<FString, AActor*> Id2Actor)
 	}
 }
 
-AActor* UObjectPainter::GetObject(FString ActorId, TMap<FString, AActor*> Id2Actor)
-{
-	if (Id2Actor.Contains(ActorId))
-	{
-		return Id2Actor[ActorId];
-	}
-	else
-	{
-		return NULL;
-	}
-}
-
-void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMap<FString, AActor*>* Id2Actor)
+void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*>* Id2Actor)
 {
 
 	uint32 ObjectIndex = 0;
+	UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Starting initial random instance segmentation"));
 	for (AActor* Actor : InLevel->Actors)
 	{
 		if (Actor && IsPaintable(Actor))
 		{
-			FString ActorId = Actor->GetHumanReadableName();
-			
-			FColor NewColor = GetColorFromColorMap(ObjectIndex);
-			Id2Actor->Emplace(ActorId, Actor);
-			Id2Color->Emplace(ActorId, ObjectIndex);
-			ObjectIndex++;
-			PaintObject(Actor, NewColor);
+			TMap<FString, UMeshComponent*> PaintableComponentsMeshes;
+			getPaintableComponentMeshes(Actor, &PaintableComponentsMeshes);
+			for (auto It = PaintableComponentsMeshes.CreateConstIterator(); It; ++It)
+			{
+				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Adding new object %s with ID # %s"), *It.Key(), *FString::FromInt(ObjectIndex));
+				Id2Actor->Emplace(It.Key(), It.Value());
+				FColor NewColor = GetColorFromColorMap(ObjectIndex);
+				Id2Color->Emplace(It.Key(), ObjectIndex);
+				check(PaintObject(It.Value(), NewColor));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s"), *It.Key(), *FString::FromInt(ObjectIndex));
+
+				ObjectIndex++;
+			}
 		}
 	}
+	UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Completed initial random instance segmentation"));
+
 }
 
-bool UObjectPainter::PaintObject(AActor* Actor, const FColor& Color, bool IsColorGammaEncoded)
+bool UObjectPainter::PaintObject(UMeshComponent* Actor, const FColor& Color, bool IsColorGammaEncoded)
 {
 	if (!Actor) return false;
 
@@ -207,57 +241,50 @@ bool UObjectPainter::PaintObject(AActor* Actor, const FColor& Color, bool IsColo
 		NewColor = Color;
 	}
 
-	TArray<UMeshComponent*> PaintableComponents;
-	Actor->GetComponents<UMeshComponent>(PaintableComponents);
-
-
-	for (auto MeshComponent : PaintableComponents)
+	if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Actor))
 	{
-		if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(MeshComponent))
+		UStaticMesh* StaticMesh;
+		StaticMesh = StaticMeshComponent->GetStaticMesh(); 
+		if (StaticMesh)
 		{
-			UStaticMesh* StaticMesh;
-			StaticMesh = StaticMeshComponent->GetStaticMesh(); 
-			if (StaticMesh)
+			uint32 NumLODLevel = StaticMesh->RenderData->LODResources.Num();
+			for (uint32 PaintingMeshLODIndex = 0; PaintingMeshLODIndex < NumLODLevel; PaintingMeshLODIndex++)
 			{
-				uint32 NumLODLevel = StaticMesh->RenderData->LODResources.Num();
-				for (uint32 PaintingMeshLODIndex = 0; PaintingMeshLODIndex < NumLODLevel; PaintingMeshLODIndex++)
+				FStaticMeshLODResources& LODModel = StaticMesh->RenderData->LODResources[PaintingMeshLODIndex];
+				FStaticMeshComponentLODInfo* InstanceMeshLODInfo = NULL;
+
+				// PaintingMeshLODIndex + 1 is the minimum requirement, enlarge if not satisfied
+				StaticMeshComponent->SetLODDataCount(PaintingMeshLODIndex + 1, StaticMeshComponent->LODData.Num());
+				InstanceMeshLODInfo = &StaticMeshComponent->LODData[PaintingMeshLODIndex];
+
+				InstanceMeshLODInfo->ReleaseOverrideVertexColorsAndBlock();
 				{
-					FStaticMeshLODResources& LODModel = StaticMesh->RenderData->LODResources[PaintingMeshLODIndex];
-					FStaticMeshComponentLODInfo* InstanceMeshLODInfo = NULL;
+					InstanceMeshLODInfo->OverrideVertexColors = new FColorVertexBuffer;
 
-					// PaintingMeshLODIndex + 1 is the minimum requirement, enlarge if not satisfied
-					StaticMeshComponent->SetLODDataCount(PaintingMeshLODIndex + 1, StaticMeshComponent->LODData.Num());
-					InstanceMeshLODInfo = &StaticMeshComponent->LODData[PaintingMeshLODIndex];
-
-					InstanceMeshLODInfo->ReleaseOverrideVertexColorsAndBlock();
-					{
-						InstanceMeshLODInfo->OverrideVertexColors = new FColorVertexBuffer;
-
-						FColor FillColor = FColor(255, 255, 255, 255);
-						InstanceMeshLODInfo->OverrideVertexColors->InitFromSingleColor(FColor::White, LODModel.GetNumVertices());
-					}
-
-					uint32 NumVertices = LODModel.GetNumVertices();
-					check(InstanceMeshLODInfo->OverrideVertexColors);
-					check(NumVertices <= InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices());
-
-					for (uint32 ColorIndex = 0; ColorIndex < NumVertices; ++ColorIndex)
-					{
-						// Need to initialize the vertex buffer first
-						uint32 NumOverrideVertexColors = InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices();
-						uint32 NumPaintedVertices = InstanceMeshLODInfo->PaintedVertices.Num();
-						InstanceMeshLODInfo->OverrideVertexColors->VertexColor(ColorIndex) = NewColor;
-					}
-					BeginInitResource(InstanceMeshLODInfo->OverrideVertexColors);
-					StaticMeshComponent->MarkRenderStateDirty();
-					
+					FColor FillColor = FColor(255, 255, 255, 255);
+					InstanceMeshLODInfo->OverrideVertexColors->InitFromSingleColor(FColor::White, LODModel.GetNumVertices());
 				}
+
+				uint32 NumVertices = LODModel.GetNumVertices();
+				check(InstanceMeshLODInfo->OverrideVertexColors);
+				check(NumVertices <= InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices());
+
+				for (uint32 ColorIndex = 0; ColorIndex < NumVertices; ++ColorIndex)
+				{
+					// Need to initialize the vertex buffer first
+					uint32 NumOverrideVertexColors = InstanceMeshLODInfo->OverrideVertexColors->GetNumVertices();
+					uint32 NumPaintedVertices = InstanceMeshLODInfo->PaintedVertices.Num();
+					InstanceMeshLODInfo->OverrideVertexColors->VertexColor(ColorIndex) = NewColor;
+				}
+				BeginInitResource(InstanceMeshLODInfo->OverrideVertexColors);
+				StaticMeshComponent->MarkRenderStateDirty();
+					
 			}
 		}
-		if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(MeshComponent))
-		{
-			SkinnedMeshComponent->SetAllVertexColorOverride(NewColor);
-		}
+	}
+	if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Actor))
+	{
+		SkinnedMeshComponent->SetAllVertexColorOverride(NewColor);
 	}
 	return true;
 }
