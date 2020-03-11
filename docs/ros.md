@@ -67,7 +67,7 @@ Or alternativly you can use launch files such as the example ones that can be fo
 Rviz is a useful visualization tool that can display the published data. Example Rviz configuration files can be found in _AirSim/ros/python_ws/src/airsim/rviz_.
 
 # C++ 
-**THIS IS NOT MAINTAINED BY COSYS-LAB SO IS LIKELY BROKEN**
+**THIS IS NOT MAINTAINED BY COSYS-LAB SO IS LIKELY BUGGED AND NOT USABLE**
 
 Please use the documentation for the C++ wrapper that can be found separately:
 - [ROS Wrapper package](../ros/cplusplus_ws/src/airsim_ros_pkgs/README.md)

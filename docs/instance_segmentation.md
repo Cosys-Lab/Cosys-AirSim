@@ -14,6 +14,9 @@ Given this is a WIP feature, there are a few limitations:
 By default, at the start of the simulation, it will give a random color to each object. 
 Please see the [Image API documentation](image_apis.md#segmentation) on how to manually set or get the color information.
 
+As with the old segmentation system, the easiest way to get the images from segmentation cameras, is through ros. 
+See the [ROS documentation](ros.md) for more information. 
+
 For an example of the Instance Segmentation API, please see the script ```segmentation_config.py``` in the _PythonClient_ folder.
 
 ## Credits
