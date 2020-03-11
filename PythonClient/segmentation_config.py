@@ -5,7 +5,8 @@ import airsim
 import csv
 import random
 
-# Demonstration script to show how segmentation can be accessed and updated through the API
+# Demonstration script to show how the instance segmentation can be accessed and updated through the API
+# See docs/instance_segmentation.md and docs/image_apis.md#segmentation for more information.
 if __name__ == '__main__':
 
     # Make connection to AirSim API
@@ -20,7 +21,6 @@ if __name__ == '__main__':
         for item in currentObjectList:
             f.write("%s\n" % item)
     print("Generated list of all current objects with a total of " + str(len(currentObjectList)) + ' objects\n')
-
 
     # Sort the objects from the list by class defined in the CSV and keep them in a dictionary with classname as key
     print("Sorting objects based on segmentation.csv into classes...")
