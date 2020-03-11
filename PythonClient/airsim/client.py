@@ -175,6 +175,9 @@ class VehicleClient:
         return self.client.call('simSetSegmentationObjectID', mesh_name, object_id, is_name_regex)
     def simGetSegmentationObjectID(self, mesh_name):
         return self.client.call('simGetSegmentationObjectID', mesh_name)
+    def simGetSegmentationColorMap(self):
+        return generate_colormap()
+
     def simPrintLogMessage(self, message, message_param = "", severity = 0):
         return self.client.call('simPrintLogMessage', message, message_param, severity)
 

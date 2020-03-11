@@ -5,6 +5,7 @@
 #include "StaticMeshResources.h"
 #include "Components/SkinnedMeshComponent.h"
 #include "Slate/SceneViewport.h"
+#include "AirBlueprintLib.h"
 
 int32 GetChannelValue(uint32 Index)
 {
@@ -56,6 +57,7 @@ void GetColors(int32 MaxVal, bool Fix1, bool Fix2, bool Fix3, TArray<FColor>& Co
 		}
 	}
 }
+
 
 FColor GetColorFromColorMap(int32 ObjectIndex)
 {

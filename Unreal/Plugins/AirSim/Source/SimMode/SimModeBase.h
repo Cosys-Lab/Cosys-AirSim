@@ -81,6 +81,7 @@ public:
     }
 
 	bool SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex);
+	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
 	int GetMeshVertexColorID(const std::string& mesh_name);
 
 protected: //must overrides

@@ -1,24 +1,73 @@
 #!/usr/bin/env python
 
 import setup_path
-import airsimpy
+import airsim
 import csv
+import random
 
+# Demonstration script to show how segmentation can be accessed and updated through the API
 if __name__ == '__main__':
-    client = airsimpy.CarClient()
+
+    # Make connection to AirSim API
+    client = airsim.CarClient()
     client.confirmConnection()
 
-    list = client.simListSceneObjects()
+    # Get names of all objects in simulation world and store in list
+    # In a dynamic world, this is never the same!!
+    currentObjectList = client.simListSceneObjects()
+    print("Generating list of all current objects...")
     with open('allObjectsFound.txt', 'w') as f:
-        for item in list:
+        for item in currentObjectList:
             f.write("%s\n" % item)
+    print("Generated list of all current objects with a total of " + str(len(currentObjectList)) + ' objects\n')
 
+
+    # Sort the objects from the list by class defined in the CSV and keep them in a dictionary with classname as key
+    print("Sorting objects based on segmentation.csv into classes...")
     with open('segmentation.csv', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         index = 0
+        classObjectMap = {}
         for idx, row in enumerate(csv_reader, start=1):
-            success = client.simSetSegmentationObjectID(row[0] + ".*", idx, True)
-            if success:
-                print("Found objects matching object-name '" + str(row[0]) + "'! Set segmentation value " + str(idx))
-            else:
-                print("No objects found matching object-name '" + str(row[0]) + ".")
+            classItems = [i for i in currentObjectList if i.startswith(row[0])]
+            print("Found " + str(len(classItems)) + " objects starting with object-name '" + str(row[0]) + "'")
+            classObjectMap[row[0]] = classItems
+    print("Sorted objects based on segmentation.csv into classes\n")
+
+    # Set the colors for all AI humans to a chosen color with color index 15
+    className = 'human_ai_C'
+    classColorIndex = 15
+    # a) this version we set it based on the gathered objects in the list
+    print("Setting all objects in world matching class-name '" + className + "' a certain color, based on object list...")
+    for item in classObjectMap[className]:
+        success = client.simSetSegmentationObjectID(item, classColorIndex, False)
+        if success:
+            print("Found object matching object-name '" + item + "'! Set segmentation value " + str(classColorIndex))
+        else:
+            print("No object found matching object-name '" + item + "'")
+    print("Found and changed color on all objects in world matching class-name '" + className + "' based on object list\n")
+
+   # b) In this version we set it based on regex of the classname
+    print("Setting all objects in world matching class-name '" + className + "' a certain color, based on regex...")
+    success = client.simSetSegmentationObjectID(className + ".*", classColorIndex, True)
+    if success:
+        print("Found objects matching object-name '" + className + "'! Set segmentation value " + str(classColorIndex))
+    else:
+        print("No objects found matching object-name '" + className + "'")
+    print("Found and changed color on all objects in world matching class-name '" + className + "' based on regex\n")
+
+    # Generate list of all colors available for segmentation
+    print("Generating segmentation colormap, this takes a while...")
+    colorMap = client.simGetSegmentationColorMap()
+    print("Generated segmentation colormap\n")
+
+    # Get the color associated with a the class
+    classColor = colorMap[classColorIndex]
+    print("Found color associated with class '" + className + "': " + str(classColor.to_numpy_array()) + "\n")
+
+    # Get the color associated with a random object from the list
+    randomObjectName = random.choice(currentObjectList)
+    print("Finding color associated with random object '" + randomObjectName + "'...")
+    randomObjectColorIndex = client.simGetSegmentationObjectID(randomObjectName)
+    randomObjectColor = colorMap[randomObjectColorIndex]
+    print("Found color associated with random object '" + randomObjectName + "':" + str(randomObjectColor.to_numpy_array()) + "\n")

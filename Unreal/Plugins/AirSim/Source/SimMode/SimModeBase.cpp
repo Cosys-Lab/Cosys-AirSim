@@ -119,6 +119,17 @@ void ASimModeBase::InitializeMeshVertexColorIDs()
 	UObjectPainter::Reset(this->GetLevel(), &Id2Color, &Id2Actor);
 }
 
+void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wait, const TStatId InStatId)
+{
+	if (::IsInGameThread())
+		InFunction();
+	else {
+		FGraphEventRef task = FFunctionGraphTask::CreateAndDispatchWhenReady(MoveTemp(InFunction), InStatId, nullptr, ENamedThreads::GameThread);
+		if (wait)
+			FTaskGraphInterface::Get().WaitUntilTaskCompletes(task);
+	}
+}
+
 bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex) {
 	if (is_name_regex) {
 		std::regex name_regex;
@@ -127,14 +138,27 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 		for (auto It = Id2Actor.CreateConstIterator(); It; ++It)
 		{
 			if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
-				return UObjectPainter::SetActorColor(It.Key(), object_id, &Id2Color, Id2Actor);
+				bool success;
+				FString key = It.Key();
+				TMap<FString, uint32>* id2color = &Id2Color;
+				TMap<FString, UMeshComponent*> id2actor = Id2Actor;
+				UAirBlueprintLib::RunCommandOnGameThread([key, object_id, id2color, id2actor, &success]() {
+					success = UObjectPainter::SetActorColor(key, object_id, id2color, id2actor);
+				}, true);
 				changes++;
 			}
 		}
 		return changes > 0;
 	}
 	else if (Id2Actor.Contains(mesh_name.c_str())) {
-		return UObjectPainter::SetActorColor(mesh_name.c_str(), object_id, &Id2Color, Id2Actor);
+		bool success;
+		FString key = mesh_name.c_str();
+		TMap<FString, uint32>* id2color = &Id2Color;
+		TMap<FString, UMeshComponent*> id2actor = Id2Actor;
+		UAirBlueprintLib::RunCommandOnGameThread([key, object_id, id2color, id2actor, &success]() {
+			success = UObjectPainter::SetActorColor(key, object_id, id2color, id2actor);
+		}, true);
+		return success;
 	}
 	else {
 		return false;
