@@ -90,6 +90,7 @@ bool IsPaintable(AActor* Actor)
 		return true;
 	}
 }
+
 void getPaintableComponentMeshes(AActor* Actor, TMap<FString, UMeshComponent*>* PaintableComponentsMeshes)
 {
 	TArray<UMeshComponent*> PaintableComponents;
