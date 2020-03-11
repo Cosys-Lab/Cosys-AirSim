@@ -90,7 +90,6 @@ bool IsPaintable(AActor* Actor)
 		return true;
 	}
 }
-
 void getPaintableComponentMeshes(AActor* Actor, TMap<FString, UMeshComponent*>* PaintableComponentsMeshes)
 {
 	TArray<UMeshComponent*> PaintableComponents;
@@ -99,7 +98,26 @@ void getPaintableComponentMeshes(AActor* Actor, TMap<FString, UMeshComponent*>* 
 	for (auto Component : PaintableComponents)
 	{
 		if (PaintableComponents.Num() == 1) {
-			PaintableComponentsMeshes->Emplace(Actor->GetName(), Component);
+			if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Component)) {
+				if (Actor->GetParentActor()) {
+					FString component_name = StaticMeshComponent->GetStaticMesh()->GetName();
+					component_name.Append("_");
+					component_name.Append(FString::FromInt(0));
+					component_name.Append("_");
+					if (Actor->GetRootComponent()->GetAttachParent()) {
+						component_name.Append(Actor->GetRootComponent()->GetAttachParent()->GetName());
+						component_name.Append("_");
+					}
+					component_name.Append(Actor->GetParentActor()->GetName());
+					PaintableComponentsMeshes->Emplace(component_name, Component);
+				}
+				else {
+					PaintableComponentsMeshes->Emplace(Actor->GetName(), Component);
+				}
+			}
+			if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
+				PaintableComponentsMeshes->Emplace(Actor->GetName(), Component);
+			}
 		}
 		else {
 			FString component_name;
@@ -108,7 +126,16 @@ void getPaintableComponentMeshes(AActor* Actor, TMap<FString, UMeshComponent*>* 
 				component_name.Append("_");				
 				component_name.Append(FString::FromInt(index));
 				component_name.Append("_");
-				component_name.Append(Actor->GetName());
+				if (Actor->GetParentActor()) {
+					if (Actor->GetRootComponent()->GetAttachParent()) {
+						component_name.Append(Actor->GetRootComponent()->GetAttachParent()->GetName());
+						component_name.Append("_");
+					}
+					component_name.Append(Actor->GetParentActor()->GetName());
+				}
+				else {
+					component_name.Append(Actor->GetName());
+				}				
 			}
 			if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
 				component_name = Actor->GetName();
@@ -154,7 +181,6 @@ bool UObjectPainter::AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2C
 			}
 			else {
 				uint32 ObjectIndex = Id2Actor->Num();
-				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Adding new object %s with ID # %s"), *It.Key(), *FString::FromInt(ObjectIndex));
 				Id2Actor->Emplace(It.Key(), It.Value());
 				FColor NewColor = GetColorFromColorMap(ObjectIndex);
 				Id2Color->Emplace(It.Key(), ObjectIndex);
@@ -209,7 +235,6 @@ void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMa
 			getPaintableComponentMeshes(Actor, &PaintableComponentsMeshes);
 			for (auto It = PaintableComponentsMeshes.CreateConstIterator(); It; ++It)
 			{
-				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Adding new object %s with ID # %s"), *It.Key(), *FString::FromInt(ObjectIndex));
 				Id2Actor->Emplace(It.Key(), It.Value());
 				FColor NewColor = GetColorFromColorMap(ObjectIndex);
 				Id2Color->Emplace(It.Key(), ObjectIndex);

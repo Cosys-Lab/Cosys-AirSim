@@ -475,7 +475,25 @@ std::vector<std::string> UAirBlueprintLib::ListMatchingActors(const UObject *con
 		{
 			FString meshName;
 			if (PaintableComponents.Num() == 1) {
-				meshName = actor->GetName();
+				if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Component)) {
+					if (actor->GetParentActor()) {
+						meshName = StaticMeshComponent->GetStaticMesh()->GetName();
+						meshName.Append("_");
+						meshName.Append(FString::FromInt(0));
+						meshName.Append("_");
+						if (actor->GetRootComponent()->GetAttachParent()) {
+							meshName.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							meshName.Append("_");
+						}
+						meshName.Append(actor->GetParentActor()->GetName());
+					}
+					else {
+						meshName = actor->GetName();
+					}
+				}
+				if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
+					meshName = actor->GetName();
+				}
 			}
 			else {
 				if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Component)) {
@@ -483,7 +501,16 @@ std::vector<std::string> UAirBlueprintLib::ListMatchingActors(const UObject *con
 					meshName.Append("_");
 					meshName.Append(FString::FromInt(index));
 					meshName.Append("_");
-					meshName.Append(actor->GetName());
+					if (actor->GetParentActor()) {
+						if (actor->GetRootComponent()->GetAttachParent()) {
+							meshName.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							meshName.Append("_");
+						}
+						meshName.Append(actor->GetParentActor()->GetName());
+					}
+					else {
+						meshName.Append(actor->GetName());
+					}
 				}
 				if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
 					meshName = actor->GetName();
