@@ -153,6 +153,7 @@ class VehicleClient:
 
     def simSetVehiclePose(self, pose, ignore_collison, vehicle_name = ''):
         self.client.call('simSetVehiclePose', pose, ignore_collison, vehicle_name)
+
     def simGetVehiclePose(self, vehicle_name = ''):
         pose = self.client.call('simGetVehiclePose', vehicle_name)
         return Pose.from_msgpack(pose)
@@ -173,8 +174,13 @@ class VehicleClient:
 
     def simSetSegmentationObjectID(self, mesh_name, object_id, is_name_regex = False):
         return self.client.call('simSetSegmentationObjectID', mesh_name, object_id, is_name_regex)
+
     def simGetSegmentationObjectID(self, mesh_name):
         return self.client.call('simGetSegmentationObjectID', mesh_name)
+
+    def simGetSegmentationColorMap(self):
+        return generate_colormap()
+
     def simPrintLogMessage(self, message, message_param = "", severity = 0):
         return self.client.call('simPrintLogMessage', message, message_param, severity)
 

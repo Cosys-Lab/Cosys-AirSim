@@ -60,57 +60,6 @@ class WeatherParameter:
     Enabled = 8
 
 
-class Vector3rgb(MsgpackMixin):
-    r_val = 0
-    g_val = 0
-    b_val = 0
-
-    def __init__(self, r_val=0, g_val=0, b_val=0):
-        self.r_val = r_val
-        self.g_val = g_val
-        self.b_val = b_val
-
-    @staticmethod
-    def nanVector3rgb():
-        return Vector3rgb(np.nan, np.nan, np.nan)
-
-    def __add__(self, other):
-        return Vector3rgb(self.r_val + other.r_val, self.g_val + other.g_val, self.b_val + other.b_val)
-
-    def __sub__(self, other):
-        return Vector3rgb(self.r_val - other.r_val, self.g_val - other.g_val, self.b_val - other.b_val)
-
-    def __truediv__(self, other):
-        if type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
-            return Vector3rgb(self.r_val / other, self.g_val / other, self.b_val / other)
-        else:
-            raise TypeError('unsupported operand type(s) for /: %s and %s' % (str(type(self)), str(type(other))))
-
-    def __mul__(self, other):
-        if type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
-            return Vector3rgb(self.r_val * other, self.g_val * other, self.b_val * other)
-        else:
-            raise TypeError('unsupported operand type(s) for *: %s and %s' % (str(type(self)), str(type(other))))
-
-    def dot(self, other):
-        if type(self) == type(other):
-            return self.r_val * other.r_val + self.g_val * other.g_val + self.b_val * other.b_val
-        else:
-            raise TypeError('unsupported operand type(s) for \'dot\': %s and %s' % (str(type(self)), str(type(other))))
-
-    def cross(self, other):
-        if type(self) == type(other):
-            cross_product = np.cross(self.to_numpy_array(), other.to_numpy_array())
-            return Vector3rgb(cross_product[0], cross_product[1], cross_product[2])
-        else:
-            raise TypeError(
-                'unsupported operand type(s) for \'cross\': %s and %s' % (str(type(self)), str(type(other))))
-
-
-    def to_numpy_array(self):
-        return np.array([self.r_val, self.g_val, self.b_val], dtype=np.float32)
-
-
 class Vector3r(MsgpackMixin):
     x_val = 0.0
     y_val = 0.0
