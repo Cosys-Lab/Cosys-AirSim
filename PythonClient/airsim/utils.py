@@ -59,7 +59,7 @@ def get_colormap_channel_values():
     init = True
     return values
 
-def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues):
+def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues, correctForGamma):
     if not enable1:
         max1 = maxVal -1
     else:
@@ -91,7 +91,10 @@ def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValu
                 else:
                     b = channelValues[k]
                 if r != 76 and g != 76 and b != 76:
-                    color = Vector3rgb(r, g, b)
+                    if correctForGamma:
+                        color = correct_color_for_gamma(Vector3rgb(r, g, b))
+                    else:
+                        color = Vector3rgb(r, g, b)
                     colormap.append(color)
                 k = k + 1
             j = j + 1
@@ -101,20 +104,36 @@ def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValu
 
 
 
-def generate_colormap():
+def generate_colormap(correctForGamma):
 
     channelValues = get_colormap_channel_values()
     numPerChannel = 255
     colorMap = []
     for maxChannelIndex in range(0, numPerChannel):
-        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues, correctForGamma)
+        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues, correctForGamma)
+        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues, correctForGamma)
+        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues, correctForGamma)
+        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues, correctForGamma)
+        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues, correctForGamma)
+        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues, correctForGamma)
     return colorMap
+
+def correct_color_for_gamma(color):
+    gammaTable = pow22OneOver255Table()
+    r_in = gammaTable.table[color.r_val]
+    g_in = gammaTable.table[color.g_val]
+    b_in = gammaTable.table[color.b_val]
+
+    r_float = np.clip(r_in, 0.0, 1.0)
+    g_float = np.clip(g_in, 0.0, 1.0)
+    b_float = np.clip(b_in, 0.0, 1.0)
+
+    r = np.floor(r_float * 255.999)
+    g = np.floor(g_float * 255.999)
+    b = np.floor(b_float * 255.999)
+
+    return Vector3rgb(r, g, b);
 
 
 # helper method for converting getOrientation to roll/pitch/yaw

@@ -4,6 +4,8 @@ import setup_path
 import airsim
 import csv
 import random
+import numpy as np
+from PIL import Image
 
 # Demonstration script to show how the instance segmentation can be accessed and updated through the API
 # See docs/instance_segmentation.md and docs/image_apis.md#segmentation for more information.
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     print("Sorted objects based on segmentation.csv into classes\n")
 
     # Set the colors for all AI humans to a chosen color with color index 15
-    className = 'human_ai_C'
+    className = 'wall'
     classColorIndex = 15
     # a) this version we set it based on the gathered objects in the list
     print("Setting all objects in world matching class-name '" + className + "' a certain color, based on object list...")
@@ -71,3 +73,16 @@ if __name__ == '__main__':
     randomObjectColorIndex = client.simGetSegmentationObjectID(randomObjectName)
     randomObjectColor = colorMap[randomObjectColorIndex]
     print("Found color associated with random object '" + randomObjectName + "':" + str(randomObjectColor.to_numpy_array()) + "\n")
+
+    # Get an image from the main segmentation camera, show and save it as png
+    print("Getting segmentation image from main camera...")
+    responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
+    img_rgb_string = responses[0].image_data_uint8
+    rgbarray = np.fromstring(img_rgb_string, np.uint8)
+    rgbarray_shaped = rgbarray.reshape((540,960,3))
+    img = Image.fromarray(rgbarray_shaped, 'RGB')
+    img.show()
+    img.save("segmentation_sample.png", "PNG")
+    print("Shown and saved segmentation image from main camera\n")
+
+    print("All instance segmentation tests completed")
