@@ -4,8 +4,8 @@ A WIP Instance segmentation is implemented into AirSim. It uses Vertex Color ren
 
 ## Limitations
 Given this is a WIP feature, there are a few limitations:
+* Only 2097152‬ different colors are currently available. More are technically possible to implement in future but likely unnecessary. 
 * **Currently only works from the Unreal Editor itself. It does not work on cooked builds.**
-* While the 'skydome' (the object representing the sun,clouds and atmosphere) does get a unique color, it seems to have a shade to it. Currently have not found a solution.
 * Landscape objects aren't supported. This is the special object type in Unreal to make terrain with. As a work-around, StaticMesh terrain must be used.
 * Foliage objects aren't supported. This is a the special object type in Unreal to place trees, grass and other plants that move with the wind. As a work-around, StaticMesh objects must be used.
 * These and other unsupported object types that are less common (decals, text,...) will by default be given the RGB color value of [76,76,76].

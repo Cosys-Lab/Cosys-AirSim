@@ -1,4 +1,4 @@
-import numpy as np #pip install numpy
+import numpy as np
 import math
 import time
 import sys
@@ -43,6 +43,78 @@ def to_str(obj):
 def write_file(filename, bstr):
     with open(filename, 'wb') as afile:
         afile.write(bstr)
+
+
+def get_colormap_channel_values():
+    values = np.zeros(258,dtype=np.int)
+    step = 256
+    iter = 0
+    values[0] = 0
+    while step >= 1:
+        val = step - 1
+        while val <= 256:
+            iter = iter + 1
+            values[iter] = int(val)
+            val = val + (step*2)
+        step = int(step /2)
+    init = True
+    return values
+
+
+def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues):
+    if not enable1:
+        max1 = maxVal -1
+    else:
+        max1 = 0
+    if not enable2:
+        max2 = maxVal -1
+    else:
+        max2 = 0
+    if not enable3:
+        max3 = maxVal -1
+    else:
+        max3 = 0
+    i = 0
+    j = 0
+    k = 0
+    while i <= max1:
+        while j <= max2:
+            while k <= max3:
+                if enable1:
+                    r = channelValues[maxVal]
+                else:
+                    r = channelValues[i]
+                if enable2:
+                    g = channelValues[maxVal]
+                else:
+                    g = channelValues[j]
+                if enable3:
+                    b = channelValues[maxVal]
+                else:
+                    b = channelValues[k]
+                if r != 76 and g != 76 and b != 76:
+                    colormap.append([r, g, b])
+                k = k + 1
+            j = j + 1
+            k = 0
+        i = i + 1
+        j = 0
+
+
+def generate_colormap():
+    channelValues = get_colormap_channel_values()
+    numPerChannel = 128
+    colorMap = []
+    for maxChannelIndex in range(0, numPerChannel):
+        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues)
+    colorMap = np.asarray(colorMap)
+    return colorMap
 
 # helper method for converting getOrientation to roll/pitch/yaw
 # https:#en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

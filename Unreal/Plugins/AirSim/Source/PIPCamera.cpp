@@ -7,7 +7,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ImageUtils.h"
 #include "EngineUtils.h"
-#include "ViewMode.h"
+#include "ObjectPainter.h"
 
 #include <string>
 #include <exception>
@@ -61,7 +61,8 @@ void APIPCamera::PostInitializeComponents()
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("InfraredCaptureComponent"));
     captures_[Utils::toNumeric(ImageType::SurfaceNormals)] = 
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("NormalsCaptureComponent"));
-	FViewMode::VertexColor(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
+
+	UObjectPainter::SetViewForVertexColor(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
 }
 
 void APIPCamera::BeginPlay()
@@ -295,7 +296,9 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
             else
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], true, 
                     image_type_to_pixel_format_map_[image_type], capture_setting, ned_transform); 
-
+			if (image_type == 5) {
+				render_targets_[image_type]->TargetGamma = 1;
+			}
             setNoiseMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings, noise_setting);
 
 			if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors = ignoreActors;
@@ -321,7 +324,7 @@ void APIPCamera::updateCaptureComponentSetting(USceneCaptureComponent2D* capture
     } 
 
     if (!std::isnan(setting.target_gamma))
-        render_target->TargetGamma = setting.target_gamma;
+		render_target->TargetGamma = setting.target_gamma;
 
     capture->ProjectionType = static_cast<ECameraProjectionMode::Type>(setting.projection_mode);
 

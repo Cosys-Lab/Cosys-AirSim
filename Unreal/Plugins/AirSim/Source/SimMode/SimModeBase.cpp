@@ -116,7 +116,7 @@ void ASimModeBase::checkVehicleReady()
 
 void ASimModeBase::InitializeMeshVertexColorIDs()
 {     
-	UObjectPainter::Reset(this->GetLevel(), &Id2Color, &Id2Actor);
+	UObjectPainter::Reset(this->GetLevel(), &nameToColorIndexMap_, &nameToComponentMap_);
 }
 
 void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wait, const TStatId InStatId)
@@ -135,28 +135,28 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 		std::regex name_regex;
 		name_regex.assign(mesh_name, std::regex_constants::icase);
 		int changes = 0;
-		for (auto It = Id2Actor.CreateConstIterator(); It; ++It)
+		for (auto It = nameToComponentMap_.CreateConstIterator(); It; ++It)
 		{
 			if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
 				bool success;
 				FString key = It.Key();
-				TMap<FString, uint32>* id2color = &Id2Color;
-				TMap<FString, UMeshComponent*> id2actor = Id2Actor;
-				UAirBlueprintLib::RunCommandOnGameThread([key, object_id, id2color, id2actor, &success]() {
-					success = UObjectPainter::SetActorColor(key, object_id, id2color, id2actor);
+				TMap<FString, uint32>* nameToColorIndexMap = &nameToColorIndexMap_;
+				TMap<FString, UMeshComponent*> nameToComponentMap = nameToComponentMap_;
+				UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, &success]() {
+					success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap);
 				}, true);
 				changes++;
 			}
 		}
 		return changes > 0;
 	}
-	else if (Id2Actor.Contains(mesh_name.c_str())) {
+	else if (nameToComponentMap_.Contains(mesh_name.c_str())) {
 		bool success;
 		FString key = mesh_name.c_str();
-		TMap<FString, uint32>* id2color = &Id2Color;
-		TMap<FString, UMeshComponent*> id2actor = Id2Actor;
-		UAirBlueprintLib::RunCommandOnGameThread([key, object_id, id2color, id2actor, &success]() {
-			success = UObjectPainter::SetActorColor(key, object_id, id2color, id2actor);
+		TMap<FString, uint32>* nameToColorIndexMap = &nameToColorIndexMap_;
+		TMap<FString, UMeshComponent*> nameToComponentMap = nameToComponentMap_;
+		UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, &success]() {
+			success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap);
 		}, true);
 		return success;
 	}
@@ -166,12 +166,12 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 }
 
 int ASimModeBase::GetMeshVertexColorID(const std::string& mesh_name) {
-	return UObjectPainter::GetActorColor(mesh_name.c_str(), Id2Color);
+	return UObjectPainter::GetComponentColor(mesh_name.c_str(), nameToColorIndexMap_);
 }
 
 bool ASimModeBase::AddNewActorToSegmentation(AActor* Actor)
 {
-	return UObjectPainter::AddNewActorColor(Actor, &Id2Color, &Id2Actor);
+	return UObjectPainter::PaintNewActor(Actor, &nameToColorIndexMap_, &nameToComponentMap_);
 }
 
 void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

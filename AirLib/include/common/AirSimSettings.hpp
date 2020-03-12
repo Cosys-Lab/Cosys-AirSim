@@ -658,6 +658,7 @@ private:
             capture_settings[i] = CaptureSetting();
         }
         capture_settings.at(Utils::toNumeric(ImageType::Scene)).target_gamma = CaptureSetting::kSceneTargetGamma;
+		capture_settings.at(Utils::toNumeric(ImageType::Segmentation)).target_gamma = 1;
     }
 
     static void loadCaptureSettings(const Settings& settings_json, std::map<int, CaptureSetting>& capture_settings)

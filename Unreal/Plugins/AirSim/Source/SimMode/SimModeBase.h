@@ -143,9 +143,9 @@ private:
     bool tod_move_sun_;
 
 	/** The assigned color for each object */
-	TMap<FString, uint32> Id2Color;
+	TMap<FString, uint32> nameToColorIndexMap_;
 	/** A list of paintable objects */
-	TMap<FString, UMeshComponent*> Id2Actor;
+	TMap<FString, UMeshComponent*> nameToComponentMap_;
 
     std::unique_ptr<NedTransform> global_ned_transform_;
     std::unique_ptr<msr::airlib::WorldSimApiBase> world_sim_api_;

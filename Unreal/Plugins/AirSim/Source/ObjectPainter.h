@@ -20,22 +20,21 @@ class AIRSIM_API UObjectPainter : public UBlueprintFunctionLibrary
 
 public:
 
-	static bool AddNewActorColor(AActor* Actor, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*>* Id2Actor);
+	/** Paint all components of an newly added actor */
+	static bool PaintNewActor(AActor* actor, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*>* name_to_component_map);
 
-	/** Reset this to uninitialized state */
-	static void Reset(ULevel* InLevel, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*>* Id2Actor);
-	/** The assigned color for each object */
-	;
-	/** A list of paintable objects */
+	/** Reset all objects to their initial vertex color */
+	static void Reset(ULevel* InLevel, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*>* name_to_component_map);
 
-	/** Vertex paint one object with Flood-Fill */
-	static bool PaintObject(UMeshComponent* Actor, const FColor& Color, bool IsColorGammaEncoded = true);
-
-	/** Return a list of actors in the level */
-	void GetObjectList(TMap<FString, UMeshComponent*> Id2Actor);
+	/** Vertex paint one object (static or skinned) */
+	static bool PaintComponent(UMeshComponent* component, const FColor& color);
 
 	/** Get the object color */
-	static uint32 GetActorColor(FString ActorId, TMap<FString, uint32> Id2Color);
+	static uint32 GetComponentColor(FString component_id, TMap<FString, uint32> name_to_colorindex_map);
 
-	static bool SetActorColor(FString ActorId, uint32 id, TMap<FString, uint32>* Id2Color, TMap<FString, UMeshComponent*> Id2Actor);
+	/** Set the object color */
+	static bool SetComponentColor(FString component_id, uint32 color_index, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*> name_to_component_map);
+
+	/** Set camera ViewMode for vertex color */
+	static void SetViewForVertexColor(FEngineShowFlags& show_flags);
 };

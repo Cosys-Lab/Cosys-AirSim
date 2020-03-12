@@ -47,6 +47,6 @@ class SetupPath:
             if os.path.exists(client_path):
                 sys.path.insert(0, parent)
         else:
-            logging.warning("airsim module not found in parent folder. Using installed package (pip install airsim).")
+            logging.warning("airsim module not found in parent folder. ")
 
 SetupPath.addAirSimModulePath()

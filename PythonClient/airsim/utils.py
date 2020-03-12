@@ -44,6 +44,7 @@ def write_file(filename, bstr):
     with open(filename, 'wb') as afile:
         afile.write(bstr)
 
+
 def get_colormap_channel_values():
     values = np.zeros(258,dtype=np.int)
     step = 256
@@ -59,7 +60,8 @@ def get_colormap_channel_values():
     init = True
     return values
 
-def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues, correctForGamma):
+
+def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues):
     if not enable1:
         max1 = maxVal -1
     else:
@@ -91,11 +93,7 @@ def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValu
                 else:
                     b = channelValues[k]
                 if r != 76 and g != 76 and b != 76:
-                    if correctForGamma:
-                        color = correct_color_for_gamma(Vector3rgb(r, g, b))
-                    else:
-                        color = Vector3rgb(r, g, b)
-                    colormap.append(color)
+                    colormap.append([r, g, b])
                 k = k + 1
             j = j + 1
             k = 0
@@ -103,42 +101,24 @@ def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValu
         j = 0
 
 
-
-def generate_colormap(correctForGamma):
-
+def generate_colormap():
     channelValues = get_colormap_channel_values()
-    numPerChannel = 255
+    numPerChannel = 128
     colorMap = []
     for maxChannelIndex in range(0, numPerChannel):
-        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues, correctForGamma)
-        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues, correctForGamma)
-        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues, correctForGamma)
-        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues, correctForGamma)
-        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues, correctForGamma)
-        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues, correctForGamma)
-        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues, correctForGamma)
+        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues)
+    colorMap = np.asarray(colorMap)
     return colorMap
-
-def correct_color_for_gamma(color):
-    gammaTable = pow22OneOver255Table()
-    r_in = gammaTable.table[color.r_val]
-    g_in = gammaTable.table[color.g_val]
-    b_in = gammaTable.table[color.b_val]
-
-    r_float = np.clip(r_in, 0.0, 1.0)
-    g_float = np.clip(g_in, 0.0, 1.0)
-    b_float = np.clip(b_in, 0.0, 1.0)
-
-    r = np.floor(r_float * 255.999)
-    g = np.floor(g_float * 255.999)
-    b = np.floor(b_float * 255.999)
-
-    return Vector3rgb(r, g, b);
 
 
 # helper method for converting getOrientation to roll/pitch/yaw
 # https:#en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-    
 def to_eularian_angles(q):
     z = q.z_val
     y = q.y_val

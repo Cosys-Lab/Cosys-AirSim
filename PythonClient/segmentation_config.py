@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     # Set the colors for all AI humans to a chosen color with color index 15
     className = 'wall'
-    classColorIndex = 15
+    classColorIndex = 1000000
     # a) this version we set it based on the gathered objects in the list
     print("Setting all objects in world matching class-name '" + className + "' a certain color, based on object list...")
     for item in classObjectMap[className]:
@@ -48,8 +48,7 @@ if __name__ == '__main__':
         else:
             print("No object found matching object-name '" + item + "'")
     print("Found and changed color on all objects in world matching class-name '" + className + "' based on object list\n")
-
-   # b) In this version we set it based on regex of the classname
+    # b) In this version we set it based on regex of the classname
     print("Setting all objects in world matching class-name '" + className + "' a certain color, based on regex...")
     success = client.simSetSegmentationObjectID(className + ".*", classColorIndex, True)
     if success:
@@ -64,22 +63,23 @@ if __name__ == '__main__':
     print("Generated segmentation colormap\n")
 
     # Get the color associated with a the class
-    classColor = colorMap[classColorIndex]
-    print("Found color associated with class '" + className + "': " + str(classColor.to_numpy_array()) + "\n")
+    classColor = colorMap[classColorIndex,:]
+    print("Found RGB color associated with class '" + className + "': " + str(classColor) + "\n")
 
     # Get the color associated with a random object from the list
     randomObjectName = random.choice(currentObjectList)
-    print("Finding color associated with random object '" + randomObjectName + "'...")
+    print("Finding RGB color associated with random object '" + randomObjectName + "'...")
     randomObjectColorIndex = client.simGetSegmentationObjectID(randomObjectName)
-    randomObjectColor = colorMap[randomObjectColorIndex]
-    print("Found color associated with random object '" + randomObjectName + "':" + str(randomObjectColor.to_numpy_array()) + "\n")
+    randomObjectColor = colorMap[randomObjectColorIndex,:]
+    print("Found RGB color associated with random object '" + randomObjectName + "':" + str(randomObjectColor) + "\n")
 
     # Get an image from the main segmentation camera, show and save it as png
     print("Getting segmentation image from main camera...")
     responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
     img_rgb_string = responses[0].image_data_uint8
-    rgbarray = np.fromstring(img_rgb_string, np.uint8)
+    rgbarray = np.frombuffer(img_rgb_string, np.uint8)
     rgbarray_shaped = rgbarray.reshape((540,960,3))
+    rgbarray_shaped = rgbarray_shaped
     img = Image.fromarray(rgbarray_shaped, 'RGB')
     img.show()
     img.save("segmentation_sample.png", "PNG")

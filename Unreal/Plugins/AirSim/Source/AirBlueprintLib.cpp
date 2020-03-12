@@ -468,56 +468,56 @@ std::vector<std::string> UAirBlueprintLib::ListMatchingActors(const UObject *con
     for (TActorIterator<AActor> actorIterator(world); actorIterator; ++actorIterator)
     {
         AActor *actor = *actorIterator;
-		TArray<UMeshComponent*> PaintableComponents;
-		actor->GetComponents<UMeshComponent>(PaintableComponents);
+		TArray<UMeshComponent*> paintable_components;
+		actor->GetComponents<UMeshComponent>(paintable_components);
 		int index = 0;
-		for (auto Component : PaintableComponents)
+		for (auto component : paintable_components)
 		{
-			FString meshName;
-			if (PaintableComponents.Num() == 1) {
-				if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Component)) {
+			FString mesh_name;
+			if (paintable_components.Num() == 1) {
+				if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
 					if (actor->GetParentActor()) {
-						meshName = StaticMeshComponent->GetStaticMesh()->GetName();
-						meshName.Append("_");
-						meshName.Append(FString::FromInt(0));
-						meshName.Append("_");
+						mesh_name = staticmesh_component->GetStaticMesh()->GetName();
+						mesh_name.Append("_");
+						mesh_name.Append(FString::FromInt(0));
+						mesh_name.Append("_");
 						if (actor->GetRootComponent()->GetAttachParent()) {
-							meshName.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
-							meshName.Append("_");
+							mesh_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							mesh_name.Append("_");
 						}
-						meshName.Append(actor->GetParentActor()->GetName());
+						mesh_name.Append(actor->GetParentActor()->GetName());
 					}
 					else {
-						meshName = actor->GetName();
+						mesh_name = actor->GetName();
 					}
 				}
-				if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
-					meshName = actor->GetName();
+				if (USkinnedMeshComponent*  skinnedmesh_component = Cast<USkinnedMeshComponent>(component)) {
+					mesh_name = actor->GetName();
 				}
 			}
 			else {
-				if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(Component)) {
-					meshName = StaticMeshComponent->GetStaticMesh()->GetName();
-					meshName.Append("_");
-					meshName.Append(FString::FromInt(index));
-					meshName.Append("_");
+				if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
+					mesh_name = staticmesh_component->GetStaticMesh()->GetName();
+					mesh_name.Append("_");
+					mesh_name.Append(FString::FromInt(index));
+					mesh_name.Append("_");
 					if (actor->GetParentActor()) {
 						if (actor->GetRootComponent()->GetAttachParent()) {
-							meshName.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
-							meshName.Append("_");
+							mesh_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							mesh_name.Append("_");
 						}
-						meshName.Append(actor->GetParentActor()->GetName());
+						mesh_name.Append(actor->GetParentActor()->GetName());
 					}
 					else {
-						meshName.Append(actor->GetName());
+						mesh_name.Append(actor->GetName());
 					}
 				}
-				if (USkinnedMeshComponent*  SkinnedMeshComponent = Cast<USkinnedMeshComponent>(Component)) {
-					meshName = actor->GetName();
+				if (USkinnedMeshComponent*  skinnedmesh_component = Cast<USkinnedMeshComponent>(component)) {
+					mesh_name = actor->GetName();
 				}
 				index++;
 			}
-			auto name = std::string(TCHAR_TO_UTF8(*meshName));
+			auto name = std::string(TCHAR_TO_UTF8(*mesh_name));
 			bool match = std::regex_match(name, compiledRegex);
 			if (match)
 				results.push_back(name);
