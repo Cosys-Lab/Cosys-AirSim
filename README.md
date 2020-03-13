@@ -21,7 +21,7 @@ Cars in AirSim
 * Added [CoSysLab environment](docs/cosysenv.md)
 * Added [Echo sensor type](docs/echo.md)
 * Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com). **Currently removed due to crashes on Linux!**
-* Added [WIP Instance Segmentation](docs/instance_segmentation.md). **Currently only works in Unreal Editor, not cooked builds!** Replaces previous system with 255 color limit. 
+* Added [WIP Instance Segmentation](docs/instance_segmentation.md). Replaces previous system with 255 color limit. This requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
 * Added WIP [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation.
@@ -50,6 +50,7 @@ Cars in AirSim
 For complete list of changes, view our [Changelog](CHANGELOG.md)
 
 ## How to Get It
+This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
 ### Windows
 * [Download binaries](docs/use_precompiled.md)
@@ -140,14 +141,6 @@ Please take a look at [open issues](https://github.com/microsoft/airsim/issues) 
 * [More on code structure](docs/code_structure.md)
 * [Contribution Guidelines](CONTRIBUTING.md)
 * [Trello Board](https://trello.com/b/1t2qCeaA/wishlist-by-community-for-community)
-
-### Who is Using AirSim?
-
-We are maintaining a [list](docs/who_is_using.md) of a few projects, people and groups that we are aware of. If you would like to be featured in this list please [make a request here](https://github.com/microsoft/airsim/issues).
-
-## Contact
-
-Join the AirSim group on [Facebook](https://www.facebook.com/groups/1225832467530667/) to stay up to date or ask any questions.
 
 ## FAQ
 

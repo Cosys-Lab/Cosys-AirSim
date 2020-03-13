@@ -1,21 +1,17 @@
 # Build AirSim on Linux
 
-The current recommended and tested environment is **Ubuntu 16.04 LTS**. Theoretically, you can build on other distros and OSX as well, but we haven't tested it.
-
-We've two options - you can either build inside docker containers or your host machine. 
-
-## Docker 
-Please see instructions [here](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/docker_ubuntu.md)
+The current recommended and tested environment is **Ubuntu 18.04 LTS**. Theoretically, you can build on other distros and OSX as well, but we haven't tested it.
 
 ## Host machine
 
 ### Build Unreal Engine and Airsim
+This branch uses a custom version of the Unreal Engine!
 - Make sure you are [registered with Epic Games](https://docs.unrealengine.com/latest/INT/Platforms/Linux/BeginnerLinuxDeveloper/SettingUpAnUnrealWorkflow/1/index.html). This is required to get source code access for Unreal Engine.
 
 - Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.22 at present.
    ```bash
    # go to the folder where you clone GitHub projects
-   git clone -b 4.22 https://github.com/EpicGames/UnrealEngine.git
+   git clone https://github.com/WouterJansen/UnrealEngine.git
    cd UnrealEngine
    ./Setup.sh
    ./GenerateProjectFiles.sh
@@ -25,7 +21,7 @@ Please see instructions [here](https://cosysgit.uantwerpen.be/sensorsimulation/a
 - Clone AirSim and build it:
    ```bash
    # go to the folder where you clone GitHub projects
-   git clone https://github.com/Microsoft/AirSim.git
+   git clone -b instance_segmentation https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git
    cd AirSim
    ./setup.sh
    ./build.sh

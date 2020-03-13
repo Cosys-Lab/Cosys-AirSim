@@ -1,18 +1,28 @@
 # Build AirSim on Windows
 
 ## Install Unreal Engine
+This branch uses a custom version of the Unreal Engine!
+- Make sure you are [registered with Epic Games](https://docs.unrealengine.com/latest/INT/Platforms/Linux/BeginnerLinuxDeveloper/SettingUpAnUnrealWorkflow/1/index.html). This is required to get source code access for Unreal Engine.
 
-1. [Download](https://www.unrealengine.com/download) the Epic Games Launcher. While the Unreal Engine is open source and free to download, registration is still required.
-2. Run the Epic Games Launcher, open the `Library` tab on the left pane.   
-Click on the `Add Versions` which should show the option to download **Unreal 4.22** as shown below. If you have multiple versions of Unreal installed then **make sure 4.22 is set to `current`** by clicking down arrow next to the Launch button for the version.
+- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.22 at present.
+   ```bash
+   # go to the folder where you clone GitHub projects
+   git clone https://github.com/WouterJansen/UnrealEngine.git
+   cd UnrealEngine
+   ```
+ -Visual Studio 2017 is required for building. We recommend getting Visual Studio Community 2017, at the time of writing at version 15.9. 
+- To install the correct components for UE4 development, check the "Game Development with C++" workload and the “.net 4.6.2”, "Unreal Engine Installer" and "Nuget Package Manager" optional individual components.
+- run `Setup.bat`
+- run `GenerateProjectFiles.bat ` as administrator 
 
-   **Note**: If you have UE 4.16 or older projects, please see the [upgrade guide](unreal_upgrade.md) to upgrade your projects.
+## Build UnrealEngine
+- Open the generated Visual Studio project `UE4.sln` in the root of the repository. Once it is open you need to set it to build the _Development Editor_ configuration for _Win64_. 
+- Once that is set, you can right click the UE4 target in the Solution Explorer on the right side of the window and press build. This will take a while. 
+- please run `Engine\Binaries\Win64\UnrealVersionSelector-Win64-Shipping.exe` once so it is detectable by your system. 
 
 ## Build AirSim
-* Install Visual Studio 2017.    
-**Make sure** to select **VC++** and **Windows SDK 8.1** while installing VS 2017.   
 * Start `x64 Native Tools Command Prompt for VS 2017`. 
-* Clone the repo: `git clone https://github.com/Microsoft/AirSim.git`, and go the AirSim directory by `cd AirSim`. 
+* Clone the repo: `git clone -b instance_segmentation https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git`, and go the AirSim directory by `cd AirSim`. 
 * Run `build.cmd` from the command line. This will create ready to use plugin bits in the `Unreal\Plugins` folder that can be dropped into any Unreal project.
 
 ## Build Unreal Project
