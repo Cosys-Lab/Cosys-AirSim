@@ -1,9 +1,8 @@
 # Instance Segmentation in AirSim
 
-A WIP Instance segmentation is implemented into AirSim. It uses Vertex Color rendering to get allow for each object in the world to get its own color.
+An Instance segmentation system is implemented into AirSim. It uses Vertex Color rendering to get allow for each object in the world to get its own color.
 
 ## Limitations
-Given this is a WIP feature, there are a few limitations:
 * Only 2097152‬ different colors are currently available. More are technically possible to implement in future but likely unnecessary. 
 * **Currently only works from the Unreal Editor itself. It does not work on cooked builds.**
 * Landscape objects aren't supported. This is the special object type in Unreal to make terrain with. As a work-around, StaticMesh terrain must be used.
@@ -14,10 +13,9 @@ Given this is a WIP feature, there are a few limitations:
 By default, at the start of the simulation, it will give a random color to each object. 
 Please see the [Image API documentation](image_apis.md#segmentation) on how to manually set or get the color information.
 
-As with the old segmentation system, the easiest way to get the images from segmentation cameras, is through ros. 
-See the [ROS documentation](ros.md) for more information. 
+The easiest way to get the images from segmentation cameras, is through ros. See the [ROS documentation](ros.md) for more information. 
 
-For an example of the Instance Segmentation API, please see the script ```segmentation_config.py``` in the _PythonClient_ folder.
+For an example of the Instance Segmentation API, please see the script  [segmentation_config.py](../ros/python_ws/src/airsim/scripts/segmentation_config.py).
 
 ## Credits
 The method used to use Vertex Colors to segment object is a derivative of and inspired by the work of [UnrealCV](https://unrealcv.org/). Their work is licensed under the MIT License.
