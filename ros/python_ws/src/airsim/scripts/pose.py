@@ -43,7 +43,7 @@ def car_pose_airpub(frameID, pubNode, vehicleName):
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('airsim_car_pose', anonymous=True)
+        rospy.init_node('airsim_pose', anonymous=True)
         frameID =rospy.get_param('~frame_id', 'world')
         pubNode = rospy.get_param('~pub_node', 'airsim/pose')
         vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
