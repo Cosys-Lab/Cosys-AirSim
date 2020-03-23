@@ -1,0 +1,30 @@
+<launch>
+      <node pkg="tf" type="static_transform_publisher" name="base_to_camera_broadcaster" args="0 0 0 0 0 0 base_link base_camera 100" />
+      <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
+            <param name="camera_active" type="int" value="1" />
+            <param name="lidar_active" type="int" value="0" />
+            <param name="imu_active" type="int" value="1" />
+            <param name="pose_active" type="int" value="1" />
+            <param name="carcontrol_active" type="int" value="0" />
+
+            <param name="camera_frame_id" type="string" value="base_camera" />
+            <param name="imu_frame_id" type="string" value="base_link" />
+            <param name="pose_frame_id" type="string" value="world" />
+
+            <param name="topic_scene_camera" type="string" value="airsim/camera/scene" />
+            <param name="topic_segmentation_camera" type="string" value="airsim/camera/segmentation" />
+            <param name="topic_depth_camera" type="string" value="airsim/camera/depth" />
+            <param name="topic_imu" type="string" value="airsim/imu" />
+            <param name="topic_pose" type="string" value="airsim/pose" />
+
+            <param name="vehicle_name" type="string" value="airsimvehicle" />
+            <param name="imu_name" type="string" value="imu" />
+            <param name="camera_name" type="string" value="front_center" />
+
+            <param name="camera_height" type="int" value="540" />
+            <param name="camera_width" type="int" value="960" />
+            <param name="camera_max_depth" type="int" value="10" />
+
+            <param name="carcontrol_input_topic" type="string" value="cmd_vel" />
+      </node>
+</launch>
