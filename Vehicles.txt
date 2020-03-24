@@ -1,0 +1,14 @@
+"SimMode": "Car",
+"VehicleType": "BoxCar",
+
+"SimMode": "Car",
+"VehicleType": "PhysXVehicle",
+
+"SimMode": "SkidSteer",
+"VehicleType": "CPHusky",
+
+"SimMode": "Multirotor",
+"VehicleType": "SimpleFlight",
+
+"SimMode": "ComputerVision",
+"VehicleType": "ComputerVision",
