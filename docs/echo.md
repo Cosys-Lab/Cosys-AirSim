@@ -69,7 +69,6 @@ e.g.,
 					"DrawInitialPoints": true,
 					"DrawBounceLines": false,
 					"DrawSensor": false,
-					"EngineTime": true,
 					"DataFrame": "SensorLocalFrame",
 					"IgnoreMarked": true
 				}	

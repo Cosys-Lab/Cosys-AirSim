@@ -25,7 +25,6 @@ Cars in AirSim
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Added option to hot-reload plugin through Unreal Editor (faster development)
-* Added option to pause CPU Lidar and Echo sensor types after each measurement.
 * Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
