@@ -55,7 +55,7 @@ namespace msr {
 
 				reporter.writeValue("Lidar-NumChannels", params_.number_of_channels);
 				reporter.writeValue("Lidar-Range", params_.range);
-				reporter.writeValue("Lidar-MeasurementsPerCycle", params_.measurement_per_cycle_);
+				reporter.writeValue("Lidar-MeasurementsPerCycle", params_.measurement_per_cycle);
 				reporter.writeValue("Lidar-HorizontalRotationFrequency", params_.horizontal_rotation_frequency);
 				reporter.writeValue("Lidar-FOV-Upper", params_.vertical_FOV_upper);
 				reporter.writeValue("Lidar-FOV-Lower", params_.vertical_FOV_lower);

@@ -209,15 +209,14 @@ public: //types
 
         // shared defaults
         uint number_of_channels = 16;
-        real_T range = 10000.0f / 100;                    // meters
-        uint points_per_second = 100000;
+        real_T range = 100.0f;                            // meters
+        uint measurement_per_cycle = 512;
         uint horizontal_rotation_frequency = 10;          // rotations/sec
         float horizontal_FOV_start = 0;                   // degrees
         float horizontal_FOV_end = 359;                   // degrees
 		float update_frequency = 10;				      // how frequently to update the data in Hz
 		bool limit_points = true;						  // limit the amount of points per measurement to 100000
 		bool pause_after_measurement = false;			  // Pause the simulation after each measurement. Useful for API interaction to be synced
-		bool engine_time = false;						  // If false, real-time simulation will be used for timestamps and measurement frequency
 												          // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 
 		bool generate_noise = false;					  // Toggle range based noise
@@ -240,9 +239,9 @@ public: //types
 
 		// shared defaults
 		uint number_of_channels = 64;
-		real_T range = 10000.0f / 100;                    // meters
-		uint measurement_per_cycle_ = 2048;
-		float horizontal_rotation_frequency = 10;          // rotations/sec
+		real_T range = 100.0f;                            // meters
+		uint measurement_per_cycle = 2048;
+		float horizontal_rotation_frequency = 10;         // rotations/sec
 		float horizontal_FOV_start = 0;                   // degrees
 		float horizontal_FOV_end = 359;                   // degrees
 		uint resolution = 512;
@@ -282,7 +281,6 @@ public: //types
 
 		// Engine & timing settings
 		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
-		bool engine_time = true;						// If false, real-time simulation will be used for timestamps and measurement frequency
 														// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 		// Debug settings
 		bool draw_initial_points = false;		     	// Draw the points of the initial half sphere where the traces (rays) are cast
@@ -1218,7 +1216,7 @@ private:
     {
 		lidar_setting.number_of_channels = settings_json.getInt("NumberOfChannels", lidar_setting.number_of_channels);
         lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
-        lidar_setting.points_per_second = settings_json.getInt("PointsPerSecond", lidar_setting.points_per_second);
+        lidar_setting.measurement_per_cycle = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle);
         lidar_setting.horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
 
 		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
@@ -1227,7 +1225,6 @@ private:
 
 		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
 		lidar_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", lidar_setting.pause_after_measurement);
-		lidar_setting.engine_time = settings_json.getBool("EngineTime", lidar_setting.engine_time);
 		lidar_setting.limit_points = settings_json.getBool("LimitPoints", lidar_setting.limit_points);
         lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
 
@@ -1246,7 +1243,7 @@ private:
 	{
 		lidar_setting.number_of_channels = settings_json.getInt("NumberOfChannels", lidar_setting.number_of_channels);
 		lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
-		lidar_setting.measurement_per_cycle_ = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle_);
+		lidar_setting.measurement_per_cycle = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle);
 		lidar_setting.horizontal_rotation_frequency = settings_json.getFloat("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
 		lidar_setting.resolution = settings_json.getInt("Resolution", lidar_setting.resolution);
 		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
@@ -1277,7 +1274,6 @@ private:
 		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
 		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
 		echo_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", echo_setting.pause_after_measurement);
-		echo_setting.engine_time = settings_json.getBool("EngineTime", echo_setting.engine_time);
 
 		echo_setting.draw_reflected_points = settings_json.getBool("DrawReflectedPoints", echo_setting.draw_reflected_points);
 		echo_setting.draw_reflected_lines = settings_json.getBool("DrawReflectedLines", echo_setting.draw_reflected_lines);

@@ -59,7 +59,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	resolution_ = settings.resolution;
 	num_of_lasers_ = settings.number_of_channels;
 	frequency_ = settings.horizontal_rotation_frequency;
-	measurement_per_cycle_ = settings.measurement_per_cycle_;
+	measurement_per_cycle_ = settings.measurement_per_cycle;
 	horizontal_min_ = settings.horizontal_FOV_start;
 	horizontal_max_ = settings.horizontal_FOV_end;
 	vertical_min_ = settings.vertical_FOV_lower;
