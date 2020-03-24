@@ -33,7 +33,6 @@ VerticalFOVLower          | Vertical FOV lower limit for the lidar, in degrees
 X Y Z                     | Position of the lidar relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
-PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
 GenerateNoise             | Generate and add range-noise based on normal distribution if set to true
 MinNoiseStandardDeviation | The standard deviation to generate the noise normal distribution, in meters. This is the minimal noise (at 0 distance)
 NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
