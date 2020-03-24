@@ -18,32 +18,31 @@ struct LidarSimpleParams {
     // TODO: enable reading of these params from AirSim settings
 
     uint number_of_channels = 16; 
-    real_T range = 10000.0f / 100;               // meters
-    uint points_per_second = 100000;  
-    uint horizontal_rotation_frequency = 10;     // rotations/sec
+    real_T range = 100.0f;                    // meters
+    uint measurement_per_cycle = 512;
+    uint horizontal_rotation_frequency = 10;  // rotations/sec
     real_T horizontal_FOV_start = 0;
     real_T horizontal_FOV_end = 359;
-    real_T vertical_FOV_upper = -15;             // drones -15, car +10
-    real_T vertical_FOV_lower = -45;             // drones -45, car -10
+    real_T vertical_FOV_upper = -15;          // drones -15, car +10
+    real_T vertical_FOV_lower = -45;          // drones -45, car -10
 
 	bool generate_noise = false;			  // Toggle range based noise
 	real_T min_noise_standard_deviation = 0;  // Minimum noise standard deviation
 	real_T noise_distance_scale = 1;		  // Factor to scale noise based on distance
 
-	real_T update_frequency = 10;                // Hz
-	bool limit_points = true;					 // how frequently to update the data in Hz
-	bool pause_after_measurement = false;	     // Pause the simulation after each measurement. Useful for API interaction to be synced
-	bool engine_time = false;				     // If false, real-time simulation will be used for timestamps and measurement frequency
-										         // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+	real_T update_frequency = 10;             // Hz
+	bool limit_points = true;			      // how frequently to update the data in Hz
+	bool pause_after_measurement = false;	  // Pause the simulation after each measurement. Useful for API interaction to be synced
+										      // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
     Pose relative_pose {
-        Vector3r(0,0,-1),                        // position - a little above vehicle (especially for cars) or Vector3r::Zero()
-        Quaternionr::Identity()                  // orientation - by default Quaternionr(1, 0, 0, 0)
+        Vector3r(0,0,-1),                     // position - a little above vehicle (especially for cars) or Vector3r::Zero()
+        Quaternionr::Identity()               // orientation - by default Quaternionr(1, 0, 0, 0)
         };                       
 
     bool draw_debug_points = false;
     std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
-    real_T startup_delay = 0;                   // sec
+    real_T startup_delay = 0;                 // sec
 
     void initializeFromSettings(const AirSimSettings::LidarSetting& settings)
     {
@@ -51,12 +50,11 @@ struct LidarSimpleParams {
 
         number_of_channels = settings.number_of_channels;
         range = settings.range;
-        points_per_second = settings.points_per_second;
+		measurement_per_cycle = settings.measurement_per_cycle;
         horizontal_rotation_frequency = settings.horizontal_rotation_frequency;
 		update_frequency = settings.update_frequency;
 		limit_points = settings.limit_points;
 		pause_after_measurement = settings.pause_after_measurement;
-		engine_time = settings.engine_time;
 
         horizontal_FOV_start = settings.horizontal_FOV_start;
         horizontal_FOV_end = settings.horizontal_FOV_end;

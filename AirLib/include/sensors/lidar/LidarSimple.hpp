@@ -22,7 +22,7 @@ public:
         params_.initializeFromSettings(setting);
 
         //initialize frequency limiter
-        freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, params_.engine_time);
+        freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, false);
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -53,7 +53,7 @@ public:
 
         reporter.writeValue("Lidar-NumChannels", params_.number_of_channels);
         reporter.writeValue("Lidar-Range", params_.range);
-		reporter.writeValue("Lidar-PointsPerSecond", params_.points_per_second);
+		reporter.writeValue("Lidar-MeasurementsPerCycle", params_.measurement_per_cycle);
 		reporter.writeValue("Lidar-HorizontalRotationFrequency", params_.horizontal_rotation_frequency);
         reporter.writeValue("Lidar-FOV-Upper", params_.vertical_FOV_upper);
         reporter.writeValue("Lidar-FOV-Lower", params_.vertical_FOV_lower);

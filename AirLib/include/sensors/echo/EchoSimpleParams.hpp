@@ -42,7 +42,6 @@ struct EchoSimpleParams {
 	bool draw_bounce_lines;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 	bool draw_sensor;						// Draw the physical sensor in the world on the vehicle
 
-	bool engine_time;						// If false, real-time simulation will be used for timestamps and measurement frequency
 											// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
     std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
@@ -98,7 +97,6 @@ struct EchoSimpleParams {
 		draw_bounce_lines = settings.draw_bounce_lines;
 		draw_sensor = settings.draw_sensor;
 
-		engine_time = settings.engine_time;
         data_frame = settings.data_frame;
 		update_frequency = settings.measurement_frequency;
 

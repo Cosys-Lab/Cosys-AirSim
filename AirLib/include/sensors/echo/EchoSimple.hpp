@@ -22,7 +22,7 @@ public:
         params_.initializeFromSettings(setting);
 
         //initialize frequency limiter
-		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, params_.engine_time);
+		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, false);
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -41,16 +41,11 @@ public:
 		EchoBase::update(delta);
 		freq_limiter_.update(delta);
 
-		if (last_tick_measurement_ && params_.pause_after_measurement == false && params_.engine_time) {
-			pause(false);
-			last_tick_measurement_ = false;
-		}
 		if (freq_limiter_.isWaitComplete())
 		{
 			last_time_ = freq_limiter_.getLastTime();
-			if(params_.engine_time || params_.pause_after_measurement)pause(true);
+			if(params_.pause_after_measurement)pause(true);
 			updateOutput();
-			if (params_.engine_time)last_tick_measurement_ = true;
 		}		
 
     }

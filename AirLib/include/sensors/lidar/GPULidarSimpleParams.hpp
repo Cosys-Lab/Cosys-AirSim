@@ -20,7 +20,7 @@ namespace msr {
 
 			uint number_of_channels = 64;
 			real_T range = 10000.0f / 100;               // meters
-			uint measurement_per_cycle_ = 2048;
+			uint measurement_per_cycle = 2048;
 			real_T horizontal_rotation_frequency = 10;   // rotations/sec
 			real_T horizontal_FOV_start = 0;
 			real_T horizontal_FOV_end = 359;
@@ -48,7 +48,7 @@ namespace msr {
 
 				number_of_channels = settings.number_of_channels;
 				range = settings.range;
-				measurement_per_cycle_ = settings.measurement_per_cycle_;
+				measurement_per_cycle = settings.measurement_per_cycle;
 				horizontal_rotation_frequency = settings.horizontal_rotation_frequency;
 				resolution = settings.resolution;
 
