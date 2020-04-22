@@ -2,7 +2,7 @@
 "VehicleType": "BoxCar",
 
 "SimMode": "Car",
-"VehicleType": "PhysXVehicle",
+"VehicleType": "PhysXCar",
 
 "SimMode": "SkidSteer",
 "VehicleType": "CPHusky",
