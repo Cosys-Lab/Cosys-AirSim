@@ -5,7 +5,6 @@ channels:
   - defaults
 dependencies:
   - alabaster=0.7.12=py37_0
-  - argh=0.26.2=py37_1001
   - asn1crypto=0.24.0=py37_0
   - astroid=2.2.5=py37_0
   - atomicwrites=1.3.0=py37_1
@@ -97,8 +96,6 @@ dependencies:
   - pysocks=1.7.0=py37_0
   - python=3.7.4=h5263a28_0
   - python-dateutil=2.8.0=py37_0
-  - python-jsonrpc-server=0.2.0=py_0
-  - python-language-server=0.28.3=py37_0
   - pytz=2019.2=py_0
   - pywin32=223=py37hfa6e2cd_1
   - pywinpty=0.5.5=py37_1000
@@ -149,11 +146,10 @@ dependencies:
   - zipp=0.5.2=py_0
   - zlib=1.2.11=h62dcd97_3
   - pip:
-    - airsim==1.2.4
-    - msgpack-python==0.5.6
-    - msgpack-rpc-python==0.4.1
-    - numpy==1.17.2
-    - pptk==0.1.0
-    - tornado==4.5.3
+      - airsim==1.2.4
+      - msgpack-python==0.5.6
+      - msgpack-rpc-python==0.4.1
+      - numpy==1.17.2
+      - pptk==0.1.0
+      - tornado==4.5.3
 prefix: C:\Users\Girmi\Anaconda3\envs\airsim
-
