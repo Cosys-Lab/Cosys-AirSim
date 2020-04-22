@@ -20,8 +20,6 @@
             <param name="vehicle_name" type="string" value="airsimvehicle" />
             <param name="imu_name" type="string" value="imu" />
             <param name="lidar_name" type="string" value="lidar" />
-
-            <param name="carcontrol_input_topic" type="string" value="cmd_vel" />
       </node>
-      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o /mnt/c/Users/Wouter/Projects/airsim/bags/airsim_lidar -a"/>
+      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o /home/airsim/bags/airsim_lidar -a"/>
 </launch>

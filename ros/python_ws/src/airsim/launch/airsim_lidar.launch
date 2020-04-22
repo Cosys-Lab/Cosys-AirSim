@@ -20,7 +20,5 @@
             <param name="vehicle_name" type="string" value="airsimvehicle" />
             <param name="imu_name" type="string" value="imu" />
             <param name="lidar_name" type="string" value="lidar" />
-
-            <param name="carcontrol_input_topic" type="string" value="cmd_vel" />
       </node>
 </launch>

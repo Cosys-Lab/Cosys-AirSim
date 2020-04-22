@@ -88,41 +88,31 @@ def is_pixels_as_float(cameraType):
         return False
 
 
-def get_image_bytes(data, cameraType, MaxDepthDistance):
+def get_image_bytes(data, cameraType):
     if (cameraType == "Scene"):
         img_rgb_string = data.image_data_uint8
     elif (cameraType == "Segmentation"):
         img_rgb_string = data.image_data_uint8
     elif (cameraType == "DepthPerspective"):
-        img_rgb_float = data.image_data_float
-        img_rgb_float = np.asarray(img_rgb_float)
-        img_rgb_float[img_rgb_float > MaxDepthDistance] = MaxDepthDistance
-        img_rgb_int = np.rint((img_rgb_float / MaxDepthDistance) * 255)
-        img_rgb_int = np.repeat(img_rgb_int, 3).astype(dtype=np.uint8)
-        img_rgb_string = img_rgb_int.tobytes()
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
     elif (cameraType == "DepthPlanner"):
-        img_rgb_float = data.image_data_float
-        img_rgb_float = np.asarray(img_rgb_float)
-        img_rgb_float[img_rgb_float > MaxDepthDistance] = MaxDepthDistance
-        img_rgb_int = np.rint((img_rgb_float / MaxDepthDistance) * 255)
-        img_rgb_int = np.repeat(img_rgb_int, 3).astype(dtype=np.uint8)
-        img_rgb_string = img_rgb_int.tobytes()
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
     elif (cameraType == "DepthVis"):
-        img_rgb_float = data.image_data_float
-        img_rgb_float = np.asarray(img_rgb_float)
-        img_rgb_int = np.rint((img_rgb_float / np.max(img_rgb_float)) * 255)
-        img_rgb_int = np.repeat(img_rgb_int, 3).astype(dtype=np.uint8)
-        img_rgb_string = img_rgb_int.tobytes()
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
     elif (cameraType == "Infrared"):
         img_rgb_string = data.image_data_uint8
     elif (cameraType == "SurfaceNormals"):
         img_rgb_string = data.image_data_uint8
     elif (cameraType == "DisparityNormalized"):
-        img_rgb_float = data.image_data_float
-        img_rgb_float = np.asarray(img_rgb_float)
-        img_rgb_int = np.rint((img_rgb_float / np.max(img_rgb_float)) * 255)
-        img_rgb_int = np.repeat(img_rgb_int, 3).astype(dtype=np.uint8)
-        img_rgb_string = img_rgb_int.tobytes()
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
     else:
         img_rgb_string = data.image_data_uint8
     return img_rgb_string
@@ -154,7 +144,6 @@ def airsim_pub(activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidar
     cameraName = cameraSettingsTuple[0]
     cameraHeight = cameraSettingsTuple[1]
     cameraWidth = cameraSettingsTuple[2]
-    maxDepthDistance = cameraSettingsTuple[3]
 
     client = airsimpy.CarClient()
     client.confirmConnection(rospy.get_name())
@@ -192,9 +181,9 @@ def airsim_pub(activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidar
                 airsimpy.ImageRequest(cameraName, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
                                       False)])
 
-            img_rgb_string1 = get_image_bytes(responses[0], "Scene", maxDepthDistance)
-            img_rgb_string2 = get_image_bytes(responses[1], "Segmentation", maxDepthDistance)
-            img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner", maxDepthDistance)
+            img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+            img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
+            img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
 
             msg = Image()
             msg.header.stamp = rospy.Time.now()
@@ -208,6 +197,7 @@ def airsim_pub(activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidar
             sceneCameraPub.publish(msg)
             msg.data = img_rgb_string2
             segmentationCameraPub.publish(msg)
+            msg.encoding = "32FC1"
             msg.data = img_rgb_string3
             depthCameraPub.publish(msg)
 
@@ -314,9 +304,9 @@ if __name__ == '__main__':
         activeTuple = (cameraActive, lidarActive, gpulidarActive, imuActive, poseActive, carcontrolActive)
 
         # Publish topic names
-        sceneCameraTopicName = rospy.get_param('~topic_scene_camera', 'airsim/camera/scene')
-        segmentationCameraTopicName = rospy.get_param('~topic_segmentation_camera', 'airsim/camera/segmentation')
-        depthCameraTopicName = rospy.get_param('~topic_depth_camera', 'airsim/camera/depth')
+        sceneCameraTopicName = rospy.get_param('~topic_scene_camera', 'airsim/rgb/image')
+        segmentationCameraTopicName = rospy.get_param('~topic_segmentation_camera', 'airsim/segmentation/image')
+        depthCameraTopicName = rospy.get_param('~topic_depth_camera', 'airsim/depth/image')
         lidarTopicName = rospy.get_param('~topic_lidar', 'airsim/lidar')
         lidarGroundtruthTopicName =  rospy.get_param('~topic_lidar_groundtruth', 'airsim/lidargroundtruth')
         imuTopicName = rospy.get_param('~topic_imu', 'airsim/imu')
@@ -334,8 +324,7 @@ if __name__ == '__main__':
         cameraName = rospy.get_param('~camera_name', "front_center")
         cameraHeight = rospy.get_param('~camera_height', 540)
         cameraWidth = rospy.get_param('~camera_width', 960)
-        maxDepthDistance = rospy.get_param('~camera_max_depth', 10)
-        cameraSettingsTuple = (cameraName, cameraHeight, cameraWidth, maxDepthDistance)
+        cameraSettingsTuple = (cameraName, cameraHeight, cameraWidth)
 
         # Lidar settings
         lidarName =  rospy.get_param('~lidar_name', 'lidar')
