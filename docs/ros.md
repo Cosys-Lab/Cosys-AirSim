@@ -16,12 +16,12 @@ You should have these components installed and working before proceeding
 
 ## Implemented launch files
 - `airsim_keyboard_control.launch`: If the main AirSim node is configured to allow controlling from ROS, this launch file will drive it using [teleop_twist_keyboard](http://wiki.ros.org/teleop_twist_keyboard).
-- `airsim_all.launch`: Publish the vehicle pose and the data from the LIDAR (correctly framed to _base_laser_) and IMU sensors and the camera(RGB, depth(10m max), segmentation) with correct frame transform if needed. Has settings to configure the camera.
+- `airsim_all.launch`: Publish the vehicle pose and the data from the LIDAR (correctly framed to _base_laser_) and IMU sensors and the camera(RGB, depth and segmentation) with correct frame transform if needed. Has settings to configure the camera.
 - `airsim_lidar.launch`: Publish the vehicle pose and the data from the LIDAR (correctly framed to _base_laser_) and IMU sensors.
-- `airsim_camera.launch`: Publish the vehicle pose and the data of the IMU sensor and the camera(RGB, depth(10m max), segmentation) with correct frame transform if needed. Has settings to configure the camera.
-- `airsim_all_record.launch`: Publish the vehicle pose, LIDAR, IMU sensor data and camera images (RGB, depth(10m max), segmentation) and record a bag file (**make sure to set output folder yourself correctly!**)
+- `airsim_camera.launch`: Publish the vehicle pose and the data of the IMU sensor and the camera(RGB, depth and segmentation) with correct frame transform if needed. Has settings to configure the camera.
+- `airsim_all_record.launch`: Publish the vehicle pose, LIDAR, IMU sensor data and camera images (RGB, depth and segmentation) and record a bag file (**make sure to set output folder yourself correctly!**)
 - `airsim_lidar_record.launch`: Publish the vehicle pose, LIDAR, IMU sensor data and record a bag file (**make sure to set output folder yourself correctly!**)
-- `airsim_camera_record.launch`: Publish the vehicle pose and camera images (RGB, depth(10m max), segmentation) and record a bag file (**make sure to set output folder yourself correctly!**)
+- `airsim_camera_record.launch`: Publish the vehicle pose and camera images (RGB, depth and segmentation) and record a bag file (**make sure to set output folder yourself correctly!**)
 
 ## Setup
 
