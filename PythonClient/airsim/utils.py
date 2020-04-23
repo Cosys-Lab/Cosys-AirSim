@@ -4,6 +4,7 @@ import time
 import sys
 import os
 import inspect
+import types
 import re
 
 from .types import *

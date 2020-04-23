@@ -50,9 +50,12 @@ class VehicleClient:
     def getHomeGeoPoint(self, vehicle_name = ''):
         return GeoPoint.from_msgpack(self.client.call('getHomeGeoPoint', vehicle_name))
 
-    def confirmConnection(self):
+    def confirmConnection(self, name = ''):
         if self.ping():
-            print("Connected!")
+            if name == '':
+                print("Connected to AirSim API!")
+            else:
+                print(name + " connected to AirSim API!")
         else:
              print("Ping returned false!")
         server_ver = self.getServerVersion()
@@ -69,9 +72,6 @@ class VehicleClient:
         elif client_ver < client_min_ver:
             print(ver_info, file=sys.stderr)
             print("AirSim client is of older version and not supported by this server. Please upgrade!")
-        else:
-            print(ver_info)
-        print('')
 
     # time-of-day control
     def simSetTimeOfDay(self, is_enabled, start_datetime = "", is_start_datetime_dst = False, celestial_clock_speed = 1, update_interval_secs = 60, move_sun = True):
@@ -151,9 +151,6 @@ class VehicleClient:
     def simGetCollisionInfo(self, vehicle_name = ''):
         return CollisionInfo.from_msgpack(self.client.call('simGetCollisionInfo', vehicle_name))
 
-    def simXyzToGeoPoints(self, geo_points, vehicle_name = ''):
-        return self.client.call('simXyzToGeoPoints', geo_points, vehicle_name)
-
     def simSetVehiclePose(self, pose, ignore_collison, vehicle_name = ''):
         self.client.call('simSetVehiclePose', pose, ignore_collison, vehicle_name)
     def simGetVehiclePose(self, vehicle_name = ''):
@@ -164,10 +161,13 @@ class VehicleClient:
         return Pose.from_msgpack(pose)
     def simSetObjectPose(self, object_name, pose, teleport = True):
         return self.client.call('simSetObjectPose', object_name, pose, teleport)
+
     def simListSceneObjects(self, name_regex = '.*'):
         return self.client.call('simListSceneObjects', name_regex)
+
     def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
         return self.client.call('simSpawnStaticMeshObject', object_class_name, object_name, pose)
+
     def simDeleteObject(self, object_name):
         return self.client.call('simDeleteObject', object_name)
 
@@ -207,11 +207,17 @@ class VehicleClient:
     def getGpsData(self, gps_name = '', vehicle_name = ''):
         return GpsData.from_msgpack(self.client.call('getGpsData', gps_name, vehicle_name))
 
-    def getDistanceSensorData(self, lidar_name = '', vehicle_name = ''):
+    def getDistanceSensorData(self, distance_sensor_name = '', vehicle_name = ''):
         return DistanceSensorData.from_msgpack(self.client.call('getDistanceSensorData', distance_sensor_name, vehicle_name))
 
     def getLidarData(self, lidar_name = '', vehicle_name = ''):
         return LidarData.from_msgpack(self.client.call('getLidarData', lidar_name, vehicle_name))
+		
+    def getGPULidarData(self, lidar_name = '', vehicle_name = ''):
+        return GPULidarData.from_msgpack(self.client.call('getGPULidarData', lidar_name, vehicle_name))
+
+    def getEchoData(self, echo_name = '', vehicle_name = ''):
+        return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))
 
     #----------- APIs to control ACharacter in scene ----------/
     def simCharSetFaceExpression(self, expression_name, value, character_name = ""):
