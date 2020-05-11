@@ -23,6 +23,9 @@ NumberOfTraces            | Amount of traces (rays) being cast
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)
 AttenuationLimit          | Attenuation at which the signal is considered dissipated (dB)
+DistanceLimit             | Maximum distance a reflection can travel
+ReflectionLimit           | Maximum amount of reflections that can happen
+ReflectionDistanceLimit   | Maximum distance between two reflections 
 MeasurementFrequency      | The frequency of the sensor (measurements/s)
 PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
 SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
@@ -35,7 +38,7 @@ DrawReflectedLines        | Draw debug lines in world from reflected points to t
 DrawInitialPoints         | Draw the points of the initial half sphere where the traces (rays) are cast
 DrawBounceLines           | Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 DrawSensor                | Draw the physical sensor in the world on the vehicle
-
+IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
 e.g.,
 ```
 {
@@ -54,6 +57,9 @@ e.g.,
 					"AttenuationPerDistance": 8,
 					"AttenuationPerReflection": 3,
 					"AttenuationLimit": 50,
+					"DistanceLimit": 10,
+					"ReflectionLimit": 3,
+					"ReflectionDistanceLimit": 0.4,
 					"MeasurementFrequency": 1,
 					"PauseAfterMeasurement": false,
 					"SensorDiameter": 0.5,
@@ -65,7 +71,8 @@ e.g.,
 					"DrawBounceLines": false,
 					"DrawSensor": false,
 					"EngineTime": true,
-					"DataFrame": "SensorLocalFrame"
+					"DataFrame": "SensorLocalFrame",
+					"IgnoreMarked": true
 				}	
 			}
 		}

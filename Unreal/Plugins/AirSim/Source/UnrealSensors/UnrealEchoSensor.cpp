@@ -6,6 +6,7 @@
 #include "common/Common.hpp"
 #include "NedTransform.h"
 #include "DrawDebugHelpers.h"
+#include "EngineUtils.h"
 #include "CoreMinimal.h"
 
 // ctor
@@ -23,7 +24,15 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	line_thinkness_(1.0f)
 {
 	generateSampleDirections();	
-	ignore_actors_ = TArray<AActor*>{};
+
+	if (sensor_params_.ignore_marked) {
+		static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
+		for (TActorIterator<AActor> ActorIterator(actor->GetWorld()); ActorIterator; ++ActorIterator)
+		{
+			AActor* Actor = *ActorIterator;
+			if (Actor && Actor != actor && Actor->Tags.Contains(lidar_ignore_tag))ignore_actors_.Add(Actor);
+		}
+	}
 }
 
 // initializes information based on echo configuration

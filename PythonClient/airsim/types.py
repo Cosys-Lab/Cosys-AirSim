@@ -2,6 +2,7 @@ from __future__ import print_function
 import msgpackrpc #install as admin: pip install msgpack-rpc-python
 import numpy as np #pip install numpy
 
+
 class MsgpackMixin:
     def __repr__(self):
         from pprint import pformat
@@ -13,13 +14,20 @@ class MsgpackMixin:
     @classmethod
     def from_msgpack(cls, encoded):
         obj = cls()
-        #obj.__dict__ = {k.decode('utf-8'): (from_msgpack(v.__class__, v) if hasattr(v, "__dict__") else v) for k, v in encoded.items()}
-        obj.__dict__ = { k : (v if not isinstance(v, dict) else getattr(getattr(obj, k).__class__, "from_msgpack")(v)) for k, v in encoded.items()}
-        #return cls(**msgpack.unpack(encoded))
+        ww = encoded.items()
+        # obj.__dict__ = {k.decode('utf-8'): (from_msgpack(v.__class__, v) if hasattr(v, "__dict__") else v) for k, v in encoded.items()}
+        for k, v in encoded.items():
+            if (isinstance(v, dict) and hasattr(getattr(obj, k).__class__, 'from_msgpack')):
+                obj.__dict__[k] = getattr(getattr(obj, k).__class__, 'from_msgpack')(v)
+            else:
+                obj.__dict__[k] = v
+
+        # obj.__dict__ = { k : (v if not isinstance(v, dict) else getattr(getattr(obj, k).__class__, "from_msgpack")(v)) for k, v in encoded.items()}
+        # return cls(**msgpack.unpack(encoded))
         return obj
 
 
-class ImageType:    
+class ImageType:
     Scene = 0
     DepthPlanner = 1
     DepthPerspective = 2
@@ -32,7 +40,7 @@ class ImageType:
 class DrivetrainType:
     MaxDegreeOfFreedom = 0
     ForwardOnly = 1
-    
+
 class LandedState:
     Landed = 0
     Flying = 1
@@ -71,13 +79,13 @@ class Vector3r(MsgpackMixin):
     def __truediv__(self, other):
         if type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
             return Vector3r( self.x_val / other, self.y_val / other, self.z_val / other)
-        else: 
+        else:
             raise TypeError('unsupported operand type(s) for /: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def __mul__(self, other):
         if type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
             return Vector3r(self.x_val*other, self.y_val*other, self.z_val*other)
-        else: 
+        else:
             raise TypeError('unsupported operand type(s) for *: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def dot(self, other):
@@ -139,12 +147,12 @@ class Quaternionr(MsgpackMixin):
         else:
             raise TypeError('unsupported operand type(s) for *: %s and %s' % ( str(type(self)), str(type(other))) )
 
-    def __truediv__(self, other): 
-        if type(other) == type(self): 
+    def __truediv__(self, other):
+        if type(other) == type(self):
             return self * other.inverse()
         elif type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
             return Quaternionr( self.x_val / other, self.y_val / other, self.z_val / other, self.w_val / other)
-        else: 
+        else:
             raise TypeError('unsupported operand type(s) for /: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def dot(self, other):
@@ -172,7 +180,7 @@ class Quaternionr(MsgpackMixin):
             else:
                 raise ValueError('length of the other Quaternionr must be 1')
         else:
-            raise TypeError('unsupported operand type(s) for \'rotate\': %s and %s' % ( str(type(self)), str(type(other))) )        
+            raise TypeError('unsupported operand type(s) for \'rotate\': %s and %s' % ( str(type(self)), str(type(other))) )
 
     def conjugate(self):
         return Quaternionr(-self.x_val, -self.y_val, -self.z_val, self.w_val)
@@ -189,11 +197,11 @@ class Quaternionr(MsgpackMixin):
     def get_length(self):
         return ( self.x_val**2 + self.y_val**2 + self.z_val**2 + self.w_val**2 )**0.5
 
-    def to_numpy_array(self):
-        return np.array([self.x_val, self.y_val, self.z_val, self.w_val], dtype=np.float32)
-
     def from_numpy_array(self, array):
         return Quaternionr( array[0], array[1], array[2], array[3] )
+
+    def to_numpy_array(self):
+        return np.array([self.x_val, self.y_val, self.z_val, self.w_val], dtype=np.float32)
 
 
 class Pose(MsgpackMixin):
@@ -207,6 +215,15 @@ class Pose(MsgpackMixin):
     @staticmethod
     def nanPose():
         return Pose(Vector3r.nanVector3r(), Quaternionr.nanQuaternionr())
+
+
+class Twist(MsgpackMixin):
+    linear = Vector3r()
+    angular = Vector3r()
+
+    def __init__(self, linear_val=Vector3r(), angular_val=Vector3r()):
+        self.linear = linear_val
+        self.angular = angular_val
 
 
 class CollisionInfo(MsgpackMixin):
@@ -241,18 +258,18 @@ class RCData(MsgpackMixin):
     def __init__(self, timestamp = 0, pitch = 0.0, roll = 0.0, throttle = 0.0, yaw = 0.0, switch1 = 0,
                  switch2 = 0, switch3 = 0, switch4 = 0, switch5 = 0, switch6 = 0, switch7 = 0, switch8 = 0, is_initialized = False, is_valid = False):
         self.timestamp = timestamp
-        self.pitch = pitch 
+        self.pitch = pitch
         self.roll = roll
-        self.throttle = throttle 
-        self.yaw = yaw 
-        self.switch1 = switch1 
-        self.switch2 = switch2 
-        self.switch3 = switch3 
-        self.switch4 = switch4 
+        self.throttle = throttle
+        self.yaw = yaw
+        self.switch1 = switch1
+        self.switch2 = switch2
+        self.switch3 = switch3
+        self.switch4 = switch4
         self.switch5 = switch5
-        self.switch6 = switch6 
-        self.switch7 = switch7 
-        self.switch8 = switch8 
+        self.switch6 = switch6
+        self.switch7 = switch7
+        self.switch8 = switch8
         self.is_initialized = is_initialized
         self.is_valid = is_valid
 
@@ -292,7 +309,7 @@ class CarControls(MsgpackMixin):
     manual_gear = 0
     gear_immediate = True
 
-    def __init__(self, throttle = 0, steering = 0, brake = 0, 
+    def __init__(self, throttle = 0, steering = 0, brake = 0,
         handbrake = False, is_manual_gear = False, manual_gear = 0, gear_immediate = True):
         self.throttle = throttle
         self.steering = steering
@@ -359,6 +376,17 @@ class LidarData(MsgpackMixin):
     point_cloud = 0.0
     time_stamp = np.uint64(0)
     pose = Pose()
+    groundtruth = ''
+
+class GPULidarData(MsgpackMixin):
+    point_cloud = 0.0
+    time_stamp = np.uint64(0)
+    pose = Pose()
+
+class EchoData(MsgpackMixin):
+    point_cloud = 0.0
+    time_stamp = np.uint64(0)
+    pose = Pose()
 
 class ImuData(MsgpackMixin):
     time_stamp = np.uint64(0)
@@ -383,7 +411,7 @@ class GnssFixType(MsgpackMixin):
     GNSS_FIX_2D_FIX = 2
     GNSS_FIX_3D_FIX = 3
 
-class GnssReport(MsgpackMixin): 
+class GnssReport(MsgpackMixin):
     geo_point = GeoPoint();
     eph = 0.0
     epv = 0.0;
@@ -395,3 +423,132 @@ class GpsData(MsgpackMixin):
     time_stamp = np.uint64(0)
     gnss = GnssReport()
     is_valid = False
+
+
+class AddAngularForce(MsgpackMixin):
+    force_name = ''
+    link_name = ''
+    axis = Vector3r()
+
+    def __init__(self, force_name_val='', link_name_val='', axis_val=Vector3r()):
+        self.force_name = force_name_val
+        self.link_name = link_name_val
+        self.axis = axis_val
+
+
+class AddLinearForce(MsgpackMixin):
+    force_name = ''
+    link_name = ''
+    application_point = Vector3r()
+    axis = Vector3r()
+
+    def __init__(self, force_name_val='', link_name_val='', application_point_val=Vector3r(), axis_val=Vector3r()):
+        self.force_name = force_name_val
+        self.link_name = link_name_val
+        self.application_point = application_point_val
+        self.axis = axis_val
+
+
+class UpdateForceMagnitude(MsgpackMixin):
+    force_name = ''
+    magnitude = 0.0
+
+    def __init__(self, force_name_val='', magnitude_val=0.0):
+        self.force_name = force_name_val
+        self.magnitude = magnitude_val
+
+
+class LinkInformation(MsgpackMixin):
+    link_name = ''
+    link_relative_pose = Pose()
+    link_relative_twist = Twist()
+
+    def __init__(self, link_name_val='', link_relative_pose_val=Pose(), link_relative_twist_val=Twist()):
+        self.link_name = link_name_val
+        self.link_relative_pose = link_relative_pose_val
+        self.link_relative_twist = link_relative_twist_val
+
+
+class UrdfBotState(MsgpackMixin):
+    link_information = []
+    kinematics_estimated = KinematicsState()
+    controlled_motion_component_states = {}
+
+    def __init__(self, link_information_val=[], kinematics_estimated_val=KinematicsState(),
+                 controlled_motion_component_states={}):
+        self.link_information = link_information_val
+        self.kinematics_estimated = kinematics_estimated_val
+        self.controlled_motion_component_states = controlled_motion_component_states
+
+
+class UrdfBotControlledMotionComponentControlSignal(MsgpackMixin):
+    component_name = ''
+    control_signal_values = {}
+
+    def __init__(self, component_name='', control_signal_values={}):
+        self.component_name = component_name
+        self.control_signal_values = control_signal_values
+
+
+class CameraPose(MsgpackMixin):
+    camera_name = ''
+    translation = Vector3r()
+    rotation = Quaternionr()
+
+    def __init__(self, camera_name, translation, rotation):
+        self.camera_name = camera_name
+        self.translation = translation
+        self.rotation = rotation
+
+
+class RayCastRequest(MsgpackMixin):
+    position = Vector3r()
+    direction = Vector3r()
+    reference_frame_link = ''
+    through_blocking = False
+    persist_seconds = 0
+
+    def __init__(self, position, direction, reference_frame_link, through_blocking, persist_seconds):
+        self.position = position
+        self.direction = direction
+        self.reference_frame_link = reference_frame_link
+        self.through_blocking = through_blocking
+        self.persist_seconds = persist_seconds
+
+
+class RayCastHit:
+    collided_actor_name = ''
+    hit_point = Vector3r()
+    hit_normal = Vector3r()
+
+    def __init__(self, collided_actor_name='', hit_point=Vector3r(), hit_normal=Vector3r()):
+        self.collided_actor_name = collided_actor_name
+        self.hit_point = hit_point
+        self.hit_normal = hit_normal
+
+
+class RayCastResponse(MsgpackMixin):
+    hits = []
+
+    def __init__(self, hits=[]):
+        self.hits = hits
+
+
+class DrawableShape(MsgpackMixin):
+    reference_frame_link = ''
+    type = 0
+    shape_params = []
+
+    def __init__(self, reference_frame_link, type, shape_params):
+        self.reference_frame_link = reference_frame_link
+        self.type = type
+        self.shape_params = shape_params
+
+
+class DrawableShapeRequest(MsgpackMixin):
+    shapes = {}
+    persist_unmentioned = False
+
+    def __init__(self, shapes={}, persist_unmentioned=False):
+        self.shapes = shapes
+        self.persist_unmentioned = persist_unmentioned

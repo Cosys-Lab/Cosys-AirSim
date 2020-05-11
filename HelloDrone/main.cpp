@@ -59,7 +59,7 @@ int main()
         std::cout << "Press Enter to arm the drone" << std::endl; std::cin.get();
         client.enableApiControl(true);
         client.armDisarm(true);
-
+/*
         auto barometer_data = client.getBarometerData();
         std::cout << "Barometer data \n" 
             << "barometer_data.time_stamp \t" << barometer_data.time_stamp << std::endl
@@ -88,7 +88,7 @@ int main()
         std::cout << "Magnetometer data \n" 
             << "magnetometer_data.time_stamp \t" << magnetometer_data.time_stamp << std::endl 
             << "magnetometer_data.magnetic_field_body \t" << magnetometer_data.magnetic_field_body << std::endl; 
-            // << "magnetometer_data.magnetic_field_covariance" << magnetometer_data.magnetic_field_covariance // not implemented in sensor
+            // << "magnetometer_data.magnetic_field_covariance" << magnetometer_data.magnetic_field_covariance // not implemented in sensor*/
 
         std::cout << "Press Enter to takeoff" << std::endl; std::cin.get();
         float takeoffTimeout = 5; 

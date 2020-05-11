@@ -26,6 +26,7 @@ struct EchoSimpleParams {
 	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
 	real_T sensor_diameter;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+	bool ignore_marked = false;
 
 	std::string name = "EchoSensor";
 
@@ -64,6 +65,7 @@ struct EchoSimpleParams {
 		measurement_frequency = settings.measurement_frequency;
 		sensor_diameter = settings.sensor_diameter;
 		pause_after_measurement = settings.pause_after_measurement;
+		ignore_marked = settings.ignore_marked;
 
 		name = settings.sensor_name;
 

@@ -6,7 +6,7 @@ AirSim and ROS can be integrated using C++ or Python.  Some example ROS nodes ar
 
 ## Prerequisites
 
-These instructions are for Ubuntu 16.04, ROS Kinetic, UE4 4.18 or higher, and latest AirSim release.
+These instructions are for Ubuntu 16.04, ROS Kinetic, UE4 4.22 and latest AirSim release.
 You should have these components installed and working before proceeding
 
 ## Implemented nodes
@@ -18,6 +18,8 @@ You should have these components installed and working before proceeding
 - `car_control.py` : subscribe to `/cmd_vel` or another chosen topic and control the AirSim cars (Car and SkidVehicle SimModes).
 - `camera.py` : Get (up to 3 simultaneously) camera images from AirSim and publish them to ROS.
 
+[URDF Vehicles](UrdfXml.md) are implemented in the ROS API but don't have any ready made nodes. URDF is extemely dependent on which robot is build, each ROS node for it should therefore be handcrafted.
+
 ## Implemented launch files
 - `airsim_car_control.launch`: Take over the control of the AirSim car by listening on  `/cmd_vel` for input
 - `airsim_car_keyboard_control.launch`: Take over the control of the AirSim car (Car and SkidVehicle SimModes) and drive it using [teleop_twist_keyboard](http://wiki.ros.org/teleop_twist_keyboard).
@@ -28,7 +30,8 @@ You should have these components installed and working before proceeding
 - `airsim_benchmark_lidar_record.launch`: Publish the vehicle pose, LIDAR, IMU sensor data and record a bag file (**make sure to set output folder yourself correctly!**)
 - `airsim_benchmark_camera_record.launch`: Publish the vehicle pose and camera images (RGB, depth(10m max), segmentation) and record a bag file (**make sure to set output folder yourself correctly!**)
 
-You can use the launch argument `use_gpu_lidar` as true or false to define the Lidar type.
+You can use the launch argument `use_gpu_lidar` as true or false to define the Lidar type, e.g. 
+```roslaunch airsim airsim_pose_imu_lidar.launch use_gpu_lidar:=true```
 ## Setup
 
 ## Setup workspace and Airsim package
@@ -64,6 +67,7 @@ Or alternativly you can use launch files such as the example ones that can be fo
 Rviz is a useful visualization tool that can display the published data. Example Rviz configuration files can be found in _AirSim/ros/python_ws/src/airsim/rviz_.
 
 # C++ 
+**THIS IS NOT MAINTAINED BY COSYS-LAB SO IS LIKELY BROKEN**
 
 Please use the documentation for the C++ wrapper that can be found separately:
 - [ROS Wrapper package](../ros/cplusplus_ws/src/airsim_ros_pkgs/README.md)

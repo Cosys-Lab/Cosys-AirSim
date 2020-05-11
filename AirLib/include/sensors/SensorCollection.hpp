@@ -5,6 +5,7 @@
 #define msr_airlib_SensorCollection_hpp
 
 #include <unordered_map>
+#include <map>
 #include "sensors/SensorBase.hpp"
 #include "common/UpdatableContainer.hpp"
 #include "common/Common.hpp"
@@ -57,6 +58,17 @@ public:
     {
         for (auto& pair : sensors_) {
             for (auto& sensor : *pair.second) {
+                sensor->initialize(kinematics, environment);
+            }
+        }
+    }
+
+    void initialize(std::function<const msr::airlib::Kinematics::State*(std::string)> state_provider_fxn, const Environment* environment)
+    {
+        for (auto& pair : sensors_){
+            for (auto& sensor : *pair.second) {
+                std::string attach_link_name = sensor->getAttachLinkName();
+                const msr::airlib::Kinematics::State* kinematics = state_provider_fxn(attach_link_name);
                 sensor->initialize(kinematics, environment);
             }
         }

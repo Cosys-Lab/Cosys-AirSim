@@ -171,6 +171,7 @@ SimMode determines which simulation mode will be used. Below are currently suppo
 - `"Car"`: Use car simulation
 - `"ComputerVision"`: Use only camera, no vehicle or physics
 - `"SkidVehicle"`: use [skid-steering vehicle](skid_steer_vehicle.md) simulation
+- `"UrdfBot"`: use [URDF Bot](UrdfXml.md) simulation. 
 
 ## ViewMode 
 The ViewMode determines which camera to use as default and how camera will follow the vehicle. For multirotors, the default ViewMode is `"FlyWithMe"` while for cars the default ViewMode is `"SpringArmChase"`.
@@ -269,7 +270,7 @@ The `Gimbal` element allows to freeze camera orientation for pitch, roll and/or 
 Each simulation mode will go through the list of vehicles specified in this setting and create the ones that has `"AutoCreate": true`. Each vehicle specified in this setting has key which becomes the name of the vehicle. If `"Vehicles"` element is missing then this list is populated with default car named "PhysXCar" and default multirotor named "SimpleFlight".
 
 ### Common Vehicle Setting
-- `VehicleType`: This could be either `PhysXCar` or `BoxCar` for the Car SimMode, `SimpleFlight` or `PX4Multirotor` for the MultiRotor SimMode, `ComputerVision' for the ComputerVision SimMode and for the kid Steering SimMode you can use `CPHusky` or `Pioneer`. For a more info on the Skid Steer vehice model see [here](skid_steer_vehicle.md). There is no default value therefore this element must be specified.
+- `VehicleType`: This could be either `PhysXCar` or `BoxCar` for the Car SimMode, `SimpleFlight` or `PX4Multirotor` for the MultiRotor SimMode, `ComputerVision` for the ComputerVision SimMode ,`CPHusky` or `Pioneer` for SkidVehicle SimMode and `UrdfBot` for the UrdfBot SimMode. you can use There is no default value therefore this element must be specified.
 - `PawnPath`: This allows to override the pawn blueprint to use for the vehicle. For example, you may create new pawn blueprint derived from ACarPawn for a warehouse robot in your own project outside the AirSim code and then specify its path here. See also [PawnPaths](#PawnPaths).
 - `DefaultVehicleState`: Possible value for multirotors is `Armed` or `Disarmed`.
 - `AutoCreate`: If true then this vehicle would be spawned (if supported by selected sim mode).
@@ -350,6 +351,10 @@ You can connect the simulator to the LogViewer app, provided in this repo, by se
 And for each flying drone added to the simulator there is a named block of additional settings.  In the above you see the default name "PX4".   You can change this name from the Unreal Editor when you add a new BP_FlyingPawn asset.  You will see these properties grouped under the category "MavLink". The MavLink node for this pawn can be remote over UDP or it can be connected to a local serial port.  If serial then set UseSerial to true, otherwise set UseSerial to false and set the appropriate bard rate.  The default of 115200 works with Pixhawk version 2 over USB.
 
 ## Other Settings
+
+## URDF
+
+For aal URDF related settings see [the seperate documentation](UrdfXml.md).
 
 ### EngineSound
 To turn off the engine sound use [setting](settings.md) `"EngineSound": false`. Currently this setting applies only to car.

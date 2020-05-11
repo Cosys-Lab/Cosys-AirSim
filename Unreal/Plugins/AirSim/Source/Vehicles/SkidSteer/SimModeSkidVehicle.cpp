@@ -81,9 +81,12 @@ std::unique_ptr<msr::airlib::ApiServerBase> ASimModeSkidVehicle::createApiServer
 #endif
 }
 
-void ASimModeSkidVehicle::getExistingVehiclePawns(TArray<AActor*>& pawns) const
+void ASimModeSkidVehicle::getExistingVehiclePawns(TArray<AirsimVehicle*>& pawns) const
 {
-	UAirBlueprintLib::FindAllActor<TVehiclePawn>(this, pawns);
+	for (TActorIterator<TVehiclePawn> it(this->GetWorld()); it; ++it)
+	{
+		pawns.Add(static_cast<AirsimVehicle*>(*it));
+	}
 }
 
 bool ASimModeSkidVehicle::isVehicleTypeSupported(const std::string& vehicle_type) const
@@ -129,7 +132,7 @@ void ASimModeSkidVehicle::initializeVehiclePawn(APawn* pawn)
 std::unique_ptr<PawnSimApi> ASimModeSkidVehicle::createVehicleSimApi(
 	const PawnSimApi::Params& pawn_sim_api_params) const
 {
-	auto vehicle_pawn = static_cast<TVehiclePawn*>(pawn_sim_api_params.pawn);
+	auto vehicle_pawn = static_cast<TVehiclePawn*>(pawn_sim_api_params.vehicle->GetPawn());
 	auto vehicle_sim_api = std::unique_ptr<PawnSimApi>(new SkidVehiclePawnSimApi(pawn_sim_api_params,
 		vehicle_pawn->getKeyBoardControls(), vehicle_pawn->getVehicleMovementComponent()));
 	vehicle_sim_api->initialize();

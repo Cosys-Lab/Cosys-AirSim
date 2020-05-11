@@ -17,7 +17,7 @@ namespace msr { namespace airlib {
 class DistanceSimple  : public DistanceBase {
 public:
     DistanceSimple(const AirSimSettings::DistanceSetting& setting = AirSimSettings::DistanceSetting())
-        : DistanceBase(setting.sensor_name)
+        : DistanceBase(setting.sensor_name, setting.attach_link)
     {
         // initialize params
         params_.initializeFromSettings(setting);
