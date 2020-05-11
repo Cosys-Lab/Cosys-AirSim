@@ -2,11 +2,26 @@
   "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
   "SettingsVersion": 1.2,
   "ClockSpeed": 1,
-  "SimMode": "ComputerVision",
+  "SimMode": "SkidSteer",
   "SubWindows": [
-    { "WindowID": 0, "CameraName": "0", "ImageType": 5, "Visible": false },
-    { "WindowID": 1, "CameraName": "0", "ImageType": 0, "Visible": false },
-    { "WindowID": 2, "CameraName": "0", "ImageType": 3, "Visible": false }
+    {
+      "WindowID": 0,
+      "CameraName": "0",
+      "ImageType": 5,
+      "Visible": false
+    },
+    {
+      "WindowID": 1,
+      "CameraName": "0",
+      "ImageType": 0,
+      "Visible": false
+    },
+    {
+      "WindowID": 2,
+      "CameraName": "0",
+      "ImageType": 3,
+      "Visible": false
+    }
   ],
   "CameraDefaults": {
     "CaptureSettings": [
@@ -28,7 +43,7 @@
   },
   "Vehicles": {
     "airsimvehicle": {
-      "VehicleType": "ComputerVision",
+      "VehicleType": "CPHusky",
       "AutoCreate": true,
       "Sensors": {
         "imu": {
@@ -39,33 +54,28 @@
           "SensorType": 7,
           "Enabled": true,
           "SensorDiameter": 0.0,
-          "X": 0.35,
-          "Y": 0,
+          "X": 0.2,
+          "Y": 0.0,
           "Z": -0.2,
           "Roll": 0,
           "Pitch": 0,
           "Yaw": 0,
           "DataFrame": "SensorLocalFrame",
-
           "NumberOfTraces": 10000,
           "SpreadOpeningAngle": 10,
-
           "AttenuationPerDistance": 0,
           "AttenuationPerReflection": 0,
           "AttenuationLimit": -100,
-
-          "DistanceLimit": 10,
+          "DistanceLimit": 40,
           "ReflectionLimit": 3,
           "ReflectionDistanceLimit": 0.2,
-
           "DrawInitialPoints": false,
           "DrawBounceLines": false,
           "DrawReflectedPoints": true,
           "DrawReflectedLines": false,
           "DrawReflectedPaths": false,
           "DrawSensor": true,
-
-          "EngineTime": true,
+          "EngineTime": false,
           "MeasurementFrequency": 10,
           "PauseAfterMeasurement": false
         },
