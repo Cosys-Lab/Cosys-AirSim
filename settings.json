@@ -2,7 +2,7 @@
   "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
   "SettingsVersion": 1.2,
   "ClockSpeed": 1,
-  "SimMode": "SkidSteer",
+  "SimMode": "SkidVehicle",
   "SubWindows": [
     {
       "WindowID": 0,
@@ -54,7 +54,7 @@
           "SensorType": 7,
           "Enabled": true,
           "SensorDiameter": 0.0,
-          "X": 0.2,
+          "X": 0.4,
           "Y": 0.0,
           "Z": -0.2,
           "Roll": 0,
