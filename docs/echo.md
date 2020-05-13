@@ -20,12 +20,13 @@ The following parameters can be configured right now via settings json.
 Parameter                 | Description
 --------------------------| ------------
 NumberOfTraces            | Amount of traces (rays) being cast
+SpreadOpeningAngle        | Beam width of the scattered traces
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)
 AttenuationLimit          | Attenuation at which the signal is considered dissipated (dB)
-DistanceLimit             | Maximum distance a reflection can travel
-ReflectionLimit           | Maximum amount of reflections that can happen
-ReflectionDistanceLimit   | Maximum distance between two reflections 
+DistanceLimit             | Maximum distance the signal can travel.
+ReflectionLimit           | Maximum times the signal can reflect.
+ReflectionDistanceLimit   | Maximum distance between reflection locations.
 MeasurementFrequency      | The frequency of the sensor (measurements/s)
 PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
 SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
@@ -35,6 +36,7 @@ Roll Pitch Yaw            | Orientation of the echo relative to the vehicle  (in
 DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
 DrawReflectedPoints       | Draw debug points in world where reflected points are captured by the sensor
 DrawReflectedLines        | Draw debug lines in world from reflected points to the sensor
+DrawReflectedPaths        | Draw debug lines for the full path of reflected points to the sensor
 DrawInitialPoints         | Draw the points of the initial half sphere where the traces (rays) are cast
 DrawBounceLines           | Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 DrawSensor                | Draw the physical sensor in the world on the vehicle
@@ -42,38 +44,45 @@ IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ fr
 e.g.,
 ```
 {
-    "SeeDocsAt": "settings_json.md",
-    "SettingsVersion": 1.2,
-    "SimMode": "CPHusky",
+	"SeeDocsAt": "settings_json.md",
+	"SettingsVersion": 1.2,
+	"SimMode": "CPHusky",
 	"Vehicles": {
-		"CPHusky": {
-			"VehicleType": "CPHusky",
-			"AutoCreate": true,
-			"Sensors": {
-				"SonarSensor1": {
-					"SensorType": 7,
-					"Enabled" : true,
-					"NumberOfTraces": 5000,
-					"AttenuationPerDistance": 8,
-					"AttenuationPerReflection": 3,
-					"AttenuationLimit": 50,
-					"DistanceLimit": 10,
-					"ReflectionLimit": 3,
-					"ReflectionDistanceLimit": 0.4,
-					"MeasurementFrequency": 1,
-					"PauseAfterMeasurement": false,
-					"SensorDiameter": 0.5,
-					"X": 0.45, "Y": 0, "Z": -0.5,
-					"Roll": 0, "Pitch": 0, "Yaw" : 0,
-					"DrawReflectedPoints": true,
-					"DrawReflectedLines": true,
-					"DrawInitialPoints": true,
-					"DrawBounceLines": false,
-					"DrawSensor": false,
-					"EngineTime": true,
-					"DataFrame": "SensorLocalFrame",
-					"IgnoreMarked": true
-				}	
+		"Vehicles": {
+			"airsimvehicle": {
+				"VehicleType": "CPHusky",
+				"AutoCreate": true,
+				"Sensors": {
+					"echo": {
+						"SensorType": 7,
+						"Enabled": true,
+						"SensorDiameter": 0.0,
+						"X": 0.2,
+						"Y": 0.0,
+						"Z": -0.2,
+						"Roll": 0,
+						"Pitch": 0,
+						"Yaw": 0,
+						"DataFrame": "SensorLocalFrame",
+						"NumberOfTraces": 10000,
+						"SpreadOpeningAngle": 10,
+						"AttenuationPerDistance": 0,
+						"AttenuationPerReflection": 0,
+						"AttenuationLimit": -100,
+						"DistanceLimit": 40,
+						"ReflectionLimit": 3,
+						"ReflectionDistanceLimit": 0.2,
+						"DrawInitialPoints": false,
+						"DrawBounceLines": false,
+						"DrawReflectedPoints": true,
+						"DrawReflectedLines": false,
+						"DrawReflectedPaths": false,
+						"DrawSensor": true,
+						"EngineTime": false,
+						"MeasurementFrequency": 10,
+						"PauseAfterMeasurement": false
+					}
+				}
 			}
 		}
 	}
