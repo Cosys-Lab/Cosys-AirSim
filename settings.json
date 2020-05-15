@@ -53,7 +53,7 @@
         "echo": {
           "SensorType": 7,
           "Enabled": true,
-          "SensorDiameter": 0.0,
+          "SensorDiameter": 0.1,
           "X": 0.4,
           "Y": 0.0,
           "Z": -0.2,
@@ -68,7 +68,7 @@
           "AttenuationLimit": -100,
           "DistanceLimit": 40,
           "ReflectionLimit": 3,
-          "ReflectionDistanceLimit": 0.2,
+          "ReflectionDistanceLimit": 0.3,
           "DrawInitialPoints": false,
           "DrawBounceLines": false,
           "DrawReflectedPoints": true,
