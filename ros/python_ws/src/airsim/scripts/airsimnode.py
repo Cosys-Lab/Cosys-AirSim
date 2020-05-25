@@ -4,6 +4,7 @@ import setup_path
 import airsimpy
 import rospy
 import tf2_ros
+import time
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import Imu
@@ -14,6 +15,8 @@ from geometry_msgs.msg import Twist
 from airsim.msg import StringArray
 import numpy as np
 import os
+import cv2
+from cv_bridge import CvBridge
 
 def handle_airsim_pose(msg, args):
     br = tf2_ros.TransformBroadcaster()
@@ -118,42 +121,71 @@ def get_image_bytes(data, cameraType):
     return img_rgb_string
 
 
-def airsim_pub(activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, imuName,
+def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, imuName,
                       vehicleName, carcontrolInputTopic):
     # Reading from Tuples
-    cameraActive = activeTuple[0]
-    lidarActive = activeTuple[1]
-    gpulidarActive = activeTuple[2]
-    imuActive = activeTuple[3]
-    poseActive = activeTuple[4]
-    carcontrolActive = activeTuple[5]
+    camera1Active = activeTuple[0]
+    camera2Active = activeTuple[1]
+    camera3Active = activeTuple[2]
+    lidarActive = activeTuple[3]
+    gpulidarActive = activeTuple[4]
+    imuActive = activeTuple[5]
+    poseActive = activeTuple[6]
+    carcontrolActive = activeTuple[7]
 
-    sceneCameraTopicName = topicsTuple[0]
-    segmentationCameraTopicName = topicsTuple[1]
-    depthCameraTopicName = topicsTuple[2]
-    lidarTopicName = topicsTuple[3]
-    lidarGroundtruthTopicName = topicsTuple[4]
-    imuTopicName = topicsTuple[5]
-    poseTopicName = topicsTuple[6]
+    sceneCamera1TopicName = topicsTuple[0]
+    segmentationCamera1TopicName = topicsTuple[1]
+    depthCamera1TopicName = topicsTuple[2]
+    sceneCamera2TopicName = topicsTuple[3]
+    segmentationCamera2TopicName = topicsTuple[4]
+    depthCamera2TopicName = topicsTuple[5]
+    sceneCamera3TopicName = topicsTuple[6]
+    segmentationCamera3TopicName = topicsTuple[7]
+    depthCamera3TopicName = topicsTuple[8]
+    lidarTopicName = topicsTuple[9]
+    lidarGroundtruthTopicName = topicsTuple[10]
+    imuTopicName = topicsTuple[11]
+    poseTopicName = topicsTuple[12]
 
-    cameraFrame = framesTuple[0]
-    lidarFrame = framesTuple[1]
-    imuFrame = framesTuple[2]
-    poseFrame = framesTuple[3]
+    camera1Frame = framesTuple[0]
+    camera2Frame = framesTuple[1]
+    camera3Frame = framesTuple[2]
+    lidarFrame = framesTuple[3]
+    imuFrame = framesTuple[4]
+    poseFrame = framesTuple[5]
 
-    cameraName = cameraSettingsTuple[0]
-    cameraHeight = cameraSettingsTuple[1]
-    cameraWidth = cameraSettingsTuple[2]
+    camera1Name = cameraSettingsTuple[0]
+    camera2Name = cameraSettingsTuple[1]
+    camera3Name = cameraSettingsTuple[2]
+    camera1SceneOnly = cameraSettingsTuple[3]
+    camera2SceneOnly = cameraSettingsTuple[4]
+    camera3SceneOnly = cameraSettingsTuple[5]
+    camera1Mono = cameraSettingsTuple[6]
+    camera2Mono = cameraSettingsTuple[7]
+    camera3Mono = cameraSettingsTuple[8]
+    cameraHeight = cameraSettingsTuple[9]
+    cameraWidth = cameraSettingsTuple[10]
 
     client = airsimpy.CarClient()
     client.confirmConnection(rospy.get_name())
 
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(rosRate)
 
-    if cameraActive:
-        sceneCameraPub = rospy.Publisher(sceneCameraTopicName, Image, queue_size=1)
-        segmentationCameraPub = rospy.Publisher(segmentationCameraTopicName, Image, queue_size=1)
-        depthCameraPub = rospy.Publisher(depthCameraTopicName, Image, queue_size=1)
+    if camera1Active:
+        sceneCamera1Pub = rospy.Publisher(sceneCamera1TopicName, Image, queue_size=1)
+        if not camera1SceneOnly:
+            segmentationCamera1Pub = rospy.Publisher(segmentationCamera1TopicName, Image, queue_size=1)
+            depthCamera1Pub = rospy.Publisher(depthCamera1TopicName, Image, queue_size=1)
+    if camera2Active:
+        sceneCamera2Pub = rospy.Publisher(sceneCamera2TopicName, Image, queue_size=1)
+        if not camera2SceneOnly:
+            segmentationCamera2Pub = rospy.Publisher(segmentationCamera2TopicName, Image, queue_size=1)
+            depthCamera2Pub = rospy.Publisher(depthCamera2TopicName, Image, queue_size=1)
+    if camera3Active:
+        sceneCamera3Pub = rospy.Publisher(sceneCamera3TopicName, Image, queue_size=1)
+        if not camera3SceneOnly:
+            segmentationCamera3Pub = rospy.Publisher(segmentationCamera3TopicName, Image, queue_size=1)
+            depthCamera3Pub = rospy.Publisher(depthCamera3TopicName, Image, queue_size=1)
     if lidarActive or gpulidarActive:
         lidarPub = rospy.Publisher(lidarTopicName, PointCloud2, queue_size=1)
     if lidarActive:
@@ -170,36 +202,134 @@ def airsim_pub(activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidar
     # Some temporary variables
     lastTimeStamp= None
 
+    bridge = CvBridge()
+
     while not rospy.is_shutdown():
-        if cameraActive:
+        if camera1Active:
             # Get camera images
-            responses = client.simGetImages([
-                airsimpy.ImageRequest(cameraName, get_camera_type("Scene"), is_pixels_as_float("Scene"),
-                                      False),
-                airsimpy.ImageRequest(cameraName, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"),
-                                      False),
-                airsimpy.ImageRequest(cameraName, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
+            if not camera1SceneOnly:
+                responses = client.simGetImages([
+                    airsimpy.ImageRequest(camera1Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
+                                        False),
+                    airsimpy.ImageRequest(camera1Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"),
+                                        False),
+                    airsimpy.ImageRequest(camera1Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
                                       False)])
+                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+                img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
+                img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
+            else:
+                responses = client.simGetImages([
+                airsimpy.ImageRequest(camera1Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
+                                      False)])
+                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
 
-            img_rgb_string1 = get_image_bytes(responses[0], "Scene")
-            img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
-            img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
+            if(len(img_rgb_string1) > 1):    
+                if camera1Mono:
+                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                else:
+                    msg = Image()
+                    msg.height = cameraHeight
+                    msg.width = cameraWidth
+                    msg.is_bigendian = 0  
+                    msg.encoding = "rgb8"
+                    msg.step = cameraWidth * 3
+                    msg.data = img_rgb_string1      
+                msg.header.stamp = rospy.Time.now()
+                msg.header.frame_id = camera1Frame
+                sceneCamera1Pub.publish(msg)
+                if not camera1SceneOnly:
+                    msg.step = cameraWidth * 3
+                    msg.data = img_rgb_string2
+                    segmentationCamera1Pub.publish(msg)
+                    msg.encoding = "32FC1"
+                    msg.data = img_rgb_string3
+                    depthCamera1Pub.publish(msg)
 
-            msg = Image()
-            msg.header.stamp = rospy.Time.now()
-            msg.header.frame_id = cameraFrame
-            msg.encoding = "rgb8"
-            msg.height = cameraHeight
-            msg.width = cameraWidth
-            msg.data = img_rgb_string1
-            msg.is_bigendian = 0
-            msg.step = msg.width * 3
-            sceneCameraPub.publish(msg)
-            msg.data = img_rgb_string2
-            segmentationCameraPub.publish(msg)
-            msg.encoding = "32FC1"
-            msg.data = img_rgb_string3
-            depthCameraPub.publish(msg)
+        if camera2Active:
+            # Get camera images
+            if not camera2SceneOnly:
+                responses = client.simGetImages([
+                    airsimpy.ImageRequest(camera2Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
+                                        False),
+                    airsimpy.ImageRequest(camera2Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"),
+                                        False),
+                    airsimpy.ImageRequest(camera2Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
+                                        False)])
+                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+                img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
+                img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
+            else:
+                responses = client.simGetImages([
+                    airsimpy.ImageRequest(camera2Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
+                                        False)])
+                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+
+            if(len(img_rgb_string1) > 1):    
+                if camera2Mono:
+                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                else:
+                    msg = Image()
+                    msg.height = cameraHeight
+                    msg.width = cameraWidth
+                    msg.is_bigendian = 0  
+                    msg.encoding = "rgb8"
+                    msg.step = cameraWidth * 3
+                    msg.data = img_rgb_string1      
+                msg.header.stamp = rospy.Time.now()
+                msg.header.frame_id = camera2Frame
+                sceneCamera2Pub.publish(msg)
+                if not camera2SceneOnly:
+                    msg.step = cameraWidth * 3
+                    msg.data = img_rgb_string2
+                    segmentationCamera2Pub.publish(msg)
+                    msg.encoding = "32FC1"
+                    msg.data = img_rgb_string3
+                    depthCamera2Pub.publish(msg)
+
+        if camera3Active:
+            # Get camera images
+            if not camera3SceneOnly:
+                responses = client.simGetImages([
+                    airsimpy.ImageRequest(camera3Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
+                                        False),
+                    airsimpy.ImageRequest(camera3Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"),
+                                        False),
+                    airsimpy.ImageRequest(camera3Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
+                                        False)])
+                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+                img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
+                img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
+            else:
+                responses = client.simGetImages([
+                    airsimpy.ImageRequest(camera3Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
+                                        False)])
+                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+
+            if(len(img_rgb_string1) > 1):    
+                if camera3Mono:
+                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                else:
+                    msg = Image()
+                    msg.height = cameraHeight
+                    msg.width = cameraWidth
+                    msg.is_bigendian = 0  
+                    msg.encoding = "rgb8"
+                    msg.step = cameraWidth * 3
+                    msg.data = img_rgb_string1      
+                msg.header.stamp = rospy.Time.now()
+                msg.header.frame_id = camera2Frame
+                sceneCamera3Pub.publish(msg)
+                if not camera3SceneOnly:
+                    msg.step = cameraWidth * 3
+                    msg.data = img_rgb_string2
+                    segmentationCamera3Pub.publish(msg)
+                    msg.encoding = "32FC1"
+                    msg.data = img_rgb_string3
+                    depthCamera3Pub.publish(msg)
 
         if lidarActive or gpulidarActive:
 
@@ -294,37 +424,60 @@ if __name__ == '__main__':
     try:
         rospy.init_node('airsim_publisher', anonymous=True)
 
+        # Desired update frequency
+        rosRate = rospy.get_param('~rate', 10)
+
+
         # Active publish topics
-        cameraActive = rospy.get_param('~camera_active', 1)
+        camera1Active = rospy.get_param('~camera1_active', 1)
+        camera2Active = rospy.get_param('~camera2_active', 1)
+        camera3Active = rospy.get_param('~camera3_active', 1)
         lidarActive = rospy.get_param('~lidar_active', 1)
         gpulidarActive = rospy.get_param('~gpulidar_active', 0)
         imuActive = rospy.get_param('~imu_active', 1)
         poseActive = rospy.get_param('~pose_active', 1)
         carcontrolActive = rospy.get_param('~carcontrol_active', 0)
-        activeTuple = (cameraActive, lidarActive, gpulidarActive, imuActive, poseActive, carcontrolActive)
+        activeTuple = (camera1Active, camera2Active, camera3Active, lidarActive, gpulidarActive, imuActive, poseActive, carcontrolActive)
 
         # Publish topic names
-        sceneCameraTopicName = rospy.get_param('~topic_scene_camera', 'airsim/rgb/image')
-        segmentationCameraTopicName = rospy.get_param('~topic_segmentation_camera', 'airsim/segmentation/image')
-        depthCameraTopicName = rospy.get_param('~topic_depth_camera', 'airsim/depth/image')
+        sceneCamera1TopicName = rospy.get_param('~topic_scene_camera1', 'airsim/rgb/image')
+        segmentationCamera1TopicName = rospy.get_param('~topic_segmentation_camera1', 'airsim/segmentation/image')
+        depthCamera1TopicName = rospy.get_param('~topic_depth_camera1', 'airsim/depth/image')
+        sceneCamera2TopicName = rospy.get_param('~topic_scene_camera2', 'airsim/rgb2/image')
+        segmentationCamera2TopicName = rospy.get_param('~topic_segmentation_camera2', 'airsim/segmentation2/image')
+        depthCamera2TopicName = rospy.get_param('~topic_depth_camera2', 'airsim/depth2/image')
+        sceneCamera3TopicName = rospy.get_param('~topic_scene_camera3', 'airsim/rgb3/image')
+        segmentationCamera3TopicName = rospy.get_param('~topic_segmentation_camera3', 'airsim/segmentation3/image')
+        depthCamera3TopicName = rospy.get_param('~topic_depth_camera3', 'airsim/depth3/image')
         lidarTopicName = rospy.get_param('~topic_lidar', 'airsim/lidar')
         lidarGroundtruthTopicName =  rospy.get_param('~topic_lidar_groundtruth', 'airsim/lidargroundtruth')
         imuTopicName = rospy.get_param('~topic_imu', 'airsim/imu')
         poseTopicName = rospy.get_param('~topic_pose', 'airsim/pose')
-        topicsTuple = (sceneCameraTopicName, segmentationCameraTopicName, depthCameraTopicName, lidarTopicName, lidarGroundtruthTopicName, imuTopicName, poseTopicName)
+        topicsTuple = (sceneCamera1TopicName, segmentationCamera1TopicName, depthCamera1TopicName, sceneCamera2TopicName, segmentationCamera2TopicName, depthCamera2TopicName, sceneCamera3TopicName, segmentationCamera3TopicName, depthCamera3TopicName,
+         lidarTopicName, lidarGroundtruthTopicName, imuTopicName, poseTopicName)
 
         # Frames
-        cameraFrame = rospy.get_param('~camera_frame_id', 'base_camera')
+        camera1Frame = rospy.get_param('~camera1_frame_id', 'base_camera')
+        camera2Frame = rospy.get_param('~camera2_frame_id', 'base_camera')
+        camera3Frame = rospy.get_param('~camera3_frame_id', 'base_camera')
         lidarFrame = rospy.get_param('~lidar_frame_id', 'base_laser')
         imuFrame = rospy.get_param('~imu_frame_id', 'base_link')
         poseFrame = rospy.get_param('~pose_frame_id', 'world')
-        framesTuple = (cameraFrame, lidarFrame, imuFrame, poseFrame )
+        framesTuple = (camera1Frame, camera2Frame, camera3Frame, lidarFrame, imuFrame, poseFrame )
 
         # Camera settings
-        cameraName = rospy.get_param('~camera_name', "front_center")
+        camera1Name = rospy.get_param('~camera1_name', "front_center")
+        camera2Name = rospy.get_param('~camera2_name', "front_left")
+        camera3Name = rospy.get_param('~camera3_name', "front_right")
+        camera1SceneOnly = rospy.get_param('~camera1_sceneonly', 0)
+        camera2SceneOnly = rospy.get_param('~camera2_sceneonly', 0)
+        camera3SceneOnly = rospy.get_param('~camera3_sceneonly', 0)
+        camera1Mono = rospy.get_param('~camera1_mono', 0)
+        camera2Mono = rospy.get_param('~camera2_mono', 0)
+        camera3Mono = rospy.get_param('~camera3_mono', 0)
         cameraHeight = rospy.get_param('~camera_height', 540)
         cameraWidth = rospy.get_param('~camera_width', 960)
-        cameraSettingsTuple = (cameraName, cameraHeight, cameraWidth)
+        cameraSettingsTuple = (camera1Name, camera2Name, camera3Name, camera1SceneOnly, camera2SceneOnly, camera3SceneOnly, camera1Mono, camera2Mono, camera3Mono, cameraHeight, cameraWidth)
 
         # Lidar settings
         lidarName =  rospy.get_param('~lidar_name', 'lidar')
@@ -338,7 +491,7 @@ if __name__ == '__main__':
         # Car Control settings
         carcontrolInputTopic = rospy.get_param('~carcontrol_input_topic', 'cmd_vel')
 
-        airsim_pub(activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, imuName,
+        airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, imuName,
                       vehicleName, carcontrolInputTopic )
 
     except rospy.ROSInterruptException:
