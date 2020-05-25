@@ -4,8 +4,11 @@
 "SimMode": "Car",
 "VehicleType": "PhysXCar",
 
-"SimMode": "SkidSteer",
+"SimMode": "SkidVehicle",
 "VehicleType": "CPHusky",
+
+"SimMode": "SkidVehicle",
+"VehicleType": "Pioneer",
 
 "SimMode": "Multirotor",
 "VehicleType": "SimpleFlight",
