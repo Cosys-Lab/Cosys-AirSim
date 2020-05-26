@@ -383,12 +383,12 @@ def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTup
             imu_msg.orientation.z = imuData.orientation.inverse().z_val
             imu_msg.orientation.w = imuData.orientation.inverse().w_val
 
-            imu_msg.angular_velocity.x = np.deg2rad(imuData.angular_velocity.x_val)
-            imu_msg.angular_velocity.y = -np.deg2rad(imuData.angular_velocity.y_val)
-            imu_msg.angular_velocity.z = -np.deg2rad(imuData.angular_velocity.z_val)
+            imu_msg.angular_velocity.x = imuData.angular_velocity.x_val
+            imu_msg.angular_velocity.y = -imuData.angular_velocity.y_val
+            imu_msg.angular_velocity.z = -imuData.angular_velocity.z_val
 
-            imu_msg.linear_acceleration.x = imuData.linear_acceleration.x_val
-            imu_msg.linear_acceleration.y = -imuData.linear_acceleration.y_val
+            imu_msg.linear_acceleration.x = -imuData.linear_acceleration.x_val
+            imu_msg.linear_acceleration.y = imuData.linear_acceleration.y_val
             imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
 
             # publish Imu message
