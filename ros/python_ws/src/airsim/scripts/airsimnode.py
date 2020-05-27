@@ -205,23 +205,35 @@ def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTup
     bridge = CvBridge()
 
     while not rospy.is_shutdown():
+
+        cameraTimeStamp = rospy.Time.now()
+
+        # Get camera images
+        requests = []
         if camera1Active:
-            # Get camera images
+            requests.append(airsimpy.ImageRequest(camera1Name, get_camera_type("Scene"), is_pixels_as_float("Scene"), False))
             if not camera1SceneOnly:
-                responses = client.simGetImages([
-                    airsimpy.ImageRequest(camera1Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
-                                        False),
-                    airsimpy.ImageRequest(camera1Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"),
-                                        False),
-                    airsimpy.ImageRequest(camera1Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
-                                      False)])
+                requests.append(airsimpy.ImageRequest(camera1Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"), False))
+                requests.append(airsimpy.ImageRequest(camera1Name, get_camera_type("Scene"), is_pixels_as_float("Scene"), False))
+        if camera2Active:
+            requests.append(airsimpy.ImageRequest(camera2Name, get_camera_type("Scene"), is_pixels_as_float("Scene"), False))
+            if not camera2SceneOnly:
+                requests.append(airsimpy.ImageRequest(camera2Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"), False))
+                requests.append(airsimpy.ImageRequest(camera2Name, get_camera_type("Scene"), is_pixels_as_float("Scene"), False))
+        if camera3Active:
+            requests.append(airsimpy.ImageRequest(camera3Name, get_camera_type("Scene"), is_pixels_as_float("Scene"), False))
+            if not camera3SceneOnly:
+                requests.append(airsimpy.ImageRequest(camera3Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"), False))
+                requests.append(airsimpy.ImageRequest(camera3Name, get_camera_type("Scene"), is_pixels_as_float("Scene"), False))
+        
+        responses = client.simGetImages(requests)
+
+        if camera1Active:
+            if not camera1SceneOnly:
                 img_rgb_string1 = get_image_bytes(responses[0], "Scene")
                 img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
                 img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
             else:
-                responses = client.simGetImages([
-                airsimpy.ImageRequest(camera1Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
-                                      False)])
                 img_rgb_string1 = get_image_bytes(responses[0], "Scene")
 
             if(len(img_rgb_string1) > 1):    
@@ -236,7 +248,7 @@ def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTup
                     msg.encoding = "rgb8"
                     msg.step = cameraWidth * 3
                     msg.data = img_rgb_string1      
-                msg.header.stamp = rospy.Time.now()
+                msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera1Frame
                 sceneCamera1Pub.publish(msg)
                 if not camera1SceneOnly:
@@ -248,23 +260,28 @@ def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTup
                     depthCamera1Pub.publish(msg)
 
         if camera2Active:
-            # Get camera images
             if not camera2SceneOnly:
-                responses = client.simGetImages([
-                    airsimpy.ImageRequest(camera2Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
-                                        False),
-                    airsimpy.ImageRequest(camera2Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"),
-                                        False),
-                    airsimpy.ImageRequest(camera2Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
-                                        False)])
-                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
-                img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
-                img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
+                if camera1Active:
+                    if not camera1SceneOnly:
+                        img_rgb_string1 = get_image_bytes(responses[3], "Scene")
+                        img_rgb_string2 = get_image_bytes(responses[4], "Segmentation")
+                        img_rgb_string3 = get_image_bytes(responses[5], "DepthPlanner")
+                    else:
+                        img_rgb_string1 = get_image_bytes(responses[1], "Scene")
+                        img_rgb_string2 = get_image_bytes(responses[2], "Segmentation")
+                        img_rgb_string3 = get_image_bytes(responses[3], "DepthPlanner")
+                else:
+                        img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+                        img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
+                        img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
             else:
-                responses = client.simGetImages([
-                    airsimpy.ImageRequest(camera2Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
-                                        False)])
-                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+                if camera1Active:
+                    if not camera1SceneOnly:
+                        img_rgb_string1 = get_image_bytes(responses[3], "Scene")
+                    else:
+                        img_rgb_string1 = get_image_bytes(responses[1], "Scene")
+                else:
+                    img_rgb_string1 = get_image_bytes(responses[0], "Scene")
 
             if(len(img_rgb_string1) > 1):    
                 if camera2Mono:
@@ -278,7 +295,7 @@ def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTup
                     msg.encoding = "rgb8"
                     msg.step = cameraWidth * 3
                     msg.data = img_rgb_string1      
-                msg.header.stamp = rospy.Time.now()
+                msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera2Frame
                 sceneCamera2Pub.publish(msg)
                 if not camera2SceneOnly:
@@ -290,23 +307,76 @@ def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTup
                     depthCamera2Pub.publish(msg)
 
         if camera3Active:
-            # Get camera images
             if not camera3SceneOnly:
-                responses = client.simGetImages([
-                    airsimpy.ImageRequest(camera3Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
-                                        False),
-                    airsimpy.ImageRequest(camera3Name, get_camera_type("Segmentation"), is_pixels_as_float("Segmentation"),
-                                        False),
-                    airsimpy.ImageRequest(camera3Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"),
-                                        False)])
-                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
-                img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
-                img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
+                if camera1Active:
+                    if not camera1SceneOnly:
+                        if camera2Active:
+                            if not camera2SceneOnly:
+                                img_rgb_string1 = get_image_bytes(responses[6], "Scene")
+                                img_rgb_string2 = get_image_bytes(responses[7], "Segmentation")
+                                img_rgb_string3 = get_image_bytes(responses[8], "DepthPlanner")
+                            else:
+                                img_rgb_string1 = get_image_bytes(responses[4], "Scene")
+                                img_rgb_string2 = get_image_bytes(responses[5], "Segmentation")
+                                img_rgb_string3 = get_image_bytes(responses[6], "DepthPlanner")
+                        else:
+                            img_rgb_string1 = get_image_bytes(responses[3], "Scene")
+                            img_rgb_string2 = get_image_bytes(responses[4], "Segmentation")
+                            img_rgb_string3 = get_image_bytes(responses[5], "DepthPlanner")
+                    else:
+                        if camera2Active:
+                            if not camera2SceneOnly:
+                                img_rgb_string1 = get_image_bytes(responses[4], "Scene")
+                                img_rgb_string2 = get_image_bytes(responses[5], "Segmentation")
+                                img_rgb_string3 = get_image_bytes(responses[6], "DepthPlanner")
+                            else:
+                                img_rgb_string1 = get_image_bytes(responses[2], "Scene")
+                                img_rgb_string2 = get_image_bytes(responses[3], "Segmentation")
+                                img_rgb_string3 = get_image_bytes(responses[4], "DepthPlanner")
+                        else:
+                            img_rgb_string1 = get_image_bytes(responses[1], "Scene")
+                            img_rgb_string2 = get_image_bytes(responses[2], "Segmentation")
+                            img_rgb_string3 = get_image_bytes(responses[3], "DepthPlanner")
+                else:
+                    if camera2Active:
+                        if not camera2SceneOnly:
+                            img_rgb_string1 = get_image_bytes(responses[3], "Scene")
+                            img_rgb_string2 = get_image_bytes(responses[4], "Segmentation")
+                            img_rgb_string3 = get_image_bytes(responses[5], "DepthPlanner")
+                        else:
+                            img_rgb_string1 = get_image_bytes(responses[1], "Scene")
+                            img_rgb_string2 = get_image_bytes(responses[2], "Segmentation")
+                            img_rgb_string3 = get_image_bytes(responses[3], "DepthPlanner")
+                    else:
+                        img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+                        img_rgb_string2 = get_image_bytes(responses[1], "Segmentation")
+                        img_rgb_string3 = get_image_bytes(responses[2], "DepthPlanner")
             else:
-                responses = client.simGetImages([
-                    airsimpy.ImageRequest(camera3Name, get_camera_type("Scene"), is_pixels_as_float("Scene"),
-                                        False)])
-                img_rgb_string1 = get_image_bytes(responses[0], "Scene")
+                if camera1Active:
+                    if not camera1SceneOnly:
+                        if camera2Active:
+                            if not camera2SceneOnly:
+                                img_rgb_string1 = get_image_bytes(responses[6], "Scene")
+                            else:
+                                img_rgb_string1 = get_image_bytes(responses[4], "Scene")
+                        else:
+                            img_rgb_string1 = get_image_bytes(responses[3], "Scene")
+                    else:
+                        if camera2Active:
+                            if not camera2SceneOnly:
+                                img_rgb_string1 = get_image_bytes(responses[4], "Scene")
+                            else:
+                                img_rgb_string1 = get_image_bytes(responses[2], "Scene")
+                        else:
+                            img_rgb_string1 = get_image_bytes(responses[1], "Scene")
+                else:
+                    if camera2Active:
+                            if not camera2SceneOnly:
+                                img_rgb_string1 = get_image_bytes(responses[3], "Scene")
+                            else:
+                                img_rgb_string1 = get_image_bytes(responses[1], "Scene")
+                    else:
+                        img_rgb_string1 = get_image_bytes(responses[0], "Scene")
 
             if(len(img_rgb_string1) > 1):    
                 if camera3Mono:
@@ -320,8 +390,8 @@ def airsim_pub(rosRate, activeTuple, topicsTuple, framesTuple, cameraSettingsTup
                     msg.encoding = "rgb8"
                     msg.step = cameraWidth * 3
                     msg.data = img_rgb_string1      
-                msg.header.stamp = rospy.Time.now()
-                msg.header.frame_id = camera2Frame
+                msg.header.stamp = cameraTimeStamp
+                msg.header.frame_id = camera3Frame
                 sceneCamera3Pub.publish(msg)
                 if not camera3SceneOnly:
                     msg.step = cameraWidth * 3
