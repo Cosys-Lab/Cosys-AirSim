@@ -4,7 +4,8 @@
       <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
 
             <param name="rate" type="int" value="10" />
-
+            <param name="imu_rate" type="int" value="100" />
+            
             <param name="camera1_active" type="int" value="1" />
             <param name="camera2_active" type="int" value="0" />
             <param name="camera3_active" type="int" value="0" />
