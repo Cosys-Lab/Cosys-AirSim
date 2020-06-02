@@ -44,6 +44,8 @@ void UnrealLidarSensor::createLasers()
 		const float vertical_angle = params.vertical_FOV_upper - static_cast<float>(i) * delta_angle;
 		laser_angles_.emplace_back(vertical_angle);
 	}
+
+	current_horizontal_angle_ = -(360.0f / params.measurement_per_cycle);
 }
 
 // Pause Unreal simulation
@@ -91,7 +93,7 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 	constexpr float MAX_POINTS_IN_SCAN = 5000;
 	if (params.limit_points && points_to_scan_with_one_laser_temp * number_of_lasers > MAX_POINTS_IN_SCAN)
 	{
-		UAirBlueprintLib::LogMessageString("Lidarerror: ", "Capping number of points to scan " + std::to_string(points_to_scan_with_one_laser_temp * number_of_lasers), LogDebugLevel::Failure);
+		UAirBlueprintLib::LogMessageString("Lidar Error: ", "Capping number of points to scan " + std::to_string(points_to_scan_with_one_laser_temp * number_of_lasers), LogDebugLevel::Failure);
 		points_to_scan_with_one_laser_temp = MAX_POINTS_IN_SCAN / number_of_lasers;
 	}
 	const uint32 points_to_scan_with_one_laser = points_to_scan_with_one_laser_temp;
@@ -100,30 +102,43 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 	float laser_start = std::fmod(360.0f + params.horizontal_FOV_start, 360.0f);
 	float laser_end = std::fmod(360.0f + params.horizontal_FOV_end, 360.0f);
 
-	float previous_horizontal_angle = 0;
+	float previous_horizontal_angle = current_horizontal_angle_;
+
 	// shoot lasers
-	for (auto i = 0u; i < points_to_scan_with_one_laser; ++i)
+	for (uint32 i = 1; i <= points_to_scan_with_one_laser; ++i)
 	{
-		const float horizontal_angle = std::fmod(current_horizontal_angle_ + angle_distance_of_laser_measure * i, 360.0f);
+		float horizontal_angle = std::fmod(current_horizontal_angle_ + angle_distance_of_laser_measure * i, 360.0f);
+		//UE_LOG(LogTemp, Display, TEXT("horizontal_angle: %f "), horizontal_angle);
+
 		for (auto laser = 0u; laser < number_of_lasers; ++laser)
 		{
-			const float vertical_angle = laser_angles_[laser];
+			float vertical_angle = laser_angles_[laser];
 			if(previous_horizontal_angle > horizontal_angle){
 				if (laser == 0u) {
+					if ((((int)point_cloud.size() / 3) != params.measurement_per_cycle * number_of_lasers) || (groundtruth.size() != params.measurement_per_cycle * number_of_lasers))
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Pointcloud or labels incorrect size! points:%i labels:%i"), (int)(point_cloud.size() / 3), groundtruth.size());
+					}		
+					//UE_LOG(LogTemp, Display, TEXT("Pointcloud completed! points:%i labels:%i"), (int)(point_cloud.size() / 3), groundtruth.size());
 					point_cloud_final = point_cloud;
 					groundtruth_final = groundtruth;
 					point_cloud.clear();
 					groundtruth.clear();
-					UE_LOG(LogTemp, Error, TEXT("Pointcloud completed!"));
 					refresh = true;
 				}
 			}
-			// check if the laser is outside the requested horizontal FOV
-			if (!VectorMath::isAngleBetweenAngles(horizontal_angle, laser_start, laser_end)) {
+			
+			// check if horizontal angle is a duplicate
+			if ((horizontal_angle - previous_horizontal_angle) <= 0.005f && (horizontal_angle - 0) >= 0.005f) {
+				UE_LOG(LogTemp, Display, TEXT("duplicate horizontal angle! angle:%f"), horizontal_angle);
 				continue;
 			}
-				
-				
+
+			// check if the laser is outside the requested horizontal FOV
+			if (!VectorMath::isAngleBetweenAngles(horizontal_angle, laser_start, laser_end)) {
+				//UE_LOG(LogTemp, Display, TEXT("outside of FOV: %f "), horizontal_angle);
+				continue;
+			}			
 
 			Vector3r point;
 			std::string label;
@@ -135,14 +150,18 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 				point_cloud.emplace_back(point.z());
 				groundtruth.emplace_back(label);
 			}
+			else {
+				point_cloud.emplace_back(0);
+				point_cloud.emplace_back(0);
+				point_cloud.emplace_back(0);
+				groundtruth.emplace_back("out_of_range");
+			}
 		}
 		previous_horizontal_angle = horizontal_angle;
-		if (i == points_to_scan_with_one_laser - 1) {
+		if (i == points_to_scan_with_one_laser) {
 			current_horizontal_angle_ = horizontal_angle;
 		}
 	}
-	
-
 	return refresh;
 }
 
@@ -187,6 +206,11 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 		FVector impact_point = hit_result.ImpactPoint;
 
 		label = TCHAR_TO_UTF8(*hit_result.Actor.Get()->GetName());
+
+		if (label.empty())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Empty label!"));
+		}
 		// If enabled add range noise
 		if (params.generate_noise) {
 			// Add noise based on normal distribution taking into account scaling of noise with distance

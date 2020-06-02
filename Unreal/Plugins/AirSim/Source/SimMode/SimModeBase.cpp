@@ -655,26 +655,29 @@ void ASimModeBase::drawLidarDebugPoints()
                         msr::airlib::Vector3r point(lidar_data.point_cloud[j], lidar_data.point_cloud[j + 1], lidar_data.point_cloud[j + 2]);
 
                         FVector uu_point;
+						if (lidar_data.point_cloud[j] == 0 && lidar_data.point_cloud[j + 1] == 0 && lidar_data.point_cloud[j + 2] == 0) {
+						}
+						else {
+							if (lidar->getParams().data_frame == AirSimSettings::kVehicleInertialFrame) {
+								uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point);
+							}
+							else if (lidar->getParams().data_frame == AirSimSettings::kSensorLocalFrame) {
 
-                        if (lidar->getParams().data_frame == AirSimSettings::kVehicleInertialFrame) {
-                            uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point);
-                        }
-                        else if (lidar->getParams().data_frame == AirSimSettings::kSensorLocalFrame) {
+								msr::airlib::Vector3r point_w = msr::airlib::VectorMath::transformToWorldFrame(point, lidar_data.pose, true);
+								uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point_w);
+							}
+							else
+								throw std::runtime_error("Unknown requested data frame");
 
-                            msr::airlib::Vector3r point_w = msr::airlib::VectorMath::transformToWorldFrame(point, lidar_data.pose, true);
-                            uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point_w);
-                        }
-                        else
-                            throw std::runtime_error("Unknown requested data frame");
-
-						UAirBlueprintLib::DrawPoint(
-                            this->GetWorld(),
-                            uu_point,
-                            5,              //size
-                            FColor::Green,
-                            false,           //persistent (never goes away)
-                            0.1             //point leaves a trail on moving object
-                        );
+							UAirBlueprintLib::DrawPoint(
+								this->GetWorld(),
+								uu_point,
+								5,              //size
+								FColor::Green,
+								false,           //persistent (never goes away)
+								0.1             //point leaves a trail on moving object
+							);
+						}
                     }
                 }
             }
