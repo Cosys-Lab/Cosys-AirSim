@@ -36,7 +36,7 @@ if __name__ == '__main__':
             classObjectMap[row[0]] = classItems
     print("Sorted objects based on segmentation.csv into classes\n")
 
-    # Set the colors for all AI humans to a chosen color with color index 15
+    # Set the colors for objects of a certain class to a chosen color with color index 15
     className = 'wall'
     classColorIndex = 1000000
     # a) this version we set it based on the gathered objects in the list
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     colorMap = client.simGetSegmentationColorMap()
     print("Generated segmentation colormap\n")
 
-    # Get the color associated with a the class
+    # Get the color associated with a class
     classColor = colorMap[classColorIndex,:]
     print("Found RGB color associated with class '" + className + "': " + str(classColor) + "\n")
 
