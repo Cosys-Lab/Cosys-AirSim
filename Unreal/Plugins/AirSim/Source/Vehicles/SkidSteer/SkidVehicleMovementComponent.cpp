@@ -316,7 +316,7 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 		VehicleInputData.setAnalogLeftBrake(LeftBreak);
 		VehicleInputData.setAnalogRightBrake(RightBreak);
 		VehicleInputData.setAnalogAccel(0);
-		UE_LOG(LogTemp, Warning, TEXT("Braking %f %f "), VehicleInputData.getAnalogLeftBrake(), VehicleInputData.getAnalogRightBrake());
+		//UE_LOG(LogTemp, Warning, TEXT("Braking %f %f "), VehicleInputData.getAnalogLeftBrake(), VehicleInputData.getAnalogRightBrake());
 	}
 	// Convert from our curve to PxFixedSizeLookupTable
 
