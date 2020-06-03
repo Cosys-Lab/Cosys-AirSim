@@ -116,7 +116,7 @@ void ASimModeBase::checkVehicleReady()
 
 void ASimModeBase::InitializeMeshVertexColorIDs()
 {     
-	UObjectPainter::Reset(this->GetLevel(), &nameToColorIndexMap_, &nameToComponentMap_);
+	UObjectPainter::Reset(this->GetLevel(), &nameToColorIndexMap_, &nameToComponentMap_, &ColorToNameMap_);
 }
 
 void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wait, const TStatId InStatId)
@@ -142,8 +142,9 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 				FString key = It.Key();
 				TMap<FString, uint32>* nameToColorIndexMap = &nameToColorIndexMap_;
 				TMap<FString, UMeshComponent*> nameToComponentMap = nameToComponentMap_;
-				UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, &success]() {
-					success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap);
+				TMap<FString, FString>* colorToNameMap = &ColorToNameMap_;
+				UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap, &success]() {
+					success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap);
 				}, true);
 				changes++;
 			}
@@ -155,8 +156,9 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 		FString key = mesh_name.c_str();
 		TMap<FString, uint32>* nameToColorIndexMap = &nameToColorIndexMap_;
 		TMap<FString, UMeshComponent*> nameToComponentMap = nameToComponentMap_;
-		UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, &success]() {
-			success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap);
+		TMap<FString, FString>* colorToNameMap = &ColorToNameMap_;
+		UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap, &success]() {
+			success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap);
 		}, true);
 		return success;
 	}
@@ -171,7 +173,7 @@ int ASimModeBase::GetMeshVertexColorID(const std::string& mesh_name) {
 
 bool ASimModeBase::AddNewActorToSegmentation(AActor* Actor)
 {
-	return UObjectPainter::PaintNewActor(Actor, &nameToColorIndexMap_, &nameToComponentMap_);
+	return UObjectPainter::PaintNewActor(Actor, &nameToColorIndexMap_, &nameToComponentMap_, &ColorToNameMap_);
 }
 
 void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

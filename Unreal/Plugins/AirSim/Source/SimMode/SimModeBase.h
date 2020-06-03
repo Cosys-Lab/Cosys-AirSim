@@ -144,6 +144,7 @@ private:
 
 	/** The assigned color for each object */
 	TMap<FString, uint32> nameToColorIndexMap_;
+	TMap<FString, FString> ColorToNameMap_;
 	/** A list of paintable objects */
 	TMap<FString, UMeshComponent*> nameToComponentMap_;
 

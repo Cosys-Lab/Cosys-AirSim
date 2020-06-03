@@ -156,7 +156,7 @@ void getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* 
 	}
 } 
 
-bool UObjectPainter::SetComponentColor(FString component_id, uint32 color_index, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*> name_to_component_map)
+bool UObjectPainter::SetComponentColor(FString component_id, uint32 color_index, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*> name_to_component_map, TMap<FString, FString>* color_to_name_map)
 {
 	if (name_to_component_map.Contains(component_id))
 	{
@@ -164,6 +164,8 @@ bool UObjectPainter::SetComponentColor(FString component_id, uint32 color_index,
 		UMeshComponent* actor = name_to_component_map[component_id];
 		if (PaintComponent(actor, color))
 		{
+			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
+			color_to_name_map->Emplace(color_string, component_id);
 			name_to_colorindex_map->Emplace(component_id, color_index);
 			return true;
 		}
@@ -178,7 +180,7 @@ bool UObjectPainter::SetComponentColor(FString component_id, uint32 color_index,
 	}
 }
 
-bool UObjectPainter::PaintNewActor(AActor* actor, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*>* name_to_component_map)
+bool UObjectPainter::PaintNewActor(AActor* actor, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*>* name_to_component_map, TMap<FString, FString>* color_to_name_map)
 {
 	if (actor && IsPaintable(actor)) {
 		TMap<FString, UMeshComponent*> paintable_components_meshes;
@@ -192,10 +194,12 @@ bool UObjectPainter::PaintNewActor(AActor* actor, TMap<FString, uint32>* name_to
 			else {
 				uint32 ObjectIndex = name_to_component_map->Num();
 				name_to_component_map->Emplace(it.Key(), it.Value());
-				FColor NewColor = GetColorFromColorMap(ObjectIndex);
+				FColor new_color = GetColorFromColorMap(ObjectIndex);
 				name_to_colorindex_map->Emplace(it.Key(), ObjectIndex);
-				check(PaintComponent(it.Value(), NewColor));
-				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s"), *it.Key(), *FString::FromInt(ObjectIndex));
+				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
+				color_to_name_map->Emplace(color_string, it.Key());
+				check(PaintComponent(it.Value(), new_color));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s (%s)"), *it.Key(), *FString::FromInt(ObjectIndex), *color_string);
 			}
 		}
 		return true;
@@ -221,7 +225,7 @@ uint32 UObjectPainter::GetComponentColor(FString component_id, TMap<FString, uin
 	}
 }
 
-void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*>* name_to_component_map)
+void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*>* name_to_component_map, TMap<FString, FString>* color_to_name_map)
 {
 	uint32 color_index = 0;
 	UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Starting initial random instance segmentation"));
@@ -236,8 +240,10 @@ void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* name_to_color
 				name_to_component_map->Emplace(it.Key(), it.Value());
 				FColor new_color = GetColorFromColorMap(color_index);
 				name_to_colorindex_map->Emplace(it.Key(), color_index);
+				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
+				color_to_name_map->Emplace(color_string, it.Key());
 				check(PaintComponent(it.Value(), new_color));
-				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s"), *it.Key(), *FString::FromInt(color_index));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s (%s)"), *it.Key(), *FString::FromInt(color_index), *color_string);
 
 				color_index++;
 			}
@@ -306,4 +312,10 @@ void UObjectPainter::SetViewForVertexColor(FEngineShowFlags& show_flags)
 	show_flags.SetHMDDistortion(false);
 	show_flags.SetTonemapper(false);
 	show_flags.SetEyeAdaptation(false);
+	show_flags.SetFog(false);
+	show_flags.SetPaper2DSprites(false);
+	show_flags.SetBloom(false);
+	show_flags.SetMotionBlur(false);
+	show_flags.SetSkyLighting(false);
+	show_flags.SetAmbientOcclusion(false);
 }
