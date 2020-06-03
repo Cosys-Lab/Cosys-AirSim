@@ -24,9 +24,16 @@ UnrealLidarSensor::UnrealLidarSensor(const AirSimSettings::LidarSetting& setting
 // initializes information based on lidar configuration
 void UnrealLidarSensor::createLasers()
 {
+
+
 	msr::airlib::LidarSimpleParams params = getParams();
 
 	const auto number_of_lasers = params.number_of_channels;
+
+	float horizontal_delta = (params.horizontal_FOV_end - params.horizontal_FOV_start) / float(params.measurement_per_cycle - 1);
+	for (uint32 i = 0; i < params.measurement_per_cycle; i++) {
+		horizontal_angles_.Add(params.horizontal_FOV_start + i * horizontal_delta);
+	}
 
 	if (number_of_lasers <= 0)
 		return;
@@ -45,7 +52,7 @@ void UnrealLidarSensor::createLasers()
 		laser_angles_.emplace_back(vertical_angle);
 	}
 
-	current_horizontal_angle_ = -(360.0f / params.measurement_per_cycle);
+	current_horizontal_angle_index_ = horizontal_angles_.Num()-1;
 }
 
 // Pause Unreal simulation
@@ -81,7 +88,7 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 
 	// calculate needed angle/distance between each point
 	const float angle_distance_of_tick = params.horizontal_rotation_frequency * 360.0f * delta_time;
-	const float angle_distance_of_laser_measure = 360.0f / params.measurement_per_cycle;
+	const double angle_distance_of_laser_measure = 360.0f / params.measurement_per_cycle;
 
 	// calculate number of points needed for each laser/channel
 	uint32 points_to_scan_with_one_laser_temp = FMath::RoundHalfFromZero(angle_distance_of_tick / angle_distance_of_laser_measure);
@@ -102,18 +109,24 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 	float laser_start = std::fmod(360.0f + params.horizontal_FOV_start, 360.0f);
 	float laser_end = std::fmod(360.0f + params.horizontal_FOV_end, 360.0f);
 
-	float previous_horizontal_angle = current_horizontal_angle_;
-
+	float previous_horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
 	// shoot lasers
 	for (uint32 i = 1; i <= points_to_scan_with_one_laser; ++i)
 	{
-		float horizontal_angle = std::fmod(current_horizontal_angle_ + angle_distance_of_laser_measure * i, 360.0f);
+		if (current_horizontal_angle_index_ == horizontal_angles_.Num() - 1) {
+			current_horizontal_angle_index_ = 0;
+		}
+		else {
+			current_horizontal_angle_index_ += 1;
+		}
+		
+		float horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
 		//UE_LOG(LogTemp, Display, TEXT("horizontal_angle: %f "), horizontal_angle);
 
 		for (auto laser = 0u; laser < number_of_lasers; ++laser)
 		{
 			float vertical_angle = laser_angles_[laser];
-			if(previous_horizontal_angle > horizontal_angle){
+			if((previous_horizontal_angle > horizontal_angle) && (point_cloud.size() != 0)){
 				if (laser == 0u) {
 					if ((((int)point_cloud.size() / 3) != params.measurement_per_cycle * number_of_lasers) || (groundtruth.size() != params.measurement_per_cycle * number_of_lasers))
 					{
@@ -129,14 +142,14 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 			}
 			
 			// check if horizontal angle is a duplicate
-			if ((horizontal_angle - previous_horizontal_angle) <= 0.005f && (horizontal_angle - 0) >= 0.005f) {
-				UE_LOG(LogTemp, Display, TEXT("duplicate horizontal angle! angle:%f"), horizontal_angle);
+			if ((horizontal_angle - previous_horizontal_angle) <= 0.00005f && (horizontal_angle - 0) >= 0.00005f) {
+				UE_LOG(LogTemp, Display, TEXT("duplicate horizontal angle! angle! previous:%f current:%f"), previous_horizontal_angle, horizontal_angle);
 				continue;
 			}
 
 			// check if the laser is outside the requested horizontal FOV
 			if (!VectorMath::isAngleBetweenAngles(horizontal_angle, laser_start, laser_end)) {
-				//UE_LOG(LogTemp, Display, TEXT("outside of FOV: %f "), horizontal_angle);
+				UE_LOG(LogTemp, Display, TEXT("outside of FOV: %f "), horizontal_angle);
 				continue;
 			}			
 
@@ -157,10 +170,7 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 				groundtruth.emplace_back("out_of_range");
 			}
 		}
-		previous_horizontal_angle = horizontal_angle;
-		if (i == points_to_scan_with_one_laser) {
-			current_horizontal_angle_ = horizontal_angle;
-		}
+		previous_horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
 	}
 	return refresh;
 }

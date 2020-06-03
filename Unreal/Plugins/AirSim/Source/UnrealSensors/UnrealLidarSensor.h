@@ -40,7 +40,8 @@ private:
     const NedTransform* ned_transform_;
 	float saved_clockspeed_ = 1;
     msr::airlib::vector<msr::airlib::real_T> laser_angles_;
-    float current_horizontal_angle_ = 0.0f;
+	uint32 current_horizontal_angle_index_ = 0;
+	TArray<float> horizontal_angles_;
 	std::mt19937 gen_;
 	std::normal_distribution<float> dist_;
 };
