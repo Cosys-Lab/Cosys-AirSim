@@ -15,13 +15,19 @@ if __name__ == '__main__':
     client = airsimpy.CarClient()
     client.confirmConnection()
 
-    # Get names of all objects in simulation world and store in list
+    # Generate list of all colors available for segmentation
+    print("Generating segmentation colormap, this takes a while...")
+    colorMap = client.simGetSegmentationColorMap()
+    print("Generated segmentation colormap\n")
+
+    # Get names of all objects in simulation world and store in list together with the associated RGB value
     # In a dynamic world, this is never the same!!
     currentObjectList = client.simListSceneObjects()
     print("Generating list of all current objects...")
     with open('allObjectsFound.txt', 'w') as f:
-        for item in currentObjectList:
-            f.write("%s\n" % item)
+        for index, item in enumerate(currentObjectList):
+
+            f.write("%s %s\n" % (item, colorMap[index,:]))
     print("Generated list of all current objects with a total of " + str(len(currentObjectList)) + ' objects\n')
 
     # Sort the objects from the list by class defined in the CSV and keep them in a dictionary with classname as key
@@ -57,11 +63,6 @@ if __name__ == '__main__':
         print("No objects found matching object-name '" + className + "'")
     print("Found and changed color on all objects in world matching class-name '" + className + "' based on regex\n")
 
-    # Generate list of all colors available for segmentation
-    print("Generating segmentation colormap, this takes a while...")
-    colorMap = client.simGetSegmentationColorMap()
-    print("Generated segmentation colormap\n")
-
     # Get the color associated with a the class
     classColor = colorMap[classColorIndex,:]
     print("Found RGB color associated with class '" + className + "': " + str(classColor) + "\n")
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     randomObjectName = random.choice(currentObjectList)
     print("Finding RGB color associated with random object '" + randomObjectName + "'...")
     randomObjectColorIndex = client.simGetSegmentationObjectID(randomObjectName)
-    randomObjectColor = colorMap[randomObjectColorIndex,:]
+    randomObjectColor = colorMap[randomObjectColorIndex, :]
     print("Found RGB color associated with random object '" + randomObjectName + "':" + str(randomObjectColor) + "\n")
 
     # Get an image from the main segmentation camera, show and save it as png

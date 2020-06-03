@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import setup_path
-import airsim
+import airsimpy
 import csv
 import random
 import numpy as np
@@ -12,16 +12,22 @@ from PIL import Image
 if __name__ == '__main__':
 
     # Make connection to AirSim API
-    client = airsim.CarClient()
+    client = airsimpy.CarClient()
     client.confirmConnection()
 
-    # Get names of all objects in simulation world and store in list
+    # Generate list of all colors available for segmentation
+    print("Generating segmentation colormap, this takes a while...")
+    colorMap = client.simGetSegmentationColorMap()
+    print("Generated segmentation colormap\n")
+
+    # Get names of all objects in simulation world and store in list together with the associated RGB value
     # In a dynamic world, this is never the same!!
     currentObjectList = client.simListSceneObjects()
     print("Generating list of all current objects...")
     with open('allObjectsFound.txt', 'w') as f:
-        for item in currentObjectList:
-            f.write("%s\n" % item)
+        for index, item in enumerate(currentObjectList):
+
+            f.write("%s %s\n" % (item, colorMap[index,:]))
     print("Generated list of all current objects with a total of " + str(len(currentObjectList)) + ' objects\n')
 
     # Sort the objects from the list by class defined in the CSV and keep them in a dictionary with classname as key
@@ -36,7 +42,7 @@ if __name__ == '__main__':
             classObjectMap[row[0]] = classItems
     print("Sorted objects based on segmentation.csv into classes\n")
 
-    # Set the colors for objects of a certain class to a chosen color with color index 15
+    # Set the colors for all AI humans to a chosen color with color index 15
     className = 'wall'
     classColorIndex = 1000000
     # a) this version we set it based on the gathered objects in the list
@@ -57,12 +63,7 @@ if __name__ == '__main__':
         print("No objects found matching object-name '" + className + "'")
     print("Found and changed color on all objects in world matching class-name '" + className + "' based on regex\n")
 
-    # Generate list of all colors available for segmentation
-    print("Generating segmentation colormap, this takes a while...")
-    colorMap = client.simGetSegmentationColorMap()
-    print("Generated segmentation colormap\n")
-
-    # Get the color associated with a class
+    # Get the color associated with a the class
     classColor = colorMap[classColorIndex,:]
     print("Found RGB color associated with class '" + className + "': " + str(classColor) + "\n")
 
@@ -70,12 +71,12 @@ if __name__ == '__main__':
     randomObjectName = random.choice(currentObjectList)
     print("Finding RGB color associated with random object '" + randomObjectName + "'...")
     randomObjectColorIndex = client.simGetSegmentationObjectID(randomObjectName)
-    randomObjectColor = colorMap[randomObjectColorIndex,:]
+    randomObjectColor = colorMap[randomObjectColorIndex, :]
     print("Found RGB color associated with random object '" + randomObjectName + "':" + str(randomObjectColor) + "\n")
 
     # Get an image from the main segmentation camera, show and save it as png
     print("Getting segmentation image from main camera...")
-    responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
+    responses = client.simGetImages([airsimpy.ImageRequest( "front_center", airsimpy.ImageType.Segmentation, False, False)])
     img_rgb_string = responses[0].image_data_uint8
     rgbarray = np.frombuffer(img_rgb_string, np.uint8)
     rgbarray_shaped = rgbarray.reshape((540,960,3))
