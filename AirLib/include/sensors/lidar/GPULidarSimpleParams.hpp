@@ -27,11 +27,13 @@ namespace msr {
 			real_T vertical_FOV_upper = -15;             // drones -15, car +10
 			real_T vertical_FOV_lower = -45;             // drones -45, car -10
 			uint resolution = 512;
+			bool ground_truth = false;                   // Generate ground truth segmentation color values
 
 			bool ignore_marked = false;
-			bool generate_noise = false;			  // Toggle range based noise
-			real_T min_noise_standard_deviation = 0;  // Minimum noise standard deviation
-			real_T noise_distance_scale = 1;		  // Factor to scale noise based on distance
+			bool generate_noise = false;			     // Toggle range based noise
+			real_T min_noise_standard_deviation = 0;     // Minimum noise standard deviation
+			real_T noise_distance_scale = 1;		     // Factor to scale noise based on distance
+			real_T update_frequency = 10;                // Hz
 
 			Pose relative_pose{
 				Vector3r(0,0,-1),                        // position - a little above vehicle (especially for cars) or Vector3r::Zero()
@@ -40,7 +42,7 @@ namespace msr {
 
 			bool draw_debug_points = false;
 
-			real_T startup_delay = 0;                   // sec
+			real_T startup_delay = 1;                   // sec
 
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
 			{
@@ -55,6 +57,9 @@ namespace msr {
 				horizontal_FOV_start = settings.horizontal_FOV_start;
 				horizontal_FOV_end = settings.horizontal_FOV_end;
 
+				ground_truth = settings.ground_truth;
+
+				update_frequency = settings.update_frequency;
 				ignore_marked = settings.ignore_marked;
 				generate_noise = settings.generate_noise;
 				min_noise_standard_deviation = settings.min_noise_standard_deviation;

@@ -31,18 +31,18 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	int counter = 0;
-
 	void GenerateLidarCoordinates();
-	void SampleRender(float rotation, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud);
+	bool SampleRenders(float rotation, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth,
+		               msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final);
 	void RotateCamera(float rotation);
 	void InitializeSettings(const AirSimSettings::GPULidarSetting& settings);
-	void Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud);
+	bool Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth,
+		        msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final);
 
 	TArray<float> horizontal_angles_;
 	TArray<float> vertical_angles_;
 	TArray<FVector> angle_to_xyz_lut_;
-
+	uint32 current_horizontal_angle_index_ = 0;
 	float current_angle_ = 0;
 	float previous_rotation_ = 0;
 	float target_fov_ = 0;
@@ -54,32 +54,40 @@ public:
 		UArrowComponent* arrow_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		USceneCaptureComponent2D* capture2D_;
+		USceneCaptureComponent2D* capture_2D_depth_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		UTextureRenderTarget2D* render_target2D_;
+		USceneCaptureComponent2D* capture_2D_segmentation_;
 
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UTextureRenderTarget2D* render_target_2D_depth_;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UTextureRenderTarget2D* render_target_2D_segmentation_;
+
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 num_of_lasers_ = 64;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float frequency_ = 10;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 measurement_per_cycle_ = 2048;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float horizontal_min_ = 0;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float horizontal_max_ = 360;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float vertical_min_ = -16.6;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float vertical_max_ = 16.6;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 resolution_ = 1800;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool draw_debug_ = true;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		bool ground_truth_ = false;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float max_range_ = 100;
-	UPROPERTY(EditAnywhere, Category = "LIDAR Setup")
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool ignore_marked_ = false;
 
 private: //members

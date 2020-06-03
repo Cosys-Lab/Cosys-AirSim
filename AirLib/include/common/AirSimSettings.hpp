@@ -244,9 +244,9 @@ public: //types
 		float horizontal_rotation_frequency = 10;         // rotations/sec
 		float horizontal_FOV_start = 0;                   // degrees
 		float horizontal_FOV_end = 359;                   // degrees
+		float update_frequency = 10;				      // how frequently to update the data in Hz
 		uint resolution = 512;
-														  // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-
+		bool ground_truth = false;                        // Generate ground truth segmentation color values
 		bool generate_noise = false;					  // Toggle range based noise
 
 		bool ignore_marked = false;
@@ -1246,8 +1246,10 @@ private:
 		lidar_setting.measurement_per_cycle = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle);
 		lidar_setting.horizontal_rotation_frequency = settings_json.getFloat("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
 		lidar_setting.resolution = settings_json.getInt("Resolution", lidar_setting.resolution);
+		lidar_setting.ground_truth = settings_json.getBool("GroundTruth", lidar_setting.ground_truth);
 		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
 		lidar_setting.min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", lidar_setting.min_noise_standard_deviation);
+		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
 		lidar_setting.noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", lidar_setting.noise_distance_scale);
 		lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
 		lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);

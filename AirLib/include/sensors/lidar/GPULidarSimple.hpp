@@ -23,8 +23,7 @@ namespace msr {
 				params_.initializeFromSettings(setting);
 
 				//initialize frequency limiter
-				freq_limiter_.initialize(params_.horizontal_rotation_frequency, params_.startup_delay, false);
-
+				freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, false);
 			}
 
 			//*** Start: UpdatableState implementation ***//
@@ -32,20 +31,18 @@ namespace msr {
 			{
 				GPULidarBase::reset();
 				freq_limiter_.reset();
-
-				updateOutput(0.0f);
+				last_time_ = clock()->nowNanos();
+				updateOutput();
 			}
 
 			virtual void update(float delta = 0) override
 			{
 				GPULidarBase::update(delta);
-				refreshPointCloud(delta);
 				freq_limiter_.update(delta);
-				if (freq_limiter_.isWaitComplete())
-				{
-					updateOutput(delta);
-				}
-
+				updateOutput();
+				//if (freq_limiter_.isWaitComplete()) {
+				//	updateOutput();
+				//}
 			}
 
 			virtual void reportState(StateReporter& reporter) override
@@ -57,8 +54,10 @@ namespace msr {
 				reporter.writeValue("Lidar-Range", params_.range);
 				reporter.writeValue("Lidar-MeasurementsPerCycle", params_.measurement_per_cycle);
 				reporter.writeValue("Lidar-HorizontalRotationFrequency", params_.horizontal_rotation_frequency);
-				reporter.writeValue("Lidar-FOV-Upper", params_.vertical_FOV_upper);
-				reporter.writeValue("Lidar-FOV-Lower", params_.vertical_FOV_lower);
+				reporter.writeValue("Lidar-VFOV-Upper", params_.vertical_FOV_upper);
+				reporter.writeValue("Lidar-VFOV-Lower", params_.vertical_FOV_lower);
+				reporter.writeValue("Lidar-HFOV-Upper", params_.horizontal_FOV_start);
+				reporter.writeValue("Lidar-HFOV-Lower", params_.horizontal_FOV_end);
 			}
 			//*** End: UpdatableState implementation ***//
 
@@ -70,39 +69,47 @@ namespace msr {
 			}
 
 		protected:
-			virtual void getPointCloud(float delta_time, vector<real_T>& point_cloud) = 0;
+			virtual bool getPointCloud(float delta_time, vector<real_T>& point_cloud, vector<std::string>& groundtruth, vector<real_T>& point_cloud_final, vector<std::string>& groundtruth_final) = 0;
 
 			virtual void pause(const bool is_paused) = 0;
 
 		private: //methods
-			void refreshPointCloud(float delta_time)
+			void updateOutput()
 			{
+
+				TTimeDelta delta_time = clock()->updateSince(last_time_);
 
 				double start = FPlatformTime::Seconds();
-				point_cloud_.clear();
-				getPointCloud(delta_time, point_cloud_);
-				point_cloud_full_.insert(point_cloud_full_.end(), point_cloud_.begin(), point_cloud_.end());
+				bool refresh = getPointCloud(delta_time, point_cloud_temp_, groundtruth_temp_, point_cloud_, groundtruth_);
 				double end = FPlatformTime::Seconds();
 				UAirBlueprintLib::LogMessageString("GPULidar: ", "Sensor data generation took " + std::to_string(end - start) + " and generated " + std::to_string(point_cloud_.size() / 3) + " points", LogDebugLevel::Informational);
-			}
+			
+				if (refresh) {
+					GPULidarData output;
+					output.point_cloud = point_cloud_;
+					output.groundtruth = groundtruth_;
+					output.time_stamp = clock()->nowNanos();
+					const GroundTruth& ground_truth = getGroundTruth();
+					Pose lidar_pose = params_.relative_pose + ground_truth.kinematics->pose;
+					output.pose = lidar_pose;
+					setOutput(output);
 
-			void updateOutput(float delta_time)
-			{
-				const GroundTruth& ground_truth = getGroundTruth();
-				Pose lidar_pose = params_.relative_pose + ground_truth.kinematics->pose;
-				GPULidarData output;
-				output.point_cloud = point_cloud_full_;
-				output.time_stamp = clock()->nowNanos();
-				output.pose = lidar_pose;
-				setOutput(output);
-				point_cloud_full_.clear();
+					last_time_ = output.time_stamp;
+				} else {
+					last_time_ = clock()->nowNanos();
+				}
+
 			}
 
 		private:
 			GPULidarSimpleParams params_;
 			vector<real_T> point_cloud_;
-			vector<real_T> point_cloud_full_;
+			vector<real_T> point_cloud_temp_;
 			FrequencyLimiter freq_limiter_;
+			vector<std::string> groundtruth_;
+			vector<std::string> groundtruth_temp_;
+			TTimePoint last_time_;
+
 		};
 
 	}
