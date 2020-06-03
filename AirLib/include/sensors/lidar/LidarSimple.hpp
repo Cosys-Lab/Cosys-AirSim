@@ -29,10 +29,8 @@ public:
     virtual void reset() override
     {
         LidarBase::reset();
-
         freq_limiter_.reset();
         last_time_ = clock()->nowNanos();
-
         updateOutput();
     }
 
@@ -40,7 +38,6 @@ public:
     {
         LidarBase::update(delta);
        freq_limiter_.update(delta);
-
 	   if (freq_limiter_.isWaitComplete()) {
 		   updateOutput();
 	   }
@@ -55,8 +52,10 @@ public:
         reporter.writeValue("Lidar-Range", params_.range);
 		reporter.writeValue("Lidar-MeasurementsPerCycle", params_.measurement_per_cycle);
 		reporter.writeValue("Lidar-HorizontalRotationFrequency", params_.horizontal_rotation_frequency);
-        reporter.writeValue("Lidar-FOV-Upper", params_.vertical_FOV_upper);
-        reporter.writeValue("Lidar-FOV-Lower", params_.vertical_FOV_lower);
+		reporter.writeValue("Lidar-VFOV-Upper", params_.vertical_FOV_upper);
+		reporter.writeValue("Lidar-VFOV-Lower", params_.vertical_FOV_lower);
+		reporter.writeValue("Lidar-HFOV-Upper", params_.horizontal_FOV_start);
+		reporter.writeValue("Lidar-HFOV-Lower", params_.horizontal_FOV_end);
     }
     //*** End: UpdatableState implementation ***//
 
@@ -96,7 +95,7 @@ private: //methods
 			delta_time,
 			point_cloud_temp_, groundtruth_temp_, point_cloud_, groundtruth_);
 		double end = FPlatformTime::Seconds();
-		UAirBlueprintLib::LogMessageString("Lidar: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
+		UAirBlueprintLib::LogMessageString("Lidar: ", "Sensor data generation took " + std::to_string(end - start) + " and generated " + std::to_string(point_cloud_.size() / 3) + " points", LogDebugLevel::Informational);
 		if (refresh) {
 			LidarData output;
 			output.point_cloud = point_cloud_;
@@ -105,11 +104,12 @@ private: //methods
 			output.time_stamp = clock()->nowNanos();
 			output.pose = lidar_pose;
 
-			last_time_ = output.time_stamp;
-
 			setOutput(output);
+			last_time_ = output.time_stamp;
+		} else {
+			last_time_ = clock()->nowNanos();
 		}
-    }
+	}
 
 private:
     LidarSimpleParams params_;

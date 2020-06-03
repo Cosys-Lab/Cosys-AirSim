@@ -42,7 +42,7 @@ struct LidarSimpleParams {
     bool draw_debug_points = false;
     std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
-    real_T startup_delay = 0;                 // sec
+    real_T startup_delay = 1;                 // sec
 
     void initializeFromSettings(const AirSimSettings::LidarSetting& settings)
     {
