@@ -99,7 +99,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	GenerateLidarCoordinates();
 	horizontal_delta_ = (horizontal_max_ - horizontal_min_) / float(measurement_per_cycle_ - 1);
 	vertical_delta_ = (FMath::Abs(vertical_min_) + vertical_max_) / num_of_lasers_;
-	target_fov_ = FMath::Abs(vertical_min_) + vertical_max_ + (2 * vertical_delta_);
+	target_fov_ = FMath::CeilToInt(FMath::Abs(vertical_min_) + vertical_max_ + (2 * vertical_delta_));
 
 	//current_horizontal_angle_index_ = horizontal_angles_.Num() - 1;
 	current_horizontal_angle_index_ = 0;
@@ -154,12 +154,12 @@ void ALidarCamera::Tick(float DeltaTime)
 bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth,
 	                      msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final)
 {
-	float fov = target_fov_;
+	int32 fov = target_fov_;
 	float rotation = 360 * delta_time * frequency_;
 	sum_rotation_ += rotation;
 	bool refresh = false;
 	if (sum_rotation_ > horizontal_delta_) {
-		if (sum_rotation_ > target_fov_) fov = FMath::Min(sum_rotation_ + (2 * vertical_delta_), 150.0f);
+		if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 150.0f));
 		fov = 90;
 		capture_2D_depth_->FOVAngle = fov;
 		capture_2D_segmentation_->FOVAngle = fov;
@@ -223,7 +223,6 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 		render_target_2D_segmentation = (FTextureRenderTarget2DResource*)capture_2D_segmentation_->TextureTarget->Resource;
 		render_target_2D_segmentation->ReadPixels(buffer_2D_segmentation);
 	}
-
 	float c_x = resolution_ / 2.0f;
 	float c_y = resolution_ / 2.0f;
 	float f_x = (resolution_ / 2.0f) / FMath::Tan(FMath::DegreesToRadians(fov / 2.0f));
@@ -241,7 +240,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
 		if (last_horizontal_idx == icol_circle)within_range = false;
-		//UE_LOG(LogTemp, Display, TEXT("angle %i %f"), icol_circle, FMath::Fmod(horizontal_angles_[icol_circle], 360));
+		
 		current_horizontal_angle_index_ = icol_circle;
 		float horizontal_angle = horizontal_angles_[icol_circle];
 		float horizontal_angle_converted = FMath::Fmod(horizontal_angle - current_angle_, 360) - (fov / 2);
@@ -254,16 +253,20 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 		{
 			if ((previous_horizontal_angle > FMath::Fmod(horizontal_angle, 360)) && (point_cloud.size() != 0)) {
 				if (ipx == 0) {
-					if ((((int)point_cloud.size() / 3) != measurement_per_cycle_ * num_of_lasers_) || (groundtruth.size() != measurement_per_cycle_ * num_of_lasers_))
+					if ((((int)point_cloud.size() / 3) != measurement_per_cycle_ * num_of_lasers_))
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Pointcloud or labels incorrect size! points:%i labels:%i %f %f"), (int)(point_cloud.size() / 3), groundtruth.size(), previous_horizontal_angle, FMath::Fmod(horizontal_angle, 360));
+						point_cloud.clear();
+						groundtruth.clear();
+						refresh = false;
 					}
-					//UE_LOG(LogTemp, Display, TEXT("Pointcloud completed! points:%i labels:%i"), (int)(point_cloud.size() / 3), groundtruth.size());
-					point_cloud_final = point_cloud;
-					groundtruth_final = groundtruth;
-					point_cloud.clear();
-					groundtruth.clear();
-					refresh = true;
+					else {
+						point_cloud_final = point_cloud;
+						groundtruth_final = groundtruth;
+						point_cloud.clear();
+						groundtruth.clear();
+						refresh = true;
+					}					
 				}
 			}
 

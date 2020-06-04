@@ -45,7 +45,7 @@ public:
 	uint32 current_horizontal_angle_index_ = 0;
 	float current_angle_ = 0;
 	float previous_rotation_ = 0;
-	float target_fov_ = 0;
+	int32 target_fov_ = 0;
 	float horizontal_delta_ = 0;
 	float vertical_delta_ = 0;
 	float sum_rotation_ = 0;
@@ -66,21 +66,21 @@ public:
 		UTextureRenderTarget2D* render_target_2D_segmentation_;
 
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
-		uint32 num_of_lasers_ = 64;
+		uint32 num_of_lasers_ = 16;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float frequency_ = 10;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
-		uint32 measurement_per_cycle_ = 2048;
+		uint32 measurement_per_cycle_ = 1024;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float horizontal_min_ = 0;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float horizontal_max_ = 360;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
-		float vertical_min_ = -16.6;
+		float vertical_min_ = -17;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
-		float vertical_max_ = 16.6;
+		float vertical_max_ = 17;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
-		uint32 resolution_ = 1800;
+		uint32 resolution_ = 1024;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool draw_debug_ = true;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
