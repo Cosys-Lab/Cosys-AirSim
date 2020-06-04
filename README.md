@@ -21,8 +21,8 @@ Cars in AirSim
 * Added [CoSysLab environment](docs/cosysenv.md)
 * Added [Echo sensor type](docs/echo.md)
 * Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com). **Currently removed due to crashes on Linux!**
-* Added [WIP Instance Segmentation](docs/instance_segmentation.md). Replaces previous system with 255 color limit. This requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
-* Added WIP [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
+* Added [Instance Segmentation](docs/instance_segmentation.md). Replaces previous system with 255 color limit. This requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
+* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Added option to hot-reload plugin through Unreal Editor (faster development)

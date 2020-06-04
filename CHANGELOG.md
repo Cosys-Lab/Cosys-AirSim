@@ -9,8 +9,8 @@ Below is summarized list of important changes. This does not include minor/less 
 * Added [CoSysLab environment](docs/cosysenv.md)
 * Added [Echo sensor type](docs/echo.md)
 * Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com). **Currently removed due to crashes on Linux!**
-* Added [WIP Instance Segmentation](docs/instance_segmentation.md). **Currently only works in Unreal Editor, not cooked builds!** Replaces previous system with 255 color limit. 
-* Added WIP [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
+* Added [Instance Segmentation](docs/instance_segmentation.md). **Currently only works in Unreal Editor, not cooked builds!** Replaces previous system with 255 color limit. 
+* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation.
 * Added option to hot-reload plugin through Unreal Editor (faster development)
