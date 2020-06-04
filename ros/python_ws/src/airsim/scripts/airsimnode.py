@@ -121,7 +121,7 @@ def get_image_bytes(data, cameraType):
     return img_rgb_string
 
 
-def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, 
+def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
                lidarName, imuName, vehicleName, carcontrolInputTopic):
 
     # Reading from Tuples
@@ -189,7 +189,6 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             depthCamera3Pub = rospy.Publisher(depthCamera3TopicName, Image, queue_size=1)
     if lidarActive or gpulidarActive:
         lidarPub = rospy.Publisher(lidarTopicName, PointCloud2, queue_size=1)
-    if lidarActive:
         lidarGroundtruthPub = rospy.Publisher(lidarGroundtruthTopicName, StringArray, queue_size=1)
     if imuActive:
         imuPub = rospy.Publisher(imuTopicName, Imu, queue_size=1)
@@ -411,8 +410,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
                 # initiate point cloud
                 pcloud = PointCloud2()
-                if lidarActive:
-                    groundtruth = StringArray()
+                groundtruth = StringArray()
 
                 # get lidar data
                 if lidarActive:
@@ -426,25 +424,22 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         lastTimeStamp = lidarData.time_stamp
                     else:
                         lastTimeStamp = lidarData.time_stamp
-                        if lidarActive:
-                            labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
+                        labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
                         points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
                         points = np.reshape(points, (int(points.shape[0] / 3), 3))
                         points = points * np.array([1, -1, -1])
                         cloud = points.tolist()
                         timeStamp = rospy.Time.now()
-                        if lidarActive:
-                            groundtruth.data = labels.tolist()
-                            groundtruth.header.frame_id = lidarFrame
-                            groundtruth.header.stamp = timeStamp
+                        groundtruth.data = labels.tolist()
+                        groundtruth.header.frame_id = lidarFrame
+                        groundtruth.header.stamp = timeStamp
                         pcloud.header.frame_id = lidarFrame
                         pcloud.header.stamp = timeStamp
                         pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
 
                         # publish messages
                         lidarPub.publish(pcloud)
-                        if lidarActive:
-                            lidarGroundtruthPub.publish(groundtruth)
+                        lidarGroundtruthPub.publish(groundtruth)
 
         if imuActive:
             # get data of IMU sensor
