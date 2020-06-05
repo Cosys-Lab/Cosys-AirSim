@@ -14,8 +14,9 @@ Please see the [Image API documentation](image_apis.md#segmentation) on how to m
 
 The easiest way to get the images from segmentation cameras, is through ros. See the [ROS documentation](ros.md) for more information. 
 
-For an example of the Instance Segmentation API, please see the script  [segmentation_config.py](../ros/python_ws/src/airsim/scripts/segmentation_config.py).
+For an example of the Instance Segmentation API, please see the script  [segmentation_test.py](../ros/python_ws/src/airsim/scripts/segmentation_test.py).
 
+For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../ros/python_ws/src/airsim/scripts/segmentation_generate_list.py).
 ## Credits
 The method used to use Vertex Colors to segment object is a derivative of and inspired by the work of [UnrealCV](https://unrealcv.org/). Their work is licensed under the MIT License.
 It is made by students from Johns Hopkins University and Peking University under the supervision of Prof. Alan Yuille and Prof. Yizhou Wang.

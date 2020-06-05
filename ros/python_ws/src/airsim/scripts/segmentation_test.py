@@ -6,6 +6,7 @@ import csv
 import random
 import numpy as np
 from PIL import Image
+from datetime import datetime
 
 # Demonstration script to show how the instance segmentation can be accessed and updated through the API
 # See docs/instance_segmentation.md and docs/image_apis.md#segmentation for more information.
@@ -24,10 +25,10 @@ if __name__ == '__main__':
     # In a dynamic world, this is never the same!!
     currentObjectList = client.simListSceneObjects()
     print("Generating list of all current objects...")
-    with open('allObjectsFound.txt', 'w') as f:
+    with open('airsim_segmentation_colormap_list_' +  datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.csv', 'w') as f:
+        f.write("ObjectName,R,G,B\n")
         for index, item in enumerate(currentObjectList):
-
-            f.write("%s %s\n" % (item, colorMap[index,:]))
+            f.write("%s,%s\n" % (item, ','.join([str(x) for x in colorMap[index,:]])))
     print("Generated list of all current objects with a total of " + str(len(currentObjectList)) + ' objects\n')
 
     # Sort the objects from the list by class defined in the CSV and keep them in a dictionary with classname as key

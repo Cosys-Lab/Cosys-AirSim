@@ -255,7 +255,8 @@ To retrieve the color map to know which color is assign to each color index you 
 colorMap = client.simGetSegmentationColorMap()
 ```
 
-A complete ready-to-run example can be found in [segmentation_config.py](../ros/python_ws/src/airsim/scripts/segmentation_config.py).
+A complete ready-to-run example can be found in [segmentation_test.py](../ros/python_ws/src/airsim/scripts/segmentation_test.py).
+For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../ros/python_ws/src/airsim/scripts/segmentation_generate_list.py).
 
 #### Unsetting object ID
 An object's ID can be set to -1 to make it not show up on the segmentation image.
