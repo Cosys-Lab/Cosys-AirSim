@@ -175,24 +175,24 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     if camera1Active:
         sceneCamera1Pub = rospy.Publisher(sceneCamera1TopicName, Image, queue_size=1)
         if not camera1SceneOnly:
-		    rospy.logwarn("Camera1 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
+            rospy.logwarn("Camera1 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
             segmentationCamera1Pub = rospy.Publisher(segmentationCamera1TopicName, Image, queue_size=1)
             depthCamera1Pub = rospy.Publisher(depthCamera1TopicName, Image, queue_size=1)
     if camera2Active:
         sceneCamera2Pub = rospy.Publisher(sceneCamera2TopicName, Image, queue_size=1)
         if not camera2SceneOnly:
-		    rospy.logwarn("Camera2 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
+            rospy.logwarn("Camera2 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
             segmentationCamera2Pub = rospy.Publisher(segmentationCamera2TopicName, Image, queue_size=1)
             depthCamera2Pub = rospy.Publisher(depthCamera2TopicName, Image, queue_size=1)
     if camera3Active:
         sceneCamera3Pub = rospy.Publisher(sceneCamera3TopicName, Image, queue_size=1)
         if not camera3SceneOnly:
-		    rospy.logwarn("Camera3 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
+            rospy.logwarn("Camera3 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
             segmentationCamera3Pub = rospy.Publisher(segmentationCamera3TopicName, Image, queue_size=1)
             depthCamera3Pub = rospy.Publisher(depthCamera3TopicName, Image, queue_size=1)
     if lidarActive or gpulidarActive:
-	    if gpulidarActive:
-			rospy.logwarn("GPULidar is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
+        if gpulidarActive:
+            rospy.logwarn("GPULidar is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
         lidarPub = rospy.Publisher(lidarTopicName, PointCloud2, queue_size=1)
         lidarGroundtruthPub = rospy.Publisher(lidarGroundtruthTopicName, StringArray, queue_size=1)
     if imuActive:
