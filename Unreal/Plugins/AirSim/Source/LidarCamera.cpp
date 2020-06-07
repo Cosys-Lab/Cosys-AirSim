@@ -278,22 +278,30 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			int32 v_pixel = FMath::FloorToInt((sin_ver * -f_y) / (cos_ver*cos_hor) + c_y);
 
 			FColor value_depth = buffer_2D_depth[h_pixel + (v_pixel * resolution_)];
-			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
-			float distance = depth / (cos_ver*cos_hor);
-			FVector point = (distance * angle_to_xyz_lut_[ipx + (icol_circle * num_of_lasers_)]);	
-			point_cloud.emplace_back(point.X / 100);
-			point_cloud.emplace_back(point.Y / 100);
-			point_cloud.emplace_back(-point.Z / 100);
-			if (draw_debug_ && depth < (max_range_ * 100)) {
-				point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-				DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
+			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));			
+			if (depth < (max_range_ * 100)) {
+				float distance = depth / (cos_ver*cos_hor);
+				FVector point = (distance * angle_to_xyz_lut_[ipx + (icol_circle * num_of_lasers_)]);
+				point_cloud.emplace_back(point.X / 100);
+				point_cloud.emplace_back(point.Y / 100);
+				point_cloud.emplace_back(-point.Z / 100);
+				if (draw_debug_) {
+					point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+					DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
+				}
+				if (ground_truth_) {
+					FColor value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
+					std::string color_string = std::to_string((int)value_segmentation.R) + "," + std::to_string((int)value_segmentation.G) + "," + std::to_string((int)value_segmentation.B);
+					groundtruth.emplace_back(color_string);
+				}
 			}
-
-			if (ground_truth_) {
-				FColor value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
-				std::string color_string = std::to_string((int)value_segmentation.R) + "," + std::to_string((int)value_segmentation.G) + "," + std::to_string((int)value_segmentation.B);
-				groundtruth.emplace_back(color_string);
-				//UE_LOG(LogTemp, Warning, TEXT("%s"), UTF8_TO_TCHAR(color_string.c_str()));
+			else {
+				point_cloud.emplace_back(0);
+				point_cloud.emplace_back(0);
+				point_cloud.emplace_back(0);
+				if (ground_truth_) {
+					groundtruth.emplace_back("-1,-1,-1");
+				}
 			}
 		}
 		previous_horizontal_angle = FMath::Fmod(horizontal_angle, 360);
