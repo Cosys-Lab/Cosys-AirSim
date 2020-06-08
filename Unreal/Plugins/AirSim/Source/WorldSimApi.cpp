@@ -59,11 +59,7 @@ void WorldSimApi::printLogMessage(const std::string& message,
 
 std::vector<std::string> WorldSimApi::listSceneObjects(const std::string& name_regex) const
 {
-    std::vector<std::string> result;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &name_regex, &result]() {
-        result = UAirBlueprintLib::ListMatchingActors(simmode_, name_regex);
-    }, true);
-    return result;
+	return simmode_->GetAllSegmentationMeshIDs();
 }
 
 
