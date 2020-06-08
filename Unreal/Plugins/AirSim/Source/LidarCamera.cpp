@@ -167,6 +167,7 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 		current_angle_ = current_angle_ + previous_rotation_;
 		current_angle_ = FMath::Fmod(current_angle_, 360);
 		capture_2D_depth_->CaptureScene();
+		capture_2D_segmentation_->CaptureScene();
 		refresh = SampleRenders(sum_rotation_, fov, point_cloud, groundtruth, point_cloud_final, groundtruth_final);
 		previous_rotation_ = sum_rotation_;
 		sum_rotation_ = 0;
