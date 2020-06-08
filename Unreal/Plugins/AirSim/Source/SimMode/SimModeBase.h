@@ -79,7 +79,7 @@ public:
     {
         return static_cast<PawnSimApi*>(api_provider_->getVehicleSimApi(vehicle_name));
     }
-
+	std::vector<std::string> GetAllSegmentationMeshIDs();
 	bool SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex);
 	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
 	int GetMeshVertexColorID(const std::string& mesh_name);
@@ -153,7 +153,7 @@ private:
     std::unique_ptr<msr::airlib::ApiProvider> api_provider_;
     std::unique_ptr<msr::airlib::ApiServerBase> api_server_;
     msr::airlib::StateReporterWrapper debug_reporter_;
-
+	
     std::vector<std::unique_ptr<msr::airlib::VehicleSimApiBase>> vehicle_sim_apis_;
 
     UPROPERTY()

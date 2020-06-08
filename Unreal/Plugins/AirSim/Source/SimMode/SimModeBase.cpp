@@ -130,6 +130,15 @@ void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wai
 	}
 }
 
+
+std::vector<std::string> ASimModeBase::GetAllSegmentationMeshIDs() {
+	std::vector<std::string> retval;
+	for (auto const& element : nameToColorIndexMap_) {
+		retval.emplace_back(std::string(TCHAR_TO_UTF8(*element.Key)));
+	}
+	return retval;
+}
+
 bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex) {
 	if (is_name_regex) {
 		std::regex name_regex;
