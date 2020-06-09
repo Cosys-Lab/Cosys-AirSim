@@ -231,10 +231,12 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
     while not rospy.is_shutdown():
 
+        timeStamp = rospy.Time.now()
+
         rateCounter += 1
         if rateCounter is rosIMURate/rosRate:
             rateCounter = 0
-            cameraTimeStamp = rospy.Time.now()
+            cameraTimeStamp = timeStamp
             
             responses = client.simGetImages(requests)
 
@@ -433,7 +435,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         points = np.reshape(points, (int(points.shape[0] / 3), 3))
                         points = points * np.array([1, -1, -1])
                         cloud = points.tolist()
-                        timeStamp = rospy.Time.now()
+                        timeStamp = timeStamp
                         groundtruth.data = labels.tolist()
                         groundtruth.header.frame_id = lidarFrame
                         groundtruth.header.stamp = timeStamp
@@ -451,7 +453,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
             # populate Imu ros message
             imu_msg = Imu()
-            imu_msg.header.stamp = rospy.Time.now()
+            imu_msg.header.stamp = timeStamp
             imu_msg.header.frame_id = imuFrame
             imu_msg.orientation.x = imuData.orientation.inverse().x_val
             imu_msg.orientation.y = imuData.orientation.inverse().y_val
@@ -484,7 +486,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             simPose.pose.orientation.x = orientation.x_val
             simPose.pose.orientation.y = orientation.y_val
             simPose.pose.orientation.z = orientation.z_val
-            simPose.header.stamp = rospy.Time.now()
+            simPose.header.stamp = timeStamp
             simPose.header.seq = 1
             simPose.header.frame_id = poseFrame
 
