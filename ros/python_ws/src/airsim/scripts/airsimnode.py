@@ -205,7 +205,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
         rospy.Subscriber(carcontrolInputTopic, Twist, handle_input_command, (vehicleName, client))
 
     # Some temporary variables
-    lastTimeStamp= None
+    lastTimeStamp = None
 
     bridge = CvBridge()
 
@@ -414,10 +414,6 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         depthCamera3Pub.publish(msg)
 
             if lidarActive or gpulidarActive:
-                # initiate point cloud
-                pcloud = PointCloud2()
-                groundtruth = StringArray()
-
                 # get lidar data
                 if lidarActive:
                     lidarData = client.getLidarData(lidarName, vehicleName)
@@ -430,12 +426,16 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         lastTimeStamp = lidarData.time_stamp
                     else:
                         lastTimeStamp = lidarData.time_stamp
+
+                        # initiate point cloud
+                        pcloud = PointCloud2()
+                        groundtruth = StringArray()
+
                         labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
                         points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
                         points = np.reshape(points, (int(points.shape[0] / 3), 3))
                         points = points * np.array([1, -1, -1])
                         cloud = points.tolist()
-                        timeStamp = timeStamp
                         groundtruth.data = labels.tolist()
                         groundtruth.header.frame_id = lidarFrame
                         groundtruth.header.stamp = timeStamp
