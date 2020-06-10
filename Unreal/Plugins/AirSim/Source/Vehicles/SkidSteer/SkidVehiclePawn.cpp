@@ -288,18 +288,16 @@ void ASkidVehiclePawn::setupInputBindings()
 {
 	UAirBlueprintLib::EnableInput(this);
 
-	UAirBlueprintLib::EnableInput(this);
-
-	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveY", EKeys::Up, 1), this,
+	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveY", EKeys::Up, 0.5), this,
 		this, &ASkidVehiclePawn::onMoveY);
 
-	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveY", EKeys::Down, -1), this,
+	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveY", EKeys::Down, -0.5), this,
 		this, &ASkidVehiclePawn::onMoveY);
 
-	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveX", EKeys::Right, 0.5), this,
+	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveX", EKeys::Right, 0.34), this,
 		this, &ASkidVehiclePawn::onMoveX);
 
-	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveX", EKeys::Left, -0.5), this,
+	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveX", EKeys::Left, -0.34), this,
 		this, &ASkidVehiclePawn::onMoveX);
 
 	UAirBlueprintLib::BindActionToKey("Break", EKeys::SpaceBar, this, &ASkidVehiclePawn::onBreakPressed, true);
