@@ -215,12 +215,17 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 
 		FVector impact_point = hit_result.ImpactPoint;
 
-		label = TCHAR_TO_UTF8(*hit_result.Actor.Get()->GetName());
-
-		if (label.empty())
+		//Store the name the hit object.
+		auto hitActor = hit_result.GetActor();
+		if (hitActor != nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Empty label!"));
+			label = TCHAR_TO_UTF8(*hitActor->GetName());
 		}
+
+		//if (label.empty())
+		//{
+		//	UE_LOG(LogTemp, Warning, TEXT("Empty label!"));
+		//}
 		// If enabled add range noise
 		if (params.generate_noise) {
 			// Add noise based on normal distribution taking into account scaling of noise with distance
