@@ -6,6 +6,7 @@ An Instance segmentation system is implemented into AirSim. It uses Vertex Color
 * Only 2097152‬ different colors are currently available. More are technically possible to implement in future but likely unnecessary. 
 * Landscape objects aren't supported. This is the special object type in Unreal to make terrain with. As a work-around, StaticMesh terrain must be used.
 * Foliage objects aren't supported. This is a the special object type in Unreal to place trees, grass and other plants that move with the wind. As a work-around, StaticMesh objects must be used.
+* Brush objects aren't supported. This is a special object type in Unreal to create your own meshes with. As a work-around, you can convert them to a StaticMesh.
 * These and other unsupported object types that are less common (decals, text,...) will by default be given the RGB color value of [76,76,76].
 
 ## Usage
