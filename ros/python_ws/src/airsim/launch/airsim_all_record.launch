@@ -6,7 +6,7 @@
 
             <param name="rate" type="int" value="10" />
             <param name="imu_rate" type="int" value="100" />
-            
+
             <param name="camera1_active" type="int" value="1" />
             <param name="camera2_active" type="int" value="0" />
             <param name="camera3_active" type="int" value="0" />
@@ -43,7 +43,7 @@
             <param name="camera1_name" type="string" value="front_center" />
 
             <param name="camera1_sceneonly" type="int" value="0" />
-            <param name="camera1_mono" type="int" value="0" />            
+            <param name="camera1_mono" type="int" value="0" />
             <param name="camera_height" type="int" value="540" />
             <param name="camera_width" type="int" value="960" />
       </node>

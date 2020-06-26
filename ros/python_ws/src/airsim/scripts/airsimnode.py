@@ -544,10 +544,10 @@ if __name__ == '__main__':
         rosIMURate = rospy.get_param('~imu_rate', 100)
 
         # Active publish topics
-        camera1Active = rospy.get_param('~camera1_active', 1)
-        camera2Active = rospy.get_param('~camera2_active', 1)
-        camera3Active = rospy.get_param('~camera3_active', 1)
-        lidarActive = rospy.get_param('~lidar_active', 1)
+        camera1Active = rospy.get_param('~camera1_active', 0)
+        camera2Active = rospy.get_param('~camera2_active', 0)
+        camera3Active = rospy.get_param('~camera3_active', 0)
+        lidarActive = rospy.get_param('~lidar_active', 0)
         gpulidarActive = rospy.get_param('~gpulidar_active', 0)
         echoActive = rospy.get_param('~echo_active', 0)
         imuActive = rospy.get_param('~imu_active', 0)
