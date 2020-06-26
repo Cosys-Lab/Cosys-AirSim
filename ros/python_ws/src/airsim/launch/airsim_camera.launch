@@ -9,6 +9,7 @@
             <param name="camera2_active" type="int" value="0" />
             <param name="camera3_active" type="int" value="0" />
             <param name="lidar_active" type="int" value="0" />
+            <param name="echo_active" type="int" value="0" />
             <param name="imu_active" type="int" value="1" />
             <param name="pose_active" type="int" value="1" />
             <param name="carcontrol_active" type="int" value="0" />

@@ -122,7 +122,7 @@ def get_image_bytes(data, cameraType):
 
 
 def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
-               lidarName, imuName, vehicleName, carcontrolInputTopic):
+               lidarName, echoName, imuName, vehicleName, carcontrolInputTopic):
 
     # Reading from Tuples
     camera1Active = activeTuple[0]
@@ -130,9 +130,10 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     camera3Active = activeTuple[2]
     lidarActive = activeTuple[3]
     gpulidarActive = activeTuple[4]
-    imuActive = activeTuple[5]
-    poseActive = activeTuple[6]
-    carcontrolActive = activeTuple[7]
+    echoActive = activeTuple[5]
+    imuActive = activeTuple[6]
+    poseActive = activeTuple[7]
+    carcontrolActive = activeTuple[8]
 
     sceneCamera1TopicName = topicsTuple[0]
     segmentationCamera1TopicName = topicsTuple[1]
@@ -145,15 +146,17 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     depthCamera3TopicName = topicsTuple[8]
     lidarTopicName = topicsTuple[9]
     lidarGroundtruthTopicName = topicsTuple[10]
-    imuTopicName = topicsTuple[11]
-    poseTopicName = topicsTuple[12]
+    echoTopicName = topicsTuple[11]
+    imuTopicName = topicsTuple[12]
+    poseTopicName = topicsTuple[13]
 
     camera1Frame = framesTuple[0]
     camera2Frame = framesTuple[1]
     camera3Frame = framesTuple[2]
     lidarFrame = framesTuple[3]
-    imuFrame = framesTuple[4]
-    poseFrame = framesTuple[5]
+    echoFrame = framesTuple[4]
+    imuFrame = framesTuple[5]
+    poseFrame = framesTuple[6]
 
     camera1Name = cameraSettingsTuple[0]
     camera2Name = cameraSettingsTuple[1]
@@ -195,6 +198,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             rospy.logwarn("GPULidar is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
         lidarPub = rospy.Publisher(lidarTopicName, PointCloud2, queue_size=1)
         lidarGroundtruthPub = rospy.Publisher(lidarGroundtruthTopicName, StringArray, queue_size=1)
+    if echoActive:
+        echoPub = rospy.Publisher(echoTopicName, PointCloud2, queue_size=1)
     if imuActive:
         imuPub = rospy.Publisher(imuTopicName, Imu, queue_size=1)
     if poseActive:
@@ -205,7 +210,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
         rospy.Subscriber(carcontrolInputTopic, Twist, handle_input_command, (vehicleName, client))
 
     # Some temporary variables
-    lastTimeStamp = None
+    lastLidarTimeStamp = None
+    lastEchoTimeStamp = None
 
     bridge = CvBridge()
 
@@ -420,12 +426,12 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 if gpulidarActive:
                     lidarData = client.getGPULidarData(lidarName, vehicleName)
 
-                if lidarData.time_stamp != lastTimeStamp:
+                if lidarData.time_stamp != lastLidarTimeStamp:
                     # Check if there are any points in the data
                     if (len(lidarData.point_cloud) < 4):
-                        lastTimeStamp = lidarData.time_stamp
+                        lastLidarTimeStamp = lidarData.time_stamp
                     else:
-                        lastTimeStamp = lidarData.time_stamp
+                        lastLidarTimeStamp = lidarData.time_stamp
 
                         # initiate point cloud
                         pcloud = PointCloud2()
@@ -446,6 +452,38 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         # publish messages
                         lidarPub.publish(pcloud)
                         lidarGroundtruthPub.publish(groundtruth)
+
+            if echoActive:
+                # get echo data
+                echoData = client.getEchoData(echoName, vehicleName)
+
+                if echoData.time_stamp != lastEchoTimeStamp:
+                    # Check if there are any points in the data
+                    if (len(echoData.point_cloud) < 4):
+                        lastEchoTimeStamp = echoData.time_stamp
+                    else:
+                        lastEchoTimeStamp = echoData.time_stamp
+
+                        # initiate point cloud
+                        pcloud = PointCloud2()
+
+                        points = np.array(echoData.point_cloud, dtype=np.dtype('f4'))
+                        points = np.reshape(points, (int(points.shape[0] / 5), 5))
+                        points = points * np.array([1, -1, -1, 1, 1])
+                        cloud = points.tolist()
+                        pcloud.header.frame_id = echoFrame
+                        pcloud.header.stamp = timeStamp
+                        fields = [
+                            PointField('x', 0, PointField.FLOAT32, 1),
+                            PointField('y', 4, PointField.FLOAT32, 1),
+                            PointField('z', 8, PointField.FLOAT32, 1),
+                            PointField('a', 12, PointField.FLOAT32, 1),
+                            PointField('d', 16, PointField.FLOAT32, 1)
+                        ]
+                        pcloud = pc2.create_cloud(pcloud.header, fields, cloud)
+
+                        # publish messages
+                        echoPub.publish(pcloud)
 
         if imuActive:
             # get data of IMU sensor
@@ -511,10 +549,11 @@ if __name__ == '__main__':
         camera3Active = rospy.get_param('~camera3_active', 1)
         lidarActive = rospy.get_param('~lidar_active', 1)
         gpulidarActive = rospy.get_param('~gpulidar_active', 0)
-        imuActive = rospy.get_param('~imu_active', 1)
+        echoActive = rospy.get_param('~echo_active', 0)
+        imuActive = rospy.get_param('~imu_active', 0)
         poseActive = rospy.get_param('~pose_active', 1)
         carcontrolActive = rospy.get_param('~carcontrol_active', 0)
-        activeTuple = (camera1Active, camera2Active, camera3Active, lidarActive, gpulidarActive, imuActive, poseActive, carcontrolActive)
+        activeTuple = (camera1Active, camera2Active, camera3Active, lidarActive, gpulidarActive, echoActive, imuActive, poseActive, carcontrolActive)
 
         # Publish topic names
         sceneCamera1TopicName = rospy.get_param('~topic_scene_camera1', 'airsim/rgb/image')
@@ -528,19 +567,21 @@ if __name__ == '__main__':
         depthCamera3TopicName = rospy.get_param('~topic_depth_camera3', 'airsim/depth3/image')
         lidarTopicName = rospy.get_param('~topic_lidar', 'airsim/lidar')
         lidarGroundtruthTopicName =  rospy.get_param('~topic_lidar_groundtruth', 'airsim/lidargroundtruth')
+        echoTopicName = rospy.get_param('~topic_echo', 'airsim/echo')
         imuTopicName = rospy.get_param('~topic_imu', 'airsim/imu')
         poseTopicName = rospy.get_param('~topic_pose', 'airsim/pose')
         topicsTuple = (sceneCamera1TopicName, segmentationCamera1TopicName, depthCamera1TopicName, sceneCamera2TopicName, segmentationCamera2TopicName, depthCamera2TopicName, sceneCamera3TopicName, segmentationCamera3TopicName, depthCamera3TopicName,
-         lidarTopicName, lidarGroundtruthTopicName, imuTopicName, poseTopicName)
+         lidarTopicName, lidarGroundtruthTopicName, echoTopicName, imuTopicName, poseTopicName)
 
         # Frames
         camera1Frame = rospy.get_param('~camera1_frame_id', 'base_camera')
         camera2Frame = rospy.get_param('~camera2_frame_id', 'base_camera')
         camera3Frame = rospy.get_param('~camera3_frame_id', 'base_camera')
         lidarFrame = rospy.get_param('~lidar_frame_id', 'base_laser')
+        echoFrame = rospy.get_param('~echo_frame_id', 'base_echo')
         imuFrame = rospy.get_param('~imu_frame_id', 'base_link')
         poseFrame = rospy.get_param('~pose_frame_id', 'world')
-        framesTuple = (camera1Frame, camera2Frame, camera3Frame, lidarFrame, imuFrame, poseFrame )
+        framesTuple = (camera1Frame, camera2Frame, camera3Frame, lidarFrame, echoFrame, imuFrame, poseFrame )
 
         # Camera settings
         camera1Name = rospy.get_param('~camera1_name', "front_center")
@@ -559,6 +600,9 @@ if __name__ == '__main__':
         # Lidar settings
         lidarName =  rospy.get_param('~lidar_name', 'lidar')
 
+        # Echo settings
+        echoName =  rospy.get_param('~echo_name', 'echo')
+
         # IMU settings
         imuName =  rospy.get_param('~imu_name', 'imu')
 
@@ -568,7 +612,7 @@ if __name__ == '__main__':
         # Car Control settings
         carcontrolInputTopic = rospy.get_param('~carcontrol_input_topic', 'cmd_vel')
 
-        airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, imuName,
+        airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, echoName, imuName,
                       vehicleName, carcontrolInputTopic )
 
     except rospy.ROSInterruptException:
