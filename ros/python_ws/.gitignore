@@ -157,3 +157,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+/.catkin_tools/profiles/default/build.yaml
+/.catkin_tools/profiles/default/devel_collisions.txt
+/.catkin_tools/README
+/.catkin_tools/VERSION
