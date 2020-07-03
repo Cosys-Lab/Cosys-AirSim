@@ -46,6 +46,7 @@ public:
 			last_time_ = freq_limiter_.getLastTime();
 			if(params_.pause_after_measurement)pause(true);
 			updateOutput();
+			updateInput();
 		}		
 
     }
@@ -77,6 +78,8 @@ protected:
 
 	virtual void pause(const bool is_paused) = 0;
 
+	virtual void setPointCloud(const Pose& echo_pose, vector<real_T>& point_cloud, TTimePoint time_stamp) = 0;
+
 private:
 	void updateOutput()
 	{
@@ -106,6 +109,10 @@ private:
 		output.time_stamp = last_time_;
 		output.pose = echo_pose;
 		setOutput(output);
+	}
+	void updateInput() {
+		EchoData input = getInput();
+		setPointCloud(input.pose, input.point_cloud, input.time_stamp);
 	}
 private:
     EchoSimpleParams params_;
