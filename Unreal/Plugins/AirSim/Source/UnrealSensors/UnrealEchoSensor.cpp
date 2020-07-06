@@ -303,15 +303,17 @@ void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 }
 
 void UnrealEchoSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp){
-	// TODO draw_time_
+	// TODO consume point cloud (+ draw_time_)?
 
-	const int DATA_PER_POINT = 5;
-	for (int point_count = 0; point_count < point_cloud.size(); point_count+=DATA_PER_POINT){
-		Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count+1], -point_cloud[point_count+2]);
-		Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_reference_frame_, true);
-		FVector point_global = ned_transform_->fromLocalNed(point_global1);
+	if (sensor_params_.draw_external_points) {
+		const int DATA_PER_POINT = 5;
+		for (int point_count = 0; point_count < point_cloud.size(); point_count += DATA_PER_POINT) {
+			Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);
+			Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
+			FVector point_global = ned_transform_->fromLocalNed(point_global1);
 
-		DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Blue, false, draw_time_);
+			DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, draw_time_);
+		}
 	}
 }
 
