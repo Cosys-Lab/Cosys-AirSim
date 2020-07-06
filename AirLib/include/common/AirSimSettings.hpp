@@ -289,6 +289,7 @@ public: //types
 		bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the sensor
 		bool draw_reflected_paths = false;				// Draw debug lines for the full path of reflected points to the sensor
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
 
 		// Misc
 		std::string data_frame = AirSimSettings::kSensorLocalFrame;
@@ -1283,6 +1284,7 @@ private:
 		echo_setting.draw_initial_points = settings_json.getBool("DrawInitialPoints", echo_setting.draw_initial_points);
 		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
+		echo_setting.draw_external_points = settings_json.getBool("DrawExternalPoints", echo_setting.draw_external_points);
 
 		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
 		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
