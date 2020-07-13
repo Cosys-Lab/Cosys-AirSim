@@ -15,8 +15,7 @@ struct EchoSimpleParams {
     // TODO: enable reading of these params from AirSim settings
 
     int number_of_traces;					// Amount of traces (rays) being cast 
-	uint number_of_spread_traces;			// Amount of scattered traces created by an incoming trace
-	float spread_opening_angle;				// Beam width of the scattered traces
+	float reflection_opening_angle;			// Beam width of the scattered traces
 	real_T attenuation_per_distance;		// Attenuation of signal wrt distance traveled (dB/m)
 	real_T attenuation_per_reflection;		// Attenuation of signal wrt reflections (dB)
 	real_T attenuation_limit;				// Attenuation at which the signal is considered dissipated (dB)
@@ -25,6 +24,7 @@ struct EchoSimpleParams {
 	real_T reflection_distance_limit;		// Maximum distance between reflection locations.
 	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
 	real_T sensor_diameter;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
+	float sensor_opening_angle;				// The opening angle in which rays will be cast from the sensor
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
 	bool ignore_marked = false;
 
@@ -54,8 +54,8 @@ struct EchoSimpleParams {
         std::string simmode_name = AirSimSettings::singleton().simmode_name;
 
 		number_of_traces = settings.number_of_traces;
-		number_of_spread_traces = settings.number_of_spread_traces;
-		spread_opening_angle = settings.spread_opening_angle;
+		reflection_opening_angle = settings.reflection_opening_angle;
+		sensor_opening_angle = settings.sensor_opening_angle;
 		attenuation_per_distance = settings.attenuation_per_distance;
 		attenuation_per_reflection = settings.attenuation_per_reflection;
 		attenuation_limit = settings.attenuation_limit;
