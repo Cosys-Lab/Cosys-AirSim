@@ -240,7 +240,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
         timeStamp = rospy.Time.now()
 
         rateCounter += 1
-        if rateCounter is rosIMURate/rosRate:
+        if rateCounter == rosIMURate/rosRate:
             rateCounter = 0
             cameraTimeStamp = timeStamp
             
