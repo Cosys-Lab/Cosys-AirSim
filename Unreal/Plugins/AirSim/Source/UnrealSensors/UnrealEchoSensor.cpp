@@ -302,6 +302,21 @@ void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 	trace_length = ned_transform_->fromNed(remainingDistance(signal_attenuation, total_distance));
 }
 
+void UnrealEchoSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp){
+	// TODO consume point cloud (+ draw_time_)?
+
+	if (sensor_params_.draw_external_points) {
+		const int DATA_PER_POINT = 5;
+		for (int point_count = 0; point_count < point_cloud.size(); point_count += DATA_PER_POINT) {
+			Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);
+			Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
+			FVector point_global = ned_transform_->fromLocalNed(point_global1);
+
+			DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, draw_time_);
+		}
+	}
+}
+
 FVector UnrealEchoSensor::Vector3rToFVector(const Vector3r &input_vector) {
 	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
 }

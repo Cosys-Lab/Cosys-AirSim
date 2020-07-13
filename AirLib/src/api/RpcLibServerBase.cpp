@@ -202,6 +202,10 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
 		return RpcLibAdapatorsBase::EchoData(echo_data);
 	});
 
+	pimpl_->server.bind("setEchoData", [&](const std::string& echo_name, const std::string& vehicle_name, RpcLibAdapatorsBase::EchoData echo_data) -> void {
+		getVehicleApi(vehicle_name)->setEchoData(echo_name, echo_data.to());
+	});
+
     pimpl_->server.bind("getImuData", [&](const std::string& imu_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::ImuData {
         const auto& imu_data = getVehicleApi(vehicle_name)->getImuData(imu_name);
         return RpcLibAdapatorsBase::ImuData(imu_data);

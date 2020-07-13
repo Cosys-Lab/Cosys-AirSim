@@ -45,6 +45,16 @@ public:
 		return output_;
 	}
 
+	const EchoData& getInput() const
+	{
+		return input_;
+	}
+
+	void setInput(const EchoData& input) const
+	{
+		input_ = input;
+	}
+
 protected:
     void setOutput(const EchoData& output)
     {
@@ -53,6 +63,7 @@ protected:
 
 private:
     EchoData output_;
+	mutable EchoData input_;
 };
 
 }} //namespace

@@ -28,6 +28,8 @@ protected:
 
 	virtual void pause(const bool is_paused);
 
+	virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
+
 private:
 	using Vector3r = msr::airlib::Vector3r;
 	using VectorMath = msr::airlib::VectorMath;
