@@ -34,6 +34,9 @@ public:
 		last_time_ = clock()->nowNanos();
 
 		updateOutput();        
+
+		EchoData emptyInput;
+		setInput(emptyInput);
     }
 
 	virtual void update(float delta = 0) override

@@ -63,7 +63,7 @@ private:
 	const float distance_limit_;
 	const int reflection_limit_;
 	const float reflection_distance_limit_;
-	const float opening_angle_;
+	const float reflection_opening_angle_;
 	const float draw_time_;
 	const float line_thinkness_;
 };
