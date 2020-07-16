@@ -276,14 +276,14 @@ public: //types
 
 		// Signal propagation settings
 		uint number_of_traces = 1000;					// Amount of traces (rays) being cast
-		uint number_of_spread_traces = 10;			    // Amount of scattered traces created by an incoming trace
-		float spread_opening_angle = 10.0f;			    // Beam width of the scattered traces
+		float reflection_opening_angle = 10.0f;			// Beam width of the scattered traces
 		float attenuation_per_distance = 0.0f;			// Attenuation of signal wrt distance traveled (dB/m)
 		float attenuation_per_reflection = 0.0f;        // Attenuation of signal wrt reflections (dB)
 		float attenuation_limit = -100.0f;              // Attenuation at which the signal is considered dissipated (dB)
 		float distance_limit = 10.0f;					// Maximum distance the signal can travel.
 		int reflection_limit = 3;						// Maximum times the signal can reflect.
-		float reflection_distance_limit = 0.4f;		// Maximum distance between reflection locations.
+		float reflection_distance_limit = 0.4f;			// Maximum distance between reflection locations.
+		float sensor_opening_angle = 180.0f;			// The opening angle in which rays will be cast from the sensor
 
 		// Sensor settings
 		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
@@ -1359,8 +1359,8 @@ private:
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
-		echo_setting.number_of_spread_traces = settings_json.getInt("NumberOfSpreadTraces", echo_setting.number_of_spread_traces);
-		echo_setting.spread_opening_angle = settings_json.getFloat("SpreadOpeningAngle", echo_setting.spread_opening_angle);
+		echo_setting.sensor_opening_angle = settings_json.getInt("SensorOpeningAngle", echo_setting.sensor_opening_angle);
+		echo_setting.reflection_opening_angle = settings_json.getFloat("ReflectionOpeningAngle", echo_setting.reflection_opening_angle);
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
 		echo_setting.attenuation_limit = settings_json.getFloat("AttenuationLimit", echo_setting.attenuation_limit);
