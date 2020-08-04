@@ -274,6 +274,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         msg.data = img_rgb_string2
                         segmentationCamera1Pub.publish(msg)
                         msg.encoding = "32FC1"
+                        msg.step = cameraWidth * 4
                         msg.data = img_rgb_string3
                         depthCamera1Pub.publish(msg)
 
@@ -321,6 +322,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         msg.data = img_rgb_string2
                         segmentationCamera2Pub.publish(msg)
                         msg.encoding = "32FC1"
+                        msg.step = cameraWidth * 4
                         msg.data = img_rgb_string3
                         depthCamera2Pub.publish(msg)
 
@@ -416,6 +418,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         msg.data = img_rgb_string2
                         segmentationCamera3Pub.publish(msg)
                         msg.encoding = "32FC1"
+                        msg.step = cameraWidth * 4
                         msg.data = img_rgb_string3
                         depthCamera3Pub.publish(msg)
 
