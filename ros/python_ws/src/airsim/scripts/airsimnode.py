@@ -122,7 +122,7 @@ def get_image_bytes(data, cameraType):
 
 
 def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
-               lidarName, echoName, imuName, vehicleName, carcontrolInputTopic):
+               lidarName, echoName, imuName, vehicleName, frameSystem, carcontrolInputTopic):
 
     # Reading from Tuples
     camera1Active = activeTuple[0]
@@ -501,13 +501,22 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             imu_msg.orientation.z = imuData.orientation.inverse().z_val
             imu_msg.orientation.w = imuData.orientation.inverse().w_val
 
-            imu_msg.angular_velocity.x = imuData.angular_velocity.x_val
-            imu_msg.angular_velocity.y = -imuData.angular_velocity.y_val
-            imu_msg.angular_velocity.z = -imuData.angular_velocity.z_val
+            if frameSystem:
+                imu_msg.angular_velocity.x = -imuData.angular_velocity.z_val
+                imu_msg.angular_velocity.y = imuData.angular_velocity.y_val
+                imu_msg.angular_velocity.z = imuData.angular_velocity.x_val
 
-            imu_msg.linear_acceleration.x = -imuData.linear_acceleration.x_val
-            imu_msg.linear_acceleration.y = imuData.linear_acceleration.y_val
-            imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
+                imu_msg.linear_acceleration.x = -imuData.linear_acceleration.z_val
+                imu_msg.linear_acceleration.y = imuData.linear_acceleration.y_val
+                imu_msg.linear_acceleration.z = imuData.linear_acceleration.x_val
+            else:
+                imu_msg.angular_velocity.x = imuData.angular_velocity.x_val
+                imu_msg.angular_velocity.y = -imuData.angular_velocity.y_val
+                imu_msg.angular_velocity.z = -imuData.angular_velocity.z_val
+
+                imu_msg.linear_acceleration.x = imuData.linear_acceleration.x_val
+                imu_msg.linear_acceleration.y = -imuData.linear_acceleration.y_val
+                imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
 
             # publish Imu message
             imuPub.publish(imu_msg)
@@ -520,9 +529,14 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
             # populate PoseStamped ros message
             simPose = PoseStamped()
-            simPose.pose.position.x = pos.x_val
-            simPose.pose.position.y = -pos.y_val
-            simPose.pose.position.z = -pos.z_val
+            if frameSystem:
+                simPose.pose.position.x = -pos.z_val
+                simPose.pose.position.y = pos.y_val
+                simPose.pose.position.z = pos.x_val
+            else:
+                simPose.pose.position.x = pos.x_val
+                simPose.pose.position.y = -pos.y_val
+                simPose.pose.position.z = -pos.z_val
             simPose.pose.orientation.w = orientation.w_val
             simPose.pose.orientation.x = orientation.x_val
             simPose.pose.orientation.y = orientation.y_val
@@ -612,11 +626,14 @@ if __name__ == '__main__':
         # Vehicle settings
         vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
 
+	# Coordinate frame settings(0=default ROS, 1=kimera)
+        frameSystem = rospy.get_param('~frame_system', 0)
+
         # Car Control settings
         carcontrolInputTopic = rospy.get_param('~carcontrol_input_topic', 'cmd_vel')
 
         airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, echoName, imuName,
-                      vehicleName, carcontrolInputTopic )
+                      vehicleName, frameSystem, carcontrolInputTopic )
 
     except rospy.ROSInterruptException:
         pass
