@@ -518,10 +518,6 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 imu_msg.linear_acceleration.y = -imuData.linear_acceleration.y_val
                 imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
 
-            imu_msg.linear_acceleration.x = imuData.linear_acceleration.x_val
-            imu_msg.linear_acceleration.y = -imuData.linear_acceleration.y_val
-            imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
-
             # publish Imu message
             imuPub.publish(imu_msg)
 
