@@ -4,8 +4,8 @@
       <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0.55 0 0 0 base_link base_laser 100" />
       <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
 
-            <param name="rate" type="int" value="20"/>
-            <param name="imu_rate" type="int" value="100" />
+            <param name="rate" type="int" value="30"/>
+            <param name="imu_rate" type="int" value="60" />
 
             <param name="camera1_active" type="int" value="1" />
             <param name="camera2_active" type="int" value="1" />
@@ -41,8 +41,8 @@
             <param name="camera2_sceneonly" type="int" value="0" />
             <param name="camera1_mono" type="int" value="0" />
             <param name="camera2_mono" type="int" value="0" />
-            <param name="camera_height" type="int" value="540" />
-            <param name="camera_width" type="int" value="960" />
+            <param name="camera_height" type="int" value="480" />
+            <param name="camera_width" type="int" value="640" />
 
             <param name="frame_system" type="int" value="0" />
             <param name="pose_transform" type="int" value="0" />
