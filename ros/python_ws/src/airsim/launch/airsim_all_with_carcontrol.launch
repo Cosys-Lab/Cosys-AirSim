@@ -30,7 +30,7 @@
             <param name="topic_lidar_groundtruth" type="string" value="airsim/lidargroundtruth" />
             <param name="topic_echo" type="string" value="airsim/echo" />
             <param name="topic_imu" type="string" value="airsim/imu" />
-            <param name="topic_pose" type="string" value="airsim/pose" />
+            <param name="topic_pose" type="string" value="airsim/gtpose" />
 
             <param name="vehicle_name" type="string" value="airsimvehicle" />
             <param name="imu_name" type="string" value="imu" />
