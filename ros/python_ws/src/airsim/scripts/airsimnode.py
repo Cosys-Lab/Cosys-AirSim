@@ -122,7 +122,7 @@ def get_image_bytes(data, cameraType):
 
 
 def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
-               lidarName, echoName, imuName, vehicleName, frameSystem, carcontrolInputTopic):
+               lidarName, echoName, imuName, vehicleName, frameSystem, transformPose, carcontrolInputTopic):
 
     # Reading from Tuples
     camera1Active = activeTuple[0]
@@ -203,7 +203,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     if imuActive:
         imuPub = rospy.Publisher(imuTopicName, Imu, queue_size=1)
     if poseActive:
-        rospy.Subscriber(poseTopicName, PoseStamped, handle_airsim_pose, (poseFrame, imuFrame))
+        if transformPose:
+            rospy.Subscriber(poseTopicName, PoseStamped, handle_airsim_pose, (poseFrame, imuFrame))
         posePub = rospy.Publisher(poseTopicName, PoseStamped, queue_size=1)
     if carcontrolActive:
         client.enableApiControl(True)
@@ -626,14 +627,18 @@ if __name__ == '__main__':
         # Vehicle settings
         vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
 
-	# Coordinate frame settings(0=default ROS, 1=kimera)
+	    # Coordinate frame settings (0=default ROS, 1=kimera)
         frameSystem = rospy.get_param('~frame_system', 0)
+
+        # Transform the groundtruth pose to the imu frame
+        # Best to turn this off to not intervene with SLAM systems
+        transformPose = rospy.get_param('~pose_transform', 0)
 
         # Car Control settings
         carcontrolInputTopic = rospy.get_param('~carcontrol_input_topic', 'cmd_vel')
 
         airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, echoName, imuName,
-                      vehicleName, frameSystem, carcontrolInputTopic )
+                      vehicleName, frameSystem, transformPose, carcontrolInputTopic )
 
     except rospy.ROSInterruptException:
         pass
