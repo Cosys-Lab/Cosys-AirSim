@@ -24,9 +24,16 @@ UnrealLidarSensor::UnrealLidarSensor(const AirSimSettings::LidarSetting& setting
 // initializes information based on lidar configuration
 void UnrealLidarSensor::createLasers()
 {
+
+
 	msr::airlib::LidarSimpleParams params = getParams();
 
 	const auto number_of_lasers = params.number_of_channels;
+
+	float horizontal_delta = (params.horizontal_FOV_end - params.horizontal_FOV_start) / float(params.measurement_per_cycle - 1);
+	for (uint32 i = 0; i < params.measurement_per_cycle; i++) {
+		horizontal_angles_.Add(params.horizontal_FOV_start + i * horizontal_delta);
+	}
 
 	if (number_of_lasers <= 0)
 		return;
@@ -44,6 +51,8 @@ void UnrealLidarSensor::createLasers()
 		const float vertical_angle = params.vertical_FOV_upper - static_cast<float>(i) * delta_angle;
 		laser_angles_.emplace_back(vertical_angle);
 	}
+
+	current_horizontal_angle_index_ = horizontal_angles_.Num()-1;
 }
 
 // Pause Unreal simulation
@@ -58,53 +67,91 @@ void UnrealLidarSensor::pause(const bool is_paused) {
 }
 
 // returns a point-cloud for the tick
-void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
-	const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth)
+bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
+	const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final)
 {
-	point_cloud.clear();
-	groundtruth.clear();
-
+	bool refresh = false;
 	msr::airlib::LidarSimpleParams params = getParams();
 	const auto number_of_lasers = params.number_of_channels;
 
-	// cap the points to scan via ray-tracing; this is currently needed for car/Unreal tick scenarios
-	// since SensorBase mechanism uses the elapsed clock time instead of the tick delta-time.
-	constexpr float MAX_POINTS_IN_SCAN = 1e+5f;
-	uint32 total_points_to_scan = FMath::RoundHalfFromZero(params.points_per_second * delta_time);
-	if (params.limit_points && total_points_to_scan > MAX_POINTS_IN_SCAN)
-	{
-		total_points_to_scan = MAX_POINTS_IN_SCAN;
-		UAirBlueprintLib::LogMessageString("Lidar: ", "Capping number of points to scan", LogDebugLevel::Failure);
-	}
+	//// cap the points to scan via ray-tracing; this is currently needed for car/Unreal tick scenarios
+	//// since SensorBase mechanism uses the elapsed clock time instead of the tick delta-time.
+	//constexpr float MAX_POINTS_IN_SCAN = 1e+5f;
+	//uint32 total_points_to_scan = FMath::RoundHalfFromZero(params.points_per_second * delta_time);
+	//if (params.limit_points && total_points_to_scan > MAX_POINTS_IN_SCAN)
+	//{
+	//	total_points_to_scan = MAX_POINTS_IN_SCAN;
+	//	UAirBlueprintLib::LogMessageString("Lidar: ", "Capping number of points to scan", LogDebugLevel::Failure);
+	//}
 
-	// calculate number of points needed for each laser/channel
-	const uint32 points_to_scan_with_one_laser = FMath::RoundHalfFromZero(total_points_to_scan / float(number_of_lasers));
-	if (points_to_scan_with_one_laser <= 0)
-	{
-		//UAirBlueprintLib::LogMessageString("Lidar: ", "No points requested this frame", LogDebugLevel::Failure);
-		return;
-	}
+
 
 	// calculate needed angle/distance between each point
 	const float angle_distance_of_tick = params.horizontal_rotation_frequency * 360.0f * delta_time;
-	const float angle_distance_of_laser_measure = angle_distance_of_tick / points_to_scan_with_one_laser;
+	const double angle_distance_of_laser_measure = 360.0f / params.measurement_per_cycle;
+
+	// calculate number of points needed for each laser/channel
+	uint32 points_to_scan_with_one_laser_temp = FMath::RoundHalfFromZero(angle_distance_of_tick / angle_distance_of_laser_measure);
+	if (points_to_scan_with_one_laser_temp <= 0)
+	{
+		//UAirBlueprintLib::LogMessageString("Lidar: ", "No points requested this frame", LogDebugLevel::Failure);
+		return refresh;
+	}
+	constexpr float MAX_POINTS_IN_SCAN = 5000;
+	if (params.limit_points && points_to_scan_with_one_laser_temp * number_of_lasers > MAX_POINTS_IN_SCAN)
+	{
+		UAirBlueprintLib::LogMessageString("Lidar Error: ", "Capping number of points to scan " + std::to_string(points_to_scan_with_one_laser_temp * number_of_lasers), LogDebugLevel::Failure);
+		points_to_scan_with_one_laser_temp = MAX_POINTS_IN_SCAN / number_of_lasers;
+	}
+	const uint32 points_to_scan_with_one_laser = points_to_scan_with_one_laser_temp;
 
 	// normalize FOV start/end
-	const float laser_start = std::fmod(360.0f + params.horizontal_FOV_start, 360.0f);
-	const float laser_end = std::fmod(360.0f + params.horizontal_FOV_end, 360.0f);
+	float laser_start = std::fmod(360.0f + params.horizontal_FOV_start, 360.0f);
+	float laser_end = std::fmod(360.0f + params.horizontal_FOV_end, 360.0f);
 
+	float previous_horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
 	// shoot lasers
-	for (auto laser = 0u; laser < number_of_lasers; ++laser)
+	for (uint32 i = 1; i <= points_to_scan_with_one_laser; ++i)
 	{
-		const float vertical_angle = laser_angles_[laser];
+		if (current_horizontal_angle_index_ == horizontal_angles_.Num() - 1) {
+			current_horizontal_angle_index_ = 0;
+		}
+		else {
+			current_horizontal_angle_index_ += 1;
+		}
+		
+		float horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
+		//UE_LOG(LogTemp, Display, TEXT("horizontal_angle: %f "), horizontal_angle);
 
-		for (auto i = 0u; i < points_to_scan_with_one_laser; ++i)
+		for (auto laser = 0u; laser < number_of_lasers; ++laser)
 		{
-			const float horizontal_angle = std::fmod(current_horizontal_angle_ + angle_distance_of_laser_measure * i, 360.0f);
+			float vertical_angle = laser_angles_[laser];
+			if((previous_horizontal_angle > horizontal_angle) && (point_cloud.size() != 0)){
+				if (laser == 0u) {
+					if ((((int)point_cloud.size() / 3) != params.measurement_per_cycle * number_of_lasers) || (groundtruth.size() != params.measurement_per_cycle * number_of_lasers))
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Pointcloud or labels incorrect size! points:%i labels:%i"), (int)(point_cloud.size() / 3), groundtruth.size());
+					}		
+					//UE_LOG(LogTemp, Display, TEXT("Pointcloud completed! points:%i labels:%i"), (int)(point_cloud.size() / 3), groundtruth.size());
+					point_cloud_final = point_cloud;
+					groundtruth_final = groundtruth;
+					point_cloud.clear();
+					groundtruth.clear();
+					refresh = true;
+				}
+			}
+			
+			// check if horizontal angle is a duplicate
+			if ((horizontal_angle - previous_horizontal_angle) <= 0.00005f && (horizontal_angle - 0) >= 0.00005f) {
+				UE_LOG(LogTemp, Display, TEXT("duplicate horizontal angle! angle! previous:%f current:%f"), previous_horizontal_angle, horizontal_angle);
+				continue;
+			}
 
 			// check if the laser is outside the requested horizontal FOV
-			if (!VectorMath::isAngleBetweenAngles(horizontal_angle, laser_start, laser_end))
+			if (!VectorMath::isAngleBetweenAngles(horizontal_angle, laser_start, laser_end)) {
+				UE_LOG(LogTemp, Display, TEXT("outside of FOV: %f "), horizontal_angle);
 				continue;
+			}			
 
 			Vector3r point;
 			std::string label;
@@ -116,12 +163,16 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 				point_cloud.emplace_back(point.z());
 				groundtruth.emplace_back(label);
 			}
+			else {
+				point_cloud.emplace_back(0);
+				point_cloud.emplace_back(0);
+				point_cloud.emplace_back(0);
+				groundtruth.emplace_back("out_of_range");
+			}
 		}
+		previous_horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
 	}
-
-	current_horizontal_angle_ = std::fmod(current_horizontal_angle_ + angle_distance_of_tick, 360.0f);
-
-	return;
+	return refresh;
 }
 
 // simulate shooting a laser via Unreal ray-tracing.
@@ -164,7 +215,17 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 
 		FVector impact_point = hit_result.ImpactPoint;
 
-		label = TCHAR_TO_UTF8(*hit_result.Actor.Get()->GetName());
+		//Store the name the hit object.
+		auto hitActor = hit_result.GetActor();
+		if (hitActor != nullptr)
+		{
+			label = TCHAR_TO_UTF8(*hitActor->GetName());
+		}
+
+		//if (label.empty())
+		//{
+		//	UE_LOG(LogTemp, Warning, TEXT("Empty label!"));
+		//}
 		// If enabled add range noise
 		if (params.generate_noise) {
 			// Add noise based on normal distribution taking into account scaling of noise with distance

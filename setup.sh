@@ -3,7 +3,7 @@
 if [[ -d "llvm-source-39" ]]; then
     echo "Hello there! We just upgraded AirSim to Unreal Engine 4.22."
     echo "Here are few easy steps for upgrade so everything is new and shiny :)"
-    echo "https://github.com/Microsoft/AirSim/blob/master/docs/unreal_upgrade.md"
+    echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/unreal_upgrade.md"
     exit 1
 fi
 

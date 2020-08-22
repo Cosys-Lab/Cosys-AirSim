@@ -177,6 +177,28 @@ public:
 		return echo->getOutput();
 	}
 
+	virtual void setEchoData(const std::string& echo_name, const EchoData& input) const
+	{
+		const EchoBase* echo = nullptr;
+
+		// Find echo with the given name (for empty input name, return the first one found)
+		// Not efficient but should suffice given small number of echos
+		uint count_echos = getSensors().size(SensorBase::SensorType::Echo);
+		for (uint i = 0; i < count_echos; i++)
+		{
+			const EchoBase* current_echo = static_cast<const EchoBase*>(getSensors().getByType(SensorBase::SensorType::Echo, i));
+			if (current_echo != nullptr && (current_echo->getName() == echo_name || echo_name == ""))
+			{
+				echo = current_echo;
+				break;
+			}
+		}
+		if (echo == nullptr)
+			throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", echo_name.c_str()));
+
+		echo->setInput(input);
+	}
+
     // IMU API
     virtual ImuBase::Output getImuData(const std::string& imu_name) const
     {

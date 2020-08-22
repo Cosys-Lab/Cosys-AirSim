@@ -43,20 +43,12 @@ void WorldSimApi::setTimeOfDay(bool is_enabled, const std::string& start_datetim
 
 bool WorldSimApi::setSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex)
 {
-    bool success;
-    UAirBlueprintLib::RunCommandOnGameThread([mesh_name, object_id, is_name_regex, &success]() {
-        success = UAirBlueprintLib::SetMeshStencilID(mesh_name, object_id, is_name_regex);
-    }, true);
-    return success;
+	return simmode_->SetMeshVertexColorID(mesh_name, object_id, is_name_regex);
 }
 
 int WorldSimApi::getSegmentationObjectID(const std::string& mesh_name) const
 {
-    int result;
-    UAirBlueprintLib::RunCommandOnGameThread([&mesh_name, &result]() {
-        result = UAirBlueprintLib::GetMeshStencilID(mesh_name);
-    }, true);
-    return result;
+	return simmode_->GetMeshVertexColorID(mesh_name);
 }
 
 void WorldSimApi::printLogMessage(const std::string& message,
@@ -67,11 +59,7 @@ void WorldSimApi::printLogMessage(const std::string& message,
 
 std::vector<std::string> WorldSimApi::listSceneObjects(const std::string& name_regex) const
 {
-    std::vector<std::string> result;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &name_regex, &result]() {
-        result = UAirBlueprintLib::ListMatchingActors(simmode_, name_regex);
-    }, true);
-    return result;
+	return simmode_->GetAllSegmentationMeshIDs();
 }
 
 
@@ -80,30 +68,8 @@ WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name) con
     Pose result;
     UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, &result]() {
         AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
-
-        if (!actor)
-        {
-            result = Pose::nanPose();
-        }
-        else
-        {
-            if (simmode_->isUrdf())
-            {
-                NedTransform transform = simmode_->getGlobalNedTransform();
-
-                FQuat rotation = actor->GetActorQuat();
-                FVector location = actor->GetActorLocation();
-
-                result = Pose(
-                    Vector3r(transform.toNed(location.X), transform.toNed(location.Y), transform.toNed(location.Z)),
-                    Quaternionr(rotation.W, rotation.X, rotation.Y, rotation.Z)
-                );
-            }
-            else
-            {
-                result = simmode_->getGlobalNedTransform().toGlobalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()));
-            }
-        }
+        result = actor ? simmode_->getGlobalNedTransform().toGlobalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
+            : Pose::nanPose();
     }, true);
     return result;
 }
@@ -138,58 +104,8 @@ void WorldSimApi::setWeatherParameter(WeatherParameter param, float val)
     UWeatherLib::setWeatherParamScalar(simmode_->GetWorld(), param_e, val);
 }
 
-bool WorldSimApi::spawnStaticMeshObject(const std::string& mesh_path, const std::string& object_name, const WorldSimApi::Pose &pose)
-{
-    bool result = false;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &mesh_path, &object_name, &pose, &result]() {
-        //UClass* class_instance = UAirBlueprintLib::LoadClass(mesh_path);
 
-        // Use raw unreal coordinates
-        // But take into account the scale. The user will provide offsets in meters.
-        // The function fromNed will convert from meters to UU. 
-        NedTransform transform = simmode_->getGlobalNedTransform();
-
-        FTransform spawn_transform(FQuat(pose.orientation.x(),
-                                         pose.orientation.y(),
-                                         pose.orientation.z(),
-                                         pose.orientation.w()),
-                                   FVector(transform.fromNed(pose.position.x()),
-                                           transform.fromNed(pose.position.y()),
-                                           transform.fromNed(pose.position.z())));
-        
-        FActorSpawnParameters spawnParameters;
-        spawnParameters.Name = FName(object_name.c_str());
-
-        AStaticMeshActor* spawned_actor = this->simmode_->GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), spawn_transform, spawnParameters);
-        UStaticMesh* mesh = LoadObject<UStaticMesh>(spawned_actor, UTF8_TO_TCHAR(mesh_path.c_str()));
-
-        spawned_actor->SetMobility(EComponentMobility::Movable);
-        spawned_actor->GetStaticMeshComponent()->SetStaticMesh(mesh);
-        spawned_actor->GetStaticMeshComponent()->SetSimulatePhysics(true);
-        spawned_actor->GetStaticMeshComponent()->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
-        spawned_actor->GetStaticMeshComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-        spawned_actor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-        spawned_actor->GetStaticMeshComponent()->SetNotifyRigidBodyCollision(true);
-
-        result = true;
-    }, true);
-    return result;
-}
-
-bool WorldSimApi::deleteObject(const std::string& object_name)
-{
-    bool result = false;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, &result]() {
-        AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
-        if (actor != nullptr)
-        {
-            this->simmode_->GetWorld()->DestroyActor(actor);
-            result = true;
-        }
-
-    }, true);
-    return result;
-}
+//------------------------------------------------- Char APIs -----------------------------------------------------------/
 
 void WorldSimApi::charSetFaceExpression(const std::string& expression_name, float value, const std::string& character_name)
 {
@@ -321,4 +237,5 @@ const AAirSimCharacter* WorldSimApi::getAirSimCharacter(const std::string& chara
 {
     return const_cast<WorldSimApi*>(this)->getAirSimCharacter(character_name);
 }
+//------------------------------------------------- Char APIs -----------------------------------------------------------/
 

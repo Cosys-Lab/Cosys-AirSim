@@ -316,7 +316,7 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 		VehicleInputData.setAnalogLeftBrake(LeftBreak);
 		VehicleInputData.setAnalogRightBrake(RightBreak);
 		VehicleInputData.setAnalogAccel(0);
-		UE_LOG(LogTemp, Warning, TEXT("Braking %f %f "), VehicleInputData.getAnalogLeftBrake(), VehicleInputData.getAnalogRightBrake());
+		//UE_LOG(LogTemp, Warning, TEXT("Braking %f %f "), VehicleInputData.getAnalogLeftBrake(), VehicleInputData.getAnalogRightBrake());
 	}
 	// Convert from our curve to PxFixedSizeLookupTable
 
@@ -405,6 +405,8 @@ float USkidVehicleMovementComponent::GetAcceleration() const
 {
 #if WITH_PHYSX_VEHICLES
 	return Acceleration;
+#else
+	return 0.0f;
 #endif
 }
 
@@ -412,6 +414,8 @@ float USkidVehicleMovementComponent::GetLeftBreak() const
 {
 #if WITH_PHYSX_VEHICLES
 	return LeftBreak;
+#else
+	return 0.0f;
 #endif
 }
 
@@ -419,6 +423,8 @@ float USkidVehicleMovementComponent::GetRightBreak() const
 {
 #if WITH_PHYSX_VEHICLES
 	return RightBreak;
+#else
+	return 0.0f;
 #endif
 }
 
@@ -426,6 +432,8 @@ float USkidVehicleMovementComponent::GetYJoy() const
 {
 #if WITH_PHYSX_VEHICLES
 	return nJoyY;
+#else
+	return 0.0f;
 #endif
 }
 
@@ -433,6 +441,8 @@ float USkidVehicleMovementComponent::GetXJoy() const
 {
 #if WITH_PHYSX_VEHICLES
 	return nJoyX;
+#else
+	return 0.0f;
 #endif
 }
 

@@ -47,7 +47,7 @@ You can download it by running
         ```
         $ ./run_airsim_image_binary.sh Blocks/Blocks.sh -- headless
         ```
-- [Specifying a `settings.json`](https://github.com/Microsoft/AirSim/blob/master/docs/docker_ubuntu.md#airsim_binary-docker-image)
+- [Specifying a `settings.json`](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/docker_ubuntu.md#airsim_binary-docker-image)
 
 ## Source
 #### Requirements:
@@ -97,7 +97,7 @@ You can download it by running
 * Inside the container, you can see `UnrealEngine` and `AirSim` under `/home/ue4`. 
 * Start unreal engine inside the container:   
    `ue4@HOSTMACHINE:~$ /home/ue4/UnrealEngine/Engine/Binaries/Linux/UE4Editor`
-* [Specifying an airsim settings.json](https://github.com/Microsoft/AirSim/blob/master/docs/docker_ubuntu.md#airsim_source-docker-image)
+* [Specifying an airsim settings.json](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/docker_ubuntu.md#airsim_source-docker-image)
 * Continue with [AirSim's Linux docs](build_linux.md). 
 
 #### [Misc] Packaging Unreal Environments in `airsim_source` containers
@@ -115,7 +115,7 @@ You can download it by running
 ### Specifying an airsim settings.json
   #### `airsim_binary` docker image:
   - We're mapping the host machine's `PATH/TO/Airsim/docker/settings.json` to the docker container's `/home/airsim_user/Documents/AirSim/settings.json`.    
-  - Hence, we can load any settings file by simply modifying `PATH_TO_YOUR/settings.json` by modifying the following snippets in * [`run_airsim_image_binary.sh`](https://github.com/Microsoft/AirSim/blob/master/docker/run_airsim_image_binary.sh)
+  - Hence, we can load any settings file by simply modifying `PATH_TO_YOUR/settings.json` by modifying the following snippets in * [`run_airsim_image_binary.sh`](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docker/run_airsim_image_binary.sh)
       ```
       nvidia-docker run -it \
           -v $PATH_TO_YOUR/settings.json:/home/airsim_user/Documents/AirSim/settings.json \
@@ -136,7 +136,7 @@ You can download it by running
   ####  `airsim_source` docker image:
 
   * We're mapping the host machine's `PATH/TO/Airsim/docker/settings.json` to the docker container's `/home/airsim_user/Documents/AirSim/settings.json`.    
-  * Hence, we can load any settings file by simply modifying `PATH_TO_YOUR/settings.json` by modifying the following snippets in [`run_airsim_image_source.sh`](https://github.com/Microsoft/AirSim/blob/master/docker/run_airsim_image_source.sh):
+  * Hence, we can load any settings file by simply modifying `PATH_TO_YOUR/settings.json` by modifying the following snippets in [`run_airsim_image_source.sh`](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docker/run_airsim_image_source.sh):
     ```
     nvidia-docker run -it \
         -v $(pwd)/settings.json:/home/airsim_user/Documents/AirSim/settings.json \

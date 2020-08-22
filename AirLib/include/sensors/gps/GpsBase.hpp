@@ -13,8 +13,8 @@ namespace msr { namespace airlib {
 
 class GpsBase  : public SensorBase {
 public:
-    GpsBase(const std::string& sensor_name = "", const std::string attach_link_name = "")
-        : SensorBase(sensor_name, attach_link_name)
+    GpsBase(const std::string& sensor_name = "")
+        : SensorBase(sensor_name)
     {}
 
 public: //types

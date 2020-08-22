@@ -189,24 +189,6 @@ public:
         }
     }
 
-    std::vector<std::map<std::string, std::string>> getArrayOfKeyValuePairs(const std::string& name, const std::vector<std::string> keys) const
-    {
-        std::vector<std::map<std::string, std::string>> return_value;
-        if (doc_.count(name) == 1 && doc_[name].is_array()) {
-            auto arr = doc_[name].get<nlohmann::json::array_t>();
-            for (size_t i = 0; i < arr.size(); i++) {
-                std::map<std::string, std::string> kvp;
-                auto obj = arr[i].get<nlohmann::json::object_t>();
-                for (size_t j = 0; j < keys.size(); j++) {
-                    auto val = obj[keys[j]];
-                    kvp[keys[j]] = val.get<std::string>();
-                }
-                return_value.emplace_back(kvp);
-            }
-        }
-        return return_value;
-    }
-
     bool hasKey(const std::string& key) const
     {
         return doc_.find(key) != doc_.end();

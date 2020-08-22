@@ -20,35 +20,22 @@ Cars in AirSim
 * Added [HySLAM environment](docs/hyslamenv.md)
 * Added [CoSysLab environment](docs/cosysenv.md)
 * Added [Echo sensor type](docs/echo.md)
-* Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com).
-* Added WIP [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
+* Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com). **Currently removed due to crashes on Linux!**
+* Added [Instance Segmentation](docs/instance_segmentation.md). Replaces previous system with 255 color limit. This requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
+* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
-* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation.
+* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Added option to hot-reload plugin through Unreal Editor (faster development)
-* Added WIP usage of engine-time for frequency updaters and timestamps instead of real-time. Useful for heavy performance sensor modalities. Currently only usable on the Echo and LIDAR sensor types.
 * Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.22
 
-## What's New
-* A ROS wrapper for multirotors is available. See [airsim_ros_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_ros_pkgs) for the ROS API, and [airsim_tutorial_pkgs](https://github.com/microsoft/AirSim/blob/master/ros/src/airsim_tutorial_pkgs) for tutorials. 
-* [Added sensor APIs for Barometer, IMU, GPS, Magnetometer, Distance Sensor](docs/sensors.md) 
-* Added support for [docker in ubuntu](docs/docker_ubuntu) 
-* Added Weather Effects and [APIs](docs/apis#weather-apis)
-* Added [Time of Day API](docs/apis#time-of-day-api)
-* An experimental integration of [AirSim on Unity](https://github.com/Microsoft/AirSim/tree/master/Unity) is now available. Learn more in [Unity blog post](https://blogs.unity3d.com/2018/11/14/airsim-on-unity-experiment-with-autonomous-vehicle-simulation).
-* [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
-* Highly efficient [NoDisplay view mode](docs/settings#viewmode) to turn off main screen rendering so you can capture images at high rate
-* [Lidar Sensor](docs/lidar)
-* Case Study: [Formula Student Technion Driverless](https://github.com/Microsoft/AirSim/wiki/technion)
-* [Multi-Vehicle Capability](docs/multi_vehicle)
-* [ROS publisher](https://github.com/Microsoft/AirSim/pull/1135)
-
 For complete list of changes, view our [Changelog](CHANGELOG.md)
 
 ## How to Get It
+This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
 ### Windows
 * [Download binaries](docs/use_precompiled.md)
@@ -139,14 +126,6 @@ Please take a look at [open issues](https://github.com/microsoft/airsim/issues) 
 * [More on code structure](docs/code_structure.md)
 * [Contribution Guidelines](CONTRIBUTING.md)
 * [Trello Board](https://trello.com/b/1t2qCeaA/wishlist-by-community-for-community)
-
-### Who is Using AirSim?
-
-We are maintaining a [list](docs/who_is_using.md) of a few projects, people and groups that we are aware of. If you would like to be featured in this list please [make a request here](https://github.com/microsoft/airsim/issues).
-
-## Contact
-
-Join the AirSim group on [Facebook](https://www.facebook.com/groups/1225832467530667/) to stay up to date or ask any questions.
 
 ## FAQ
 

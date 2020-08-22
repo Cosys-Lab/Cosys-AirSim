@@ -19,7 +19,7 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	distance_limit_(getParams().distance_limit),
 	reflection_limit_(getParams().reflection_limit),
 	reflection_distance_limit_(ned_transform_->fromNed(getParams().reflection_distance_limit)),
-	opening_angle_(FMath::DegreesToRadians(getParams().spread_opening_angle)),
+	reflection_opening_angle_(FMath::DegreesToRadians(getParams().reflection_opening_angle)),
 	draw_time_(1.05f / sensor_params_.measurement_frequency),
 	line_thinkness_(1.0f)
 {
@@ -39,7 +39,7 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 void UnrealEchoSensor::generateSampleDirections()
 {
 	int num_traces = sensor_params_.number_of_traces;
-	float opening_angle = 180;  // deg, = full hemisphere
+	float opening_angle = sensor_params_.sensor_opening_angle;  // deg, = full hemisphere
 
 	if (num_traces < 0)
 	{
@@ -236,7 +236,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 
 		FVector direction_to_sensor = sensor_position - trace_start_position;
 		float receiving_angle = angleBetweenVectors(direction_to_sensor, trace_direction);
-		if (receiving_angle < opening_angle_)  // Check if sensor lies in opening angle
+		if (receiving_angle < reflection_opening_angle_)  // Check if sensor lies in opening angle
 		{
 			float received_attenuation = signal_attenuation + receptionAttenuation(receiving_angle);
 			if (received_attenuation < attenuation_limit_) {
@@ -274,7 +274,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 				DrawDebugLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, draw_time_, 0, line_thinkness_);
 				DrawDebugPoint(actor_->GetWorld(), draw_location, 5, FColor::Red, false, draw_time_);
 
-				float radius = distance_to_sensor * FMath::Tan(opening_angle_);
+				float radius = distance_to_sensor * FMath::Tan(reflection_opening_angle_);
 				VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), FVectorToVector3r(trace_direction));
 				Vector3r y_axis = VectorMath::rotateVector(VectorMath::right(), trace_rotation_quat, true);
 				Vector3r z_axis = VectorMath::rotateVector(VectorMath::down(), trace_rotation_quat, true);
@@ -302,6 +302,21 @@ void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 	trace_length = ned_transform_->fromNed(remainingDistance(signal_attenuation, total_distance));
 }
 
+void UnrealEchoSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp){
+	// TODO consume point cloud (+ draw_time_)?
+
+	if (sensor_params_.draw_external_points) {
+		const int DATA_PER_POINT = 5;
+		for (int point_count = 0; point_count < point_cloud.size(); point_count += DATA_PER_POINT) {
+			Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);
+			Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
+			FVector point_global = ned_transform_->fromLocalNed(point_global1);
+
+			DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, draw_time_);
+		}
+	}
+}
+
 FVector UnrealEchoSensor::Vector3rToFVector(const Vector3r &input_vector) {
 	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
 }
@@ -319,7 +334,7 @@ float UnrealEchoSensor::angleBetweenVectors(FVector vector1, FVector vector2) {
 }
 
 float UnrealEchoSensor::receptionAttenuation(float reception_angle) {
-	//float sigma = opening_angle_ / 10 * 3;
+	//float sigma = reflection_opening_angle_ / 10 * 3;
 
 	//return -(FMath::Exp(-FMath::Pow(reception_angle, 2) / (2*FMath::Pow(sigma, 2))) - 1) * attenuation_limit_;
 	// TODO

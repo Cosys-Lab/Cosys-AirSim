@@ -1,0 +1,35 @@
+<launch>
+      <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0 0 0 0 base_link base_laser 100" />
+      <node pkg="tf" type="static_transform_publisher" name="base_to_echo_broadcaster" args="0 0 0 0 0 0 base_link base_echo 100" />
+      <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
+
+            <param name="rate" type="int" value="10" />
+            <param name="imu_rate" type="int" value="100" />
+            
+            <param name="camera1_active" type="int" value="0" />
+            <param name="camera2_active" type="int" value="0" />
+            <param name="camera3_active" type="int" value="0" />
+            <param name="lidar_active" type="int" value="1" />
+            <param name="echo_active" type="int" value="1" />
+            <param name="imu_active" type="int" value="1" />
+            <param name="pose_active" type="int" value="1" />
+            <param name="carcontrol_active" type="int" value="0" />
+
+            <param name="lidar_frame_id" type="string" value="base_laser" />
+            <param name="echo_frame_id" type="string" value="base_echo" />
+            <param name="imu_frame_id" type="string" value="base_link" />
+            <param name="pose_frame_id" type="string" value="world" />
+
+            <param name="topic_lidar" type="string" value="airsim/lidar" />
+            <param name="topic_lidar_groundtruth" type="string" value="airsim/lidargroundtruth" />
+            <param name="topic_echo" type="string" value="airsim/echo" />
+            <param name="topic_imu" type="string" value="airsim/imu" />
+            <param name="topic_pose" type="string" value="airsim/gtpose" />
+
+            <param name="vehicle_name" type="string" value="airsimvehicle" />
+            <param name="imu_name" type="string" value="imu" />
+            <param name="lidar_name" type="string" value="lidar" />
+            <param name="echo_name" type="string" value="echo" />
+      </node>
+      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o /home/airsim/bags/airsim_lidar_echo -a"/>
+</launch>

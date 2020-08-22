@@ -52,24 +52,20 @@ public:
 
     virtual std::vector<ImageCaptureBase::ImageResponse> getImages(const std::vector<ImageCaptureBase::ImageRequest>& request) const = 0;
     virtual std::vector<uint8_t> getImage(const std::string& camera_name, ImageCaptureBase::ImageType image_type) const = 0;
-    virtual void setCameraPose(const CameraPose camera_pose) = 0;
 
     virtual Pose getPose() const = 0;
     virtual void setPose(const Pose& pose, bool ignore_collision) = 0;
-    virtual std::vector<GeoPoint> xyzToGeoPoints(const std::vector<Vector3r>& xyz_points) = 0;
     virtual const Kinematics::State* getGroundTruthKinematics() const = 0;
     virtual const msr::airlib::Environment* getGroundTruthEnvironment() const = 0;
 
     virtual CameraInfo getCameraInfo(const std::string& camera_name) const = 0;
     virtual void setCameraOrientation(const std::string& camera_name, const Quaternionr& orientation) = 0;
-    virtual msr::airlib::RayCastResponse rayCast(const msr::airlib::RayCastRequest& request) = 0;
 
     virtual CollisionInfo getCollisionInfo() const = 0;
     virtual int getRemoteControlID() const = 0; //which RC to use, 0 is first one, -1 means disable RC (use keyborad)
     virtual RCData getRCData() const = 0; //get reading from RC from simulator's host OS
     virtual std::string getVehicleName() const = 0;
     virtual std::string getRecordFileLine(bool is_header_line) const = 0;
-    virtual void setDrawShapes(std::unordered_map<std::string, msr::airlib::DrawableShape> &drawableShapes, bool persist_unmentioned) = 0;
     virtual void toggleTrace() = 0;
 
     //use pointer here because of derived classes for VehicleSetting
@@ -77,7 +73,6 @@ public:
     {
         return AirSimSettings::singleton().getVehicleSetting(getVehicleName());
     }
-
 };
 
 } } //namespace

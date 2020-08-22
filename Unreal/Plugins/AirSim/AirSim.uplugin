@@ -3,13 +3,13 @@
   "Version" : "1.2.0",
   "VersionName": "1.2.0",
   "FriendlyName": "AirSim",
-  "Description": "AirSim - Autonomous Aerial Vehicles Simulator Plugin",
+  "Description": "AirSim - Simulator Plugin",
   "Category" : "Science",
   "CreatedBy": "Shital Shah",
-  "CreatedByURL": "http://github.com/Microsoft/AirSim",
-  "DocsURL" : "https://github.com/Microsoft/AirSim/blob/master/README.md",
+  "CreatedByURL": "http://cosys-lab.uantwerpen.be/",
+  "DocsURL" : "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/README.md",
   "MarketplaceURL" : "",
-  "SupportURL" : "https://github.com/Microsoft/AirSim/issues",
+  "SupportURL" : "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/README.md",
   "EnabledByDefault" : true,
   "CanContainContent": true,
   "IsBetaVersion" : true,
@@ -22,13 +22,9 @@
     }
   ],
   "Plugins": [
-    {
-      "Name": "PhysXVehicles",
-      "Enabled": true
-    },
-    {
-      "Name": "ProceduralMeshComponent",
-      "Enabled": true
-    }
+	  {
+		  "Name": "PhysXVehicles",
+		  "Enabled": true
+	  }
   ]
 }

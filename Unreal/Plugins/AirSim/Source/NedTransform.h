@@ -31,6 +31,7 @@ public:
 
     //UU -> local NED
     Vector3r toLocalNed(const FVector& position) const;
+	Vector3r toLocalNedVelocity(const FVector &velocity) const;
     Vector3r toGlobalNed(const FVector& position) const;
     Quaternionr toNed(const FQuat& q) const;
     float toNed(float length) const;
@@ -50,10 +51,11 @@ public:
     FVector getLocalOffset() const;
     FTransform getGlobalTransform() const;
 
+	FVector toFVector(const Vector3r& vec, float scale, bool convert_from_ned) const;
+	Vector3r toVector3r(const FVector& vec, float scale, bool convert_to_ned) const;
+
 private:
     NedTransform(const AActor* pivot, const FTransform& global_transform, float world_to_meters); //create only through static factory methods
-    FVector toFVector(const Vector3r& vec, float scale, bool convert_from_ned) const;
-    Vector3r toVector3r(const FVector& vec, float scale, bool convert_to_ned) const;
 
 private:
     FTransform global_transform_;

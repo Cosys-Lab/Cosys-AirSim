@@ -16,13 +16,13 @@ namespace msr { namespace airlib {
 class EchoSimple : public EchoBase {
 public:
     EchoSimple(const AirSimSettings::EchoSetting& setting = AirSimSettings::EchoSetting())
-        : EchoBase(setting.sensor_name, setting.attach_link)
+        : EchoBase(setting.sensor_name)
     {
         // initialize params
         params_.initializeFromSettings(setting);
 
         //initialize frequency limiter
-		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, params_.engine_time);
+		freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, false);
     }
 
     //*** Start: UpdatableState implementation ***//
@@ -34,6 +34,9 @@ public:
 		last_time_ = clock()->nowNanos();
 
 		updateOutput();        
+
+		EchoData emptyInput;
+		setInput(emptyInput);
     }
 
 	virtual void update(float delta = 0) override
@@ -41,16 +44,12 @@ public:
 		EchoBase::update(delta);
 		freq_limiter_.update(delta);
 
-		if (last_tick_measurement_ && params_.pause_after_measurement == false && params_.engine_time) {
-			pause(false);
-			last_tick_measurement_ = false;
-		}
 		if (freq_limiter_.isWaitComplete())
 		{
 			last_time_ = freq_limiter_.getLastTime();
-			if(params_.engine_time || params_.pause_after_measurement)pause(true);
+			if(params_.pause_after_measurement)pause(true);
 			updateOutput();
-			if (params_.engine_time)last_tick_measurement_ = true;
+			updateInput();
 		}		
 
     }
@@ -82,6 +81,8 @@ protected:
 
 	virtual void pause(const bool is_paused) = 0;
 
+	virtual void setPointCloud(const Pose& echo_pose, vector<real_T>& point_cloud, TTimePoint time_stamp) = 0;
+
 private:
 	void updateOutput()
 	{
@@ -111,6 +112,10 @@ private:
 		output.time_stamp = last_time_;
 		output.pose = echo_pose;
 		setOutput(output);
+	}
+	void updateInput() {
+		EchoData input = getInput();
+		setPointCloud(input.pose, input.point_cloud, input.time_stamp);
 	}
 private:
     EchoSimpleParams params_;

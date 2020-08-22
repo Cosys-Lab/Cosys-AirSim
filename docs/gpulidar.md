@@ -33,31 +33,27 @@ VerticalFOVUpper          | Vertical FOV upper limit for the lidar, in degrees
 VerticalFOVLower          | Vertical FOV lower limit for the lidar, in degrees
 X Y Z                     | Position of the lidar relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
-GenerateNoise             | Generate and add range-noise based on normal distribution if set to true
-MinNoiseStandardDeviation | The standard deviation to generate the noise normal distribution, in meters. This is the minimal noise (at 0 distance)
-NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
+GroundTruth               | Generate ground truth segmentation color values
 ```
 {
-    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
     "SettingsVersion": 1.2,
 
-    "SimMode": "Multirotor",
+    "SimMode": "SkidVehicle",
 
      "Vehicles": {
-		"Drone1": {
-			"VehicleType": "simpleflight",
+		"airsimvehicle": {
+			"VehicleType": "CPHusky",
 			"AutoCreate": true,
 			"Sensors": {
-			    "gpulidar": {
+			    "gpulidar1": {
 					"SensorType": 8,
 					"Enabled" : true,
 					"NumberOfChannels": 64,
 					"Range": 100,
-					"GenerateNoise": false,
-					"MinNoiseStandardDeviation": 0.01,
-					"NoiseDistanceScale": 3,
-					"RotationsPerSecond": 1,
+				    "Resolution": 512,
+					"RotationsPerSecond": 10,
 					"MeasurementsPerCycle": 1024,
 					"X": 0, "Y": 0, "Z": -0.3,
 					"Roll": 0, "Pitch": 0, "Yaw" : 0,
@@ -76,7 +72,7 @@ IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ fr
 ```
 
 ## Server side visualization for debugging
-Be default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. *This needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
+By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. *This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
 e.g.,
 ```
         "Lidar1": { 
@@ -86,13 +82,13 @@ e.g.,
 ```
 
 ## Client API 
-Use `getGPULidarData()` API to retrieve the GPU Lidar data. 
+Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar data. 
 * The API returns a Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
 * Point-Cloud: 
   * The floats represent [x,y,z] coordinate for each point hit within the range in the last scan.
-  * The frame for the points in the output is configurable using "DataFrame" attribute
-  "" or "VehicleInertialFrame" -- default; returned points are in vehicle inertial frame (in NED, in meters)
-  "SensorLocalFrame" -- returned points are in lidar local frame (in NED, in meters)
 * Lidar Pose:
     * Lidar pose in the vehicle inertial frame (in NED, in meters)
     * Can be used to transform points to other frames.
+* Lidar Groundtruth (if _GroundTruth_ parameter is enabled):
+    * For each point of the Point-Cloud a string is kept that has the RGB-color value of the segmentation image of that point in the format _"r-value,g-value,b-value"_.
+    * To learn more about the segmentation and how the color relates to the object name, see the [Image API documentation](image_apis.md#segmentation) and the [instance segmentation documentation](instance_segmentation.md).

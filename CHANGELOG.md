@@ -1,13 +1,32 @@
 # What's new
 
-Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. This list updated every few months. For complete detailed changes, please review [commit history](https://github.com/Microsoft/AirSim/commits/master).
+Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. This list updated every few months. For complete detailed changes, please review [commit history](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/commits/master).
+
+### CoSys-Lab Modifications
+* Updated [ROS implementation](docs/ros.md)
+* Added [HySLAM Benchmark Scenario environment](docs/hyslambenchmarkenv.md)
+* Added [HySLAM environment](docs/hyslamenv.md)
+* Added [CoSysLab environment](docs/cosysenv.md)
+* Added [Echo sensor type](docs/echo.md)
+* Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com). **Currently removed due to crashes on Linux!**
+* Added [Instance Segmentation](docs/instance_segmentation.md). **Currently only works in Unreal Editor, not cooked builds!** Replaces previous system with 255 color limit. 
+* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
+* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
+* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation.
+* Added option to hot-reload plugin through Unreal Editor (faster development)
+* Added WIP usage of engine-time for frequency updaters and timestamps instead of real-time. Useful for heavy performance sensor modalities. Currently only usable on the Echo and LIDAR sensor types.
+* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
+* Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
+* Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
+* Updated Unreal to 4.22
 
 ### November, 2018
 * Added Weather Effects and [APIs](docs/apis.md#weather-apis)
 * Added [Time of Day API](docs/apis.md#time-of-day-api)
 * An experimental integration of [AirSim on Unity](https://github.com/Microsoft/AirSim/tree/master/Unity) is now available. Learn more in [Unity blog post](https://blogs.unity3d.com/2018/11/14/airsim-on-unity-experiment-with-autonomous-vehicle-simulation). 
 * [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
-* Highly efficient [NoDisplay view mode](https://github.com/Microsoft/AirSim/blob/master/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
+* Highly efficient [NoDisplay view mode](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
 * [Enable/disable sensors](https://github.com/Microsoft/AirSim/pull/1479) via settings
 * [Lidar Sensor](docs/lidar.md)
 * [Support for Flysky FS-SM100 RC](https://github.com/Microsoft/AirSim/commit/474214364676b6631c01b3ed79d00c83ba5bccf5) USB adapter
@@ -16,7 +35,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * [Custom speed units](https://github.com/Microsoft/AirSim/pull/1181)
 * [ROS publisher](https://github.com/Microsoft/AirSim/pull/1135)
 * [simSetObjectPose API](https://github.com/Microsoft/AirSim/pull/1161)
-* [Character Control APIs](https://github.com/Microsoft/AirSim/blob/master/PythonClient/airsim/client.py#L137) (works on TalkingHeads binaries in release)
+* [Character Control APIs](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/PythonClient/airsim/client.py#L137) (works on TalkingHeads binaries in release)
 * [Arducopter Solo Support](https://github.com/Microsoft/AirSim/pull/1387)
 * [Linux install without sudo access](https://github.com/Microsoft/AirSim/pull/1434)
 * [Kinect like ROS publisher](https://github.com/Microsoft/AirSim/pull/1298)

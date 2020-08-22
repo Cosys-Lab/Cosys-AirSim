@@ -1,5 +1,5 @@
 {
-  "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings.md",
+  "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
   "SettingsVersion": 1.2,
   "SimMode": "ComputerVision",
   "CameraDefaults": {

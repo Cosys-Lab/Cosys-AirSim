@@ -15,7 +15,7 @@ class ImuSimple : public ImuBase {
 public:
     //constructors
     ImuSimple(const AirSimSettings::ImuSetting& setting = AirSimSettings::ImuSetting())
-        : ImuBase(setting.sensor_name, setting.attach_link)
+        : ImuBase(setting.sensor_name)
     {
         // initialize params
         params_.initializeFromSettings(setting);

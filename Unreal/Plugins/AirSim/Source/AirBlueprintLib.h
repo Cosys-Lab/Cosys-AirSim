@@ -15,8 +15,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Engine/World.h"
-#include "ProceduralMeshComponent.h"
-#include "Runtime/Foliage/Public/FoliageType.h"
 
 #include "Runtime/Landscape/Classes/LandscapeComponent.h"
 #include "common/AirSimSettings.hpp"
@@ -98,44 +96,32 @@ public:
 	template<class T>
 	static std::string GetMeshName(T* mesh)
 	{
-		switch (mesh_naming_method_)
+		if (mesh->GetOwner())
 		{
-		case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::OwnerName:
-			if (mesh->GetOwner())
+			// For foliage actors, need to use mesh's name in order to differentiate different meshes from each other.
+			// Otherwise, all items placed with the foliage actor will get the same ID.
+			auto owner = mesh->GetOwner();
+			if (owner->GetName().StartsWith("InstancedFoliageActor"))
 			{
-				// For foliage actors, need to use mesh's name in order to differentiate different meshes from each other.
-				// Otherwise, all items placed with the foliage actor will get the same ID.
-				auto owner = mesh->GetOwner();
-				if (owner->GetName().StartsWith("InstancedFoliageActor"))
+				FString meshName = mesh->GetName();
+
+				// It is expected that the user will create a blueprint class that starts with "IFA_" for each of the classes they want to differentiate.
+				// Unreal adds a _C_ into the name for blueprint created classes, which messes up the hash. Remove it as well.
+				if (meshName.StartsWith(TEXT("IFA_")))
 				{
-					FString meshName = mesh->GetName();
-
-					// It is expected that the user will create a blueprint class that starts with "IFA_" for each of the classes they want to differentiate.
-					// Unreal adds a _C_ into the name for blueprint created classes, which messes up the hash. Remove it as well. 
-					if (meshName.StartsWith(TEXT("IFA_")))
-					{
-						meshName = meshName.Replace(TEXT("IFA_"), TEXT("")).Replace(TEXT("_C_"), TEXT(""));
-					}
-
-					return std::string(TCHAR_TO_UTF8(*(meshName)));
+					meshName = meshName.Replace(TEXT("IFA_"), TEXT("")).Replace(TEXT("_C_"), TEXT(""));
 				}
 
-				return std::string(TCHAR_TO_UTF8(*(owner->GetName())));
+				return std::string(TCHAR_TO_UTF8(*(meshName)));
 			}
-			else
-				return ""; //std::string(TCHAR_TO_UTF8(*(UKismetSystemLibrary::GetDisplayName(mesh))));
-		case msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::StaticMeshName:
-			if (mesh)
-				return std::string(TCHAR_TO_UTF8(*(mesh->GetName())));
-			else
-				return "";
-		default:
-			return "";
+
+			return std::string(TCHAR_TO_UTF8(*(owner->GetName())));
 		}
+		else
+			return ""; //std::string(TCHAR_TO_UTF8(*(UKismetSystemLibrary::GetDisplayName(mesh))));
 	}
 
-	static std::string GetMeshName(ALandscapeProxy* mesh);
-	static std::string GetMeshName(UProceduralMeshComponent* meshComponent);
+    static std::string GetMeshName(ALandscapeProxy* mesh);
 
     template<class UserClass>
     static FInputActionBinding& BindActionToKey(const FName action_name, const FKey in_key, UserClass* actor,
@@ -188,10 +174,6 @@ public:
     static void setLogMessagesHidden(bool is_hidden)
     {
         log_messages_hidden_ = is_hidden;
-    }
-    static void SetMeshNamingMethod(msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType method)
-    {
-        mesh_naming_method_ = method;
     }
 
 	static void DrawLine(const UWorld* InWorld, FVector const& LineStart, FVector const& LineEnd, FColor const& Color, bool bPersistentLines = false, float LifeTime = -1.f, uint8 DepthPriority = 0, float Thickness = 0.f);
@@ -301,7 +283,6 @@ private:
     static bool log_messages_hidden_;
     //FViewPort doesn't expose this field so we are doing dirty work around by maintaining count by ourselves
     static uint32_t flush_on_draw_count_;
-    static msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType mesh_naming_method_;
 
     static IImageWrapperModule* image_wrapper_module_;
 };

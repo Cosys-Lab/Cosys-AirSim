@@ -19,7 +19,7 @@ namespace msr { namespace airlib {
 class BarometerSimple  : public BarometerBase {
 public:
     BarometerSimple(const AirSimSettings::BarometerSetting& setting = AirSimSettings::BarometerSetting())
-        : BarometerBase(setting.sensor_name, setting.attach_link)
+        : BarometerBase(setting.sensor_name)
     {
         // initialize params
         params_.initializeFromSettings(setting);

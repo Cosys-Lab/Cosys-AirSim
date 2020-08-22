@@ -15,7 +15,6 @@
 #include "common/common_utils/UniqueValueMap.hpp"
 #include "PawnEvents.h"
 #include "PIPCamera.h"
-#include "Vehicles/AirSimVehicle.h"
 
 #include "CarPawn.generated.h"
 
@@ -27,7 +26,7 @@ class UInputComponent;
 class UAudioComponent;
 
 UCLASS(config = Game)
-class ACarPawn : public AWheeledVehicle, public AirsimVehicle
+class ACarPawn : public AWheeledVehicle
 {
     GENERATED_BODY()
 
@@ -58,11 +57,6 @@ public:
 	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_front_right_base_;
 	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_driver_base_;
 	UPROPERTY(BluePrintReadWrite)  USceneComponent* camera_back_center_base_;
-
-    virtual USceneComponent* GetComponent(FString componentName) override;
-    virtual void GetComponentReferenceTransform(FString componentName, FVector& translation, FRotator& rotation) override;
-    virtual APawn* GetPawn() override { return this; };
-    virtual bool PawnUsesNedCoords() override { return true; }
 
 private:
     void updateHUDStrings();

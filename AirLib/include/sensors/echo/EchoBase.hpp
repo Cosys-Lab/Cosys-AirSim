@@ -10,8 +10,8 @@ namespace msr { namespace airlib {
 
 class EchoBase : public SensorBase {
 public:
-    EchoBase(const std::string& sensor_name = "", const std::string& attach_link = "")
-        : SensorBase(sensor_name, attach_link)
+    EchoBase(const std::string& sensor_name = "")
+        : SensorBase(sensor_name)
     {}
 
 public: //types
@@ -45,6 +45,16 @@ public:
 		return output_;
 	}
 
+	const EchoData& getInput() const
+	{
+		return input_;
+	}
+
+	void setInput(const EchoData& input) const
+	{
+		input_ = input;
+	}
+
 protected:
     void setOutput(const EchoData& output)
     {
@@ -53,6 +63,7 @@ protected:
 
 private:
     EchoData output_;
+	mutable EchoData input_;
 };
 
 }} //namespace

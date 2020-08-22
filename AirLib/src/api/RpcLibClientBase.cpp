@@ -164,6 +164,41 @@ msr::airlib::LidarData RpcLibClientBase::getLidarData(const std::string& lidar_n
     return pimpl_->client.call("getLidarData", lidar_name, vehicle_name).as<RpcLibAdapatorsBase::LidarData>().to();
 }
 
+msr::airlib::GPULidarData RpcLibClientBase::getGPULidarData(const std::string& lidar_name, const std::string& vehicle_name) const
+{
+	return pimpl_->client.call("getGPULidarData", lidar_name, vehicle_name).as<RpcLibAdapatorsBase::GPULidarData>().to();
+}
+
+msr::airlib::EchoData RpcLibClientBase::getEchoData(const std::string& echo_name, const std::string& vehicle_name) const
+{
+	return pimpl_->client.call("getEchoData", echo_name, vehicle_name).as<RpcLibAdapatorsBase::EchoData>().to();
+}
+
+msr::airlib::ImuBase::Output RpcLibClientBase::getImuData(const std::string& imu_name, const std::string& vehicle_name) const
+{
+    return pimpl_->client.call("getImuData", imu_name, vehicle_name).as<RpcLibAdapatorsBase::ImuData>().to();
+}
+
+msr::airlib::BarometerBase::Output RpcLibClientBase::getBarometerData(const std::string& barometer_name, const std::string& vehicle_name) const
+{
+    return pimpl_->client.call("getBarometerData", barometer_name, vehicle_name).as<RpcLibAdapatorsBase::BarometerData>().to();
+}
+
+msr::airlib::MagnetometerBase::Output RpcLibClientBase::getMagnetometerData(const std::string& magnetometer_name, const std::string& vehicle_name) const
+{
+    return pimpl_->client.call("getMagnetometerData", magnetometer_name, vehicle_name).as<RpcLibAdapatorsBase::MagnetometerData>().to();
+}
+
+msr::airlib::GpsBase::Output RpcLibClientBase::getGpsData(const std::string& gps_name, const std::string& vehicle_name) const
+{
+    return pimpl_->client.call("getGpsData", gps_name, vehicle_name).as<RpcLibAdapatorsBase::GpsData>().to();
+}
+
+msr::airlib::DistanceBase::Output RpcLibClientBase::getDistanceSensorData(const std::string& distance_sensor_name, const std::string& vehicle_name) const
+{
+    return pimpl_->client.call("getDistanceSensorData", distance_sensor_name, vehicle_name).as<RpcLibAdapatorsBase::DistanceSensorData>().to();
+}
+
 bool RpcLibClientBase::simSetSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex)
 {
     return pimpl_->client.call("simSetSegmentationObjectID", mesh_name, object_id, is_name_regex).as<bool>();
@@ -189,28 +224,6 @@ void RpcLibClientBase::simSetVehiclePose(const Pose& pose, bool ignore_collision
     pimpl_->client.call("simSetVehiclePose", RpcLibAdapatorsBase::Pose(pose), ignore_collision, vehicle_name);
 }
 
-vector<msr::airlib::GeoPoint> RpcLibClientBase::xyzToGeoPoints(const vector<msr::airlib::Vector3r> &xyz_points, const std::string& vehicle_name)
-{
-    // TODO: a lot of copying...
-    vector<RpcLibAdapatorsBase::Vector3r> input;
-    input.reserve(xyz_points.size());
-    for (const auto &point : xyz_points)
-    {
-        input.emplace_back(RpcLibAdapatorsBase::Vector3r(point));
-    }
-
-    vector<RpcLibAdapatorsBase::GeoPoint> result = pimpl_->client.call("simXyzToGeoPoints", input, vehicle_name).as<vector<RpcLibAdapatorsBase::GeoPoint>>();
-
-    vector<msr::airlib::GeoPoint> output;
-    output.reserve(result.size());
-    for (const auto &point : result)
-    {
-        output.emplace_back(point.to());
-    }
-    
-    return output;
-}
-
 vector<ImageCaptureBase::ImageResponse> RpcLibClientBase::simGetImages(vector<ImageCaptureBase::ImageRequest> request, const std::string& vehicle_name)
 {
     const auto& response_adaptor = pimpl_->client.call("simGetImages", 
@@ -229,142 +242,9 @@ vector<uint8_t> RpcLibClientBase::simGetImage(const std::string& camera_name, Im
     return result;
 }
 
-void RpcLibClientBase::simSetCameraPose(const CameraPose camera_pose, const std::string& vehicle_name)
-{
-    pimpl_->client.call("simSetCameraPose", msr::airlib_rpclib::RpcLibAdapatorsBase::CameraPose(camera_pose), vehicle_name);
-}
-
 void RpcLibClientBase::simPrintLogMessage(const std::string& message, std::string message_param, unsigned char  severity)
 {
     pimpl_->client.call("simPrintLogMessage", message, message_param, severity);
-}
-
-msr::airlib::RayCastResponse RpcLibClientBase::simRayCast(const msr::airlib::RayCastRequest request, const std::string vehicle_name)
-{
-    return pimpl_->client.call("simRayCast", msr::airlib_rpclib::RpcLibAdapatorsBase::RayCastRequest(request), vehicle_name).as<msr::airlib_rpclib::RpcLibAdapatorsBase::RayCastResponse>().to();
-}
-
-void RpcLibClientBase::simSetDrawableShapes(const msr::airlib::DrawableShapeRequest request, const std::string vehicle_name)
-{
-    pimpl_->client.call("simSetDrawableShapes", msr::airlib_rpclib::RpcLibAdapatorsBase::DrawableShapeRequest(request), vehicle_name);
-}
-
-void RpcLibClientBase::addDrawableShapePoint(msr::airlib::DrawableShapeRequest &request, const std::string &shape_name, const std::string &reference_frame_link, float x, float y, float z, float size, int color_r, int color_g, int color_b, int color_a)
-{
-    msr::airlib::DrawableShape shape;
-    shape.reference_frame_link = reference_frame_link;
-    shape.type = 0;
-
-    shape.shape_params = std::vector<float>
-    {
-        x,
-        y,
-        z,
-        size,
-        static_cast<float>(color_r),
-        static_cast<float>(color_g),
-        static_cast<float>(color_b),
-        static_cast<float>(color_a)
-    };
-
-    request.shapes.emplace(shape_name, shape);
-}
-
-void RpcLibClientBase::addDrawableShapeSphere(msr::airlib::DrawableShapeRequest &request, const std::string &shape_name, const std::string &reference_frame_link, float x, float y, float z, float radius, float thickness, int number_of_segments, int color_r, int color_g, int color_b, int color_a)
-{
-    msr::airlib::DrawableShape shape;
-    shape.reference_frame_link = reference_frame_link;
-    shape.type = 1;
-
-    shape.shape_params = std::vector<float>
-    {
-        x,
-        y,
-        z,
-        radius,
-        thickness,
-        static_cast<float>(number_of_segments),
-        static_cast<float>(color_r),
-        static_cast<float>(color_g),
-        static_cast<float>(color_b),
-        static_cast<float>(color_a)
-    };
-
-    request.shapes.emplace(shape_name, shape);
-}
-
-void RpcLibClientBase::addDrawableShapeCircle(msr::airlib::DrawableShapeRequest &request, const std::string &shape_name, const std::string &reference_frame_link, float x, float y, float z, float normal_x, float normal_y, float normal_z, float radius, float thickness, int number_of_segments, int color_r, int color_g, int color_b, int color_a)
-{
-    msr::airlib::DrawableShape shape;
-    shape.reference_frame_link = reference_frame_link;
-    shape.type = 2;
-
-    shape.shape_params = std::vector<float>
-    {
-        x,
-        y,
-        z,
-        normal_x,
-        normal_y,
-        normal_z,
-        radius,
-        thickness,
-        static_cast<float>(number_of_segments),
-        static_cast<float>(color_r),
-        static_cast<float>(color_g),
-        static_cast<float>(color_b),
-        static_cast<float>(color_a)
-    };
-
-    request.shapes.emplace(shape_name, shape);
-}
-
-void RpcLibClientBase::addDrawableShapeBox(msr::airlib::DrawableShapeRequest &request, const std::string &shape_name, const std::string &reference_frame_link, float x, float y, float z, float extents_x, float extents_y, float extents_z, float thickness, int color_r, int color_g, int color_b, int color_a)
-{
-    msr::airlib::DrawableShape shape;
-    shape.reference_frame_link = reference_frame_link;
-    shape.type = 3;
-
-    shape.shape_params = std::vector<float>
-    {
-        x,
-        y,
-        z,
-        extents_x,
-        extents_y,
-        extents_z,
-        thickness,
-        static_cast<float>(color_r),
-        static_cast<float>(color_g),
-        static_cast<float>(color_b),
-        static_cast<float>(color_a)
-    };
-
-    request.shapes.emplace(shape_name, shape);
-}
-
-void RpcLibClientBase::addDrawableShapeLine(msr::airlib::DrawableShapeRequest &request, const std::string &shape_name, const std::string &reference_frame_link, float start_x, float start_y, float start_z, float end_x, float end_y, float end_z, float thickness, int color_r, int color_g, int color_b, int color_a)
-{
-    msr::airlib::DrawableShape shape;
-    shape.reference_frame_link = reference_frame_link;
-    shape.type = 4;
-
-    shape.shape_params = std::vector<float>
-    {
-        start_x,
-        start_y,
-        start_z,
-        end_x,
-        end_y,
-        end_z,
-        thickness,
-        static_cast<float>(color_r),
-        static_cast<float>(color_g),
-        static_cast<float>(color_b),
-        static_cast<float>(color_a)
-    };
-
-    request.shapes.emplace(shape_name, shape);
 }
 
 bool RpcLibClientBase::simIsPaused() const
@@ -382,6 +262,27 @@ void RpcLibClientBase::simContinueForTime(double seconds)
     pimpl_->client.call("simContinueForTime", seconds);
 }
 
+void RpcLibClientBase::simEnableWeather(bool enable)
+{
+    pimpl_->client.call("simEnableWeather", enable);
+}
+void RpcLibClientBase::simSetWeatherParameter(WorldSimApiBase::WeatherParameter param, float val)
+{
+    pimpl_->client.call("simSetWeatherParameter", param, val);
+}
+
+void RpcLibClientBase::simSetTimeOfDay(bool is_enabled, const string& start_datetime, bool is_start_datetime_dst,
+    float celestial_clock_speed, float update_interval_secs, bool move_sun)
+{
+    pimpl_->client.call("simSetTimeOfDay", is_enabled, start_datetime, is_start_datetime_dst,
+        celestial_clock_speed, update_interval_secs, move_sun);
+}
+
+vector<string> RpcLibClientBase::simListSceneObjects(const string& name_regex) const
+{
+    return pimpl_->client.call("simListSceneObjects", name_regex).as<vector<string>>();
+}
+
 msr::airlib::Pose RpcLibClientBase::simGetObjectPose(const std::string& object_name) const
 {
     return pimpl_->client.call("simGetObjectPose", object_name).as<RpcLibAdapatorsBase::Pose>().to();
@@ -389,14 +290,6 @@ msr::airlib::Pose RpcLibClientBase::simGetObjectPose(const std::string& object_n
 bool RpcLibClientBase::simSetObjectPose(const std::string& object_name, const msr::airlib::Pose& pose, bool teleport)
 {
     return pimpl_->client.call("simSetObjectPose", object_name, RpcLibAdapatorsBase::Pose(pose), teleport).as<bool>();
-}
-bool RpcLibClientBase::simSpawnStaticMeshObject(const std::string& object_class_name, const std::string& object_name, const msr::airlib::Pose& pose)
-{
-    return pimpl_->client.call("simSpawnStaticMeshObject", object_class_name, object_name, RpcLibAdapatorsBase::Pose(pose)).as<bool>();
-}
-bool RpcLibClientBase::simDeleteObject(const std::string& object_name)
-{
-    return pimpl_->client.call("simDeleteObject", object_name).as<bool>();
 }
 
 CameraInfo RpcLibClientBase::simGetCameraInfo(const std::string& camera_name, const std::string& vehicle_name) const

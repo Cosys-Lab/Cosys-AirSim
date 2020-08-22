@@ -4,6 +4,7 @@
 #include "Components/SkyLightComponent.h"
 #include "Engine/DirectionalLight.h"
 #include "GameFramework/Actor.h"
+#include "Components/MeshComponent.h"
 #include "ParticleDefinitions.h"
 
 #include <string>
@@ -14,8 +15,6 @@
 #include "api/ApiProvider.hpp"
 #include "PawnSimApi.h"
 #include "common/StateReporterWrapper.hpp"
-
-#include "Vehicles/AirSimVehicle.h"
 
 #include "SimModeBase.generated.h"
 
@@ -35,6 +34,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Recording")
     bool toggleRecording();
+
+	UFUNCTION(BlueprintCallable, Category = "Segmentation")
+	bool AddNewActorToSegmentation(AActor* Actor);
 
 public:	
     // Sets default values for this actor's properties
@@ -77,14 +79,16 @@ public:
     {
         return static_cast<PawnSimApi*>(api_provider_->getVehicleSimApi(vehicle_name));
     }
-
-    virtual bool isUrdf() { return false; }
+	std::vector<std::string> GetAllSegmentationMeshIDs();
+	bool SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex);
+	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
+	int GetMeshVertexColorID(const std::string& mesh_name);
 
 protected: //must overrides
     typedef msr::airlib::AirSimSettings AirSimSettings;
 
     virtual std::unique_ptr<msr::airlib::ApiServerBase> createApiServer() const;
-    virtual void getExistingVehiclePawns(TArray<AirsimVehicle*>& pawns) const;
+    virtual void getExistingVehiclePawns(TArray<AActor*>& pawns) const;
     virtual bool isVehicleTypeSupported(const std::string& vehicle_type) const;
     virtual std::string getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const;
     virtual PawnEvents* getVehiclePawnEvents(APawn* pawn) const;
@@ -138,12 +142,18 @@ private:
     float tod_update_interval_secs_;
     bool tod_move_sun_;
 
+	/** The assigned color for each object */
+	TMap<FString, uint32> nameToColorIndexMap_;
+	TMap<FString, FString> ColorToNameMap_;
+	/** A list of paintable objects */
+	TMap<FString, UMeshComponent*> nameToComponentMap_;
+
     std::unique_ptr<NedTransform> global_ned_transform_;
     std::unique_ptr<msr::airlib::WorldSimApiBase> world_sim_api_;
     std::unique_ptr<msr::airlib::ApiProvider> api_provider_;
     std::unique_ptr<msr::airlib::ApiServerBase> api_server_;
     msr::airlib::StateReporterWrapper debug_reporter_;
-
+	
     std::vector<std::unique_ptr<msr::airlib::VehicleSimApiBase>> vehicle_sim_apis_;
 
     UPROPERTY()
@@ -153,7 +163,7 @@ private:
     bool lidar_draw_debug_points_ = false;
 
 private:
-    void setStencilIDs();
+    void InitializeMeshVertexColorIDs();
     void initializeTimeOfDay();
     void advanceTimeOfDay();
     void setSunRotation(FRotator rotation);

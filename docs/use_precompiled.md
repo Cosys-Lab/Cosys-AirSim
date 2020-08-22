@@ -4,9 +4,12 @@ You can simply download precompiled binaries and run to get started immediately.
 
 ### Unreal Engine
 
+Standard AirSim:
 **Windows**: Download the binaries for the environment of your choice from the [latest release](https://github.com/Microsoft/AirSim/releases).
-
 **Linux**: Binaries for Ubuntu 16.04 LTS is coming soon. For now you will need to [build it on Linux](build_linux.md) yourself.
+
+CoSys-Lab AirSim:
+Contact CoSys-Lab members to gain access to pre-build versions. 
 
 ### Unity (Experimental)
 A free environment called Windridge City is available at [Unity Asset Store](https://assetstore.unity.com/) as an experimental release of AirSim on Unity. Please note that this is work in progress and all features may not work yet.

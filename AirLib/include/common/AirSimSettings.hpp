@@ -31,7 +31,6 @@ public: //types
 	static constexpr char const * kVehicleTypeCPHusky = "cphusky";
 	static constexpr char const * kVehicleTypePioneer = "pioneer";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
-    static constexpr char const * kVehicleTypeUrdfBot = "urdfbot";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
@@ -64,13 +63,11 @@ public: //types
         std::string pawn_bp;
         std::string slippery_mat;
         std::string non_slippery_mat;
-        std::string urdf_path;
 
         PawnPath(const std::string& pawn_bp_val = "",
             const std::string& slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/Slippery.Slippery",
-            const std::string& non_slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/NonSlippery.NonSlippery",
-            const std::string& urdf_path_val = "")
-            : pawn_bp(pawn_bp_val), slippery_mat(slippery_mat_val), non_slippery_mat(non_slippery_mat_val), urdf_path(urdf_path_val)
+            const std::string& non_slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/NonSlippery.NonSlippery")
+            : pawn_bp(pawn_bp_val), slippery_mat(slippery_mat_val), non_slippery_mat(non_slippery_mat_val)
         {
         }
     };
@@ -170,8 +167,6 @@ public: //types
         Vector3r position = VectorMath::nanVector();
         Rotation rotation = Rotation::nanRotation();
 
-        std::string attach_link = "";
-
         GimbalSetting gimbal;
         std::map<int, CaptureSetting> capture_settings;
         std::map<int, NoiseSetting>  noise_settings;
@@ -192,7 +187,6 @@ public: //types
     struct SensorSetting {
         SensorBase::SensorType sensor_type;
         std::string sensor_name;
-        std::string attach_link = "";
         bool enabled;
     };
 
@@ -215,15 +209,14 @@ public: //types
 
         // shared defaults
         uint number_of_channels = 16;
-        real_T range = 10000.0f / 100;                    // meters
-        uint points_per_second = 100000;
+        real_T range = 100.0f;                            // meters
+        uint measurement_per_cycle = 512;
         uint horizontal_rotation_frequency = 10;          // rotations/sec
         float horizontal_FOV_start = 0;                   // degrees
         float horizontal_FOV_end = 359;                   // degrees
 		float update_frequency = 10;				      // how frequently to update the data in Hz
 		bool limit_points = true;						  // limit the amount of points per measurement to 100000
 		bool pause_after_measurement = false;			  // Pause the simulation after each measurement. Useful for API interaction to be synced
-		bool engine_time = false;						  // If false, real-time simulation will be used for timestamps and measurement frequency
 												          // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 
 		bool generate_noise = false;					  // Toggle range based noise
@@ -236,8 +229,6 @@ public: //types
         Vector3r position = VectorMath::nanVector(); 
         Rotation rotation = Rotation::nanRotation();
 
-        std::string attach_link = "";
-
         bool draw_debug_points = false;
 
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
@@ -248,21 +239,19 @@ public: //types
 
 		// shared defaults
 		uint number_of_channels = 64;
-		real_T range = 10000.0f / 100;                    // meters
-		uint measurement_per_cycle_ = 2048;
-		float horizontal_rotation_frequency = 10;          // rotations/sec
+		real_T range = 100.0f;                            // meters
+		uint measurement_per_cycle = 2048;
+		float horizontal_rotation_frequency = 10;         // rotations/sec
 		float horizontal_FOV_start = 0;                   // degrees
 		float horizontal_FOV_end = 359;                   // degrees
+		float update_frequency = 10;				      // how frequently to update the data in Hz
 		uint resolution = 512;
-														  // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-
+		bool ground_truth = false;                        // Generate ground truth segmentation color values
 		bool generate_noise = false;					  // Toggle range based noise
 
 		bool ignore_marked = false;
 		real_T min_noise_standard_deviation = 0;		  // Minimum noise standard deviation
 		real_T noise_distance_scale = 1;			      // Factor to scale noise based on distance
-
-        std::string attach_link = "";
 
 		// defaults specific to a mode
 		float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
@@ -277,14 +266,14 @@ public: //types
 
 		// Signal propagation settings
 		uint number_of_traces = 1000;					// Amount of traces (rays) being cast
-		uint number_of_spread_traces = 10;			    // Amount of scattered traces created by an incoming trace
-		float spread_opening_angle = 10.0f;			    // Beam width of the scattered traces
+		float reflection_opening_angle = 10.0f;			// Beam width of the scattered traces
 		float attenuation_per_distance = 0.0f;			// Attenuation of signal wrt distance traveled (dB/m)
 		float attenuation_per_reflection = 0.0f;        // Attenuation of signal wrt reflections (dB)
 		float attenuation_limit = -100.0f;              // Attenuation at which the signal is considered dissipated (dB)
 		float distance_limit = 10.0f;					// Maximum distance the signal can travel.
 		int reflection_limit = 3;						// Maximum times the signal can reflect.
-		float reflection_distance_limit = 0.4f;		// Maximum distance between reflection locations.
+		float reflection_distance_limit = 0.4f;			// Maximum distance between reflection locations.
+		float sensor_opening_angle = 180.0f;			// The opening angle in which rays will be cast from the sensor
 
 		// Sensor settings
 		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
@@ -292,7 +281,6 @@ public: //types
 
 		// Engine & timing settings
 		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
-		bool engine_time = true;						// If false, real-time simulation will be used for timestamps and measurement frequency
 														// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
 		// Debug settings
 		bool draw_initial_points = false;		     	// Draw the points of the initial half sphere where the traces (rays) are cast
@@ -301,8 +289,7 @@ public: //types
 		bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the sensor
 		bool draw_reflected_paths = false;				// Draw debug lines for the full path of reflected points to the sensor
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
-
-		std::string attach_link = "";
+		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
 
 		// Misc
 		std::string data_frame = AirSimSettings::kSensorLocalFrame;
@@ -325,7 +312,6 @@ public: //types
         bool enable_trace = false;
         bool enable_collisions = true;
         bool is_fpv_vehicle = false;
-		float debug_symbol_scale = 0.0f;
         
         //nan means use player start
         Vector3r position = VectorMath::nanVector(); //in global NED
@@ -333,7 +319,6 @@ public: //types
 
         std::map<std::string, CameraSetting> cameras;
         std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
-		std::vector<std::pair<std::string, std::string>> collision_blacklist;
 
         RCSettings rc;
     };
@@ -384,20 +369,6 @@ public: //types
 		MavLinkConnectionInfo connection_info;
 	};
 
-    struct SegmentationSetting {
-        enum class InitMethodType {
-            None, CommonObjectsRandomIDs
-        };
-
-        enum class MeshNamingMethodType {
-            OwnerName, StaticMeshName
-        };
-
-        InitMethodType init_method = InitMethodType::CommonObjectsRandomIDs;
-        bool override_existing = false;
-        MeshNamingMethodType mesh_naming_method = MeshNamingMethodType::OwnerName;
-    };
-
     struct TimeOfDaySetting {
         bool enabled = false;
         std::string start_datetime = "";    //format: %Y-%m-%d %H:%M:%S
@@ -405,11 +376,6 @@ public: //types
         float celestial_clock_speed = 1;
         float update_interval_secs = 60;
         bool move_sun = true;
-    };
-
-    struct ControlledMotionComponentSetting {
-        std::string name = "";
-        std::map<std::string, std::string> configuration;
     };
 
 private: //fields
@@ -421,7 +387,6 @@ public: //fields
 
     std::vector<SubwindowSetting> subwindow_settings;
     RecordingSetting recording_setting;
-    SegmentationSetting segmentation_setting;
     TimeOfDaySetting tod_setting;
 
     std::vector<std::string> warning_messages;
@@ -474,7 +439,6 @@ public: //methods
         loadSubWindowsSettings(settings_json, subwindow_settings);
         loadViewModeSettings(settings_json);
         loadRecordingSetting(settings_json, recording_setting);
-        loadSegmentationSetting(settings_json, segmentation_setting);
         loadPawnPaths(settings_json, pawn_paths);
         loadOtherSettings(settings_json);
         loadDefaultSensorSettings(simmode_name, settings_json, sensor_defaults);
@@ -496,7 +460,7 @@ public: //methods
         std::string settings_filename = Settings::getUserDirectoryFullPath("settings.json");
         Settings& settings_json = Settings::loadJSonString("{}");
         //write some settings_json in new file otherwise the string "null" is written if all settings_json are empty
-        settings_json.setString("SeeDocsAt", "https://github.com/Microsoft/AirSim/blob/master/docs/settings.md");
+        settings_json.setString("SeeDocsAt", "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md");
         settings_json.setDouble("SettingsVersion", 1.2);
 
         //TODO: there is a crash in Linux due to settings_json.saveJSonString(). Remove this workaround after we only support Unreal 4.17
@@ -693,6 +657,7 @@ private:
             capture_settings[i] = CaptureSetting();
         }
         capture_settings.at(Utils::toNumeric(ImageType::Scene)).target_gamma = CaptureSetting::kSceneTargetGamma;
+		capture_settings.at(Utils::toNumeric(ImageType::Segmentation)).target_gamma = 1;
     }
 
     static void loadCaptureSettings(const Settings& settings_json, std::map<int, CaptureSetting>& capture_settings)
@@ -784,29 +749,6 @@ private:
                 //currently keyboard is not supported so use rc as default
                 vehicle_setting->rc.remote_control_id = 0;
             }
-            else if (vehicle_type == kVehicleTypeUrdfBot) {
-                vehicle_setting->debug_symbol_scale = settings_json.getFloat("DebugSymbolScale", 0.0f);
-
-                Settings collisionBlacklist;
-
-                std::vector<std::string> keys;
-                std::string botMeshKey = "BotMesh";
-                std::string externalMeshRegexKey = "ExternalActorRegex";
-                keys.emplace_back(botMeshKey);
-                keys.emplace_back(externalMeshRegexKey);
-
-                std::vector<std::map<std::string, std::string>> collision_blacklist_pairs = settings_json.getArrayOfKeyValuePairs("CollisionBlacklist", keys);
-
-                vehicle_setting->collision_blacklist.clear();
-                for (unsigned int i = 0; i < collision_blacklist_pairs.size(); i++)
-                {
-                    std::pair<std::string, std::string> pair;
-                    pair.first = collision_blacklist_pairs[i][botMeshKey];
-                    pair.second = collision_blacklist_pairs[i][externalMeshRegexKey];
-
-                    vehicle_setting->collision_blacklist.emplace_back(pair);
-                }
-            }
         }
         vehicle_setting->vehicle_name = vehicle_name;
 
@@ -888,13 +830,6 @@ private:
         cv_setting->vehicle_name = "ComputerVision";
         cv_setting->vehicle_type = kVehicleTypeComputerVision;
         vehicles[cv_setting->vehicle_name] = std::move(cv_setting);
-
-        //create default urdf bot vehicle
-        auto urdf_bot_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-        urdf_bot_setting->vehicle_name = "UrdfBot";
-        urdf_bot_setting->vehicle_type = kVehicleTypeUrdfBot;
-        urdf_bot_setting->is_fpv_vehicle = true; // TODO: Should this be defined somewhere else??
-        vehicles[urdf_bot_setting->vehicle_name] = std::move(urdf_bot_setting);
     }
 
     static void loadVehicleSettings(const std::string& simmode_name, const Settings& settings_json,
@@ -962,41 +897,13 @@ private:
         paths.pawn_bp = settings_json.getString("PawnBP", "");
         auto slippery_mat = settings_json.getString("SlipperyMat", "");
         auto non_slippery_mat = settings_json.getString("NonSlipperyMat", "");
-        auto urdf_path = settings_json.getString("UrdfFile", "");
 
         if (slippery_mat != "")
             paths.slippery_mat = slippery_mat;
         if (non_slippery_mat != "")
             paths.non_slippery_mat = non_slippery_mat;
-        if (urdf_path != "")
-            paths.urdf_path = urdf_path;
 
         return paths;
-    }
-
-    static void loadSegmentationSetting(const Settings& settings_json, SegmentationSetting& segmentation_setting)
-    {
-        Settings json_parent;
-        if (settings_json.getChild("SegmentationSettings", json_parent)) {
-            std::string init_method = Utils::toLower(json_parent.getString("InitMethod", ""));
-            if (init_method == "" || init_method == "commonobjectsrandomids")
-                segmentation_setting.init_method = SegmentationSetting::InitMethodType::CommonObjectsRandomIDs;
-            else if (init_method == "none")
-                segmentation_setting.init_method = SegmentationSetting::InitMethodType::None;
-            else
-                //TODO: below exception doesn't actually get raised right now because of issue in Unreal Engine?
-                throw std::invalid_argument(std::string("SegmentationSetting init_method has invalid value in settings_json ") + init_method);
-
-            segmentation_setting.override_existing = json_parent.getBool("OverrideExisting", false);
-
-            std::string mesh_naming_method = Utils::toLower(json_parent.getString("MeshNamingMethod", ""));
-            if (mesh_naming_method == "" || mesh_naming_method == "ownername")
-                segmentation_setting.mesh_naming_method = SegmentationSetting::MeshNamingMethodType::OwnerName;
-            else if (mesh_naming_method == "staticmeshname")
-                segmentation_setting.mesh_naming_method = SegmentationSetting::MeshNamingMethodType::StaticMeshName;
-            else
-                throw std::invalid_argument(std::string("SegmentationSetting MeshNamingMethod has invalid value in settings_json ") + mesh_naming_method);
-        }
     }
 
     static void initializeNoiseSettings(std::map<int, NoiseSetting>&  noise_settings)
@@ -1065,8 +972,6 @@ private:
         Settings json_gimbal;
         if (settings_json.getChild("Gimbal", json_gimbal))
             setting.gimbal = createGimbalSetting(json_gimbal);
-
-        setting.attach_link = settings_json.getString("AttachLink", "");
 
         return setting;
     }
@@ -1312,7 +1217,7 @@ private:
     {
 		lidar_setting.number_of_channels = settings_json.getInt("NumberOfChannels", lidar_setting.number_of_channels);
         lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
-        lidar_setting.points_per_second = settings_json.getInt("PointsPerSecond", lidar_setting.points_per_second);
+        lidar_setting.measurement_per_cycle = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle);
         lidar_setting.horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
 
 		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
@@ -1321,7 +1226,6 @@ private:
 
 		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
 		lidar_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", lidar_setting.pause_after_measurement);
-		lidar_setting.engine_time = settings_json.getBool("EngineTime", lidar_setting.engine_time);
 		lidar_setting.limit_points = settings_json.getBool("LimitPoints", lidar_setting.limit_points);
         lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
 
@@ -1334,18 +1238,19 @@ private:
 
         lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
-        lidar_setting.attach_link = settings_json.getString("AttachLink", "");
     }
 
 	static void initializeGPULidarSetting(GPULidarSetting& lidar_setting, const Settings& settings_json)
 	{
 		lidar_setting.number_of_channels = settings_json.getInt("NumberOfChannels", lidar_setting.number_of_channels);
 		lidar_setting.range = settings_json.getFloat("Range", lidar_setting.range);
-		lidar_setting.measurement_per_cycle_ = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle_);
+		lidar_setting.measurement_per_cycle = settings_json.getInt("MeasurementsPerCycle", lidar_setting.measurement_per_cycle);
 		lidar_setting.horizontal_rotation_frequency = settings_json.getFloat("RotationsPerSecond", lidar_setting.horizontal_rotation_frequency);
 		lidar_setting.resolution = settings_json.getInt("Resolution", lidar_setting.resolution);
+		lidar_setting.ground_truth = settings_json.getBool("GroundTruth", lidar_setting.ground_truth);
 		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
 		lidar_setting.min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", lidar_setting.min_noise_standard_deviation);
+		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
 		lidar_setting.noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", lidar_setting.noise_distance_scale);
 		lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
 		lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);
@@ -1353,7 +1258,7 @@ private:
 		lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);
 		lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
 		lidar_setting.ignore_marked = settings_json.getBool("IgnoreMarked", lidar_setting.ignore_marked);
-        lidar_setting.attach_link = settings_json.getString("AttachLink", "");
+
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
 	}
@@ -1361,8 +1266,8 @@ private:
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
-		echo_setting.number_of_spread_traces = settings_json.getInt("NumberOfSpreadTraces", echo_setting.number_of_spread_traces);
-		echo_setting.spread_opening_angle = settings_json.getFloat("SpreadOpeningAngle", echo_setting.spread_opening_angle);
+		echo_setting.sensor_opening_angle = settings_json.getInt("SensorOpeningAngle", echo_setting.sensor_opening_angle);
+		echo_setting.reflection_opening_angle = settings_json.getFloat("ReflectionOpeningAngle", echo_setting.reflection_opening_angle);
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
 		echo_setting.attenuation_limit = settings_json.getFloat("AttenuationLimit", echo_setting.attenuation_limit);
@@ -1372,7 +1277,6 @@ private:
 		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
 		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
 		echo_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", echo_setting.pause_after_measurement);
-		echo_setting.engine_time = settings_json.getBool("EngineTime", echo_setting.engine_time);
 
 		echo_setting.draw_reflected_points = settings_json.getBool("DrawReflectedPoints", echo_setting.draw_reflected_points);
 		echo_setting.draw_reflected_lines = settings_json.getBool("DrawReflectedLines", echo_setting.draw_reflected_lines);
@@ -1380,18 +1284,17 @@ private:
 		echo_setting.draw_initial_points = settings_json.getBool("DrawInitialPoints", echo_setting.draw_initial_points);
 		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
+		echo_setting.draw_external_points = settings_json.getBool("DrawExternalPoints", echo_setting.draw_external_points);
 
 		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
 		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
-
-        echo_setting.attach_link = settings_json.getString("AttachLink", "");
 
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);
 	}
 
     static std::unique_ptr<SensorSetting> createSensorSetting(
-        SensorBase::SensorType sensor_type, const std::string& sensor_name, const std::string& attach_link,
+        SensorBase::SensorType sensor_type, const std::string& sensor_name,
         bool enabled)
     {
         std::unique_ptr<SensorSetting> sensor_setting;
@@ -1427,7 +1330,6 @@ private:
 
         sensor_setting->sensor_type = sensor_type;
         sensor_setting->sensor_name = sensor_name;
-        sensor_setting->attach_link = attach_link;
         sensor_setting->enabled = enabled;
 
         return sensor_setting;
@@ -1481,10 +1383,9 @@ private:
                 sensors_child.getChild(key, child);
 
                 auto sensor_type = Utils::toEnum<SensorBase::SensorType>(child.getInt("SensorType", 0));
-                auto attach_link = child.getString("AttachLink", "");
                 auto enabled = child.getBool("Enabled", false);
        
-                sensors[key] = createSensorSetting(sensor_type, key, attach_link, enabled);
+                sensors[key] = createSensorSetting(sensor_type, key, enabled);
                 initializeSensorSetting(sensors[key].get(), child);
             }
         }
@@ -1495,10 +1396,10 @@ private:
         std::map<std::string, std::unique_ptr<SensorSetting>>& sensors)
     {
         if (simmode_name == "Multirotor") {
-            sensors["imu"] = createSensorSetting(SensorBase::SensorType::Imu, "imu", "", true);
-            sensors["magnetometer"] = createSensorSetting(SensorBase::SensorType::Magnetometer, "magnetometer", "", true);
-            sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", "", true);
-            sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", "", true);
+            sensors["imu"] = createSensorSetting(SensorBase::SensorType::Imu, "imu", true);
+            sensors["magnetometer"] = createSensorSetting(SensorBase::SensorType::Magnetometer, "magnetometer", true);
+            sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);
+            sensors["barometer"] = createSensorSetting(SensorBase::SensorType::Barometer, "barometer", true);
         }
         else {
             // no sensors added for other modes

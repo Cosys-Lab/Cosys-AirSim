@@ -221,12 +221,12 @@ When you specify `ImageType = DepthVis` in `ImageRequest`, you get an image that
 You normally want to retrieve disparity image as float (i.e. set `pixels_as_float = true` and specify `ImageType = DisparityNormalized` in `ImageRequest`) in which case each pixel is `(Xl - Xr)/Xmax`, which is thereby normalized to values between 0 to 1.
 
 ### Segmentation
-When you specify `ImageType = Segmentation` in `ImageRequest`, you get an image that gives you ground truth segmentation of the scene. At the startup, AirSim assigns value 0 to 255 to each mesh available in environment. This value is than mapped to a specific color in [the pallet](https://github.com/Microsoft/AirSim/tree/master/Unreal//Plugins/AirSim/Content/HUDAssets/seg_color_pallet.png). The RGB values for each object ID can be found in [this file](seg_rgbs.txt).
+When you specify `ImageType = Segmentation` in `ImageRequest`, you get an image that gives you ground truth segmentation of the scene. At the startup, AirSim assigns a random color index to each mesh available in environment. This val. The RGB values for each color index ID can be retrieved from the API.
 
-You can assign a specific value (limited to the range 0-255) to a specific mesh using APIs. For example, below Python code sets the object ID for the mesh called "Ground" to 20 in Blocks environment and hence changes its color in Segmentation view:
+You can assign a specific value to a specific mesh using APIs. For example, below Python code sets the object ID for the mesh called "Ground" to 20 in Blocks environment and hence changes its color in Segmentation view:
 
 ```python
-success = client.simSetSegmentationObjectID("Ground", 20);
+success = client.simSetSegmentationObjectID("Ground", 20)
 ```
 
 The return value is a boolean type that lets you know if the mesh was found.
@@ -234,46 +234,51 @@ The return value is a boolean type that lets you know if the mesh was found.
 Notice that typical Unreal environments, like Blocks, usually have many other meshes that comprises of same object, for example, "Ground_2", "Ground_3" and so on. As it is tedious to set object ID for all of these meshes, AirSim also supports regular expressions. For example, the code below sets all meshes which have names starting with "ground" (ignoring case) to 21 with just one line:
 
 ```python
-success = client.simSetSegmentationObjectID("ground[\w]*", 21, True);
+success = client.simSetSegmentationObjectID("ground[\w]*", 21, True)
 ```
 
 The return value is true if at least one mesh was found using regular expression matching.
 
 It is recommended that you request uncompressed image using this API to ensure you get precise RGB values for segmentation image:
 ```python
-responses = client.simGetImages([ImageRequest(0, AirSimImageType.Segmentation, False, False)])
-img1d = np.fromstring(response.image_data_uint8, dtype=np.uint8) #get numpy array
-img_rgb = img1d.reshape(response.height, response.width, 3) #reshape array to 3 channel image array H X W X 3
-img_rgb = np.flipud(img_rgb) #original image is fliped vertically
-
-#find unique colors
-print(np.unique(img_rgb[:,:,0], return_counts=True)) #red
-print(np.unique(img_rgb[:,:,1], return_counts=True)) #green
-print(np.unique(img_rgb[:,:,2], return_counts=True)) #blue  
+responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
+img_rgb_string = responses[0].image_data_uint8
+rgbarray = np.frombuffer(img_rgb_string, np.uint8)
+rgbarray_shaped = rgbarray.reshape((540,960,3))
+rgbarray_shaped = rgbarray_shaped
+img = Image.fromarray(rgbarray_shaped, 'RGB')
+img.show()
 ```
 
-A complete ready-to-run example can be found in [segmentation.py](https://github.com/Microsoft/AirSim/tree/master/PythonClient//computer_vision/segmentation.py).
+To retrieve the color map to know which color is assign to each color index you can use:
+```python
+colorMap = client.simGetSegmentationColorMap()
+```
+
+A complete ready-to-run example can be found in [segmentation_test.py](../ros/python_ws/src/airsim/scripts/segmentation_test.py).
+For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../ros/python_ws/src/airsim/scripts/segmentation_generate_list.py).
 
 #### Unsetting object ID
 An object's ID can be set to -1 to make it not show up on the segmentation image.
 
 #### How to Find Mesh Names?
-To get desired ground truth segmentation you will need to know the names of the meshes in your Unreal environment. To do this, you will need to open up Unreal Environment in Unreal Editor and then inspect the names of the meshes you are interested in using the World Outliner. For example, below we see the mesh names for he ground in Blocks environment in right panel in the editor:
+To get desired ground truth segmentation you will need to know the names of the meshes in your Unreal environment. To do this, you can use the API:
 
-![record screenshot](images/unreal_editor_blocks.png)
+To retrieve the color map to know which color is assign to each color index you can use:
+```python
+currentObjectList = client.simListSceneObjects()
+```
 
-If you don't know how to open Unreal Environment in Unreal Editor then try following the guide for [building from source](build_windows.md).
-
-Once you decide on the meshes you are interested, note down their names and use above API to set their object IDs. There are [few settings](settings.md#segmentation-settings) available to change object ID generation behavior.
-
-#### Changing Colors for Object IDs
-At present the color for each object ID is fixed as in [this palate](https://github.com/Microsoft/AirSim/tree/master/Unreal//Plugins/AirSim/Content/HUDAssets/seg_color_pallet.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
+This also supports regex!
 
 #### Startup Object IDs
-At the start, AirSim assigns object ID to each object found in environment of type `UStaticMeshComponent` or `ALandscapeProxy`. It then either uses mesh name or owner name (depending on settings), lower cases it, removes any chars below ASCII 97 to remove numbers and some punctuations, sums int value of all chars and modulo 255 to generate the object ID. In other words, all object with same alphabet chars would get same object ID. This heuristic is simple and effective for many Unreal environments but may not be what you want. In that case, please use above APIs to change object IDs to your desired values. There are [few settings](settings.md#segmentation-settings) available to change this behavior.
+At the start, AirSim assigns color indexes to each object found in environment of type `UStaticMeshComponent` or `USkinnedMeshComponent`.It then makes a understable naming depending on the hiarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).
 
 #### Getting Object ID for Mesh
 The `simGetSegmentationObjectID` API allows you get object ID for given mesh name.
+
+#### More information
+Please see the [instance segmentation documentation](instance_segmentation.md) for some more information on the segmentation system. 
 
 ### Infrared
 Currently this is just a map from object ID to grey scale 0-255. So any mesh with object ID 42 shows up with color (42, 42, 42). Please see [segmentation section](#segmentation) for more details on how to set object IDs. Typically noise setting can be applied for this image type to get slightly more realistic effect. We are still working on adding other infrared artifacts and any contributions are welcome.

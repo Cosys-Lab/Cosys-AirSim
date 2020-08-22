@@ -1,6 +1,0 @@
-  <launch>
-    <node name="airsim_car_control" pkg="airsim" type="car_control.py" respawn="false" output="screen">
-          <param name="input_topic" type="string" value="cmd_vel" />
-          <param name="vehicle_name" type="string" value="airsimvehicle" />
-    </node>
-  </launch>

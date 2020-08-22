@@ -10,8 +10,8 @@
 #include "physics/Environment.hpp"
 #include "common/ImageCaptureBase.hpp"
 #include "safety/SafetyEval.hpp"
-#include "sensors/SensorCollection.hpp"
 #include "api/WorldSimApiBase.hpp"
+
 #include "common/common_utils/WindowsApisCommonPre.hpp"
 #include "rpc/msgpack.hpp"
 #include "common/common_utils/WindowsApisCommonPost.hpp"
@@ -126,25 +126,6 @@ public:
             return msr::airlib::Pose(position.to(), orientation.to());
         }
     };
-
-	struct Twist {
-		Vector3r linear;
-		Vector3r angular;
-		MSGPACK_DEFINE_MAP(linear, angular);
-
-		Twist() {};
-
-		Twist(const msr::airlib::Twist& t)
-		{
-			linear = t.linear;
-			angular = t.angular;
-		}
-
-		msr::airlib::Twist to() const
-		{
-			return msr::airlib::Twist(linear.to(), angular.to());
-		}
-	};
 
     struct GeoPoint {
         double latitude = 0, longitude = 0;
@@ -527,10 +508,11 @@ public:
 
 		msr::airlib::TTimePoint time_stamp;    // timestamp
 		std::vector<float> point_cloud;        // data
+		std::vector<std::string> groundtruth;  // ground truth labels
 
 		Pose pose;
 
-		MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+		MSGPACK_DEFINE_MAP(time_stamp, point_cloud, groundtruth, pose);
 
 		GPULidarData()
 		{}
@@ -539,6 +521,7 @@ public:
 		{
 			time_stamp = s.time_stamp;
 			point_cloud = s.point_cloud;
+			groundtruth = s.groundtruth;
 
 			//TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
 			if (point_cloud.size() == 0)
@@ -552,6 +535,7 @@ public:
 
 			d.time_stamp = time_stamp;
 			d.point_cloud = point_cloud;
+			d.groundtruth = groundtruth;
 			d.pose = pose.to();
 
 			return d;
@@ -592,7 +576,7 @@ public:
 			return d;
 		}
 	};
-
+	
     struct ImuData {
         msr::airlib::TTimePoint time_stamp;
         Quaternionr orientation;
@@ -688,7 +672,7 @@ public:
 
     struct GnssReport {
         GeoPoint geo_point;
-        msr::airlib::real_T eph = 0.0, epv = 0.0;
+        msr::airlib::real_T eph = 0.0, epv = 0.0; 
         Vector3r velocity;
         msr::airlib::GpsBase::GnssFixType fix_type;
         uint64_t time_utc = 0;
@@ -784,191 +768,6 @@ public:
             d.relative_pose = relative_pose.to();
 
             return d;
-        }
-    };
-
-    struct CameraPose {
-        std::string camera_name;
-        Vector3r translation;
-        Quaternionr rotation;
-
-        MSGPACK_DEFINE_MAP(camera_name, translation, rotation);
-        
-        CameraPose() {}
-
-        CameraPose(const msr::airlib::CameraPose& position)
-        {
-            this->camera_name = position.camera_name;
-            this->translation = position.translation;
-            this->rotation = position.rotation;
-        }
-
-        msr::airlib::CameraPose to() const
-        {
-            msr::airlib::CameraPose p;
-
-            p.camera_name = this->camera_name;
-            p.translation = this->translation.to();
-            p.rotation = this->rotation.to();
-
-            return p;
-        }
-    };
-
-    struct RayCastRequest {
-        Vector3r position;
-        Vector3r direction;
-        std::string reference_frame_link;
-        bool through_blocking;
-        float persist_seconds;
-        MSGPACK_DEFINE_MAP(position, direction, reference_frame_link, through_blocking, persist_seconds);
-
-        RayCastRequest() {}
-
-        RayCastRequest(const msr::airlib::RayCastRequest &r)
-        {
-            this->position = Vector3r(r.position);
-            this->direction = Vector3r(r.direction);
-            this->reference_frame_link = r.reference_frame_link;
-            this->through_blocking = r.through_blocking;
-            this->persist_seconds = r.persist_seconds;
-        }
-
-        msr::airlib::RayCastRequest to() const
-        {
-            msr::airlib::RayCastRequest r;
-
-            r.position = this->position.to();
-            r.direction = this->direction.to();
-            r.reference_frame_link = this->reference_frame_link;
-            r.through_blocking = this->through_blocking;
-            r.persist_seconds = this->persist_seconds;
-
-            return r;
-        }
-    };
-
-    struct RayCastHit {
-        std::string collided_actor_name;
-        Vector3r hit_point;
-        Vector3r hit_normal;
-        MSGPACK_DEFINE_MAP(collided_actor_name, hit_point, hit_normal)
-
-        RayCastHit() {}
-
-        RayCastHit(const msr::airlib::RayCastHit& r)
-        {
-            this->collided_actor_name = r.collided_actor_name;
-            this->hit_point = r.hit_point;
-            this->hit_normal = r.hit_normal;
-        }
-
-        msr::airlib::RayCastHit to() const
-        {
-            msr::airlib::RayCastHit r;
-
-            r.collided_actor_name = this->collided_actor_name;
-            r.hit_point = this->hit_point.to();
-            r.hit_normal = this->hit_normal.to();
-
-            return r;
-        }
-    };
-
-    struct RayCastResponse
-    {
-        std::vector<RayCastHit> hits;
-        MSGPACK_DEFINE_MAP(hits);
-
-        RayCastResponse() {}
-
-        RayCastResponse(const msr::airlib::RayCastResponse& r)
-        {
-            this->hits.clear();
-
-            for (const auto hit : r.hits)
-            {
-                this->hits.emplace_back(RayCastHit(hit));
-            }
-        }
-
-        msr::airlib::RayCastResponse to() const
-        {
-            msr::airlib::RayCastResponse r;
-            r.hits.clear();
-
-            for (const auto hit : this->hits)
-            {
-                msr::airlib::RayCastHit h(hit.to());
-                r.hits.emplace_back(h);
-                
-            }
-
-            return r;
-        }
-    };
-
-    struct DrawableShape
-    {
-        std::string reference_frame_link;
-        int type;
-        std::vector<float> shape_params;
-        MSGPACK_DEFINE_MAP(reference_frame_link, type, shape_params)
-
-        DrawableShape() {}
-
-        DrawableShape(const msr::airlib::DrawableShape& ds)
-        {
-            this->reference_frame_link = ds.reference_frame_link;
-            this->type = ds.type;
-            this->shape_params = ds.shape_params;
-        }
-
-        msr::airlib::DrawableShape to() const
-        {
-            msr::airlib::DrawableShape ds;
-
-            ds.reference_frame_link = this->reference_frame_link;
-            ds.type = this->type;
-            ds.shape_params = this->shape_params;
-
-            return ds;
-        }
-    };
-
-    struct DrawableShapeRequest
-    {
-        std::unordered_map<std::string, DrawableShape> shapes;
-        bool persist_unmentioned;
-        MSGPACK_DEFINE_MAP(shapes, persist_unmentioned)
-
-        DrawableShapeRequest() {}
-
-        DrawableShapeRequest(const msr::airlib::DrawableShapeRequest& dsr)
-        {
-            this->persist_unmentioned = dsr.persist_unmentioned;
-
-            this->shapes.clear();
-
-            for (const auto &kvp : dsr.shapes)
-            {
-                DrawableShape ds(kvp.second);
-                this->shapes.emplace(kvp.first, kvp.second);
-            }
-        }
-
-        msr::airlib::DrawableShapeRequest to() const
-        {
-            msr::airlib::DrawableShapeRequest dsr;
-
-            dsr.persist_unmentioned = this->persist_unmentioned;
-
-            for (const auto &kvp : this->shapes)
-            {
-                dsr.shapes.emplace(kvp.first, kvp.second.to());
-            }
-
-            return dsr;
         }
     };
 };
