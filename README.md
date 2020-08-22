@@ -32,20 +32,6 @@ Cars in AirSim
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.22
 
-## What's New
-* A ROS wrapper for multirotors is available. See [airsim_ros_pkgs](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/ros/src/airsim_ros_pkgs) for the ROS API, and [airsim_tutorial_pkgs](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/ros/src/airsim_tutorial_pkgs) for tutorials. 
-* [Added sensor APIs for Barometer, IMU, GPS, Magnetometer, Distance Sensor](docs/sensors.md) 
-* Added support for [docker in ubuntu](docs/docker_ubuntu) 
-* Added Weather Effects and [APIs](docs/apis#weather-apis)
-* Added [Time of Day API](docs/apis#time-of-day-api)
-* An experimental integration of [AirSim on Unity](https://github.com/Microsoft/AirSim/tree/master/Unity) is now available. Learn more in [Unity blog post](https://blogs.unity3d.com/2018/11/14/airsim-on-unity-experiment-with-autonomous-vehicle-simulation).
-* [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
-* Highly efficient [NoDisplay view mode](docs/settings#viewmode) to turn off main screen rendering so you can capture images at high rate
-* [Lidar Sensor](docs/lidar)
-* Case Study: [Formula Student Technion Driverless](https://github.com/Microsoft/AirSim/wiki/technion)
-* [Multi-Vehicle Capability](docs/multi_vehicle)
-* [ROS publisher](https://github.com/Microsoft/AirSim/pull/1135)
-
 For complete list of changes, view our [Changelog](CHANGELOG.md)
 
 ## How to Get It
