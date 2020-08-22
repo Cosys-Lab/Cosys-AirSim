@@ -91,13 +91,11 @@ e.g.,
 ```
 
 ## Client API 
-Use `getEchoData()` API to retrieve the echo sensor data. 
-* The API returns a Point-Cloud as a flat array of floats and the final attenuation along with the timestamp of the capture and echo pose.
+Use `getEchoData(sensor name, vehicle name)` API to retrieve the echo sensor data. 
+* The API returns a Point-Cloud as a flat array of floats, the final attenuation, total distance along with the timestamp of the capture and sensor pose.
 * Point-Cloud: 
-  * The floats represent [x,y,z,attenuation] for each point hit within the range in the last scan.
-  * The frame for the points in the output is configurable using "DataFrame" attribute
-  "" or "SensorLocalFrame" -- default; returned points are in echo sensor local frame (in NED, in meters)
-  "VehicleInertialFrame" -- returned points are in vehicle inertial frame (in NED, in meters)  
+  * The floats represent [x,y,z,attenuation,total_distance] for each point hit within the range in the last scan. 
 * Echo Pose:
     * echo sensor pose in the vehicle inertial frame (in NED, in meters)
     * Can be used to transform points to other frames.
+Use `setEchoData(sensor name, vehicle name, echo data)` API to render an external pointcloud back to the simulation. It expects it to be [x,y,z] as a flat array of floats.

@@ -82,13 +82,10 @@ e.g.,
 ```
 
 ## Client API 
-Use `getGPULidarData()` API to retrieve the GPU Lidar data. 
+Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar data. 
 * The API returns a Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
 * Point-Cloud: 
   * The floats represent [x,y,z] coordinate for each point hit within the range in the last scan.
-  * The frame for the points in the output is configurable using "DataFrame" attribute
-  "" or "VehicleInertialFrame" -- default; returned points are in vehicle inertial frame (in NED, in meters)
-  "SensorLocalFrame" -- returned points are in lidar local frame (in NED, in meters)
 * Lidar Pose:
     * Lidar pose in the vehicle inertial frame (in NED, in meters)
     * Can be used to transform points to other frames.

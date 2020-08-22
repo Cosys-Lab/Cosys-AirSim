@@ -32,7 +32,6 @@ VerticalFOVUpper          | Vertical FOV upper limit for the lidar, in degrees
 VerticalFOVLower          | Vertical FOV lower limit for the lidar, in degrees
 X Y Z                     | Position of the lidar relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
-DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
 GenerateNoise             | Generate and add range-noise based on normal distribution if set to true
 MinNoiseStandardDeviation | The standard deviation to generate the noise normal distribution, in meters. This is the minimal noise (at 0 distance)
 NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
@@ -63,8 +62,7 @@ LimitPoints               | Limit the amount of points that can be calculated in
 					"VerticalFOVLower": -25,
 					"HorizontalFOVStart": -20,
 					"HorizontalFOVEnd": 20,
-					"DrawDebugPoints": true,
-					"DataFrame": "SensorLocalFrame"
+					"DrawDebugPoints": true
 				},
 				"LidarSensor2": { 
 				   "SensorType": 6,
@@ -76,8 +74,7 @@ LimitPoints               | Limit the amount of points that can be calculated in
 					"Roll": 0, "Pitch": 0, "Yaw" : 0,
 					"VerticalFOVUpper": -15,
 					"VerticalFOVLower": -25,
-					"DrawDebugPoints": true,
-					"DataFrame": "SensorLocalFrame"
+					"DrawDebugPoints": true
 				}
 			}
 		}
@@ -96,13 +93,10 @@ e.g.,
 ```
 
 ## Client API 
-Use `getLidarData()` API to retrieve the Lidar data. 
+Use `getLidarData(sensor name, vehicle name)` API to retrieve the Lidar data. 
 * The API returns a full scan Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
 * Point-Cloud: 
   * The floats represent [x,y,z] coordinate for each point hit within the range in the last scan. It will be [0,0,0] for a laser that didn't get any reflection (out of range).
-  * The frame for the points in the output is configurable using "DataFrame" attribute
-  "" or "VehicleInertialFrame" -- default; returned points are in vehicle inertial frame (in NED, in meters)
-  "SensorLocalFrame" -- returned points are in lidar local frame (in NED, in meters)
 * Lidar Pose:
     * Lidar pose in the vehicle inertial frame (in NED, in meters)
     * Can be used to transform points to other frames.
