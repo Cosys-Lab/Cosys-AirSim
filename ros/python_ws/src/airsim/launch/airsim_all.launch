@@ -43,7 +43,8 @@
             <param name="camera_height" type="int" value="540" />
             <param name="camera_width" type="int" value="960" />
 
-            <param name="frame_system" type="int" value="0" />
             <param name="pose_transform" type="int" value="0" />
+
+            <param name="publish_alternative" type="int" value="0" />
       </node>
       </launch>

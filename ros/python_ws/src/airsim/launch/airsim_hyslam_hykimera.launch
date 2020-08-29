@@ -36,7 +36,10 @@
             <param name="camera_height" type="int" value="480" />
             <param name="camera_width" type="int" value="752" />
 
-            <param name="frame_system" type="int" value="1" />
             <param name="pose_transform" type="int" value="0" />
+
+            <param name="publish_alternative" type="int" value="1" />
+            <param name="topic_imu_alt" type="string" value="imu0Kimera" />
+            <param name="topic_pose_alt" type="string" value="airsim/gtposekimera" />
       </node>
 </launch>

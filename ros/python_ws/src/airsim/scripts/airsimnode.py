@@ -122,7 +122,7 @@ def get_image_bytes(data, cameraType):
 
 
 def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
-               lidarName, echoName, imuName, vehicleName, frameSystem, transformPose, carcontrolInputTopic):
+               lidarName, echoName, imuName, vehicleName, transformPose, carcontrolInputTopic, publishAlternative):
 
     # Reading from Tuples
     camera1Active = activeTuple[0]
@@ -148,7 +148,9 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     lidarGroundtruthTopicName = topicsTuple[10]
     echoTopicName = topicsTuple[11]
     imuTopicName = topicsTuple[12]
-    poseTopicName = topicsTuple[13]
+    imuAltTopicName = topicsTuple[13]
+    poseTopicName = topicsTuple[14]
+    poseAltTopicName = topicsTuple[15]
 
     camera1Frame = framesTuple[0]
     camera2Frame = framesTuple[1]
@@ -202,10 +204,14 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
         echoPub = rospy.Publisher(echoTopicName, PointCloud2, queue_size=1)
     if imuActive:
         imuPub = rospy.Publisher(imuTopicName, Imu, queue_size=1)
+        if publishAlternative:
+            imuAltPub = rospy.Publisher(imuAltTopicName, Imu, queue_size=1)
     if poseActive:
         if transformPose:
             rospy.Subscriber(poseTopicName, PoseStamped, handle_airsim_pose, (poseFrame, imuFrame))
         posePub = rospy.Publisher(poseTopicName, PoseStamped, queue_size=1)
+        if publishAlternative:
+            poseAltPub = rospy.Publisher(poseAltTopicName, PoseStamped, queue_size=1)
     if carcontrolActive:
         client.enableApiControl(True)
         rospy.Subscriber(carcontrolInputTopic, Twist, handle_input_command, (vehicleName, client))
@@ -502,7 +508,19 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             imu_msg.orientation.z = imuData.orientation.inverse().z_val
             imu_msg.orientation.w = imuData.orientation.inverse().w_val
 
-            if frameSystem:
+            imu_msg.angular_velocity.x = imuData.angular_velocity.x_val
+            imu_msg.angular_velocity.y = -imuData.angular_velocity.y_val
+            imu_msg.angular_velocity.z = -imuData.angular_velocity.z_val
+
+            imu_msg.linear_acceleration.x = imuData.linear_acceleration.x_val
+            imu_msg.linear_acceleration.y = -imuData.linear_acceleration.y_val
+            imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
+
+            # publish Imu message
+            imuPub.publish(imu_msg)
+
+            # publish Imu message in different coordinate scheme
+            if publishAlternative:
                 imu_msg.angular_velocity.x = -imuData.angular_velocity.z_val
                 imu_msg.angular_velocity.y = imuData.angular_velocity.y_val
                 imu_msg.angular_velocity.z = imuData.angular_velocity.x_val
@@ -510,17 +528,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 imu_msg.linear_acceleration.x = -imuData.linear_acceleration.z_val
                 imu_msg.linear_acceleration.y = imuData.linear_acceleration.y_val
                 imu_msg.linear_acceleration.z = imuData.linear_acceleration.x_val
-            else:
-                imu_msg.angular_velocity.x = imuData.angular_velocity.x_val
-                imu_msg.angular_velocity.y = -imuData.angular_velocity.y_val
-                imu_msg.angular_velocity.z = -imuData.angular_velocity.z_val
 
-                imu_msg.linear_acceleration.x = imuData.linear_acceleration.x_val
-                imu_msg.linear_acceleration.y = -imuData.linear_acceleration.y_val
-                imu_msg.linear_acceleration.z = -imuData.linear_acceleration.z_val
-
-            # publish Imu message
-            imuPub.publish(imu_msg)
+                imuAltPub.publish(imu_msg)
 
         if poseActive:
             # get state of the car
@@ -530,14 +539,9 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
             # populate PoseStamped ros message
             simPose = PoseStamped()
-            if frameSystem:
-                simPose.pose.position.x = -pos.z_val
-                simPose.pose.position.y = pos.y_val
-                simPose.pose.position.z = pos.x_val
-            else:
-                simPose.pose.position.x = pos.x_val
-                simPose.pose.position.y = -pos.y_val
-                simPose.pose.position.z = -pos.z_val
+            simPose.pose.position.x = pos.x_val
+            simPose.pose.position.y = -pos.y_val
+            simPose.pose.position.z = -pos.z_val
             simPose.pose.orientation.w = orientation.w_val
             simPose.pose.orientation.x = orientation.x_val
             simPose.pose.orientation.y = orientation.y_val
@@ -548,6 +552,15 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
             # publish PoseStamped message
             posePub.publish(simPose)
+
+            # publish PoseStamped message in different coordinate scheme
+            if publishAlternative:
+
+                simPose.pose.position.x = -pos.z_val
+                simPose.pose.position.y = pos.y_val
+                simPose.pose.position.z = pos.x_val
+
+                poseAltPub.publish(simPose)
 
         # sleep until next cycle
         rate.sleep()
@@ -587,9 +600,11 @@ if __name__ == '__main__':
         lidarGroundtruthTopicName =  rospy.get_param('~topic_lidar_groundtruth', 'airsim/lidargroundtruth')
         echoTopicName = rospy.get_param('~topic_echo', 'airsim/echo')
         imuTopicName = rospy.get_param('~topic_imu', 'airsim/imu')
+        imuAltTopicName = rospy.get_param('~topic_imu_alt', 'imualt')
         poseTopicName = rospy.get_param('~topic_pose', 'airsim/pose')
+        poseAltTopicName = rospy.get_param('~topic_pose_alt', 'airsim/posealt')
         topicsTuple = (sceneCamera1TopicName, segmentationCamera1TopicName, depthCamera1TopicName, sceneCamera2TopicName, segmentationCamera2TopicName, depthCamera2TopicName, sceneCamera3TopicName, segmentationCamera3TopicName, depthCamera3TopicName,
-         lidarTopicName, lidarGroundtruthTopicName, echoTopicName, imuTopicName, poseTopicName)
+         lidarTopicName, lidarGroundtruthTopicName, echoTopicName, imuTopicName, imuAltTopicName, poseTopicName, poseAltTopicName)
 
         # Frames
         camera1Frame = rospy.get_param('~camera1_frame_id', 'base_camera')
@@ -627,9 +642,6 @@ if __name__ == '__main__':
         # Vehicle settings
         vehicleName = rospy.get_param('~vehicle_name', 'airsimvehicle')
 
-	    # Coordinate frame settings (0=default ROS, 1=kimera)
-        frameSystem = rospy.get_param('~frame_system', 0)
-
         # Transform the groundtruth pose to the imu frame
         # Best to turn this off to not intervene with SLAM systems
         transformPose = rospy.get_param('~pose_transform', 0)
@@ -637,8 +649,11 @@ if __name__ == '__main__':
         # Car Control settings
         carcontrolInputTopic = rospy.get_param('~carcontrol_input_topic', 'cmd_vel')
 
+        # Publish on alternative coordinate frame settings with HySLAM
+        publishAlternative = rospy.get_param('~publish_alternative', 0)
+
         airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, echoName, imuName,
-                      vehicleName, frameSystem, transformPose, carcontrolInputTopic )
+                      vehicleName, transformPose, carcontrolInputTopic, publishAlternative)
 
     except rospy.ROSInterruptException:
         pass
