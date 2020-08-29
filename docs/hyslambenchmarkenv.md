@@ -31,7 +31,6 @@ These are as well available in the editor with the _DynamicWorldMaster_ actors s
 
 Please see the code below for a basic .bat script that can be used to launch the standalone simulation with the above values easily configurable.
 ```
-@echo off 
 set STARTSEED=450                              & :: To control the seed use this parameter to set it. If set to 0 a random one will be chosen.
 set REMOVEPERCENTAGE=15                        & :: The amount of dynamic objects removed at the start (in %)
 set MOVEPERCENTAGE=15                          & :: The amount of dynamic objects that are moved at the start (in %)
@@ -47,6 +46,43 @@ if %LOG%==1 (
 		start "" "HS_BM_1.exe" -startSeed %STARTSEED% -removePercentage %REMOVEPERCENTAGE% -movePercentage %MOVEPERCENTAGE% -moveOffsetValue %MOVEOFFSETVALUE% -moveRotationValue %MOVEROTATIONVALUE% -startPoint %STARTPOINT% -spawnAI %SPAWNAI%
 		)
 ```  
+
+  
+### LaunchFile Configuration
+You can also use a file to define multiple dynamic setting configurations line per line. Then by pressing a button (<kbd>O</kbd>) you can switch to the next configuration.
+This file has the following structure:
+```
+seed,removePercentage,movePercentage,moveOffsetValue,moveRotationValue
+```  
+For example you can create _launchfile.ini_, each line defining a new configuration:
+```
+0,50,25,50,50
+450,10,10,50,50
+450,10,10,50,50
+500,10,10,50,50
+450,10,10,50,50
+```  
+Do note that this only configures those 5 settings. The **Starting point** and **Spawn AI** settings are not configured this way and are configured just as before.
+
+to make the environment load this file, you need to define it. Which similarly to before is different for the editor or standalone:
+- **Editor**: 
+  - To control the launchfile in the editor, enable the `Use Launch File` toggle and set the `Editor Launch File` field to the absolute filepath of the launchfile of the _DynamicWorldMaster_ actor in the level. 
+- **Standalone**:
+  - To control the launchfile when using the simulator as standalone, use the launch parameter `-launchFile STRING` and set it to the absolute filepath of the launchfile.
+ 
+Please see the code below for a basic .bat script that can be used to launch the standalone simulation with the above values easily configurable with a launchfile:
+```
+set LAUNCHFILE=C:\airsim\launchfile.ini               & :: Set to the absolute path of the launchfile
+set STARTPOINT=1                               		  & :: The starting waypoint to begin. Currently 1 to 4 are available for each corner
+set SPAWNAI=0                           	   	      & :: Toggle the AI in the world on and off 
+set /A LOG=1								   		  & :: Set to 1 to open a separate window to display the contents of the log in real time
+
+if %LOG%==1 (	
+	start "" "HS_BM_1.exe" -LOG -launchFile %LAUNCHFILE% -startPoint %STARTPOINT% -spawnAI %SPAWNAI%
+	) else (
+		start "" "HS_BM_1.exe" -launchFile %LAUNCHFILE% -startPoint %STARTPOINT% -spawnAI %SPAWNAI%
+		)
+```
 
 ## Editing the Environment
 If changes are needed, please take note of the following guidlines:
