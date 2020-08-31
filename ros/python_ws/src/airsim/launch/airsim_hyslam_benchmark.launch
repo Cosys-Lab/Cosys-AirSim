@@ -1,6 +1,6 @@
 <launch>
-      <node pkg="tf" type="static_transform_publisher" name="base_to_camera1_broadcaster" args="0 0.05 0 0 0 0 base_link left_cam 100" />
-      <node pkg="tf" type="static_transform_publisher" name="base_to_camera2_broadcaster" args="0 -0.05 0 0 0 0 base_link right_cam 100" />
+      <node pkg="tf" type="static_transform_publisher" name="base_to_camera1_broadcaster" args="0 0.05 0.55 0 0 0 base_link left_cam 100" />
+      <node pkg="tf" type="static_transform_publisher" name="base_to_camera2_broadcaster" args="0 -0.05 0.55 0 0 0 base_link right_cam 100" />
       <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0.55 0 0 0 base_link base_laser 100" />
       <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
 
@@ -11,7 +11,7 @@
             <param name="camera2_active" type="int" value="1" />
             <param name="camera3_active" type="int" value="0" />
             <param name="lidar_active" type="int" value="0" />
-            <param name="gpulidar_active" type="int" value="1" />
+            <param name="gpulidar_active" type="int" value="0" />
             <param name="imu_active" type="int" value="1" />
             <param name="pose_active" type="int" value="1" />
             <param name="carcontrol_active" type="int" value="0" />
@@ -46,6 +46,8 @@
 
             <param name="pose_transform" type="int" value="0" />
 
-            <param name="publish_alternative" type="int" value="0" />
+            <param name="publish_alternative" type="int" value="1" />
+            <param name="topic_imu_alt" type="string" value="imu0kimera" />
+            <param name="topic_pose_alt" type="string" value="airsim/gtposekimera" />
       </node>
 </launch>

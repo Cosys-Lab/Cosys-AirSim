@@ -601,8 +601,8 @@ if __name__ == '__main__':
         echoTopicName = rospy.get_param('~topic_echo', 'airsim/echo')
         imuTopicName = rospy.get_param('~topic_imu', 'airsim/imu')
         imuAltTopicName = rospy.get_param('~topic_imu_alt', 'imualt')
-        poseTopicName = rospy.get_param('~topic_pose', 'airsim/pose')
-        poseAltTopicName = rospy.get_param('~topic_pose_alt', 'airsim/posealt')
+        poseTopicName = rospy.get_param('~topic_pose', 'airsim/gtpose')
+        poseAltTopicName = rospy.get_param('~topic_pose_alt', 'airsim/gtposealt')
         topicsTuple = (sceneCamera1TopicName, segmentationCamera1TopicName, depthCamera1TopicName, sceneCamera2TopicName, segmentationCamera2TopicName, depthCamera2TopicName, sceneCamera3TopicName, segmentationCamera3TopicName, depthCamera3TopicName,
          lidarTopicName, lidarGroundtruthTopicName, echoTopicName, imuTopicName, imuAltTopicName, poseTopicName, poseAltTopicName)
 
