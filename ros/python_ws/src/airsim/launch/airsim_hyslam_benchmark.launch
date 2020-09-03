@@ -43,6 +43,7 @@
             <param name="camera2_mono" type="int" value="0" />
             <param name="camera_height" type="int" value="540" />
             <param name="camera_width" type="int" value="960" />
+            <param name="camera_segmentation_disabled" type="int" value="1" />
 
             <param name="pose_transform" type="int" value="0" />
 
