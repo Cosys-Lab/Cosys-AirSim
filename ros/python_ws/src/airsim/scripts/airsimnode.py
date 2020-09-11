@@ -17,6 +17,7 @@ import numpy as np
 import os
 import cv2
 from cv_bridge import CvBridge
+from multiprocessing import Queue
 
 def handle_airsim_pose(msg, args):
     br = tf2_ros.TransformBroadcaster()
@@ -35,18 +36,12 @@ def handle_airsim_pose(msg, args):
     br.sendTransform(t)
 
 def handle_input_command(msg, args):
-    # set the controls for car
-    car_controls = airsimpy.CarControls()
-    if (msg.linear.x < 0):
-        car_controls.is_manual_gear = True
-        car_controls.manual_gear = -1
-    else:
-        car_controls.is_manual_gear = False
-    car_controls.throttle = msg.linear.x
-    car_controls.steering = -msg.angular.z
-    args[1].setCarControls(car_controls, args[0])
-    print("now")
-
+        # set the controls for car
+        q = args
+        try:
+            q.put(msg)
+        except:
+            print("Input queue full") 
 def get_camera_type(cameraType):
     if (cameraType == "Scene"):
         cameraTypeClass = airsimpy.ImageType.Scene
@@ -119,10 +114,10 @@ def get_image_bytes(data, cameraType):
     else:
         img_rgb_string = data.image_data_uint8
     return img_rgb_string
-
+    
 
 def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
-               lidarName, echoName, imuName, vehicleName, transformPose, carcontrolInputTopic, publishAlternative):
+                lidarName, echoName, imuName, vehicleName, transformPose, carcontrolInputTopic, publishAlternative):
 
     # Reading from Tuples
     camera1Active = activeTuple[0]
@@ -218,7 +213,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             poseAltPub = rospy.Publisher(poseAltTopicName, PoseStamped, queue_size=1)
     if carcontrolActive:
         client.enableApiControl(True)
-        rospy.Subscriber(carcontrolInputTopic, Twist, handle_input_command, (vehicleName, client))
+        queue_input_command = Queue(1)
+        rospy.Subscriber(carcontrolInputTopic, Twist, handle_input_command, (queue_input_command))
 
     # Some temporary variables
     lastLidarTimeStamp = None
@@ -504,7 +500,22 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 simPose.pose.position.z = pos.x_val
 
                 poseAltPub.publish(simPose)
-
+        
+        if carcontrolActive:
+            # set the controls for car
+            try:
+                msg = queue_input_command.get_nowait()
+                car_controls = airsimpy.CarControls()
+                if (msg.linear.x < 0):
+                    car_controls.is_manual_gear = True
+                    car_controls.manual_gear = -1
+                else:
+                    car_controls.is_manual_gear = False
+                car_controls.throttle = msg.linear.x
+                car_controls.steering = -msg.angular.z
+                client.setCarControls(car_controls, vehicleName)
+            except:
+                pass #queue is empty
         # sleep until next cycle
         rate.sleep()
 
