@@ -146,6 +146,9 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     imuAltTopicName = topicsTuple[13]
     poseTopicName = topicsTuple[14]
     poseAltTopicName = topicsTuple[15]
+    sceneCamera1MonoTopicName = topicsTuple[16]
+    sceneCamera2MonoTopicName = topicsTuple[17]
+    sceneCamera3MonoTopicName = topicsTuple[18]
 
     camera1Frame = framesTuple[0]
     camera2Frame = framesTuple[1]
@@ -175,6 +178,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
     if camera1Active:
         sceneCamera1Pub = rospy.Publisher(sceneCamera1TopicName, Image, queue_size=1)
+        if camera1Mono:
+            sceneCamera1MonoPub = rospy.Publisher(sceneCamera1MonoTopicName, Image, queue_size=1)
         if not camera1SceneOnly:
             if not cameraSegmentationDisabled:
                 rospy.logwarn("Camera1 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
@@ -182,6 +187,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             depthCamera1Pub = rospy.Publisher(depthCamera1TopicName, Image, queue_size=1)
     if camera2Active:
         sceneCamera2Pub = rospy.Publisher(sceneCamera2TopicName, Image, queue_size=1)
+        if camera2Mono:
+            sceneCamera2MonoPub = rospy.Publisher(sceneCamera2MonoTopicName, Image, queue_size=1)
         if not camera2SceneOnly:
             if not cameraSegmentationDisabled:
                 rospy.logwarn("Camera2 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
@@ -189,6 +196,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             depthCamera2Pub = rospy.Publisher(depthCamera2TopicName, Image, queue_size=1)
     if camera3Active:
         sceneCamera3Pub = rospy.Publisher(sceneCamera3TopicName, Image, queue_size=1)
+        if camera3Mono:
+            sceneCamera3MonoPub = rospy.Publisher(sceneCamera3MonoTopicName, Image, queue_size=1)
         if not camera3SceneOnly:
             if not cameraSegmentationDisabled:
                 rospy.logwarn("Camera3 with segmentation is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
@@ -276,20 +285,22 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 img_rgb_string1 = get_image_bytes(responses[responseLocations[0]], "Scene")
 
             if(len(img_rgb_string1) > 1):
-                if camera1Mono:
-                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
-                else:
-                    msg = Image()
-                    msg.height = cameraHeight
-                    msg.width = cameraWidth
-                    msg.is_bigendian = 0
-                    msg.encoding = "rgb8"
-                    msg.step = cameraWidth * 3
-                    msg.data = img_rgb_string1
+                msg = Image()
+                msg.height = cameraHeight
+                msg.width = cameraWidth
+                msg.is_bigendian = 0
+                msg.encoding = "rgb8"
+                msg.step = cameraWidth * 3
+                msg.data = img_rgb_string1
                 msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera1Frame
                 sceneCamera1Pub.publish(msg)
+                if camera1Mono:
+                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                    msg.header.stamp = cameraTimeStamp
+                    msg.header.frame_id = camera1Frame
+                    sceneCamera1MonoPub.publish(msg)
                 if not camera1SceneOnly:
                     if not cameraSegmentationDisabled:
                         msg.step = cameraWidth * 3
@@ -310,20 +321,22 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 img_rgb_string1 = get_image_bytes(responses[responseLocations[3]], "Scene")
 
             if(len(img_rgb_string1) > 1):
-                if camera2Mono:
-                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
-                else:
-                    msg = Image()
-                    msg.height = cameraHeight
-                    msg.width = cameraWidth
-                    msg.is_bigendian = 0
-                    msg.encoding = "rgb8"
-                    msg.step = cameraWidth * 3
-                    msg.data = img_rgb_string1
+                msg = Image()
+                msg.height = cameraHeight
+                msg.width = cameraWidth
+                msg.is_bigendian = 0
+                msg.encoding = "rgb8"
+                msg.step = cameraWidth * 3
+                msg.data = img_rgb_string1
                 msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera2Frame
                 sceneCamera2Pub.publish(msg)
+                if camera2Mono:
+                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                    msg.header.stamp = cameraTimeStamp
+                    msg.header.frame_id = camera2Frame
+                    sceneCamera2MonoPub.publish(msg)
                 if not camera2SceneOnly:
                     if not cameraSegmentationDisabled:
                         msg.step = cameraWidth * 3
@@ -344,20 +357,22 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 img_rgb_string1 = get_image_bytes(responses[responseLocations[6]], "Scene")
 
             if(len(img_rgb_string1) > 1):
-                if camera3Mono:
-                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
-                else:
-                    msg = Image()
-                    msg.height = cameraHeight
-                    msg.width = cameraWidth
-                    msg.is_bigendian = 0
-                    msg.encoding = "rgb8"
-                    msg.step = cameraWidth * 3
-                    msg.data = img_rgb_string1
+                msg = Image()
+                msg.height = cameraHeight
+                msg.width = cameraWidth
+                msg.is_bigendian = 0
+                msg.encoding = "rgb8"
+                msg.step = cameraWidth * 3
+                msg.data = img_rgb_string1
                 msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera3Frame
                 sceneCamera3Pub.publish(msg)
+                if camera3Mono:
+                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                    msg.header.stamp = cameraTimeStamp
+                    msg.header.frame_id = camera3Frame
+                    sceneCamera3MonoPub.publish(msg)
                 if not camera3SceneOnly:
                     if not cameraSegmentationDisabled:
                         msg.step = cameraWidth * 3
@@ -557,8 +572,12 @@ if __name__ == '__main__':
         imuAltTopicName = rospy.get_param('~topic_imu_alt', 'imualt')
         poseTopicName = rospy.get_param('~topic_pose', 'airsim/gtpose')
         poseAltTopicName = rospy.get_param('~topic_pose_alt', 'airsim/gtposealt')
+        sceneCamera1MonoTopicName = rospy.get_param('~topic_scene_camera1_mono', 'airsim/mono/image')
+        sceneCamera2MonoTopicName = rospy.get_param('~topic_scene_camera2_mono', 'airsim/mono2/image')
+        sceneCamera3MonoTopicName = rospy.get_param('~topic_scene_camera3_mono', 'airsim/mono3/image')
         topicsTuple = (sceneCamera1TopicName, segmentationCamera1TopicName, depthCamera1TopicName, sceneCamera2TopicName, segmentationCamera2TopicName, depthCamera2TopicName, sceneCamera3TopicName, segmentationCamera3TopicName, depthCamera3TopicName,
-                       lidarTopicName, lidarGroundtruthTopicName, echoTopicName, imuTopicName, imuAltTopicName, poseTopicName, poseAltTopicName)
+                       lidarTopicName, lidarGroundtruthTopicName, echoTopicName, imuTopicName, imuAltTopicName, poseTopicName, poseAltTopicName,
+                       sceneCamera1MonoTopicName, sceneCamera2MonoTopicName, sceneCamera3MonoTopicName)
 
         # Frames
         camera1Frame = rospy.get_param('~camera1_frame_id', 'base_camera')
