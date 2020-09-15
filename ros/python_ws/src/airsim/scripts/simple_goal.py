@@ -43,7 +43,7 @@ def movebase_client():
     global goalnr
     global finished
 
-    poseReader = PoseCSV("/home/jori/projects/hyslam/airsim/ros/python_ws/src/airsim/scripts/poses.csv", False)
+    poseReader = PoseCSV("/home/jori/projects/hyslam/airsim/ros/python_ws/src/airsim/scripts/poses_example_benchmark_env_one_round.csv", False)
     poses = poseReader.readPoses()
     lengthPoses = len(poses)
 

@@ -79,27 +79,56 @@ class PoseCSV():
         self.csvFile.close()
         
 if __name__ == '__main__':
-    csvFileLocation = "poses.csv"
+    import argparse
+    from multiprocessing import Process
+    from time import sleep
+    parser = argparse.ArgumentParser(description="Record a traject (set of poses).")
+    parser.add_argument('--csvfile', type=str, default="poses.csv", help="File location to read or write poses")
+    parser.add_argument('--record', action='store_true', help="Enable record and write functionality")
+    args = parser.parse_args()
 
-    client = airsimpy.VehicleClient()
-    client.confirmConnection()
-    
-    writer = PoseCSV(csvFileLocation, True)
-
-    while True:
-        command = raw_input("Enter command (c: stop, r:record): ")
-        if command == 'r':
-            print("Recording pose...")
+    def looprecord(client, posewriter):
+        global isActive
+        nr = 0
+        while isActive:
+            print("Recording pose {}...".format(nr))
             pose = client.simGetVehiclePose('airsimvehicle')
-            writer.writePose(pose)
-            print(pose) #is airsim pose, but we need ROS Pose
-        elif command == 'c':
-            break
-        else:
-            print("Did not understand command: {}".format(command))
-    writer.close()
+            posewriter.writePose(pose)
+            print(str(pose) + "\n") #is airsim pose, but we need ROS Pose
+            nr = nr + 1
+            sleep(4)
 
-    print("Verifying file (reading out poses)...")
+    
+    csvFileLocation = args.csvfile
+    isRecord = args.record
+    
+    writer = PoseCSV(csvFileLocation, isRecord)
+
+    if isRecord:
+        global isActive
+        client = airsimpy.VehicleClient()
+        client.confirmConnection()
+        p = Process(target=looprecord, args=(client, writer,))
+
+        while True:
+            command = raw_input("[MAIN] Enter command 'c' to stop and 'r' to start recording: ")
+            if command == 'c':
+                isActive = False
+                break
+            elif command == 'r':
+                isActive = True
+                print("[MAIN] Starting record loop (2 Hz)...")
+                sleep(2)
+                p.start()
+            else:
+                print("[MAIN] Did not understand command: {}".format(command))
+        
+        if p.is_alive():
+            p.join()
+        writer.close()
+        print("[MAIN] Verifying file ...")
+
+    print("Reading out poses...")
     reader = PoseCSV(csvFileLocation, False)
     poses = reader.readPoses()
     for pose in poses:
