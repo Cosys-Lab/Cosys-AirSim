@@ -80,16 +80,16 @@ class PoseCSV():
         
 if __name__ == '__main__':
     import argparse
-    from multiprocessing import Process
+    from multiprocessing import Process, Queue
     from time import sleep
     parser = argparse.ArgumentParser(description="Record a traject (set of poses).")
     parser.add_argument('--csvfile', type=str, default="poses.csv", help="File location to read or write poses")
     parser.add_argument('--record', action='store_true', help="Enable record and write functionality")
     args = parser.parse_args()
 
-    def looprecord(client, posewriter):
-        global isActive
+    def looprecord(client, posewriter, q):
         nr = 0
+        isActive = q.get()
         while isActive:
             print("Recording pose {}...".format(nr))
             pose = client.simGetVehiclePose('airsimvehicle')
@@ -97,6 +97,10 @@ if __name__ == '__main__':
             print(str(pose) + "\n") #is airsim pose, but we need ROS Pose
             nr = nr + 1
             sleep(4)
+            try:
+                isActive = q.get_nowait()
+            except:
+                pass
 
     
     csvFileLocation = args.csvfile
@@ -105,18 +109,19 @@ if __name__ == '__main__':
     writer = PoseCSV(csvFileLocation, isRecord)
 
     if isRecord:
-        global isActive
         client = airsimpy.VehicleClient()
         client.confirmConnection()
-        p = Process(target=looprecord, args=(client, writer,))
+        q = Queue(1)
+        p = Process(target=looprecord, args=(client, writer,q))
 
         while True:
             command = raw_input("[MAIN] Enter command 'c' to stop and 'r' to start recording: ")
             if command == 'c':
-                isActive = False
+                q.put(False)
+                print("Stopping recording...")
                 break
             elif command == 'r':
-                isActive = True
+                q.put(True)
                 print("[MAIN] Starting record loop (2 Hz)...")
                 sleep(2)
                 p.start()
@@ -124,7 +129,11 @@ if __name__ == '__main__':
                 print("[MAIN] Did not understand command: {}".format(command))
         
         if p.is_alive():
-            p.join()
+            try:
+                p.join(timeout=5)
+            except:
+                print("[MAIN] Took too long, terminating recording")
+                p.terminate()
         writer.close()
         print("[MAIN] Verifying file ...")
 
