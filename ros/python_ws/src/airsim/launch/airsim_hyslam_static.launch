@@ -12,12 +12,12 @@
             <param name="camera1_frame_id" type="string" value="left_cam" />
             <param name="camera2_frame_id" type="string" value="right_cam" />
 
-            <param name="topic_scene_camera1" type="string" value="airsim/camera/left/rgb/image" />
-            <param name="topic_segmentation_camera1" type="string" value="airsim/camera/left/segmentation/image" />
-            <param name="topic_depth_camera1" type="string" value="airsim/camera/left/depth/image" />
-            <param name="topic_scene_camera2" type="string" value="airsim/camera/right/rgb/image" />
-            <param name="topic_segmentation_camera2" type="string" value="airsim/camera/right/segmentation/image" />
-            <param name="topic_depth_camera2" type="string" value="airsim/camera/right/depth/image" />
+            <param name="topic_scene_camera1" type="string" value="/airsim/camera/left/rgb/image" />
+            <param name="topic_segmentation_camera1" type="string" value="/airsim/camera/left/segmentation/image" />
+            <param name="topic_depth_camera1" type="string" value="/airsim/camera/left/depth/image" />
+            <param name="topic_scene_camera2" type="string" value="/airsim/camera/right/rgb/image" />
+            <param name="topic_segmentation_camera2" type="string" value="/airsim/camera/right/segmentation/image" />
+            <param name="topic_depth_camera2" type="string" value="/airsim/camera/right/depth/image" />
             <param name="topic_pose" type="string" value="/airsim/gtpose" />
 
             <param name="vehicle_name" type="string" value="airsimvehicle" />
