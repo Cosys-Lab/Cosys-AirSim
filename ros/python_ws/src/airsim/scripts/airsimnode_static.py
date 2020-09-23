@@ -16,6 +16,7 @@ from cv_bridge import CvBridge
 from multiprocessing import Queue
 from airsimnode import handle_airsim_pose, handle_input_command, get_camera_type, is_pixels_as_float, get_image_bytes
 import rosbag
+import pyautogui
 
 def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
                 lidarName, echoName, imuName, vehicleName, transformPose, carcontrolInputTopic, publishAlternative, route_rosbag, dst_rosbag):
@@ -128,18 +129,36 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             requests.append(airsimpy.ImageRequest(camera3Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"), False))
 
     print("Starting...: {}".format(requests))
+    rospy.logwarn("Ensure focus is on the screen of simulator to allow auto configuration!")
     # for each pose in route generate measurements (camera, lidar, ...)
     #print(route.read_messages())
-    print(route.get_type_and_topic_info())
-    for _, msg, t in route.read_messages(topics=poseTopicName):
+    rospy.logdebug(str(route.get_type_and_topic_info()))
 
+    # Variables to automatically push for next configuration of environment
+    initialPose = None
+    hystSetNextConfiguration = True #start is ref position thus do not trigger next
+
+    for _, msg, t in route.read_messages(topics=poseTopicName):
+        
         rostimestamp = t
         timeStamp = msg.header.stamp
         position = airsimpy.Vector3r(msg.pose.position.x, -msg.pose.position.y, -msg.pose.position.z)
         orientation = airsimpy.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w).inverse()
         orientation = airsimpy.Quaternionr(float(orientation.x_val), float(orientation.y_val), float(orientation.z_val), float(orientation.w_val))
         client.simSetVehiclePose(airsimpy.Pose(position, orientation), True, vehicleName)
-        print("Set pose at {}".format(str(t)))
+        rospy.logdebug("Set pose at {}".format(str(t)))
+
+        if initialPose is None:
+            initialPose = position
+        distanceToInitialPose = initialPose.distance_to(position)
+        if distanceToInitialPose < 1.0 and not hystSetNextConfiguration:
+            hystSetNextConfiguration = True
+            print("Triggering next configuration...")
+            pyautogui.press('o')
+        elif distanceToInitialPose >= 1.0 and hystSetNextConfiguration:
+            print("Waiting for trigger location of next configuration...")
+            hystSetNextConfiguration = False
+
         cameraTimeStamp = timeStamp
 
         responses = client.simGetImages(requests)
