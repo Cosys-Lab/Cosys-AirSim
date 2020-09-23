@@ -1,0 +1,39 @@
+<launch>
+      <node name="airsimnode_static" pkg="airsim" type="airsimnode_static.py" respawn="false" output="screen">
+
+            <param name="camera1_active" type="int" value="1" />
+            <param name="camera2_active" type="int" value="1" />
+            <param name="camera3_active" type="int" value="0" />
+            <param name="lidar_active" type="int" value="0" />
+            <param name="gpulidar_active" type="int" value="0" />
+            <param name="carcontrol_active" type="int" value="0" />
+
+            <param name="lidar_frame_id" type="string" value="base_laser" />
+            <param name="camera1_frame_id" type="string" value="left_cam" />
+            <param name="camera2_frame_id" type="string" value="right_cam" />
+
+            <param name="topic_scene_camera1" type="string" value="airsim/camera/left/rgb/image" />
+            <param name="topic_segmentation_camera1" type="string" value="airsim/camera/left/segmentation/image" />
+            <param name="topic_depth_camera1" type="string" value="airsim/camera/left/depth/image" />
+            <param name="topic_scene_camera2" type="string" value="airsim/camera/right/rgb/image" />
+            <param name="topic_segmentation_camera2" type="string" value="airsim/camera/right/segmentation/image" />
+            <param name="topic_depth_camera2" type="string" value="airsim/camera/right/depth/image" />
+            <param name="topic_pose" type="string" value="/airsim/gtpose" />
+
+            <param name="vehicle_name" type="string" value="airsimvehicle" />
+            <param name="camera1_name" type="string" value="leftcamera" />
+            <param name="camera2_name" type="string" value="rightcamera" />
+            <param name="lidar_name" type="string" value="gpulidar" />
+
+            <param name="camera1_sceneonly" type="int" value="0" />
+            <param name="camera2_sceneonly" type="int" value="0" />
+            <param name="camera1_mono" type="int" value="0" />
+            <param name="camera2_mono" type="int" value="0" />
+            <param name="camera_height" type="int" value="540" />
+            <param name="camera_width" type="int" value="960" />
+            <param name="camera_segmentation_disabled" type="int" value="1" />
+
+            <param name="route_rosbag" type="string" value="/home/jori/projects/hyslam/airsim/ros/python_ws/src/airsim_hyslam_route_start.bag" />
+            <param name="dst_rosbag" type="string" value="/home/jori/projects/hyslam/airsim/ros/python_ws/airsim_hyslam_benchmark_test.bag" />
+      </node>
+</launch>
