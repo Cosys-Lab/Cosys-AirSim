@@ -1,6 +1,9 @@
 <launch>
       <node name="airsimnode_static" pkg="airsim" type="airsimnode_static.py" respawn="false" output="screen">
 
+            <param name="rate" type="int" value="30"/>
+            <param name="imu_rate" type="int" value="90" />
+            
             <param name="camera1_active" type="int" value="1" />
             <param name="camera2_active" type="int" value="1" />
             <param name="camera3_active" type="int" value="0" />
@@ -33,7 +36,7 @@
             <param name="camera_width" type="int" value="960" />
             <param name="camera_segmentation_disabled" type="int" value="1" />
 
-            <param name="route_rosbag" type="string" value="/home/jori/projects/hyslam/airsim/ros/python_ws/src/airsim_hyslam_route_start.bag" />
-            <param name="dst_rosbag" type="string" value="/home/jori/projects/hyslam/airsim/ros/python_ws/airsim_hyslam_benchmark_test.bag" />
+            <param name="route_rosbag" type="string" value="$(optenv HOME)/projects/hyslam/bags/airsim_hyslam_route_rack_simple_front.bag" />
+            <param name="dst_rosbag" type="string" value="$(optenv HOME)/projects/hyslam/bags/airsim_hyslam_benchmark_rack_simple_front_0r.bag" />
       </node>
 </launch>

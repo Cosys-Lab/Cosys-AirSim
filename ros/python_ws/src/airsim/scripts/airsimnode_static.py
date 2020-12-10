@@ -138,7 +138,15 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     initialPose = None
     hystSetNextConfiguration = True #start is ref position thus do not trigger next
 
+    periodFrames = round(float(rosIMURate)/float(rosRate))
+    print("Using frame period of {} to generate data.".format(periodFrames))
+    currentFrame = 0
     for _, msg, t in route.read_messages(topics=poseTopicName):
+        if currentFrame == periodFrames:
+            currentFrame = 0
+        else:
+            currentFrame += 1
+            continue
         
         rostimestamp = t
         timeStamp = msg.header.stamp
