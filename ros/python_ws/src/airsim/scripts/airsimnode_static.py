@@ -137,6 +137,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     # Variables to automatically push for next configuration of environment
     initialPose = None
     hystSetNextConfiguration = True #start is ref position thus do not trigger next
+    hystSetNextConfigurationSize = 0.5 #size of detection area in m
+    print("Size of configuration detection area is {} m.".format(hystSetNextConfigurationSize))
 
     periodFrames = round(float(rosIMURate)/float(rosRate))
     print("Using frame period of {} to generate data.".format(periodFrames))
@@ -159,11 +161,11 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
         if initialPose is None:
             initialPose = position
         distanceToInitialPose = initialPose.distance_to(position)
-        if distanceToInitialPose < 1.0 and not hystSetNextConfiguration:
+        if distanceToInitialPose < hystSetNextConfigurationSize and not hystSetNextConfiguration:
             hystSetNextConfiguration = True
             print("Triggering next configuration...")
             pyautogui.press('o')
-        elif distanceToInitialPose >= 1.0 and hystSetNextConfiguration:
+        elif distanceToInitialPose >= hystSetNextConfigurationSize and hystSetNextConfiguration:
             print("Waiting for trigger location of next configuration...")
             hystSetNextConfiguration = False
 
