@@ -1266,7 +1266,7 @@ private:
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
-		echo_setting.sensor_opening_angle = settings_json.getInt("SensorOpeningAngle", echo_setting.sensor_opening_angle);
+		echo_setting.sensor_opening_angle = settings_json.getFloat("SensorOpeningAngle", echo_setting.sensor_opening_angle);
 		echo_setting.reflection_opening_angle = settings_json.getFloat("ReflectionOpeningAngle", echo_setting.reflection_opening_angle);
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
