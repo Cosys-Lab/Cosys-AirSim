@@ -74,6 +74,19 @@ Chance to Change                | Percentage of chance to alter the stack config
 Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
 
+- _RandomStackSpawnerSwitcher_: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. Difference with the one above is that this one can
+select from a Data Table object to select randomely a 'goods'/object type and it's stacking settings. One can control it with the following settings:
+
+Setting                         | Description
+--------------------------------| ------------
+Data Table                      | The Data Table object of the type _RandomStackSpawnerSwitcherStruct_ to set the object types and their settings similar to the ones above for the normal _RandomStackSpawner_
+Chance To Spawn                 | Percentage of chance to spawn each object in the stack                
+Chance to Change                | Percentage of chance to alter the stack configuration every so many seconds
+Chance To Switch                | Percentage of chance to switch to a different object type from Data Table      
+Average Time Between Changes    | Average time delta in seconds between changes
+Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
+
+
 - _RandomStaticModifier_: This can be used to spawn a singular static and alter it's spawn transform dynamically. One can control it with the following settings:
 
 Setting                         | Description

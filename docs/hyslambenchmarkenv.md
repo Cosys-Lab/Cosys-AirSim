@@ -1,6 +1,6 @@
-# Setup HySLAM Benchmark Scenario Environment for AirSim
+# Setup HySLAM Benchmark Scenario Environments for AirSim
 
-The HySLAM environment is available in repo in folder `Unreal/Environments/HS_BM_1`. 
+The HySLAM environments for benchmarking is available in repo in folder `Unreal/Environments` with the names `HS_BM_1` and `HS_BM_2`. 
 It is the environment for the HySLAM  to test state-of-the-art SLAM and object recognition algorithms on.
 
 ## Features
@@ -89,15 +89,87 @@ If changes are needed, please take note of the following guidlines:
 - Name your objects properly. The object segmentation camera will use the naming to generate hashes and pick a object color for the segmentation. Naming similar objects with similar names will make them have the same color.
 - All dynamic objects (those that can be removed or moved) need to have their actor tag set to _DynamicObject_.
 - New start locations are simple _TargetPoints_ put in the level. 
+- Dynamic spawning stacked goods (pallets etc.)
+- Dynamic static objects spawning (either always the same or pick from a set of options)
+- Small dynamic changes such as random open doors.
+- Dynamic AI humans walking between waypoints
 
+### Dynamic Static Spawners
+Currently there are 3 dynamic static object spawners blueprints available:
+- _RandomStackSpawner_: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. One can control it with the following settings:
+
+Setting                         | Description
+--------------------------------| ------------
+Static                          | The StaticMesh that needs to be stacked dynamically
+Min Width Count                 | Minimum amount of statics to spawn in the Y direction
+Max Width Count                 | Maximum amount of statics to spawn in the Y direction
+Min Length Count                | Minimum amount of statics to spawn in the X direction
+Max Length Count                | Maximum amount of statics to spawn in the X direction
+Min Height Count                | Minimum amount of statics to spawn in the Z direction
+Max Height Count                | Maximum amount of statics to spawn in the Z direction
+Random Rotation                 | Boolean to toggle the application of a random rotation to the object ( for barrels and other cylinder objects)
+Random Position Offset          | Value in cm to apply a random offset in position in any direction
+Chance To Spawn                 | Percentage of chance to spawn each object in the stack                
+Chance to Change                | Percentage of chance to alter the stack configuration every so many seconds
+Average Time Between Changes    | Average time delta in seconds between changes
+Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
+
+- _RandomStackSpawnerSwitcher_: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. Difference with the one above is that this one can
+select from a Data Table object to select randomely a 'goods'/object type and it's stacking settings. One can control it with the following settings:
+
+Setting                         | Description
+--------------------------------| ------------
+Data Table                      | The Data Table object of the type _RandomStackSpawnerSwitcherStruct_ to set the object types and their settings similar to the ones above for the normal _RandomStackSpawner_
+Chance To Spawn                 | Percentage of chance to spawn each object in the stack                
+Chance to Change                | Percentage of chance to alter the stack configuration every so many seconds
+Chance To Switch                | Percentage of chance to switch to a different object type from Data Table      
+Average Time Between Changes    | Average time delta in seconds between changes
+Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
+
+
+- _RandomStaticModifier_: This can be used to spawn a singular static and alter it's spawn transform dynamically. One can control it with the following settings:
+
+Setting                         | Description
+--------------------------------| ------------
+Static                          | The StaticMesh that needs to be spawned
+Chance To Spawn                 | Percentage of chance to spawn the object   
+Max Rotation Offset             | Maximum rotation in degrees (both positive and negative) to alter the transform
+Max XPosition Offset            | Maximum position offset in cm (both positive and negative) to alter the transform in the X axis
+Max YPosition Offset            | Maximum position offset in cm (both positive and negative) to alter the transform in the Y axis         
+Chance to Change                | Percentage of chance to alter the stack configuration every so many seconds
+Average Time Between Changes    | Average time delta in seconds between changes
+Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
+
+- _RandomStaticPicker_: This can be used to spawn a singular randomly picked static out of list of chosen statics and alter it's spawn transform dynamically. One can control it with the following settings:
+
+Setting                         | Description
+--------------------------------| ------------
+Statics                         | The list of StaticMesh objects that can be picked from to spawn one
+Chance To Spawn                 | Percentage of chance to spawn the object   
+Max Rotation Offset             | Maximum rotation in degrees (both positive and negative) to alter the transform
+Max XPosition Offset            | Maximum position offset in cm (both positive and negative) to alter the transform in the X axis
+Max YPosition Offset            | Maximum position offset in cm (both positive and negative) to alter the transform in the Y axis         
+Chance to Change                | Percentage of chance to alter the stack configuration every so many seconds
+Average Time Between Changes    | Average time delta in seconds between changes
+Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
+
+- There are some other more simple dynamic objects such as doors and conveyor belts, their have self-explanatory settings very similar to those above. All are based on the seed randomisation.
+
+### Grouped AI
 A human looking AI is also available to walk dynamically between a set of self chosen waypoints. They are based on the DetourAIController of Unreal so will avoid each other and the user pretty well. 
 In order to have more control over them, some custom blueprints were created. Their main features are that the AI themselves, the waypoints and the spawners can be assigned a group ID number. So that all functionally is grouped. 
 They also use the Seed randomisation so that they can be spawned at the same waypoints and target the same waypoints each time if the same seed value is chosen. The following blueprints are available:
 - _GroupedTargetPoint_: These are the TargetPoints (waypoints) that the AI will walk between. Their only setting is the group ID number to decide which AI group will be able to pick this waypoint to spawn AI and be the target waypoint for them.
 - _GroupedAI_: One can manually spawn an AI by placing these in the world. They need to be assigned the Group ID manually to choose which waypoints to target.
 - _GroupedAISpawner_: To automate the spawner of AI, one can use this blueprint. It will spawn Ai at the waypoints of the same group. A setting is available to configure the fill percentage. This will set the percentage of waypoints to spawn AI upon. On also has to chose which Skeletal Meshes and their Animation Blueprints can be chosen from.                                                                      
-    
+      
+      
+      
+## Asset Installation
+To keep this repository free of large asset files, they are stored separately on the CoSys-Lab Data Archive network share. 
+You can find the assets for this environment in _/AirSimAssets/HySLAM/_. If you do not have access to this shared network drive, please contact CoSys-Lab members.
 
+There you can find the _Assets_ folder which you can copy to _/airsim/Unreal/Environments/HS_BM_X/Content_.
 
 ## Initial Setup
 Here are quick steps to get HySLAM environment up and running:

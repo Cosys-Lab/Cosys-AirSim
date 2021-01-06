@@ -16,7 +16,7 @@ Cars in AirSim
 
 ## CoSys-Lab Modifications
 * Updated [ROS implementation](docs/ros.md)
-* Added [HySLAM Benchmark Scenario environment](docs/hyslambenchmarkenv.md)
+* Added [HySLAM Benchmark Scenario environments](docs/hyslambenchmarkenv.md)
 * Added [HySLAM environment](docs/hyslamenv.md)
 * Added [CoSysLab environment](docs/cosysenv.md)
 * Added [Echo sensor type](docs/echo.md)
