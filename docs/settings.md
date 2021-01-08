@@ -59,6 +59,9 @@ Below are complete list of settings available along with their default values. I
         "TargetGamma": 1.0,
         "ProjectionMode": "",
         "OrthoWidth": 5.12,
+        "MotionBlurAmount": 1,
+        "MotionBlurMax": 10,
+        "ChromaticAberrationScale": 2
 		"IgnoreMarked": false
       }
     ],
@@ -82,7 +85,12 @@ Below are complete list of settings available along with their default values. I
         "HorzNoiseLinesDensityXY": 0.5,
         
         "HorzDistortionContrib": 1.0,
-        "HorzDistortionStrength": 0.002
+        "HorzDistortionStrength": 0.002,
+
+        "LensDistortionEnable": true,
+        "LensDistortionAreaFalloff": 2,
+        "LensDistortionAreaRadius": 1,
+        "LensDistortionInvert": false
       }
     ],
     "Gimbal": {
@@ -215,7 +223,7 @@ For example, `CaptureSettings` element is json array so you can add settings for
 
 ### CaptureSettings
 The `CaptureSettings` determines how different image types such as scene, depth, disparity, surface normals and segmentation views are rendered. The Width, Height and FOV settings should be self explanatory. The AutoExposureSpeed decides how fast eye adaptation works. We set to generally high value such as 100 to avoid artifacts in image capture. Similarly we set MotionBlurAmount to 0 by default to avoid artifacts in ground truth images. The `ProjectionMode` decides the projection used by the capture camera and can take value "perspective" (default) or "orthographic". If projection mode is "orthographic" then `OrthoWidth` determines width of projected area captured in meters.
-To disable the rendering of certain objects on specific cameras or all, use the "IgnoreMarked" boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_.
+To disable the rendering of certain objects on specific cameras or all, use the "IgnoreMarked" boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_. You can also tweak the motion blur and chromatic Aberration here. 
 
 For explanation of other settings, please see [this article](https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/AutomaticExposure/). 
 
@@ -250,6 +258,13 @@ This adds regions of noise on horizontal lines.
 This adds fluctuations on horizontal line.
 * `HorzDistortionContrib`: This determines blend ratio of noise pixel with image pixel, 0 means no noise and 1 means only noise.
 * `HorzDistortionStrength`: This determines how large is the distortion.
+
+#### Radial Lens Distortion
+This adds radial lens distortion to the camera sensor.
+* `LensDistortionEnable`: Enable or disable this feature
+* `LensDistortionAreaFalloff`: The size of the area to distort
+* `LensDistortionAreaRadius`: The distortion radius
+* `LensDistortionInvert`: Set to true to invert and create 'pincushion distortion' or false for 'barrel distortion'
 
 ### Gimbal
 The `Gimbal` element allows to freeze camera orientation for pitch, roll and/or yaw. This setting is ignored unless `ImageType` is -1. The `Stabilization` is defaulted to 0 meaning no gimbal i.e. camera orientation changes with body orientation on all axis. The value of 1 means full stabilization. The value between 0 to 1 acts as a weight for fixed angles specified (in degrees, in world-frame) in `Pitch`, `Roll` and `Yaw` elements and orientation of the vehicle body. When any of the angles is omitted from json or set to NaN, that angle is not stabilized (i.e. it moves along with vehicle body).

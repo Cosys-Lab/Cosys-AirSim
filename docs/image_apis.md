@@ -189,8 +189,12 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
           "Width": 256,
           "Height": 144,
           "FOV_Degrees": 90,
-          "AutoExposureSpeed": 100,
-          "MotionBlurAmount": 0
+          "AutoExposureBias": 1.3,
+          "AutoExposureMaxBrightness": 0.64,
+          "AutoExposureMinBrightness": 0.03,
+          "MotionBlurAmount": 1,
+          "MotionBlurMax": 10,
+          "ChromaticAberrationScale": 2
         }
     ]
   },
