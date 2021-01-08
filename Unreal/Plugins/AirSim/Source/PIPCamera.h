@@ -59,7 +59,11 @@ private: //members
     //TMap<int, UMaterialInstanceDynamic*> noise_materials_;
     //below is needed because TMap doesn't work with UPROPERTY, but we do have -ve index
     UPROPERTY() TArray<UMaterialInstanceDynamic*> noise_materials_;
+	UPROPERTY() TArray<UMaterialInstanceDynamic*> lens_distortion_materials_;
+
     UPROPERTY() UMaterial* noise_material_static_;
+	UPROPERTY() UMaterial* lens_distortion_material_static_;
+	UPROPERTY() UMaterial* lens_distortion_invert_material_static_;
 
     std::vector<bool> camera_type_enabled_;
     FRotator gimbald_rotator_;

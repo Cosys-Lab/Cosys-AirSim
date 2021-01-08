@@ -25,6 +25,25 @@ APIPCamera::APIPCamera()
         UAirBlueprintLib::LogMessageString("Cannot create noise material for the PIPCamera", 
             "", LogDebugLevel::Failure);
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder2(TEXT("Material'/AirSim/HUDAssets/CameraSensorLensDistortion.CameraSensorLensDistortion'"));
+	if (mat_finder2.Succeeded())
+	{
+		lens_distortion_material_static_ = mat_finder2.Object;
+	}
+	else
+		UAirBlueprintLib::LogMessageString("Cannot create lens distortion material for the PIPCamera",
+			"", LogDebugLevel::Failure);
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder3(TEXT("Material'/AirSim/HUDAssets/CameraSensorLensDistortionInvert.CameraSensorLensDistortionInvert'"));
+	if (mat_finder3.Succeeded())
+	{
+		lens_distortion_invert_material_static_ = mat_finder3.Object;
+	}
+	else
+		UAirBlueprintLib::LogMessageString("Cannot create inverted lens distortion material for the PIPCamera",
+			"", LogDebugLevel::Failure);
+
+
     PrimaryActorTick.bCanEverTick = true;
 
     image_type_to_pixel_format_map_.Add(0, EPixelFormat::PF_B8G8R8A8);
@@ -70,6 +89,7 @@ void APIPCamera::BeginPlay()
     Super::BeginPlay();
 
     noise_materials_.AddZeroed(imageTypeCount() + 1);
+	lens_distortion_materials_.AddZeroed(imageTypeCount() + 1);
 
     //by default all image types are disabled
     camera_type_enabled_.assign(imageTypeCount(), false);
@@ -208,8 +228,20 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
             camera_->PostProcessSettings.RemoveBlendable(noise_materials_[0]);
     }
 
+	if (lens_distortion_materials_.Num()) {
+		for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
+			if (lens_distortion_materials_[image_type + 1])
+				captures_[image_type]->PostProcessSettings.RemoveBlendable(lens_distortion_materials_[image_type + 1]);
+		}
+		if (lens_distortion_materials_[0])
+			camera_->PostProcessSettings.RemoveBlendable(lens_distortion_materials_[0]);
+	}
+
     noise_material_static_ = nullptr;
+	lens_distortion_material_static_ = nullptr;
+	lens_distortion_invert_material_static_ = nullptr;
     noise_materials_.Empty();
+	lens_distortion_materials_.Empty();
 
     for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
         //use final color for all calculations
@@ -363,6 +395,11 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
         obj.bOverride_MotionBlurAmount = 1;
         obj.MotionBlurAmount = setting.motion_blur_amount;
     }
+	if (!std::isnan(setting.motion_blur_max))
+	{
+		obj.bOverride_MotionBlurMax = 1;
+		obj.MotionBlurMax = setting.motion_blur_max;
+	}
     if (setting.auto_exposure_method >= 0)
     {
         obj.bOverride_AutoExposureMethod = 1;
@@ -408,6 +445,11 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
         obj.bOverride_HistogramLogMax = 1;
         obj.HistogramLogMax = setting.auto_exposure_histogram_log_max;
     }
+	if (!std::isnan(setting.chromatic_aberration_scale))
+	{
+		obj.bOverride_SceneFringeIntensity = 1;
+		obj.SceneFringeIntensity = setting.chromatic_aberration_scale;
+	}
 }
 
 void APIPCamera::setNoiseMaterial(int image_type, UObject* outer, FPostProcessSettings& obj, const NoiseSetting& settings)
@@ -434,6 +476,28 @@ void APIPCamera::setNoiseMaterial(int image_type, UObject* outer, FPostProcessSe
     noise_material_->SetScalarParameterValue("HorzDistortionContrib", settings.HorzDistortionContrib);
 
     obj.AddBlendable(noise_material_, 1.0f);
+
+	if (settings.LensDistortionEnable) {
+
+		UMaterialInstanceDynamic* lens_distortion_material_;
+		
+		if (settings.LensDistortionInvert) {
+			lens_distortion_material_ = UMaterialInstanceDynamic::Create(lens_distortion_invert_material_static_, outer);
+		}
+		else {
+			lens_distortion_material_ = UMaterialInstanceDynamic::Create(lens_distortion_material_static_, outer);
+		}
+
+		lens_distortion_materials_[image_type + 1] = lens_distortion_material_;
+
+
+		lens_distortion_material_->SetScalarParameterValue("AreaFalloff", settings.LensDistortionAreaFalloff);
+		lens_distortion_material_->SetScalarParameterValue("AreaRadius", settings.LensDistortionAreaRadius);
+		lens_distortion_material_->SetScalarParameterValue("Intensity", settings.LensDistortionIntensity);
+	
+
+		obj.AddBlendable(lens_distortion_material_, 1.0f);
+	}
 }
 
 void APIPCamera::enableCaptureComponent(const APIPCamera::ImageType type, bool is_enabled)

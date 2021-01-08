@@ -132,10 +132,11 @@ public: //types
         float auto_exposure_histogram_log_min = Utils::nan<float>(); // -8;
         float auto_exposure_histogram_log_max = Utils::nan<float>(); // 4;
         float motion_blur_amount = Utils::nan<float>();
+		float motion_blur_max = Utils::nan<float>(); // 5f;
         float target_gamma = Utils::nan<float>(); //1.0f; //This would be reset to kSceneTargetGamma for scene as default
         int projection_mode = 0; // ECameraProjectionMode::Perspective
         float ortho_width = Utils::nan<float>();
-
+		float chromatic_aberration_scale = Utils::nan<float>(); // 0f;
 		bool ignore_marked = false;
     };
 
@@ -160,6 +161,12 @@ public: //types
 
         float HorzDistortionContrib = 1.0f;
         float HorzDistortionStrength = 0.002f;
+
+		bool LensDistortionEnable = false;
+		float LensDistortionAreaFalloff = 1.0f;
+		float LensDistortionAreaRadius = 1.0f;
+		float LensDistortionIntensity = 0.5f;
+		bool LensDistortionInvert = false;
     };
 
     struct CameraSetting {
@@ -949,6 +956,11 @@ private:
         noise_setting.HorzNoiseLinesDensityXY = settings_json.getFloat("HorzNoiseLinesDensityXY", noise_setting.HorzNoiseLinesDensityXY);
         noise_setting.HorzDistortionStrength = settings_json.getFloat("HorzDistortionStrength", noise_setting.HorzDistortionStrength);
         noise_setting.HorzDistortionContrib = settings_json.getFloat("HorzDistortionContrib", noise_setting.HorzDistortionContrib);
+		noise_setting.LensDistortionEnable = settings_json.getBool("LensDistortionEnable", noise_setting.LensDistortionEnable);
+		noise_setting.LensDistortionAreaFalloff = settings_json.getFloat("LensDistortionAreaFalloff", noise_setting.LensDistortionAreaFalloff);
+		noise_setting.LensDistortionAreaRadius = settings_json.getFloat("LensDistortionAreaRadius", noise_setting.LensDistortionAreaRadius);
+		noise_setting.LensDistortionIntensity = settings_json.getFloat("LensDistortionIntensity", noise_setting.LensDistortionIntensity);
+		noise_setting.LensDistortionInvert = settings_json.getBool("LensDistortionInvert", noise_setting.LensDistortionInvert);
     }
 
     static GimbalSetting createGimbalSetting(const Settings& settings_json)
@@ -1003,8 +1015,9 @@ private:
         capture_setting.auto_exposure_max_brightness = settings_json.getFloat("AutoExposureMaxBrightness", capture_setting.auto_exposure_max_brightness);
         capture_setting.auto_exposure_min_brightness = settings_json.getFloat("AutoExposureMinBrightness", capture_setting.auto_exposure_min_brightness);
         capture_setting.motion_blur_amount = settings_json.getFloat("MotionBlurAmount", capture_setting.motion_blur_amount);
+		capture_setting.motion_blur_max = settings_json.getFloat("MotionBlurMax", capture_setting.motion_blur_max);
         capture_setting.image_type = settings_json.getInt("ImageType", 0);
-
+		capture_setting.chromatic_aberration_scale = settings_json.getFloat("ChromaticAberrationScale", capture_setting.chromatic_aberration_scale);
 		capture_setting.ignore_marked = settings_json.getBool("IgnoreMarked", capture_setting.ignore_marked);
 
 

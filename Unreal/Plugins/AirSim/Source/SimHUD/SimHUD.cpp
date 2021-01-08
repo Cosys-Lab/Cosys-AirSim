@@ -214,7 +214,7 @@ void ASimHUD::setUnrealEngineSettings()
 {
     //TODO: should we only do below on SceneCapture2D components and cameras?
     //avoid motion blur so capture images don't get
-    GetWorld()->GetGameViewport()->GetEngineShowFlags()->SetMotionBlur(false);
+    //GetWorld()->GetGameViewport()->GetEngineShowFlags()->SetMotionBlur(false);
 
     //use two different methods to set console var because sometime it doesn't seem to work
     static const auto custom_depth_var = IConsoleManager::Get().FindConsoleVariable(TEXT("r.CustomDepth"));
