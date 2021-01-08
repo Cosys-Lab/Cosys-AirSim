@@ -19,6 +19,7 @@ import cv2
 from cv_bridge import CvBridge
 from multiprocessing import Queue
 
+
 def handle_airsim_pose(msg, args):
     br = tf2_ros.TransformBroadcaster()
     t = TransformStamped()
@@ -35,13 +36,16 @@ def handle_airsim_pose(msg, args):
     t.transform.rotation.w = msg.pose.orientation.w
     br.sendTransform(t)
 
+
 def handle_input_command(msg, args):
-        # set the controls for car
-        q = args
-        try:
-            q.put(msg)
-        except:
-            print("Input queue full") 
+    # set the controls for car
+    q = args
+    try:
+        q.put(msg)
+    except:
+        print("Input queue full")
+
+
 def get_camera_type(cameraType):
     if (cameraType == "Scene"):
         cameraTypeClass = airsimpy.ImageType.Scene
@@ -114,7 +118,7 @@ def get_image_bytes(data, cameraType):
     else:
         img_rgb_string = data.image_data_uint8
     return img_rgb_string
-    
+
 
 def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple,
                 lidarName, echoName, imuName, vehicleName, transformPose, carcontrolInputTopic, publishAlternative):
@@ -170,6 +174,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     cameraHeight = cameraSettingsTuple[9]
     cameraWidth = cameraSettingsTuple[10]
     cameraSegmentationDisabled = cameraSettingsTuple[11]
+    encodingQuality = cameraSettingsTuple[12]
 
     client = airsimpy.CarClient()
     client.confirmConnection(rospy.get_name())
@@ -284,20 +289,23 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             else:
                 img_rgb_string1 = get_image_bytes(responses[responseLocations[0]], "Scene")
 
-            if(len(img_rgb_string1) > 1):
-                msg = Image()
-                msg.height = cameraHeight
-                msg.width = cameraWidth
-                msg.is_bigendian = 0
-                msg.encoding = "rgb8"
-                msg.step = cameraWidth * 3
-                msg.data = img_rgb_string1
+            img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
+                                                                                            cameraWidth, 3)
+            if encodingQuality > 0:
+                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
+                result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
+                img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
+                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
+
+            if (len(img_rgb_string1) > 1):
+                msg = bridge.cv2_to_imgmsg(img_rgb_string1_matrix, encoding="rgb8")
                 msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera1Frame
                 sceneCamera1Pub.publish(msg)
                 if camera1Mono:
-                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
+                                               encoding="mono8")
                     msg.header.stamp = cameraTimeStamp
                     msg.header.frame_id = camera1Frame
                     sceneCamera1MonoPub.publish(msg)
@@ -320,20 +328,23 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             else:
                 img_rgb_string1 = get_image_bytes(responses[responseLocations[3]], "Scene")
 
-            if(len(img_rgb_string1) > 1):
-                msg = Image()
-                msg.height = cameraHeight
-                msg.width = cameraWidth
-                msg.is_bigendian = 0
-                msg.encoding = "rgb8"
-                msg.step = cameraWidth * 3
-                msg.data = img_rgb_string1
+            img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
+                                                                                            cameraWidth, 3)
+            if encodingQuality > 0:
+                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
+                result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
+                img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
+                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
+
+            if (len(img_rgb_string1) > 1):
+                msg = bridge.cv2_to_imgmsg(img_rgb_string1_matrix, encoding="rgb8")
                 msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera2Frame
                 sceneCamera2Pub.publish(msg)
                 if camera2Mono:
-                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
+                                               encoding="mono8")
                     msg.header.stamp = cameraTimeStamp
                     msg.header.frame_id = camera2Frame
                     sceneCamera2MonoPub.publish(msg)
@@ -356,20 +367,23 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             else:
                 img_rgb_string1 = get_image_bytes(responses[responseLocations[6]], "Scene")
 
-            if(len(img_rgb_string1) > 1):
-                msg = Image()
-                msg.height = cameraHeight
-                msg.width = cameraWidth
-                msg.is_bigendian = 0
-                msg.encoding = "rgb8"
-                msg.step = cameraWidth * 3
-                msg.data = img_rgb_string1
+            img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
+                                                                                            cameraWidth, 3)
+            if encodingQuality > 0:
+                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
+                result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
+                img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
+                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
+
+            if (len(img_rgb_string1) > 1):
+                msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
                 msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera3Frame
-                sceneCamera3Pub.publish(msg)
+                sceneCamera3MonoPub.publish(msg)
                 if camera3Mono:
-                    img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight, cameraWidth, 3)
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
+                                               encoding="mono8")
                     msg.header.stamp = cameraTimeStamp
                     msg.header.frame_id = camera3Frame
                     sceneCamera3MonoPub.publish(msg)
@@ -509,13 +523,11 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
             # publish PoseStamped message in different coordinate scheme
             if publishAlternative:
-
                 simPose.pose.position.x = -pos.z_val
                 simPose.pose.position.y = pos.y_val
                 simPose.pose.position.z = pos.x_val
-
                 poseAltPub.publish(simPose)
-        
+
         if carcontrolActive:
             # set the controls for car
             try:
@@ -566,7 +578,7 @@ if __name__ == '__main__':
         segmentationCamera3TopicName = rospy.get_param('~topic_segmentation_camera3', 'airsim/segmentation3/image')
         depthCamera3TopicName = rospy.get_param('~topic_depth_camera3', 'airsim/depth3/image')
         lidarTopicName = rospy.get_param('~topic_lidar', 'airsim/lidar')
-        lidarGroundtruthTopicName =  rospy.get_param('~topic_lidar_groundtruth', 'airsim/lidargroundtruth')
+        lidarGroundtruthTopicName = rospy.get_param('~topic_lidar_groundtruth', 'airsim/lidargroundtruth')
         echoTopicName = rospy.get_param('~topic_echo', 'airsim/echo')
         imuTopicName = rospy.get_param('~topic_imu', 'airsim/imu')
         imuAltTopicName = rospy.get_param('~topic_imu_alt', 'imualt')
@@ -602,7 +614,10 @@ if __name__ == '__main__':
         cameraHeight = rospy.get_param('~camera_height', 540)
         cameraWidth = rospy.get_param('~camera_width', 960)
         cameraSegementationDisabled = rospy.get_param('~camera_segmentation_disabled', 0)
-        cameraSettingsTuple = (camera1Name, camera2Name, camera3Name, camera1SceneOnly, camera2SceneOnly, camera3SceneOnly, camera1Mono, camera2Mono, camera3Mono, cameraHeight, cameraWidth, cameraSegementationDisabled)
+        encodingQuality = rospy.get_param('~camera_encoding_quality', 0)
+        cameraSettingsTuple = (camera1Name, camera2Name, camera3Name, camera1SceneOnly, camera2SceneOnly, camera3SceneOnly,
+                               camera1Mono, camera2Mono, camera3Mono, cameraHeight, cameraWidth,
+                               cameraSegementationDisabled, encodingQuality)
 
         # Lidar settings
         lidarName =  rospy.get_param('~lidar_name', 'lidar')

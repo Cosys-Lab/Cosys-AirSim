@@ -31,6 +31,7 @@
 			<param name="camera1_sceneonly" type="int" value="1" />
             <param name="camera1_mono" type="int" value="1" />
 			<param name="camera1_name" type="string" value="front_center" />
+            <param name="camera_encoding_quality" type="int" value="0" />
 
             <param name="vehicle_name" type="string" value="airsimvehicle" />
             <param name="imu_name" type="string" value="imu" />

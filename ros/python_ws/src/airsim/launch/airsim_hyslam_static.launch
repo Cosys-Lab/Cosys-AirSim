@@ -35,6 +35,7 @@
             <param name="camera_height" type="int" value="540" />
             <param name="camera_width" type="int" value="960" />
             <param name="camera_segmentation_disabled" type="int" value="1" />
+            <param name="camera_encoding_quality" type="int" value="0" />
 
             <param name="route_rosbag" type="string" value="$(optenv HOME)/projects/hyslam/bags/airsim_hyslam_route_rack_simple_front.bag" />
             <param name="dst_rosbag" type="string" value="$(optenv HOME)/projects/hyslam/bags/airsim_hyslam_benchmark_rack_simple_front_0r.bag" />

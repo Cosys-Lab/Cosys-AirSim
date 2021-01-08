@@ -32,6 +32,7 @@
             <param name="camera1_mono" type="int" value="0" />
             <param name="camera_height" type="int" value="540" />
             <param name="camera_width" type="int" value="960" />
+            <param name="camera_encoding_quality" type="int" value="0" />
       </node>
       <node pkg="rosbag" type="record" name="rosbag_record" args="record -o /home/airsim/bags/airsim_camera -a"/>
 </launch>

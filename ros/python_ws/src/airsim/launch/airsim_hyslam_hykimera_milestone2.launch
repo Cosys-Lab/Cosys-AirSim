@@ -46,5 +46,6 @@
             <param name="publish_alternative" type="int" value="1" />
             <param name="topic_imu_alt" type="string" value="imu0Kimera" />
             <param name="topic_pose_alt" type="string" value="airsim/gtposekimera" />
+            <param name="camera_encoding_quality" type="int" value="0" />
       </node>
 </launch>

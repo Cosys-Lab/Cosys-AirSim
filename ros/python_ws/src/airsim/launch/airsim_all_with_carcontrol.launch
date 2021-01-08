@@ -42,6 +42,7 @@
             <param name="camera1_mono" type="int" value="0" />            
             <param name="camera_height" type="int" value="540" />
             <param name="camera_width" type="int" value="960" />
+            <param name="camera_encoding_quality" type="int" value="0" />
 
             <param name="carcontrol_input_topic" type="string" value="cmd_vel" />
       </node>
