@@ -380,7 +380,7 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                 msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
                 msg.header.stamp = cameraTimeStamp
                 msg.header.frame_id = camera3Frame
-                sceneCamera3MonoPub.publish(msg)
+                sceneCamera3Pub.publish(msg)
                 if camera3Mono:
                     msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
                                                encoding="mono8")
