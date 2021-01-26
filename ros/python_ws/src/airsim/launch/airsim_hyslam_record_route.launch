@@ -35,7 +35,7 @@
             <param name="imu_name" type="string" value="imu" />
             <param name="camera1_name" type="string" value="leftcamera" />
             <param name="camera2_name" type="string" value="rightcamera" />
-            <param name="lidar_name" type="string" value="gpulidar" />
+            <param name="lidar_name" type="string" value="lidar" />
 
             <param name="camera1_sceneonly" type="int" value="0" />
             <param name="camera2_sceneonly" type="int" value="0" />
@@ -52,5 +52,5 @@
             <param name="topic_imu_alt" type="string" value="imu0kimera" />
             <param name="topic_pose_alt" type="string" value="airsim/gtposekimera" />
       </node>
-      <node pkg="rosbag" type="record" name="rosbag_record" args="record -O $(optenv HOME)/projects/hyslam/bags/airsim_hyslam_route -a"/>
+      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o $(optenv HOME)/projects/hyslam/bags/airsim_route -a"/>
 </launch>

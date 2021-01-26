@@ -8,7 +8,7 @@
             <param name="camera2_active" type="int" value="1" />
             <param name="camera3_active" type="int" value="0" />
             <param name="lidar_active" type="int" value="0" />
-            <param name="gpulidar_active" type="int" value="0" />
+            <param name="gpulidar_active" type="int" value="1" />
             <param name="carcontrol_active" type="int" value="0" />
 
             <param name="lidar_frame_id" type="string" value="base_laser" />
@@ -26,7 +26,7 @@
             <param name="vehicle_name" type="string" value="airsimvehicle" />
             <param name="camera1_name" type="string" value="leftcamera" />
             <param name="camera2_name" type="string" value="rightcamera" />
-            <param name="lidar_name" type="string" value="gpulidar" />
+            <param name="lidar_name" type="string" value="lidar" />
 
             <param name="camera1_sceneonly" type="int" value="0" />
             <param name="camera2_sceneonly" type="int" value="0" />

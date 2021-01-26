@@ -5,7 +5,7 @@
       <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
 
             <param name="rate" type="int" value="30"/>
-            <param name="imu_rate" type="int" value="60" />
+            <param name="imu_rate" type="int" value="90" />
 
             <param name="camera1_active" type="int" value="1" />
             <param name="camera2_active" type="int" value="1" />
@@ -52,4 +52,5 @@
             <param name="topic_imu_alt" type="string" value="imu0kimera" />
             <param name="topic_pose_alt" type="string" value="airsim/gtposekimera" />
       </node>
+      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o $(optenv HOME)/projects/hyslam/bags/airsim -a"/>
 </launch>
