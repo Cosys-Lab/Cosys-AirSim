@@ -145,6 +145,9 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     print("Using frame period of {} to generate data.".format(periodFrames))
     currentFrame = 0
     for _, msg, t in route.read_messages(topics=poseTopicName):
+        if rospy.is_shutdown():
+            break
+
         if currentFrame == periodFrames:
             currentFrame = 0
         else:
