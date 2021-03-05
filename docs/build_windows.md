@@ -22,7 +22,7 @@ This branch uses a custom version of the Unreal Engine!
 
 ## Build AirSim
 * Start `x64 Native Tools Command Prompt for VS 2017`. 
-* Clone the repo: `git clone -b instance_segmentation https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git`, and go the AirSim directory by `cd AirSim`. 
+* Clone the repo: `git clone https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git`, and go the AirSim directory by `cd AirSim`. 
 * Run `build.cmd` from the command line. This will create ready to use plugin bits in the `Unreal\Plugins` folder that can be dropped into any Unreal project.
 
 ## Build Unreal Project
