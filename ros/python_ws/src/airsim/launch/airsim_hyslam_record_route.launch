@@ -1,7 +1,7 @@
 <launch>
-      <node pkg="tf" type="static_transform_publisher" name="base_to_camera1_broadcaster" args="0 0.05 0.55 0 0 0 base_link left_cam 100" />
-      <node pkg="tf" type="static_transform_publisher" name="base_to_camera2_broadcaster" args="0 -0.05 0.55 0 0 0 base_link right_cam 100" />
-      <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0.55 0 0 0 base_link base_laser 100" />
+      <node pkg="tf" type="static_transform_publisher" name="base_to_camera1_broadcaster" args="0 0.05 0.55 0 0 0 os_imu cam0 100" />
+      <node pkg="tf" type="static_transform_publisher" name="base_to_camera2_broadcaster" args="0 -0.05 0.55 0 0 0 os_imu cam1 100" />
+      <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0.55 0 0 0 os_imu os_lidar 100" />
       <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
 
             <param name="rate" type="int" value="30"/>
@@ -16,10 +16,10 @@
             <param name="pose_active" type="int" value="1" />
             <param name="carcontrol_active" type="int" value="0" />
 
-            <param name="lidar_frame_id" type="string" value="base_laser" />
-            <param name="camera1_frame_id" type="string" value="left_cam" />
-            <param name="camera2_frame_id" type="string" value="right_cam" />
-            <param name="imu_frame_id" type="string" value="base_link" />
+            <param name="lidar_frame_id" type="string" value="os_lidar" />
+            <param name="camera1_frame_id" type="string" value="cam0" />
+            <param name="camera2_frame_id" type="string" value="cam1" />
+            <param name="imu_frame_id" type="string" value="os_imu" />
             <param name="pose_frame_id" type="string" value="world" />
 
             <param name="topic_scene_camera1" type="string" value="airsim/camera/left/rgb/image" />
