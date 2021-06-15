@@ -240,7 +240,7 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 
 	PxVehicleDriveTankRawInputData VehicleInputData(PxVehicleDriveTankControlModel::eSPECIAL);
 
-	float accel = FMath::Min((float)sqrt(nJoyX*nJoyX + nJoyY * nJoyY) , 1.0f);
+	float accel = FMath::Min((float)sqrt(nJoyX*nJoyX + nJoyY*nJoyY) , 1.0f);
 
 	// Differential Steering Joystick Algorithm
 	// ========================================
@@ -266,7 +266,7 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 	//                away from the X-axis (Y=0). A greater value will assign
 	//                more of the joystick's range to pivot actions.
 	//                Allowable range: (0..+1)
-	float fPivYLimit = 0.2;
+	float fPivYLimit = 1.00;
 
 	// TEMP VARIABLES
 	float   nMotPremixL;    // Motor (left)  premixed output        (-1..+1)
@@ -295,7 +295,7 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 	// - Strength of pivot (nPivSpeed) based on Joystick X input
 	// - Blending of pivot vs drive (fPivScale) based on Joystick Y input
 	nPivSpeed = nJoyX;
-	fPivScale = (abs(nJoyY) > fPivYLimit) ? 0.0 : (1.0 - abs(nJoyY) / fPivYLimit);
+	fPivScale = (abs(nJoyY) >= fPivYLimit) ? 0.0 : (1.0 - abs(nJoyY) / fPivYLimit);
 
 	// Calculate final mix of Drive and Pivot
 	nMotMixL = (1.0 - fPivScale)*nMotPremixL + fPivScale * (nPivSpeed);

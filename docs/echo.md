@@ -19,20 +19,18 @@ The following parameters can be configured right now via settings json.
 
 Parameter                 | Description
 --------------------------| ------------
-NumberOfTraces            | Amount of initial traces (rays) being cast
-MeasurementFrequency      | The frequency of the sensor (measurements/s)
-SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
-SensorOpeningAngle        | The angle for receiving signals on the sensor
+NumberOfTraces            | Amount of traces (rays) being cast
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)
 AttenuationLimit          | Attenuation at which the signal is considered dissipated (dB)
 DistanceLimit             | Maximum distance a reflection can travel
 ReflectionLimit           | Maximum amount of reflections that can happen
 ReflectionDistanceLimit   | Maximum distance between two reflections 
-ReflectionOpeningAngle    | Opening angle of reflections
-PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
+MeasurementFrequency      | The frequency of the sensor (measurements/s)
+SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
 X Y Z                     | Position of the echo relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the echo relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
+DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
 DrawReflectedPoints       | Draw debug points in world where reflected points are captured by the sensor
 DrawReflectedLines        | Draw debug lines in world from reflected points to the sensor
 DrawReflectedPaths        | Draw the full paths of the reflected points
@@ -41,7 +39,6 @@ DrawExternalPoints        | Draw a pointcloud coming through the API from an ext
 DrawBounceLines           | Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 DrawSensor                | Draw the physical sensor in the world on the vehicle
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
-
 e.g.,
 ```
 {
@@ -53,37 +50,35 @@ e.g.,
 			"VehicleType": "CPHusky",
 			"AutoCreate": true,
 			"Sensors": {
-				  "radar": {
+				"SonarSensor1": {
                       "SensorType": 7,
                       "Enabled": true,
-                      "X": 0.4,
-                      "Y": 0.0,
-                      "Z": -0.2,
+                      "X": 0,
+                      "Y": 0,
+                      "Z": -0.55,
                       "Roll": 0,
                       "Pitch": 0,
                       "Yaw": 0,
                       "DataFrame": "SensorLocalFrame",
-                      "MeasurementFrequency": 10,
-                      "NumberOfTraces": 5000,
-                      "DistanceLimit": 10,
+                      "MeasurementFrequency": 5,
+                      "NumberOfTraces": 30000,
+                      "DistanceLimit": 5,
                       "SensorDiameter": 0.1,
-                      "SensorOpeningAngle": 90,
-                      "AttenuationPerDistance": 0,
-                      "AttenuationPerReflection": 0,
+                      "SensorOpeningAngle": 180,
+                      "Wavelength": 0.01,
                       "AttenuationLimit": -100,
-                      "ReflectionLimit": 3,
-                      "ReflectionDistanceLimit": 0.3,
+                      "ReflectionDepth": 3,
+                      "ReflectionDistanceLimit": 1,
                       "ReflectionOpeningAngle": 10,
                       "DrawInitialPoints": false,
                       "DrawBounceLines": false,
                       "DrawReflectedPoints": true,
                       "DrawReflectedLines": false,
-                      "DrawReflectedPaths": true,
+                      "DrawReflectedPaths": false,
                       "DrawExternalPoints": false,
-                      "DrawSensor": true,
-                      "EngineTime": false,
-                      "PauseAfterMeasurement": false
-                    }
+                      "DrawNearFieldReflections": false,
+                      "DrawSensor": false,
+				}	
 			}
 		}
 	}

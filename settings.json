@@ -1,0 +1,114 @@
+{
+  "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+  "SettingsVersion": 1.2,
+  "ClockSpeed": 1,
+  "SimMode": "SkidVehicle",
+  "SubWindows": [
+    {
+      "WindowID": 0,
+      "CameraName": "0",
+      "ImageType": 5,
+      "Visible": false
+    },
+    {
+      "WindowID": 1,
+      "CameraName": "0",
+      "ImageType": 0,
+      "Visible": false
+    },
+    {
+      "WindowID": 2,
+      "CameraName": "0",
+      "ImageType": 3,
+      "Visible": false
+    }
+  ],
+  "CameraDefaults": {
+    "CaptureSettings": [
+      {
+        "ImageType": 0,
+        "Width": 960,
+        "Height": 540,
+        "FOV_Degrees": 90,
+        "AutoExposureSpeed": 100,
+        "AutoExposureBias": 0,
+        "AutoExposureMaxBrightness": 0.64,
+        "AutoExposureMinBrightness": 0.03,
+        "MotionBlurAmount": 0,
+        "TargetGamma": 1.0,
+        "ProjectionMode": "",
+        "OrthoWidth": 5.12
+      }
+    ]
+  },
+  "Vehicles": {
+    "airsimvehicle": {
+      "VehicleType": "CPHusky",
+      "AutoCreate": true,
+      "Sensors": {
+        "imu": {
+          "SensorType": 2,
+          "Enabled": false
+        },
+        "echo": {
+          "SensorType": 7,
+          "Enabled": true,
+          "X": 0.4,
+          "Y": 0.0,
+          "Z": -0.2,
+          "Roll": 0,
+          "Pitch": 0,
+          "Yaw": 0,
+          "DataFrame": "SensorLocalFrame",
+          "MeasurementFrequency": 10,
+          "NumberOfTraces": 10000,
+          "DistanceLimit": 12,
+          "SensorDiameter": 0.1,
+          "SensorOpeningAngle": 180,
+          "AttenuationPerDistance": 0,
+          "AttenuationPerReflection": 0,
+          "AttenuationLimit": -100,
+          "ReflectionLimit": 3,
+          "ReflectionDistanceLimit": 0.3,
+          "ReflectionOpeningAngle": 10,
+          "DrawInitialPoints": false,
+          "DrawBounceLines": false,
+          "DrawReflectedPoints": true,
+          "DrawReflectedLines": false,
+          "DrawReflectedPaths": false,
+          "DrawExternalPoints": true,
+          "DrawSensor": true,
+          "EngineTime": false,
+          "PauseAfterMeasurement": false
+        },
+        "lidar": {
+          "SensorType": 6,
+          "Enabled": false,
+          "NumberOfChannels": 16,
+          "Range": 100,
+          "GenerateNoise": true,
+          "MinNoiseStandardDeviation": 0.01,
+          "NoiseDistanceScale": 3,
+          "RotationsPerSecond": 10,
+          "PointsPerSecond": 30000,
+          "UpdateFrequency": 10,
+          "LimitPoints": false,
+          "PauseAfterMeasurement": false,
+          "EngineTime": false,
+          "X": 0.45,
+          "Y": 0,
+          "Z": -0.5,
+          "Roll": 0,
+          "Pitch": 0,
+          "Yaw": 0,
+          "VerticalFOVUpper": 17,
+          "VerticalFOVLower": -17,
+          "HorizontalFOVStart": 0,
+          "HorizontalFOVEnd": 360,
+          "DrawDebugPoints": false,
+          "DataFrame": "SensorLocalFrame"
+        }
+      }
+    }
+  }
+}
