@@ -20,6 +20,8 @@ The following parameters can be configured right now via settings json.
 Parameter                 | Description
 --------------------------| ------------
 NumberOfTraces            | Amount of traces (rays) being cast
+SensorOpeningAngle        | The angle for receiving signals on the sensor
+ReflectionOpeningAngle    | Opening angle of reflections
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)
 AttenuationLimit          | Attenuation at which the signal is considered dissipated (dB)
@@ -28,6 +30,7 @@ ReflectionLimit           | Maximum amount of reflections that can happen
 ReflectionDistanceLimit   | Maximum distance between two reflections 
 MeasurementFrequency      | The frequency of the sensor (measurements/s)
 SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
+PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
 X Y Z                     | Position of the echo relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the echo relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
@@ -76,7 +79,6 @@ e.g.,
                       "DrawReflectedLines": false,
                       "DrawReflectedPaths": false,
                       "DrawExternalPoints": false,
-                      "DrawNearFieldReflections": false,
                       "DrawSensor": false,
 				}	
 			}
