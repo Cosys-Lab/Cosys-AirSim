@@ -1,10 +1,10 @@
 <launch>
       <node pkg="tf" type="static_transform_publisher" name="base_to_camera1_broadcaster" args="0 0.05 0.55 0 0 0 os_imu cam0 100" />
       <node pkg="tf" type="static_transform_publisher" name="base_to_camera2_broadcaster" args="0 -0.05 0.55 0 0 0 os_imu cam1 100" />
-      <node name="airsimnode_static" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
+      <node name="airsimnode" pkg="airsim" type="airsimnode.py" respawn="false" output="screen">
 
-            <param name="rate" type="int" value="30"/>
-            <param name="imu_rate" type="int" value="90" />
+            <param name="rate" type="int" value="5"/>
+            <param name="imu_rate" type="int" value="5" />
             
             <param name="camera1_active" type="int" value="1" />
             <param name="camera2_active" type="int" value="1" />
@@ -23,8 +23,10 @@
 
             <param name="topic_scene_camera1" type="string" value="cam0/image_raw" />
             <param name="topic_scene_camera2" type="string" value="cam1/image_raw" />
+			<param name="topic_scene_camera1_mono" type="string" value="cam0/mono/image_raw" />
+            <param name="topic_scene_camera2_mono" type="string" value="cam1/mono/image_raw" />
             <param name="topic_imu" type="string" value="imu0" />
-            <param name="topic_pose" type="string" value="airsim/gtpose" />
+            <param name="topic_pose" type="string" value="/airsim/gtpose" />
 
             <param name="vehicle_name" type="string" value="airsimvehicle" />
             <param name="camera1_name" type="string" value="leftcamera" />
@@ -34,8 +36,8 @@
 
             <param name="camera1_sceneonly" type="int" value="1" />
             <param name="camera2_sceneonly" type="int" value="1" />
-            <param name="camera1_mono" type="int" value="0" />
-            <param name="camera2_mono" type="int" value="0" />
+            <param name="camera1_mono" type="int" value="1" />
+            <param name="camera2_mono" type="int" value="1" />
             <param name="camera_height" type="int" value="540" />
             <param name="camera_width" type="int" value="960" />
             <param name="camera_segmentation_disabled" type="int" value="1" />

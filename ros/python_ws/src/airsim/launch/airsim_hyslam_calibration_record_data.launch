@@ -1,0 +1,51 @@
+<launch>
+      <node name="airsimnode_static" pkg="airsim" type="airsimnode_static.py" respawn="false" output="screen">
+
+            <param name="rate" type="int" value="20"/>
+            <param name="imu_rate" type="int" value="100" />
+            
+            <param name="camera1_active" type="int" value="1" />
+            <param name="camera2_active" type="int" value="1" />
+            <param name="camera3_active" type="int" value="0" />
+            <param name="lidar_active" type="int" value="0" />
+            <param name="gpulidar_active" type="int" value="0" />
+            <param name="carcontrol_active" type="int" value="0" />
+            <param name="imu_active" type="int" value="0" />
+            <param name="pose_active" type="int" value="0" />
+			
+            <param name="lidar_frame_id" type="string" value="os_lidar" />
+            <param name="camera1_frame_id" type="string" value="cam0" />
+            <param name="camera2_frame_id" type="string" value="cam1" />
+			<param name="imu_frame_id" type="string" value="os_imu" />
+			<param name="pose_frame_id" type="string" value="world" />
+
+            <param name="topic_scene_camera1" type="string" value="cam0/image_raw" />
+            <param name="topic_scene_camera2" type="string" value="cam1/image_raw" />
+			<param name="topic_scene_camera1_mono" type="string" value="cam0/mono/image_raw" />
+            <param name="topic_scene_camera2_mono" type="string" value="cam1/mono/image_raw" />
+            <param name="topic_imu" type="string" value="imu0" />
+            <param name="topic_pose" type="string" value="/airsim/gtpose" />
+
+            <param name="vehicle_name" type="string" value="airsimvehicle" />
+            <param name="camera1_name" type="string" value="leftcamera" />
+            <param name="camera2_name" type="string" value="rightcamera" />
+            <param name="lidar_name" type="string" value="lidar" />
+			<param name="imu_name" type="string" value="imu" />
+
+            <param name="camera1_sceneonly" type="int" value="1" />
+            <param name="camera2_sceneonly" type="int" value="1" />
+            <param name="camera1_mono" type="int" value="1" />
+            <param name="camera2_mono" type="int" value="1" />
+            <param name="camera_height" type="int" value="540" />
+            <param name="camera_width" type="int" value="960" />
+            <param name="camera_segmentation_disabled" type="int" value="1" />
+            <param name="camera_encoding_quality" type="int" value="0" />
+			
+            <param name="publish_alternative" type="int" value="1" />
+            <param name="topic_imu_alt" type="string" value="imu0Kimera" />
+            <param name="topic_pose_alt" type="string" value="airsim/gtposekimera" />
+			
+			<param name="route_rosbag" type="string" value="/mnt/c/Users/Wouter/airsim_calibration_route_2021-06-17-22-36-09.bag" />
+            <param name="dst_rosbag" type="string" value="/mnt/c/Users/Wouter/airsim_calib_data_2021-06-17-22-36-09.bag" />
+      </node>
+</launch>
