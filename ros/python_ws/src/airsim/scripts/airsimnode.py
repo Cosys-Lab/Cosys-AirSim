@@ -181,6 +181,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
 
     rate = rospy.Rate(rosIMURate)
 
+    periodFrames = round(float(rosIMURate) / float(rosRate))
+
     if camera1Active:
         sceneCamera1Pub = rospy.Publisher(sceneCamera1TopicName, Image, queue_size=1)
         if camera1Mono:
@@ -270,198 +272,204 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             responseLocations[8] = tmp_i; tmp_i += 1
             requests.append(airsimpy.ImageRequest(camera3Name, get_camera_type("DepthPlanner"), is_pixels_as_float("DepthPlanner"), False))
 
-    rateCounter = 0
-
+    currentFrame = 1
     while not rospy.is_shutdown():
 
         timeStamp = rospy.Time.now()
 
-        cameraTimeStamp = timeStamp
+        if currentFrame == periodFrames:
+            currentFrame = 1
 
-        responses = client.simGetImages(requests)
+            cameraTimeStamp = timeStamp
 
-        if camera1Active:
-            if not camera1SceneOnly:
-                img_rgb_string1 = get_image_bytes(responses[responseLocations[0]], "Scene")
-                if not cameraSegmentationDisabled:
-                    img_rgb_string2 = get_image_bytes(responses[responseLocations[1]], "Segmentation")
-                img_rgb_string3 = get_image_bytes(responses[responseLocations[2]], "DepthPlanner")
-            else:
-                img_rgb_string1 = get_image_bytes(responses[responseLocations[0]], "Scene")
+            responses = client.simGetImages(requests)
 
-            img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
-                                                                                            cameraWidth, 3)
-            if encodingQuality > 0:
-                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
-                result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
-                img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
-                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
+            if camera1Active:
+                if not camera1SceneOnly:
+                    img_rgb_string1 = get_image_bytes(responses[responseLocations[0]], "Scene")
+                    if not cameraSegmentationDisabled:
+                        img_rgb_string2 = get_image_bytes(responses[responseLocations[1]], "Segmentation")
+                    img_rgb_string3 = get_image_bytes(responses[responseLocations[2]], "DepthPlanner")
+                else:
+                    img_rgb_string1 = get_image_bytes(responses[responseLocations[0]], "Scene")
 
-            if (len(img_rgb_string1) > 1):
-                msg = bridge.cv2_to_imgmsg(img_rgb_string1_matrix, encoding="rgb8")
-                msg.header.stamp = cameraTimeStamp
-                msg.header.frame_id = camera1Frame
-                sceneCamera1Pub.publish(msg)
-                if camera1Mono:
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
-                                               encoding="mono8")
+                img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
+                                                                                                cameraWidth, 3)
+                if encodingQuality > 0:
+                    img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
+                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
+                    result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
+                    img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
+                    img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
+
+                if (len(img_rgb_string1) > 1):
+                    msg = bridge.cv2_to_imgmsg(img_rgb_string1_matrix, encoding="rgb8")
                     msg.header.stamp = cameraTimeStamp
                     msg.header.frame_id = camera1Frame
-                    sceneCamera1MonoPub.publish(msg)
-                if not camera1SceneOnly:
+                    sceneCamera1Pub.publish(msg)
+                    if camera1Mono:
+                        msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
+                                                   encoding="mono8")
+                        msg.header.stamp = cameraTimeStamp
+                        msg.header.frame_id = camera1Frame
+                        sceneCamera1MonoPub.publish(msg)
+                    if not camera1SceneOnly:
+                        if not cameraSegmentationDisabled:
+                            msg.step = cameraWidth * 3
+                            msg.data = img_rgb_string2
+                            segmentationCamera1Pub.publish(msg)
+                        msg.encoding = "32FC1"
+                        msg.step = cameraWidth * 4
+                        msg.data = img_rgb_string3
+                        depthCamera1Pub.publish(msg)
+
+            if camera2Active:
+                if not camera2SceneOnly:
+                    img_rgb_string1 = get_image_bytes(responses[responseLocations[3]], "Scene")
                     if not cameraSegmentationDisabled:
-                        msg.step = cameraWidth * 3
-                        msg.data = img_rgb_string2
-                        segmentationCamera1Pub.publish(msg)
-                    msg.encoding = "32FC1"
-                    msg.step = cameraWidth * 4
-                    msg.data = img_rgb_string3
-                    depthCamera1Pub.publish(msg)
+                        img_rgb_string2 = get_image_bytes(responses[responseLocations[4]], "Segmentation")
+                    img_rgb_string3 = get_image_bytes(responses[responseLocations[5]], "DepthPlanner")
+                else:
+                    img_rgb_string1 = get_image_bytes(responses[responseLocations[3]], "Scene")
 
-        if camera2Active:
-            if not camera2SceneOnly:
-                img_rgb_string1 = get_image_bytes(responses[responseLocations[3]], "Scene")
-                if not cameraSegmentationDisabled:
-                    img_rgb_string2 = get_image_bytes(responses[responseLocations[4]], "Segmentation")
-                img_rgb_string3 = get_image_bytes(responses[responseLocations[5]], "DepthPlanner")
-            else:
-                img_rgb_string1 = get_image_bytes(responses[responseLocations[3]], "Scene")
+                img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
+                                                                                                cameraWidth, 3)
+                if encodingQuality > 0:
+                    img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
+                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
+                    result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
+                    img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
+                    img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
 
-            img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
-                                                                                            cameraWidth, 3)
-            if encodingQuality > 0:
-                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
-                result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
-                img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
-                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
-
-            if (len(img_rgb_string1) > 1):
-                msg = bridge.cv2_to_imgmsg(img_rgb_string1_matrix, encoding="rgb8")
-                msg.header.stamp = cameraTimeStamp
-                msg.header.frame_id = camera2Frame
-                sceneCamera2Pub.publish(msg)
-                if camera2Mono:
-                    msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
-                                               encoding="mono8")
+                if (len(img_rgb_string1) > 1):
+                    msg = bridge.cv2_to_imgmsg(img_rgb_string1_matrix, encoding="rgb8")
                     msg.header.stamp = cameraTimeStamp
                     msg.header.frame_id = camera2Frame
-                    sceneCamera2MonoPub.publish(msg)
-                if not camera2SceneOnly:
+                    sceneCamera2Pub.publish(msg)
+                    if camera2Mono:
+                        msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
+                                                   encoding="mono8")
+                        msg.header.stamp = cameraTimeStamp
+                        msg.header.frame_id = camera2Frame
+                        sceneCamera2MonoPub.publish(msg)
+                    if not camera2SceneOnly:
+                        if not cameraSegmentationDisabled:
+                            msg.step = cameraWidth * 3
+                            msg.data = img_rgb_string2
+                            segmentationCamera2Pub.publish(msg)
+                        msg.encoding = "32FC1"
+                        msg.step = cameraWidth * 4
+                        msg.data = img_rgb_string3
+                        depthCamera2Pub.publish(msg)
+
+            if camera3Active:
+                if not camera3SceneOnly:
+                    img_rgb_string1 = get_image_bytes(responses[responseLocations[6]], "Scene")
                     if not cameraSegmentationDisabled:
-                        msg.step = cameraWidth * 3
-                        msg.data = img_rgb_string2
-                        segmentationCamera2Pub.publish(msg)
-                    msg.encoding = "32FC1"
-                    msg.step = cameraWidth * 4
-                    msg.data = img_rgb_string3
-                    depthCamera2Pub.publish(msg)
+                        img_rgb_string2 = get_image_bytes(responses[responseLocations[7]], "Segmentation")
+                    img_rgb_string3 = get_image_bytes(responses[responseLocations[8]], "DepthPlanner")
+                else:
+                    img_rgb_string1 = get_image_bytes(responses[responseLocations[6]], "Scene")
 
-        if camera3Active:
-            if not camera3SceneOnly:
-                img_rgb_string1 = get_image_bytes(responses[responseLocations[6]], "Scene")
-                if not cameraSegmentationDisabled:
-                    img_rgb_string2 = get_image_bytes(responses[responseLocations[7]], "Segmentation")
-                img_rgb_string3 = get_image_bytes(responses[responseLocations[8]], "DepthPlanner")
-            else:
-                img_rgb_string1 = get_image_bytes(responses[responseLocations[6]], "Scene")
+                img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
+                                                                                                cameraWidth, 3)
+                if encodingQuality > 0:
+                    img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
+                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
+                    result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
+                    img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
+                    img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
 
-            img_rgb_string1_matrix = np.fromstring(img_rgb_string1, dtype=np.uint8).reshape(cameraHeight,
-                                                                                            cameraWidth, 3)
-            if encodingQuality > 0:
-                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2BGR)
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), encodingQuality]
-                result, encimg = cv2.imencode('.jpg', img_rgb_string1_matrix, encode_param)
-                img_rgb_string1_matrix = cv2.imdecode(encimg, 1)
-                img_rgb_string1_matrix = cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_BGR2RGB)
-
-            if (len(img_rgb_string1) > 1):
-                msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
-                msg.header.stamp = cameraTimeStamp
-                msg.header.frame_id = camera3Frame
-                sceneCamera3Pub.publish(msg)
-                if camera3Mono:
+                if (len(img_rgb_string1) > 1):
                     msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
                                                encoding="mono8")
                     msg.header.stamp = cameraTimeStamp
                     msg.header.frame_id = camera3Frame
-                    sceneCamera3MonoPub.publish(msg)
-                if not camera3SceneOnly:
-                    if not cameraSegmentationDisabled:
-                        msg.step = cameraWidth * 3
-                        msg.data = img_rgb_string2
-                        segmentationCamera3Pub.publish(msg)
-                    msg.encoding = "32FC1"
-                    msg.step = cameraWidth * 4
-                    msg.data = img_rgb_string3
-                    depthCamera3Pub.publish(msg)
+                    sceneCamera3Pub.publish(msg)
+                    if camera3Mono:
+                        msg = bridge.cv2_to_imgmsg(cv2.cvtColor(img_rgb_string1_matrix, cv2.COLOR_RGB2GRAY),
+                                                   encoding="mono8")
+                        msg.header.stamp = cameraTimeStamp
+                        msg.header.frame_id = camera3Frame
+                        sceneCamera3MonoPub.publish(msg)
+                    if not camera3SceneOnly:
+                        if not cameraSegmentationDisabled:
+                            msg.step = cameraWidth * 3
+                            msg.data = img_rgb_string2
+                            segmentationCamera3Pub.publish(msg)
+                        msg.encoding = "32FC1"
+                        msg.step = cameraWidth * 4
+                        msg.data = img_rgb_string3
+                        depthCamera3Pub.publish(msg)
 
-        if lidarActive or gpulidarActive:
-            # get lidar data
-            if lidarActive:
-                lidarData = client.getLidarData(lidarName, vehicleName)
-            if gpulidarActive:
-                lidarData = client.getGPULidarData(lidarName, vehicleName)
+            if lidarActive or gpulidarActive:
+                # get lidar data
+                if lidarActive:
+                    lidarData = client.getLidarData(lidarName, vehicleName)
+                if gpulidarActive:
+                    lidarData = client.getGPULidarData(lidarName, vehicleName)
 
-            if lidarData.time_stamp != lastLidarTimeStamp:
-                # Check if there are any points in the data
-                if (len(lidarData.point_cloud) < 4):
-                    lastLidarTimeStamp = lidarData.time_stamp
-                else:
-                    lastLidarTimeStamp = lidarData.time_stamp
+                if lidarData.time_stamp != lastLidarTimeStamp:
+                    # Check if there are any points in the data
+                    if (len(lidarData.point_cloud) < 4):
+                        lastLidarTimeStamp = lidarData.time_stamp
+                    else:
+                        lastLidarTimeStamp = lidarData.time_stamp
 
-                    # initiate point cloud
-                    pcloud = PointCloud2()
-                    groundtruth = StringArray()
+                        # initiate point cloud
+                        pcloud = PointCloud2()
+                        groundtruth = StringArray()
 
-                    labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
-                    points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
-                    points = np.reshape(points, (int(points.shape[0] / 3), 3))
-                    points = points * np.array([1, -1, -1])
-                    cloud = points.tolist()
-                    groundtruth.data = labels.tolist()
-                    groundtruth.header.frame_id = lidarFrame
-                    groundtruth.header.stamp = timeStamp
-                    pcloud.header.frame_id = lidarFrame
-                    pcloud.header.stamp = timeStamp
-                    pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
+                        labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
+                        points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
+                        points = np.reshape(points, (int(points.shape[0] / 3), 3))
+                        points = points * np.array([1, -1, -1])
+                        cloud = points.tolist()
+                        groundtruth.data = labels.tolist()
+                        groundtruth.header.frame_id = lidarFrame
+                        groundtruth.header.stamp = timeStamp
+                        pcloud.header.frame_id = lidarFrame
+                        pcloud.header.stamp = timeStamp
+                        pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
 
-                    # publish messages
-                    lidarPub.publish(pcloud)
-                    lidarGroundtruthPub.publish(groundtruth)
+                        # publish messages
+                        lidarPub.publish(pcloud)
+                        lidarGroundtruthPub.publish(groundtruth)
 
-        if echoActive:
-            # get echo data
-            echoData = client.getEchoData(echoName, vehicleName)
+            if echoActive:
+                # get echo data
+                echoData = client.getEchoData(echoName, vehicleName)
 
-            if echoData.time_stamp != lastEchoTimeStamp:
-                # Check if there are any points in the data
-                if (len(echoData.point_cloud) < 4):
-                    lastEchoTimeStamp = echoData.time_stamp
-                else:
-                    lastEchoTimeStamp = echoData.time_stamp
+                if echoData.time_stamp != lastEchoTimeStamp:
+                    # Check if there are any points in the data
+                    if (len(echoData.point_cloud) < 4):
+                        lastEchoTimeStamp = echoData.time_stamp
+                    else:
+                        lastEchoTimeStamp = echoData.time_stamp
 
-                    # initiate point cloud
-                    pcloud = PointCloud2()
+                        # initiate point cloud
+                        pcloud = PointCloud2()
 
-                    points = np.array(echoData.point_cloud, dtype=np.dtype('f4'))
-                    points = np.reshape(points, (int(points.shape[0] / 5), 5))
-                    points = points * np.array([1, -1, -1, 1, 1])
-                    cloud = points.tolist()
-                    pcloud.header.frame_id = echoFrame
-                    pcloud.header.stamp = timeStamp
-                    fields = [
-                        PointField('x', 0, PointField.FLOAT32, 1),
-                        PointField('y', 4, PointField.FLOAT32, 1),
-                        PointField('z', 8, PointField.FLOAT32, 1),
-                        PointField('a', 12, PointField.FLOAT32, 1),
-                        PointField('d', 16, PointField.FLOAT32, 1)
-                    ]
-                    pcloud = pc2.create_cloud(pcloud.header, fields, cloud)
+                        points = np.array(echoData.point_cloud, dtype=np.dtype('f4'))
+                        points = np.reshape(points, (int(points.shape[0] / 5), 5))
+                        points = points * np.array([1, -1, -1, 1, 1])
+                        cloud = points.tolist()
+                        pcloud.header.frame_id = echoFrame
+                        pcloud.header.stamp = timeStamp
+                        fields = [
+                            PointField('x', 0, PointField.FLOAT32, 1),
+                            PointField('y', 4, PointField.FLOAT32, 1),
+                            PointField('z', 8, PointField.FLOAT32, 1),
+                            PointField('a', 12, PointField.FLOAT32, 1),
+                            PointField('d', 16, PointField.FLOAT32, 1)
+                        ]
+                        pcloud = pc2.create_cloud(pcloud.header, fields, cloud)
 
-                    # publish messages
-                    echoPub.publish(pcloud)
+                        # publish messages
+                        echoPub.publish(pcloud)
+
+        else:
+            currentFrame += 1
 
         if imuActive:
             # get data of IMU sensor
