@@ -36,8 +36,8 @@
             <param name="camera2_sceneonly" type="int" value="1" />
             <param name="camera1_mono" type="int" value="1" />
             <param name="camera2_mono" type="int" value="1" />
-            <param name="camera_height" type="int" value="540" />
-            <param name="camera_width" type="int" value="960" />
+            <param name="camera_height" type="int" value="810" />
+            <param name="camera_width" type="int" value="1440" />
             <param name="camera_segmentation_disabled" type="int" value="1" />
             <param name="camera_encoding_quality" type="int" value="0" />
 			
@@ -45,7 +45,7 @@
             <param name="topic_imu_alt" type="string" value="imu0Kimera" />
             <param name="topic_pose_alt" type="string" value="airsim/gtposekimera" />
 			
-			<param name="route_rosbag" type="string" value="/mnt/c/Users/Wouter/airsim_calibration_route_2021-06-17-22-36-09.bag" />
-            <param name="dst_rosbag" type="string" value="/mnt/c/Users/Wouter/airsim_calib_data_2021-06-17-22-36-09.bag" />
+			<param name="route_rosbag" type="string" value="/mnt/c/Users/Wouter/imucam_calibration_route.bag" />
+            <param name="dst_rosbag" type="string" value="/mnt/c/Users/Wouter/imucam_calibration.bag" />
       </node>
 </launch>
