@@ -571,7 +571,7 @@ if __name__ == '__main__':
         gpulidarActive = rospy.get_param('~gpulidar_active', 0)
         echoActive = rospy.get_param('~echo_active', 0)
         imuActive = rospy.get_param('~imu_active', 0)
-        poseActive = rospy.get_param('~pose_active', 1)
+        poseActive = rospy.get_param('~pose_active', 0)
         carcontrolActive = rospy.get_param('~carcontrol_active', 0)
         activeTuple = (camera1Active, camera2Active, camera3Active, lidarActive, gpulidarActive, echoActive, imuActive, poseActive, carcontrolActive)
 
