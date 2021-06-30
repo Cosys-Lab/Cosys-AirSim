@@ -1,15 +1,12 @@
 <launch>
       <node name="airsimnode_static" pkg="airsim" type="airsimnode_static.py" respawn="false" output="screen">
 
-            <param name="rate" type="int" value="30"/>
+            <param name="rate" type="int" value="10"/>
             <param name="imu_rate" type="int" value="90" />
             
             <param name="camera1_active" type="int" value="1" />
             <param name="camera2_active" type="int" value="1" />
-            <param name="camera3_active" type="int" value="0" />
-            <param name="lidar_active" type="int" value="0" />
             <param name="gpulidar_active" type="int" value="1" />
-            <param name="carcontrol_active" type="int" value="0" />
 
             <param name="lidar_frame_id" type="string" value="os_lidar" />
             <param name="camera1_frame_id" type="string" value="cam0" />
@@ -21,6 +18,8 @@
             <param name="topic_scene_camera2" type="string" value="/airsim/camera/right/rgb/image" />
             <param name="topic_segmentation_camera2" type="string" value="/airsim/camera/right/segmentation/image" />
             <param name="topic_depth_camera2" type="string" value="/airsim/camera/right/depth/image" />
+		    <param name="topic_lidar_groundtruth" type="string" value="airsim/lidargroundtruth" />
+			<param name="topic_lidar" type="string" value="airsim/lidar" />
             <param name="topic_pose" type="string" value="/airsim/gtpose" />
 
             <param name="vehicle_name" type="string" value="airsimvehicle" />
