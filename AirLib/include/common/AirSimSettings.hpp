@@ -266,7 +266,10 @@ public: //types
 		Vector3r position = VectorMath::nanVector();
 		Rotation rotation = Rotation::nanRotation();
 
+		bool generate_intensity = false;                  // Toggle intensity calculation on or off
+
 		bool draw_debug_points = false;
+		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
 	};
 
 	struct EchoSetting : SensorSetting {
@@ -417,6 +420,9 @@ public: //fields
 	float speed_unit_factor =  1.0f;
 	std::string speed_unit_label = "m\\s";
     std::map<std::string, std::unique_ptr<SensorSetting>> sensor_defaults;
+
+	bool use_material_list = false;
+	FString material_list_file = "";
 
 public: //methods
     static AirSimSettings& singleton() 
@@ -574,7 +580,20 @@ private:
             else
                 physics_engine_name = "PhysX"; //this value is only informational for now
         }
+
+		use_material_list = settings_json.getBool("UseMaterialList", false);
+		if (use_material_list) material_list_file = getMaterialListFile();
     }
+
+	FString getMaterialListFile()
+	{
+		bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("material_list.txt").c_str()));
+		if (found) {
+			return FString(msr::airlib::Settings::getExecutableFullPath("material_list.txt").c_str());
+		}else{
+			return FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("material_list.txt").c_str());
+		}
+	}
 
     void loadViewModeSettings(const Settings& settings_json)
     {
@@ -1262,10 +1281,12 @@ private:
 		lidar_setting.resolution = settings_json.getInt("Resolution", lidar_setting.resolution);
 		lidar_setting.ground_truth = settings_json.getBool("GroundTruth", lidar_setting.ground_truth);
 		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
+		lidar_setting.generate_intensity = settings_json.getBool("GenerateIntensity", lidar_setting.generate_intensity);
 		lidar_setting.min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", lidar_setting.min_noise_standard_deviation);
 		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
 		lidar_setting.noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", lidar_setting.noise_distance_scale);
 		lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
+		lidar_setting.draw_mode = settings_json.getInt("DrawMode", lidar_setting.draw_mode);
 		lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);
 		lidar_setting.vertical_FOV_lower = settings_json.getFloat("VerticalFOVLower", lidar_setting.vertical_FOV_lower);
 		lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);

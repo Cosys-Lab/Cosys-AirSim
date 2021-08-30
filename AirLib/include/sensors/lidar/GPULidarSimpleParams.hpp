@@ -40,7 +40,10 @@ namespace msr {
 				Quaternionr::Identity()                  // orientation - by default Quaternionr(1, 0, 0, 0)
 			};
 
+			bool generate_intensity = false;             // Toggle intensity calculation on or off
+
 			bool draw_debug_points = false;
+			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
 
 			real_T startup_delay = 1;                   // sec
 
@@ -104,7 +107,10 @@ namespace msr {
 					Utils::degreesToRadians(roll),    //roll  - rotation around X axis
 					Utils::degreesToRadians(yaw));    //yaw   - rotation around Z axis
 
+				generate_intensity = settings.generate_intensity;
+
 				draw_debug_points = settings.draw_debug_points;
+				draw_mode = settings.draw_mode;
 			}
 		};
 

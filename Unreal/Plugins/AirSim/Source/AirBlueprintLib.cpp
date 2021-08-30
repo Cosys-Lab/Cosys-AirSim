@@ -404,7 +404,7 @@ std::string UAirBlueprintLib::GetMeshName(ALandscapeProxy* mesh)
     return std::string(TCHAR_TO_UTF8(*(mesh->GetName())));
 }
 
-void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing)
+void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing, FString material_list)
 {
     for (TObjectIterator<UStaticMeshComponent> comp; comp; ++comp)
     {

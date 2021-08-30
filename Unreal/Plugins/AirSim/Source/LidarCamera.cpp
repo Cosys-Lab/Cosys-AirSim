@@ -71,9 +71,11 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	vertical_min_ = settings.vertical_FOV_lower;
 	vertical_max_ = settings.vertical_FOV_upper;
 	draw_debug_ = settings.draw_debug_points;
+	draw_mode_ = settings.draw_mode;
 	max_range_ = settings.range;
 	ignore_marked_ = settings.ignore_marked;
 	ground_truth_ = settings.ground_truth;
+	generate_intensity_ = settings.generate_intensity;
 
 	render_target_2D_depth_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
 	render_target_2D_segmentation_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
@@ -99,8 +101,11 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	GenerateLidarCoordinates();
 	horizontal_delta_ = (horizontal_max_ - horizontal_min_) / float(measurement_per_cycle_ - 1);
 	vertical_delta_ = (FMath::Abs(vertical_min_) + vertical_max_) / num_of_lasers_;
-	target_fov_ = FMath::CeilToInt(FMath::Abs(vertical_min_) + vertical_max_ + (2 * vertical_delta_));
-
+	target_fov_ = FMath::CeilToInt(FMath::Abs(vertical_min_) + vertical_max_ + (10 * vertical_delta_));
+	UE_LOG(LogTemp, Warning, TEXT("Target FOV: %f"), (int)target_fov_);
+	if (target_fov_ % 2 != 0) {
+		target_fov_ = target_fov_ + 1;
+	}
 	//current_horizontal_angle_index_ = horizontal_angles_.Num() - 1;
 	current_horizontal_angle_index_ = 0;
 
@@ -160,7 +165,7 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	bool refresh = false;
 	if (sum_rotation_ > horizontal_delta_) {
 		if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 150.0f));
-		fov = 90;
+		UE_LOG(LogTemp, Warning, TEXT("Chosen FOV: %i"), (int)fov);
 		capture_2D_depth_->FOVAngle = fov;
 		capture_2D_segmentation_->FOVAngle = fov;
 		RotateCamera(current_angle_ + previous_rotation_ + (fov / 2));
@@ -286,15 +291,20 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 				point_cloud.emplace_back(point.X / 100);
 				point_cloud.emplace_back(point.Y / 100);
 				point_cloud.emplace_back(-point.Z / 100);
-				if (draw_debug_) {
-					point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-					DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
-				}
 				if (ground_truth_) {
 					FColor value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
 					std::string color_string = std::to_string((int)value_segmentation.R) + "," + std::to_string((int)value_segmentation.G) + "," + std::to_string((int)value_segmentation.B);
 					groundtruth.emplace_back(color_string);
+					if (draw_debug_ && draw_mode_ == 1) {
+						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, (1 / (frequency_ * 4)));
+					}
 				}
+				if (draw_debug_ && draw_mode_ == 0) {
+					point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+					DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
+				}
+				
 			}
 			else {
 				point_cloud.emplace_back(0);
