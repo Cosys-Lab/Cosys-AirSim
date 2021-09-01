@@ -406,17 +406,37 @@ std::string UAirBlueprintLib::GetMeshName(ALandscapeProxy* mesh)
 
 void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing, FString material_list)
 {
+    std::string materialListString = std::string(TCHAR_TO_UTF8(*material_list));
+    std::map< std::string, int> materialMap;
+    std::string::size_type key_pos = 0;
+    std::string::size_type key_end;
+    std::string::size_type val_pos;
+    std::string::size_type val_end;
+
+    while ((key_end = materialListString.find(':', key_pos)) != std::string::npos)
+    {
+        if ((val_pos = materialListString.find_first_not_of(": ", key_end)) == std::string::npos)
+            break;
+
+        val_end = materialListString.find('\n', val_pos);
+        materialMap.emplace(materialListString.substr(key_pos, key_end - key_pos), std::stoi(materialListString.substr(val_pos, val_end - val_pos)));
+
+        key_pos = val_end;
+        if (key_pos != std::string::npos)
+            ++key_pos;
+    }
+
     for (TObjectIterator<UStaticMeshComponent> comp; comp; ++comp)
     {
-        InitializeObjectStencilID(*comp, ignore_existing);
+        InitializeObjectStencilID(*comp, materialMap, ignore_existing);
     }
     for (TObjectIterator<USkinnedMeshComponent> comp; comp; ++comp)
     {
-        InitializeObjectStencilID(*comp, ignore_existing);
+        InitializeObjectStencilID(*comp, materialMap, ignore_existing);
     }
     for (TObjectIterator<ALandscapeProxy> comp; comp; ++comp)
     {
-        InitializeObjectStencilID(*comp, ignore_existing);
+        InitializeObjectStencilID(*comp, materialMap, ignore_existing);
     }
 }
 

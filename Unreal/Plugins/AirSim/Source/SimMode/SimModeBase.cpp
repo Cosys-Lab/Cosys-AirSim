@@ -124,9 +124,9 @@ void ASimModeBase::InitializeMeshVertexColorIDs()
 
 void ASimModeBase::setStencilIDs()
 {
-	FString launchFileContent;
-	if (FFileHelper::LoadFileToString(launchFileContent, *getSettings().material_list_file)) {
-		UAirBlueprintLib::InitializeMeshStencilIDs(false, launchFileContent);
+	FString materialListContent;
+	if (FFileHelper::LoadFileToString(materialListContent, *getSettings().material_list_file)) {
+		UAirBlueprintLib::InitializeMeshStencilIDs(true, materialListContent);
 	}
 	else {
 		UAirBlueprintLib::LogMessage("Material list '%s' was not found. Cannot start stencil initialization.",
