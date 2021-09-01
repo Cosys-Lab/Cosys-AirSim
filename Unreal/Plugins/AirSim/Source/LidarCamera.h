@@ -84,7 +84,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 draw_debug_ = true;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
-		bool draw_mode_ = 0;
+		uint32 draw_mode_ = 0;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool ground_truth_ = false;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
