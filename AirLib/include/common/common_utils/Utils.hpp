@@ -130,6 +130,15 @@ public:
         return s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0;
     }
 
+    static bool contains(const string& s, const string& value) {
+        if (s.find(value) != std::string::npos) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     template <template<class, class, class...> class TContainer, typename TKey, typename TVal, typename... Args>
     static const TVal& findOrDefault(const TContainer<TKey, TVal, Args...>& m, TKey const& key, const TVal& default_val)
     {
