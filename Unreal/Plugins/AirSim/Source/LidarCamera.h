@@ -49,6 +49,8 @@ public:
 	float horizontal_delta_ = 0;
 	float vertical_delta_ = 0;
 	float sum_rotation_ = 0;
+	std::string material_list_file_ = "";
+	std::map<uint8, float> material_map_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UArrowComponent* arrow_;
@@ -60,10 +62,16 @@ public:
 		USceneCaptureComponent2D* capture_2D_segmentation_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		USceneCaptureComponent2D* capture_2D_intensity_;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UTextureRenderTarget2D* render_target_2D_depth_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UTextureRenderTarget2D* render_target_2D_segmentation_;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UTextureRenderTarget2D* render_target_2D_intensity_;
 
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 num_of_lasers_ = 16;
@@ -82,7 +90,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 resolution_ = 1024;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
-		uint32 draw_debug_ = true;
+		bool draw_debug_ = true;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 draw_mode_ = 0;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")

@@ -73,7 +73,7 @@ void ASimModeBase::BeginPlay()
 
     setupClockSpeed();
 
-    if(getSettings().use_material_list)setStencilIDs();
+    setStencilIDs();
 	InitializeMeshVertexColorIDs();
     
     record_tick_count = 0;

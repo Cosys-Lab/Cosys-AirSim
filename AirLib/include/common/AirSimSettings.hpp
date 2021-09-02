@@ -267,6 +267,7 @@ public: //types
 		Rotation rotation = Rotation::nanRotation();
 
 		bool generate_intensity = false;                  // Toggle intensity calculation on or off
+        std::string material_list_file = "";              // String holding all material data
 
 		bool draw_debug_points = false;
 		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
@@ -421,7 +422,6 @@ public: //fields
 	std::string speed_unit_label = "m\\s";
     std::map<std::string, std::unique_ptr<SensorSetting>> sensor_defaults;
 
-	bool use_material_list = false;
 	FString material_list_file = "";
 
 public: //methods
@@ -581,8 +581,7 @@ private:
                 physics_engine_name = "PhysX"; //this value is only informational for now
         }
 
-		use_material_list = settings_json.getBool("UseMaterialList", false);
-		if (use_material_list) material_list_file = getMaterialListFile();
+		material_list_file = getMaterialListFile();
     }
 
 	FString getMaterialListFile()
@@ -1270,6 +1269,7 @@ private:
 
         lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
+
     }
 
 	static void initializeGPULidarSetting(GPULidarSetting& lidar_setting, const Settings& settings_json)
@@ -1293,6 +1293,19 @@ private:
 		lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
 		lidar_setting.ignore_marked = settings_json.getBool("IgnoreMarked", lidar_setting.ignore_marked);
 
+        FString materialListFile;
+        bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("material_values.txt").c_str()));
+        if (found) {
+            materialListFile =  FString(msr::airlib::Settings::getExecutableFullPath("material_values.txt").c_str());
+        }
+        else {
+            materialListFile =  FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("material_values.txt").c_str());
+        }
+
+        FString materialListContent;
+        if (FFileHelper::LoadFileToString(materialListContent, *materialListFile)) {
+            lidar_setting.material_list_file = std::string(TCHAR_TO_UTF8(*materialListContent));
+        }
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
 	}

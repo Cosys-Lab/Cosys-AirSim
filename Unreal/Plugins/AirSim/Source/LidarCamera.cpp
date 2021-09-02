@@ -31,6 +31,7 @@ ALidarCamera::ALidarCamera()
 	arrow_ = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 	capture_2D_depth_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DDepth"));
 	capture_2D_segmentation_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DSegmentation"));
+	capture_2D_intensity_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DIntensity"));
 
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder(TEXT("Material'/AirSim/HUDAssets/LidarDepthMaterial.LidarDepthMaterial'"));
@@ -42,6 +43,16 @@ ALidarCamera::ALidarCamera()
 	else
 		UAirBlueprintLib::LogMessageString("Cannot create depth material for the LidarCamera", "", LogDebugLevel::Failure);
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder_intensity(TEXT("Material'/AirSim/HUDAssets/LidarImpactNormalMaterial.LidarImpactNormalMaterial'"));
+	if (mat_finder_intensity.Succeeded())
+	{
+		UMaterialInstanceDynamic* intensity_material = UMaterialInstanceDynamic::Create(mat_finder_intensity.Object, capture_2D_intensity_);
+		capture_2D_intensity_->PostProcessSettings.AddBlendable(intensity_material, 1.0f);
+	}
+	else
+		UAirBlueprintLib::LogMessageString("Cannot create intensity material for the LidarCamera", "", LogDebugLevel::Failure);
+
+
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -50,6 +61,7 @@ void ALidarCamera::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	render_target_2D_depth_ = NewObject<UTextureRenderTarget2D>();
 	render_target_2D_segmentation_ = NewObject<UTextureRenderTarget2D>();
+	render_target_2D_intensity_ = NewObject<UTextureRenderTarget2D>();
 	capture_2D_depth_->SetRelativeRotation(FRotator(0, 0, 0));
 	capture_2D_depth_->SetRelativeLocation(FVector(0, 0, 0));
 	capture_2D_depth_->AttachTo(this->RootComponent);
@@ -58,6 +70,10 @@ void ALidarCamera::PostInitializeComponents()
 	capture_2D_segmentation_->SetRelativeLocation(FVector(0, 0, 0));
 	capture_2D_segmentation_->AttachTo(this->RootComponent);
 	capture_2D_segmentation_->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+	capture_2D_intensity_->SetRelativeRotation(FRotator(0, 0, 0));
+	capture_2D_intensity_->SetRelativeLocation(FVector(0, 0, 0));
+	capture_2D_intensity_->AttachTo(this->RootComponent);
+	capture_2D_intensity_->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 }
 
 void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& settings) {
@@ -76,9 +92,28 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	ignore_marked_ = settings.ignore_marked;
 	ground_truth_ = settings.ground_truth;
 	generate_intensity_ = settings.generate_intensity;
+	material_list_file_ = settings.material_list_file;
+	std::string::size_type key_pos = 0;
+	std::string::size_type key_end;
+	std::string::size_type val_pos;
+	std::string::size_type val_end;
+
+	while ((key_end = material_list_file_.find(':', key_pos)) != std::string::npos)
+	{
+		if ((val_pos = material_list_file_.find_first_not_of(": ", key_end)) == std::string::npos)
+			break;
+
+		val_end = material_list_file_.find('\n', val_pos);
+		material_map_.emplace(std::stoi(material_list_file_.substr(key_pos, key_end - key_pos)), std::stoi(material_list_file_.substr(val_pos, val_end - val_pos)));
+
+		key_pos = val_end;
+		if (key_pos != std::string::npos)
+			++key_pos;
+	}
 
 	render_target_2D_depth_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
 	render_target_2D_segmentation_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
+	render_target_2D_intensity_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
 
 	this->SetActorRelativeLocation(FVector(settings.position.x() * 100, settings.position.y() * 100, -settings.position.z() * 100));
 	this->SetActorRelativeRotation(FRotator(settings.rotation.pitch, settings.rotation.yaw, settings.rotation.roll));
@@ -97,6 +132,12 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	capture_2D_segmentation_->bCaptureEveryFrame = false;
 	capture_2D_segmentation_->bCaptureOnMovement = false;
 	capture_2D_segmentation_->bUseCustomProjectionMatrix = false;
+
+	capture_2D_intensity_->TextureTarget = render_target_2D_intensity_;
+	capture_2D_intensity_->bAlwaysPersistRenderingState = true;
+	capture_2D_intensity_->bCaptureEveryFrame = false;
+	capture_2D_intensity_->bCaptureOnMovement = false;
+	capture_2D_intensity_->bUseCustomProjectionMatrix = false;
 
 	GenerateLidarCoordinates();
 	horizontal_delta_ = (horizontal_max_ - horizontal_min_) / float(measurement_per_cycle_ - 1);
@@ -128,6 +169,8 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 
 	capture_2D_depth_->HiddenActors = actors;
 	capture_2D_segmentation_->HiddenActors = actors;
+	capture_2D_intensity_->HiddenActors = actors;
+
 }
 
 void ALidarCamera::GenerateLidarCoordinates() {
@@ -165,14 +208,16 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	bool refresh = false;
 	if (sum_rotation_ > horizontal_delta_) {
 		if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 150.0f));
-		UE_LOG(LogTemp, Warning, TEXT("Chosen FOV: %i"), (int)fov);
+		//UE_LOG(LogTemp, Warning, TEXT("Chosen FOV: %i"), (int)fov);
 		capture_2D_depth_->FOVAngle = fov;
 		capture_2D_segmentation_->FOVAngle = fov;
+		capture_2D_intensity_->FOVAngle = fov;
 		RotateCamera(current_angle_ + previous_rotation_ + (fov / 2));
 		current_angle_ = current_angle_ + previous_rotation_;
 		current_angle_ = FMath::Fmod(current_angle_, 360);
 		capture_2D_depth_->CaptureScene();
 		capture_2D_segmentation_->CaptureScene();
+		capture_2D_intensity_->CaptureScene();
 		refresh = SampleRenders(sum_rotation_, fov, point_cloud, groundtruth, point_cloud_final, groundtruth_final);
 		previous_rotation_ = sum_rotation_;
 		sum_rotation_ = 0;
@@ -184,12 +229,18 @@ void ALidarCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	capture_2D_depth_ = nullptr;
 	render_target_2D_depth_ = nullptr;
+	capture_2D_segmentation_ = nullptr;
+	render_target_2D_segmentation_ = nullptr;
+	capture_2D_intensity_ = nullptr;
+	render_target_2D_intensity_ = nullptr;
+
 }
 
 void ALidarCamera::RotateCamera(float rotation)
 {
 	capture_2D_depth_->SetRelativeRotation(FRotator(0, rotation, 0));
 	capture_2D_segmentation_->SetRelativeRotation(FRotator(0, rotation, 0));
+	capture_2D_intensity_->SetRelativeRotation(FRotator(0, rotation, 0));
 }
 
 int32 getIndexOfMatchOrUpperClosest(TArray<float> range, float value) {
@@ -225,9 +276,16 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 
 	TArray<FColor> buffer_2D_segmentation;
 	FTextureRenderTarget2DResource* render_target_2D_segmentation;
+
+	TArray<FColor> buffer_2D_intensity;
+	FTextureRenderTarget2DResource* render_target_2D_intensity;
 	if (ground_truth_) {
 		render_target_2D_segmentation = (FTextureRenderTarget2DResource*)capture_2D_segmentation_->TextureTarget->Resource;
 		render_target_2D_segmentation->ReadPixels(buffer_2D_segmentation);
+	}
+	if (generate_intensity_) {
+		render_target_2D_intensity = (FTextureRenderTarget2DResource*)capture_2D_intensity_->TextureTarget->Resource;
+		render_target_2D_intensity->ReadPixels(buffer_2D_intensity);
 	}
 	float c_x = resolution_ / 2.0f;
 	float c_y = resolution_ / 2.0f;
@@ -284,7 +342,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			int32 v_pixel = FMath::FloorToInt((sin_ver * -f_y) / (cos_ver*cos_hor) + c_y);
 
 			FColor value_depth = buffer_2D_depth[h_pixel + (v_pixel * resolution_)];
-			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));			
+			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));	
+
 			if (depth < (max_range_ * 100)) {
 				float distance = depth / (cos_ver*cos_hor);
 				FVector point = (distance * angle_to_xyz_lut_[ipx + (icol_circle * num_of_lasers_)]);
@@ -300,6 +359,25 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 						DrawDebugPoint(this->GetWorld(), point, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, (1 / (frequency_ * 4)));
 					}
 				}
+				if (generate_intensity_) {
+					FColor value_intensity = buffer_2D_intensity[h_pixel + (v_pixel * resolution_)];
+					uint8 stencil_color = value_intensity.A;
+					float impact_angle = ((value_intensity.R + value_intensity.G * 256 + value_intensity.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
+					float final_intensity = impact_angle * material_map_.at(stencil_color);
+					if (draw_debug_ && draw_mode_ == 2) {
+						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point, 5, FColor(stencil_color, 0, 0, 1), false, (1 / (frequency_ * 4)));
+					}
+					if (draw_debug_ && draw_mode_ == 3) {
+						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, FMath::FloorToInt(impact_angle*255), 0, 1), false, (1 / (frequency_ * 4)));
+					}
+					if (draw_debug_ && draw_mode_ == 4) {
+						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 255), 1), false, (1 / (frequency_ * 4)));
+					}
+				}
+
 				if (draw_debug_ && draw_mode_ == 0) {
 					point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
 					DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));

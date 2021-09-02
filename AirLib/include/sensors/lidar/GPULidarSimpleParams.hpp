@@ -47,6 +47,9 @@ namespace msr {
 
 			real_T startup_delay = 1;                   // sec
 
+			std::string material_list_file = "";        // String holding all material data
+
+
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
 			{
 				std::string simmode_name = AirSimSettings::singleton().simmode_name;
@@ -108,6 +111,7 @@ namespace msr {
 					Utils::degreesToRadians(yaw));    //yaw   - rotation around Z axis
 
 				generate_intensity = settings.generate_intensity;
+				material_list_file = settings.material_list_file;
 
 				draw_debug_points = settings.draw_debug_points;
 				draw_mode = settings.draw_mode;
