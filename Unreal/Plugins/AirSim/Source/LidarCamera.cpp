@@ -9,9 +9,11 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ImageUtils.h"
 #include "common/AirSimSettings.hpp"
+#include "api/WorldSimApiBase.hpp"
 #include "EngineUtils.h"
 #include "ObjectPainter.h"
 #include "DrawDebugHelpers.h"
+#include "Weather/WeatherLib.h"
 
 #include "AirBlueprintLib.h"
 #include <string>
@@ -93,6 +95,9 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	ground_truth_ = settings.ground_truth;
 	generate_intensity_ = settings.generate_intensity;
 	material_list_file_ = settings.material_list_file;
+	range_max_lambertian_percentage_ = settings.range_max_lambertian_percentage;
+	rain_max_intensity_ = settings.rain_max_intensity;
+
 	std::string::size_type key_pos = 0;
 	std::string::size_type key_end;
 	std::string::size_type val_pos;
@@ -104,7 +109,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 			break;
 
 		val_end = material_list_file_.find('\n', val_pos);
-		material_map_.emplace(std::stoi(material_list_file_.substr(key_pos, key_end - key_pos)), std::stoi(material_list_file_.substr(val_pos, val_end - val_pos)));
+		material_map_.emplace(std::stoi(material_list_file_.substr(key_pos, key_end - key_pos)), std::stof(material_list_file_.substr(val_pos, val_end - val_pos)));
 
 		key_pos = val_end;
 		if (key_pos != std::string::npos)
@@ -300,6 +305,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	int32 icol = first_horizontal_idx;
 
 	float previous_horizontal_angle = FMath::Fmod(horizontal_angles_[current_horizontal_angle_index_], 360);
+	float rain_value;
+	if (generate_intensity_)rain_value = UWeatherLib::getWeatherParamScalar(this->GetWorld(), msr::airlib::Utils::toEnum<EWeatherParamScalar>(0));
 
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
@@ -347,9 +354,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			if (depth < (max_range_ * 100)) {
 				float distance = depth / (cos_ver*cos_hor);
 				FVector point = (distance * angle_to_xyz_lut_[ipx + (icol_circle * num_of_lasers_)]);
-				point_cloud.emplace_back(point.X / 100);
-				point_cloud.emplace_back(point.Y / 100);
-				point_cloud.emplace_back(-point.Z / 100);
+				bool threshold_enable = true;
+
 				if (ground_truth_) {
 					FColor value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
 					std::string color_string = std::to_string((int)value_segmentation.R) + "," + std::to_string((int)value_segmentation.G) + "," + std::to_string((int)value_segmentation.B);
@@ -359,14 +365,16 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 						DrawDebugPoint(this->GetWorld(), point, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, (1 / (frequency_ * 4)));
 					}
 				}
+
 				if (generate_intensity_) {
 					FColor value_intensity = buffer_2D_intensity[h_pixel + (v_pixel * resolution_)];
-					uint8 stencil_color = value_intensity.A;
 					float impact_angle = ((value_intensity.R + value_intensity.G * 256 + value_intensity.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
-					float final_intensity = impact_angle * material_map_.at(stencil_color);
+
+					float final_intensity = impact_angle * material_map_.at(value_intensity.A) * FMath::Exp(-2.0f * 0.01 * FMath::Pow(rain_max_intensity_ * rain_value, 0.6) * (depth / 100.0f));
+
 					if (draw_debug_ && draw_mode_ == 2) {
 						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point, 5, FColor(stencil_color, 0, 0, 1), false, (1 / (frequency_ * 4)));
+						DrawDebugPoint(this->GetWorld(), point, 5, FColor(value_intensity.A, 0, 0, 1), false, (1 / (frequency_ * 4)));
 					}
 					if (draw_debug_ && draw_mode_ == 3) {
 						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
@@ -376,13 +384,27 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
 						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 255), 1), false, (1 / (frequency_ * 4)));
 					}
+					if(final_intensity < (max_range_ / range_max_lambertian_percentage_) * depth / 100.0)threshold_enable = false;
+				}
+
+				if (threshold_enable) {
+					point_cloud.emplace_back(point.X / 100);
+					point_cloud.emplace_back(point.Y / 100);
+					point_cloud.emplace_back(-point.Z / 100);
+				}
+				else {
+					point_cloud.emplace_back(0);
+					point_cloud.emplace_back(0);
+					point_cloud.emplace_back(0);
+					if (ground_truth_) {
+						groundtruth.emplace_back("-1,-1,-1");
+					}
 				}
 
 				if (draw_debug_ && draw_mode_ == 0) {
 					point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
 					DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
-				}
-				
+				}				
 			}
 			else {
 				point_cloud.emplace_back(0);

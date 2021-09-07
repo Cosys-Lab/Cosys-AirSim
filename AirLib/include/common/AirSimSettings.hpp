@@ -247,6 +247,8 @@ public: //types
 		// shared defaults
 		uint number_of_channels = 64;
 		real_T range = 100.0f;                            // meters
+        float range_max_lambertian_percentage = 80;       // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
+        float rain_max_intensity = 70;                    // Rain intensity maximum to scale from in mm/hour.
 		uint measurement_per_cycle = 2048;
 		float horizontal_rotation_frequency = 10;         // rotations/sec
 		float horizontal_FOV_start = 0;                   // degrees
@@ -1292,6 +1294,8 @@ private:
 		lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);
 		lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
 		lidar_setting.ignore_marked = settings_json.getBool("IgnoreMarked", lidar_setting.ignore_marked);
+        lidar_setting.range_max_lambertian_percentage = settings_json.getFloat("rangeMaxLambertianPercentage", lidar_setting.range_max_lambertian_percentage);
+        lidar_setting.rain_max_intensity = settings_json.getFloat("rainMaxIntensity", lidar_setting.rain_max_intensity);
 
         FString materialListFile;
         bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("material_values.txt").c_str()));

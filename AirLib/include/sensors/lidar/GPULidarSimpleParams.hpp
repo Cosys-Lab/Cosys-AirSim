@@ -20,6 +20,8 @@ namespace msr {
 
 			uint number_of_channels = 64;
 			real_T range = 10000.0f / 100;               // meters
+			float range_max_lambertian_percentage = 80;  // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
+			float rain_max_intensity = 70;               // Rain intensity maximum to scale from in mm/hour.
 			uint measurement_per_cycle = 2048;
 			real_T horizontal_rotation_frequency = 10;   // rotations/sec
 			real_T horizontal_FOV_start = 0;
@@ -70,6 +72,9 @@ namespace msr {
 				generate_noise = settings.generate_noise;
 				min_noise_standard_deviation = settings.min_noise_standard_deviation;
 				noise_distance_scale = settings.noise_distance_scale;
+
+				range_max_lambertian_percentage = settings.range_max_lambertian_percentage;
+				rain_max_intensity = settings.rain_max_intensity;
 
 				// By default, for multirotors the lidars FOV point downwards;
 				// for cars, the lidars FOV is more forward facing.

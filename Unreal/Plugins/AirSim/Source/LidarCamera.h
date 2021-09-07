@@ -98,6 +98,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float max_range_ = 100;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		float range_max_lambertian_percentage_ = 80;	
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		float rain_max_intensity_ = 70;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool ignore_marked_ = false;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool generate_intensity_ = false;
