@@ -97,6 +97,8 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	material_list_file_ = settings.material_list_file;
 	range_max_lambertian_percentage_ = settings.range_max_lambertian_percentage;
 	rain_max_intensity_ = settings.rain_max_intensity;
+	rain_constant_a_ = settings.rain_constant_a;
+	rain_constant_b_ = settings.rain_constant_b;
 
 	std::string::size_type key_pos = 0;
 	std::string::size_type key_end;
@@ -148,7 +150,6 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	horizontal_delta_ = (horizontal_max_ - horizontal_min_) / float(measurement_per_cycle_ - 1);
 	vertical_delta_ = (FMath::Abs(vertical_min_) + vertical_max_) / num_of_lasers_;
 	target_fov_ = FMath::CeilToInt(FMath::Abs(vertical_min_) + vertical_max_ + (10 * vertical_delta_));
-	UE_LOG(LogTemp, Warning, TEXT("Target FOV: %f"), (int)target_fov_);
 	if (target_fov_ % 2 != 0) {
 		target_fov_ = target_fov_ + 1;
 	}
@@ -213,7 +214,7 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	bool refresh = false;
 	if (sum_rotation_ > horizontal_delta_) {
 		if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 150.0f));
-		//UE_LOG(LogTemp, Warning, TEXT("Chosen FOV: %i"), (int)fov);
+		//UAirBlueprintLib::LogMessageString("GPULidar2: ", "Chosen FOV: " + std::to_string((int)fov) + ".", LogDebugLevel::Informational);
 		capture_2D_depth_->FOVAngle = fov;
 		capture_2D_segmentation_->FOVAngle = fov;
 		capture_2D_intensity_->FOVAngle = fov;
@@ -370,7 +371,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					FColor value_intensity = buffer_2D_intensity[h_pixel + (v_pixel * resolution_)];
 					float impact_angle = ((value_intensity.R + value_intensity.G * 256 + value_intensity.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
 
-					float final_intensity = impact_angle * material_map_.at(value_intensity.A) * FMath::Exp(-2.0f * 0.01 * FMath::Pow(rain_max_intensity_ * rain_value, 0.6) * (depth / 100.0f));
+					float final_intensity = impact_angle * material_map_.at(value_intensity.A) * FMath::Exp(-2.0f * rain_constant_a_ * FMath::Pow(rain_max_intensity_ * rain_value, rain_constant_b_) * (depth / 100.0f));
 
 					if (draw_debug_ && draw_mode_ == 2) {
 						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
