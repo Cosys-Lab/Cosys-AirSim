@@ -38,7 +38,7 @@ namespace msr {
 				UpdatableObject::reportState(reporter);
 
 				reporter.writeValue("Lidar-Timestamp", output_.time_stamp);
-				reporter.writeValue("Lidar-NumPoints", static_cast<int>(output_.point_cloud.size() / 3));
+				reporter.writeValue("Lidar-NumPoints", static_cast<int>(output_.point_cloud.size() / 5));
 			}
 
 			const GPULidarData& getOutput() const

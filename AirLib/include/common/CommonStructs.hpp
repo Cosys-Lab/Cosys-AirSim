@@ -310,7 +310,6 @@ struct GPULidarData {
 
 	TTimePoint time_stamp = 0;
 	vector<real_T> point_cloud;
-	vector<std::string> groundtruth;
 	Pose pose;
 
 	GPULidarData()
