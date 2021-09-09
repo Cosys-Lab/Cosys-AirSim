@@ -214,7 +214,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
         if gpulidarActive:
             rospy.logwarn("GPULidar is enabled! Do not forget to generate instance segmentation data at the end if it is required!")
         lidarPub = rospy.Publisher(lidarTopicName, PointCloud2, queue_size=1)
-        lidarGroundtruthPub = rospy.Publisher(lidarGroundtruthTopicName, StringArray, queue_size=1)
+        if lidarActive:
+            lidarGroundtruthPub = rospy.Publisher(lidarGroundtruthTopicName, StringArray, queue_size=1)
     if echoActive:
         echoPub = rospy.Publisher(echoTopicName, PointCloud2, queue_size=1)
     if imuActive:
@@ -420,21 +421,36 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                         pcloud = PointCloud2()
                         groundtruth = StringArray()
 
-                        labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
-                        points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
-                        points = np.reshape(points, (int(points.shape[0] / 3), 3))
-                        points = points * np.array([1, -1, -1])
-                        cloud = points.tolist()
-                        groundtruth.data = labels.tolist()
-                        groundtruth.header.frame_id = lidarFrame
-                        groundtruth.header.stamp = timeStamp
-                        pcloud.header.frame_id = lidarFrame
-                        pcloud.header.stamp = timeStamp
-                        pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
+                        if gpulidarActive:
+                            points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
+                            points = np.reshape(points, (int(points.shape[0] / 5), 5))
+                            pcloud.header.frame_id = lidarFrame
+                            pcloud.header.stamp = timeStamp
+                            fields = [
+                                PointField('x', 0, PointField.FLOAT32, 1),
+                                PointField('y', 4, PointField.FLOAT32, 1),
+                                PointField('z', 8, PointField.FLOAT32, 1),
+                                PointField('rgb', 12, PointField.UINT32, 1),
+                                PointField('intensity', 16, PointField.FLOAT32, 1)
+                            ]
+                            pcloud = pc2.create_cloud(pcloud.header, fields, points.tolist())
+                            lidarPub.publish(pcloud)
+                        else:
+                            labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
+                            points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
+                            points = np.reshape(points, (int(points.shape[0] / 3), 3))
+                            points = points * np.array([1, -1, -1])
+                            cloud = points.tolist()
+                            groundtruth.data = labels.tolist()
+                            groundtruth.header.frame_id = lidarFrame
+                            groundtruth.header.stamp = timeStamp
+                            pcloud.header.frame_id = lidarFrame
+                            pcloud.header.stamp = timeStamp
+                            pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
 
-                        # publish messages
-                        lidarPub.publish(pcloud)
-                        lidarGroundtruthPub.publish(groundtruth)
+                            # publish messages
+                            lidarPub.publish(pcloud)
+                            lidarGroundtruthPub.publish(groundtruth)
 
             if echoActive:
                 # get echo data

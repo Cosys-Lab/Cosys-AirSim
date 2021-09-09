@@ -148,14 +148,18 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
         if rospy.is_shutdown():
             break
 
+        rostimestamp = t
+        timeStamp = msg.header.stamp
+        print(timeStamp)
         if currentFrame == periodFrames:
             currentFrame = 1
+            print("yup")
         else:
             currentFrame += 1
             continue
         
-        rostimestamp = t
-        timeStamp = msg.header.stamp
+
+
         position = airsimpy.Vector3r(msg.pose.position.x, -msg.pose.position.y, -msg.pose.position.z)
         orientation = airsimpy.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w).inverse()
         orientation = airsimpy.Quaternionr(float(orientation.x_val), float(orientation.y_val), float(orientation.z_val), float(orientation.w_val))
@@ -312,21 +316,40 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                     pcloud = PointCloud2()
                     groundtruth = StringArray()
 
-                    labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
-                    points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
-                    points = np.reshape(points, (int(points.shape[0] / 3), 3))
-                    points = points * np.array([1, -1, -1])
-                    cloud = points.tolist()
-                    groundtruth.data = labels.tolist()
-                    groundtruth.header.frame_id = lidarFrame
-                    groundtruth.header.stamp = timeStamp
-                    pcloud.header.frame_id = lidarFrame
-                    pcloud.header.stamp = timeStamp
-                    pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
+                    if gpulidarActive:
+                        points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
+                        points = np.reshape(points, (int(points.shape[0] / 5), 5))
+                        pcloud.header.frame_id = lidarFrame
+                        pcloud.header.stamp = timeStamp
+                        fields = [
+                            PointField('x', 0, PointField.FLOAT32, 1),
+                            PointField('y', 4, PointField.FLOAT32, 1),
+                            PointField('z', 8, PointField.FLOAT32, 1),
+                            PointField('rgb', 12, PointField.UINT32, 1),
+                            PointField('intensity', 16, PointField.FLOAT32, 1)
+                        ]
+                        pcloud = pc2.create_cloud(pcloud.header, fields, points.tolist())
 
-                    # publish messages
-                    output.write(lidarTopicName, pcloud, t=rostimestamp)
-                    output.write(lidarGroundtruthTopicName, groundtruth, t=rostimestamp)
+                        # publish messages
+                        output.write(lidarTopicName, pcloud, t=rostimestamp)
+                    else:
+                        labels = np.array(lidarData.groundtruth, dtype=np.dtype('U'))
+                        points = np.array(lidarData.point_cloud, dtype=np.dtype('f4'))
+                        points = np.reshape(points, (int(points.shape[0] / 3), 3))
+                        points = points * np.array([1, -1, -1])
+                        cloud = points.tolist()
+                        groundtruth.data = labels.tolist()
+                        groundtruth.header.frame_id = lidarFrame
+                        groundtruth.header.stamp = timeStamp
+                        pcloud.header.frame_id = lidarFrame
+                        pcloud.header.stamp = timeStamp
+                        pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
+
+                        # publish messages
+                        output.write(lidarTopicName, pcloud, t=rostimestamp)
+                        output.write(lidarGroundtruthTopicName, groundtruth, t=rostimestamp)
+
+
 
         if echoActive:
             # get echo data

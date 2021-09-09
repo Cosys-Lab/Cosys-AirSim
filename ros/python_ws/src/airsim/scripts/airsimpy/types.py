@@ -382,7 +382,6 @@ class GPULidarData(MsgpackMixin):
     point_cloud = 0.0
     time_stamp = np.uint64(0)
     pose = Pose()
-    groundtruth = ''
 
 class EchoData(MsgpackMixin):
     point_cloud = 0.0
