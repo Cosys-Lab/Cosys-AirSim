@@ -592,11 +592,11 @@ private:
 
 	FString getMaterialListFile()
 	{
-		bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("material_list.txt").c_str()));
+		bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str()));
 		if (found) {
-			return FString(msr::airlib::Settings::getExecutableFullPath("material_list.txt").c_str());
+			return FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str());
 		}else{
-			return FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("material_list.txt").c_str());
+			return FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv").c_str());
 		}
 	}
 
@@ -1304,12 +1304,12 @@ private:
         lidar_setting.rain_constant_b = settings_json.getFloat("rainConstantB", lidar_setting.rain_constant_b);
 
         FString materialListFile;
-        bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("material_values.txt").c_str()));
+        bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str()));
         if (found) {
-            materialListFile =  FString(msr::airlib::Settings::getExecutableFullPath("material_values.txt").c_str());
+            materialListFile =  FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str());
         }
         else {
-            materialListFile =  FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("material_values.txt").c_str());
+            materialListFile =  FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv").c_str());
         }
 
         FString materialListContent;

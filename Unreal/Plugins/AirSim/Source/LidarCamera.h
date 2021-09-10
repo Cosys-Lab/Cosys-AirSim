@@ -10,6 +10,7 @@
 #include "common/AirSimSettings.hpp"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
+#include <random>
 
 #include "LidarCamera.generated.h"
 
@@ -49,6 +50,8 @@ public:
 	float sum_rotation_ = 0;
 	std::string material_list_file_ = "";
 	std::map<uint8, float> material_map_;
+	std::mt19937 gen_;
+	std::normal_distribution<float> dist_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UArrowComponent* arrow_;

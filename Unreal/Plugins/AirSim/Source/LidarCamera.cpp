@@ -14,7 +14,7 @@
 #include "ObjectPainter.h"
 #include "DrawDebugHelpers.h"
 #include "Weather/WeatherLib.h"
-
+#include <random>
 #include "AirBlueprintLib.h"
 #include <string>
 #include <exception>
@@ -30,6 +30,11 @@ TArray<float> LinearSpacedArray(float min, float max, size_t N) {
 
 ALidarCamera::ALidarCamera()
 {
+
+	// Seed and initiate noise
+	std::random_device rd;
+	gen_ = std::mt19937(rd());
+	dist_ = std::normal_distribution<float>(0, 1);
 	arrow_ = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 	capture_2D_depth_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DDepth"));
 	capture_2D_segmentation_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DSegmentation"));
@@ -100,23 +105,40 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	rain_constant_a_ = settings.rain_constant_a;
 	rain_constant_b_ = settings.rain_constant_b;
 
-	std::string::size_type key_pos = 0;
-	std::string::size_type key_end;
-	std::string::size_type val_pos;
-	std::string::size_type val_end;
+	//std::string::size_type key_pos = 0;
+	//std::string::size_type key_end;
+	//std::string::size_type val_pos;
+	//std::string::size_type val_end;
 
-	while ((key_end = material_list_file_.find(':', key_pos)) != std::string::npos)
+
+	std::istringstream iss(material_list_file_);
+	std::string line, word;
+
+	material_map_.emplace(0, 1);
+	int stencil_index = 1;
+	while (std::getline(iss, line))
 	{
-		if ((val_pos = material_list_file_.find_first_not_of(": ", key_end)) == std::string::npos)
-			break;
-
-		val_end = material_list_file_.find('\n', val_pos);
-		material_map_.emplace(std::stoi(material_list_file_.substr(key_pos, key_end - key_pos)), std::stof(material_list_file_.substr(val_pos, val_end - val_pos)));
-
-		key_pos = val_end;
-		if (key_pos != std::string::npos)
-			++key_pos;
+		std::stringstream ss(line);
+		std::vector<std::string> row;
+		while (std::getline(ss, word, ',')) {
+			row.push_back(word);
+		}
+		material_map_.emplace(stencil_index, std::stof(row[1]));
+		stencil_index = stencil_index + 1;
 	}
+
+	//while ((key_end = material_list_file_.find(':', key_pos)) != std::string::npos)
+	//{
+	//	if ((val_pos = material_list_file_.find_first_not_of(": ", key_end)) == std::string::npos)
+	//		break;
+
+	//	val_end = material_list_file_.find('\n', val_pos);
+	//	material_map_.emplace(std::stoi(material_list_file_.substr(key_pos, key_end - key_pos)), std::stof(material_list_file_.substr(val_pos, val_end - val_pos)));
+
+	//	key_pos = val_end;
+	//	if (key_pos != std::string::npos)
+	//		++key_pos;
+	//}
 
 	render_target_2D_depth_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
 	render_target_2D_segmentation_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
@@ -306,8 +328,12 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 
 	float previous_horizontal_angle = FMath::Fmod(horizontal_angles_[current_horizontal_angle_index_], 360);
 	float rain_value;
-	if (generate_intensity_)rain_value = UWeatherLib::getWeatherParamScalar(this->GetWorld(), msr::airlib::Utils::toEnum<EWeatherParamScalar>(0));
 
+	bool add_rain_noise = false;
+	if (generate_intensity_) {
+		rain_value = UWeatherLib::getWeatherParamScalar(this->GetWorld(), msr::airlib::Utils::toEnum<EWeatherParamScalar>(0));
+		if (rain_value != 0)add_rain_noise;
+	}
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
 		if (last_horizontal_idx == icol_circle)within_range = false;
@@ -349,6 +375,10 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));	
 
 			if (depth < (max_range_ * 100)) {
+				if (generate_intensity_) {
+					float noise = dist_(gen_) * 0.02 * depth * FMath::Pow(1 - FMath::Exp(-rain_max_intensity_ * rain_value), 2);
+					depth = depth + noise;
+				}
 				float distance = depth / (cos_ver*cos_hor);
 				FVector point = (distance * angle_to_xyz_lut_[ipx + (icol_circle * num_of_lasers_)]);
 				bool threshold_enable = true;
@@ -370,11 +400,13 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, FMath::FloorToInt(impact_angle*254), 0, 1), false, (1 / (frequency_ * 4)));
 					}
 
+
 					if(final_intensity < (max_range_ / range_max_lambertian_percentage_ / 100) * depth / 100.0)threshold_enable = false;
 					if (draw_debug_ && draw_mode_ == 4 && threshold_enable) {
 						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
 						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, (1 / (frequency_ * 4)));
 					}
+	
 				}
 
 				if (ground_truth_) {
