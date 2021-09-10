@@ -387,8 +387,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 
 				if (generate_intensity_) {
 					FColor value_intensity = buffer_2D_intensity[h_pixel + (v_pixel * resolution_)];
-					//float impact_angle = ((value_intensity.R + value_intensity.G * 256 + value_intensity.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
-					float impact_angle = value_intensity.R / 255.0f;
+					float impact_angle = ((value_intensity.R + value_intensity.G * 256 + value_intensity.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
+					//float impact_angle = value_intensity.R / 255.0f;
 					final_intensity = impact_angle * material_map_.at(value_intensity.A) * FMath::Exp(-2.0f * rain_constant_a_ * FMath::Pow(rain_max_intensity_ * rain_value, rain_constant_b_) * (depth / 100.0f));
 
 					if (draw_debug_ && draw_mode_ == 2) {
