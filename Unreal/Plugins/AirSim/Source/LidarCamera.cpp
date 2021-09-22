@@ -105,12 +105,6 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	rain_constant_a_ = settings.rain_constant_a;
 	rain_constant_b_ = settings.rain_constant_b;
 
-	//std::string::size_type key_pos = 0;
-	//std::string::size_type key_end;
-	//std::string::size_type val_pos;
-	//std::string::size_type val_end;
-
-
 	std::istringstream iss(material_list_file_);
 	std::string line, word;
 
@@ -126,19 +120,6 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 		material_map_.emplace(stencil_index, std::stof(row[1]));
 		stencil_index = stencil_index + 1;
 	}
-
-	//while ((key_end = material_list_file_.find(':', key_pos)) != std::string::npos)
-	//{
-	//	if ((val_pos = material_list_file_.find_first_not_of(": ", key_end)) == std::string::npos)
-	//		break;
-
-	//	val_end = material_list_file_.find('\n', val_pos);
-	//	material_map_.emplace(std::stoi(material_list_file_.substr(key_pos, key_end - key_pos)), std::stof(material_list_file_.substr(val_pos, val_end - val_pos)));
-
-	//	key_pos = val_end;
-	//	if (key_pos != std::string::npos)
-	//		++key_pos;
-	//}
 
 	render_target_2D_depth_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
 	render_target_2D_segmentation_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
@@ -170,8 +151,8 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 
 	GenerateLidarCoordinates();
 	horizontal_delta_ = (horizontal_max_ - horizontal_min_) / float(measurement_per_cycle_ - 1);
-	vertical_delta_ = (FMath::Abs(vertical_min_) + vertical_max_) / num_of_lasers_;
-	target_fov_ = FMath::CeilToInt(FMath::Abs(vertical_min_) + vertical_max_ + (10 * vertical_delta_));
+	vertical_delta_ = (FMath::Abs(vertical_min_) + vertical_max_) / float(num_of_lasers_ - 1);
+	target_fov_ = FMath::CeilToInt(FMath::Abs(vertical_min_) + vertical_max_ + ((vertical_max_ - vertical_min_) * 0.7f * vertical_delta_));
 	if (target_fov_ % 2 != 0) {
 		target_fov_ = target_fov_ + 1;
 	}
@@ -235,7 +216,7 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	sum_rotation_ += rotation;
 	bool refresh = false;
 	if (sum_rotation_ > horizontal_delta_) {
-		if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 150.0f));
+		if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 180.0f));
 		//UAirBlueprintLib::LogMessageString("GPULidar2: ", "Chosen FOV: " + std::to_string((int)fov) + ".", LogDebugLevel::Informational);
 		capture_2D_depth_->FOVAngle = fov;
 		capture_2D_segmentation_->FOVAngle = fov;
