@@ -18,10 +18,14 @@
     {
       "Name": "AirSim",
       "Type": "Runtime",
-      "LoadingPhase": "PreDefault"
+      "LoadingPhase": "Default"
     }
   ],
   "Plugins": [
+	  {
+		"Name": "TemaranShaderTutorial",
+		"Enabled": true
+	  },
 	  {
 		  "Name": "PhysXVehicles",
 		  "Enabled": true
