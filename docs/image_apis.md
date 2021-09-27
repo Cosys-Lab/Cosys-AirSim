@@ -9,31 +9,13 @@ Here's a sample code to get a single image from camera named "0". The returned v
 ### Python
 
 ```python
-import airsim #pip install airsim
+import airsim 
 
 # for car use CarClient() 
 client = airsim.MultirotorClient()
 
 png_image = client.simGetImage("0", airsim.ImageType.Scene)
 # do something with image
-```
-
-### C++
-
-```cpp
-#include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
-
-int getOneImage() 
-{
-    using namespace std;
-    using namespace msr::airlib;
-    
-    //for car use CarRpcLibClient
-    msr::airlib::MultirotorRpcLibClient client;
-
-    vector<uint8_t> png_image = client.simGetImage("0", VehicleCameraBase::ImageType::Scene);
-    //do something with images
-}
 ```
 
 ## Getting Images with More Flexibility
@@ -43,7 +25,7 @@ The `simGetImages` API which is slightly more complex to use than `simGetImage` 
 ### Python
 
 ```python
-import airsim #pip install airsim
+import airsim 
 
 # for car use CarClient() 
 client = airsim.MultirotorClient()
@@ -89,48 +71,11 @@ airsim.write_png(os.path.normpath(filename + '.png'), img_rgb)
     ```
     You can also save float array to .pfm file (Portable Float Map format) using `airsim.write_pfm()` function.
 
-### C++
-
-```cpp
-int getStereoAndDepthImages() 
-{
-    using namespace std;
-    using namespace msr::airlib;
-    
-    typedef VehicleCameraBase::ImageRequest ImageRequest;
-    typedef VehicleCameraBase::ImageResponse ImageResponse;
-    typedef VehicleCameraBase::ImageType ImageType;
-
-    //for car use
-    //msr::airlib::CarRpcLibClient client;
-    msr::airlib::MultirotorRpcLibClient client;
-
-    //get right, left and depth images. First two as png, second as float16.
-    vector<ImageRequest> request = { 
-        //png format
-        ImageRequest("0", ImageType::Scene),
-        //uncompressed RGB array bytes
-        ImageRequest("1", ImageType::Scene, false, false),       
-        //floating point uncompressed image  
-        ImageRequest("1", ImageType::DepthPlanner, true) 
-    };
-
-    const vector<ImageResponse>& response = client.simGetImages(request);
-    //do something with response which contains image data, pose, timestamp etc
-}
-```
-
 ## Ready to Run Complete Examples
 
 ### Python
 
 For a more complete ready to run sample code please see [sample code in AirSimClient project](https://github.com/Microsoft/AirSim/tree/master/PythonClient//multirotor/hello_drone.py) for multirotors or [HelloCar sample](https://github.com/Microsoft/AirSim/tree/master/PythonClient//car/hello_car.py). This code also demonstrates simple activities such as saving images in files or using `numpy` to manipulate images.
-
-### C++
-
-For a more complete ready to run sample code please see [sample code in HelloDrone project](https://github.com/Microsoft/AirSim/tree/master/HelloDrone//main.cpp) for multirotors or [HelloCar project](https://github.com/Microsoft/AirSim/tree/master/HelloCar//main.cpp). 
-
-See also [other example code](https://github.com/Microsoft/AirSim/tree/master/Examples/DataCollection/StereoImageGenerator.hpp) that generates specified number of stereo images along with ground truth depth and disparity and saving it to [pfm format](pfm.md).
 
 ## Available Cameras
 ### Car
@@ -259,8 +204,8 @@ To retrieve the color map to know which color is assign to each color index you 
 colorMap = client.simGetSegmentationColorMap()
 ```
 
-A complete ready-to-run example can be found in [segmentation_test.py](../ros/python_ws/src/airsim/scripts/segmentation_test.py).
-For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../ros/python_ws/src/airsim/scripts/segmentation_generate_list.py).
+A complete ready-to-run example can be found in [segmentation_test.py](../PythonClient/segmentation_test.py).
+For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../PythonClient/segmentation_generate_list.py).
 
 #### Unsetting object ID
 An object's ID can be set to -1 to make it not show up on the segmentation image.

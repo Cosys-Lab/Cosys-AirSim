@@ -75,7 +75,7 @@ Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
 
 - _RandomStackSpawnerSwitcher_: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. Difference with the one above is that this one can
-select from a Data Table object to select randomely a 'goods'/object type and it's stacking settings. One can control it with the following settings:
+select from a Data Table object to select randomly a 'goods'/object type and it's stacking settings. One can control it with the following settings:
 
 Setting                         | Description
 --------------------------------| ------------
@@ -113,7 +113,7 @@ Chance to Change                | Percentage of chance to alter the stack config
 Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
 
-- There are some other more simple dynamic objects such as doors and conveyor belts, their have self-explanatory settings very similar to those above. All are based on the seed randomisation.
+- There are some other more simple dynamic objects such as doors and conveyor belts. They have self-explanatory settings very similar to those above. All are based on the seed randomisation.
 
 ### Grouped AI
 A human looking AI is also available to walk dynamically between a set of self chosen waypoints. They are based on the DetourAIController of Unreal so will avoid each other and the user pretty well. 
