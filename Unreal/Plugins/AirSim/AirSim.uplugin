@@ -23,10 +23,6 @@
   ],
   "Plugins": [
 	  {
-		"Name": "TemaranShaderTutorial",
-		"Enabled": true
-	  },
-	  {
 		  "Name": "PhysXVehicles",
 		  "Enabled": true
 	  }
