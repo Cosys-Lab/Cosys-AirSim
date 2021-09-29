@@ -313,7 +313,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	bool add_rain_noise = false;
 	if (generate_intensity_) {
 		rain_value = UWeatherLib::getWeatherParamScalar(this->GetWorld(), msr::airlib::Utils::toEnum<EWeatherParamScalar>(0));
-		if (rain_value != 0)add_rain_noise;
+		if (rain_value != 0)add_rain_noise = true;
 	}
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
@@ -356,7 +356,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));	
 
 			if (depth < (max_range_ * 100)) {
-				if (generate_intensity_) {
+				if (generate_intensity_ && add_rain_noise) {
 					float noise = dist_(gen_) * 0.02 * depth * FMath::Pow(1 - FMath::Exp(-rain_max_intensity_ * rain_value), 2);
 					depth = depth + noise;
 				}
