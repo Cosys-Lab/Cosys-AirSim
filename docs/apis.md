@@ -18,7 +18,7 @@ Once you can run AirSim, choose Car as vehicle and then navigate to `PythonClien
 python hello_car.py
 ```
 
-If you are using Visual Studio 2017 then just open AirSim.sln, set PythonClient as startup project and choose `car\hello_car.py` as your startup script.
+If you are using Visual Studio then just open AirSim.sln, set PythonClient as startup project and choose `car\hello_car.py` as your startup script.
 
 ## Hello Car
 Here's how to use AirSim APIs using Python to control simulated car (see also [C++ example](apis_cpp.md#hello_car)):

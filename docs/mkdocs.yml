@@ -148,10 +148,6 @@ nav:
       - "MavLink LogViewer": "docs/log_viewer.md"
       # - "MavLinkCom": 'MavLinkCom/README.md'
       # - "MavLink MoCap": 'MavLinkCom/MavLinkMoCap/Readme.md'
-    - "Upgrading":
-      - "Upgrading Unreal": 'docs/unreal_upgrade.md'
-      - "Upgrading APIs": 'docs/upgrade_apis.md'
-      - "Upgrading Settings": 'docs/upgrade_settings.md'
     - "Contributed Tutorials":
       - "Reinforcement Learning": 'docs/reinforcement_learning.md'
       - "Using Environments from Marketplace": 'https://www.youtube.com/watch?v=y09VbdQWvQY'
