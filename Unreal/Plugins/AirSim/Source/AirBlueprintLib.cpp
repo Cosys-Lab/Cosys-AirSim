@@ -425,25 +425,6 @@ void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing, FString ma
         stencil_index = stencil_index + 1;
     }
 
-
-    /*std::string::size_type key_pos = 0;
-    std::string::size_type key_end;
-    std::string::size_type val_pos;
-    std::string::size_type val_end;
-
-    while ((key_end = materialListString.find(':', key_pos)) != std::string::npos)
-    {
-        if ((val_pos = materialListString.find_first_not_of(": ", key_end)) == std::string::npos)
-            break;
-
-        val_end = materialListString.find('\n', val_pos);
-        materialMap.emplace(materialListString.substr(key_pos, key_end - key_pos), std::stoi(materialListString.substr(val_pos, val_end - val_pos)));
-
-        key_pos = val_end;
-        if (key_pos != std::string::npos)
-            ++key_pos;
-    }*/
-
     for (TObjectIterator<UStaticMeshComponent> comp; comp; ++comp)
     {
         InitializeObjectStencilID(*comp, materialMap, ignore_existing);
