@@ -250,8 +250,8 @@ public: //types
         float range_max_lambertian_percentage = 80;       // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
 
         float rain_max_intensity = 70;                    // Rain intensity maximum to scale from in mm/hour.
-        float rain_constant_a = 0.01;                     // Two constants to calculate the extinction coefficient in rain
-        float rain_constant_b = 0.6;
+        float rain_constant_a = 0.01f;                     // Two constants to calculate the extinction coefficient in rain
+        float rain_constant_b = 0.6f;
 
 		uint measurement_per_cycle = 2048;
 		float horizontal_rotation_frequency = 10;         // rotations/sec
@@ -1322,7 +1322,7 @@ private:
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
-		echo_setting.sensor_opening_angle = settings_json.getInt("SensorOpeningAngle", echo_setting.sensor_opening_angle);
+		echo_setting.sensor_opening_angle = settings_json.getFloat("SensorOpeningAngle", echo_setting.sensor_opening_angle);
 		echo_setting.reflection_opening_angle = settings_json.getFloat("ReflectionOpeningAngle", echo_setting.reflection_opening_angle);
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);
