@@ -8,7 +8,7 @@
 #include "Misc/OutputDeviceNull.h"
 #include "Engine/World.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-
+#include "Misc/FileHelper.h"
 #include <memory>
 #include "AirBlueprintLib.h"
 #include "ObjectPainter.h"
@@ -125,12 +125,12 @@ void ASimModeBase::InitializeMeshVertexColorIDs()
 void ASimModeBase::setStencilIDs()
 {
 	FString materialListContent;
-	if (FFileHelper::LoadFileToString(materialListContent, *getSettings().material_list_file)) {
+	if (FFileHelper::LoadFileToString(materialListContent, UTF8_TO_TCHAR(getSettings().material_list_file.c_str()))) {
 		UAirBlueprintLib::InitializeMeshStencilIDs(true, materialListContent);
 	}
 	else {
 		UAirBlueprintLib::LogMessage("Material list '%s' was not found. Cannot start stencil initialization.",
-			getSettings().material_list_file, LogDebugLevel::Failure);
+            UTF8_TO_TCHAR(getSettings().material_list_file.c_str()), LogDebugLevel::Failure);
 	}
 }
 	

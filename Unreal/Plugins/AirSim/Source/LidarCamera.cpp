@@ -18,6 +18,7 @@
 #include "AirBlueprintLib.h"
 #include <string>
 #include <exception>
+#include "Misc/FileHelper.h"
 
 TArray<float> LinearSpacedArray(float min, float max, size_t N) {
 	TArray<float> range;
@@ -104,8 +105,16 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	rain_max_intensity_ = settings.rain_max_intensity;
 	rain_constant_a_ = settings.rain_constant_a;
 	rain_constant_b_ = settings.rain_constant_b;
+	std::string material_List_content;
+	FString materialListContent;
+	bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str()));
 
-	std::istringstream iss(material_list_file_);
+	if (FFileHelper::LoadFileToString(materialListContent, UTF8_TO_TCHAR(settings.material_list_file.c_str()))) {
+		material_List_content = std::string(TCHAR_TO_UTF8(*materialListContent));
+	}
+
+
+	std::istringstream iss(material_List_content);
 	std::string line, word;
 
 	material_map_.emplace(0, 1);
@@ -313,7 +322,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	bool add_rain_noise = false;
 	if (generate_intensity_) {
 		rain_value = UWeatherLib::getWeatherParamScalar(this->GetWorld(), msr::airlib::Utils::toEnum<EWeatherParamScalar>(0));
-		if (rain_value != 0)add_rain_noise = true;
+		if (rain_value != 0)add_rain_noise;
 	}
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
@@ -356,7 +365,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));	
 
 			if (depth < (max_range_ * 100)) {
-				if (generate_intensity_ && add_rain_noise) {
+				if (generate_intensity_) {
 					float noise = dist_(gen_) * 0.02 * depth * FMath::Pow(1 - FMath::Exp(-rain_max_intensity_ * rain_value), 2);
 					depth = depth + noise;
 				}
