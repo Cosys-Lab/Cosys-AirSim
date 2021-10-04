@@ -428,7 +428,7 @@ public: //fields
 	std::string speed_unit_label = "m\\s";
     std::map<std::string, std::unique_ptr<SensorSetting>> sensor_defaults;
 
-	FString material_list_file = "";
+    std::string material_list_file = "";
 
 public: //methods
     static AirSimSettings& singleton() 
@@ -590,14 +590,16 @@ private:
 		material_list_file = getMaterialListFile();
     }
 
-	FString getMaterialListFile()
+    std::string getMaterialListFile()
 	{
-		bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str()));
-		if (found) {
-			return FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str());
-		}else{
-			return FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv").c_str());
-		}
+
+        if (FILE* file = fopen(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str(), "r")) {
+            fclose(file);
+            return material_list_file = msr::airlib::Settings::getExecutableFullPath("materials.csv");
+        }
+        else {
+            return material_list_file = msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv");
+        }
 	}
 
     void loadViewModeSettings(const Settings& settings_json)
@@ -1303,19 +1305,16 @@ private:
         lidar_setting.rain_constant_a = settings_json.getFloat("rainConstantA", lidar_setting.rain_constant_a);
         lidar_setting.rain_constant_b = settings_json.getFloat("rainConstantB", lidar_setting.rain_constant_b);
 
-        FString materialListFile;
-        bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str()));
-        if (found) {
-            materialListFile =  FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str());
+        if (FILE* file = fopen(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str(), "r")) {
+            fclose(file);
+            lidar_setting.material_list_file = msr::airlib::Settings::getExecutableFullPath("materials.csv");
         }
         else {
-            materialListFile =  FString(msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv").c_str());
+            lidar_setting.material_list_file = msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv");
         }
 
-        FString materialListContent;
-        if (FFileHelper::LoadFileToString(materialListContent, *materialListFile)) {
-            lidar_setting.material_list_file = std::string(TCHAR_TO_UTF8(*materialListContent));
-        }
+
+
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
 	}
