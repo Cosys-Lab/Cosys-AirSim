@@ -7,18 +7,6 @@ pushd "$SCRIPT_DIR"  >/dev/null
 set -e
 # set -x
 
-#check for correct verion of llvm
-if [[ ! -d "llvm-source-50" ]]; then
-    if [[ -d "llvm-source-39" ]]; then
-        echo "Hello there! We just upgraded AirSim to Unreal Engine 4.22."
-        echo "Here are few easy steps for upgrade so everything is new and shiny :)"
-        echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/unreal_upgrade.md"
-        exit 1
-    else
-        echo "The llvm-souce-50 folder was not found! Mystery indeed."
-    fi
-fi
-
 # check for libc++
 if [[ !(-d "./llvm-build/output/lib") ]]; then
     echo "ERROR: clang++ and libc++ is necessary to compile AirSim and run it in Unreal engine"
