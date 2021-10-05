@@ -19,7 +19,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
-* Updated Unreal to 4.22
+* Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
 
 ### November, 2018
 * Added Weather Effects and [APIs](docs/apis.md#weather-apis)
