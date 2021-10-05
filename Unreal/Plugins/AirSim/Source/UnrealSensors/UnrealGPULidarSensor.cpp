@@ -39,8 +39,7 @@ void UnrealGPULidarSensor::pause(const bool is_paused) {
 }
 
 // returns a point-cloud for the tick
-bool UnrealGPULidarSensor::getPointCloud(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth,
-	                                     msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final)
+bool UnrealGPULidarSensor::getPointCloud(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final)
 {	
-	return lidar_camera_->Update(delta_time, point_cloud, groundtruth, point_cloud_final, groundtruth_final);
+	return lidar_camera_->Update(delta_time, point_cloud, point_cloud_final);
 }

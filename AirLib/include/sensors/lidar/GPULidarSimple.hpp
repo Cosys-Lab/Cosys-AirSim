@@ -69,7 +69,7 @@ namespace msr {
 			}
 
 		protected:
-			virtual bool getPointCloud(float delta_time, vector<real_T>& point_cloud, vector<std::string>& groundtruth, vector<real_T>& point_cloud_final, vector<std::string>& groundtruth_final) = 0;
+			virtual bool getPointCloud(float delta_time, vector<real_T>& point_cloud, vector<real_T>& point_cloud_final) = 0;
 
 			virtual void pause(const bool is_paused) = 0;
 
@@ -80,14 +80,13 @@ namespace msr {
 				TTimeDelta delta_time = clock()->updateSince(last_time_);
 
 				double start = FPlatformTime::Seconds();
-				bool refresh = getPointCloud(delta_time, point_cloud_temp_, groundtruth_temp_, point_cloud_, groundtruth_);
+				bool refresh = getPointCloud(delta_time, point_cloud_temp_, point_cloud_);
 				double end = FPlatformTime::Seconds();
-				UAirBlueprintLib::LogMessageString("GPULidar: ", "Sensor data generation took " + std::to_string(end - start) + " and generated " + std::to_string(point_cloud_.size() / 3) + " points", LogDebugLevel::Informational);
+				UAirBlueprintLib::LogMessageString("GPULidar: ", "Sensor data generation took " + std::to_string(end - start) + " and generated " + std::to_string(point_cloud_.size() / 5) + " points", LogDebugLevel::Informational);
 			
 				if (refresh) {
 					GPULidarData output;
 					output.point_cloud = point_cloud_;
-					output.groundtruth = groundtruth_;
 					output.time_stamp = clock()->nowNanos();
 					const GroundTruth& ground_truth = getGroundTruth();
 					Pose lidar_pose = params_.relative_pose + ground_truth.kinematics->pose;
@@ -106,8 +105,6 @@ namespace msr {
 			vector<real_T> point_cloud_;
 			vector<real_T> point_cloud_temp_;
 			FrequencyLimiter freq_limiter_;
-			vector<std::string> groundtruth_;
-			vector<std::string> groundtruth_temp_;
 			TTimePoint last_time_;
 
 		};

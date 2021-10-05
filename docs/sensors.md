@@ -123,22 +123,12 @@ Please see [GPU lidar](gpulidar.md) for example of GPU Lidar specific settings.
 ## Sensor APIs 
 - Barometer
 
-    C++
-    ```cpp
-    msr::airlib::BarometerBase::Output getBarometerData(const std::string& barometer_name, const std::string& vehicle_name);
-    ```
-
-    Python
+- Python
     ```python
     barometer_data = getBarometerData(barometer_name = "", vehicle_name = "")
     ```
 
 - IMU
-
-C++
-    ```cpp
-    msr::airlib::ImuBase::Output getImuData(const std::string& imu_name = "", const std::string& vehicle_name = "");
-    ```
 
     Python
     ```python
@@ -147,10 +137,6 @@ C++
 
 - GPS
 
-    C++
-    ```cpp
-    msr::airlib::GpsBase::Output getGpsData(const std::string& gps_name = "", const std::string& vehicle_name = "");
-    ```
     Python
     ```python
     gps_data = getGpsData(gps_name = "", vehicle_name = "")
@@ -158,10 +144,6 @@ C++
 
 - Magnetometer
 
-    C++
-    ```cpp
-    msr::airlib::MagnetometerBase::Output getMagnetometerData(const std::string& magnetometer_name = "", const std::string& vehicle_name = "");
-    ```
     Python
     ```python
     magnetometer_data = getMagnetometerData(magnetometer_name = "", vehicle_name = "")
@@ -169,10 +151,6 @@ C++
 
 - Distance sensor
 
-    C++
-    ```cpp
-    msr::airlib::DistanceBase::Output getDistanceSensorData(const std::string& distance_sensor_name = "", const std::string& vehicle_name = "");
-    ```
     Python
     ```python
     distance_sensor_name = getDistanceSensorData(distance_sensor_name = "", vehicle_name = "")

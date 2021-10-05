@@ -89,7 +89,7 @@ public:
     static bool SetMeshStencilID(const std::string& mesh_name, int object_id,
         bool is_name_regex = false);
     static int GetMeshStencilID(const std::string& mesh_name);
-    static void InitializeMeshStencilIDs(bool ignore_existing);
+    static void InitializeMeshStencilIDs(bool ignore_existing, FString material_list);
 
     static bool IsInGameThread();
 
@@ -195,26 +195,27 @@ public:
 
 private:
     template<typename T>
-    static void InitializeObjectStencilID(T* mesh, bool ignore_existing = true)
+    static void InitializeObjectStencilID(T* mesh, std::map< std::string, int> materialMap, bool ignore_existing = true)
     {
         std::string mesh_name = common_utils::Utils::toLower(GetMeshName(mesh));
-        if (mesh_name == "" || common_utils::Utils::startsWith(mesh_name, "default_")) {
-            //common_utils::Utils::DebugBreak();
-            return;
+        bool painted = false;
+
+        for (std::map<std::string, int>::iterator iter = materialMap.begin(); iter != materialMap.end(); ++iter)
+        {
+            std::string materialName = iter->first;
+            if (common_utils::Utils::contains(mesh_name, "_material_" + materialName)) {
+                int value = iter->second;
+                if (ignore_existing || mesh->CustomDepthStencilValue == 0) {
+                    SetObjectStencilID(mesh, value);
+                }
+                painted = true;
+                break;
+            }
         }
-        FString name(mesh_name.c_str());
-        int hash = 5;
-        for (int idx = 0; idx < name.Len(); ++idx) {
-            auto char_num = UKismetStringLibrary::GetCharacterAsNumber(name, idx);
-            if (char_num < 97)
-                continue; //numerics and other punctuations
-            hash += char_num;
-        }
-        if (ignore_existing || mesh->CustomDepthStencilValue == 0) { //if value is already set then don't bother
-            SetObjectStencilID(mesh, hash % 256);
+        if (!painted) {
+            SetObjectStencilID(mesh, 0);
         }
     }
-
 
     template<typename T>
     static void SetObjectStencilIDIfMatch(T* mesh, int object_id,
@@ -230,7 +231,6 @@ private:
             SetObjectStencilID(mesh, object_id);
         }
     }
-
 
     template<typename T>
     static void SetObjectStencilID(T* mesh, int object_id)

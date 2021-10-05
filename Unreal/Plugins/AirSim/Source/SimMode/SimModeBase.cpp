@@ -3,11 +3,12 @@
 #include "Misc/MessageDialog.h"
 #include "Misc/EngineVersion.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "ConstructorHelpers.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Engine/World.h"
-
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "Misc/FileHelper.h"
 #include <memory>
 #include "AirBlueprintLib.h"
 #include "ObjectPainter.h"
@@ -72,6 +73,7 @@ void ASimModeBase::BeginPlay()
 
     setupClockSpeed();
 
+    setStencilIDs();
 	InitializeMeshVertexColorIDs();
     
     record_tick_count = 0;
@@ -118,6 +120,22 @@ void ASimModeBase::InitializeMeshVertexColorIDs()
 {     
 	UObjectPainter::Reset(this->GetLevel(), &nameToColorIndexMap_, &nameToComponentMap_, &ColorToNameMap_);
 }
+
+
+void ASimModeBase::setStencilIDs()
+{
+	FString materialListContent;
+	if (FFileHelper::LoadFileToString(materialListContent, UTF8_TO_TCHAR(getSettings().material_list_file.c_str()))) {
+		UAirBlueprintLib::InitializeMeshStencilIDs(true, materialListContent);
+	}
+	else {
+		UAirBlueprintLib::LogMessage("Material list '%s' was not found. Cannot start stencil initialization.",
+            UTF8_TO_TCHAR(getSettings().material_list_file.c_str()), LogDebugLevel::Failure);
+	}
+}
+	
+
+
 
 void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wait, const TStatId InStatId)
 {

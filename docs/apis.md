@@ -12,29 +12,13 @@ First install this package:
 pip install msgpack-rpc-python
 ```
 
-You can either get AirSim binaries from [releases](https://github.com/Microsoft/AirSim/releases) or compile from the source ([Windows](build_windows.md), [Linux](build_linux.md)). Once you can run AirSim, choose Car as vehicle and then navigate to `PythonClient\car\` folder and run:
+Once you can run AirSim, choose Car as vehicle and then navigate to `PythonClient\car\` folder and run:
 
 ```
 python hello_car.py
 ```
 
-If you are using Visual Studio 2017 then just open AirSim.sln, set PythonClient as startup project and choose `car\hello_car.py` as your startup script.
-
-### Installing AirSim Package
-You can also install `airsim` package simply by,
-
-```
-pip install airsim
-```
-
-You can find source code and samples for this package in `PythonClient` folder in your repo. 
-
-**Notes**
-1. You may notice a file `setup_path.py` in our example folders. This file has simple code to detect if `airsim` package is available in parent folder and in that case we use that instead of pip installed package so you always use latest code.
-2. AirSim is still under heavy development which means you might frequently need to update the package to use new APIs.
-
-## C++ Users
-If you want to use C++ APIs and examples, please see [C++ APIs Guide](apis_cpp.md).
+If you are using Visual Studio then just open AirSim.sln, set PythonClient as startup project and choose `car\hello_car.py` as your startup script.
 
 ## Hello Car
 Here's how to use AirSim APIs using Python to control simulated car (see also [C++ example](apis_cpp.md#hello_car)):
@@ -179,9 +163,9 @@ Please note that `Roadwetness`, `RoadSnow` and `RoadLeaf` effects requires addin
 Please see [example code](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/PythonClient/computer_vision/weather.py) for more details.
 
 ### Lidar APIs
-AirSim offers API to retrieve point cloud data from Lidar sensors on vehicles. You can set the number of channels, points per second, horizontal and vertical FOV, etc parameters in [settings.json](settings.md). 
+AirSim offers API to retrieve point cloud data from (GPU)Lidar sensors on vehicles. You can set the number of channels, points per second, horizontal and vertical FOV, etc parameters in [settings.json](settings.md). 
 
-More on [lidar APIs and settings](lidar.md) and [sensor settings](sensors.md)
+More on [lidar APIs and settings](lidar.md), [GPUlidar APIs and settings](gpulidar.md) and [sensor settings](sensors.md)
 
 ### Multiple Vehicles
 AirSim supports multiple vehicles and control them through APIs. Please [Multiple Vehicles](multi_vehicle.md) doc.
@@ -248,7 +232,6 @@ The APIs use [msgpack-rpc protocol](https://github.com/msgpack-rpc/msgpack-rpc) 
 
 ## References and Examples
 
-* [C++ API Examples](apis_cpp.md)
 * [Car Examples](https://github.com/Microsoft/AirSim/tree/master/PythonClient//car)
 * [Multirotor Examples](https://github.com/Microsoft/AirSim/tree/master/PythonClient//multirotor)
 * [Computer Vision Examples](https://github.com/Microsoft/AirSim/tree/master/PythonClient//computer_vision)

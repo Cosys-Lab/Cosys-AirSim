@@ -6,13 +6,12 @@ AirSim and ROS can be integrated using C++ or Python.  Some example ROS node are
 
 ## Prerequisites
 
-These instructions are for Ubuntu 16.04, ROS Kinetic, UE4 4.22 and latest AirSim release.
+These instructions are for Ubuntu 18.04, ROS Melodic, UE4 4.24.4 and latest AirSim release.
 You should have these components installed and working before proceeding
 
 ## Implemented nodes
 - `airsimnode.py`: Configurable Python node to get and publish the pose of vehicle and sensory data from lidar, echosensor, cameras and IMU. You can also toggle controlling the vehicle from here.
    It will also perform proper transformation of all frames.
-[URDF Vehicles](UrdfXml.md) are implemented in the ROS API but don't have any ready made nodes. URDF is extemely dependent on which robot is build, each ROS node for it should therefore be handcrafted.
 
 ## Implemented launch files
 Various launch files are available, please check their settings for more information. 

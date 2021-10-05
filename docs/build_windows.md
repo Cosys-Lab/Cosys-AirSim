@@ -4,13 +4,13 @@
 This branch uses a custom version of the Unreal Engine!
 - Make sure you are [registered with Epic Games](https://docs.unrealengine.com/latest/INT/Platforms/Linux/BeginnerLinuxDeveloper/SettingUpAnUnrealWorkflow/1/index.html). This is required to get source code access for Unreal Engine.
 
-- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.22 at present.
+- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.24.4 (Cosys-Lab fork) at present.
    ```bash
    # go to the folder where you clone GitHub projects
    git clone https://github.com/WouterJansen/UnrealEngine.git
    cd UnrealEngine
    ```
- -Visual Studio 2017 is required for building. We recommend getting Visual Studio Community 2017, at the time of writing at version 15.9. 
+ -Visual Studio 2019 is required for building. 
 - To install the correct components for UE4 development, check the "Game Development with C++" workload and the “.net 4.6.2”, "Unreal Engine Installer" and "Nuget Package Manager" optional individual components.
 - run `Setup.bat`
 - run `GenerateProjectFiles.bat ` as administrator 
@@ -21,7 +21,7 @@ This branch uses a custom version of the Unreal Engine!
 - please run `Engine\Binaries\Win64\UnrealVersionSelector-Win64-Shipping.exe` once so it is detectable by your system. 
 
 ## Build AirSim
-* Start `x64 Native Tools Command Prompt for VS 2017`. 
+* Start `x64 Native Tools Command Prompt for VS 2019`. 
 * Clone the repo: `git clone https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git`, and go the AirSim directory by `cd AirSim`. 
 * Run `build.cmd` from the command line. This will create ready to use plugin bits in the `Unreal\Plugins` folder that can be dropped into any Unreal project.
 

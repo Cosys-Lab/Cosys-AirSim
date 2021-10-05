@@ -20,6 +20,10 @@ namespace msr {
 
 			uint number_of_channels = 64;
 			real_T range = 10000.0f / 100;               // meters
+			float range_max_lambertian_percentage = 80;  // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
+			float rain_max_intensity = 70;               // Rain intensity maximum to scale from in mm/hour.
+			float rain_constant_a = 0.01;                // Two constants to calculate the extinction coefficient in rain
+			float rain_constant_b = 0.6;
 			uint measurement_per_cycle = 2048;
 			real_T horizontal_rotation_frequency = 10;   // rotations/sec
 			real_T horizontal_FOV_start = 0;
@@ -40,9 +44,15 @@ namespace msr {
 				Quaternionr::Identity()                  // orientation - by default Quaternionr(1, 0, 0, 0)
 			};
 
+			bool generate_intensity = false;             // Toggle intensity calculation on or off
+
 			bool draw_debug_points = false;
+			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
 
 			real_T startup_delay = 1;                   // sec
+
+			std::string material_list_file = "";        // String holding all material data
+
 
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
 			{
@@ -64,6 +74,11 @@ namespace msr {
 				generate_noise = settings.generate_noise;
 				min_noise_standard_deviation = settings.min_noise_standard_deviation;
 				noise_distance_scale = settings.noise_distance_scale;
+
+				range_max_lambertian_percentage = settings.range_max_lambertian_percentage;
+				rain_max_intensity = settings.rain_max_intensity;
+				rain_constant_a = settings.rain_constant_a;
+				rain_constant_b = settings.rain_constant_b;
 
 				// By default, for multirotors the lidars FOV point downwards;
 				// for cars, the lidars FOV is more forward facing.
@@ -104,7 +119,11 @@ namespace msr {
 					Utils::degreesToRadians(roll),    //roll  - rotation around X axis
 					Utils::degreesToRadians(yaw));    //yaw   - rotation around Z axis
 
+				generate_intensity = settings.generate_intensity;
+				material_list_file = settings.material_list_file;
+
 				draw_debug_points = settings.draw_debug_points;
+				draw_mode = settings.draw_mode;
 			}
 		};
 

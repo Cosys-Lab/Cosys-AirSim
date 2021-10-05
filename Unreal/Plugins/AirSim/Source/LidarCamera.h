@@ -10,6 +10,7 @@
 #include "common/AirSimSettings.hpp"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
+#include <random>
 
 #include "LidarCamera.generated.h"
 
@@ -32,12 +33,10 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void GenerateLidarCoordinates();
-	bool SampleRenders(float rotation, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth,
-		               msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final);
+	bool SampleRenders(float rotation, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
 	void RotateCamera(float rotation);
 	void InitializeSettings(const AirSimSettings::GPULidarSetting& settings);
-	bool Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth,
-		        msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final);
+	bool Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
 
 	TArray<float> horizontal_angles_;
 	TArray<float> vertical_angles_;
@@ -49,6 +48,10 @@ public:
 	float horizontal_delta_ = 0;
 	float vertical_delta_ = 0;
 	float sum_rotation_ = 0;
+	std::string material_list_file_ = "";
+	std::map<uint8, float> material_map_;
+	std::mt19937 gen_;
+	std::normal_distribution<float> dist_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UArrowComponent* arrow_;
@@ -60,10 +63,16 @@ public:
 		USceneCaptureComponent2D* capture_2D_segmentation_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		USceneCaptureComponent2D* capture_2D_intensity_;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UTextureRenderTarget2D* render_target_2D_depth_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UTextureRenderTarget2D* render_target_2D_segmentation_;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UTextureRenderTarget2D* render_target_2D_intensity_;
 
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		uint32 num_of_lasers_ = 16;
@@ -84,11 +93,23 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool draw_debug_ = true;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		uint32 draw_mode_ = 0;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool ground_truth_ = false;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float max_range_ = 100;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		float range_max_lambertian_percentage_ = 80;	
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		float rain_max_intensity_ = 70;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		float rain_constant_a_ = 0.01;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		float rain_constant_b_ = 0.6;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool ignore_marked_ = false;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		bool generate_intensity_ = false;
 
 private: //members
  

@@ -75,7 +75,7 @@ Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
 
 - _RandomStackSpawnerSwitcher_: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. Difference with the one above is that this one can
-select from a Data Table object to select randomely a 'goods'/object type and it's stacking settings. One can control it with the following settings:
+select from a Data Table object to select randomly a 'goods'/object type and it's stacking settings. One can control it with the following settings:
 
 Setting                         | Description
 --------------------------------| ------------
@@ -113,7 +113,7 @@ Chance to Change                | Percentage of chance to alter the stack config
 Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
 
-- There are some other more simple dynamic objects such as doors and conveyor belts, their have self-explanatory settings very similar to those above. All are based on the seed randomisation.
+- There are some other more simple dynamic objects such as doors and conveyor belts. They have self-explanatory settings very similar to those above. All are based on the seed randomisation.
 
 ### Grouped AI
 A human looking AI is also available to walk dynamically between a set of self chosen waypoints. They are based on the DetourAIController of Unreal so will avoid each other and the user pretty well. 
@@ -136,7 +136,7 @@ Here are quick steps to get HySLAM environment up and running:
 
 1. Make sure you have [installed Unreal and built AirSim](build_windows.md).
 2. Navigate to folder `AirSim\Unreal\Environments\HySLAM` and run `update_from_git.bat`.
-3. Double click on generated .sln file to open in Visual Studio 2017 or newer.
+3. Double click on generated .sln file to open in Visual Studio.
 4. Make sure `HySLAM` project is the startup project, build configuration is set to `DebugGame_Editor` and `Win64`. Hit F5 to run.
 5. Press the Play button in Unreal Editor to start. See [how to use AirSim](https://github.com/Microsoft/AirSim/#how-to-use-it).
 

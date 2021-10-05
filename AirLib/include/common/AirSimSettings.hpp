@@ -247,6 +247,12 @@ public: //types
 		// shared defaults
 		uint number_of_channels = 64;
 		real_T range = 100.0f;                            // meters
+        float range_max_lambertian_percentage = 80;       // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
+
+        float rain_max_intensity = 70;                    // Rain intensity maximum to scale from in mm/hour.
+        float rain_constant_a = 0.01f;                     // Two constants to calculate the extinction coefficient in rain
+        float rain_constant_b = 0.6f;
+
 		uint measurement_per_cycle = 2048;
 		float horizontal_rotation_frequency = 10;         // rotations/sec
 		float horizontal_FOV_start = 0;                   // degrees
@@ -266,7 +272,11 @@ public: //types
 		Vector3r position = VectorMath::nanVector();
 		Rotation rotation = Rotation::nanRotation();
 
+		bool generate_intensity = false;                  // Toggle intensity calculation on or off
+        std::string material_list_file = "";              // String holding all material data
+
 		bool draw_debug_points = false;
+		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
 	};
 
 	struct EchoSetting : SensorSetting {
@@ -400,7 +410,7 @@ public: //fields
     std::vector<std::string> error_messages;
     
     bool is_record_ui_visible = false;
-    int initial_view_mode = 3; //ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FLY_WITH_ME
+    int initial_view_mode = 2; //ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FLY_WITH_ME
     bool enable_rpc = true;
     std::string api_server_address = "";
     std::string physics_engine_name = "";
@@ -417,6 +427,8 @@ public: //fields
 	float speed_unit_factor =  1.0f;
 	std::string speed_unit_label = "m\\s";
     std::map<std::string, std::unique_ptr<SensorSetting>> sensor_defaults;
+
+    std::string material_list_file = "";
 
 public: //methods
     static AirSimSettings& singleton() 
@@ -574,7 +586,21 @@ private:
             else
                 physics_engine_name = "PhysX"; //this value is only informational for now
         }
+
+		material_list_file = getMaterialListFile();
     }
+
+    std::string getMaterialListFile()
+	{
+
+        if (FILE* file = fopen(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str(), "r")) {
+            fclose(file);
+            return material_list_file = msr::airlib::Settings::getExecutableFullPath("materials.csv");
+        }
+        else {
+            return material_list_file = msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv");
+        }
+	}
 
     void loadViewModeSettings(const Settings& settings_json)
     {
@@ -590,21 +616,21 @@ private:
         }
 
         if (view_mode_string == "Fpv")
-            initial_view_mode = 1; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FPV;
+            initial_view_mode = 0; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FPV;
         else if (view_mode_string == "GroundObserver")
-            initial_view_mode = 2; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_GROUND_OBSERVER;
+            initial_view_mode = 1; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_GROUND_OBSERVER;
         else if (view_mode_string == "FlyWithMe")
-            initial_view_mode = 3; //ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FLY_WITH_ME;
+            initial_view_mode = 2; //ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FLY_WITH_ME;
         else if (view_mode_string == "Manual")
-            initial_view_mode = 4; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_MANUAL;
+            initial_view_mode = 3; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_MANUAL;
         else if (view_mode_string == "SpringArmChase")
-            initial_view_mode = 5; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_SPRINGARM_CHASE;
+            initial_view_mode = 4; // ECameraDirectorMode::CAMERA_DIRECTOR_MODE_SPRINGARM_CHASE;
         else if (view_mode_string == "Backup")
-            initial_view_mode = 6; // ECameraDirectorMode::CAMREA_DIRECTOR_MODE_BACKUP;
+            initial_view_mode = 5; // ECameraDirectorMode::CAMREA_DIRECTOR_MODE_BACKUP;
         else if (view_mode_string == "NoDisplay")
-            initial_view_mode = 7; // ECameraDirectorMode::CAMREA_DIRECTOR_MODE_NODISPLAY;
+            initial_view_mode = 6; // ECameraDirectorMode::CAMREA_DIRECTOR_MODE_NODISPLAY;
         else if (view_mode_string == "Front")
-            initial_view_mode = 8; // ECameraDirectorMode::CAMREA_DIRECTOR_MODE_FRONT;
+            initial_view_mode = 7; // ECameraDirectorMode::CAMREA_DIRECTOR_MODE_FRONT;
         else
             error_messages.push_back("ViewMode setting is not recognized: " + view_mode_string);
     }
@@ -1251,6 +1277,7 @@ private:
 
         lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
+
     }
 
 	static void initializeGPULidarSetting(GPULidarSetting& lidar_setting, const Settings& settings_json)
@@ -1262,15 +1289,31 @@ private:
 		lidar_setting.resolution = settings_json.getInt("Resolution", lidar_setting.resolution);
 		lidar_setting.ground_truth = settings_json.getBool("GroundTruth", lidar_setting.ground_truth);
 		lidar_setting.generate_noise = settings_json.getBool("GenerateNoise", lidar_setting.generate_noise);
+		lidar_setting.generate_intensity = settings_json.getBool("GenerateIntensity", lidar_setting.generate_intensity);
 		lidar_setting.min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", lidar_setting.min_noise_standard_deviation);
 		lidar_setting.update_frequency = settings_json.getFloat("UpdateFrequency", lidar_setting.update_frequency);
 		lidar_setting.noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", lidar_setting.noise_distance_scale);
 		lidar_setting.draw_debug_points = settings_json.getBool("DrawDebugPoints", lidar_setting.draw_debug_points);
+		lidar_setting.draw_mode = settings_json.getInt("DrawMode", lidar_setting.draw_mode);
 		lidar_setting.vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", lidar_setting.vertical_FOV_upper);
 		lidar_setting.vertical_FOV_lower = settings_json.getFloat("VerticalFOVLower", lidar_setting.vertical_FOV_lower);
 		lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);
 		lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
 		lidar_setting.ignore_marked = settings_json.getBool("IgnoreMarked", lidar_setting.ignore_marked);
+        lidar_setting.range_max_lambertian_percentage = settings_json.getFloat("rangeMaxLambertianPercentage", lidar_setting.range_max_lambertian_percentage);
+        lidar_setting.rain_max_intensity = settings_json.getFloat("rainMaxIntensity", lidar_setting.rain_max_intensity);
+        lidar_setting.rain_constant_a = settings_json.getFloat("rainConstantA", lidar_setting.rain_constant_a);
+        lidar_setting.rain_constant_b = settings_json.getFloat("rainConstantB", lidar_setting.rain_constant_b);
+
+        if (FILE* file = fopen(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str(), "r")) {
+            fclose(file);
+            lidar_setting.material_list_file = msr::airlib::Settings::getExecutableFullPath("materials.csv");
+        }
+        else {
+            lidar_setting.material_list_file = msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv");
+        }
+
+
 
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
@@ -1279,7 +1322,7 @@ private:
     static void initializeEchoSetting(EchoSetting& echo_setting, const Settings& settings_json)
 	{
 		echo_setting.number_of_traces = settings_json.getInt("NumberOfTraces", echo_setting.number_of_traces);
-		echo_setting.sensor_opening_angle = settings_json.getInt("SensorOpeningAngle", echo_setting.sensor_opening_angle);
+		echo_setting.sensor_opening_angle = settings_json.getFloat("SensorOpeningAngle", echo_setting.sensor_opening_angle);
 		echo_setting.reflection_opening_angle = settings_json.getFloat("ReflectionOpeningAngle", echo_setting.reflection_opening_angle);
 		echo_setting.attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", echo_setting.attenuation_per_distance);
 		echo_setting.attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", echo_setting.attenuation_per_reflection);

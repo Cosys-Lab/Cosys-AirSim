@@ -19,7 +19,7 @@ Here are quick steps to get CoSys-Lab environment up and running:
 
 1. Make sure you have [installed Unreal and built AirSim](build_windows.md).
 2. Navigate to folder `AirSim\Unreal\Environments\CoSysLab` and run `update_from_git.bat`.
-3. Double click on generated .sln file to open in Visual Studio 2017 or newer.
+3. Double click on generated .sln file to open in Visual Studio.
 4. Make sure `CoSysLab` project is the startup project, build configuration is set to `DebugGame_Editor` and `Win64`. Hit F5 to run.
 5. Press the Play button in Unreal Editor to start. See [how to use AirSim](https://github.com/Microsoft/AirSim/#how-to-use-it).
 

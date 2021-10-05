@@ -9,14 +9,14 @@
 #include "Components/StaticMeshComponent.h"
 #include "EngineUtils.h"
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
-#include "UObjectIterator.h"
+#include "UObject/UObjectIterator.h"
 #include "Camera/CameraComponent.h"
-#include "MessageDialog.h"
+#include "Misc/MessageDialog.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
 #include "Slate/SceneViewport.h"
 #include "IImageWrapper.h"
-#include "ObjectThumbnail.h"
+#include "Misc/ObjectThumbnail.h"
 #include "Engine/Engine.h"
 #include <exception>
 #include "common/common_utils/Utils.hpp"
@@ -404,19 +404,38 @@ std::string UAirBlueprintLib::GetMeshName(ALandscapeProxy* mesh)
     return std::string(TCHAR_TO_UTF8(*(mesh->GetName())));
 }
 
-void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing)
+void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing, FString material_list)
 {
+    std::string materialListString = std::string(TCHAR_TO_UTF8(*material_list));
+    std::map< std::string, int> materialMap;
+
+
+    std::istringstream iss(materialListString);
+    std::string line, word;
+    int stencil_index = 1;
+
+    while (std::getline(iss, line))
+    {
+        std::stringstream ss(line);
+        std::vector<std::string> row;
+        while (std::getline(ss, word, ',')) {
+            row.push_back(word);
+        }
+        materialMap.emplace(row[0], stencil_index);
+        stencil_index = stencil_index + 1;
+    }
+
     for (TObjectIterator<UStaticMeshComponent> comp; comp; ++comp)
     {
-        InitializeObjectStencilID(*comp, ignore_existing);
+        InitializeObjectStencilID(*comp, materialMap, ignore_existing);
     }
     for (TObjectIterator<USkinnedMeshComponent> comp; comp; ++comp)
     {
-        InitializeObjectStencilID(*comp, ignore_existing);
+        InitializeObjectStencilID(*comp, materialMap, ignore_existing);
     }
     for (TObjectIterator<ALandscapeProxy> comp; comp; ++comp)
     {
-        InitializeObjectStencilID(*comp, ignore_existing);
+        InitializeObjectStencilID(*comp, materialMap, ignore_existing);
     }
 }
 

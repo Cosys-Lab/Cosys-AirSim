@@ -164,6 +164,7 @@ private:
 
 private:
     void InitializeMeshVertexColorIDs();
+	void setStencilIDs();
     void initializeTimeOfDay();
     void advanceTimeOfDay();
     void setSunRotation(FRotator rotation);
