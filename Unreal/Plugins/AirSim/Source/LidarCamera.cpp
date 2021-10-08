@@ -319,10 +319,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	float previous_horizontal_angle = FMath::Fmod(horizontal_angles_[current_horizontal_angle_index_], 360);
 	float rain_value;
 
-	bool add_rain_noise = false;
 	if (generate_intensity_) {
 		rain_value = UWeatherLib::getWeatherParamScalar(this->GetWorld(), msr::airlib::Utils::toEnum<EWeatherParamScalar>(0));
-		if (rain_value != 0)add_rain_noise;
 	}
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
