@@ -22,6 +22,10 @@
 
 #include "Weather/WeatherLib.h"
 
+#include "Beacons/TemplateBeacon.h"
+#include "Beacons/FiducialBeacon.h"
+#include "Beacons/UWBBeacon.h"
+
 #include "DrawDebugHelpers.h"
 
 //TODO: this is going to cause circular references which is fine here but
@@ -603,6 +607,56 @@ void ASimModeBase::setupVehiclesAndCamera()
             }
         }
 
+        //add beacons from settings
+        for (auto const& beacon_setting_pair : getSettings().beacons)
+        {
+            //if vehicle is of type for derived SimMode and auto creatable
+            const auto& beacon_setting = *beacon_setting_pair.second;
+            //if (beacon_setting.auto_create &&
+                //isVehicleTypeSupported(beacon_setting.beacon_type)) {
+            if (beacon_setting.auto_create) {
+                //compute initial pose
+                FVector spawn_position = uu_origin.GetLocation();
+                msr::airlib::Vector3r settings_position = beacon_setting.position;
+                if (!msr::airlib::VectorMath::hasNan(settings_position))
+                    spawn_position = getGlobalNedTransform().fromGlobalNed(settings_position);
+                FRotator spawn_rotation = toFRotator(beacon_setting.rotation, uu_origin.Rotator());
+
+                //spawn beacon pawn
+                FActorSpawnParameters pawn_spawn_params;
+                FString comboName = beacon_setting.beacon_name.c_str() + FString(":") + beacon_setting.beacon_pawn_name.c_str();
+                pawn_spawn_params.Name = FName(*comboName);
+                pawn_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+                //auto beacon_bp_class = UAirBlueprintLib::LoadClass(getSettings().pawn_paths.at(beacon_setting.beacon_pawn_name).pawn_bp);
+                //FActorSpawnParameters SpawnInfo;
+                // TODO: Make the child sim modes responsible for casting the types. 
+                //ATemplateBeacon* spawned_beacon = static_cast<ATemplateBeacon*>(this->GetWorld()->SpawnActor(beacon_bp_class, &spawn_position, &spawn_rotation, pawn_spawn_params2));
+
+                if (beacon_setting.beacon_type.compare("fiducialmarker") == 0) {
+                    AFiducialBeacon* spawned_beacon = static_cast<AFiducialBeacon*>(GetWorld()->SpawnActor<AFiducialBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
+                }
+                else if (beacon_setting.beacon_type.compare("uwbbeacon") == 0) {
+                    AUWBBeacon* spawned_beacon = static_cast<AUWBBeacon*>(GetWorld()->SpawnActor<AUWBBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
+                }
+                else {
+                    ATemplateBeacon* spawned_beacon = static_cast<ATemplateBeacon*>(GetWorld()->SpawnActor<ATemplateBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
+                }
+
+                //this->GetWorld()->SpawnActor<AActor>(ATemplateBeacon)
+                /*AActor* spawned_actor = static_cast<AActor*>(this->GetWorld()->SpawnActor(
+                    beacon_bp_class, &spawn_position, &spawn_rotation, pawn_spawn_params2));
+
+                AirsimVehicle* spawned_pawn2 = dynamic_cast<AirsimVehicle*>(spawned_actor);
+
+                spawned_actors_.Add(spawned_pawn2->GetPawn());
+                pawns.Add(spawned_pawn2);
+
+                if (beacon_setting.is_fpv_vehicle)
+                    fpv_pawn = spawned_pawn2->GetPawn();*/
+            }
+        }
+
         //create API objects for each pawn we have
         for (AActor* pawn : pawns)
         {
@@ -655,6 +709,11 @@ bool ASimModeBase::isVehicleTypeSupported(const std::string& vehicle_type) const
 }
 
 std::string ASimModeBase::getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const
+{
+    //derived class should override this method to retrieve types of pawns they support
+    return "";
+}
+std::string ASimModeBase::getBeaconPawnPathName(const AirSimSettings::BeaconSetting& beacon_setting) const
 {
     //derived class should override this method to retrieve types of pawns they support
     return "";

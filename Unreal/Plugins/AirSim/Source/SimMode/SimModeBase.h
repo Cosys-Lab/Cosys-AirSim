@@ -16,6 +16,11 @@
 #include "PawnSimApi.h"
 #include "common/StateReporterWrapper.hpp"
 
+//#include "Vehicles/AirSimVehicle.h"
+
+#include "Beacons/TemplateBeacon.h"
+#include "Beacons/FiducialBeacon.h"
+
 #include "SimModeBase.generated.h"
 
 
@@ -91,6 +96,7 @@ protected: //must overrides
     virtual void getExistingVehiclePawns(TArray<AActor*>& pawns) const;
     virtual bool isVehicleTypeSupported(const std::string& vehicle_type) const;
     virtual std::string getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const;
+    virtual std::string getBeaconPawnPathName(const AirSimSettings::BeaconSetting& beacon_setting) const;
     virtual PawnEvents* getVehiclePawnEvents(APawn* pawn) const;
     virtual const common_utils::UniqueValueMap<std::string, APIPCamera*> getVehiclePawnCameras(APawn* pawn) const;
     virtual void initializeVehiclePawn(APawn* pawn);

@@ -326,5 +326,33 @@ struct EchoData {
 	{}
 };
 
+struct SensorTemplateData {
+
+    TTimePoint time_stamp = 0;
+    vector<real_T> point_cloud;
+    Pose pose;
+
+    SensorTemplateData()
+    {}
+};
+
+struct UWBHit
+{
+    int beaconID;
+    int rssi;
+};
+
+struct MarLocUwbSensorData {
+
+    TTimePoint time_stamp = 0;
+    //vector<real_T> point_cloud;
+    Pose pose;
+    std::vector<int> beaconsActiveID;
+    std::vector<int> beaconsActiveRssi;
+
+    MarLocUwbSensorData()
+    {}
+};
+
 }} //namespace
 #endif

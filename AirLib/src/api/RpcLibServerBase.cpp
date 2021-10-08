@@ -231,6 +231,14 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         return RpcLibAdapatorsBase::EnvironmentState(result);
     });
 
+    /*pimpl_->server.bind("getUWBData", []() -> string {
+        return "Greetings from MarLoc three oooA";
+    });*/
+    pimpl_->server.bind("getUWBData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::MarLocUwbSensorData {
+        const auto& sensor_data = getVehicleApi(vehicle_name)->getMarLocUWBSensorData(sensor_name);
+        return RpcLibAdapatorsBase::MarLocUwbSensorData(sensor_data);
+    });
+
     pimpl_->server.bind("cancelLastTask", [&](const std::string& vehicle_name) -> void {
         getVehicleApi(vehicle_name)->cancelLastTask();
     });

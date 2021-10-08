@@ -573,6 +573,81 @@ public:
 			return d;
 		}
 	};
+
+    struct SensorTemplateData {
+
+        msr::airlib::TTimePoint time_stamp;    // timestamp
+        std::vector<float> point_cloud;        // data
+        Pose pose;
+
+        MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+
+        SensorTemplateData()
+        {}
+
+        SensorTemplateData(const msr::airlib::SensorTemplateData& s)
+        {
+            time_stamp = s.time_stamp;
+            point_cloud = s.point_cloud;
+
+            //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+            if (point_cloud.size() == 0)
+                point_cloud.push_back(0);
+
+            pose = s.pose;
+        }
+
+        msr::airlib::SensorTemplateData to() const
+        {
+            msr::airlib::SensorTemplateData d;
+
+            d.time_stamp = time_stamp;
+            d.point_cloud = point_cloud;
+            d.pose = pose.to();
+
+            return d;
+        }
+    };
+
+    struct MarLocUwbSensorData {
+
+        msr::airlib::TTimePoint time_stamp;    // timestamp
+        //std::vector<float> point_cloud;        // data
+        Pose pose;
+        std::vector<int> beaconsActiveID;
+        std::vector<int> beaconsActiveRssi;
+
+        MSGPACK_DEFINE_MAP(time_stamp, pose, beaconsActiveID, beaconsActiveRssi);
+
+        MarLocUwbSensorData()
+        {}
+
+        MarLocUwbSensorData(const msr::airlib::MarLocUwbSensorData& s)
+        {
+            time_stamp = s.time_stamp;
+            /*point_cloud = s.point_cloud;
+
+            //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+            if (point_cloud.size() == 0)
+                point_cloud.push_back(0);*/
+            pose = s.pose;
+            beaconsActiveID = s.beaconsActiveID;
+            beaconsActiveRssi = s.beaconsActiveRssi;
+        }
+
+        msr::airlib::MarLocUwbSensorData to() const
+        {
+            msr::airlib::MarLocUwbSensorData d;
+
+            d.time_stamp = time_stamp;
+            //d.point_cloud = point_cloud;
+            d.pose = pose.to();
+            d.beaconsActiveID = beaconsActiveID;
+            d.beaconsActiveRssi = beaconsActiveRssi;
+
+            return d;
+        }
+    };
 	
     struct ImuData {
         msr::airlib::TTimePoint time_stamp;

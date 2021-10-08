@@ -19,6 +19,8 @@
 #include "sensors/barometer/BarometerBase.hpp"
 #include "sensors/magnetometer/MagnetometerBase.hpp"
 #include "sensors/distance/DistanceBase.hpp"
+#include "sensors/template/SensorTemplateBase.hpp"
+#include "sensors/MarLocUwb/MarLocUwbBase.hpp"
 #include "sensors/gps/GpsBase.hpp"
 #include <exception>
 #include <string>
@@ -38,6 +40,11 @@ public:
     virtual bool isApiControlEnabled() const = 0;
     virtual bool armDisarm(bool arm) = 0;
     virtual GeoPoint getHomeGeoPoint() const = 0;
+
+    virtual string MarLoc_test2() const
+    {
+        return "MarLoc was here two";
+    }
 
     //default implementation so derived class doesn't have to call on UpdatableObject
     virtual void reset() override
@@ -198,6 +205,73 @@ public:
 
 		echo->setInput(input);
 	}
+
+    // Echo APIs
+    virtual SensorTemplateData getSensorTemplateData(const std::string& sensor_name) const
+    {
+        const SensorTemplateBase* sensor = nullptr;
+
+        // Find echo with the given name (for empty input name, return the first one found)
+        // Not efficient but should suffice given small number of echos
+        uint template_sensor_count = getSensors().size(SensorBase::SensorType::SensorTemplate);
+        for (uint i = 0; i < template_sensor_count; i++)
+        {
+            const SensorTemplateBase* current_sensor = static_cast<const SensorTemplateBase*>(getSensors().getByType(SensorBase::SensorType::SensorTemplate, i));
+            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
+            {
+                sensor = current_sensor;
+                break;
+            }
+        }
+        if (sensor == nullptr)
+            throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", sensor_name.c_str()));
+
+        return sensor->getOutput();
+    }
+
+    virtual void setSensorTemplateData(const std::string& sensor_name, const SensorTemplateData& input) const
+    {
+        const SensorTemplateBase* sensor = nullptr;
+
+        // Find echo with the given name (for empty input name, return the first one found)
+        // Not efficient but should suffice given small number of echos
+        uint count_echos = getSensors().size(SensorBase::SensorType::SensorTemplate);
+        for (uint i = 0; i < count_echos; i++)
+        {
+            const SensorTemplateBase* current_sensor = static_cast<const SensorTemplateBase*>(getSensors().getByType(SensorBase::SensorType::SensorTemplate, i));
+            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
+            {
+                sensor = current_sensor;
+                break;
+            }
+        }
+        if (sensor == nullptr)
+            throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", sensor_name.c_str()));
+
+        sensor->setInput(input);
+    }
+
+    virtual MarLocUwbSensorData getMarLocUWBSensorData(const std::string& sensor_name) const
+    {
+        const MarLocUwbBase* sensor = nullptr;
+
+        // Find echo with the given name (for empty input name, return the first one found)
+        // Not efficient but should suffice given small number of echos
+        uint uwb_sensor_count = getSensors().size(SensorBase::SensorType::MarlocUwb);
+        for (uint i = 0; i < uwb_sensor_count; i++)
+        {
+            const MarLocUwbBase* current_sensor = static_cast<const MarLocUwbBase*>(getSensors().getByType(SensorBase::SensorType::MarlocUwb, i));
+            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
+            {
+                sensor = current_sensor;
+                break;
+            }
+        }
+        if (sensor == nullptr)
+            throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", sensor_name.c_str()));
+
+        return sensor->getOutput();
+    }
 
     // IMU API
     virtual ImuBase::Output getImuData(const std::string& imu_name) const

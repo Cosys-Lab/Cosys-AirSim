@@ -17,6 +17,8 @@ class VehicleClient:
         self.client = msgpackrpc.Client(msgpackrpc.Address(ip, port), timeout = timeout_value, pack_encoding = 'utf-8', unpack_encoding = 'utf-8')
         
     # -----------------------------------  Common vehicle APIs ---------------------------------------------
+    def MarLoc_test(self):
+        return "MarLoc was here" + self.client.call('MarLoc_test_3') + "done"
     def reset(self):
         self.client.call('reset')
 
@@ -348,6 +350,8 @@ class MultirotorClient(VehicleClient, object):
         return self.client.call_async('moveByVelocity', vx, vy, vz, duration, drivetrain, yaw_mode, vehicle_name)
     def moveByVelocityZAsync(self, vx, vy, z, duration, drivetrain = DrivetrainType.MaxDegreeOfFreedom, yaw_mode = YawMode(), vehicle_name = ''):
         return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, drivetrain, yaw_mode, vehicle_name)
+    def moveByVelocityZAsync2(self, vx, vy, z, duration, vehicle_name = ''):
+        return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, DrivetrainType.MaxDegreeOfFreedom, YawMode(), vehicle_name)
     def moveOnPathAsync(self, path, velocity, timeout_sec = 3e+38, drivetrain = DrivetrainType.MaxDegreeOfFreedom, yaw_mode = YawMode(), 
         lookahead = -1, adaptive_lookahead = 1, vehicle_name = ''):
         return self.client.call_async('moveOnPath', path, velocity, timeout_sec, drivetrain, yaw_mode, lookahead, adaptive_lookahead, vehicle_name)

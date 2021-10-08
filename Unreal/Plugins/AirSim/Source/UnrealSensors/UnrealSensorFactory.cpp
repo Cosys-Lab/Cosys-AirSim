@@ -5,6 +5,9 @@
 #include "UnrealSensors/UnrealLidarSensor.h"
 #include "UnrealSensors/UnrealGPULidarSensor.h"
 #include "UnrealSensors/UnrealEchoSensor.h"
+#include "UnrealSensors/UnrealSensorTemplate.h"
+#include "UnrealSensors/UnrealMarLocUwbSensor.h"
+//#include "Vehicles/AirSimVehicle.h"
 
 UnrealSensorFactory::UnrealSensorFactory(AActor* actor, const NedTransform* ned_transform)
 {
@@ -29,6 +32,12 @@ std::unique_ptr<msr::airlib::SensorBase> UnrealSensorFactory::createSensorFromSe
     case SensorBase::SensorType::Echo:
         return std::unique_ptr<UnrealEchoSensor>(new UnrealEchoSensor(
             *static_cast<const AirSimSettings::EchoSetting*>(sensor_setting), actor_, ned_transform_));
+    case SensorBase::SensorType::SensorTemplate:
+        return std::unique_ptr<UnrealSensorTemplate>(new UnrealSensorTemplate(
+            *static_cast<const AirSimSettings::SensorTemplateSetting*>(sensor_setting), actor_, ned_transform_));
+    case SensorBase::SensorType::MarlocUwb:
+        return std::unique_ptr<UnrealMarLocUwbSensor>(new UnrealMarLocUwbSensor(
+            *static_cast<const AirSimSettings::MarLocUwbSetting*>(sensor_setting), actor_, ned_transform_));
     default:
         return msr::airlib::SensorFactory::createSensorFromSettings(sensor_setting);
     }
