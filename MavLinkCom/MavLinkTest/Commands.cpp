@@ -11,12 +11,7 @@
 #include "FileSystem.hpp"
 #include "Utils.hpp"
 #include <filesystem>
-#if defined(_WIN32) || ((defined __cplusplus) && (__cplusplus >= 201700L))
-#define USE_CPP_FILESYSTEM
-#else
-#undef USE_CPP_FILESYSTEM
-#endif
-
+using namespace std::filesystem;
 
 using namespace mavlink_utils;
 using namespace mavlinkcom;
@@ -47,7 +42,7 @@ void Command::Execute(std::shared_ptr<MavLinkVehicle> com)
         Close();
     }
     this->vehicle = com;
-    
+
     if (subscription == 0)
     {
         subscription = com->getConnection()->subscribe([=](std::shared_ptr<MavLinkConnection> connection, const MavLinkMessage& msg) {
@@ -216,7 +211,7 @@ void GetParamsCommand::Execute(std::shared_ptr<MavLinkVehicle> com)
         {
             count++;
             MavLinkParameter p = *iter;
-            if (p.type == static_cast<int>(MAV_PARAM_TYPE::MAV_PARAM_TYPE_REAL32) || 
+            if (p.type == static_cast<int>(MAV_PARAM_TYPE::MAV_PARAM_TYPE_REAL32) ||
                 p.type == static_cast<int>(MAV_PARAM_TYPE::MAV_PARAM_TYPE_REAL64)) {
                 if (ptr != nullptr) {
                     fprintf(ptr, "%s=%f\n", p.name.c_str(), p.value);
@@ -295,7 +290,7 @@ void GetSetParamCommand::Execute(std::shared_ptr<MavLinkVehicle> com)
         try {
             MavLinkParameter  p;
             if (com->getParameter(name).wait(2000, &p)) {
-                if (p.type == static_cast<int>(MAV_PARAM_TYPE::MAV_PARAM_TYPE_REAL32) || 
+                if (p.type == static_cast<int>(MAV_PARAM_TYPE::MAV_PARAM_TYPE_REAL32) ||
                     p.type == static_cast<int>(MAV_PARAM_TYPE::MAV_PARAM_TYPE_REAL64)) {
                     printf("%s=%f\n", p.name.c_str(), p.value);
                 }
@@ -384,7 +379,7 @@ bool DumpLogCommandsCommand::Parse(const std::vector<std::string>& args)
         if (args.size() > 1) {
             log_folder_ = std::string(args.at(1));
             return true;
-        } 
+        }
         else {
             printf("Usage: dumplogcommands <log_folder>\n");
         }
@@ -444,7 +439,7 @@ void DumpLogCommandsCommand::processLogCommands(MavLinkFileLog& log, const std::
                 if (std::isnan(x_start)) {
                     x_start = pos_msg.x;
                     y_start = pos_msg.y;
-                    z_start = pos_msg.z; 
+                    z_start = pos_msg.z;
                 }
                 else {
                     pos_log_file << log_timestamp - command_start_timestamp << "\t" << heading << "\t";
@@ -602,7 +597,7 @@ void PlayLogCommand::Execute(std::shared_ptr<MavLinkVehicle> com)
         switch (msg.msgid)
         {
         case MavLinkStatustext::kMessageId: {
-            
+
             MavLinkStatustext status_msg;
             status_msg.decode(msg);
             if (std::strstr(status_msg.text, kCommandLogPrefix) == status_msg.text) {
@@ -689,7 +684,7 @@ void TakeOffCommand::HandleMessage(const MavLinkMessage& msg)
 {
     if (msg.msgid == static_cast<uint8_t>(MavLinkMessageIds::MAVLINK_MSG_ID_GPS_RAW_INT))
     {
-        // The global position, as returned by the Global Positioning System (GPS).		
+        // The global position, as returned by the Global Positioning System (GPS).
         MavLinkGpsRawInt rawGps;
         rawGps.decode(msg);
         float lat = static_cast<float>(static_cast<double>(rawGps.lat) / 1e7);
@@ -1009,7 +1004,7 @@ void FakeGpsCommand::Execute(std::shared_ptr<MavLinkVehicle> mav)
 float FakeGpsCommand::addNoise(float x, float scale)
 {
     // generate random between 0 and 1
-    float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); 
+    float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     // move to range -1 to 1
     r = (r * 2) - 1;
     // scale it
@@ -1140,7 +1135,7 @@ void HilCommand::HilThread()
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    // add MAV_MODE_FLAG_HIL_ENABLED flag to current mode 
+    // add MAV_MODE_FLAG_HIL_ENABLED flag to current mode
     int mode = com->getVehicleState().mode;
     mode |= static_cast<int>(MAV_MODE_FLAG::MAV_MODE_FLAG_HIL_ENABLED);
     MavCmdDoSetMode cmd;
@@ -1429,7 +1424,7 @@ bool CapabilitiesCommand::Parse(const std::vector<std::string>& args) {
 void CapabilitiesCommand::Execute(std::shared_ptr<MavLinkVehicle> com)
 {
     MavLinkAutopilotVersion ver;
-    if (com->getCapabilities().wait(10000, &ver)) 
+    if (com->getCapabilities().wait(10000, &ver))
     {
         printf("AUTOPILOT_VERSION: \n");
         printf("    capabilities: %lx\n", static_cast<long unsigned int>(ver.capabilities));
@@ -1508,7 +1503,7 @@ bool GotoCommand::Parse(const std::vector<std::string>& args) {
                 }
 
                 if (args.size() == 5) {
-                    cruise_speed_ = static_cast<float>(atof(args[4].c_str()));		
+                    cruise_speed_ = static_cast<float>(atof(args[4].c_str()));
                     if (cruise_speed_ < 0 || cruise_speed_ > 10) {
                         printf("### invalid speed, 0 < speed < 10\n");
                         return false;
@@ -1583,7 +1578,7 @@ void GotoCommand::HandleMessage(const MavLinkMessage& message)
         if (!this->requestedControl || ! channel->hasOffboardControl()) {
             return;
         }
-        
+
         if (!this->hasLocalPosition) {
             this->hasLocalPosition = true;
             HasLocalPosition();
@@ -1594,7 +1589,7 @@ void GotoCommand::HandleMessage(const MavLinkMessage& message)
         if (targetPosition) {
             // must send these regularly to keep offboard control.
             channel->moveToLocalPosition(tx, ty, tz, is_yaw, static_cast<float>(theading * M_PI / 180));
-            
+
             if (this->hasLocalPosition) {
                 if (!targetReached && std::abs(x - tx) < nearDelta && std::abs(y - ty) < nearDelta)
                 {
@@ -1735,8 +1730,8 @@ void OrbitCommand::Execute(std::shared_ptr<MavLinkVehicle> com) {
     startAngle = 0;
     startTime = 0;
     orbits = 0;
-    halfWay = false;    
-    previousAngle = 0;	
+    halfWay = false;
+    previousAngle = 0;
     orbitSpeed = 0;
     printf("waiting for local position...\n");
     GotoCommand::Execute(com);
@@ -1783,7 +1778,7 @@ void OrbitCommand::UpdateTarget()
             orbiting = true;
             orbitSpeed = 0;
             flyingToRadius = false;
-        }		
+        }
         MoveAltHold(static_cast<float>(newvx), static_cast<float>(newvy), cz, 180);
     }
     else if (orbiting)
@@ -1905,7 +1900,7 @@ bool RotateCommand::Parse(const std::vector<std::string>& args)
                 }
                 speed_ = static_cast<float>(atof(arg.c_str()));
             }
-            else 
+            else
             {
                 speed_ = 10;
             }
@@ -1984,7 +1979,7 @@ bool SquareCommand::Parse(const std::vector<std::string>& args)
                     printf("invalid length '%f', expecting 1 < length < 100 ", length_);
                     return false;
                 }
-            } 
+            }
             if (args.size() > 2) {
                 speed_ = static_cast<float>(atof(args[2].c_str()));
                 if (speed_ < 0.1 || speed_ > 10) {
@@ -2007,14 +2002,14 @@ void SquareCommand::Execute(std::shared_ptr<MavLinkVehicle> com)
         throw std::runtime_error(Utils::stringf("Your drone does not support the MAV_PROTOCOL_CAPABILITY_SET_POSITION_TARGET_LOCAL_NED capability."));
     }
     started_ = false;
-    leg_ = 0;	
+    leg_ = 0;
     near = speed_;
     printf("executing a square pattern of length %f and at %f m/s\n", length_, speed_);
     GotoCommand::Execute(com);
 }
 
 void SquareCommand::setNextTarget() {
-    
+
     switch (leg_) {
     case 0:
         printf("Driving north\n");
@@ -2121,7 +2116,7 @@ bool WiggleCommand::Parse(const std::vector<std::string>& args)
                     xaxis_ = true;
                 }
             }
-            
+
             return true;
         }
     }
@@ -2148,7 +2143,7 @@ void WiggleCommand::Execute(std::shared_ptr<MavLinkVehicle> com)
 
     meter_.reset();
 
-    // start by moving right with 10 degree roll.    
+    // start by moving right with 10 degree roll.
     targetAngle_ = wiggle_angle_;
     ready_ = false;
     started_ = true;
@@ -2208,7 +2203,7 @@ void WiggleCommand::HandleMessage(const MavLinkMessage& message)
 
 void WiggleCommand::wiggleX(const MavLinkLocalPositionNed& pos)
 {
-    // track how our actual pitch is coming along compared to our target 
+    // track how our actual pitch is coming along compared to our target
     float roll, pitch;
 
     // and check position
@@ -2272,7 +2267,7 @@ void WiggleCommand::wiggleX(const MavLinkLocalPositionNed& pos)
 void WiggleCommand::wiggleY(const MavLinkLocalPositionNed& pos)
 {
 
-    // track how our actual roll is coming along compared to our target 
+    // track how our actual roll is coming along compared to our target
     float roll, pitch;
 
     // and check position
@@ -2334,7 +2329,7 @@ void WiggleCommand::wiggleY(const MavLinkLocalPositionNed& pos)
 
 }
 
-void WiggleCommand::Close() 
+void WiggleCommand::Close()
 {
     started_ = false;
     ready_ = false;
@@ -2362,7 +2357,7 @@ bool AltHoldCommand::Parse(const std::vector<std::string>& args)
             {
                 sz_ = static_cast<float>(atof(args[1].c_str()));
             }
-            else 
+            else
             {
                 printf("hold - missing altitude parameter.\n");
                 return false;
@@ -2454,7 +2449,7 @@ void AltHoldCommand::HandleMessage(const MavLinkMessage& message)
         // and check position
         //double dx = this->sx_ - pos.x;
         //double dy = this->sy_ - pos.y;
-        double z = pos.z; 
+        double z = pos.z;
 
         float ctrl = thrust_controller_.control(static_cast<float>(z));
         float thrust = start_thrust_ + ctrl;
@@ -2468,7 +2463,7 @@ void AltHoldCommand::HandleMessage(const MavLinkMessage& message)
         float pitch = fmax(-0.2f, fmin(0.2f, pos.vx / 5.0f));
         float roll = fmax(-0.2f, fmin(0.2f, -pos.vy / 5.0f));
 
-        // adjust thrust so we keep steady height target 
+        // adjust thrust so we keep steady height target
         thrust = static_cast<float>(fmax(0.01, fmin(1.0, thrust)));
 
         //DebugOutput("ctrl=%f, sz=%f, z=%f, dz=%f, new thrust=%f", ctrl, sz_, z, sz_ - z, thrust);
@@ -2709,14 +2704,14 @@ void FtpCommand::doList() {
 }
 
 void FtpCommand::doGet() {
-    
+
     std::string fsTarget = normalize(target);
     std::string leaf = FileSystem::getFileName(fsTarget);
     bool wildcards;
     if (!parse(leaf, wildcards)) {
         printf("wildcard pattern '%s' is too complex\n", leaf.c_str());
     } else if (wildcards) {
-        std::vector<MavLinkFileInfo> files;		
+        std::vector<MavLinkFileInfo> files;
         FileSystem::removeLeaf(fsTarget);
         std::string dir = toPX4Path(fsTarget);
         printf("getting all files in: %s matching '%s' ", dir.c_str(), leaf.c_str());
@@ -2825,7 +2820,7 @@ void FtpCommand::doRemove() {
                 if (matches(leaf, info.name)) {
                     matching++;
                     printf("Removing %s ", info.name.c_str());
-                    std::string targetFile = FileSystem::combine(normalize(dir), info.name); 
+                    std::string targetFile = FileSystem::combine(normalize(dir), info.name);
                     startMonitor();
                     client->remove(progress, toPX4Path(targetFile));
                     stopMonitor();
@@ -2996,7 +2991,7 @@ void NshCommand::send(std::string& msg)
 {
     MavLinkSerialControl ctrl;
     ctrl.device = static_cast<uint8_t>(SERIAL_CONTROL_DEV::SERIAL_CONTROL_DEV_SHELL);
-    ctrl.flags = static_cast<uint8_t>(SERIAL_CONTROL_FLAG::SERIAL_CONTROL_FLAG_RESPOND) | 
+    ctrl.flags = static_cast<uint8_t>(SERIAL_CONTROL_FLAG::SERIAL_CONTROL_FLAG_RESPOND) |
                  static_cast<uint8_t>(SERIAL_CONTROL_FLAG::SERIAL_CONTROL_FLAG_EXCLUSIVE);
     ctrl.baudrate = 0;
     ctrl.timeout = 0;
@@ -3050,7 +3045,7 @@ bool SetMessageIntervalCommand::Parse(const std::vector<std::string>& args)
         cmd = Utils::toLower(cmd);
         if (cmd == "setmessageinterval") {
             msgid_ = atoi(args[1].c_str());
-            frequency_ = atoi(args[2].c_str());		
+            frequency_ = atoi(args[2].c_str());
             if (msgid_ <= 0) {
                 printf("invalid message id %d.\n", msgid_);
                 return false;
