@@ -22,12 +22,8 @@ STRICT_MODE_OFF
 STRICT_MODE_ON
 #include "UnitTests.h"
 
-#if defined(_WIN32)
 #include <filesystem>
-#define USE_CPP_FILESYSTEM
-#else
-#undef USE_CPP_FILESYSTEM
-#endif
+using namespace std::filesystem;
 
 /* enable math defines on Windows */
 
@@ -77,7 +73,7 @@ void DebugOutput(const char* message, ...) {
 
     va_end(args);
 }
-#else 
+#else
 // how do you write to the debug output windows on Unix ?
 __attribute__((__format__ (__printf__, 1, 0)))
 void DebugOutput(const char* message, ...) {
@@ -114,7 +110,7 @@ int baudRate = 115200;
 
 // server mode is when you want another app to connect to Pixhawk and publish data back to this process.
 // this server will be listening for UDP packets, this is mutually exclusive with 'offboard' as this
-// server will become the primary "droneConnection".  For example, jMAVSim can talk to this server 
+// server will become the primary "droneConnection".  For example, jMAVSim can talk to this server
 // using their the -qgc option.
 bool server = false;
 PortAddress serverEndPoint;
@@ -128,8 +124,8 @@ PortAddress logViewerEndPoint;
 std::vector<PortAddress> proxyEndPoints;
 #define DEFAULT_PROXY_PORT 14580
 
-// this switch controls whether we turn off the RC remote active link loss detection 
-// if you do not have radio connected this is needed to stop "failsafe" override in pixhawk 
+// this switch controls whether we turn off the RC remote active link loss detection
+// if you do not have radio connected this is needed to stop "failsafe" override in pixhawk
 // from kicking in when you try and fly.
 bool noRadio = false;
 bool unitTest = false;
@@ -1138,7 +1134,7 @@ bool connect()
         usedPorts.push_back(serverEndPoint);
 
         if (droneConnection != nullptr) {
-            // then we have a serial connection as the primary droneConnection, so publish all PX4 messages out to the server 
+            // then we have a serial connection as the primary droneConnection, so publish all PX4 messages out to the server
             droneConnection->join(serverConnection);
         }
         else {
@@ -1415,7 +1411,7 @@ int console(std::stringstream& script) {
                     auto str = std::string(Command::kCommandLogPrefix) + line;
                     MavLinkStatustext st;
                     strncpy(st.text, str.c_str(), 50);
-                    MavLinkMessage m; 
+                    MavLinkMessage m;
                     st.encode(m);
                     droneConnection->prepareForSending(m);
                     std::lock_guard<std::mutex> lock(logLock);
@@ -1519,4 +1515,3 @@ int main(int argc, const char* argv[])
 
     CloseLogFiles();
 }
-
