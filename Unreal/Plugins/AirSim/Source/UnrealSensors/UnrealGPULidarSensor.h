@@ -34,6 +34,4 @@ private:
 
 	const NedTransform* ned_transform_;
 	float saved_clockspeed_ = 1;
-	std::mt19937 gen_;
-	std::normal_distribution<float> dist_;
 };

@@ -97,6 +97,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	draw_debug_ = settings.draw_debug_points;
 	draw_mode_ = settings.draw_mode;
 	max_range_ = settings.range;
+	noise_distance_scale_ = settings.noise_distance_scale;
 	ignore_marked_ = settings.ignore_marked;
 	ground_truth_ = settings.ground_truth;
 	generate_intensity_ = settings.generate_intensity;
@@ -361,6 +362,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 
 			FColor value_depth = buffer_2D_depth[h_pixel + (v_pixel * resolution_)];
 			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));	
+			float distance_noise = dist_(gen_) * (1 + ((depth / 100) / max_range_) * (noise_distance_scale_ - 1));
+			depth = depth + distance_noise;
 
 			if (depth < (max_range_ * 100)) {
 				if (generate_intensity_) {

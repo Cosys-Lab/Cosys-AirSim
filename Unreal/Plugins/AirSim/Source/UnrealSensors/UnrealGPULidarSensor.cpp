@@ -14,10 +14,6 @@ UnrealGPULidarSensor::UnrealGPULidarSensor(const AirSimSettings::GPULidarSetting
 	AActor* actor, const NedTransform* ned_transform)
 	: GPULidarSimple(setting), actor_(actor), ned_transform_(ned_transform)
 {
-	// Seed and initiate noise
-	std::random_device rd;
-	gen_ = std::mt19937(rd());
-	dist_ = std::normal_distribution<float>(0, getParams().min_noise_standard_deviation);
 
 	FActorSpawnParameters camera_spawn_params;
 
