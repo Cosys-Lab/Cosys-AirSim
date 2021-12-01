@@ -246,7 +246,7 @@ public: //types
 
 		// shared defaults
 		uint number_of_channels = 64;
-		real_T range = 100.0f;                            // meters
+		real_T range = 50.0f;                            // meters
         float range_max_lambertian_percentage = 80;       // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
 
         float rain_max_intensity = 70;                    // Rain intensity maximum to scale from in mm/hour.

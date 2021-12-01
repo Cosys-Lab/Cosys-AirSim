@@ -19,7 +19,7 @@ namespace msr {
 			// TODO: enable reading of these params from AirSim settings
 
 			uint number_of_channels = 64;
-			real_T range = 10000.0f / 100;               // meters
+			real_T range = 5000.0f / 100;                // meters
 			float range_max_lambertian_percentage = 80;  // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
 			float rain_max_intensity = 70;               // Rain intensity maximum to scale from in mm/hour.
 			float rain_constant_a = 0.01;                // Two constants to calculate the extinction coefficient in rain
