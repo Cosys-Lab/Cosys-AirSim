@@ -392,7 +392,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					}
 
 
-					if(final_intensity < (max_range_ / range_max_lambertian_percentage_ / 100) * depth / 100.0)threshold_enable = false;
+					if((impact_angle * material_map_.at(value_intensity.A)) < (max_range_ / range_max_lambertian_percentage_ / 100) * depth / 100.0)threshold_enable = false;
 					if (draw_debug_ && draw_mode_ == 4 && threshold_enable) {
 						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
 						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, (1 / (frequency_ * 4)));
