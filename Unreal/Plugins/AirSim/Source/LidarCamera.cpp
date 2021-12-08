@@ -383,19 +383,19 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					final_intensity = impact_angle * material_map_.at(value_intensity.A) * FMath::Exp(-2.0f * rain_constant_a_ * FMath::Pow(rain_max_intensity_ * rain_value, rain_constant_b_) * (depth / 100.0f));
 
 					if (draw_debug_ && draw_mode_ == 2) {
-						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point, 5, FColor(value_intensity.A, 0, 0, 1), false, (1 / (frequency_ * 4)));
+						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_intensity.A, 0, 0, 1), false, (1 / (frequency_ * 4)));
 					}
 					if (draw_debug_ && draw_mode_ == 3) {
-						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, FMath::FloorToInt(impact_angle*254), 0, 1), false, (1 / (frequency_ * 4)));
+						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, FMath::FloorToInt(impact_angle*254), 0, 1), false, (1 / (frequency_ * 4)));
 					}
 
 
 					if((impact_angle * material_map_.at(value_intensity.A)) < (max_range_ / range_max_lambertian_percentage_ / 100) * depth / 100.0)threshold_enable = false;
 					if (draw_debug_ && draw_mode_ == 4 && threshold_enable) {
-						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, (1 / (frequency_ * 4)));
+						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, (1 / (frequency_ * 4)));
 					}
 	
 				}
@@ -403,8 +403,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 				if (ground_truth_) {
 					value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
 					if (draw_debug_ && draw_mode_ == 1 && threshold_enable) {
-						point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, (1 / (frequency_ * 4)));
+						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, (1 / (frequency_ * 4)));
 					}
 				}
 
@@ -425,8 +425,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 				}
 
 				if (draw_debug_ && draw_mode_ == 0 && threshold_enable) {
-					point = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-					DrawDebugPoint(this->GetWorld(), point, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
+					FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
+					DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor::Blue, false, (1 / (frequency_ * 4)));
 				}				
 			}
 			else {
