@@ -79,6 +79,7 @@ private: //methods
 		TTimeDelta delta_time = clock()->updateSince(last_time_);
 
 		const GroundTruth& ground_truth = getGroundTruth();
+		Pose const pose_offset = params_.external ? Pose() : ground_truth.kinematics->pose;
 
 		// calculate the pose before obtaining the point-cloud. Before/after is a bit arbitrary
 		// decision here. If the pose can change while obtaining the point-cloud (could happen for drones)
@@ -88,10 +89,10 @@ private: //methods
 		//    That could be a bit unintuitive but seems consistent with the position/orientation returned as part of 
 		//    ImageResponse for cameras and pose returned by getCameraInfo API.
 		//    Do we need to convert pose to Global NED frame before returning to clients?
-		Pose lidar_pose = params_.relative_pose + ground_truth.kinematics->pose;
+		Pose lidar_pose = params_.relative_pose + pose_offset;
 		double start = FPlatformTime::Seconds();
 		bool refresh = getPointCloud(params_.relative_pose, // relative lidar pose
-			ground_truth.kinematics->pose,   // relative vehicle pose
+			pose_offset,   // relative vehicle pose
 			delta_time,
 			point_cloud_temp_, groundtruth_temp_, point_cloud_, groundtruth_);
 		double end = FPlatformTime::Seconds();

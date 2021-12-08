@@ -204,7 +204,13 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 	FHitResult hit_result = FHitResult(ForceInit);
 	TArray<AActor*> actorArray;
 	//actorArray.Add(actor_);
-	bool is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actorArray, ECC_Visibility, true, true);
+	bool is_hit;
+	if (params.external) {
+		is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->toFVector(start, 100, true), ned_transform_->toFVector(end, 100, true), hit_result, actorArray, ECC_Visibility, true, true);
+	}
+	else {
+		is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actorArray, ECC_Visibility, true, true);
+	}
 	bool ignoreMaterial = false;
 	if (hit_result.PhysMaterial != nullptr) {
 		if (hit_result.PhysMaterial.Get()->GetFName().ToString().Contains("Lidar_Ignore_PhysicalMaterial"))
@@ -253,11 +259,25 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 		if (params.data_frame == AirSimSettings::kVehicleInertialFrame) {
 			// current detault behavior; though it is probably not very useful.
 			// not changing the default for now to maintain backwards-compat.
-			point = ned_transform_->toLocalNed(impact_point);
+
+			if (params.external) {
+				Vector3r point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
+				point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
+			}
+			else {
+				point = ned_transform_->toLocalNed(impact_point);
+			}
 		}
 		else if (params.data_frame == AirSimSettings::kSensorLocalFrame) {
 			// point in vehicle intertial frame
-			Vector3r point_v_i = ned_transform_->toLocalNed(impact_point);
+
+			Vector3r point_v_i;
+			if (params.external) {
+				point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
+			}
+			else {
+				point_v_i = ned_transform_->toLocalNed(impact_point);
+			}
 
 			// tranform to lidar frame
 			point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);

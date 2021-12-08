@@ -19,7 +19,9 @@ UnrealGPULidarSensor::UnrealGPULidarSensor(const AirSimSettings::GPULidarSetting
 
 	camera_spawn_params.Name = FName(*(actor->GetName() + "_gpulidar_" + FString(setting.sensor_name.c_str())));
 	lidar_camera_ = actor->GetWorld()->SpawnActor<ALidarCamera>(camera_spawn_params);
-	lidar_camera_->AttachToActor(actor, FAttachmentTransformRules::KeepRelativeTransform);
+	if (!setting.external) {
+		lidar_camera_->AttachToActor(actor, FAttachmentTransformRules::KeepRelativeTransform);
+	}
 	lidar_camera_->InitializeSettings(setting);
 }
 

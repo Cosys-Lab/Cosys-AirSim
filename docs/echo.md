@@ -33,7 +33,6 @@ SensorDiameter            | The diameter of the sensor plane used to capture the
 PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
 X Y Z                     | Position of the echo relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the echo relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
-DataFrame                 | Frame for the points in output ("VehicleInertialFrame" or "SensorLocalFrame")
 DrawReflectedPoints       | Draw debug points in world where reflected points are captured by the sensor
 DrawReflectedLines        | Draw debug lines in world from reflected points to the sensor
 DrawReflectedPaths        | Draw the full paths of the reflected points
@@ -42,6 +41,7 @@ DrawExternalPoints        | Draw a pointcloud coming through the API from an ext
 DrawBounceLines           | Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 DrawSensor                | Draw the physical sensor in the world on the vehicle
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
+External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
 e.g.,
 ```
 {
@@ -62,7 +62,6 @@ e.g.,
                       "Roll": 0,
                       "Pitch": 0,
                       "Yaw": 0,
-                      "DataFrame": "SensorLocalFrame",
                       "MeasurementFrequency": 5,
                       "NumberOfTraces": 30000,
                       "DistanceLimit": 5,
@@ -80,6 +79,7 @@ e.g.,
                       "DrawReflectedPaths": false,
                       "DrawExternalPoints": false,
                       "DrawSensor": false,
+                      "External": false
 				}	
 			}
 		}

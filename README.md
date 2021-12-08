@@ -15,6 +15,7 @@ Cars in AirSim
 [![AirSim Car Demo Video](docs/images/car_demo_video.png)](https://youtu.be/gnz1X3UNM5Y)
 
 ## CoSys-Lab Modifications
+* Updated Echo, Lidar and GPU LIDAR to be allowed to be uncoupled from vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated [ROS implementation](docs/ros.md) with completly new implementation and feature set.
 * Added [HySLAM Benchmark Scenario environments](docs/hyslambenchmarkenv.md)

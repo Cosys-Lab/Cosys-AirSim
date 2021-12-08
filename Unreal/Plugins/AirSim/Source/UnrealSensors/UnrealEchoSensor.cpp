@@ -21,7 +21,8 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	reflection_distance_limit_(ned_transform_->fromNed(getParams().reflection_distance_limit)),
 	reflection_opening_angle_(FMath::DegreesToRadians(getParams().reflection_opening_angle)),
 	draw_time_(1.05f / sensor_params_.measurement_frequency),
-	line_thinkness_(1.0f)
+	line_thinkness_(1.0f),
+	external_(getParams().external)
 {
 	generateSampleDirections();	
 
@@ -111,10 +112,15 @@ void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr:
 void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
-	
 	// DRAW DEBUG
 	if (sensor_params_.draw_sensor) {
-		FVector sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		FVector sensor_position;
+		if (external_) {
+			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+		}
+		else {
+			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		}
 		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Blue, false, draw_time_);
 		//FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
 		//DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_);
@@ -135,8 +141,14 @@ void UnrealEchoSensor::pause(const bool is_paused) {
 void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
 {
 	// Set the physical echo mesh in the correct location in the world
+	FVector trace_start_position;
 	updatePose(sensor_pose, vehicle_pose);
-	FVector trace_start_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+	if (external_) {
+		trace_start_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+	}
+	else {
+		trace_start_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+	}
 
 	// Shoot traces (rays)
 	point_cloud.clear();
@@ -224,7 +236,15 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		trace_end_position = trace_start_position + trace_direction * trace_length;
 		reflection_count += 1;
 
-		FVector sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+
+		FVector sensor_position;
+		if (external_) {
+			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+		}
+		else {
+			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		}
+
 		float distance_to_sensor = FVector::Distance(trace_start_position, sensor_position);
 
 		// Stop if signal can't travel far enough to return
@@ -249,7 +269,13 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 				continue;
 			}
 
-			Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
+			Vector3r point_sensor_frame;
+			if (external_) {
+				point_sensor_frame = ned_transform_->toVector3r(trace_hit_result.ImpactPoint, 0.01, true);
+			}
+			else {
+				point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
+			}
 			point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
 
 			point_cloud.emplace_back(point_sensor_frame.x());
@@ -310,8 +336,13 @@ void UnrealEchoSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::
 		for (int point_count = 0; point_count < point_cloud.size(); point_count += DATA_PER_POINT) {
 			Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);
 			Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
-			FVector point_global = ned_transform_->fromLocalNed(point_global1);
-
+			FVector point_global;
+			if (external_) {
+				point_global = ned_transform_->toFVector(point_global1, 100, true);
+			}
+			else {
+				point_global = ned_transform_->fromLocalNed(point_global1);
+			}
 			DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, draw_time_);
 		}
 	}

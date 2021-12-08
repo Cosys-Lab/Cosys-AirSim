@@ -66,4 +66,5 @@ private:
 	const float reflection_opening_angle_;
 	const float draw_time_;
 	const float line_thinkness_;
+	const bool external_;
 };

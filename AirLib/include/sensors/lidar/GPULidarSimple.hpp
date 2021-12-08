@@ -89,7 +89,10 @@ namespace msr {
 					output.point_cloud = point_cloud_;
 					output.time_stamp = clock()->nowNanos();
 					const GroundTruth& ground_truth = getGroundTruth();
-					Pose lidar_pose = params_.relative_pose + ground_truth.kinematics->pose;
+					Pose lidar_pose = params_.relative_pose;
+					if (!params_.external) {
+						lidar_pose = lidar_pose + ground_truth.kinematics->pose;
+					}
 					output.pose = lidar_pose;
 					setOutput(output);
 

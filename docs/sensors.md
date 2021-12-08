@@ -82,7 +82,7 @@ The default sensor list can be configured in settings json:
 ## Configuring vehicle-specific sensor list
 
 If a vehicle provides its sensor list, it **must** provide the whole list. Selective add/remove/update of the default sensor list is **NOT** supported.   
-A vehicle specific sensor list can be specified in the vehicle settings part of the json.
+A (vehicle specific) sensor list can be specified in the vehicle settings part of the json.
 e.g.,
 
 ```

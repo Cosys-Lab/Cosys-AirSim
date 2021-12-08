@@ -37,6 +37,7 @@ MinNoiseStandardDeviation | The standard deviation to generate the noise normal 
 NoiseDistanceScale        | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
 UpdateFrequency           | Amount of times per second that the sensor should update and calculate the next set of poins
 LimitPoints               | Limit the amount of points that can be calculated in one measurement (to work around freezes due to bad performance). Will result in incomplete pointclouds
+External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
 
 ```
 {
@@ -74,7 +75,8 @@ LimitPoints               | Limit the amount of points that can be calculated in
 					"Roll": 0, "Pitch": 0, "Yaw" : 0,
 					"VerticalFOVUpper": -15,
 					"VerticalFOVLower": -25,
-					"DrawDebugPoints": true
+					"DrawDebugPoints": true,
+					"External": false
 				}
 			}
 		}

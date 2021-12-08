@@ -238,6 +238,8 @@ public: //types
 
         bool draw_debug_points = false;
 
+        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
     };
 
@@ -275,6 +277,8 @@ public: //types
 		bool generate_intensity = false;                  // Toggle intensity calculation on or off
         std::string material_list_file = "";              // String holding all material data
 
+        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+
 		bool draw_debug_points = false;
 		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
 	};
@@ -308,8 +312,9 @@ public: //types
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
 		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
 
+        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+
 		// Misc
-		std::string data_frame = AirSimSettings::kSensorLocalFrame;
 		Vector3r position = VectorMath::nanVector();
 		Rotation rotation = Rotation::nanRotation();
 		bool ignore_marked = false;
@@ -1275,6 +1280,8 @@ private:
         lidar_setting.horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", lidar_setting.horizontal_FOV_start);
         lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
 
+        lidar_setting.external = settings_json.getBool("External", lidar_setting.external);
+
         lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
 
@@ -1313,7 +1320,7 @@ private:
             lidar_setting.material_list_file = msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv");
         }
 
-
+        lidar_setting.external = settings_json.getBool("External", lidar_setting.external);
 
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
@@ -1341,9 +1348,9 @@ private:
 		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
 		echo_setting.draw_external_points = settings_json.getBool("DrawExternalPoints", echo_setting.draw_external_points);
-
-		echo_setting.data_frame = settings_json.getString("DataFrame", echo_setting.data_frame);
 		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
+
+        echo_setting.external = settings_json.getBool("External", echo_setting.external);
 
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);

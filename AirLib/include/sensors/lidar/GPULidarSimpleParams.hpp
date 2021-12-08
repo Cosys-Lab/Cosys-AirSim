@@ -46,6 +46,8 @@ namespace msr {
 
 			bool generate_intensity = false;             // Toggle intensity calculation on or off
 
+			bool external = false;                       // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+
 			bool draw_debug_points = false;
 			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
 
@@ -124,6 +126,8 @@ namespace msr {
 
 				draw_debug_points = settings.draw_debug_points;
 				draw_mode = settings.draw_mode;
+
+				external = settings.external;
 			}
 		};
 
