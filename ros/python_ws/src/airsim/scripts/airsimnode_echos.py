@@ -16,7 +16,8 @@ import geometry_msgs
 print("Connecting...")
 client = airsimpy.CarClient()
 client.confirmConnection(rospy.get_name())
-print("Connected")
+
+print("Connected to AirSim!")
 
 
 def get_valid_ros_topic_nameid(sensor_name):
@@ -39,6 +40,7 @@ def airsim_echos_pub(ros_rate, vehicle_name, topic_prefix, topic_suffix, frame_p
                                                              + str(get_valid_ros_topic_nameid(sensor_name))
                                                              + "/" + topic_suffix, PointCloud2, queue_size=2)
         last_timestamps[sensor_name] = None
+    rospy.loginfo("Started publishers...")
 
     fields = [
         PointField('x', 0, PointField.FLOAT32, 1),
@@ -77,7 +79,6 @@ def airsim_echos_pub(ros_rate, vehicle_name, topic_prefix, topic_suffix, frame_p
 if __name__ == '__main__':
     try:
         rospy.init_node('airsim_echos_publisher', anonymous=True)
-
         ros_rate = rospy.get_param('~ros_rate', 10)
 
         topic_prefix = rospy.get_param('~topic_prefix', "rtis")
@@ -87,7 +88,7 @@ if __name__ == '__main__':
         base_frame = rospy.get_param('~base_frame', "world")
 
         sensor_names = rospy.get_param('~sensor_names', "True")
-
+        rospy.loginfo("Starting static transforms...")
         broadcaster = tf2_ros.StaticTransformBroadcaster()
         transformList = []
         for sensor_name in sensor_names:
@@ -107,7 +108,7 @@ if __name__ == '__main__':
             static_transformStamped.transform.rotation.w = pose.orientation.w_val
             transformList.append(static_transformStamped)
             time.sleep(1)
-            rospy.loginfo("Started static tranform for RTIS Client with ID " + sensor_name + ".")
+            rospy.loginfo("Started static transform for RTIS Client with ID " + sensor_name + ".")
         broadcaster.sendTransform(transformList)
 
         airsim_echos_pub(ros_rate, vehicle_name, topic_prefix, topic_suffix, frame_prefix, sensor_names)

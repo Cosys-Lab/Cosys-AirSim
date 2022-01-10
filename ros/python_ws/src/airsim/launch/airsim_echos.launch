@@ -1,5 +1,5 @@
 <launch>
-      <arg name="sensor_names" default="[echo1,echo2]"/>
+      <arg name="sensor_names" default="[echo1,echo2,echo3,echo4,echo5,echo6,echo7,echo8,echo9,echo10,echo11,echo12,echo13,echo14]"/>
       <node name="airsimnode_echos" pkg="airsim" type="airsimnode_echos.py" respawn="false" output="screen">
 
             <param name="ros_rate" type="int" value="10"/>
