@@ -63,13 +63,19 @@ std::vector<std::string> WorldSimApi::listSceneObjects(const std::string& name_r
 }
 
 
-WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name) const
+WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name, bool ned) const
 {
     Pose result;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, &result]() {
+    UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, ned, &result]() {
         AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
-        result = actor ? simmode_->getGlobalNedTransform().toGlobalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
-            : Pose::nanPose();
+        if (ned) {
+            result = actor ? simmode_->getGlobalNedTransform().toGlobalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
+                : Pose::nanPose();
+        }
+        else {
+            result = actor ? simmode_->getGlobalNedTransform().toLocalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
+                : Pose::nanPose();
+        }
     }, true);
     return result;
 }
