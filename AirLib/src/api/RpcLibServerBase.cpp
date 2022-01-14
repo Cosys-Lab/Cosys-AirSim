@@ -213,8 +213,8 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         return getWorldSimApi()->listSceneObjects(name_regex);
     });
 
-    pimpl_->server.bind("simGetObjectPose", [&](const std::string& object_name) -> RpcLibAdapatorsBase::Pose {
-        const auto& pose = getWorldSimApi()->getObjectPose(object_name); 
+    pimpl_->server.bind("simGetObjectPose", [&](const std::string& object_name, bool ned) -> RpcLibAdapatorsBase::Pose {
+        const auto& pose = getWorldSimApi()->getObjectPose(object_name, ned);
         return RpcLibAdapatorsBase::Pose(pose);
     });
     pimpl_->server.bind("simSetObjectPose", [&](const std::string& object_name, const RpcLibAdapatorsBase::Pose& pose, bool teleport) -> bool {
