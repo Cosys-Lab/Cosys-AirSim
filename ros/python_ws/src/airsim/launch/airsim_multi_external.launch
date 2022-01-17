@@ -1,7 +1,7 @@
 <launch>
-      <arg name="echo_names" default="[echo1,echo2,echo3]"/>
+      <arg name="echo_names" default="[echo1, echo2, echo3]"/>
       <arg name="lidar_names" default="[lidar1]"/>
-      <arg name="object_names" default="[cargoship]"/>
+      <arg name="object_names" default="[CargoShip]"/>
       <node name="airsimnode_multi_external" pkg="airsim" type="airsimnode_multi_external.py" respawn="false" output="screen">
             <param name="ros_rate" type="int" value="10"/>
             <param name="echo_topic_prefix" type="string" value="echo"/>
@@ -13,7 +13,6 @@
             <param name="vehicle_name" type="string" value="airsimvehicle" />
             <param name="echo_frame_prefix" type="string" value="base_echo"/>
             <param name="lidar_frame_prefix" type="string" value="base_lidar"/>
-            <param name="object_frame_prefix" type="string" value="base_object"/>
             <param name="base_frame" type="string" value="world"/>
             <rosparam param="echo_names" subst_value="True">$(arg echo_names)</rosparam>
             <rosparam param="lidar_names" subst_value="True">$(arg lidar_names)</rosparam>

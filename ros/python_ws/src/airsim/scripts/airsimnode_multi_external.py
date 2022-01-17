@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import time
 import setup_path
 import airsimpy
@@ -31,7 +30,7 @@ def get_valid_ros_topic_nameid(sensor_name):
 
 def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffix, lidar_topic_prefix,
                          lidar_topic_suffix, object_topic_prefix, object_topic_suffix,
-                         echo_frame_prefix, lidar_frame_prefix, object_frame_prefix,
+                         echo_frame_prefix, lidar_frame_prefix, base_frame,
                          echo_names, lidar_names, object_names):
 
     rospy.Rate(ros_rate)
@@ -79,14 +78,12 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
 
         for object_name in object_names:
             pose = client.simGetObjectPose(object_name, False)
-
             pos = pose.position
             orientation = pose.orientation.inverse()
 
-            # populate PoseStamped ros message
             simPose = PoseStamped()
             simPose.pose.position.x = pos.x_val
-            simPose.pose.position.y = pos.y_val
+            simPose.pose.position.y = -pos.y_val
             simPose.pose.position.z = pos.z_val
             simPose.pose.orientation.w = orientation.w_val
             simPose.pose.orientation.x = orientation.x_val
@@ -94,9 +91,8 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
             simPose.pose.orientation.z = orientation.z_val
             simPose.header.stamp = timestamp
             simPose.header.seq = 1
-            simPose.header.frame_id = object_frame_prefix + "_" + str(get_valid_ros_topic_nameid(object_name))
+            simPose.header.frame_id = base_frame
 
-            # publish PoseStamped message
             object_pose_publishers[object_name].publish(simPose)
 
         for sensor_name in lidar_names:
@@ -141,9 +137,6 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
                     pointcloud_publishers[sensor_name].publish(pcloud)
 
 
-
-
-
 if __name__ == '__main__':
     try:
         rospy.init_node('airsimnode_multi_external_publisher', anonymous=True)
@@ -158,7 +151,6 @@ if __name__ == '__main__':
         vehicle_name = rospy.get_param('~vehicle_name', 'airsimvehicle')
         echo_frame_prefix = rospy.get_param('~echo_frame_prefix', "base_echo")
         lidar_frame_prefix = rospy.get_param('~lidar_frame_prefix', "base_lidar")
-        object_frame_prefix = rospy.get_param('~object_frame_prefix', "base_object")
         base_frame = rospy.get_param('~base_frame', "world")
         echo_names = rospy.get_param('~echo_names', "True")
         lidar_names = rospy.get_param('~lidar_names', "True")
@@ -176,7 +168,7 @@ if __name__ == '__main__':
             static_transformStamped.header.frame_id = base_frame
             static_transformStamped.child_frame_id = str(echo_frame_prefix) + "_" + str(get_valid_ros_topic_nameid(sensor_name))
             static_transformStamped.transform.translation.x = pose.position.x_val
-            static_transformStamped.transform.translation.y = pose.position.y_val
+            static_transformStamped.transform.translation.y = -pose.position.y_val
             static_transformStamped.transform.translation.z = pose.position.z_val
             static_transformStamped.transform.rotation.x = pose.orientation.x_val
             static_transformStamped.transform.rotation.y = pose.orientation.y_val
@@ -194,7 +186,7 @@ if __name__ == '__main__':
             static_transformStamped.header.frame_id = base_frame
             static_transformStamped.child_frame_id = str(lidar_frame_prefix) + "_" + str(get_valid_ros_topic_nameid(sensor_name))
             static_transformStamped.transform.translation.x = pose.position.x_val
-            static_transformStamped.transform.translation.y = pose.position.y_val
+            static_transformStamped.transform.translation.y = -pose.position.y_val
             static_transformStamped.transform.translation.z = pose.position.z_val
             static_transformStamped.transform.rotation.x = pose.orientation.x_val
             static_transformStamped.transform.rotation.y = pose.orientation.y_val
@@ -208,7 +200,7 @@ if __name__ == '__main__':
 
         airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffix, lidar_topic_prefix,
                          lidar_topic_suffix, object_topic_prefix, object_topic_suffix,
-                         echo_frame_prefix, lidar_frame_prefix, object_frame_prefix,
+                         echo_frame_prefix, lidar_frame_prefix, base_frame,
                          echo_names, lidar_names, object_names)
 
     except rospy.ROSInterruptException:
