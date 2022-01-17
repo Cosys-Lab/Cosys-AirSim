@@ -55,15 +55,23 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
                                                                   + "/" + object_topic_suffix, PoseStamped,
                                                                   queue_size=1)
 
-    rospy.loginfo("Started publishers...")
-
-    fields = [
+    fields_echo = [
         PointField('x', 0, PointField.FLOAT32, 1),
         PointField('y', 4, PointField.FLOAT32, 1),
         PointField('z', 8, PointField.FLOAT32, 1),
         PointField('a', 12, PointField.FLOAT32, 1),
         PointField('d', 16, PointField.FLOAT32, 1)
     ]
+
+    fields_lidar = [
+        PointField('x', 0, PointField.FLOAT32, 1),
+        PointField('y', 4, PointField.FLOAT32, 1),
+        PointField('z', 8, PointField.FLOAT32, 1),
+        PointField('rgb', 12, PointField.UINT32, 1),
+        PointField('intensity', 16, PointField.FLOAT32, 1)
+    ]
+
+    rospy.loginfo("Started publishers...")
 
     while not rospy.is_shutdown():
 
@@ -86,7 +94,7 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
             simPose.pose.orientation.z = orientation.z_val
             simPose.header.stamp = timestamp
             simPose.header.seq = 1
-            simPose.header.frame_id = object_frame_prefix + "_" + str(get_valid_ros_topic_nameid(sensor_name))
+            simPose.header.frame_id = object_frame_prefix + "_" + str(get_valid_ros_topic_nameid(object_name))
 
             # publish PoseStamped message
             object_pose_publishers[object_name].publish(simPose)
@@ -107,17 +115,9 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
                     points = np.reshape(points, (int(points.shape[0] / 5), 5))
                     pcloud.header.frame_id = lidar_frame_prefix + "_" + str(get_valid_ros_topic_nameid(sensor_name))
                     pcloud.header.stamp = timestamp
-                    fields = [
-                        PointField('x', 0, PointField.FLOAT32, 1),
-                        PointField('y', 4, PointField.FLOAT32, 1),
-                        PointField('z', 8, PointField.FLOAT32, 1),
-                        PointField('rgb', 12, PointField.UINT32, 1),
-                        PointField('intensity', 16, PointField.FLOAT32, 1)
-                    ]
-                    pcloud = pc2.create_cloud(pcloud.header, fields, points.tolist())
+
+                    pcloud = pc2.create_cloud(pcloud.header, fields_lidar, points.tolist())
                     pointcloud_publishers[sensor_name].publish(pcloud)
-            else:
-                print('1')
 
         for sensor_name in echo_names:
             echo_data = client.getEchoData(sensor_name, vehicle_name)
@@ -135,10 +135,13 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
 
                     header = Header()
                     header.frame_id = echo_frame_prefix + "_" + str(get_valid_ros_topic_nameid(sensor_name))
-                    pcloud = pc2.create_cloud(header, fields, points_list)
-                    pcloud.header.stamp = timestamp
 
+                    pcloud = pc2.create_cloud(header, fields_echo, points_list)
+                    pcloud.header.stamp = timestamp
                     pointcloud_publishers[sensor_name].publish(pcloud)
+
+
+
 
 
 if __name__ == '__main__':
