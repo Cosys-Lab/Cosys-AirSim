@@ -110,16 +110,18 @@ void getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* 
 		if (paintable_components.Num() == 1) {
 			if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
 				if (actor->GetParentActor()) {
-					FString component_name = staticmesh_component->GetStaticMesh()->GetName();
-					component_name.Append("_");
-					component_name.Append(FString::FromInt(0));
-					component_name.Append("_");
-					if (actor->GetRootComponent()->GetAttachParent()) {
-						component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+					if (staticmesh_component->GetStaticMesh() != nullptr) {
+						FString component_name = staticmesh_component->GetStaticMesh()->GetName();
 						component_name.Append("_");
-					}
-					component_name.Append(actor->GetParentActor()->GetName());
-					paintable_components_meshes->Emplace(component_name, component);
+						component_name.Append(FString::FromInt(0));
+						component_name.Append("_");
+						if (actor->GetRootComponent()->GetAttachParent()) {
+							component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							component_name.Append("_");
+						}
+						component_name.Append(actor->GetParentActor()->GetName());
+						paintable_components_meshes->Emplace(component_name, component);
+					}					
 				}
 				else {
 					paintable_components_meshes->Emplace(actor->GetName(), component);
