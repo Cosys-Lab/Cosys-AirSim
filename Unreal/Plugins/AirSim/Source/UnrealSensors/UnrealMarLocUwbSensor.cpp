@@ -16,6 +16,7 @@
 #include "Beacons/UWBBeacon.h"
 #include <typeinfo>
 #include <mutex>
+#include "common/CommonStructs.hpp"
 
 using std::fill_n;
 std::mutex mtx;
@@ -210,7 +211,8 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 
 						//std::string aaa (TCHAR_TO_UTF8(*trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId)));
 						trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId);
-						UWBHit thisHit = { FCString::Atoi(*tmpId)  , traceRayCurrentSignalStrength };
+						int tmpRssi = (int)traceRayCurrentSignalStrength;
+						UWBHit thisHit = { FCString::Atoi(*tmpId)  ,  tmpRssi};
 						UWBHitLog->Add(thisHit);
 						mtx.unlock();
 					}

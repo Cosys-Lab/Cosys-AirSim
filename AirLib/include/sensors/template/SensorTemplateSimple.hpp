@@ -16,7 +16,7 @@ namespace msr { namespace airlib {
 class SensorTemplateSimple : public SensorTemplateBase {
 public:
 	SensorTemplateSimple(const AirSimSettings::SensorTemplateSetting& setting = AirSimSettings::SensorTemplateSetting())
-        : SensorTemplateBase(setting.sensor_name, setting.attach_link)
+        : SensorTemplateBase(setting.sensor_name)
     {
         // initialize params
         params_.initializeFromSettings(setting);

@@ -71,7 +71,7 @@ private:
 	TArray<AActor*> beacon_actors;
 
 	//TArray<TArray<UWBHit>> UWBHits;
-	UINT32 maxUWBHits = 5;
+	int maxUWBHits = 5;
 
 	void updateActiveBeacons();
 };
