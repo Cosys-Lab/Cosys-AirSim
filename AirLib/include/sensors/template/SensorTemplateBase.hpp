@@ -13,7 +13,7 @@ public:
 	/*SensorTemplateBase(const std::string& sensor_name = "", const std::string& attach_link = "")
         : SensorBase(sensor_name, attach_link)
     {}*/
-    SensorTemplateBase(const std::string& sensor_name = "", const std::string& attach_link = "")
+    SensorTemplateBase(const std::string& sensor_name = "")
         : SensorBase(sensor_name)
     {}
 
