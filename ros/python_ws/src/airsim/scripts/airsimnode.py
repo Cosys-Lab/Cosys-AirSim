@@ -13,6 +13,7 @@ from sensor_msgs.msg import PointCloud2, PointField
 from geometry_msgs.msg import PoseStamped, TransformStamped
 from geometry_msgs.msg import Twist
 from airsim.msg import StringArray
+from airsim.msg import uwb_Diagnostics
 import numpy as np
 import os
 import cv2
@@ -130,9 +131,10 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     lidarActive = activeTuple[3]
     gpulidarActive = activeTuple[4]
     echoActive = activeTuple[5]
-    imuActive = activeTuple[6]
-    poseActive = activeTuple[7]
-    carcontrolActive = activeTuple[8]
+    uwbActive = activeTuple[6]
+    imuActive = activeTuple[7]
+    poseActive = activeTuple[8]
+    carcontrolActive = activeTuple[9]
 
     sceneCamera1TopicName = topicsTuple[0]
     segmentationCamera1TopicName = topicsTuple[1]
@@ -146,13 +148,14 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
     lidarTopicName = topicsTuple[9]
     lidarGroundtruthTopicName = topicsTuple[10]
     echoTopicName = topicsTuple[11]
-    imuTopicName = topicsTuple[12]
-    imuAltTopicName = topicsTuple[13]
-    poseTopicName = topicsTuple[14]
-    poseAltTopicName = topicsTuple[15]
-    sceneCamera1MonoTopicName = topicsTuple[16]
-    sceneCamera2MonoTopicName = topicsTuple[17]
-    sceneCamera3MonoTopicName = topicsTuple[18]
+    uwbTopicName = topicsTuple[12]
+    imuTopicName = topicsTuple[13]
+    imuAltTopicName = topicsTuple[14]
+    poseTopicName = topicsTuple[15]
+    poseAltTopicName = topicsTuple[16]
+    sceneCamera1MonoTopicName = topicsTuple[17]
+    sceneCamera2MonoTopicName = topicsTuple[18]
+    sceneCamera3MonoTopicName = topicsTuple[19]
 
     camera1Frame = framesTuple[0]
     camera2Frame = framesTuple[1]
@@ -218,6 +221,8 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
             lidarGroundtruthPub = rospy.Publisher(lidarGroundtruthTopicName, StringArray, queue_size=1)
     if echoActive:
         echoPub = rospy.Publisher(echoTopicName, PointCloud2, queue_size=1)
+    if uwbActive:
+        uwbPub = rospy.Publisher(uwbTopicName, uwb_Diagnostics, queue_size=10)
     if imuActive:
         imuPub = rospy.Publisher(imuTopicName, Imu, queue_size=1)
         if publishAlternative:
@@ -451,6 +456,24 @@ def airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, camer
                             # publish messages
                             lidarPub.publish(pcloud)
                             lidarGroundtruthPub.publish(groundtruth)
+            if uwbActive:
+                # get uwb data
+                uwbData = client.getUWBData("MarLocUwb", vehicleName)
+                    arrBeaconIds  = np.array(uwbData.beaconsActiveID)   # Convert IDs and RSSIs to numpy arrays
+                    arrBeaconRssi = np.array(uwbData.beaconsActiveRssi)
+
+                    if (np.unique(arrBeaconIds)).size > 1:
+                        for beaconId in np.unique(arrBeaconIds):        # For all unique IDs
+                            # Find indexes of this ID
+                            # Put all rssi of said index into arry
+                            thisBeaconRssis = arrBeaconRssi[tuple(np.where(arrBeaconIds==beaconId))]
+
+                            uwbMsg = uwb_Diagnostics()
+                            uwbMsg.header.frame_id = "MarLocUWB"
+                            uwbMsg.header.stamp = timeStamp
+                            uwbMsg.id = beaconId
+                            uwbMsg.rssi = np.amax(thisBeaconRssis)
+                            uwbPub.publish(uwbMsg)
 
             if echoActive:
                 # get echo data
@@ -586,10 +609,11 @@ if __name__ == '__main__':
         lidarActive = rospy.get_param('~lidar_active', 0)
         gpulidarActive = rospy.get_param('~gpulidar_active', 0)
         echoActive = rospy.get_param('~echo_active', 0)
+        uwbActive = rospy.get_param('~uwb_active', 0)
         imuActive = rospy.get_param('~imu_active', 0)
         poseActive = rospy.get_param('~pose_active', 0)
         carcontrolActive = rospy.get_param('~carcontrol_active', 0)
-        activeTuple = (camera1Active, camera2Active, camera3Active, lidarActive, gpulidarActive, echoActive, imuActive, poseActive, carcontrolActive)
+        activeTuple = (camera1Active, camera2Active, camera3Active, lidarActive, gpulidarActive, echoActive, uwbActive, imuActive, poseActive, carcontrolActive)
 
         # Publish topic names
         sceneCamera1TopicName = rospy.get_param('~topic_scene_camera1', 'airsim/rgb/image')
@@ -604,6 +628,7 @@ if __name__ == '__main__':
         lidarTopicName = rospy.get_param('~topic_lidar', 'airsim/lidar')
         lidarGroundtruthTopicName = rospy.get_param('~topic_lidar_groundtruth', 'airsim/lidargroundtruth')
         echoTopicName = rospy.get_param('~topic_echo', 'airsim/echo')
+        uwbTopicName = rospy.get_param('~topic_uwb', 'airsim/uwb')
         imuTopicName = rospy.get_param('~topic_imu', 'airsim/imu')
         imuAltTopicName = rospy.get_param('~topic_imu_alt', 'imualt')
         poseTopicName = rospy.get_param('~topic_pose', 'airsim/gtpose')
@@ -612,7 +637,7 @@ if __name__ == '__main__':
         sceneCamera2MonoTopicName = rospy.get_param('~topic_scene_camera2_mono', 'airsim/mono2/image')
         sceneCamera3MonoTopicName = rospy.get_param('~topic_scene_camera3_mono', 'airsim/mono3/image')
         topicsTuple = (sceneCamera1TopicName, segmentationCamera1TopicName, depthCamera1TopicName, sceneCamera2TopicName, segmentationCamera2TopicName, depthCamera2TopicName, sceneCamera3TopicName, segmentationCamera3TopicName, depthCamera3TopicName,
-                       lidarTopicName, lidarGroundtruthTopicName, echoTopicName, imuTopicName, imuAltTopicName, poseTopicName, poseAltTopicName,
+                       lidarTopicName, lidarGroundtruthTopicName, echoTopicName, uwbTopicName, imuTopicName, imuAltTopicName, poseTopicName, poseAltTopicName,
                        sceneCamera1MonoTopicName, sceneCamera2MonoTopicName, sceneCamera3MonoTopicName)
 
         # Frames

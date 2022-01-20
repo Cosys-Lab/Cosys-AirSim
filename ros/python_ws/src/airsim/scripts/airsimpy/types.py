@@ -388,6 +388,12 @@ class EchoData(MsgpackMixin):
     time_stamp = np.uint64(0)
     pose = Pose()
 
+class UwbData(MsgpackMixin):
+    beaconsActiveID = []
+    beaconsActiveRssi = []
+    time_stamp = np.uint64(0)
+    pose = Pose()
+    
 class ImuData(MsgpackMixin):
     time_stamp = np.uint64(0)
     orientation = Quaternionr()

@@ -488,6 +488,6 @@ if __name__ == '__main__':
 
         airsim_pub(rosRate, rosIMURate, activeTuple, topicsTuple, framesTuple, cameraSettingsTuple, lidarName, echoName, imuName,
                    vehicleName, transformPose, carcontrolInputTopic, publishAlternative, route_rosbag, dst_rosbag)
-
+        
     except rospy.ROSInterruptException:
         pass
