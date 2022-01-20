@@ -222,10 +222,25 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 					DrawDebugLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
 				}
 
-				UAirBlueprintLib::LogMessageString("Calculating the current distance", std::to_string(traceRayCurrentDistance),LogDebugLevel::Informational);
-				UAirBlueprintLib::LogMessageString("Calculating the current bounces", std::to_string(traceRayCurrentbounces), LogDebugLevel::Informational);
-				UAirBlueprintLib::LogMessageString("Calculating the current signal strength", std::to_string(traceRayCurrentSignalStrength), LogDebugLevel::Informational);
-				
+				/*if (isnan(traceRayCurrentDistance)) {
+					traceRayCurrentDistance = -1;
+				}
+				if (isnan(traceRayCurrentbounces)) {
+					traceRayCurrentbounces = -1;
+				}
+				if (isnan(traceRayCurrentSignalStrength)) {
+					traceRayCurrentbounces = -1;
+				}*/
+					
+				/*try {
+					UAirBlueprintLib::LogMessageString("Calculating the current distance", std::to_string(traceRayCurrentDistance), LogDebugLevel::Informational);
+					UAirBlueprintLib::LogMessageString("Calculating the current bounces", std::to_string(traceRayCurrentbounces), LogDebugLevel::Informational);
+					UAirBlueprintLib::LogMessageString("Calculating the current signal strength", std::to_string(traceRayCurrentSignalStrength), LogDebugLevel::Informational);
+				}
+				catch (const std::exception& e) {
+					UAirBlueprintLib::LogMessageString("Calculating the current distance", (e.what()), LogDebugLevel::Informational);
+				}*/
+
 				return(traceDirection(trace_start_position, trace_end_position, UWBHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug));
 
 				/*if (drawDebug) {
