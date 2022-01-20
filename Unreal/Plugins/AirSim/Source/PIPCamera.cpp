@@ -329,7 +329,7 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], true, 
                     image_type_to_pixel_format_map_[image_type], capture_setting, ned_transform); 
 			if (image_type == 5) {
-				render_targets_[image_type]->TargetGamma = 1;
+				render_targets_[image_type]->TargetGamma = 0.4545454545;
 			}
             setNoiseMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings, noise_setting);
 

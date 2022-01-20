@@ -7,6 +7,45 @@
 #include "Slate/SceneViewport.h"
 #include "AirBlueprintLib.h"
 
+static TMap<uint8, uint8> DecodeColorValue; // Convert Encoded Color to Display Color, for numerical issue
+
+// Do Gamma correction
+void BuildDecodeColorValue(float InvGamma)
+{
+	DecodeColorValue.Empty();
+	for (int32 DisplayIter = 0; DisplayIter < 256; DisplayIter++) // if use uint8, this loop will go forever
+	{
+		int32 EncodeVal = FMath::FloorToInt(FMath::Pow((float)DisplayIter / 255.0, InvGamma) * 255.0);
+		check(EncodeVal >= 0);
+		check(EncodeVal <= 255);
+		if (!DecodeColorValue.Find(EncodeVal))
+		{
+			DecodeColorValue.Emplace(EncodeVal, DisplayIter);
+		}
+	}
+	check(DecodeColorValue.Num() < 256); // Not all of them can find a correspondence due to numerical issue
+}
+
+bool GetDisplayValue(uint8 InEncodedValue, uint8& OutDisplayValue, float InvGamma)
+{
+	static float CachedInvGamma;
+	if (DecodeColorValue.Num() == 0 || CachedInvGamma != InvGamma)
+	{
+		BuildDecodeColorValue(InvGamma);
+		CachedInvGamma = InvGamma;
+	}
+
+	if (DecodeColorValue.Find(InEncodedValue))
+	{
+		OutDisplayValue = DecodeColorValue[InEncodedValue];
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 int32 GetChannelValue(uint32 index)
 {
 	static int32 values[256] = { 0 };
@@ -67,12 +106,12 @@ FColor GetColorFromColorMap(int32 color_index)
 	{
 		for (int32 max_channel_index = 0; max_channel_index < num_per_channel; max_channel_index++)
 		{
-			GetColors(max_channel_index, false, false, true, color_map_);
-			GetColors(max_channel_index, false, true, false, color_map_);
-			GetColors(max_channel_index, false, true, true, color_map_);
-			GetColors(max_channel_index, true, false, false, color_map_);
-			GetColors(max_channel_index, true, false, true, color_map_);
-			GetColors(max_channel_index, true, true, false, color_map_);
+			//GetColors(max_channel_index, false, false, true, color_map_);
+			//GetColors(max_channel_index, false, true, false, color_map_);
+			//GetColors(max_channel_index, false, true, true, color_map_);
+			//GetColors(max_channel_index, true, false, false, color_map_);
+			//GetColors(max_channel_index, true, false, true, color_map_);
+			//GetColors(max_channel_index, true, true, false, color_map_);
 			GetColors(max_channel_index, true, true, true, color_map_);
 		}
 	}
@@ -121,7 +160,7 @@ void getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* 
 						}
 						component_name.Append(actor->GetParentActor()->GetName());
 						paintable_components_meshes->Emplace(component_name, component);
-					}					
+					}
 				}
 				else {
 					paintable_components_meshes->Emplace(actor->GetName(), component);
@@ -230,6 +269,10 @@ uint32 UObjectPainter::GetComponentColor(FString component_id, TMap<FString, uin
 void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* name_to_colorindex_map, TMap<FString, UMeshComponent*>* name_to_component_map, TMap<FString, FString>* color_to_name_map)
 {
 	uint32 color_index = 0;
+	FSceneViewport* SceneViewport = InLevel->GetWorld()->GetGameViewport()->GetGameViewport();
+	float Gamma = SceneViewport->GetDisplayGamma();
+	float InvGamma = 1 / Gamma;
+	BuildDecodeColorValue(InvGamma);
 	UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Starting initial random instance segmentation"));
 	for (AActor* actor : InLevel->Actors)
 	{
@@ -245,7 +288,12 @@ void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* name_to_color
 				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 				color_to_name_map->Emplace(color_string, it.Key());
 				check(PaintComponent(it.Value(), new_color));
-				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s (%s)"), *it.Key(), *FString::FromInt(color_index), *color_string);
+				FColor NewColor;
+				GetDisplayValue(new_color.R, NewColor.R, InvGamma);
+				GetDisplayValue(new_color.G, NewColor.G, InvGamma);
+				GetDisplayValue(new_color.B, NewColor.B, InvGamma);
+				FString color_string2 = FString::FromInt(NewColor.R) + "," + FString::FromInt(NewColor.G) + "," + FString::FromInt(NewColor.B);
+				UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Added new object %s with ID # %s (%s)(%s)"), *it.Key(), *FString::FromInt(color_index), *color_string, *color_string2);
 
 				color_index++;
 			}
@@ -258,6 +306,9 @@ void UObjectPainter::Reset(ULevel* InLevel, TMap<FString, uint32>* name_to_color
 bool UObjectPainter::PaintComponent(UMeshComponent* component, const FColor& color)
 {
 	if (!component) return false;
+
+	FLinearColor LinearColor = FLinearColor::FLinearColor(color);
+	const FColor NewColor = color;
 	if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component))
 	{
 		UStaticMesh* staticmesh;
@@ -289,7 +340,7 @@ bool UObjectPainter::PaintComponent(UMeshComponent* component, const FColor& col
 					// Need to initialize the vertex buffer first
 					uint32 num_override_vertex_colors = instance_mesh_lod_info->OverrideVertexColors->GetNumVertices();
 					uint32 num_painted_vertices = instance_mesh_lod_info->PaintedVertices.Num();
-					instance_mesh_lod_info->OverrideVertexColors->VertexColor(color_index) = color;
+					instance_mesh_lod_info->OverrideVertexColors->VertexColor(color_index) = NewColor;
 				}
 				BeginInitResource(instance_mesh_lod_info->OverrideVertexColors);
 				staticmesh_component->MarkRenderStateDirty();
@@ -299,7 +350,7 @@ bool UObjectPainter::PaintComponent(UMeshComponent* component, const FColor& col
 	}
 	if (USkinnedMeshComponent*  skinnedmesh_component = Cast<USkinnedMeshComponent>(component))
 	{
-		skinnedmesh_component->SetAllVertexColorOverride(color);
+		skinnedmesh_component->SetAllVertexColorOverride(NewColor);
 	}
 	return true;
 }
