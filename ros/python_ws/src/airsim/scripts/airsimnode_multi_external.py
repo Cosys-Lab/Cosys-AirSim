@@ -13,7 +13,7 @@ import tf2_ros
 import geometry_msgs
 
 print("Connecting...")
-client = airsimpy.CarClient("172.30.128.1")
+client = airsimpy.CarClient()
 client.confirmConnection(rospy.get_name())
 
 print("Connected to AirSim!")
