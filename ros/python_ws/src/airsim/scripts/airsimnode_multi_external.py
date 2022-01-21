@@ -13,7 +13,7 @@ import tf2_ros
 import geometry_msgs
 
 print("Connecting...")
-client = airsimpy.CarClient()
+client = airsimpy.CarClient("172.30.128.1")
 client.confirmConnection(rospy.get_name())
 
 print("Connected to AirSim!")
@@ -31,7 +31,7 @@ def get_valid_ros_topic_nameid(sensor_name):
 def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffix, lidar_topic_prefix,
                          lidar_topic_suffix, object_topic_prefix, object_topic_suffix,
                          echo_frame_prefix, lidar_frame_prefix, base_frame,
-                         echo_names, lidar_names, object_names):
+                         echo_names, lidar_names, cpulidar_names, object_names):
 
     rospy.Rate(ros_rate)
 
@@ -44,6 +44,11 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
                                                              + "/" + echo_topic_suffix, PointCloud2, queue_size=2)
         last_timestamps[sensor_name] = None
     for sensor_name in lidar_names:
+        pointcloud_publishers[sensor_name] = rospy.Publisher(lidar_topic_prefix + "/"
+                                                             + str(get_valid_ros_topic_nameid(sensor_name))
+                                                             + "/" + lidar_topic_suffix, PointCloud2, queue_size=2)
+        last_timestamps[sensor_name] = None
+    for sensor_name in cpulidar_names:
         pointcloud_publishers[sensor_name] = rospy.Publisher(lidar_topic_prefix + "/"
                                                              + str(get_valid_ros_topic_nameid(sensor_name))
                                                              + "/" + lidar_topic_suffix, PointCloud2, queue_size=2)
@@ -100,10 +105,9 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
 
             if lidar_data.time_stamp != last_timestamps[sensor_name]:
                 if len(lidar_data.point_cloud) < 5:
-                    last_timestamps[sensor_name] = timestamp
-                    print('len' + str(len(lidar_data.point_cloud)))
+                    last_timestamps[sensor_name] = lidar_data.time_stamp
                 else:
-                    last_timestamps[sensor_name] = timestamp
+                    last_timestamps[sensor_name] = lidar_data.time_stamp
 
                     pcloud = PointCloud2()
 
@@ -113,6 +117,26 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
                     pcloud.header.stamp = timestamp
 
                     pcloud = pc2.create_cloud(pcloud.header, fields_lidar, points.tolist())
+                    pointcloud_publishers[sensor_name].publish(pcloud)
+
+        for sensor_name in cpulidar_names:
+            lidar_data = client.getLidarData(sensor_name, vehicle_name)
+            if lidar_data.time_stamp != last_timestamps[sensor_name]:
+                if len(lidar_data.point_cloud) < 4:
+                    last_timestamps[sensor_name] = lidar_data.time_stamp
+                else:
+                    last_timestamps[sensor_name] = lidar_data.time_stamp
+
+                    pcloud = PointCloud2()
+
+                    points = np.array(lidar_data.point_cloud, dtype=np.dtype('f4'))
+                    points = np.reshape(points, (int(points.shape[0] / 3), 3))
+                    points = points * np.array([1, -1, -1])
+                    cloud = points.tolist()
+                    pcloud.header.frame_id = lidar_frame_prefix + "_" + str(get_valid_ros_topic_nameid(sensor_name))
+                    pcloud.header.stamp = timestamp
+                    pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
+
                     pointcloud_publishers[sensor_name].publish(pcloud)
 
         for sensor_name in echo_names:
@@ -140,7 +164,7 @@ def airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffi
 if __name__ == '__main__':
     try:
         rospy.init_node('airsimnode_multi_external_publisher', anonymous=True)
-        ros_rate = rospy.get_param('~ros_rate', 10)
+        ros_rate = rospy.get_param('~ros_rate', 100)
 
         echo_topic_prefix = rospy.get_param('~echo_topic_prefix', "echo")
         echo_topic_suffix = rospy.get_param('~echo_topic_suffix', "pointcloud")
@@ -154,6 +178,7 @@ if __name__ == '__main__':
         base_frame = rospy.get_param('~base_frame', "world")
         echo_names = rospy.get_param('~echo_names', "True")
         lidar_names = rospy.get_param('~lidar_names', "True")
+        cpulidar_names = rospy.get_param('~cpulidar_names', "True")
         object_names = rospy.get_param('~object_names', "True")
 
         rospy.loginfo("Starting static transforms...")
@@ -196,12 +221,30 @@ if __name__ == '__main__':
             time.sleep(1)
             rospy.loginfo("Started static transform for LiDAR sensor with ID " + sensor_name + ".")
 
+        for sensor_name in cpulidar_names:
+            lidar_data = client.getLidarData(sensor_name, vehicle_name)
+            pose = lidar_data.pose
+            static_transformStamped = geometry_msgs.msg.TransformStamped()
+            static_transformStamped.header.stamp = rospy.Time.now()
+            static_transformStamped.header.frame_id = base_frame
+            static_transformStamped.child_frame_id = str(lidar_frame_prefix) + "_" + str(get_valid_ros_topic_nameid(sensor_name))
+            static_transformStamped.transform.translation.x = pose.position.x_val
+            static_transformStamped.transform.translation.y = -pose.position.y_val
+            static_transformStamped.transform.translation.z = pose.position.z_val
+            static_transformStamped.transform.rotation.x = pose.orientation.x_val
+            static_transformStamped.transform.rotation.y = pose.orientation.y_val
+            static_transformStamped.transform.rotation.z = pose.orientation.z_val
+            static_transformStamped.transform.rotation.w = pose.orientation.w_val
+            transformList.append(static_transformStamped)
+            time.sleep(1)
+            rospy.loginfo("Started static transform for LiDAR sensor with ID " + sensor_name + ".")
+
         broadcaster.sendTransform(transformList)
 
         airsim_echos_pub(ros_rate, vehicle_name, echo_topic_prefix, echo_topic_suffix, lidar_topic_prefix,
                          lidar_topic_suffix, object_topic_prefix, object_topic_suffix,
                          echo_frame_prefix, lidar_frame_prefix, base_frame,
-                         echo_names, lidar_names, object_names)
+                         echo_names, lidar_names, cpulidar_names, object_names)
 
     except rospy.ROSInterruptException:
         pass
