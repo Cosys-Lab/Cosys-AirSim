@@ -44,6 +44,7 @@ void RenderRequest::getScreenshot(std::shared_ptr<RenderParams> params[], std::v
                 //below is documented method but more expensive because it forces flush
                 FTextureRenderTargetResource* rt_resource = params[i]->render_target->GameThread_GetRenderTargetResource();
                 auto flags = setupRenderResource(rt_resource, params[i].get(), results[i].get(), img_size);
+                flags.SetLinearToGamma(false);
                 rt_resource->ReadPixels(results[i]->bmp, flags);
             }
             else {
