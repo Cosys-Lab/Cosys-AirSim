@@ -1,6 +1,6 @@
 # How to use AirSim with Robot Operating System (ROS)
 
-AirSim and ROS can be integrated using C++ or Python.  Some example ROS node are provided demonstrating how to publish data from AirSim as ROS topics.
+AirSim and ROS can be integrated using Python. Some example ROS node are provided demonstrating how to publish data from AirSim as ROS topics.
 
 # Python
 
@@ -46,13 +46,4 @@ First make sure UE4 is running an AirSim project and the simulations is playing.
 
 The implemented AirSim nodes can be run using ```rosrun airsim scriptname.py```.
 
-Or alternativly you can use launch files such as the example ones that can be found in _AirSim/ros/python_ws/src/airsim/launch_.
-
-Rviz is a useful visualization tool that can display the published data. example Rviz configuration files for when all sensors are enabled can be found in _AirSim/ros/python_ws/src/airsim/rviz_.
-
-# C++ 
-**THIS IS NOT MAINTAINED BY COSYS-LAB SO IS LIKELY BUGGED AND NOT USABLE**
-
-Please use the documentation for the C++ wrapper that can be found separately:
-- [ROS Wrapper package](../ros/cplusplus_ws/src/airsim_ros_pkgs/README.md)
-- [ROS Wrapper tutorial package](../ros/cplusplus_ws/src/airsim_tutorial_pkgs/README.md)
+Or alternatively you can use launch files such as the example ones that can be found in _AirSim/ros/python_ws/src/airsim/launch_.

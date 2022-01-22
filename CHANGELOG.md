@@ -2,20 +2,18 @@
 
 Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. This list updated every few months. For complete detailed changes, please review [commit history](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/commits/master).
 
-### CoSys-Lab Modifications
-* Updated [ROS implementation](docs/ros.md)
-* Added [HySLAM Benchmark Scenario environment](docs/hyslambenchmarkenv.md)
-* Added [HySLAM environment](docs/hyslamenv.md)
-* Added [CoSysLab environment](docs/cosysenv.md)
-* Added [Echo sensor type](docs/echo.md)
-* Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com). **Currently removed due to crashes on Linux!**
-* Added [Instance Segmentation](docs/instance_segmentation.md). **Currently only works in Unreal Editor, not cooked builds!** Replaces previous system with 255 color limit. 
-* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
-* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
-* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation.
-* Added option to hot-reload plugin through Unreal Editor (faster development)
-* Added WIP usage of engine-time for frequency updaters and timestamps instead of real-time. Useful for heavy performance sensor modalities. Currently only usable on the Echo and LIDAR sensor types.
-* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+## CoSys-Lab Modifications
+* Updated the Echo, (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
+* Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
+* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
+* Added various dynamic object types [HySLAM Benchmark Scenario environments](docs/hyslambenchmarkenv.md)
+* Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
+* Added [Instance Segmentation](docs/instance_segmentation.md). 
+* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
+* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
+* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
+* Added option to hot-reload plugin through Unreal Editor (faster development).
+* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVIDIA tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
