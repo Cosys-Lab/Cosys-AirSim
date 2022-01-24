@@ -11,6 +11,7 @@
             <param name="pose_topic" type="string" value="airsim/gtpose" />
             <param name="pose_frame" type="string" value="world" />
 
+            <param name="sensor_imu_enable" type="int" value="1" />
             <param name="sensor_imu_name" type="string" value="imu" />
             <param name="sensor_imu_topic" type="string" value="airsim/imu" />
             <param name="sensor_imu_frame" type="string" value="world" />

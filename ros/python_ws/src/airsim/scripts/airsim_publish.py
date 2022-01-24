@@ -90,7 +90,7 @@ def get_image_bytes(data, cameraType):
     return img_rgb_string
 
 
-def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_name, sensor_imu_topic,
+def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enable, sensor_imu_name, sensor_imu_topic,
                    sensor_imu_frame, sensor_echo_names,
                    sensor_echo_external, sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
                    sensor_lidar_toggle_external, sensor_lidar_toggle_segmentation,
@@ -108,7 +108,8 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_name
     last_timestamps = {}
 
     pose_publisher = rospy.Publisher(pose_topic, PoseStamped, queue_size=1)
-    imu_publisher = rospy.Publisher(sensor_imu_topic, Imu, queue_size=1)
+    if sensor_imu_enable:
+        imu_publisher = rospy.Publisher(sensor_imu_topic, Imu, queue_size=1)
     objectpose_publishers = {}
     pointcloud_publishers = {}
     string_segmentation_publishers = {}
@@ -205,26 +206,27 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_name
 
         pose_publisher.publish(pose_msg)
 
-        imu_data = client.getImuData(sensor_imu_name, vehicle_name)
+        if sensor_imu_enable:
+            imu_data = client.getImuData(sensor_imu_name, vehicle_name)
 
-        imu_msg = Imu()
-        imu_msg.header.stamp = timestamp
-        imu_msg.header.frame_id = sensor_imu_frame
+            imu_msg = Imu()
+            imu_msg.header.stamp = timestamp
+            imu_msg.header.frame_id = sensor_imu_frame
 
-        imu_msg.orientation.x = imu_data.orientation.inverse().x_val
-        imu_msg.orientation.y = imu_data.orientation.inverse().y_val
-        imu_msg.orientation.z = imu_data.orientation.inverse().z_val
-        imu_msg.orientation.w = imu_data.orientation.inverse().w_val
+            imu_msg.orientation.x = imu_data.orientation.inverse().x_val
+            imu_msg.orientation.y = imu_data.orientation.inverse().y_val
+            imu_msg.orientation.z = imu_data.orientation.inverse().z_val
+            imu_msg.orientation.w = imu_data.orientation.inverse().w_val
 
-        imu_msg.angular_velocity.x = imu_data.angular_velocity.x_val
-        imu_msg.angular_velocity.y = -imu_data.angular_velocity.y_val
-        imu_msg.angular_velocity.z = -imu_data.angular_velocity.z_val
+            imu_msg.angular_velocity.x = imu_data.angular_velocity.x_val
+            imu_msg.angular_velocity.y = -imu_data.angular_velocity.y_val
+            imu_msg.angular_velocity.z = -imu_data.angular_velocity.z_val
 
-        imu_msg.linear_acceleration.x = imu_data.linear_acceleration.x_val
-        imu_msg.linear_acceleration.y = -imu_data.linear_acceleration.y_val
-        imu_msg.linear_acceleration.z = -imu_data.linear_acceleration.z_val
+            imu_msg.linear_acceleration.x = imu_data.linear_acceleration.x_val
+            imu_msg.linear_acceleration.y = -imu_data.linear_acceleration.y_val
+            imu_msg.linear_acceleration.z = -imu_data.linear_acceleration.z_val
 
-        imu_publisher.publish(imu_msg)
+            imu_publisher.publish(imu_msg)
 
         camera_responses = client.simGetImages(requests)
 
@@ -364,6 +366,7 @@ if __name__ == '__main__':
         pose_topic = rospy.get_param('~pose_topic', "airsim/gtpose")
         pose_frame = rospy.get_param('~pose_frame', "world")
 
+        sensor_imu_enable = rospy.get_param('~sensor_imu_enable', 1)
         sensor_imu_name = rospy.get_param('~sensor_imu_name', "imu")
         sensor_imu_topic = rospy.get_param('~sensor_imu_topic', "airsim/imu")
         sensor_imu_frame = rospy.get_param('~sensor_imu_frame', "base_link")
@@ -484,8 +487,8 @@ if __name__ == '__main__':
 
         broadcaster.sendTransform(transform_list)
 
-        airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_name, sensor_imu_topic,
-                       sensor_imu_frame, sensor_echo_names, sensor_echo_external,
+        airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
+                       sensor_imu_name, sensor_imu_topic, sensor_imu_frame, sensor_echo_names, sensor_echo_external,
                        sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
                        sensor_lidar_toggle_external, sensor_lidar_toggle_groundtruth,
                        sensor_lidar_topics, sensor_lidar_segmentation_topics, sensor_lidar_frames,

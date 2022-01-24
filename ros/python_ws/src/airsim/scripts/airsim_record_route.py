@@ -8,7 +8,7 @@ from sensor_msgs.msg import Imu
 from geometry_msgs.msg import PoseStamped
 
 
-def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, pose_frame,
+def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
                         sensor_imu_name, sensor_imu_topic, sensor_imu_frame):
 
     rate = rospy.Rate(ros_rate)
@@ -22,7 +22,8 @@ def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, po
     rospy.loginfo("Connected to AirSim!")
 
     pose_publisher = rospy.Publisher(pose_topic, PoseStamped, queue_size=1)
-    imu_publisher = rospy.Publisher(sensor_imu_topic, Imu, queue_size=1)
+    if sensor_imu_enable:
+        imu_publisher = rospy.Publisher(sensor_imu_topic, Imu, queue_size=1)
 
     rospy.loginfo("Started publishers...")
 
@@ -50,26 +51,27 @@ def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, po
 
         pose_publisher.publish(pose_msg)
 
-        imu_data = client.getImuData(sensor_imu_name, vehicle_name)
+        if sensor_imu_enable:
+            imu_data = client.getImuData(sensor_imu_name, vehicle_name)
 
-        imu_msg = Imu()
-        imu_msg.header.stamp = timestamp
-        imu_msg.header.frame_id = sensor_imu_frame
+            imu_msg = Imu()
+            imu_msg.header.stamp = timestamp
+            imu_msg.header.frame_id = sensor_imu_frame
 
-        imu_msg.orientation.x = imu_data.orientation.inverse().x_val
-        imu_msg.orientation.y = imu_data.orientation.inverse().y_val
-        imu_msg.orientation.z = imu_data.orientation.inverse().z_val
-        imu_msg.orientation.w = imu_data.orientation.inverse().w_val
+            imu_msg.orientation.x = imu_data.orientation.inverse().x_val
+            imu_msg.orientation.y = imu_data.orientation.inverse().y_val
+            imu_msg.orientation.z = imu_data.orientation.inverse().z_val
+            imu_msg.orientation.w = imu_data.orientation.inverse().w_val
 
-        imu_msg.angular_velocity.x = imu_data.angular_velocity.x_val
-        imu_msg.angular_velocity.y = -imu_data.angular_velocity.y_val
-        imu_msg.angular_velocity.z = -imu_data.angular_velocity.z_val
+            imu_msg.angular_velocity.x = imu_data.angular_velocity.x_val
+            imu_msg.angular_velocity.y = -imu_data.angular_velocity.y_val
+            imu_msg.angular_velocity.z = -imu_data.angular_velocity.z_val
 
-        imu_msg.linear_acceleration.x = imu_data.linear_acceleration.x_val
-        imu_msg.linear_acceleration.y = -imu_data.linear_acceleration.y_val
-        imu_msg.linear_acceleration.z = -imu_data.linear_acceleration.z_val
+            imu_msg.linear_acceleration.x = imu_data.linear_acceleration.x_val
+            imu_msg.linear_acceleration.y = -imu_data.linear_acceleration.y_val
+            imu_msg.linear_acceleration.z = -imu_data.linear_acceleration.z_val
 
-        imu_publisher.publish(imu_msg)
+            imu_publisher.publish(imu_msg)
 
         rate.sleep()
 
@@ -89,12 +91,13 @@ if __name__ == '__main__':
         pose_topic = rospy.get_param('~pose_topic', "airsim/gtpose")
         pose_frame = rospy.get_param('~pose_frame', "world")
 
+        sensor_imu_enable = rospy.get_param('~sensor_imu_enable', 1)
         sensor_imu_name = rospy.get_param('~sensor_imu_name', "imu")
         sensor_imu_topic = rospy.get_param('~sensor_imu_topic', "airsim/imu")
         sensor_imu_frame = rospy.get_param('~sensor_imu_frame', "base_link")
 
-        airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, pose_frame, sensor_imu_name,
-                            sensor_imu_topic, sensor_imu_frame)
+        airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
+                            sensor_imu_name, sensor_imu_topic, sensor_imu_frame)
 
     except rospy.ROSInterruptException:
         pass
