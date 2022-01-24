@@ -15,6 +15,9 @@ import numpy as np
 import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+import msgpackrpc
+import sys
+
 
 def get_camera_type(cameraType):
     if (cameraType == "Scene"):
@@ -106,7 +109,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
     rate = rospy.Rate(ros_rate)
 
     last_timestamps = {}
-
+    warning_issued = {}
     pose_publisher = rospy.Publisher(pose_topic, PoseStamped, queue_size=1)
     if sensor_imu_enable:
         imu_publisher = rospy.Publisher(sensor_imu_topic, Imu, queue_size=1)
@@ -132,7 +135,6 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
     for sensor_index, sensor_name in enumerate(sensor_camera_names):
         image_publishers[sensor_name + '_scene'] = rospy.Publisher(sensor_camera_scene_topics[sensor_index],
                                                                    Image, queue_size=2)
-        last_timestamps[sensor_name] = None
         if sensor_camera_toggle_segmentation[sensor_index] is 1:
             image_publishers[sensor_name + '_segmentation'] = rospy.Publisher(sensor_camera_segmentation_topics[sensor_index],
                                                                        Image, queue_size=2)
@@ -141,7 +143,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
                                                                        Image, queue_size=2)
     for object_index, object_name in enumerate(object_names):
         objectpose_publishers[object_name] = rospy.Publisher(object_topics[object_index], PoseStamped, queue_size=1)
-
+        warning_issued[object_name] = False
 
     cv_bridge = CvBridge()
 
@@ -186,7 +188,13 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
 
         timestamp = rospy.Time.now()
 
-        pose = client.simGetVehiclePose(vehicle_name)
+        try:
+            pose = client.simGetVehiclePose(vehicle_name)
+        except msgpackrpc.error.RPCError:
+            rospy.logerr("vehicle '" + vehicle_name + "' could not be found.")
+            rospy.signal_shutdown('Vehicle not found.')
+            sys.exit()
+
         pos = pose.position
         orientation = pose.orientation.inverse()
 
@@ -207,7 +215,13 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
         pose_publisher.publish(pose_msg)
 
         if sensor_imu_enable:
-            imu_data = client.getImuData(sensor_imu_name, vehicle_name)
+
+            try:
+                imu_data = client.getImuData(sensor_imu_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("IMU sensor '" + sensor_imu_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
 
             imu_msg = Imu()
             imu_msg.header.stamp = timestamp
@@ -330,22 +344,28 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
 
         for object_index, object_name in enumerate(object_names):
             pose = client.simGetObjectPose(object_name, False)
-            pos = pose.position
-            orientation = pose.orientation.inverse()
+            if np.isnan(pose.position.x_val):
+                if warning_issued[object_name] is False:
+                    rospy.logwarn("Object '" + object_name + "' could not be found.")
+                    warning_issued[object_name] = True
+            else:
+                warning_issued[object_name] = False
+                pos = pose.position
+                orientation = pose.orientation.inverse()
 
-            object_pose = PoseStamped()
-            object_pose.pose.position.x = pos.x_val
-            object_pose.pose.position.y = -pos.y_val
-            object_pose.pose.position.z = pos.z_val
-            object_pose.pose.orientation.w = orientation.w_val
-            object_pose.pose.orientation.x = orientation.x_val
-            object_pose.pose.orientation.y = orientation.y_val
-            object_pose.pose.orientation.z = orientation.z_val
-            object_pose.header.stamp = timestamp
-            object_pose.header.seq = 1
-            object_pose.header.frame_id = pose_frame
+                object_pose = PoseStamped()
+                object_pose.pose.position.x = pos.x_val
+                object_pose.pose.position.y = -pos.y_val
+                object_pose.pose.position.z = pos.z_val
+                object_pose.pose.orientation.w = orientation.w_val
+                object_pose.pose.orientation.x = orientation.x_val
+                object_pose.pose.orientation.y = orientation.y_val
+                object_pose.pose.orientation.z = orientation.z_val
+                object_pose.header.stamp = timestamp
+                object_pose.header.seq = 1
+                object_pose.header.frame_id = pose_frame
 
-            objectpose_publishers[object_name].publish(object_pose)
+                objectpose_publishers[object_name].publish(object_pose)
 
         rate.sleep()
 
@@ -414,7 +434,12 @@ if __name__ == '__main__':
         transform_list = []
 
         for sensor_index, sensor_name in enumerate(sensor_echo_names):
-            echo_data = client.getEchoData(sensor_name, vehicle_name)
+            try:
+                echo_data = client.getEchoData(sensor_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("Echo sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = echo_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()
@@ -432,7 +457,12 @@ if __name__ == '__main__':
             rospy.loginfo("Started static transform for echo sensor with ID " + sensor_name + ".")
 
         for sensor_index, sensor_name in enumerate(sensor_lidar_names):
-            lidar_data = client.getLidarData(sensor_name, vehicle_name)
+            try:
+                lidar_data = client.getLidarData(sensor_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("LiDAR sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = lidar_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()
@@ -450,7 +480,12 @@ if __name__ == '__main__':
             rospy.loginfo("Started static transform for LiDAR sensor with ID " + sensor_name + ".")
 
         for sensor_index, sensor_name in enumerate(sensor_gpulidar_names):
-            lidar_data = client.getGPULidarData(sensor_name, vehicle_name)
+            try:
+                lidar_data = client.getGPULidarData(sensor_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("GPU-LiDAR sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = lidar_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()
@@ -468,7 +503,12 @@ if __name__ == '__main__':
             rospy.loginfo("Started static transform for GPU-LiDAR sensor with ID " + sensor_name + ".")
 
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
-            camera_data = client.getCameraInfo(sensor_name)
+            try:
+                camera_data = client.getCameraInfo(sensor_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("camera sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = camera_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()

@@ -15,6 +15,8 @@ import numpy as np
 import cv2
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+import msgpackrpc
+import sys
 
 def get_camera_type(cameraType):
     if (cameraType == "Scene"):
@@ -108,6 +110,16 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
     rospy.loginfo("Route retrieved!")
 
     last_timestamps = {}
+    warning_issued = {}
+
+    for sensor_index, sensor_name in enumerate(sensor_echo_names):
+        last_timestamps[sensor_name] = None
+    for sensor_index, sensor_name in enumerate(sensor_lidar_names):
+        last_timestamps[sensor_name] = None
+    for sensor_index, sensor_name in enumerate(sensor_gpulidar_names):
+        last_timestamps[sensor_name] = None
+    for object_index, object_name in enumerate(object_names):
+        warning_issued[object_name] = False
 
     cv_bridge = CvBridge()
 
@@ -267,22 +279,28 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
 
         for object_index, object_name in enumerate(object_names):
             pose = client.simGetObjectPose(object_name, False)
-            pos = pose.position
-            orientation = pose.orientation.inverse()
+            if np.isnan(pose.position.x_val):
+                if warning_issued[object_name] is False:
+                    rospy.logwarn("Object '" + object_name + "' could not be found.")
+                    warning_issued[object_name] = True
+            else:
+                warning_issued[object_name] = False
+                pos = pose.position
+                orientation = pose.orientation.inverse()
 
-            object_pose = PoseStamped()
-            object_pose.pose.position.x = pos.x_val
-            object_pose.pose.position.y = -pos.y_val
-            object_pose.pose.position.z = pos.z_val
-            object_pose.pose.orientation.w = orientation.w_val
-            object_pose.pose.orientation.x = orientation.x_val
-            object_pose.pose.orientation.y = orientation.y_val
-            object_pose.pose.orientation.z = orientation.z_val
-            object_pose.header.stamp = timestamp
-            object_pose.header.seq = 1
-            object_pose.header.frame_id = pose_frame
+                object_pose = PoseStamped()
+                object_pose.pose.position.x = pos.x_val
+                object_pose.pose.position.y = -pos.y_val
+                object_pose.pose.position.z = pos.z_val
+                object_pose.pose.orientation.w = orientation.w_val
+                object_pose.pose.orientation.x = orientation.x_val
+                object_pose.pose.orientation.y = orientation.y_val
+                object_pose.pose.orientation.z = orientation.z_val
+                object_pose.header.stamp = timestamp
+                object_pose.header.seq = 1
+                object_pose.header.frame_id = pose_frame
 
-            output.write(object_topics[sensor_index], object_pose, t=ros_timestamp)
+                output.write(object_topics[sensor_index], object_pose, t=ros_timestamp)
 
     print("Process completed. Writing all messages to merged rosbag...")
     for topic, msg, t in route.read_messages():
@@ -351,7 +369,12 @@ if __name__ == '__main__':
         transform_list = []
 
         for sensor_index, sensor_name in enumerate(sensor_echo_names):
-            echo_data = client.getEchoData(sensor_name, vehicle_name)
+            try:
+                echo_data = client.getEchoData(sensor_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("Echo sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = echo_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()
@@ -369,7 +392,12 @@ if __name__ == '__main__':
             rospy.loginfo("Started static transform for echo sensor with ID " + sensor_name + ".")
 
         for sensor_index, sensor_name in enumerate(sensor_lidar_names):
-            lidar_data = client.getLidarData(sensor_name, vehicle_name)
+            try:
+                lidar_data = client.getLidarData(sensor_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("LiDAR sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = lidar_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()
@@ -387,7 +415,12 @@ if __name__ == '__main__':
             rospy.loginfo("Started static transform for LiDAR sensor with ID " + sensor_name + ".")
 
         for sensor_index, sensor_name in enumerate(sensor_gpulidar_names):
-            lidar_data = client.getGPULidarData(sensor_name, vehicle_name)
+            try:
+                lidar_data = client.getGPULidarData(sensor_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("GPU-LiDAR sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = lidar_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()
@@ -405,7 +438,12 @@ if __name__ == '__main__':
             rospy.loginfo("Started static transform for GPU-LiDAR sensor with ID " + sensor_name + ".")
 
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
-            camera_data = client.getCameraInfo(sensor_name)
+            try:
+                camera_data = client.getCameraInfo(sensor_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("camera sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
             pose = camera_data.pose
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()

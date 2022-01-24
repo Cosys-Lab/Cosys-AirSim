@@ -6,7 +6,8 @@ import rospy
 import time
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import PoseStamped
-
+import msgpackrpc
+import sys
 
 def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
                         sensor_imu_name, sensor_imu_topic, sensor_imu_frame):
@@ -31,7 +32,13 @@ def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, po
 
         timestamp = rospy.Time.now()
 
-        pose = client.simGetVehiclePose(vehicle_name)
+        try:
+            pose = client.simGetVehiclePose(vehicle_name)
+        except msgpackrpc.error.RPCError:
+            rospy.logerr("Vehicle '" + vehicle_name + "' could not be found.")
+            rospy.signal_shutdown('Vehicle not found.')
+            sys.exit()
+
         pos = pose.position
         orientation = pose.orientation.inverse()
 
@@ -52,7 +59,13 @@ def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, po
         pose_publisher.publish(pose_msg)
 
         if sensor_imu_enable:
-            imu_data = client.getImuData(sensor_imu_name, vehicle_name)
+
+            try:
+                imu_data = client.getImuData(sensor_imu_name, vehicle_name)
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("IMU sensor '" + sensor_imu_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
 
             imu_msg = Imu()
             imu_msg.header.stamp = timestamp
