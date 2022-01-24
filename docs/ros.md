@@ -10,11 +10,13 @@ These instructions are for Ubuntu 18.04, ROS Melodic, UE4 4.24.4 and latest AirS
 You should have these components installed and working before proceeding
 
 ## Implemented nodes
-- `airsimnode.py`: Configurable Python node to get and publish the pose of vehicle and sensory data from lidar, echosensor, cameras and IMU. You can also toggle controlling the vehicle from here.
+- `airsim_publish.py`: Configurable Python node to get and publish the pose of vehicle and sensory data from all sensors as well as the poses of world objects. 
    It will also perform proper transformation of all frames.
+- `airsim_record_route.py`: Configurable Python node to get and publish the pose of vehicle and the IMU sensor of a vehicle and save this data to a rosbag. The idea behind this node is to record a deterministic route that can later be replayed by the next node:
+- `airsim_play_route_record_sensors.py`: Configurable Python node that replays the route rosbag mentioned above and records all sensors as well as the poses of world objects for each of the recorded poses. It generates a new rosbag holding both the route and sensor data. This allows for better performance.
 
 ## Implemented launch files
-Various launch files are available, please check their settings for more information. 
+Various launch files are available for these ROS nodes, please check their settings for more information. 
 
 ## Setup
 
