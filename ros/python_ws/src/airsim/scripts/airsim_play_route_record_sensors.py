@@ -162,9 +162,15 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
     rospy.logwarn("Ensure focus is on the screen of AirSim simulator to allow auto configuration!")
     rospy.logdebug(str(route.get_type_and_topic_info()))
 
-    for _, msg, t in route.read_messages(topics=pose_topic):
+    pose_count = route.get_message_count('/' + pose_topic)
+    pose_index = 1
+
+    print(pose_topic)
+    for _, msg, t in route.read_messages(topics='/' + pose_topic):
         if rospy.is_shutdown():
             break
+
+        rospy.logdebug("Setting vehicle pose at {}".format(str(t)))
 
         ros_timestamp = t
         timestamp = msg.header.stamp
@@ -175,7 +181,9 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
         orientation = airsimpy.Quaternionr(float(orientation.x_val), float(orientation.y_val),
                                            float(orientation.z_val), float(orientation.w_val))
         client.simSetVehiclePose(airsimpy.Pose(position, orientation), True, vehicle_name)
-        rospy.logdebug("Setting vehicle pose at {}".format(str(t)))
+
+        rospy.loginfo("Setting vehicle pose " + str(pose_index) + ' of ' + str(pose_count) + '.')
+        pose_index += 1
 
         camera_responses = client.simGetImages(requests)
 
@@ -448,7 +456,7 @@ if __name__ == '__main__':
             static_transform = TransformStamped()
             static_transform.header.stamp = rospy.Time.now()
             static_transform.header.frame_id = vehicle_base_frame
-            static_transform.child_frame_id = sensor_gpulidar_frames[sensor_index]
+            static_transform.child_frame_id = sensor_camera_frames[sensor_index]
             static_transform.transform.translation.x = pose.position.x_val
             static_transform.transform.translation.y = -pose.position.y_val
             static_transform.transform.translation.z = -pose.position.z_val
