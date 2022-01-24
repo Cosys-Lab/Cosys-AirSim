@@ -46,7 +46,7 @@ def write_file(filename, bstr):
 
 
 def get_colormap_channel_values():
-    values = np.zeros(258,dtype=np.int)
+    values = np.zeros(258, dtype=np.int)
     step = 256
     iter = 0
     values[0] = 0
@@ -55,23 +55,52 @@ def get_colormap_channel_values():
         while val <= 256:
             iter = iter + 1
             values[iter] = int(val)
-            val = val + (step*2)
-        step = int(step /2)
+            val = val + (step * 2)
+        step = int(step / 2)
     init = True
     return values
 
 
-def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues):
+gammaCorrectionTable = [0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 79, 0,
+                        81, 0, 83, 0, 85, 0, 86, 0, 88, 0,
+                        90, 0, 93, 0, 95, 0, 96, 0, 98, 0,
+                        101, 0, 102, 0, 105, 0, 106, 0, 109, 0,
+                        110, 0, 113, 0, 114, 0, 117, 0, 119, 0,
+                        120, 0, 122, 0, 125, 0, 127, 0, 129, 0,
+                        131, 0, 133, 0, 135, 0, 137, 0, 139, 0,
+                        141, 0, 143, 0, 145, 0, 147, 147, 148, 150,
+                        151, 152, 153, 154, 155, 156, 157, 158, 159, 160,
+                        161, 162, 163, 164, 165, 166, 167, 168, 169, 170,
+                        171, 172, 173, 174, 175, 176, 177, 178, 179, 180,
+                        181, 182, 183, 184, 185, 186, 187, 188, 189, 190,
+                        191, 192, 193, 194, 195, 196, 197, 198, 199, 200,
+                        201, 202, 203, 204, 205, 206, 207, 208, 209, 210,
+                        211, 212, 213, 214, 215, 216, 217, 218, 219, 220,
+                        221, 222, 223, 224, 225, 226, 227, 228, 229, 230,
+                        231, 232, 233, 234, 235, 236, 237, 238, 239, 240,
+                        241, 242, 243, 244, 245, 246, 247, 248, 249, 250,
+                        251, 252, 253, 254, 255]
+
+
+def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues, okValues):
     if not enable1:
-        max1 = maxVal -1
+        max1 = maxVal - 1
     else:
         max1 = 0
     if not enable2:
-        max2 = maxVal -1
+        max2 = maxVal - 1
     else:
         max2 = 0
     if not enable3:
-        max3 = maxVal -1
+        max3 = maxVal - 1
     else:
         max3 = 0
     i = 0
@@ -92,8 +121,8 @@ def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValu
                     b = channelValues[maxVal]
                 else:
                     b = channelValues[k]
-                if r != 76 and g != 76 and b != 76:
-                    colormap.append([r, g, b])
+                if r in okValues and g in okValues and b in okValues and r != 149 and g != 149 and b != 149:
+                    colormap.append([gammaCorrectionTable[r], gammaCorrectionTable[g], gammaCorrectionTable[b]])
                 k = k + 1
             j = j + 1
             k = 0
@@ -103,94 +132,29 @@ def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValu
 
 def generate_colormap():
     channelValues = get_colormap_channel_values()
-    numPerChannel = 128
+    numPerChannel = 256
     colorMap = []
+    okValues = []
+    num_per_channel = 256
+    uneven_start = 79
+    full_start = 149
+    for i in np.arange(uneven_start, full_start + 1, 2):
+        okValues.append(i)
+    for i in np.arange(full_start + 1, numPerChannel, 1):
+        okValues.append(i)
     for maxChannelIndex in range(0, numPerChannel):
-        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues)
-    colorMap = np.asarray(colorMap)
-    return colorMap
-
-
-def get_colormap_channel_values():
-    values = np.zeros(258,dtype=np.int)
-    step = 256
-    iter = 0
-    values[0] = 0
-    while step >= 1:
-        val = step - 1
-        while val <= 256:
-            iter = iter + 1
-            values[iter] = int(val)
-            val = val + (step*2)
-        step = int(step /2)
-    init = True
-    return values
-
-
-def get_colormap_colors(maxVal, enable1, enable2, enable3, colormap, channelValues):
-    if not enable1:
-        max1 = maxVal -1
-    else:
-        max1 = 0
-    if not enable2:
-        max2 = maxVal -1
-    else:
-        max2 = 0
-    if not enable3:
-        max3 = maxVal -1
-    else:
-        max3 = 0
-    i = 0
-    j = 0
-    k = 0
-    while i <= max1:
-        while j <= max2:
-            while k <= max3:
-                if enable1:
-                    r = channelValues[maxVal]
-                else:
-                    r = channelValues[i]
-                if enable2:
-                    g = channelValues[maxVal]
-                else:
-                    g = channelValues[j]
-                if enable3:
-                    b = channelValues[maxVal]
-                else:
-                    b = channelValues[k]
-                if r != 76 and g != 76 and b != 76:
-                    colormap.append([r, g, b])
-                k = k + 1
-            j = j + 1
-            k = 0
-        i = i + 1
-        j = 0
-
-
-def generate_colormap():
-    channelValues = get_colormap_channel_values()
-    numPerChannel = 128
-    colorMap = []
-    for maxChannelIndex in range(0, numPerChannel):
-        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues)
-        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues)
+        get_colormap_colors(maxChannelIndex, False, False, True, colorMap, channelValues, okValues)
+        get_colormap_colors(maxChannelIndex, False, True, False, colorMap, channelValues, okValues)
+        get_colormap_colors(maxChannelIndex, False, True, True, colorMap, channelValues, okValues)
+        get_colormap_colors(maxChannelIndex, True, False, False, colorMap, channelValues, okValues)
+        get_colormap_colors(maxChannelIndex, True, False, True, colorMap, channelValues, okValues)
+        get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues, okValues)
+        get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues, okValues)
     colorMap = np.asarray(colorMap)
     return colorMap
 
 # helper method for converting getOrientation to roll/pitch/yaw
 # https:#en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-    
 def to_eularian_angles(q):
     z = q.z_val
     y = q.y_val

@@ -1,0 +1,20 @@
+<launch>
+      <node name="airsim_record_route" pkg="airsim" type="airsim_record_route.py" respawn="false" output="screen">
+            <param name="rate" type="int" value="10"/>
+
+            <param name="ip" type="string" value="" />
+
+            <param name="toggle_drone" type="int" value="0" />
+
+            <param name="vehicle_name" type="string" value="airsimvehicle" />
+
+            <param name="pose_topic" type="string" value="airsim/gtpose" />
+            <param name="pose_frame" type="string" value="world" />
+
+            <param name="sensor_imu_name" type="string" value="imu" />
+            <param name="sensor_imu_topic" type="string" value="airsim/imu" />
+            <param name="sensor_imu_frame" type="string" value="world" />
+      </node>
+
+      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o airsim_route_only -a"/>
+</launch>
