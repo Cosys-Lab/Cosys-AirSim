@@ -17,5 +17,5 @@
             <param name="sensor_imu_frame" type="string" value="world" />
       </node>
 
-      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o airsim_route_only -a"/>
+      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o /pathto/airsim_route_only -a"/>
 </launch>
