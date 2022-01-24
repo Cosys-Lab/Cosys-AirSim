@@ -246,36 +246,45 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
 
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
             response = camera_responses[response_locations[sensor_name + '_scene']]
-            rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
-                                                                                            response.width, 3)
-            if sensor_camera_scene_quality[sensor_index] > 0:
-                rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2BGR)
-                encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), sensor_camera_scene_quality[sensor_index]]
-                result, img = cv2.imencode('.jpg', rgb_matrix, encode_params)
-                rgb_matrix = cv2.imdecode(img, 1)
-                rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_BGR2RGB)
-
-            if sensor_camera_toggle_scene_mono is 1:
-                camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+            if response.width == 0 and response.height == 0:
+                rospy.logwarn("Camera '" + sensor_name + "' could not retrieve scene image.")
             else:
-                camera_msg = cv_bridge.cv2_to_imgmsg(rgb_matrix, encoding="rgb8")
-            camera_msg.header.stamp = timestamp
-            camera_msg.header.frame_id = sensor_camera_frames[sensor_index]
-            image_publishers[sensor_name + '_scene'].publish(camera_msg)
+                rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
+                                                                                                response.width, 3)
+                if sensor_camera_scene_quality[sensor_index] > 0:
+                    rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2BGR)
+                    encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), sensor_camera_scene_quality[sensor_index]]
+                    result, img = cv2.imencode('.jpg', rgb_matrix, encode_params)
+                    rgb_matrix = cv2.imdecode(img, 1)
+                    rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_BGR2RGB)
+
+                if sensor_camera_toggle_scene_mono is 1:
+                    camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                else:
+                    camera_msg = cv_bridge.cv2_to_imgmsg(rgb_matrix, encoding="rgb8")
+                camera_msg.header.stamp = timestamp
+                camera_msg.header.frame_id = sensor_camera_frames[sensor_index]
+                image_publishers[sensor_name + '_scene'].publish(camera_msg)
 
             if sensor_camera_toggle_segmentation[sensor_index] is 1:
                 response = camera_responses[response_locations[sensor_name + '_segmentation']]
-                rgb_string = get_image_bytes(response, "Segmentation")
-                camera_msg.step = response.width * 3
-                camera_msg.data = rgb_string
-                image_publishers[sensor_name + '_segmentation'].publish(camera_msg)
+                if response.width == 0 and response.height == 0:
+                    rospy.logwarn("Camera '" + sensor_name + "' could not retrieve segmentation image.")
+                else:
+                    rgb_string = get_image_bytes(response, "Segmentation")
+                    camera_msg.step = response.width * 3
+                    camera_msg.data = rgb_string
+                    image_publishers[sensor_name + '_segmentation'].publish(camera_msg)
             if sensor_camera_toggle_depth[sensor_index] is 1:
                 response = camera_responses[response_locations[sensor_name + '_depth']]
-                rgb_string = get_image_bytes(response, "DepthPlanner")
-                camera_msg.encoding = "32FC1"
-                camera_msg.step = response.width * 4
-                camera_msg.data = rgb_string
-                image_publishers[sensor_name + '_depth'].publish(camera_msg)
+                if response.width == 0 and response.height == 0:
+                    rospy.logwarn("Camera '" + sensor_name + "' could not retrieve depth image.")
+                else:
+                    rgb_string = get_image_bytes(response, "DepthPlanner")
+                    camera_msg.encoding = "32FC1"
+                    camera_msg.step = response.width * 4
+                    camera_msg.data = rgb_string
+                    image_publishers[sensor_name + '_depth'].publish(camera_msg)
 
         for sensor_index, sensor_name in enumerate(sensor_echo_names):
             echo_data = client.getEchoData(sensor_name, vehicle_name)
