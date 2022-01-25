@@ -375,10 +375,15 @@ if __name__ == '__main__':
 
         print("Connecting to AirSim...")
         if toggle_drone:
-            client = airsimpy.MultirotorClient(ip)
+            client = airsimpy.MultirotorClient(ip, timeout_value=15)
         else:
-            client = airsimpy.CarClient(ip)
-        client.confirmConnection(rospy.get_name())
+            client = airsimpy.CarClient(ip, timeout_value=15)
+        try:
+            client.confirmConnection(rospy.get_name())
+        except msgpackrpc.error.TimeoutError:
+            rospy.logerr("Could not connect to AirSim.")
+            rospy.signal_shutdown('no connection to airsim.')
+            sys.exit()
         print("Connected to AirSim!")
 
         rospy.loginfo("Starting static transforms...")
