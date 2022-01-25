@@ -283,6 +283,11 @@ vector<string> RpcLibClientBase::simListSceneObjects(const string& name_regex) c
     return pimpl_->client.call("simListSceneObjects", name_regex).as<vector<string>>();
 }
 
+vector<string> RpcLibClientBase::simListInstanceSegmentationObjects() const
+{
+    return pimpl_->client.call("simListInstanceSegmentationObjects").as<vector<string>>();
+}
+
 msr::airlib::Pose RpcLibClientBase::simGetObjectPose(const std::string& object_name, bool ned) const
 {
     return pimpl_->client.call("simGetObjectPose", object_name, ned).as<RpcLibAdapatorsBase::Pose>().to();

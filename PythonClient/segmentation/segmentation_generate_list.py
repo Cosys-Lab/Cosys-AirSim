@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     # Get names of all objects in simulation world and store in list together with the associated RGB value
     # In a dynamic world, this is never the same!!
-    currentObjectList = client.simListSceneObjects()
+    currentObjectList = client.simListInstanceSegmentationObjects()
     print("Generating list of all current objects...")
     with open('airsim_segmentation_colormap_list_' +  datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.csv', 'w') as f:
         f.write("ObjectName,R,G,B\n")

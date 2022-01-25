@@ -19,6 +19,9 @@ For an example of the Instance Segmentation API, please see the script  [segment
 
 For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../ros/python_ws/src/airsim/scripts/segmentation_generate_list.py).
 
+When a new object is spawned in your environment by for example a c++ or blueprint extension you made,
+and you want it to work with the instance segmentation system, you can use the extended function `ASimModeBase::AddNewActorToSegmentation(AActor)` which is also available in blueprints. 
+
 ## Credits
 The method used to use Vertex Colors to segment object is a derivative of and inspired by the work of [UnrealCV](https://unrealcv.org/). Their work is licensed under the MIT License.
 It is made by students from Johns Hopkins University and Peking University under the supervision of Prof. Alan Yuille and Prof. Yizhou Wang.

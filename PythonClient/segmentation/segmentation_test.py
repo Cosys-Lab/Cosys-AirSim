@@ -21,9 +21,10 @@ if __name__ == '__main__':
     colorMap = client.simGetSegmentationColorMap()
     print("Generated segmentation colormap\n")
 
-    # Get names of all objects in simulation world and store in list together with the associated RGB value
+    # Get names of all objects in simulation world in the instance segmentation format
+    # and store in list together with the associated RGB value
     # In a dynamic world, this is never the same!!
-    currentObjectList = client.simListSceneObjects()
+    currentObjectList = client.simListInstanceSegmentationObjects()
     print("Generating list of all current objects...")
     with open('airsim_segmentation_colormap_list_' +  datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.csv', 'w') as f:
         f.write("ObjectName,R,G,B\n")
@@ -47,14 +48,16 @@ if __name__ == '__main__':
     className = 'wall'
     classColorIndex = 1000000
     # a) this version we set it based on the gathered objects in the list
-    print("Setting all objects in world matching class-name '" + className + "' a certain color, based on object list...")
+    print("Setting all objects in world matching class-name '"
+          + className + "' a certain color, based on object list...")
     for item in classObjectMap[className]:
         success = client.simSetSegmentationObjectID(item, classColorIndex, False)
         if success:
             print("Found object matching object-name '" + item + "'! Set segmentation value " + str(classColorIndex))
         else:
             print("No object found matching object-name '" + item + "'")
-    print("Found and changed color on all objects in world matching class-name '" + className + "' based on object list\n")
+    print("Found and changed color on all objects in world matching class-name '"
+          + className + "' based on object list\n")
     # b) In this version we set it based on regex of the classname
     print("Setting all objects in world matching class-name '" + className + "' a certain color, based on regex...")
     success = client.simSetSegmentationObjectID(className + ".*", classColorIndex, True)

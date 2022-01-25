@@ -177,7 +177,6 @@ Note that this will not do a check if this color is already assigned to a differ
 ```python
 success = client.simSetSegmentationObjectID("Ground", 20)
 ```
-
 The return value is a boolean type that lets you know if the mesh was found.
 
 Notice that typical Unreal environments, like Blocks, usually have many other meshes that comprises of same object, for example, "Ground_2", "Ground_3" and so on. As it is tedious to set object ID for all of these meshes, AirSim also supports regular expressions. For example, the code below sets all meshes which have names starting with "ground" (ignoring case) to 21 with just one line:
@@ -206,22 +205,17 @@ colorMap = client.simGetSegmentationColorMap()
 An example can be found in [segmentation_test.py](../PythonClient/segmentation/segmentation_test.py).
 For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../PythonClient/segmentation/segmentation_generate_list.py).
 
-#### Unsetting object ID
-An object's ID can be set t
-A complete ready-to-run exo -1 to make it not show up on the segmentation image.
-
-#### How to Find Mesh Names?
+#### How to Find Mesh names?
 To get desired ground truth segmentation you will need to know the names of the meshes in your Unreal environment. To do this, you can use the API:
 
-To retrieve the color map to know which color is assign to each color index you can use:
 ```python
-currentObjectList = client.simListSceneObjects()
+currentObjectList = client.simListInstanceSegmentationObjects()
 ```
-
-This also supports regex!
+This will use an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).
+Note that this provides a different result from `simListSceneObjects()` as this one will make a simple list of all Unreal Actors in the scene, without keeping the hierarchy in mind. 
 
 #### Startup Object IDs
-At the start, AirSim assigns color indexes to each object found in environment of type `UStaticMeshComponent` or `USkinnedMeshComponent`.It then makes an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).
+At the start, AirSim assigns color indexes to each object found in environment of type `UStaticMeshComponent` or `USkinnedMeshComponent`. It then makes an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).
 
 #### Getting Object ID for Mesh
 The `simGetSegmentationObjectID` API allows you get object ID for given mesh name.

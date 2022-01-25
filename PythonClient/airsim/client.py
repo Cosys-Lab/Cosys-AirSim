@@ -166,6 +166,9 @@ class VehicleClient:
     def simListSceneObjects(self, name_regex = '.*'):
         return self.client.call('simListSceneObjects', name_regex)
 
+    def simListInstanceSegmentationObjects(self):
+        return self.client.call('simListInstanceSegmentationObjects')
+
     def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
         return self.client.call('simSpawnStaticMeshObject', object_class_name, object_name, pose)
 
