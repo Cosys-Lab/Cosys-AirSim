@@ -132,7 +132,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	}
 
 	render_target_2D_depth_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
-	render_target_2D_segmentation_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
+	render_target_2D_segmentation_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, false);
 	render_target_2D_intensity_->InitCustomFormat(resolution_, resolution_, PF_B8G8R8A8, true);
 
 	this->SetActorRelativeLocation(FVector(settings.position.x() * 100, settings.position.y() * 100, -settings.position.z() * 100));
@@ -209,7 +209,7 @@ void ALidarCamera::GenerateLidarCoordinates() {
 
 void ALidarCamera::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();		
 }
 
 void ALidarCamera::Tick(float DeltaTime)
@@ -299,6 +299,8 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	FTextureRenderTarget2DResource* render_target_2D_intensity;
 	if (ground_truth_) {
 		render_target_2D_segmentation = (FTextureRenderTarget2DResource*)capture_2D_segmentation_->TextureTarget->Resource;
+		FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
+		flags.SetLinearToGamma(false);
 		render_target_2D_segmentation->ReadPixels(buffer_2D_segmentation);
 	}
 	if (generate_intensity_) {
