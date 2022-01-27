@@ -179,8 +179,10 @@ bool UObjectPainter::SetComponentColor(FString component_id, uint32 color_index,
 		if (PaintComponent(actor, color))
 		{
 			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
+			FString color_string_gammacorrected = FString::FromInt(GammaCorrectionTable[color.R]) + "," + FString::FromInt(GammaCorrectionTable[color.G]) + "," + FString::FromInt(GammaCorrectionTable[color.B]);
 			color_to_name_map->Emplace(color_string, component_id);
 			name_to_colorindex_map->Emplace(component_id, color_index);
+			UE_LOG(LogTemp, Log, TEXT("AirSim Segmentation: Adjusted object %s to new ID # %s (original:%s, gamma corrected:%s)"), *component_id, *FString::FromInt(color_index), *color_string, *color_string_gammacorrected);
 			return true;
 		}
 		else
@@ -338,6 +340,11 @@ void UObjectPainter::SetViewForVertexColor(FEngineShowFlags& show_flags)
 	show_flags.SetMotionBlur(false);
 	show_flags.SetSkyLighting(false);
 	show_flags.SetAmbientOcclusion(false);
+	show_flags.SetInstancedFoliage(false);
+	show_flags.SetInstancedGrass(false);
+	show_flags.SetTextRender(false);
+	show_flags.SetTemporalAA(false);
+	show_flags.SetDecals(false);
 }
 
 int32 UObjectPainter::GammaCorrectionTable[256] =
