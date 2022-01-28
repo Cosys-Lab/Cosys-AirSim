@@ -209,7 +209,7 @@ void ALidarCamera::GenerateLidarCoordinates() {
 
 void ALidarCamera::BeginPlay()
 {
-	Super::BeginPlay();		
+	Super::BeginPlay();
 }
 
 void ALidarCamera::Tick(float DeltaTime)
@@ -415,6 +415,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					point_cloud.emplace_back(-point.Y / 100);
 					point_cloud.emplace_back(point.Z / 100);
 					std::uint32_t rgb = ((std::uint32_t)value_segmentation.R << 16 | (std::uint32_t)value_segmentation.G << 8 | (std::uint32_t)value_segmentation.B);
+					//UE_LOG(LogTemp, Warning, TEXT("RGB FCOLOR:%i %i %i"), (int)(value_segmentation.R), (int)(value_segmentation.G), (int)(value_segmentation.B));
 					point_cloud.emplace_back(rgb);
 					point_cloud.emplace_back(final_intensity);
 				}

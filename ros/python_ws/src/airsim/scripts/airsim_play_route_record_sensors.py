@@ -93,15 +93,15 @@ def get_image_bytes(data, cameraType):
 
 
 def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_frame, sensor_echo_names,
-                                     sensor_echo_external, sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
-                                     sensor_lidar_toggle_external, sensor_lidar_toggle_segmentation,
+                                     sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
+                                     sensor_lidar_toggle_segmentation,
                                      sensor_lidar_topics, sensor_lidar_segmentation_topics, sensor_lidar_frames,
-                                     sensor_gpulidar_names, sensor_gpulidar_external, sensor_gpulidar_topics,
+                                     sensor_gpulidar_names, sensor_gpulidar_topics,
                                      sensor_gpulidar_frames, sensor_camera_names, sensor_camera_toggle_scene_mono,
                                      sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
                                      sensor_camera_toggle_depth, sensor_camera_scene_topics,
                                      sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                                     sensor_camera_frames, object_names, object_topics,
+                                     sensor_camera_frames, object_names, objects_coordinates_local, object_topics,
                                      route_rosbag, merged_rosbag):
 
     rospy.loginfo("Reading route...")
@@ -295,7 +295,10 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                     output.write(sensor_gpulidar_topics[sensor_index], pcloud, t=ros_timestamp)
 
         for object_index, object_name in enumerate(object_names):
-            pose = client.simGetObjectPose(object_name, False)
+            if objects_coordinates_local[object_index] == 1:
+                pose = client.simGetObjectPose(object_name, True)
+            else:
+                pose = client.simGetObjectPose(object_name, False)
             if np.isnan(pose.position.x_val):
                 if warning_issued[object_name] is False:
                     rospy.logwarn("Object '" + object_name + "' could not be found.")
@@ -344,19 +347,16 @@ if __name__ == '__main__':
         merged_rosbag = rospy.get_param('~merged_rosbag', "airsim_route_sensors.bag")
         
         sensor_echo_names = rospy.get_param('~sensor_echo_names', "True")
-        sensor_echo_external = rospy.get_param('~sensor_echo_external', "True")
         sensor_echo_topics = rospy.get_param('~sensor_echo_topics', "True")
         sensor_echo_frames = rospy.get_param('~sensor_echo_frames', "True")
 
         sensor_lidar_names = rospy.get_param('~sensor_lidar_names', "True")
-        sensor_lidar_toggle_external = rospy.get_param('~sensor_lidar_toggle_external', "True")
         sensor_lidar_toggle_groundtruth = rospy.get_param('~sensor_lidar_toggle_groundtruth', "True")
         sensor_lidar_topics = rospy.get_param('~sensor_lidar_topics', "True")
         sensor_lidar_segmentation_topics = rospy.get_param('~sensor_lidar_segmentation_topics', "True")
         sensor_lidar_frames = rospy.get_param('~sensor_lidar_frames', "True")
 
         sensor_gpulidar_names = rospy.get_param('~sensor_gpulidar_names', "True")
-        sensor_gpulidar_external = rospy.get_param('~sensor_gpulidar_external', "True")
         sensor_gpulidar_topics = rospy.get_param('~sensor_gpulidar_topics', "True")
         sensor_gpulidar_frames = rospy.get_param('~sensor_gpulidar_frames', "True")
 
@@ -371,6 +371,7 @@ if __name__ == '__main__':
         sensor_camera_frames = rospy.get_param('~sensor_camera_frames', "True")
 
         object_names = rospy.get_param('~object_names', "True")
+        objects_coordinates_local = rospy.get_param('~objects_coordinates_local', "True")
         object_topics = rospy.get_param('~object_topics', "True")
 
         print("Connecting to AirSim...")
@@ -461,7 +462,7 @@ if __name__ == '__main__':
 
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
             try:
-                camera_data = client.getCameraInfo(sensor_name)
+                camera_data = client.simGetCameraInfo(sensor_name)
             except msgpackrpc.error.RPCError:
                 rospy.logerr("camera sensor '" + sensor_name + "' could not be found.")
                 rospy.signal_shutdown('Sensor not found.')
@@ -485,16 +486,17 @@ if __name__ == '__main__':
         broadcaster.sendTransform(transform_list)
 
         airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_frame,
-                                         sensor_echo_names, sensor_echo_external,
+                                         sensor_echo_names,
                                          sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
-                                         sensor_lidar_toggle_external, sensor_lidar_toggle_groundtruth,
+                                         sensor_lidar_toggle_groundtruth,
                                          sensor_lidar_topics, sensor_lidar_segmentation_topics, sensor_lidar_frames,
-                                         sensor_gpulidar_names, sensor_gpulidar_external, sensor_gpulidar_topics,
+                                         sensor_gpulidar_names, sensor_gpulidar_topics,
                                          sensor_gpulidar_frames, sensor_camera_names, sensor_camera_toggle_scene_mono,
                                          sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
                                          sensor_camera_toggle_depth, sensor_camera_scene_topics,
                                          sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                                         sensor_camera_frames, object_names, object_topics, route_rosbag, merged_rosbag)
+                                         sensor_camera_frames, object_names, objects_coordinates_local,
+                                         object_topics, route_rosbag, merged_rosbag)
 
     except rospy.ROSInterruptException:
         pass

@@ -36,6 +36,7 @@ struct EchoSimpleParams {
         };                       
 
 	bool external = false;                  // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+	bool external_ned = true;               // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 
 	bool draw_reflected_points;				// Draw debug points in world where reflected points are captured by the echo sensor
@@ -102,6 +103,7 @@ struct EchoSimpleParams {
 		update_frequency = settings.measurement_frequency;
 
 		external = settings.external;
+		external_ned = settings.external_ned;
 
 		startup_delay = 0;
     }

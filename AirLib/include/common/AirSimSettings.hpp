@@ -174,6 +174,10 @@ public: //types
         Vector3r position = VectorMath::nanVector();
         Rotation rotation = Rotation::nanRotation();
 
+        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        bool draw_sensor = false;						  // Draw the physical sensor in the world on the vehicle
+
         GimbalSetting gimbal;
         std::map<int, CaptureSetting> capture_settings;
         std::map<int, NoiseSetting>  noise_settings;
@@ -237,9 +241,11 @@ public: //types
         Rotation rotation = Rotation::nanRotation();
 
         bool draw_debug_points = false;
+        bool draw_sensor = false;						  // Draw the physical sensor in the world on the vehicle
+
 
         bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-
+        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
         std::string data_frame = AirSimSettings::kVehicleInertialFrame;
     };
 
@@ -278,9 +284,11 @@ public: //types
         std::string material_list_file = "";              // String holding all material data
 
         bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 		bool draw_debug_points = false;
 		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
+        bool draw_sensor = false;						  // Draw the physical sensor in the world on the vehicle
 	};
 
 	struct EchoSetting : SensorSetting {
@@ -313,6 +321,7 @@ public: //types
 		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
 
         bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 		// Misc
 		Vector3r position = VectorMath::nanVector();
@@ -1010,6 +1019,12 @@ private:
         setting.position = createVectorSetting(settings_json, setting.position);
         setting.rotation = createRotationSetting(settings_json, setting.rotation);
 
+        setting.external = settings_json.getBool("External", setting.external);
+        setting.external_ned = settings_json.getBool("ExternalLocal", setting.external_ned);
+        setting.draw_sensor = settings_json.getBool("DrawSensor", setting.draw_sensor);
+
+        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
         loadCaptureSettings(settings_json, setting.capture_settings);
         loadNoiseSettings(settings_json, setting.noise_settings);
         Settings json_gimbal;
@@ -1281,10 +1296,12 @@ private:
         lidar_setting.horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", lidar_setting.horizontal_FOV_end);
 
         lidar_setting.external = settings_json.getBool("External", lidar_setting.external);
+        lidar_setting.external_ned = settings_json.getBool("ExternalLocal", lidar_setting.external_ned);
+
+        lidar_setting.draw_sensor = settings_json.getBool("DrawSensor", lidar_setting.draw_sensor);
 
         lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
         lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
-
     }
 
 	static void initializeGPULidarSetting(GPULidarSetting& lidar_setting, const Settings& settings_json)
@@ -1321,6 +1338,10 @@ private:
         }
 
         lidar_setting.external = settings_json.getBool("External", lidar_setting.external);
+        lidar_setting.external_ned = settings_json.getBool("ExternalLocal", lidar_setting.external_ned);
+
+        lidar_setting.draw_sensor = settings_json.getBool("DrawSensor", lidar_setting.draw_sensor);
+
 
 		lidar_setting.position = createVectorSetting(settings_json, lidar_setting.position);
 		lidar_setting.rotation = createRotationSetting(settings_json, lidar_setting.rotation);
@@ -1351,6 +1372,7 @@ private:
 		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
 
         echo_setting.external = settings_json.getBool("External", echo_setting.external);
+        echo_setting.external_ned = settings_json.getBool("ExternalLocal", echo_setting.external_ned);
 
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);

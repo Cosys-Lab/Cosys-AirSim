@@ -11,7 +11,10 @@
 // ctor
 UnrealLidarSensor::UnrealLidarSensor(const AirSimSettings::LidarSetting& setting,
 	AActor* actor, const NedTransform* ned_transform)
-	: LidarSimple(setting), actor_(actor), ned_transform_(ned_transform)
+	: LidarSimple(setting), actor_(actor), ned_transform_(ned_transform),
+	sensor_params_(getParams()),
+	draw_time_(1.05f / sensor_params_.horizontal_rotation_frequency),
+	external_(getParams().external)
 {
 	// Seed and initiate noise
 	std::random_device rd;
@@ -55,6 +58,32 @@ void UnrealLidarSensor::createLasers()
 	current_horizontal_angle_index_ = horizontal_angles_.Num()-1;
 }
 
+// Set echo object in correct pose in physical world
+void UnrealLidarSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
+{
+	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
+	// DRAW DEBUG
+	if (sensor_params_.draw_sensor) {
+		FVector sensor_position;
+		if (external_) {
+			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+		}
+		else {
+			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		}
+		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, draw_time_);
+		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
+		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_, 10);
+	}
+}
+
+// Get echo pose in Local NED
+void UnrealLidarSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
+{
+	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1)); ;
+	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
+}
+
 // Pause Unreal simulation
 void UnrealLidarSensor::pause(const bool is_paused) {
 	if (is_paused) {
@@ -70,6 +99,9 @@ void UnrealLidarSensor::pause(const bool is_paused) {
 bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
 	const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final)
 {
+
+	updatePose(lidar_pose, vehicle_pose);
+
 	bool refresh = false;
 	msr::airlib::LidarSimpleParams params = getParams();
 	const auto number_of_lasers = params.number_of_channels;
@@ -173,6 +205,10 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 		previous_horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
 	}
 	return refresh;
+}
+
+FVector UnrealLidarSensor::Vector3rToFVector(const Vector3r& input_vector) {
+	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
 }
 
 // simulate shooting a laser via Unreal ray-tracing.

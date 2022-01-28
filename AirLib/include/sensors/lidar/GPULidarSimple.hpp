@@ -73,6 +73,8 @@ namespace msr {
 
 			virtual void pause(const bool is_paused) = 0;
 
+			virtual void getLocalPose(Pose& sensor_pose) = 0;
+
 		private: //methods
 			void updateOutput()
 			{
@@ -90,12 +92,13 @@ namespace msr {
 					output.time_stamp = clock()->nowNanos();
 					const GroundTruth& ground_truth = getGroundTruth();
 					Pose lidar_pose = params_.relative_pose;
-					if (!params_.external) {
-						lidar_pose = lidar_pose + ground_truth.kinematics->pose;
+					if (params_.external && params_.external_ned) {
+						getLocalPose(output.pose);
 					}
-					output.pose = lidar_pose;
+					else {
+						output.pose = params_.relative_pose;
+					}
 					setOutput(output);
-
 					last_time_ = output.time_stamp;
 				} else {
 					last_time_ = clock()->nowNanos();

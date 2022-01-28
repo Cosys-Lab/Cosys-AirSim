@@ -3,7 +3,7 @@
 Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. This list updated every few months. For complete detailed changes, please review [commit history](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/commits/master).
 
 ## CoSys-Lab Modifications
-* Updated the Echo, (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
+* Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
 * Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).

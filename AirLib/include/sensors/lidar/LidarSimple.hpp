@@ -72,6 +72,10 @@ protected:
 
 	virtual void pause(const bool is_paused) = 0;
 
+	virtual void updatePose(const Pose& lidar_pose, const Pose& vehicle_pose) = 0;
+
+	virtual void getLocalPose(Pose& sensor_pose) = 0;
+
     
 private: //methods
 	void updateOutput()
@@ -81,15 +85,6 @@ private: //methods
 		const GroundTruth& ground_truth = getGroundTruth();
 		Pose const pose_offset = params_.external ? Pose() : ground_truth.kinematics->pose;
 
-		// calculate the pose before obtaining the point-cloud. Before/after is a bit arbitrary
-		// decision here. If the pose can change while obtaining the point-cloud (could happen for drones)
-		// then the pose won't be very accurate either way.
-		//
-		// TODO: Seems like pose is in vehicle inertial-frame (NOT in Global NED frame).
-		//    That could be a bit unintuitive but seems consistent with the position/orientation returned as part of 
-		//    ImageResponse for cameras and pose returned by getCameraInfo API.
-		//    Do we need to convert pose to Global NED frame before returning to clients?
-		Pose lidar_pose = params_.relative_pose + pose_offset;
 		double start = FPlatformTime::Seconds();
 		bool refresh = getPointCloud(params_.relative_pose, // relative lidar pose
 			pose_offset,   // relative vehicle pose
@@ -103,8 +98,12 @@ private: //methods
 			output.groundtruth = groundtruth_;
 
 			output.time_stamp = clock()->nowNanos();
-			output.pose = lidar_pose;
-
+			if (params_.external && params_.external_ned) {
+				getLocalPose(output.pose);
+			}
+			else {
+				output.pose = params_.relative_pose;
+			}
 			setOutput(output);
 			last_time_ = output.time_stamp;
 		} else {

@@ -47,13 +47,15 @@ namespace msr {
 			bool generate_intensity = false;             // Toggle intensity calculation on or off
 
 			bool external = false;                       // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+			bool external_ned = true;                    // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 			bool draw_debug_points = false;
 			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
+			bool draw_sensor;						     // Draw the physical sensor in the world on the vehicle
 
-			real_T startup_delay = 1;                   // sec
+			real_T startup_delay = 1;                    // sec
 
-			std::string material_list_file = "";        // String holding all material data
+			std::string material_list_file = "";         // String holding all material data
 
 
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
@@ -126,8 +128,10 @@ namespace msr {
 
 				draw_debug_points = settings.draw_debug_points;
 				draw_mode = settings.draw_mode;
+				draw_sensor = settings.draw_sensor;
 
 				external = settings.external;
+				external_ned = settings.external_ned;
 			}
 		};
 

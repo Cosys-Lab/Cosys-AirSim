@@ -39,9 +39,10 @@ DrawReflectedPaths        | Draw the full paths of the reflected points
 DrawInitialPoints         | Draw the points of the initial half sphere where the traces (rays) are cast
 DrawExternalPoints        | Draw a pointcloud coming through the API from an external source
 DrawBounceLines           | Draw lines of all bouncing reflections of the traces with their color depending on attenuation
-DrawSensor                | Draw the physical sensor in the world on the vehicle
+DrawSensor                | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
 External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
+ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
 e.g.,
 ```
 {
@@ -78,8 +79,7 @@ e.g.,
                       "DrawReflectedLines": false,
                       "DrawReflectedPaths": false,
                       "DrawExternalPoints": false,
-                      "DrawSensor": false,
-                      "External": false
+                      "DrawSensor": false
 				}	
 			}
 		}
@@ -91,9 +91,9 @@ e.g.,
 Use `getEchoData(sensor name, vehicle name)` API to retrieve the echo sensor data. 
 * The API returns a Point-Cloud as a flat array of floats, the final attenuation, total distance along with the timestamp of the capture and sensor pose.
 * Point-Cloud: 
-  * The floats represent [x,y,z,attenuation,total_distance] for each point hit within the range in the last scan. 
+  * The floats represent [x, y, z, attenuation, total_distance] for each point hit within the range in the last scan. 
 * Echo Pose:
-    * echo sensor pose in the vehicle inertial frame (in NED, in meters)
-    * Can be used to transform points to other frames.
+    * Default: Echo sensor pose in the vehicle frame. 
+    * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
     
 Use `setEchoData(sensor name, vehicle name, echo data)` API to render an external pointcloud back to the simulation. It expects it to be [x,y,z] as a flat array of floats.

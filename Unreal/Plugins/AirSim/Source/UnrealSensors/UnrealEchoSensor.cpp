@@ -121,10 +121,17 @@ void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const ms
 		else {
 			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 		}
-		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Blue, false, draw_time_);
-		//FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
-		//DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_);
+		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, draw_time_);
+		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
+		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_, 10);
 	}
+}
+
+// Get echo pose in Local NED
+void UnrealEchoSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
+{
+	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));	;		
+	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
 }
 
 // Pause Unreal simulation

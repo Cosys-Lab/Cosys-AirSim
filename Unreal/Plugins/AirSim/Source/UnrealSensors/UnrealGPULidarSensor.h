@@ -22,10 +22,13 @@ public:
 protected:
 	virtual bool getPointCloud(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final) override;
 	virtual void pause(const bool is_paused);
+	virtual void getLocalPose(msr::airlib::Pose& sensor_pose);
+
 
 private:
 	using Vector3r = msr::airlib::Vector3r;
 	using VectorMath = msr::airlib::VectorMath;
+
 
 
 private:
@@ -34,4 +37,7 @@ private:
 
 	const NedTransform* ned_transform_;
 	float saved_clockspeed_ = 1;
+	const msr::airlib::GPULidarSimpleParams sensor_params_;
+	const float draw_time_;
+	const bool external_;
 };
