@@ -4,34 +4,26 @@ AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https:
 
 Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
 
-**Check out the quick 1.5 minute demo**
-
-Drones in AirSim
-
-[![AirSim Drone Demo Video](docs/images/demo_video.png)](https://youtu.be/-WfTr1-OBGQ)
-
-Cars in AirSim
-
-[![AirSim Car Demo Video](docs/images/car_demo_video.png)](https://youtu.be/gnz1X3UNM5Y)
+Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects. Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
+The biggest difference is that this requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
 
 ## CoSys-Lab Modifications
+* Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated [ROS implementation](docs/ros.md) with completly new implementation and feature set.
-* Added [HySLAM Benchmark Scenario environments](docs/hyslambenchmarkenv.md)
-* Added [HySLAM environment](docs/hyslamenv.md)
-* Added [CoSysLab environment](docs/cosysenv.md)
-* Added [Echo sensor type](docs/echo.md)
-* Added [URDF vehicle type](docs/UrdfXml.md) made by [Mitchell Spryn](http://www.mitchellspryn.com). **Currently removed due to crashes on Linux!**
-* Added [Instance Segmentation](docs/instance_segmentation.md). Replaces previous system with 255 color limit. This requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
-* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a Lidar sensor. Can support much higher point density then normal Lidar.
-* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached. Improved handling and camera operation.
+* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
+* Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
+* Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
+* Added [Instance Segmentation](docs/instance_segmentation.md). 
+* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
+* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
-* Added option to hot-reload plugin through Unreal Editor (faster development)
-* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVidia tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Added option to hot-reload plugin through Unreal Editor (faster development).
+* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVIDIA tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
+* Dropped support for Unity Environments.
 
 
 For complete list of changes, view our [Changelog](CHANGELOG.md)
@@ -46,13 +38,11 @@ This branch uses a custom Unreal Engine version! Please read the documentation c
 ### Linux
 * [Build it](docs/build_linux.md)
 
-[![Build Status](https://travis-ci.org/Microsoft/AirSim.svg?branch=master)](https://travis-ci.org/Microsoft/AirSim)
-
 ## How to Use It
 
 ### Documentation
 
-View our [detailed documentation](https://microsoft.github.io/AirSim/) on all aspects of AirSim.
+View our [detailed documentation](docs) on all aspects of AirSim.
 
 ### Manual drive
 
@@ -119,19 +109,6 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
   url = {https://arxiv.org/abs/1705.05065}
 }
 ```
-
-### Contribute
-
-Please take a look at [open issues](https://github.com/microsoft/airsim/issues) if you are looking for areas to contribute to.
-
-* [More on AirSim design](docs/design.md)
-* [More on code structure](docs/code_structure.md)
-* [Contribution Guidelines](CONTRIBUTING.md)
-* [Trello Board](https://trello.com/b/1t2qCeaA/wishlist-by-community-for-community)
-
-## FAQ
-
-If you run into problems, check the [FAQ](docs/.md) and feel free to post issues in the  [AirSim](https://github.com/Microsoft/AirSim/issues) repository.
 
 ## License
 

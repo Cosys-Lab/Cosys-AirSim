@@ -35,6 +35,10 @@ X Y Z                     | Position of the lidar relative to the vehicle (in NE
 Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
 GroundTruth               | Generate ground truth segmentation color values
+DrawSensor                | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
+External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.
+ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
+
 ```
 {
     "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
@@ -85,10 +89,24 @@ e.g.,
 Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar data. 
 * The API returns a Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
 * Point-Cloud: 
-  * The floats represent [x,y,z] coordinate for each point hit within the range in the last scan.
-* Lidar Pose:
-    * Lidar pose in the vehicle inertial frame (in NED, in meters)
-    * Can be used to transform points to other frames.
-* Lidar Groundtruth (if _GroundTruth_ parameter is enabled):
-    * For each point of the Point-Cloud a string is kept that has the RGB-color value of the segmentation image of that point in the format _"r-value,g-value,b-value"_.
-    * To learn more about the segmentation and how the color relates to the object name, see the [Image API documentation](image_apis.md#segmentation) and the [instance segmentation documentation](instance_segmentation.md).
+  * The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan.
+    * [x,y,z] represent the coordinates of each detected point in the local sensor frame. 
+    * rgb represents a float32 representation of the RGB8 value that is linked to the instance segmentation system. See the [Image API documentation](image_apis.md#segmentation) and the [instance segmentation documentation](instance_segmentation.md).
+      The float32 comes from binary concatenation of the RGB8 values :`rgb = value_segmentation.R << 16 | value_segmentation.G << 8 | value_segmentation.B`\\
+      It can be retrieved from the API and converted back to RGB8 with for example the following Python code:
+    ```python 
+    lidar_data = client.getGPULidarData('lidar', 'vehicle')
+    points = np.array(lidar_data.point_cloud, dtype=np.dtype('f4'))
+    points = np.reshape(points, (int(points.shape[0] / 5), 5))
+    rgb_values = points[:, 3].astype(np.uint32)
+    rgb = np.zeros((np.shape(points)[0], 3))
+    xyz = points[:, 0:3]
+    for index, rgb_value in enumerate(rgb_values):
+        rgb[index, 0] = (rgb_value >> 16) & 0xFF
+        rgb[index, 1] = (rgb_value >> 8) & 0xFF
+        rgb[index, 2] = rgb_value & 0xFF
+    ```
+    * intensity represents the reflection strength as a float.
+* Echo Pose:
+    * Default: Echo sensor pose in the vehicle frame. 
+    * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.

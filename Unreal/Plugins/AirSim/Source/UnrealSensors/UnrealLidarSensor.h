@@ -26,6 +26,10 @@ protected:
 
 	virtual void pause(const bool is_paused);
 
+    virtual void updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose);
+
+    virtual void getLocalPose(msr::airlib::Pose& sensor_pose);
+
 private:
     using Vector3r = msr::airlib::Vector3r;
     using VectorMath = msr::airlib::VectorMath;
@@ -34,6 +38,7 @@ private:
     bool shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
         const uint32 channel, const float horizontal_angle, const float vertical_angle, 
         const msr::airlib::LidarSimpleParams params, Vector3r &point, std::string &label);
+    FVector Vector3rToFVector(const Vector3r& input_vector);
 
 private:
     AActor* actor_;
@@ -44,4 +49,8 @@ private:
 	TArray<float> horizontal_angles_;
 	std::mt19937 gen_;
 	std::normal_distribution<float> dist_;
+    const msr::airlib::LidarSimpleParams sensor_params_;
+    msr::airlib::Pose sensor_reference_frame_;
+    const float draw_time_;
+    const bool external_;
 };

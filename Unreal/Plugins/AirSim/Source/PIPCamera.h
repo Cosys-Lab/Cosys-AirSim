@@ -40,6 +40,7 @@ public:
 
     void setCameraTypeEnabled(ImageType type, bool enabled);
     bool getCameraTypeEnabled(ImageType type) const;
+    AirSimSettings::CameraSetting getParams() const;
     void setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform);
     void setCameraOrientation(const FRotator& rotator);
 
@@ -70,7 +71,7 @@ private: //members
     float gimbal_stabilization_;
     const NedTransform* ned_transform_;
     TMap<int, EPixelFormat> image_type_to_pixel_format_map_;
-
+    msr::airlib::AirSimSettings::CameraSetting sensor_params_;
 private: //methods
     typedef common_utils::Utils Utils;
     typedef AirSimSettings::CaptureSetting CaptureSetting;

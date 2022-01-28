@@ -12,18 +12,19 @@
 // ctor
 UnrealGPULidarSensor::UnrealGPULidarSensor(const AirSimSettings::GPULidarSetting& setting,
 	AActor* actor, const NedTransform* ned_transform)
-	: GPULidarSimple(setting), actor_(actor), ned_transform_(ned_transform)
+	: GPULidarSimple(setting), actor_(actor), ned_transform_(ned_transform),
+	sensor_params_(getParams()),
+	draw_time_(1.05f / sensor_params_.horizontal_rotation_frequency),
+	external_(getParams().external)
 {
-	// Seed and initiate noise
-	std::random_device rd;
-	gen_ = std::mt19937(rd());
-	dist_ = std::normal_distribution<float>(0, getParams().min_noise_standard_deviation);
 
-	FActorSpawnParameters camera_spawn_params;
+	FActorSpawnParameters lidar_spawn_params;
 
-	camera_spawn_params.Name = FName(*(actor->GetName() + "_gpulidar_" + FString(setting.sensor_name.c_str())));
-	lidar_camera_ = actor->GetWorld()->SpawnActor<ALidarCamera>(camera_spawn_params);
-	lidar_camera_->AttachToActor(actor, FAttachmentTransformRules::KeepRelativeTransform);
+	lidar_spawn_params.Name = FName(*(actor->GetName() + "_gpulidar_" + FString(setting.sensor_name.c_str())));
+	lidar_camera_ = actor->GetWorld()->SpawnActor<ALidarCamera>(lidar_spawn_params);
+	if (!setting.external) {
+		lidar_camera_->AttachToActor(actor, FAttachmentTransformRules::KeepRelativeTransform);
+	}
 	lidar_camera_->InitializeSettings(setting);
 }
 
@@ -41,5 +42,16 @@ void UnrealGPULidarSensor::pause(const bool is_paused) {
 // returns a point-cloud for the tick
 bool UnrealGPULidarSensor::getPointCloud(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final)
 {	
+	if (sensor_params_.draw_sensor) {
+		DrawDebugPoint(actor_->GetWorld(), lidar_camera_->GetActorTransform().GetLocation(), 5, FColor::Black, false, draw_time_);
+		DrawDebugCoordinateSystem(actor_->GetWorld(), lidar_camera_->GetActorLocation(), lidar_camera_->GetActorRotation(), 25, false, draw_time_, 10);
+	}
 	return lidar_camera_->Update(delta_time, point_cloud, point_cloud_final);
 }
+
+// Get echo pose in Local NED
+void UnrealGPULidarSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
+{
+	sensor_pose = ned_transform_->toLocalNed(lidar_camera_->GetActorTransform());
+}
+
