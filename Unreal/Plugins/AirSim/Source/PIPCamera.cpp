@@ -7,6 +7,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ImageUtils.h"
 #include "EngineUtils.h"
+#include "DrawDebugHelpers.h"
 #include "ObjectPainter.h"
 
 #include <string>
@@ -106,6 +107,12 @@ void APIPCamera::BeginPlay()
     gimbal_stabilization_ = 0;
     gimbald_rotator_ = this->GetActorRotation();
     this->SetActorTickEnabled(false);
+}
+
+
+msr::airlib::AirSimSettings::CameraSetting APIPCamera::getParams() const
+{
+    return sensor_params_;
 }
 
 msr::airlib::ProjectionMatrix APIPCamera::getProjectionMatrix(const APIPCamera::ImageType image_type) const
@@ -215,6 +222,10 @@ void APIPCamera::Tick(float DeltaTime)
 
         this->SetActorRotation(rotator);
     }
+    if (sensor_params_.draw_sensor) {
+        DrawDebugPoint(this->GetWorld(), this->GetActorTransform().GetLocation(), 5, FColor::Black, false, 0.1);
+        DrawDebugCoordinateSystem(this->GetWorld(), this->GetActorLocation(), this->GetActorRotation(), 25, false, 0.1, 10);
+    }
 }
 
 void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -298,6 +309,8 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
 
     ned_transform_ = &ned_transform;
 
+    sensor_params_ = camera_setting;
+
     gimbal_stabilization_ = Utils::clip(camera_setting.gimbal.stabilization, 0.0f, 1.0f);
     if (gimbal_stabilization_ > 0) {
         this->SetActorTickEnabled(true);
@@ -307,6 +320,10 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
     }
     else
         this->SetActorTickEnabled(false);
+
+    if (sensor_params_.draw_sensor) {
+        this->SetActorTickEnabled(true);
+    }
 
 	static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
 	TArray<AActor*> ignoreActors;

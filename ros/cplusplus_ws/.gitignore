@@ -1,6 +1,0 @@
-# ROS
-.catkin_tools/
-devel/
-logs/
-.catkin_workspace
-.idea/

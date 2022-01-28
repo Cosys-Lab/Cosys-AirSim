@@ -28,6 +28,8 @@ protected:
 
 	virtual void pause(const bool is_paused);
 
+	virtual void getLocalPose(msr::airlib::Pose& sensor_pose);
+
 	virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
 
 private:
@@ -66,4 +68,5 @@ private:
 	const float reflection_opening_angle_;
 	const float draw_time_;
 	const float line_thinkness_;
+	const bool external_;
 };

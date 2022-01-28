@@ -1,6 +1,6 @@
 # How to use AirSim with Robot Operating System (ROS)
 
-AirSim and ROS can be integrated using C++ or Python.  Some example ROS node are provided demonstrating how to publish data from AirSim as ROS topics.
+AirSim and ROS can be integrated using Python. Some example ROS node are provided demonstrating how to publish data from AirSim as ROS topics.
 
 # Python
 
@@ -10,11 +10,13 @@ These instructions are for Ubuntu 18.04, ROS Melodic, UE4 4.24.4 and latest AirS
 You should have these components installed and working before proceeding
 
 ## Implemented nodes
-- `airsimnode.py`: Configurable Python node to get and publish the pose of vehicle and sensory data from lidar, echosensor, cameras and IMU. You can also toggle controlling the vehicle from here.
+- `airsim_publish.py`: Configurable Python node to get and publish the pose of vehicle and sensory data from all sensors as well as the poses of world objects. 
    It will also perform proper transformation of all frames.
+- `airsim_record_route.py`: Configurable Python node to get and publish the pose of vehicle and the IMU sensor of a vehicle and save this data to a rosbag. The idea behind this node is to record a deterministic route that can later be replayed by the next node:
+- `airsim_play_route_record_sensors.py`: Configurable Python node that replays the route rosbag mentioned above and records all sensors as well as the poses of world objects for each of the recorded poses. It generates a new rosbag holding both the route and sensor data. This allows for better performance.
 
 ## Implemented launch files
-Various launch files are available, please check their settings for more information. 
+Various launch files are available for these ROS nodes, please check their settings for more information. 
 
 ## Setup
 
@@ -46,13 +48,4 @@ First make sure UE4 is running an AirSim project and the simulations is playing.
 
 The implemented AirSim nodes can be run using ```rosrun airsim scriptname.py```.
 
-Or alternativly you can use launch files such as the example ones that can be found in _AirSim/ros/python_ws/src/airsim/launch_.
-
-Rviz is a useful visualization tool that can display the published data. example Rviz configuration files for when all sensors are enabled can be found in _AirSim/ros/python_ws/src/airsim/rviz_.
-
-# C++ 
-**THIS IS NOT MAINTAINED BY COSYS-LAB SO IS LIKELY BUGGED AND NOT USABLE**
-
-Please use the documentation for the C++ wrapper that can be found separately:
-- [ROS Wrapper package](../ros/cplusplus_ws/src/airsim_ros_pkgs/README.md)
-- [ROS Wrapper tutorial package](../ros/cplusplus_ws/src/airsim_tutorial_pkgs/README.md)
+Or alternatively you can use launch files such as the example ones that can be found in _AirSim/ros/python_ws/src/airsim/launch_.
