@@ -36,7 +36,6 @@ Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (i
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
 GroundTruth               | Generate ground truth segmentation color values
 External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
-
 ```
 {
     "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",

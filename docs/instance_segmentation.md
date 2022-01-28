@@ -22,6 +22,8 @@ For a script that generates a full list of objects and their associated color, p
 When a new object is spawned in your environment by for example a c++ or blueprint extension you made,
 and you want it to work with the instance segmentation system, you can use the extended function `ASimModeBase::AddNewActorToSegmentation(AActor)` which is also available in blueprints. 
 
+Make sure to provide human-readable names to your objects in your environment as the ground truth tables that the AirSim API can provide will use your object naming to create the table.
+
 ## Credits
 The method used to use Vertex Colors to segment object is a derivative of and inspired by the work of [UnrealCV](https://unrealcv.org/). Their work is licensed under the MIT License.
 It is made by students from Johns Hopkins University and Peking University under the supervision of Prof. Alan Yuille and Prof. Yizhou Wang.

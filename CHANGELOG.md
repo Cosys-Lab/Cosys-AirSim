@@ -6,7 +6,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * Updated the Echo, (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
-* Added various dynamic object types [HySLAM Benchmark Scenario environments](docs/hyslambenchmarkenv.md)
+* Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
 * Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
@@ -18,7 +18,8 @@ Below is summarized list of important changes. This does not include minor/less 
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
-
+* Dropped support for Unity Environments.
+* 
 ### November, 2018
 * Added Weather Effects and [APIs](docs/apis.md#weather-apis)
 * Added [Time of Day API](docs/apis.md#time-of-day-api)

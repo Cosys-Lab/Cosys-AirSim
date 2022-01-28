@@ -1,61 +1,88 @@
-# Setup HySLAM Environment for AirSim
+# Setup Dynamic Objects for Scenario Environments for AirSim
 
-The HySLAM environment is available in repo in folder `Unreal/Environments/HySLAM`. 
-It is the main simulator environment for the HySLAM project.
+The available environments often feature some custom-made dynamic blueprints that can be used to create random but deterministic change in your environment. 
+
+
+## Location
+While these can be found in the environments available, they are also separately saved in _Unreal/Environments/DynamicObjects_.
+Copy the c++ files to your environments Source folder (_Environments/Source/levelname/_) and copy the uassets to your Contents folder.
 
 ## Features
- - HySLAM environment features a semi-realistic industrial building representing the average warehouse or manufacturing plant.
- - It's mean purpose is to offer an industrial environement with a high amount of dynamic objects such as:
-    - Dynamic AI humans walking between waypoints
-    - Dynamic spawning stacked goods (pallets etc.)
-    - Dynamic static objects spawning (either always the same or pick from a set of options)
-    - Small dynamic changes such as random open doors.
- - All randomization is controllable by a seed to make sure you can simulate the same setup again.
- - Other animate objects such as modular conveyor belts and robotic arms are available as well.
- - To change to a game-mode where you can simply fly through the world and not simulate, press L. You can press it again to go back to the simulation. **This will reset everything!!**
- 
-## Dynamic Object Configuration
-There are several object types to make the HySLAM environment dynamic. Here follows some simple instructions to tweak and alter their behavior.
+- Dynamic AI humans walking between waypoints
+- Dynamic spawning stacked goods (pallets etc.)
+- Dynamic static objects spawning (either always the same or pick from a set of options)
+- Small dynamic changes such as random open doors.
+- All randomization is controllable by a seed to make sure you can simulate the same setup again.
+- Other animate objects such as modular conveyor belts and robotic arms are available as well.
+- Some features can also be configured with a launchfile/launch parameters.
 
-### Seed Configuration
-To control the randomisation functionally used in the dynamic objects, a controllable seed number is used. In every level using the dynamic objects an actor has to be present of the class _SeedStorage_.
+## Usage
+There are several object types and settings to make the environment dynamic. Here follows some simple instructions to tweak and alter their behaviour using the created blueprints.
+
+### Seed & World Dynamics Configuration
+To control the randomisation functionally used in the dynamic objects, a controllable seed number is used. In every level using the dynamic objects an actor has to be present of the class _Dynamic World Master_.
 This object will visually show the chosen seed every time the simulation is started (it can be hidden as well with a toggle). There are few other toggles available as well.
 
-The seed and these other settings can be controlled both in standalone and in the editor:
+The seed and these other settings can be controlled both in standalone(build packages) and in the editor:
 - **Editor**: 
-  - To control the seed in the editor, change the `Editor Seed` setting of the _SeedStorage_ actor in the level. If it is set to 0, it will generate a random seed number. But if set to anything else, it will use that number as seed for all dynamic objects. 
-  - To make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics) set the `Is Static` boolean to true. Default is false. 
-  - Toggle the AI in the world on and off set the `Spawn AI`. Default to true.
+  - To control the seed in the editor, change the `Editor Seed` setting of the _Dynamic World Master_ actor in the level. If it is set to 0, it will generate a random seed number. But if set to anything else, it will use that number as seed for all dynamic objects. 
+  - To make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics) set the `Editor Is Static` boolean to true. Default is false. 
+  - Toggle the AI in the world on and off set the `Editor Spawn AI`. Default to true.
 - **Standalone**:
   - To control the seed when using the simulator as standalone, use the launch parameter `-startSeed INT` with X being the chosen seed value. if not set it will chose a random one.
   - To make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics) add a launch parameter `-isStatic BOOL` with the boolean set to true. If not set it defaults to false.
   - Toggle the AI in the world on and off with a launch parameter the `-spawnAI BOOL`. If not set it defaults to true.
 
-Please see the code below for a basic .bat script that can be used to launch the world with the above values easily configurable.
+
+### Start Point
+In order for your environment to have multiple starting points, the _Dynamic World Master_ can be configured to teleport the AirSim vehicle after launch to one of several manually defined starting points.
+To define a new startpoint in your environment, place objects of the type _Target Point_ in your environment. At launch these will be marked as potential staring points for the simulator.
+They are used in order that they appear in the World Outliner.
+
+To configure which starting point is used, you can configure the number:
+- **Editor**: To control the starting point in the editor, change the `Editor Start Point` setting of the _Dynamic World Master_ actor in the level.
+- **Standalone**: To control the starting point in aa standalone build, use the launch parameter `-startPoint INT` with X being the chosen starting point.
+
+### Dynamic Marked Objects
+Objects in your environment can be marked to be 'dynamic'. It's mean purpose is to offer a simple setup with a configurable amount of dynamic objects that can move or be deleted.
+All dynamic objects (those that can be removed or moved) need to have their actor tag set to _DynamicObject_.
+
+To control the dynamic objects a few parameters are available:
+- **Remove percentage**: number of marked objects to remove randomly
+- **Move percentage**: number of marked objects to move and rotate slightly
+  - **Move offset**: maximum the object can move in cm
+  - **Rotation offset**: maximum rotation in degrees the object can rotate
+These are as well available in the editor with the _DynamicWorldMaster_ actors settings. Or can be setup in the launch parameters.
+- **Editor**: Search for the settings `Editor Remove Percentage`, `Editor Move Percentage`, `Editor Move Offset Value` and `Editor Rotation Offset Value` to configure the dynamic marked objects system.
+- **Standalone**: Use the launch parameters `-removePercentage INT`, `-movePercentage INT`, `-moveOffsetValue INT` and `-moveRotationValue INT` to configure the dynamic marked objects system.
+
+Furthermore, you can mark an object as _Guide_ with an actor tag. This will print out the horizontal distance of all marked dynamic objects to these Guide Objects for debugging or validation purposes.
+
+### LaunchFile
+You can also use a file to define the previous dynamic setting configurations line per line. Then by pressing a button (<kbd>O</kbd>) you can switch to the next configuration.
+This file has the following structure:
 ```
-@echo off 
-set STARTSEED=450                              & :: To control the seed use this parameter to set it. If set to 0 a random one will be chosen.
-set ISSTATIC=0                            	   & :: Set to 1 to make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics)
-set SPAWNAI=0                           	   & :: Toggle the AI in the world on and off 
-set /A LOG=1								   & :: Set to 1 to open a separate window to display the contents of the log in real time
-
-if %LOG%==1 (	
-	if %STARTSEED%==0 (
-		start "" "HySLAM.exe" -LOG -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
-		) else (
-			start "" "HySLAM.exe" -LOG -startSeed %STARTSEED% -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
-			) 
-	) else (
-		if %STARTSEED%==0 (
-			start "" "HySLAM.exe" -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
-			) else (
-				start "" "HySLAM.exe" -startSeed %STARTSEED% -isStatic %ISSTATIC% -spawnAI %SPAWNAI%
-				) 
-		)
+seed,removePercentage,movePercentage,moveOffsetValue,moveRotationValue
 ```  
+For example you can create _launchfile.ini_, each line defining a new configuration:
+```
+0,50,25,50,50
+450,10,10,50,50
+450,10,10,50,50
+500,10,10,50,50
+450,10,10,50,50
+```  
+Do note that this only configures those 5 settings. The **Starting point**,**Is Static** and **Spawn AI** settings are not configured this way and are configured just as before.
 
+to make the environment load this file, you need to define it. Which similarly to before is different for the editor or standalone:
+- **Editor**: 
+  - To control the launchfile in the editor, enable the `Use Launch File` toggle and set the `Editor Launch File` field to the absolute filepath of the launchfile of the _DynamicWorldMaster_ actor in the level. 
+- **Standalone**:
+  - To control the launchfile when using the simulator as standalone, use the launch parameter `-launchFile STRING` and set it to the absolute filepath of the launchfile.
+ 
 ### Dynamic Static Spawners
-Currently there are 3 dynamic static object spawners blueprints available:
+Some blueprints are also available to be used to spawn dynamic objects.
+Currently, there are 4 dynamic static object spawners blueprints available:
 - _RandomStackSpawner_: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. One can control it with the following settings:
 
 Setting                         | Description
@@ -73,9 +100,11 @@ Chance To Spawn                 | Percentage of chance to spawn each object in t
 Chance to Change                | Percentage of chance to alter the stack configuration every so many seconds
 Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
+Nav Collision W/L/H             | This setting can be used to create a area around the object spawner of which the Dynamic AI pathfinding will stay away from. 
+
 
 - _RandomStackSpawnerSwitcher_: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. Difference with the one above is that this one can
-select from a Data Table object to select randomly a 'goods'/object type and it's stacking settings. One can control it with the following settings:
+select from a Data Table object to select randomly a 'goods'/object type, and it's stacking settings. One can control it with the following settings:
 
 Setting                         | Description
 --------------------------------| ------------
@@ -85,7 +114,6 @@ Chance to Change                | Percentage of chance to alter the stack config
 Chance To Switch                | Percentage of chance to switch to a different object type from Data Table      
 Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
-
 
 - _RandomStaticModifier_: This can be used to spawn a singular static and alter it's spawn transform dynamically. One can control it with the following settings:
 
@@ -113,7 +141,7 @@ Chance to Change                | Percentage of chance to alter the stack config
 Average Time Between Changes    | Average time delta in seconds between changes
 Max Time Between Changes Offset | Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)
 
-- There are some other more simple dynamic objects such as doors and conveyor belts. They have self-explanatory settings very similar to those above. All are based on the seed randomisation.
+- There are some other more simple dynamic objects such as doors and conveyor belts that have self-explanatory settings very similar to those above. All are based on the seed randomisation.
 
 ### Grouped AI
 A human looking AI is also available to walk dynamically between a set of self chosen waypoints. They are based on the DetourAIController of Unreal so will avoid each other and the user pretty well. 
@@ -122,34 +150,3 @@ They also use the Seed randomisation so that they can be spawned at the same way
 - _GroupedTargetPoint_: These are the TargetPoints (waypoints) that the AI will walk between. Their only setting is the group ID number to decide which AI group will be able to pick this waypoint to spawn AI and be the target waypoint for them.
 - _GroupedAI_: One can manually spawn an AI by placing these in the world. They need to be assigned the Group ID manually to choose which waypoints to target.
 - _GroupedAISpawner_: To automate the spawner of AI, one can use this blueprint. It will spawn Ai at the waypoints of the same group. A setting is available to configure the fill percentage. This will set the percentage of waypoints to spawn AI upon. On also has to chose which Skeletal Meshes and their Animation Blueprints can be chosen from.                                                                      
-      
-## Asset Installation
-To keep this repository free of large asset files, they are stored separately on the CoSys-Lab Data Archive network share. 
-You can find the assets for this environment in _/AirSimAssets/HySLAM/_. If you do not have access to this shared network drive, please contact CoSys-Lab members.
-
-There you can find the _Assets_ folder which you can copy to _/airsim/Unreal/Environments/HySLAM/Content_.
-
-## Initial Setup
-Here are quick steps to get HySLAM environment up and running:
-
-### Windows
-
-1. Make sure you have [installed Unreal and built AirSim](build_windows.md).
-2. Navigate to folder `AirSim\Unreal\Environments\HySLAM` and run `update_from_git.bat`.
-3. Double click on generated .sln file to open in Visual Studio.
-4. Make sure `HySLAM` project is the startup project, build configuration is set to `DebugGame_Editor` and `Win64`. Hit F5 to run.
-5. Press the Play button in Unreal Editor to start. See [how to use AirSim](https://github.com/Microsoft/AirSim/#how-to-use-it).
-
-#### Changing Code and Rebuilding on Windows
-For Windows, you can just change the code in Visual Studio, press F5 and re-run. There are few batch files available in folder `AirSim\Unreal\Environments\HySLAM` that lets you sync code, clean etc.
-
-### Linux
-1. Make sure you have [built the Unreal Engine and AirSim](build_linux.md).
-2. Navigate to your UnrealEngine repo folder and run `Engine/Binaries/Linux/UE4Editor` which will start Unreal Editor.
-3. On first start you might not see any projects in UE4 editor. Click on Projects tab, Browse button and then navigate to `AirSim/Unreal/Environments/HySLAM/HySLAM.uproject`. 
-4. If you get prompted for incompatible version and conversion, select In-place conversion which is usually under "More" options. If you get prompted for missing modules, make sure to select No so you don't exit. 
-5. Finally, when prompted with building AirSim, select Yes. Now it might take a while so go get some coffee :).
-6. Press the Play button in Unreal Editor and you will see something like in below video. Also see [how to use AirSim](/#how-to-use-it).
-
-#### Changing Code and Rebuilding on Linux
-For Linux, make code changes in AirLib or Unreal/Plugins folder and then run `./build.sh` to rebuild. This step also copies the build output to HySLAM project. You can then follow above steps again to re-run.
