@@ -19,7 +19,7 @@ namespace msr {
 			// TODO: enable reading of these params from AirSim settings
 
 			uint number_of_channels = 64;
-			real_T range = 10000.0f / 100;               // meters
+			real_T range = 5000.0f / 100;                // meters
 			float range_max_lambertian_percentage = 80;  // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
 			float rain_max_intensity = 70;               // Rain intensity maximum to scale from in mm/hour.
 			float rain_constant_a = 0.01;                // Two constants to calculate the extinction coefficient in rain
@@ -46,12 +46,16 @@ namespace msr {
 
 			bool generate_intensity = false;             // Toggle intensity calculation on or off
 
+			bool external = false;                       // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+			bool external_ned = true;                    // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+
 			bool draw_debug_points = false;
 			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
+			bool draw_sensor;						     // Draw the physical sensor in the world on the vehicle
 
-			real_T startup_delay = 1;                   // sec
+			real_T startup_delay = 1;                    // sec
 
-			std::string material_list_file = "";        // String holding all material data
+			std::string material_list_file = "";         // String holding all material data
 
 
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
@@ -124,6 +128,10 @@ namespace msr {
 
 				draw_debug_points = settings.draw_debug_points;
 				draw_mode = settings.draw_mode;
+				draw_sensor = settings.draw_sensor;
+
+				external = settings.external;
+				external_ned = settings.external_ned;
 			}
 		};
 

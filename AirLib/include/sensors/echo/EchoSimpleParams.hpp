@@ -35,6 +35,10 @@ struct EchoSimpleParams {
         Quaternionr::Identity()             // orientation - by default Quaternionr(1, 0, 0, 0) 
         };                       
 
+	bool external = false;                  // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+	bool external_ned = true;               // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+
+
 	bool draw_reflected_points;				// Draw debug points in world where reflected points are captured by the echo sensor
 	bool draw_reflected_lines;				// Draw debug lines in world from reflected points to the echo sensor
 	bool draw_reflected_paths;				// Draw debug lines for the full path of reflected points to the sensor
@@ -42,9 +46,6 @@ struct EchoSimpleParams {
 	bool draw_bounce_lines;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
 	bool draw_sensor;						// Draw the physical sensor in the world on the vehicle
 	bool draw_external_points;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
-
-											// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-    std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
     real_T update_frequency;				// polling rate of update function, in Hz
     real_T startup_delay;               // startup delay of sensor, in sec
@@ -99,8 +100,10 @@ struct EchoSimpleParams {
 		draw_sensor = settings.draw_sensor;
 		draw_external_points = settings.draw_external_points;
 
-        data_frame = settings.data_frame;
 		update_frequency = settings.measurement_frequency;
+
+		external = settings.external;
+		external_ned = settings.external_ned;
 
 		startup_delay = 0;
     }

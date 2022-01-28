@@ -74,6 +74,7 @@ public:
         UGameplayStatics::GetAllActorsOfClass(context, T::StaticClass(), foundActors);
     }
 
+    static std::vector<std::string> ListMatchingActorsOriginal(const UObject* context, const std::string& name_regex);
     static std::vector<std::string> ListMatchingActors(const UObject *context, const std::string& name_regex);
 
     static bool HasObstacle(const AActor* actor, const FVector& start, const FVector& end,

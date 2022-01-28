@@ -134,9 +134,11 @@ void PawnSimApi::createCamerasFromSettings()
             position, FVector(1., 1., 1.));
 
         //spawn and attach camera to pawn
-        APIPCamera* camera = params_.pawn->GetWorld()->SpawnActor<APIPCamera>(params_.pip_camera_class, camera_transform, camera_spawn_params);
-        camera->AttachToComponent(bodyMesh, FAttachmentTransformRules::KeepRelativeTransform);
 
+        APIPCamera* camera = params_.pawn->GetWorld()->SpawnActor<APIPCamera>(params_.pip_camera_class, camera_transform, camera_spawn_params);
+        if (!setting.external){
+            camera->AttachToComponent(bodyMesh, FAttachmentTransformRules::KeepRelativeTransform);
+        }
         //add on to our collection
         cameras_.insert_or_assign(camera_setting_pair.first, camera);
     }
@@ -397,10 +399,26 @@ msr::airlib::CameraInfo PawnSimApi::getCameraInfo(const std::string& camera_name
     msr::airlib::CameraInfo camera_info;
 
     const APIPCamera* camera = getCamera(camera_name);
-    camera_info.pose.position = ned_transform_.toLocalNed(camera->GetActorLocation());
-    camera_info.pose.orientation = ned_transform_.toNed(camera->GetActorRotation().Quaternion());
-    camera_info.fov = camera->GetCameraComponent()->FieldOfView;
-    camera_info.proj_mat = camera->getProjectionMatrix(APIPCamera::ImageType::Scene);
+    if (camera != NULL) {
+
+        if (camera->getParams().external && camera->getParams().external_ned) {
+            camera_info.pose = ned_transform_.toLocalNed(camera->GetActorTransform());
+        }
+        else {
+            camera_info.pose.position = camera->getParams().position;
+            float pitch, roll, yaw;
+            pitch = !std::isnan(camera->getParams().rotation.pitch) ? camera->getParams().rotation.pitch : 0;
+            roll = !std::isnan(camera->getParams().rotation.roll) ? camera->getParams().rotation.roll : 0;
+            yaw = !std::isnan(camera->getParams().rotation.yaw) ? camera->getParams().rotation.yaw : 0;
+            camera_info.pose.orientation = VectorMath::toQuaternion(
+                Utils::degreesToRadians(pitch),   //pitch - rotation around Y axis
+                Utils::degreesToRadians(roll),    //roll  - rotation around X axis
+                Utils::degreesToRadians(yaw)	  //yaw   - rotation around Z axis
+            );
+        }
+        camera_info.fov = camera->GetCameraComponent()->FieldOfView;
+        camera_info.proj_mat = camera->getProjectionMatrix(APIPCamera::ImageType::Scene);
+    }
     return camera_info;
 }
 

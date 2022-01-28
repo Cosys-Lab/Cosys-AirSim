@@ -216,6 +216,13 @@ This setting allows you to set the speed of simulation clock with respect to wal
 ## Camera Settings
 The `CameraDefaults` element at root level specifies defaults used for all cameras. These defaults can be overridden for individual camera in `Cameras` element inside `Vehicles` as described later.
 
+### Main settings
+Like other sensors the pose of the sensor in the vehicle frame can be defined by X, Y, Z, Roll, Pitch, Yaw parameters. 
+Furthermore there are some other settings available:
+* `DrawSensor`: Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is.
+* `External`: Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates.
+* `ExternalLocal`: When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default.
+
 ### Note on ImageType element
 The `ImageType` element in JSON array determines which image type that settings applies to. The valid values are described in [ImageType section](image_apis.md#available-imagetype). In addition, we also support special value `ImageType: -1` to apply the settings to external camera (i.e. what you are looking at on the screen).
 
