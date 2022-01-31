@@ -174,6 +174,16 @@ msr::airlib::EchoData RpcLibClientBase::getEchoData(const std::string& echo_name
 	return pimpl_->client.call("getEchoData", echo_name, vehicle_name).as<RpcLibAdapatorsBase::EchoData>().to();
 }
 
+msr::airlib::SensorTemplateData RpcLibClientBase::getSensorTemplateData(const std::string& echo_name, const std::string& vehicle_name) const
+{
+    return msr::airlib::SensorTemplateData();
+}
+
+msr::airlib::MarLocUwbSensorData RpcLibClientBase::getMarLocUwbSensorData(const std::string& echo_name, const std::string& vehicle_name) const
+{
+    return msr::airlib::MarLocUwbSensorData();
+}
+
 msr::airlib::ImuBase::Output RpcLibClientBase::getImuData(const std::string& imu_name, const std::string& vehicle_name) const
 {
     return pimpl_->client.call("getImuData", imu_name, vehicle_name).as<RpcLibAdapatorsBase::ImuData>().to();

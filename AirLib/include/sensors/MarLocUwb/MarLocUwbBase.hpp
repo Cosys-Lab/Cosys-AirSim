@@ -14,8 +14,9 @@ public:
         : SensorBase(sensor_name, attach_link)
     {}*/
     MarLocUwbBase(const std::string& sensor_name = "")
-        : SensorBase(sensor_name)
-    {}
+        : SensorBase(sensor_name){
+        id_ = stoi(sensor_name.substr(sensor_name.find_last_of("_") + 1));
+    }
 
 public: //types
     struct Output { //fields to enable creation of ROS message PointCloud2 and LaserScan
@@ -47,6 +48,11 @@ public:
 		return output_;
 	}
 
+    const int& getID() const
+    {
+        return id_;
+    }
+
 	const MarLocUwbSensorData& getInput() const
 	{
 		return input_;
@@ -65,6 +71,7 @@ protected:
 
 private:
 	MarLocUwbSensorData output_;
+    int id_;
 	mutable MarLocUwbSensorData input_;
 };
 

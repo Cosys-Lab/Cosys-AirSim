@@ -207,12 +207,13 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 					if (trace_hit_result.Actor->IsA(AUWBBeacon::StaticClass())) {
 						mtx.lock();
 						FString tmpName, tmpId;
-						UAirBlueprintLib::LogMessageString("Calculating the name", "as BEACON", LogDebugLevel::Informational, 1);
+						//UAirBlueprintLib::LogMessageString("Calculating the name", "as BEACON", LogDebugLevel::Informational, 1);
 
 						//std::string aaa (TCHAR_TO_UTF8(*trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId)));
 						trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId);
 						int tmpRssi = (int)traceRayCurrentSignalStrength;
-						UWBHit thisHit = { FCString::Atoi(*tmpId)  ,  tmpRssi};
+						FVector beaconPos = trace_hit_result.Actor->GetActorLocation();
+						UWBHit thisHit = { FCString::Atoi(*tmpId),  tmpRssi, beaconPos[0], beaconPos[1] , beaconPos[2] };
 						UWBHitLog->Add(thisHit);
 						mtx.unlock();
 					}

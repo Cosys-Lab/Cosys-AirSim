@@ -117,6 +117,9 @@ private:
 		
 		std::vector<int> beaconsActiveRSSI;
 		std::vector<int> beaconsActiveID;
+		std::vector<float> beaconsActivePosX;
+		std::vector<float> beaconsActivePosY;
+		std::vector<float> beaconsActivePosZ;
 		for (int i = 0; i < beaconsActive_.Num(); i++) {
 			for (int ii = 0; ii < beaconsActive_[i].Num(); ii++) {
 				beaconsActiveRSSI.push_back(beaconsActive_[i][ii].rssi);
@@ -124,10 +127,16 @@ private:
 				//beaconsActive_[i][ii].beaconID.Split(TEXT("_"), &tmpName, &tmpId);
 				//beaconsActiveID.push_back(FCString::Atoi(*tmpId));
 				beaconsActiveID.push_back(beaconsActive_[i][ii].beaconID);
+				beaconsActivePosX.push_back(beaconsActive_[i][ii].beaconPosX);
+				beaconsActivePosY.push_back(beaconsActive_[i][ii].beaconPosY);
+				beaconsActivePosZ.push_back(beaconsActive_[i][ii].beaconPosZ);
 			}
 		}
 		output.beaconsActiveRssi = beaconsActiveRSSI;
 		output.beaconsActiveID = beaconsActiveID;
+		output.beaconsActivePosX = beaconsActivePosX;
+		output.beaconsActivePosY = beaconsActivePosY;
+		output.beaconsActivePosZ = beaconsActivePosZ;
 		
 		//output.beaconsActiveRssi;
 		setOutput(output);
