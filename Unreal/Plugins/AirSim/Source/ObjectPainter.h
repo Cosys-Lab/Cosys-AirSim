@@ -37,4 +37,6 @@ public:
 
 	/** Set camera ViewMode for vertex color */
 	static void SetViewForVertexColor(FEngineShowFlags& show_flags);
+
+	static int GammaCorrectionTable[256];
 };

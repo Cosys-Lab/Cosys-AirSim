@@ -11,7 +11,10 @@
 // ctor
 UnrealLidarSensor::UnrealLidarSensor(const AirSimSettings::LidarSetting& setting,
 	AActor* actor, const NedTransform* ned_transform)
-	: LidarSimple(setting), actor_(actor), ned_transform_(ned_transform)
+	: LidarSimple(setting), actor_(actor), ned_transform_(ned_transform),
+	sensor_params_(getParams()),
+	draw_time_(1.05f / sensor_params_.horizontal_rotation_frequency),
+	external_(getParams().external)
 {
 	// Seed and initiate noise
 	std::random_device rd;
@@ -55,6 +58,32 @@ void UnrealLidarSensor::createLasers()
 	current_horizontal_angle_index_ = horizontal_angles_.Num()-1;
 }
 
+// Set echo object in correct pose in physical world
+void UnrealLidarSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
+{
+	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
+	// DRAW DEBUG
+	if (sensor_params_.draw_sensor) {
+		FVector sensor_position;
+		if (external_) {
+			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+		}
+		else {
+			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		}
+		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, draw_time_);
+		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
+		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_, 10);
+	}
+}
+
+// Get echo pose in Local NED
+void UnrealLidarSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
+{
+	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1)); ;
+	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
+}
+
 // Pause Unreal simulation
 void UnrealLidarSensor::pause(const bool is_paused) {
 	if (is_paused) {
@@ -70,6 +99,9 @@ void UnrealLidarSensor::pause(const bool is_paused) {
 bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
 	const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final, msr::airlib::vector<std::string>& groundtruth_final)
 {
+
+	updatePose(lidar_pose, vehicle_pose);
+
 	bool refresh = false;
 	msr::airlib::LidarSimpleParams params = getParams();
 	const auto number_of_lasers = params.number_of_channels;
@@ -175,6 +207,10 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 	return refresh;
 }
 
+FVector UnrealLidarSensor::Vector3rToFVector(const Vector3r& input_vector) {
+	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
+}
+
 // simulate shooting a laser via Unreal ray-tracing.
 bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
 	const uint32 laser, const float horizontal_angle, const float vertical_angle,
@@ -204,7 +240,13 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 	FHitResult hit_result = FHitResult(ForceInit);
 	TArray<AActor*> actorArray;
 	//actorArray.Add(actor_);
-	bool is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actorArray, ECC_Visibility, true, true);
+	bool is_hit;
+	if (params.external) {
+		is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->toFVector(start, 100, true), ned_transform_->toFVector(end, 100, true), hit_result, actorArray, ECC_Visibility, true, true);
+	}
+	else {
+		is_hit = UAirBlueprintLib::GetObstacleAdv(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actorArray, ECC_Visibility, true, true);
+	}
 	bool ignoreMaterial = false;
 	if (hit_result.PhysMaterial != nullptr) {
 		if (hit_result.PhysMaterial.Get()->GetFName().ToString().Contains("Lidar_Ignore_PhysicalMaterial"))
@@ -253,11 +295,25 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 		if (params.data_frame == AirSimSettings::kVehicleInertialFrame) {
 			// current detault behavior; though it is probably not very useful.
 			// not changing the default for now to maintain backwards-compat.
-			point = ned_transform_->toLocalNed(impact_point);
+
+			if (params.external) {
+				Vector3r point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
+				point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
+			}
+			else {
+				point = ned_transform_->toLocalNed(impact_point);
+			}
 		}
 		else if (params.data_frame == AirSimSettings::kSensorLocalFrame) {
 			// point in vehicle intertial frame
-			Vector3r point_v_i = ned_transform_->toLocalNed(impact_point);
+
+			Vector3r point_v_i;
+			if (params.external) {
+				point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
+			}
+			else {
+				point_v_i = ned_transform_->toLocalNed(impact_point);
+			}
 
 			// tranform to lidar frame
 			point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);

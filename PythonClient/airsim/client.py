@@ -159,14 +159,17 @@ class VehicleClient:
     def simGetVehiclePose(self, vehicle_name = ''):
         pose = self.client.call('simGetVehiclePose', vehicle_name)
         return Pose.from_msgpack(pose)
-    def simGetObjectPose(self, object_name):
-        pose = self.client.call('simGetObjectPose', object_name)
+    def simGetObjectPose(self, object_name, ned = True):
+        pose = self.client.call('simGetObjectPose', object_name, ned)
         return Pose.from_msgpack(pose)
     def simSetObjectPose(self, object_name, pose, teleport = True):
         return self.client.call('simSetObjectPose', object_name, pose, teleport)
 
     def simListSceneObjects(self, name_regex = '.*'):
         return self.client.call('simListSceneObjects', name_regex)
+
+    def simListInstanceSegmentationObjects(self):
+        return self.client.call('simListInstanceSegmentationObjects')
 
     def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
         return self.client.call('simSpawnStaticMeshObject', object_class_name, object_name, pose)

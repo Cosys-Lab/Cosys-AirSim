@@ -59,17 +59,33 @@ void WorldSimApi::printLogMessage(const std::string& message,
 
 std::vector<std::string> WorldSimApi::listSceneObjects(const std::string& name_regex) const
 {
-	return simmode_->GetAllSegmentationMeshIDs();
+    std::vector<std::string> result;
+    UAirBlueprintLib::RunCommandOnGameThread([this, &name_regex, &result]() {
+        result = UAirBlueprintLib::ListMatchingActorsOriginal(simmode_, name_regex);
+    },
+        true);
+    return result;
+}
+
+std::vector<std::string> WorldSimApi::listInstanceSegmentationObjects() const
+{
+    return simmode_->GetAllSegmentationMeshIDs();
 }
 
 
-WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name) const
+WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name, bool ned) const
 {
     Pose result;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, &result]() {
+    UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, ned, &result]() {
         AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
-        result = actor ? simmode_->getGlobalNedTransform().toGlobalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
-            : Pose::nanPose();
+        if (ned) {
+            result = actor ? simmode_->getGlobalNedTransform().toGlobalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
+                : Pose::nanPose();
+        }
+        else {
+            result = actor ? simmode_->getGlobalNedTransform().toLocalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
+                : Pose::nanPose();
+        }
     }, true);
     return result;
 }

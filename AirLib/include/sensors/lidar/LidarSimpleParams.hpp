@@ -34,6 +34,11 @@ struct LidarSimpleParams {
 	bool limit_points = true;			      // how frequently to update the data in Hz
 	bool pause_after_measurement = false;	  // Pause the simulation after each measurement. Useful for API interaction to be synced
 										      // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+
+    bool external = false;                    // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+    bool external_ned = true;                 // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+    bool draw_sensor;						  // Draw the physical sensor in the world on the vehicle
+
     Pose relative_pose {
         Vector3r(0,0,-1),                     // position - a little above vehicle (especially for cars) or Vector3r::Zero()
         Quaternionr::Identity()               // orientation - by default Quaternionr(1, 0, 0, 0)
@@ -104,6 +109,10 @@ struct LidarSimpleParams {
            
         draw_debug_points = settings.draw_debug_points;
         data_frame = settings.data_frame;
+        draw_sensor = settings.draw_sensor;
+
+        external = settings.external;
+        external_ned = settings.external_ned;
     }
 };
 

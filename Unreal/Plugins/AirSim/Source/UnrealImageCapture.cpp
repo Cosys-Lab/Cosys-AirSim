@@ -68,8 +68,9 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
         }
         else 
             textureTarget = capture->TextureTarget;
-
-        render_params.push_back(std::make_shared<RenderRequest::RenderParams>(capture, textureTarget, requests[i].pixels_as_float, requests[i].compress));
+        bool disable_gamma = false;
+        if (requests[i].image_type == ImageCaptureBase::ImageType::Segmentation)disable_gamma = true;
+        render_params.push_back(std::make_shared<RenderRequest::RenderParams>(capture, textureTarget, requests[i].pixels_as_float, requests[i].compress, disable_gamma));
     }
 
     if (nullptr == gameViewport) {
