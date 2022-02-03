@@ -275,7 +275,7 @@ bool UObjectPainter::PaintComponent(UMeshComponent* component, const FColor& col
 {
 	if (!component) return false;
 
-	FLinearColor LinearColor = FLinearColor::FLinearColor(color);
+	FLinearColor LinearColor = FLinearColor(color);
 	const FColor NewColor = LinearColor.ToFColor(false);
 
 	if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component))
