@@ -1023,8 +1023,6 @@ private:
         setting.external_ned = settings_json.getBool("ExternalLocal", setting.external_ned);
         setting.draw_sensor = settings_json.getBool("DrawSensor", setting.draw_sensor);
 
-        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
         loadCaptureSettings(settings_json, setting.capture_settings);
         loadNoiseSettings(settings_json, setting.noise_settings);
         Settings json_gimbal;
