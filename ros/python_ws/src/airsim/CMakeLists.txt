@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
     FILES
     StringArray.msg
+    uwb_Diagnostics.msg
 #   Message2.msg
 )
 

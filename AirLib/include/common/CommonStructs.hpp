@@ -326,5 +326,86 @@ struct EchoData {
 	{}
 };
 
+struct SensorTemplateData {
+
+    TTimePoint time_stamp = 0;
+    vector<real_T> point_cloud;
+    Pose pose;
+
+    SensorTemplateData()
+    {}
+};
+
+struct UWBHit
+{
+    int beaconID;
+    int rssi;
+    float beaconPosX;
+    float beaconPosY;
+    float beaconPosZ;
+};
+
+struct MarLocUwbSensorData {
+
+    TTimePoint time_stamp = 0;
+    //vector<real_T> point_cloud;
+    Pose pose;
+    vector<int> beaconsActiveID;
+    vector<float> beaconsActiveRssi;
+    vector<float> beaconsActivePosX;
+    vector<float> beaconsActivePosY;
+    vector<float> beaconsActivePosZ;
+
+    MarLocUwbSensorData()
+    {}
+};
+
+struct MarLocUwbRange {
+    TTimePoint time_stamp = 0;
+    int anchorId;
+    float anchorX, anchorY, anchorZ;
+    bool valid_range;
+    float distance;
+    float rssi;
+
+    MarLocUwbRange()
+    {}
+};
+
+struct MarLocUwbRangeArray {
+    int tagId;
+    float tagX, tagY, tagZ;
+    vector<int> ranges;
+
+    MarLocUwbRangeArray()
+    {}
+};
+
+/*struct MarLocUwbReturnMessage {
+    std::vector<MarLocUwbRange> marLocUwbRange;
+    std::vector<MarLocUwbRangeArray> marLocUwbRangeArray;
+
+    MarLocUwbReturnMessage()
+    {}
+};*/
+
+struct MarLocUwbReturnMessage2 {
+    //MarLocUwbRange
+    vector <TTimePoint> mur_time_stamp;
+    vector<int> mur_anchorId;
+    vector<float> mur_anchorX, mur_anchorY, mur_anchorZ;
+    vector<bool> mur_valid_range;
+    vector<float> mur_distance;
+    vector<float> mur_rssi;
+    
+    //MarLocUwbRangeArray
+    vector<int> mura_tagId;
+    vector<float> mura_tagX, mura_tagY, mura_tagZ;
+    vector <vector<int>> mura_ranges;
+
+    MarLocUwbReturnMessage2()
+    {}
+};
+
 }} //namespace
 #endif

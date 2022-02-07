@@ -19,6 +19,8 @@
 #include "sensors/barometer/BarometerBase.hpp"
 #include "sensors/magnetometer/MagnetometerBase.hpp"
 #include "sensors/distance/DistanceBase.hpp"
+#include "sensors/template/SensorTemplateBase.hpp"
+#include "sensors/MarLocUwb/MarLocUwbBase.hpp"
 #include "sensors/gps/GpsBase.hpp"
 #include <exception>
 #include <string>
@@ -38,6 +40,11 @@ public:
     virtual bool isApiControlEnabled() const = 0;
     virtual bool armDisarm(bool arm) = 0;
     virtual GeoPoint getHomeGeoPoint() const = 0;
+
+    virtual string MarLoc_test2() const
+    {
+        return "MarLoc was here two";
+    }
 
     //default implementation so derived class doesn't have to call on UpdatableObject
     virtual void reset() override
@@ -198,6 +205,135 @@ public:
 
 		echo->setInput(input);
 	}
+
+    // Echo APIs
+    virtual SensorTemplateData getSensorTemplateData(const std::string& sensor_name) const
+    {
+        const SensorTemplateBase* sensor = nullptr;
+
+        // Find echo with the given name (for empty input name, return the first one found)
+        // Not efficient but should suffice given small number of echos
+        uint template_sensor_count = getSensors().size(SensorBase::SensorType::SensorTemplate);
+        for (uint i = 0; i < template_sensor_count; i++)
+        {
+            const SensorTemplateBase* current_sensor = static_cast<const SensorTemplateBase*>(getSensors().getByType(SensorBase::SensorType::SensorTemplate, i));
+            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
+            {
+                sensor = current_sensor;
+                break;
+            }
+        }
+        if (sensor == nullptr)
+            throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", sensor_name.c_str()));
+
+        return sensor->getOutput();
+    }
+
+    virtual void setSensorTemplateData(const std::string& sensor_name, const SensorTemplateData& input) const
+    {
+        const SensorTemplateBase* sensor = nullptr;
+
+        // Find echo with the given name (for empty input name, return the first one found)
+        // Not efficient but should suffice given small number of echos
+        uint count_echos = getSensors().size(SensorBase::SensorType::SensorTemplate);
+        for (uint i = 0; i < count_echos; i++)
+        {
+            const SensorTemplateBase* current_sensor = static_cast<const SensorTemplateBase*>(getSensors().getByType(SensorBase::SensorType::SensorTemplate, i));
+            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
+            {
+                sensor = current_sensor;
+                break;
+            }
+        }
+        if (sensor == nullptr)
+            throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", sensor_name.c_str()));
+
+        sensor->setInput(input);
+    }
+
+    virtual MarLocUwbReturnMessage2 getMarLocUWBSensorData(const std::string& sensor_name) const
+    {
+        MarLocUwbReturnMessage2 toReturn;                       // The entire DB (ranges and rangeArrays)
+        const MarLocUwbBase* sensor = nullptr;                 // The used sensor
+        vector<MarLocUwbRange> uwbRanges;                      // A list of the ranges (incl diagnostics)
+        vector<MarLocUwbRangeArray> uwbRangesArray;            // A list of the range arrays
+        vector<int> processedRangeArrays;                      // A list of all RangeArray (= tags) PK's we already have
+
+        // Find echo with the given name (for empty input name, return the first one found)
+        // Not efficient but should suffice given small number of echos
+        uint uwb_sensor_count = getSensors().size(SensorBase::SensorType::MarlocUwb);
+
+        //vector<MarLocUwbSensorData> toReturn;
+        for (uint i = 0; i < uwb_sensor_count; i++)
+        {
+            const MarLocUwbBase* current_sensor = static_cast<const MarLocUwbBase*>(getSensors().getByType(SensorBase::SensorType::MarlocUwb, i));
+            //throw VehicleControllerException(current_sensor->getName().substr(0, 9));
+            if (current_sensor != nullptr && (current_sensor->getName().substr(0, 9) == sensor_name || sensor_name == ""))
+            {
+                sensor = current_sensor;
+                MarLocUwbSensorData outPut = sensor->getOutput();
+                for (int itId = 0; itId < outPut.beaconsActiveID.size(); itId++) {
+                    MarLocUwbRange newRange;
+                    newRange.time_stamp = outPut.time_stamp;
+                    newRange.anchorId = sensor->getID();
+                    newRange.anchorX = outPut.pose.position[0];
+                    newRange.anchorY = outPut.pose.position[1];
+                    newRange.anchorZ = outPut.pose.position[2];
+                    newRange.valid_range = 1;
+                    newRange.distance = 6;
+                    newRange.rssi = outPut.beaconsActiveRssi[itId];
+                    uwbRanges.push_back(newRange);
+
+                    if (count(processedRangeArrays.begin(), processedRangeArrays.end(), outPut.beaconsActiveID[itId]) == 0) { // If this beacon (tag) is not in the list
+                        // Create a new entry in the rangeArray list
+                        processedRangeArrays.push_back(outPut.beaconsActiveID[itId]);
+                        MarLocUwbRangeArray newUwbRangesArray;
+
+                        newUwbRangesArray.tagId = outPut.beaconsActiveID[itId];
+                        newUwbRangesArray.tagX = outPut.beaconsActivePosX[itId];
+                        newUwbRangesArray.tagY = outPut.beaconsActivePosY[itId];
+                        newUwbRangesArray.tagZ = outPut.beaconsActivePosZ[itId];
+
+                        uwbRangesArray.push_back(newUwbRangesArray);
+                    } 
+
+                    //Add this range to the rangeArray
+                    for (auto& rangeArray : uwbRangesArray) {
+                        if (rangeArray.tagId == outPut.beaconsActiveID[itId]) {
+                            rangeArray.ranges.push_back(newRange.anchorId);
+                        }
+                    }
+
+                }
+            }
+        }
+        if (sensor == nullptr)
+            throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", sensor_name.c_str()));
+
+
+        for (std::vector<MarLocUwbRange>::iterator it = uwbRanges.begin(); it != uwbRanges.end(); ++it) {
+            toReturn.mur_time_stamp.push_back(it->time_stamp);
+            toReturn.mur_anchorId.push_back(it->anchorId);
+            toReturn.mur_anchorX.push_back(it->anchorX);
+            toReturn.mur_anchorY.push_back(it->anchorY);
+            toReturn.mur_anchorZ.push_back(it->anchorZ);
+            toReturn.mur_valid_range.push_back(it->valid_range);
+            toReturn.mur_distance.push_back(it->distance);
+            toReturn.mur_rssi.push_back(it->rssi);
+        }
+
+        for (std::vector<MarLocUwbRangeArray>::iterator it = uwbRangesArray.begin(); it != uwbRangesArray.end(); ++it) {
+            toReturn.mura_tagId.push_back(it->tagId);
+            toReturn.mura_tagX.push_back(it->tagX);
+            toReturn.mura_tagY.push_back(it->tagY);
+            toReturn.mura_tagZ.push_back(it->tagZ);
+            toReturn.mura_ranges.push_back(it->ranges);
+        }
+            
+        //toReturn.marLocUwbRange = uwbRanges;
+        //toReturn.marLocUwbRangeArray = uwbRangesArray;
+        return toReturn;
+    }
 
     // IMU API
     virtual ImuBase::Output getImuData(const std::string& imu_name) const
