@@ -615,7 +615,7 @@ public:
         //std::vector<float> point_cloud;        // data
         Pose pose;
         std::vector<int> beaconsActiveID;
-        std::vector<int> beaconsActiveRssi;
+        std::vector<float> beaconsActiveRssi;
 
         MSGPACK_DEFINE(time_stamp, pose, beaconsActiveID, beaconsActiveRssi);
 

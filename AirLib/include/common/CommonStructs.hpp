@@ -351,7 +351,7 @@ struct MarLocUwbSensorData {
     //vector<real_T> point_cloud;
     Pose pose;
     vector<int> beaconsActiveID;
-    vector<int> beaconsActiveRssi;
+    vector<float> beaconsActiveRssi;
     vector<float> beaconsActivePosX;
     vector<float> beaconsActivePosY;
     vector<float> beaconsActivePosZ;
