@@ -255,11 +255,11 @@ public: //types
 
 		// shared defaults
 		uint number_of_channels = 64;
-		real_T range = 50.0f;                            // meters
+		real_T range = 50.0f;                             // meters
         float range_max_lambertian_percentage = 80;       // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
 
         float rain_max_intensity = 70;                    // Rain intensity maximum to scale from in mm/hour.
-        float rain_constant_a = 0.01f;                     // Two constants to calculate the extinction coefficient in rain
+        float rain_constant_a = 0.01f;                    // Two constants to calculate the extinction coefficient in rain
         float rain_constant_b = 0.6f;
 
 		uint measurement_per_cycle = 2048;
@@ -321,8 +321,8 @@ public: //types
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
 		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
 
-        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 		// Misc
 		Vector3r position = VectorMath::nanVector();
@@ -335,8 +335,9 @@ public: //types
         float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
         bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
                                                         // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-
-        std::string attach_link = "";
+        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
         // Misc
         std::string data_frame = AirSimSettings::kSensorLocalFrame;
@@ -351,13 +352,15 @@ public: //types
         float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
         bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
                                                         // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-
-        std::string attach_link = "";
-
+        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        
         // Misc
         std::string data_frame = AirSimSettings::kSensorLocalFrame;
         Vector3r position = VectorMath::nanVector();
         Rotation rotation = Rotation::nanRotation();
+
     };
 
     struct VehicleSetting {
@@ -1507,10 +1510,12 @@ private:
     {
         sensortemplate_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", sensortemplate_setting.measurement_frequency);
         sensortemplate_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", sensortemplate_setting.pause_after_measurement);
+        sensortemplate_setting.external = settings_json.getBool("External", sensortemplate_setting.external);
+        sensortemplate_setting.external_ned = settings_json.getBool("ExternalLocal", sensortemplate_setting.external_ned);
+        sensortemplate_setting.draw_sensor = settings_json.getBool("DrawSensor", sensortemplate_setting.draw_sensor);
 
         sensortemplate_setting.data_frame = settings_json.getString("DataFrame", sensortemplate_setting.data_frame);
 
-        sensortemplate_setting.attach_link = settings_json.getString("AttachLink", "");
 
         sensortemplate_setting.position = createVectorSetting(settings_json, sensortemplate_setting.position);
         sensortemplate_setting.rotation = createRotationSetting(settings_json, sensortemplate_setting.rotation);
@@ -1522,10 +1527,11 @@ private:
         marlocUwb_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", marlocUwb_setting.pause_after_measurement);
         marlocUwb_setting.number_of_traces = settings_json.getInt("NumberOfTraces", marlocUwb_setting.number_of_traces);
         marlocUwb_setting.sensor_opening_angle = settings_json.getFloat("SensorOpeningAngle", marlocUwb_setting.sensor_opening_angle);
+        marlocUwb_setting.external = settings_json.getBool("External", marlocUwb_setting.external);
+        marlocUwb_setting.external_ned = settings_json.getBool("ExternalLocal", marlocUwb_setting.external_ned);
+        marlocUwb_setting.draw_sensor = settings_json.getBool("DrawSensor", marlocUwb_setting.draw_sensor);
 
         marlocUwb_setting.data_frame = settings_json.getString("DataFrame", marlocUwb_setting.data_frame);
-
-        marlocUwb_setting.attach_link = settings_json.getString("AttachLink", "");
 
         marlocUwb_setting.position = createVectorSetting(settings_json, marlocUwb_setting.position);
         marlocUwb_setting.rotation = createRotationSetting(settings_json, marlocUwb_setting.rotation);

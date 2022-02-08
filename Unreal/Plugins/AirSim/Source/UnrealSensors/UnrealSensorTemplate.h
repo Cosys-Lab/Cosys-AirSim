@@ -30,15 +30,20 @@ protected:
 
 	virtual void pause(const bool is_paused);
 
+	virtual void getLocalPose(msr::airlib::Pose& sensor_pose);
+
 	virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
 
 private:
 	using Vector3r = msr::airlib::Vector3r;
 	using VectorMath = msr::airlib::VectorMath;
+
+	FVector Vector3rToFVector(const Vector3r& input_vector);
 private:
 	AActor* actor_;
 	const NedTransform* ned_transform_;
 	float saved_clockspeed_;
 	msr::airlib::Pose sensor_reference_frame_;
 	const msr::airlib::SensorTemplateSimpleParams sensor_params_;
+	const bool external_;
 };

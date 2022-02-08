@@ -14,15 +14,34 @@
 
 // ctor
 UnrealSensorTemplate::UnrealSensorTemplate(const AirSimSettings::SensorTemplateSetting& setting, AActor* actor, const NedTransform* ned_transform)
-	: SensorTemplateSimple(setting), actor_(actor), ned_transform_(ned_transform), saved_clockspeed_(1), sensor_params_(getParams())
+	: SensorTemplateSimple(setting), actor_(actor), ned_transform_(ned_transform), saved_clockspeed_(1), sensor_params_(getParams()), external_(getParams().external)
 {
 }
 
 
-// Set SensorTemplate object in correct pose in physical world
+// Set UnrealSensorTemplate object in correct pose in physical world
 void UnrealSensorTemplate::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
+	if (sensor_params_.draw_sensor) {
+		FVector sensor_position;
+		if (external_) {
+			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+		}
+		else {
+			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		}
+		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.1);
+		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
+		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.1, 10);
+	}
+}
+
+// Get UnrealSensorTemplate pose in Local NED
+void UnrealSensorTemplate::getLocalPose(msr::airlib::Pose& sensor_pose)
+{
+	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1)); ;
+	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
 }
 
 // Pause Unreal simulation
@@ -58,4 +77,8 @@ void UnrealSensorTemplate::setPointCloud(const msr::airlib::Pose& sensor_pose, m
 
 		DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);
 	}
+}
+
+FVector UnrealSensorTemplate::Vector3rToFVector(const Vector3r& input_vector) {
+	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
 }

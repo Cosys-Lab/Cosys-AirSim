@@ -77,6 +77,8 @@ protected:
 
 	virtual void updatePose(const Pose& sensor_pose, const Pose& vehicle_pose) = 0;
 
+	virtual void getLocalPose(Pose& sensor_pose) = 0;
+
 	virtual void pause(const bool is_paused) = 0;
 
 	//virtual void setPointCloud(const Pose& sensor_pose, vector<real_T>& point_cloud, TTimePoint time_stamp) = 0;
@@ -89,7 +91,7 @@ private:
 		//point_cloud_.clear();
 
 		const GroundTruth& ground_truth = getGroundTruth();
-
+		Pose const pose_offset = params_.external ? Pose() : ground_truth.kinematics->pose;
 		// calculate the pose before obtaining the point-cloud. Before/after is a bit arbitrary
 		// decision here. If the pose can change while obtaining the point-cloud (could happen for drones)
 		// then the pose won't be very accurate either way.
@@ -99,12 +101,11 @@ private:
 		//    ImageResponse for cameras and pose returned by getCameraInfo API.
 		//    Do we need to convert pose to Global NED frame before returning to clients?
 
-		Pose sensor_pose = params_.relative_pose + ground_truth.kinematics->pose;
 		double start = FPlatformTime::Seconds();
 		/*getPointCloud(params_.relative_pose, // relative sensor pose
 			ground_truth.kinematics->pose,   // relative vehicle pose			
 			point_cloud_);*/
-		updatePose(params_.relative_pose, ground_truth.kinematics->pose);
+		updatePose(params_.relative_pose, pose_offset);
 		updateUWBRays();
 		double end = FPlatformTime::Seconds();
 		UAirBlueprintLib::LogMessageString("MarLocUwb: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
@@ -113,9 +114,14 @@ private:
 
 		//output.point_cloud = point_cloud_;
 		output.time_stamp = last_time_;
-		output.pose = sensor_pose;
-		
-		std::vector<int> beaconsActiveRSSI;
+		if (params_.external && params_.external_ned) {
+			getLocalPose(output.pose);
+		}
+		else {
+			output.pose = params_.relative_pose;
+		}
+
+		std::vector<float> beaconsActiveRSSI;
 		std::vector<int> beaconsActiveID;
 		std::vector<float> beaconsActivePosX;
 		std::vector<float> beaconsActivePosY;

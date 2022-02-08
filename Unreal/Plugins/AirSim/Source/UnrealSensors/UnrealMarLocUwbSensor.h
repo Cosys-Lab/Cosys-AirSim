@@ -29,6 +29,8 @@ protected:
 
 	virtual void pause(const bool is_paused);
 
+	virtual void getLocalPose(msr::airlib::Pose& sensor_pose);
+
 	//virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
 
 	void updateUWBRays();
@@ -43,7 +45,7 @@ private:
 	msr::airlib::Pose sensor_reference_frame_;
 	const msr::airlib::MarLocUwbSimpleParams sensor_params_;
 	msr::airlib::vector<msr::airlib::Vector3r> sample_directions_;
-
+	const bool external_;
 	std::vector<float> uwbTraceMaxDistances; // in meter
 
 	/*struct UWBHit
@@ -59,6 +61,7 @@ private:
 	float getFreeSpaceLoss(float previous_distance, float added_distance);
 	float getReflectionAttenuation(const FHitResult &trace_hit_result);
 	float remainingDistance(float signal_attenuation, float total_distance);
+	FVector Vector3rToFVector(const Vector3r& input_vector);
 	const std::map<EPhysicalSurface, float> material_attenuations_ = {
 		{ EPhysicalSurface::SurfaceType_Default,		0.0f },
 		{ EPhysicalSurface::SurfaceType1,				0.0f }

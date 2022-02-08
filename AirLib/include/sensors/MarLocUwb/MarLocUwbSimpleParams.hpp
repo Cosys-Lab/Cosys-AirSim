@@ -15,6 +15,10 @@ struct MarLocUwbSimpleParams {
 	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
 	std::string name = "MarLocUwb";
+    bool external = false;                  // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+    bool external_ned = true;               // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+    bool draw_sensor;						// Draw the physical sensor in the world on the vehicle
+
 
     Pose relative_pose {
         Vector3r(0,0,-1),                   // position - a little above vehicle (especially for cars) or Vector3r::Zero()
@@ -35,7 +39,9 @@ struct MarLocUwbSimpleParams {
 		sensor_opening_angle = settings.sensor_opening_angle;
 		pause_after_measurement = settings.pause_after_measurement;
 		measurement_frequency = settings.measurement_frequency;
-
+        external = settings.external;
+        external_ned = settings.external_ned;
+        draw_sensor = settings.draw_sensor;
 		name = settings.sensor_name;
 
         relative_pose.position = settings.position;

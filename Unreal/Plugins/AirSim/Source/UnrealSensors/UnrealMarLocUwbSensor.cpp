@@ -22,7 +22,7 @@ using std::fill_n;
 std::mutex mtx;
 // ctor
 UnrealMarLocUwbSensor::UnrealMarLocUwbSensor(const AirSimSettings::MarLocUwbSetting& setting, AActor* actor, const NedTransform* ned_transform)
-	: MarLocUwbSimple(setting), actor_(actor), ned_transform_(ned_transform), saved_clockspeed_(1), sensor_params_(getParams())
+	: MarLocUwbSimple(setting), actor_(actor), ned_transform_(ned_transform), saved_clockspeed_(1), sensor_params_(getParams()), external_(getParams().external)
 {
 	// Initialize UWB properties
 	//configureUwbProperties();
@@ -44,6 +44,18 @@ UnrealMarLocUwbSensor::UnrealMarLocUwbSensor(const AirSimSettings::MarLocUwbSett
 void UnrealMarLocUwbSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
+	if (sensor_params_.draw_sensor) {
+		FVector sensor_position;
+		if (external_) {
+			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+		}
+		else {
+			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		}
+		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.1);
+		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
+		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.1, 10);
+	}
 }
 
 // Pause Unreal simulation
@@ -56,6 +68,15 @@ void UnrealMarLocUwbSensor::pause(const bool is_paused) {
 		UAirBlueprintLib::setUnrealClockSpeed(actor_, saved_clockspeed_);
 	}
 } 
+
+
+// Get MarLocUwbSensor pose in Local NED
+void UnrealMarLocUwbSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
+{
+	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1)); ;
+	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
+}
+
 /*void UnrealMarLocUwbSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
 {
 	// Set the physical MarLocUwbSensor mesh in the correct location in the world
@@ -414,6 +435,10 @@ float UnrealMarLocUwbSensor::remainingDistance(float signal_attenuation, float t
 	float distanceLength = distance_limit_ - total_distance;
 
 	return FMath::Max(distanceLength, 0.0f);
+}
+
+FVector UnrealMarLocUwbSensor::Vector3rToFVector(const Vector3r& input_vector) {
+	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
 }
 
 void UnrealMarLocUwbSensor::updateActiveBeacons() {
