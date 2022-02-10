@@ -223,8 +223,8 @@ void APIPCamera::Tick(float DeltaTime)
         this->SetActorRotation(rotator);
     }
     if (sensor_params_.draw_sensor) {
-        DrawDebugPoint(this->GetWorld(), this->GetActorTransform().GetLocation(), 5, FColor::Black, false, 0.1);
-        DrawDebugCoordinateSystem(this->GetWorld(), this->GetActorLocation(), this->GetActorRotation(), 25, false, 0.1, 10);
+        DrawDebugPoint(this->GetWorld(), this->GetActorTransform().GetLocation(), 5, FColor::Black, false, 0.3);
+        DrawDebugCoordinateSystem(this->GetWorld(), this->GetActorLocation(), this->GetActorRotation(), 25, false, 0.3, 10);
     }
 }
 
