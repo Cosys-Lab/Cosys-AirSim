@@ -258,6 +258,7 @@ public:
         vector<MarLocUwbRange> uwbRanges;                      // A list of the ranges (incl diagnostics)
         vector<MarLocUwbRangeArray> uwbRangesArray;            // A list of the range arrays
         vector<int> processedRangeArrays;                      // A list of all RangeArray (= tags) PK's we already have
+        vector<int> processedAnchorIDs;                        // A list of all anchor ID's already processed
 
         // Find echo with the given name (for empty input name, return the first one found)
         // Not efficient but should suffice given small number of echos
@@ -272,6 +273,9 @@ public:
             {
                 sensor = current_sensor;
                 MarLocUwbSensorData outPut = sensor->getOutput();
+
+                toReturn.pose = outPut.pose;
+
                 for (int itId = 0; itId < outPut.beaconsActiveID.size(); itId++) {
                     MarLocUwbRange newRange;
                     newRange.time_stamp = outPut.time_stamp;
@@ -282,7 +286,23 @@ public:
                     newRange.valid_range = 1;
                     newRange.distance = 6;
                     newRange.rssi = outPut.beaconsActiveRssi[itId];
-                    uwbRanges.push_back(newRange);
+                    
+
+                    
+                    // Test if this ID already exists in the ranges
+                    std::vector<int>::iterator it;
+                    it = find(processedAnchorIDs.begin(), processedAnchorIDs.end(), newRange.anchorId);
+                    
+                    if (it != processedAnchorIDs.end()) {// It exists
+                        int index = it - processedAnchorIDs.begin();
+
+                        if (newRange.rssi > uwbRanges[index].rssi) {
+                            uwbRanges[index].rssi = newRange.rssi;
+                        }
+                    } else { // does not yet exist
+                        uwbRanges.push_back(newRange);
+                        processedAnchorIDs.push_back(newRange.anchorId);
+                    }
 
                     if (count(processedRangeArrays.begin(), processedRangeArrays.end(), outPut.beaconsActiveID[itId]) == 0) { // If this beacon (tag) is not in the list
                         // Create a new entry in the rangeArray list

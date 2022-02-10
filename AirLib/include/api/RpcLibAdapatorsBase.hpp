@@ -763,7 +763,9 @@ public:
         std::vector<float> mura_tagX, mura_tagY, mura_tagZ;
         std::vector <std::vector<int>> mura_ranges;
 
-        MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorX, mur_anchorY, mur_anchorZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagX, mura_tagY, mura_tagZ, mura_ranges);
+        Pose pose;
+
+        MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorX, mur_anchorY, mur_anchorZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagX, mura_tagY, mura_tagZ, mura_ranges, pose);
 
         MarLocUwbReturnMessage2()
         {}
@@ -785,6 +787,8 @@ public:
             mura_ranges = s.mura_ranges;
             //marLocUwbRange = s.marLocUwbRange;
             //marLocUwbRangeArray = s.marLocUwbRangeArray;
+
+            pose = s.pose;
         }
 
         msr::airlib::MarLocUwbReturnMessage2 to() const
@@ -806,7 +810,7 @@ public:
             d.mura_ranges = mura_ranges;
             //d.marLocUwbRange = marLocUwbRange;
             //d.marLocUwbRangeArray = marLocUwbRangeArray;
-
+            d.pose = pose.to();
             return d;
         }
     };
