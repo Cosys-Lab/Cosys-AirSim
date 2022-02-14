@@ -10,6 +10,7 @@ import sensor_msgs.point_cloud2 as pc2
 import tf2_ros
 from airsim.msg import StringArray
 from sensor_msgs.msg import PointCloud2, PointField, Imu
+#from fm_msgs import Diagnostics, Range, RangeArray
 import rosbag
 import numpy as np
 import cv2
@@ -351,6 +352,11 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
 
                     pointcloud_publishers[sensor_name].publish(pcloud)
 
+        for sensor_index, sensor_name in enumerate(sensor_uwb_names):
+            if (sensor_index == 0): # only once
+                uwb_data = client.getUWBData()
+                print(uwb_data)
+                    
         for object_index, object_name in enumerate(object_names):
             if objects_coordinates_local[object_index] == 1:
                 pose = client.simGetObjectPose(object_name, True)
@@ -416,6 +422,10 @@ if __name__ == '__main__':
         sensor_gpulidar_names = rospy.get_param('~sensor_gpulidar_names', "True")
         sensor_gpulidar_topics = rospy.get_param('~sensor_gpulidar_topics', "True")
         sensor_gpulidar_frames = rospy.get_param('~sensor_gpulidar_frames', "True")
+
+        sensor_uwb_names = rospy.get_param('~sensor_uwb_names', "True")
+        sensor_uwb_topics = rospy.get_param('~sensor_uwb_topics', "True")
+        sensor_uwb_frames = rospy.get_param('~sensor_uwb_frames', "True")
 
         sensor_camera_names = rospy.get_param('~sensor_camera_names', "True")
         sensor_camera_toggle_scene_mono = rospy.get_param('~sensor_camera_toggle_scene_mono', "True")
@@ -517,6 +527,35 @@ if __name__ == '__main__':
             time.sleep(0.1)
             rospy.loginfo("Started static transform for GPU-LiDAR sensor with ID " + sensor_name + ".")
 
+        for sensor_index, sensor_name in enumerate(sensor_uwb_names):
+
+            # Get uwb sensor data
+            try:
+                uwb_data = client.getUWBSensorData(sensor_name, vehicle_name)
+                #timeStamp = uwb_data[0]
+                
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("UWB sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
+
+            if (len(uwb_data) == 2):
+                pose = uwb_data[1]
+                static_transform = TransformStamped()
+                static_transform.header.stamp = rospy.Time.now()
+                static_transform.header.frame_id = vehicle_base_frame
+                static_transform.child_frame_id = sensor_uwb_frames[sensor_index]
+                static_transform.transform.translation.x = pose['position']['x_val']
+                static_transform.transform.translation.y = -pose['position']['y_val']
+                static_transform.transform.translation.z = -pose['position']['z_val']
+                static_transform.transform.rotation.x = pose['orientation']['x_val']
+                static_transform.transform.rotation.y = pose['orientation']['y_val']
+                static_transform.transform.rotation.z = pose['orientation']['z_val']
+                static_transform.transform.rotation.w = pose['orientation']['w_val']
+                transform_list.append(static_transform)
+                time.sleep(0.1)
+                rospy.loginfo("Started static transform for UWB sensor with ID " + sensor_name + ".")
+            
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
             try:
                 camera_data = client.simGetCameraInfo(sensor_name)

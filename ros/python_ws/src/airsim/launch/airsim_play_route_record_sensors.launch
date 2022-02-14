@@ -39,8 +39,8 @@
             <param name="pose_topic" type="string" value="airsim/gtpose" />
             <param name="pose_frame" type="string" value="world" />
 
-            <param name="route_rosbag" type="string" value="/pathto/airsim_route_only.bag" />
-            <param name="merged_rosbag" type="string" value="/pathto/airsim_route_sensors.bag" />
+            <param name="route_rosbag" type="string" value="$(arg route_rosbag)" />
+            <param name="merged_rosbag" type="string" value="$(arg dst_rosbag)" />
 
             <rosparam param="sensor_echo_names" subst_value="True">$(arg sensor_echo_names)</rosparam>
             <rosparam param="sensor_echo_topics" subst_value="True">$(arg sensor_echo_topics)</rosparam>

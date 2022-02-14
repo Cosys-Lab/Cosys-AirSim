@@ -117,8 +117,11 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 	// Create new log record for newest UWB measurements
 	TArray<UWBHit> UWBHitLog;
 
-	ParallelFor(sample_directions_.size(), [&](int32 direction_count) {
-	//for (int32 direction_count = 0; direction_count< sample_directions_.size(); direction_count++){
+	//FVector lineEnd = uwbTraceMaxDistances[direction_count] * FVector(sample_direction[0], sample_direction[1], sample_direction[2]);
+	//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
+
+	//ParallelFor(sample_directions_.size(), [&](int32 direction_count) {
+	for (int32 direction_count = 0; direction_count< sample_directions_.size(); direction_count++){
 		Vector3r sample_direction = sample_directions_[direction_count];
 
 		//FVector trace_direction = ned_transform_->toFVector(VectorMath::rotateVector(sample_direction, sensor_reference_frame_.orientation, 1), 1.0f, true); 
@@ -134,6 +137,7 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 		lineEnd += sensorBase_global;
 		//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
 
+		// Trace ray, bounce and add to hitlog if beacon was hit
 		traceDirection(sensorBase_global, lineEnd, &UWBHitLog, 0, 0, 1, 0);
 		//int traceDir = 0;
 		//if (direction_count <= 10) {
@@ -142,8 +146,8 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 				UAirBlueprintLib::LogMessageString("Drawing ", "a line", LogDebugLevel::Informational);
 			}*/
 		//}
-	});
-	//}
+	//});
+	}
 	//actor_->GetWorld()->GetPhysicsScene()->GetPxScene()->unlockRead();
 	//UWBHits.Add(UWBHitLog);
 	beaconsActive_.Add(UWBHitLog);
@@ -225,7 +229,8 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 
 				// If beacon was hit
 				if (trace_hit_result.Actor != nullptr) {
-					if (trace_hit_result.Actor->IsA(AUWBBeacon::StaticClass())) {
+					if ((trace_hit_result.Actor->GetName().Len() >= 9) && (trace_hit_result.Actor->GetName().Left(9) == "uwbBeacon")){
+					//if (trace_hit_result.Actor->IsA(AUWBBeacon::StaticClass())) {
 						mtx.lock();
 						FString tmpName, tmpId;
 						//UAirBlueprintLib::LogMessageString("Calculating the name", "as BEACON", LogDebugLevel::Informational, 1);

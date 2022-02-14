@@ -403,6 +403,7 @@ struct MarLocUwbReturnMessage2 {
     vector<float> mura_tagX, mura_tagY, mura_tagZ;
     vector <vector<int>> mura_ranges;
 
+    Pose pose;
     MarLocUwbReturnMessage2()
     {}
 };
