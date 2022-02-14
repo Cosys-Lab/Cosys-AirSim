@@ -228,8 +228,11 @@ class VehicleClient:
     def getEchoData(self, echo_name = '', vehicle_name = ''):
         return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))
     
-    def getUWBData(self, echo_name = '', vehicle_name = ''):
-        return UwbData.from_msgpack(self.client.call('getUWBData', echo_name, vehicle_name))
+    def getUWBData(self, uwb_name = '', vehicle_name = ''):
+        return UwbData.from_msgpack(self.client.call('getUWBData', uwb_name, vehicle_name))
+    
+    def getUWBSensorData(self, uwb_name = '', vehicle_name = ''):
+        return UwbSensorData.from_msgpack(self.client.call('getUWBSensorData', uwb_name, vehicle_name))
 
     #----------- APIs to control ACharacter in scene ----------/
     def simCharSetFaceExpression(self, expression_name, value, character_name = ""):
