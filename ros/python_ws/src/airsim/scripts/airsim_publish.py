@@ -10,7 +10,7 @@ import sensor_msgs.point_cloud2 as pc2
 import tf2_ros
 from airsim.msg import StringArray
 from sensor_msgs.msg import PointCloud2, PointField, Imu
-from fm_msgs import Diagnostics, Range, RangeArray
+#from fm_msgs import Diagnostics, Range, RangeArray
 import rosbag
 import numpy as np
 import cv2
@@ -355,23 +355,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
         for sensor_index, sensor_name in enumerate(sensor_uwb_names):
             if (sensor_index == 0): # only once
                 uwb_data = client.getUWBData()
-                print("Aaaaaaaaaaaaaaaaaaaaaaaaaa")
                 print(uwb_data)
-
-                if lidar_data.time_stamp != last_timestamps[sensor_name]:
-                    if len(lidar_data.point_cloud) < 5:
-                        last_timestamps[sensor_name] = lidar_data.time_stamp
-                    else:
-                        last_timestamps[sensor_name] = lidar_data.time_stamp
-
-                        pcloud = PointCloud2()
-                        points = np.array(lidar_data.point_cloud, dtype=np.dtype('f4'))
-                        points = np.reshape(points, (int(points.shape[0] / 5), 5))
-                        pcloud.header.frame_id = sensor_gpulidar_frames[sensor_index]
-                        pcloud.header.stamp = timestamp
-                        pcloud = pc2.create_cloud(pcloud.header, fields_lidar, points.tolist())
-
-                        pointcloud_publishers[sensor_name].publish(pcloud)
                     
         for object_index, object_name in enumerate(object_names):
             if objects_coordinates_local[object_index] == 1:
