@@ -5,12 +5,12 @@ import airsimpy
 import rospy
 import time
 from std_msgs.msg import String, Header
-from geometry_msgs.msg import PoseStamped, TransformStamped
+from geometry_msgs.msg import PoseStamped, TransformStamped, Point
 import sensor_msgs.point_cloud2 as pc2
 import tf2_ros
 from airsim.msg import StringArray
 from sensor_msgs.msg import PointCloud2, PointField, Imu
-#from fm_msgs import Diagnostics, Range, RangeArray
+from uwb_msgs.msg import Diagnostics, Range, RangeArray
 import rosbag
 import numpy as np
 import cv2
@@ -133,6 +133,13 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
         pointcloud_publishers[sensor_name] = rospy.Publisher(sensor_gpulidar_topics[sensor_index], PointCloud2,
                                                              queue_size=2)
         last_timestamps[sensor_name] = None
+
+
+    if (len(sensor_uwb_names) > 0):                             #
+        uwb_diagnostics_publisher = rospy.Publisher(sensor_uwb_topics[0], Diagnostics, queue_size=10)
+        uwb_range_publisher = rospy.Publisher(sensor_uwb_topics[1], Range, queue_size=10)
+        uwb_rangeArray_publisher = rospy.Publisher(sensor_uwb_topics[2], RangeArray, queue_size=10)
+        
     for sensor_index, sensor_name in enumerate(sensor_camera_names):
         image_publishers[sensor_name + '_scene'] = rospy.Publisher(sensor_camera_scene_topics[sensor_index],
                                                                    Image, queue_size=2)
@@ -355,8 +362,54 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, sensor_imu_enab
         for sensor_index, sensor_name in enumerate(sensor_uwb_names):
             if (sensor_index == 0): # only once
                 uwb_data = client.getUWBData()
-                print(uwb_data)
+                #print(uwb_data)
+                # Sanity check
+                if len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorY) or \
+                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorZ) or \
+                len(uwb_data.mur_anchorX) != len(uwb_data.mur_distance) or \
+                len(uwb_data.mur_anchorX) != len(uwb_data.mur_rssi) or \
+                len(uwb_data.mur_anchorX) != len(uwb_data.mur_time_stamp) or \
+                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorId) or \
+                len(uwb_data.mur_anchorX) != len(uwb_data.mur_valid_range):
+                  rospy.logerr("UWB sensor mur lengths do not match")
+                  rospy.signal_shutdown('Packet error.')
+                  sys.exit()
+                if len(uwb_data.mura_ranges) != len(uwb_data.mura_tagId) or \
+                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagX) or \
+                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagY) or \
+                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagZ):
+                  rospy.logerr("UWB sensor mur lengths do not match")
+                  rospy.signal_shutdown('Packet error.')
+                  sys.exit()
+
+                allRanges =[]
+                for i_mur in range(0, len(uwb_data.mur_anchorX)):
+                    diag = Diagnostics()
+                    diag.rssi = uwb_data.mur_rssi[i_mur]
+
+                    uwb_diagnostics_publisher.publish(diag)
+
+                    rang = Range()
+                    rang.stamp = timestamp
+                    rang.anchorid = str(uwb_data.mur_anchorId[i_mur])
+                    rang.anchor_position = Point(uwb_data.mur_anchorX[i_mur], uwb_data.mur_anchorY[i_mur], uwb_data.mur_anchorZ[i_mur])
+                    rang.valid_range = uwb_data.mur_valid_range[i_mur]
+                    rang.distance = -1 # TODO
+                    rang.diagnostics = diag
+                    uwb_range_publisher.publish(rang)
+
+                    allRanges.append(rang)
                     
+                for i_mura in range(0, len(uwb_data.mura_ranges)):
+                    rangeArray = RangeArray()
+                    rangeArray.tagid = str(uwb_data.mura_tagId[i_mura])
+                    rangeArray.tag_position = Point(uwb_data.mura_tagX[i_mura], uwb_data.mura_tagY[i_mura], uwb_data.mura_tagZ[i_mura])
+                    for i_range in range(0, len(uwb_data.mura_ranges[i_mura])):
+                        rangeArray.ranges.append(allRanges[i_range])
+                    #rangeArray.ranges = uwb_data.mura_ranges[i_mura]
+                    #
+                    uwb_rangeArray_publisher.publish(rangeArray)
+
         for object_index, object_name in enumerate(object_names):
             if objects_coordinates_local[object_index] == 1:
                 pose = client.simGetObjectPose(object_name, True)
