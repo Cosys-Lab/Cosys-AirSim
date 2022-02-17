@@ -777,7 +777,7 @@ public:
             mur_rssi = s.mur_rssi;
             mura_tagId = s.mura_tagId;
             mura_tagX = s.mura_tagX;
-            mura_tagY = s.mura_tagX;
+            mura_tagY = s.mura_tagY;
             mura_tagZ = s.mura_tagZ;
             mura_ranges = s.mura_ranges;
             //marLocUwbRange = s.marLocUwbRange;
