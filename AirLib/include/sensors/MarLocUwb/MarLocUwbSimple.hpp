@@ -122,7 +122,7 @@ private:
 		}
 
 		std::vector<float> beaconsActiveRSSI;
-		std::vector<int> beaconsActiveID;
+		std::vector<std::string> beaconsActiveID;
 		std::vector<float> beaconsActivePosX;
 		std::vector<float> beaconsActivePosY;
 		std::vector<float> beaconsActivePosZ;

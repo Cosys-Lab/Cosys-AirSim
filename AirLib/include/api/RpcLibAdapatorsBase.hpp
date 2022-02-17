@@ -614,10 +614,8 @@ public:
         msr::airlib::TTimePoint time_stamp;    // timestamp
         //std::vector<float> point_cloud;        // data
         Pose pose;
-        std::vector<int> beaconsActiveID;
-        std::vector<float> beaconsActiveRssi;
-
-        MSGPACK_DEFINE(time_stamp, pose, beaconsActiveID, beaconsActiveRssi);
+        
+        MSGPACK_DEFINE(time_stamp, pose);
 
         MarLocUwbSensorData()
         {}
@@ -627,8 +625,7 @@ public:
             time_stamp = s.time_stamp;
 
             pose = s.pose;
-            beaconsActiveID = s.beaconsActiveID;
-            beaconsActiveRssi = s.beaconsActiveRssi;
+            
         }
 
         msr::airlib::MarLocUwbSensorData to() const
@@ -638,9 +635,7 @@ public:
             d.time_stamp = time_stamp;
             //d.point_cloud = point_cloud;
             d.pose = pose.to();
-            d.beaconsActiveID = beaconsActiveID;
-            d.beaconsActiveRssi = beaconsActiveRssi;
-
+            
             return d;
         }
     };
@@ -759,13 +754,13 @@ public:
         std::vector<float> mur_rssi;
 
         //MarLocUwbRangeArray
-        std::vector<int> mura_tagId;
+        std::vector<std::string> mura_tagId;
         std::vector<float> mura_tagX, mura_tagY, mura_tagZ;
         std::vector <std::vector<int>> mura_ranges;
 
-        Pose pose;
+        //std::vector<Pose> pose;
 
-        MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorX, mur_anchorY, mur_anchorZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagX, mura_tagY, mura_tagZ, mura_ranges, pose);
+        MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorX, mur_anchorY, mur_anchorZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagX, mura_tagY, mura_tagZ, mura_ranges);
 
         MarLocUwbReturnMessage2()
         {}
@@ -788,7 +783,7 @@ public:
             //marLocUwbRange = s.marLocUwbRange;
             //marLocUwbRangeArray = s.marLocUwbRangeArray;
 
-            pose = s.pose;
+            //pose = s.pose;
         }
 
         msr::airlib::MarLocUwbReturnMessage2 to() const
@@ -805,12 +800,12 @@ public:
             d.mur_rssi = mur_rssi;
             d.mura_tagId = mura_tagId;
             d.mura_tagX = mura_tagX;
-            d.mura_tagY = mura_tagX;
+            d.mura_tagY = mura_tagY;
             d.mura_tagZ = mura_tagZ;
             d.mura_ranges = mura_ranges;
             //d.marLocUwbRange = marLocUwbRange;
             //d.marLocUwbRangeArray = marLocUwbRangeArray;
-            d.pose = pose.to();
+            //d.pose = pose;
             return d;
         }
     };

@@ -251,84 +251,112 @@ public:
         sensor->setInput(input);
     }
 
-    virtual MarLocUwbReturnMessage2 getMarLocUWBSensorData(const std::string& sensor_name) const
+    virtual MarLocUwbSensorData getUWBSensorData(const std::string& sensor_name) const
     {
-        MarLocUwbReturnMessage2 toReturn;                       // The entire DB (ranges and rangeArrays)
-        const MarLocUwbBase* sensor = nullptr;                 // The used sensor
-        vector<MarLocUwbRange> uwbRanges;                      // A list of the ranges (incl diagnostics)
-        vector<MarLocUwbRangeArray> uwbRangesArray;            // A list of the range arrays
-        vector<int> processedRangeArrays;                      // A list of all RangeArray (= tags) PK's we already have
-        vector<int> processedAnchorIDs;                        // A list of all anchor ID's already processed
+        const MarLocUwbBase* sensor = nullptr;
 
-        // Find echo with the given name (for empty input name, return the first one found)
-        // Not efficient but should suffice given small number of echos
+        // Find uwb with the given name (for empty input name, return the first one found)
+        // Not efficient but should suffice given small number of uwbs
         uint uwb_sensor_count = getSensors().size(SensorBase::SensorType::MarlocUwb);
-
-        //vector<MarLocUwbSensorData> toReturn;
         for (uint i = 0; i < uwb_sensor_count; i++)
         {
             const MarLocUwbBase* current_sensor = static_cast<const MarLocUwbBase*>(getSensors().getByType(SensorBase::SensorType::MarlocUwb, i));
-            //throw VehicleControllerException(current_sensor->getName().substr(0, 9));
-            if (current_sensor != nullptr && (current_sensor->getName().substr(0, 9) == sensor_name || sensor_name == ""))
+            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
             {
                 sensor = current_sensor;
-                MarLocUwbSensorData outPut = sensor->getOutput();
+                break;
+            }
+        }
+        if (sensor == nullptr)
+            throw VehicleControllerException(Utils::stringf("No uwb sensor with name %s exist on vehicle", sensor_name.c_str()));
 
-                toReturn.pose = outPut.pose;
+        return sensor->getOutput();
+    }
 
-                for (int itId = 0; itId < outPut.beaconsActiveID.size(); itId++) {
+    virtual MarLocUwbReturnMessage2 getUWBData(const std::string& sensor_name) const
+    {
+        MarLocUwbReturnMessage2 toReturn;                      // The entire DB (ranges and rangeArrays)
+        const MarLocUwbBase* sensor = nullptr;                 // The used sensor
+        vector<MarLocUwbRangeArray> uwbRangesArray;            // A list of the range arrays
+        vector<std::string> processedRangeArrays;              // A list of all RangeArray PK's we already have 
+                                                               // The PK of a range array is the tag/beacon ID
+        vector<MarLocUwbRange> uwbRanges;                      // A list of the ranges (incl diagnostics)
+        //vector<int> processedAnchorIDs;                        // A list of all anchors PK's already processed
+                                                               // The PK of a range is a combination of the tag/beacon ID and the anchor/sensor ID
+
+
+        uint uwb_sensor_count = getSensors().size(SensorBase::SensorType::MarlocUwb);
+
+        int RangeNumber = 0;
+
+        for (uint i = 0; i < uwb_sensor_count; i++)            // For all uwb sensors
+        {                                                      // Get current sensor
+            const MarLocUwbBase* current_sensor = static_cast<const MarLocUwbBase*>(getSensors().getByType(SensorBase::SensorType::MarlocUwb, i));
+            if (current_sensor != nullptr && (current_sensor->getName().substr(0, 9) == sensor_name || sensor_name == "")) // If current sensor matches
+            {
+                sensor = current_sensor;
+                MarLocUwbSensorData output = sensor->getOutput(); // Get sensor output
+
+                // Create a new range for all beacon/tag hits in the current sensor/anchor output
+                for (int itId = 0; itId < output.beaconsActiveID.size(); itId++) { 
                     MarLocUwbRange newRange;
-                    newRange.time_stamp = outPut.time_stamp;
+                    newRange.time_stamp = output.time_stamp;
                     newRange.anchorId = sensor->getID();
-                    newRange.anchorX = outPut.pose.position[0];
-                    newRange.anchorY = outPut.pose.position[1];
-                    newRange.anchorZ = outPut.pose.position[2];
+                    newRange.tagId = output.beaconsActiveID[itId];
+                    newRange.anchorX = output.pose.position[0];
+                    newRange.anchorY = output.pose.position[1];
+                    newRange.anchorZ = output.pose.position[2];
                     newRange.valid_range = 1;
                     newRange.distance = 6;
-                    newRange.rssi = outPut.beaconsActiveRssi[itId];
-                    
-
+                    newRange.rssi = output.beaconsActiveRssi[itId];
                     
                     // Test if this ID already exists in the ranges
-                    std::vector<int>::iterator it;
-                    it = find(processedAnchorIDs.begin(), processedAnchorIDs.end(), newRange.anchorId);
-                    
-                    if (it != processedAnchorIDs.end()) {// It exists
-                        int index = it - processedAnchorIDs.begin();
-
-                        if (newRange.rssi > uwbRanges[index].rssi) {
-                            uwbRanges[index].rssi = newRange.rssi;
+                    // If it does not yet exist, add it
+                    // if it does exist, keep the highest rssi
+                    bool rangeExists = 0;
+                    for (auto& uwbRange : uwbRanges) {
+                        // Match PK (anchorID + tagID)
+                        if (uwbRange.anchorId == newRange.anchorId && uwbRange.tagId == newRange.tagId) { // it exists
+                            if (newRange.rssi < uwbRange.rssi) {
+                                uwbRange.rssi = newRange.rssi;
+                            }
+                            rangeExists = 1;
                         }
-                    } else { // does not yet exist
+                    }
+                    if (!rangeExists) {// it does not yet exist
                         uwbRanges.push_back(newRange);
-                        processedAnchorIDs.push_back(newRange.anchorId);
-                    }
+                        RangeNumber++;
 
-                    if (count(processedRangeArrays.begin(), processedRangeArrays.end(), outPut.beaconsActiveID[itId]) == 0) { // If this beacon (tag) is not in the list
-                        // Create a new entry in the rangeArray list
-                        processedRangeArrays.push_back(outPut.beaconsActiveID[itId]);
-                        MarLocUwbRangeArray newUwbRangesArray;
+                        // Test if a rangeArray for this beacon/tag already exists
+                        if (count(processedRangeArrays.begin(), processedRangeArrays.end(), output.beaconsActiveID[itId]) == 0) { // If this beacon (tag) is not in the list
+                            processedRangeArrays.push_back(output.beaconsActiveID[itId]); // Create a new entry in the rangeArray list
+                            MarLocUwbRangeArray newUwbRangesArray;
 
-                        newUwbRangesArray.tagId = outPut.beaconsActiveID[itId];
-                        newUwbRangesArray.tagX = outPut.beaconsActivePosX[itId];
-                        newUwbRangesArray.tagY = outPut.beaconsActivePosY[itId];
-                        newUwbRangesArray.tagZ = outPut.beaconsActivePosZ[itId];
+                            newUwbRangesArray.tagId = output.beaconsActiveID[itId];
+                            newUwbRangesArray.tagX = output.beaconsActivePosX[itId];
+                            newUwbRangesArray.tagY = output.beaconsActivePosY[itId];
+                            newUwbRangesArray.tagZ = output.beaconsActivePosZ[itId];
 
-                        uwbRangesArray.push_back(newUwbRangesArray);
-                    } 
+                            uwbRangesArray.push_back(newUwbRangesArray);
+                        }
 
-                    //Add this range to the rangeArray
-                    for (auto& rangeArray : uwbRangesArray) {
-                        if (rangeArray.tagId == outPut.beaconsActiveID[itId]) {
-                            rangeArray.ranges.push_back(newRange.anchorId);
+                        //Add this range to the rangeArray[ranges]
+                        for (auto& rangeArray : uwbRangesArray) {  // For all rangeArrays
+                            if (rangeArray.tagId == output.beaconsActiveID[itId]) { // If beacon/tag matches
+                                rangeArray.ranges.push_back(RangeNumber); // 
+                                //rangeArray.ranges.push_back(newRange.anchorId);
+                                //for (auto& range : uwbRanges) {
+                                //    if 
+                                //}
+                                // don't push the id but the index
+                            }
                         }
                     }
-
                 }
             }
         }
         if (sensor == nullptr)
-            throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", sensor_name.c_str()));
+            throw VehicleControllerException(Utils::stringf("No sensor with name %s exist on vehicle", sensor_name.c_str()));
 
 
         for (std::vector<MarLocUwbRange>::iterator it = uwbRanges.begin(); it != uwbRanges.end(); ++it) {

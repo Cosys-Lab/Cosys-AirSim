@@ -338,7 +338,7 @@ struct SensorTemplateData {
 
 struct UWBHit
 {
-    int beaconID;
+    std::string beaconID;
     int rssi;
     float beaconPosX;
     float beaconPosY;
@@ -350,7 +350,7 @@ struct MarLocUwbSensorData {
     TTimePoint time_stamp = 0;
     //vector<real_T> point_cloud;
     Pose pose;
-    vector<int> beaconsActiveID;
+    vector<std::string> beaconsActiveID;
     vector<float> beaconsActiveRssi;
     vector<float> beaconsActivePosX;
     vector<float> beaconsActivePosY;
@@ -363,6 +363,7 @@ struct MarLocUwbSensorData {
 struct MarLocUwbRange {
     TTimePoint time_stamp = 0;
     int anchorId;
+    std::string tagId;
     float anchorX, anchorY, anchorZ;
     bool valid_range;
     float distance;
@@ -373,7 +374,7 @@ struct MarLocUwbRange {
 };
 
 struct MarLocUwbRangeArray {
-    int tagId;
+    std::string tagId;
     float tagX, tagY, tagZ;
     vector<int> ranges;
 
@@ -399,11 +400,10 @@ struct MarLocUwbReturnMessage2 {
     vector<float> mur_rssi;
     
     //MarLocUwbRangeArray
-    vector<int> mura_tagId;
+    vector<std::string> mura_tagId;
     vector<float> mura_tagX, mura_tagY, mura_tagZ;
     vector <vector<int>> mura_ranges;
 
-    Pose pose;
     MarLocUwbReturnMessage2()
     {}
 };
