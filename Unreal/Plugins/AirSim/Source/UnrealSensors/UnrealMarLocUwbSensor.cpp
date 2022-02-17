@@ -115,7 +115,7 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 		beaconsActive_.RemoveAt(0);
 	}
 	// Create new log record for newest UWB measurements
-	TArray<UWBHit> UWBHitLog;
+	TArray<msr::airlib::UWBHit> UWBHitLog;
 
 	//FVector lineEnd = uwbTraceMaxDistances[direction_count] * FVector(sample_direction[0], sample_direction[1], sample_direction[2]);
 	//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
@@ -139,13 +139,6 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 
 		// Trace ray, bounce and add to hitlog if beacon was hit
 		traceDirection(sensorBase_global, lineEnd, &UWBHitLog, 0, 0, 1, 0);
-		//int traceDir = 0;
-		//if (direction_count <= 10) {
-		//traceDir = traceDirection(sensorBase_global, lineEnd, &UWBHitLog, 0, 0, 1, 0);
-			/*if (traceDir) {
-				UAirBlueprintLib::LogMessageString("Drawing ", "a line", LogDebugLevel::Informational);
-			}*/
-		//}
 	//});
 	}
 	//actor_->GetWorld()->GetPhysicsScene()->GetPxScene()->unlockRead();
@@ -200,7 +193,7 @@ void UnrealMarLocUwbSensor::sampleSphereCap(int num_points, float opening_angle)
 	}
 }
 
-int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<UWBHit> *UWBHitLog, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug) {
+int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::UWBHit> *UWBHitLog, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug) {
 	FHitResult trace_hit_result;
 	bool trace_hit;
 	TArray<AActor*> ignore_actors_;
@@ -229,17 +222,28 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 
 				// If beacon was hit
 				if (trace_hit_result.Actor != nullptr) {
-					if ((trace_hit_result.Actor->GetName().Len() >= 9) && (trace_hit_result.Actor->GetName().Left(9) == "uwbBeacon")){
-					//if (trace_hit_result.Actor->IsA(AUWBBeacon::StaticClass())) {
+					if ((trace_hit_result.Actor->GetName().Len() >= 9) && (trace_hit_result.Actor->GetName().Left(9) == "uwbBeacon")) {
+						//if (trace_hit_result.Actor->IsA(AUWBBeacon::StaticClass())) {
 						mtx.lock();
-						FString tmpName, tmpId;
+						auto hitActor = trace_hit_result.GetActor();
+						//FString tmpName, tmpId;
+						//FString tmpName;
 						//UAirBlueprintLib::LogMessageString("Calculating the name", "as BEACON", LogDebugLevel::Informational, 1);
 
 						//std::string aaa (TCHAR_TO_UTF8(*trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId)));
-						trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId);
+						//trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId);
+						//tmpName = trace_hit_result.Actor->GetFName().ToString();
 						int tmpRssi = (int)traceRayCurrentSignalStrength;
 						FVector beaconPos = trace_hit_result.Actor->GetActorLocation();
-						UWBHit thisHit = { FCString::Atoi(*tmpId),  tmpRssi, beaconPos[0], beaconPos[1] , beaconPos[2] };
+						//UWBHit thisHit = { FCString::Atoi(*tmpId),  tmpRssi, beaconPos[0], beaconPos[1] , beaconPos[2] };
+						msr::airlib::UWBHit thisHit;
+						
+						thisHit.beaconID = TCHAR_TO_UTF8(*hitActor->GetName());
+						
+						thisHit.rssi = tmpRssi;
+						thisHit.beaconPosX = beaconPos[0];
+						thisHit.beaconPosY = beaconPos[1];
+						thisHit.beaconPosZ = beaconPos[2];
 						UWBHitLog->Add(thisHit);
 						mtx.unlock();
 					}
@@ -249,117 +253,7 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 					DrawDebugLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
 				}
 
-				/*if (isnan(traceRayCurrentDistance)) {
-					traceRayCurrentDistance = -1;
-				}
-				if (isnan(traceRayCurrentbounces)) {
-					traceRayCurrentbounces = -1;
-				}
-				if (isnan(traceRayCurrentSignalStrength)) {
-					traceRayCurrentbounces = -1;
-				}*/
-					
-				/*try {
-					UAirBlueprintLib::LogMessageString("Calculating the current distance", std::to_string(traceRayCurrentDistance), LogDebugLevel::Informational);
-					UAirBlueprintLib::LogMessageString("Calculating the current bounces", std::to_string(traceRayCurrentbounces), LogDebugLevel::Informational);
-					UAirBlueprintLib::LogMessageString("Calculating the current signal strength", std::to_string(traceRayCurrentSignalStrength), LogDebugLevel::Informational);
-				}
-				catch (const std::exception& e) {
-					UAirBlueprintLib::LogMessageString("Calculating the current distance", (e.what()), LogDebugLevel::Informational);
-				}*/
-
-				return(traceDirection(trace_start_position, trace_end_position, UWBHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug));
-
-				/*if (drawDebug) {
-					DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_end_position, FColor::Green, false, 0.1);
-				}*/
-
-	//			FVector sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
-	//			float distance_to_sensor = FVector::Distance(trace_hit_result.ImpactPoint, sensor_position);
-	//			FVector direction_to_sensor = sensor_position - trace_hit_result.ImpactPoint;
-	//			float receiving_angle = angleBetweenVectors(direction_to_sensor, trace_direction);
-
-	//			received_attenuation = signal_attenuation + getFreeSpaceLoss(total_distance, ned_transform_->toNed(distance_to_sensor)) + (ned_transform_->toNed(distance_to_sensor) * attenuation_atmospheric_);
-	//			 Stop if signal can't travel far enough to return (distance or attenuation)
-	//			/*if (distance_to_sensor > trace_length || received_attenuation < attenuation_limit_) {
-	//				return;
-	//			}*/
-
-	//			if (sensor_params_.draw_reflected_paths) trace_path.Emplace(trace_hit_result.ImpactPoint);
-
-	//			 If impact point is in near field, register as reflection
-	//			/*bool reflectionInNearField = (distance_to_sensor <= near_field_ && reflection_count > 0);
-	//			bool reflectionFromVehicle = (trace_hit_result.Actor.Get()->GetName().Compare(FString(TEXT("airsimvehicle"))) == 0);  // Compare returns 0 if match
-	//			if (reflectionInNearField && !reflectionFromVehicle)
-	//			{
-	//				echo_received = true;
-
-	//				 DRAW DEBUG
-	//				/*if (sensor_params_.draw_near_field_reflections) {
-	//					point_cloud_mutex_.Lock();
-	//					DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Purple, false, draw_time_);
-	//					point_cloud_mutex_.Unlock();
-	//				}
-	//			}
-	//			else */
-	//			/*if (receiving_angle < reflection_opening_angle_)  // Check if sensor lies in opening angle
-	//			{
-	//				hit_result_temp = FHitResult(ForceInit);
-	//				trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_hit_result.ImpactPoint, sensor_position, hit_result_temp, ignore_actors_, ECC_Visibility, true);
-	//				if (trace_hit) {  // Hit = no clear LoS to sensor
-	//					continue;
-	//				}
-
-	//				echo_received = true;
-
-	//				 DRAW DEBUG
-	//				/*if (sensor_params_.draw_reflected_points) {
-	//					point_cloud_mutex_.Lock();
-	//					DrawDebugPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Red, false, draw_time_);
-	//					point_cloud_mutex_.Unlock();
-	//				}*/
-	//				/*if (sensor_params_.draw_reflected_paths) {
-	//					point_cloud_mutex_.Lock();
-	//					DrawDebugLine(actor_->GetWorld(), sensor_position, trace_path[0], FColor::Red, false, draw_time_, 0, line_thinkness_);
-	//					for (int trace_count = 0; trace_count < trace_path.Num() - 1; trace_count++)
-	//					{
-	//						DrawDebugLine(actor_->GetWorld(), trace_path[trace_count], trace_path[trace_count + 1], FColor::Red, false, draw_time_, 0, line_thinkness_);
-	//					}
-	//					DrawDebugLine(actor_->GetWorld(), trace_path.Last(), sensor_position, FColor::Red, false, draw_time_, 0, line_thinkness_);
-	//					point_cloud_mutex_.Unlock();
-	//				}*/
-	//				/*if (sensor_params_.draw_reflected_lines) {
-	//					point_cloud_mutex_.Lock();
-	//					FVector draw_location = trace_hit_result.ImpactPoint + trace_direction * distance_to_sensor;
-
-	//					DrawDebugLine(actor_->GetWorld(), trace_hit_result.ImpactPoint, draw_location, FColor::Red, false, draw_time_, 0, line_thinkness_);
-	//					DrawDebugPoint(actor_->GetWorld(), draw_location, 5, FColor::Red, false, draw_time_);
-
-	//					float radius = distance_to_sensor * FMath::Tan(reflection_opening_angle_);
-	//					VectorMath::Quaternionf trace_rotation_quat = VectorMath::toQuaternion(VectorMath::front(), ned_transform_->toVector3r(trace_direction, 1.0f, true));
-	//					Vector3r y_axis = VectorMath::rotateVector(VectorMath::right(), trace_rotation_quat, true);
-	//					Vector3r z_axis = VectorMath::rotateVector(VectorMath::down(), trace_rotation_quat, true);
-	//					DrawDebugCircle(actor_->GetWorld(), draw_location, radius, 128, FColor::Blue, false, draw_time_, 0u, 1.0f, ned_transform_->toFVector(y_axis, 1.0f, true), ned_transform_->toFVector(z_axis, 1.0f, true), false);
-	//					point_cloud_mutex_.Unlock();
-	//				}
-	//			}*/
-	//		}
-	//	}
-
-	//	/*if (echo_received)
-	//	{
-	//		Vector3r point_sensor_frame = ned_transform_->toLocalNed(trace_hit_result.ImpactPoint);
-	//		point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
-
-	//		/*point_cloud_mutex_.Lock();
-	//		point_cloud.emplace_back(point_sensor_frame.x());
-	//		point_cloud.emplace_back(point_sensor_frame.y());
-	//		point_cloud.emplace_back(point_sensor_frame.z());
-	//		point_cloud.emplace_back(received_attenuation);
-	//		point_cloud.emplace_back(total_distance);
-	//		point_cloud_mutex_.Unlock();
-	//	}*/
-	//}
+				return(traceDirection(trace_start_position, trace_end_position, UWBHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug));		
 			}
 		}
 	}
