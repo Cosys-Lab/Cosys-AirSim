@@ -1,4 +1,28 @@
 <launch>
+
+      <arg name="rate" default="10"/>
+      <arg name="ip" default="" />
+
+      <arg name="toggle_drone" default="0" />
+
+      <arg name="vehicle_name" default="airsimvehicle" />
+      <arg name="vehicle_base_frame" default="base_link" />
+
+      <arg name="pose_topic" default="airsim/gtpose" />
+      <arg name="pose_frame" default="world" />
+      <arg name="tf_localisation_enable" default="1" />
+
+      <arg name="carcontrol_enable" default="0" />
+      <arg name="carcontrol_topic" default="/airsim/carcontrol" />
+
+      <arg name="odometry_enable" default="1" />
+      <arg name="odometry_topic" default="airsim/odom" />
+
+      <arg name="sensor_imu_enable" default="1" />
+      <arg name="sensor_imu_name" default="imu" />
+      <arg name="sensor_imu_topic" default="airsim/imu" />
+      <arg name="sensor_imu_frame" default="world" />
+
       <arg name="sensor_echo_names" default="[echo1]"/>
       <arg name="sensor_echo_topics" default="[airsim/echo1/pointcloud]"/>
       <arg name="sensor_echo_frames" default="[base_echo1]"/>
@@ -14,7 +38,7 @@
       <arg name="sensor_gpulidar_frames" default="[base_lidar2]"/>
 
       <arg name="sensor_uwb_names" default="[]"/>
-      <arg name="sensor_uwb_topics" default="[airsim/uwb1/pointcloud, airsim/uwb2/pointcloud]"/>
+      <arg name="sensor_uwb_topics" default="[airsim/uwbX/diagnostics, airsim/uwbX/range, airsim/uwbX/rangeArray]"/>
       <arg name="sensor_uwb_frames" default="[base_uwb1, base_uwb2]"/>
 
       <arg name="sensor_camera_names" default="[leftcamera, rightcamera]"/>
@@ -26,6 +50,11 @@
       <arg name="sensor_camera_segmentation_topics" default="[airsim/leftcamera/segmentation/image, airsim/rightcamera/segmentation/image]"/>
       <arg name="sensor_camera_depth_topics" default="[airsim/leftcamera/depth/image, airsim/rightcamera/depth/image]"/>
       <arg name="sensor_camera_frames" default="[base_leftcamera, base_rightcamera]"/>
+      <arg name="sensor_camera_optical_frames" default="[leftcamera_optical_link, rightcamera_optical_link]"/>
+      <arg name="sensor_camera_toggle_camera_info" default="[1, 1]"/>
+      <arg name="sensor_camera_info_topics" default="[airsim/leftcamera/rgb/camera_info, airsim/rightcamera/rgb/camera_info]"/>
+      <arg name="sensor_stereo_enable" default="1"/>
+
 
       <arg name="object_names" default="[object_name]"/>
       <arg name="objects_coordinates_local" default="[1]"/>
@@ -33,22 +62,29 @@
 
       <node name="airsim_publish" pkg="airsim" type="airsim_publish.py" respawn="false" output="screen">
 
-            <param name="rate" type="int" value="10"/>
+            <rosparam param="rate" subst_value="True">$(arg rate)</rosparam>
 
-            <param name="ip" type="string" value="" />
+            <param name="ip" type="string" value="$(arg ip)" />
 
-            <param name="toggle_drone" type="int" value="0" />
+            <rosparam param="toggle_drone" subst_value="True">$(arg toggle_drone)</rosparam>
 
-            <param name="vehicle_name" type="string" value="airsimvehicle" />
-            <param name="vehicle_base_frame" type="string" value="base_link" />
+            <rosparam param="vehicle_name" subst_value="True">$(arg vehicle_name)</rosparam>
+            <rosparam param="vehicle_base_frame" subst_value="True">$(arg vehicle_base_frame)</rosparam>            
 
-            <param name="pose_topic" type="string" value="airsim/gtpose" />
-            <param name="pose_frame" type="string" value="world" />
+            <rosparam param="pose_topic" subst_value="True">$(arg pose_topic)</rosparam>
+            <rosparam param="pose_frame" subst_value="True">$(arg pose_frame)</rosparam>
+            <rosparam param="tf_localisation_enable" subst_value="True">$(arg tf_localisation_enable)</rosparam>
 
-            <param name="sensor_imu_enable" type="int" value="1" />
-            <param name="sensor_imu_name" type="string" value="imu" />
-            <param name="sensor_imu_topic" type="string" value="airsim/imu" />
-            <param name="sensor_imu_frame" type="string" value="world" />
+            <rosparam param="carcontrol_enable" subst_value="True">$(arg carcontrol_enable)</rosparam>
+            <rosparam param="carcontrol_topic" subst_value="True">$(arg carcontrol_topic)</rosparam>
+
+            <rosparam param="odometry_enable" subst_value="True">$(arg odometry_enable)</rosparam>
+            <rosparam param="odometry_topic" subst_value="True">$(arg odometry_topic)</rosparam>
+
+            <rosparam param="sensor_imu_enable" subst_value="True">$(arg sensor_imu_enable)</rosparam>
+            <rosparam param="sensor_imu_name" subst_value="True">$(arg sensor_imu_name)</rosparam>
+            <rosparam param="sensor_imu_topic" subst_value="True">$(arg sensor_imu_topic)</rosparam> 
+            <rosparam param="sensor_imu_frame" subst_value="True">$(arg sensor_imu_frame)</rosparam>            
 
             <rosparam param="sensor_echo_names" subst_value="True">$(arg sensor_echo_names)</rosparam>
             <rosparam param="sensor_echo_topics" subst_value="True">$(arg sensor_echo_topics)</rosparam>
@@ -77,6 +113,10 @@
             <rosparam param="sensor_camera_segmentation_topics" subst_value="True">$(arg sensor_camera_segmentation_topics)</rosparam>
             <rosparam param="sensor_camera_depth_topics" subst_value="True">$(arg sensor_camera_depth_topics)</rosparam>
             <rosparam param="sensor_camera_frames" subst_value="True">$(arg sensor_camera_frames)</rosparam>
+            <rosparam param="sensor_camera_optical_frames" subst_value="True">$(arg sensor_camera_optical_frames)</rosparam>
+            <rosparam param="sensor_camera_toggle_camera_info" subst_value="True">$(arg sensor_camera_toggle_camera_info)</rosparam>
+            <rosparam param="sensor_camera_info_topics" subst_value="True">$(arg sensor_camera_info_topics)</rosparam>
+            <rosparam param="sensor_stereo_enable" subst_value="True">$(arg sensor_stereo_enable)</rosparam>
 
             <rosparam param="object_names" subst_value="True">$(arg object_names)</rosparam>
             <rosparam param="objects_coordinates_local" subst_value="True">$(arg objects_coordinates_local)</rosparam>
