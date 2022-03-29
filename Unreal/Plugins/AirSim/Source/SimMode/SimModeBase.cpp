@@ -25,6 +25,7 @@
 #include "Beacons/TemplateBeacon.h"
 #include "Beacons/FiducialBeacon.h"
 #include "Beacons/UWBBeacon.h"
+#include "Beacons/WifiBeacon.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -638,6 +639,9 @@ void ASimModeBase::setupVehiclesAndCamera()
                 }
                 else if (beacon_setting.beacon_type.compare("uwbbeacon") == 0) {
                     AUWBBeacon* spawned_beacon = static_cast<AUWBBeacon*>(GetWorld()->SpawnActor<AUWBBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
+                }
+                else if (beacon_setting.beacon_type.compare("wifibeacon") == 0) {
+                    AWifiBeacon* spawned_beacon = static_cast<AWifiBeacon*>(GetWorld()->SpawnActor<AWifiBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
                 }
                 else {
                     ATemplateBeacon* spawned_beacon = static_cast<ATemplateBeacon*>(GetWorld()->SpawnActor<ATemplateBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));

@@ -1,19 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-#ifndef msr_airlib_MarLocUwbBase_hpp
-#define msr_airlib_MarLocUwbBase_hpp
+#ifndef msr_airlib_WifiBase_hpp
+#define msr_airlib_WifiBase_hpp
 
 #include "sensors/SensorBase.hpp"
 
 namespace msr { namespace airlib {
 
-class MarLocUwbBase : public SensorBase {
+class WifiBase : public SensorBase {
 public:
-	/*MarLocUwbBase(const std::string& sensor_name = "", const std::string& attach_link = "")
-        : SensorBase(sensor_name, attach_link)
-    {}*/
-    MarLocUwbBase(const std::string& sensor_name = "")
+    WifiBase(const std::string& sensor_name = "")
         : SensorBase(sensor_name){
         if (sensor_name.find("_") != std::string::npos) {
             id_ = stoi(sensor_name.substr(sensor_name.find_last_of("_") + 1));
@@ -44,10 +41,10 @@ public:
         //call base
         UpdatableObject::reportState(reporter);
 
-        reporter.writeValue("MarLocUwbSensor-Timestamp", output_.time_stamp);
+        reporter.writeValue("WifiSensor-Timestamp", output_.time_stamp);
     }
 
-	const MarLocUwbSensorData& getOutput() const
+	const WifiSensorData& getOutput() const
 	{
 		return output_;
 	}
@@ -57,26 +54,26 @@ public:
         return id_;
     }
 
-	const MarLocUwbSensorData& getInput() const
+	const WifiSensorData& getInput() const
 	{
 		return input_;
 	}
 
-	void setInput(const MarLocUwbSensorData& input) const
+	void setInput(const WifiSensorData& input) const
 	{
 		input_ = input;
 	}
 
 protected:
-    void setOutput(const MarLocUwbSensorData& output)
+    void setOutput(const WifiSensorData& output)
     {
         output_ = output;
     }
 
 private:
-	MarLocUwbSensorData output_;
+	WifiSensorData output_;
     int id_;
-	mutable MarLocUwbSensorData input_;
+	mutable WifiSensorData input_;
 };
 
 }} //namespace

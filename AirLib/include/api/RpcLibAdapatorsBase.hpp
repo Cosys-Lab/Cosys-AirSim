@@ -810,6 +810,100 @@ public:
         }
     };
 
+    struct WifiSensorData {
+
+        msr::airlib::TTimePoint time_stamp;    // timestamp
+        //std::vector<float> point_cloud;        // data
+        Pose pose;
+
+        MSGPACK_DEFINE(time_stamp, pose);
+
+        WifiSensorData()
+        {}
+
+        WifiSensorData(const msr::airlib::WifiSensorData& s)
+        {
+            time_stamp = s.time_stamp;
+
+            pose = s.pose;
+
+        }
+
+        msr::airlib::WifiSensorData to() const
+        {
+            msr::airlib::WifiSensorData d;
+
+            d.time_stamp = time_stamp;
+            //d.point_cloud = point_cloud;
+            d.pose = pose.to();
+
+            return d;
+        }
+    };
+
+    struct WifiReturnMessage2 {
+        //MarLocUwbRange
+        std::vector <uint64_t> wr_time_stamp;
+        std::vector<int> wr_anchorId;
+        std::vector<float> wr_anchorX, wr_anchorY, wr_anchorZ;
+        std::vector<bool> wr_valid_range;
+        std::vector<float> wr_distance;
+        std::vector<float> wr_rssi;
+
+        //MarLocUwbRangeArray
+        std::vector<std::string> wra_tagId;
+        std::vector<float> wra_tagX, wra_tagY, wra_tagZ;
+        std::vector <std::vector<int>> wra_ranges;
+
+        //std::vector<Pose> pose;
+
+        MSGPACK_DEFINE_MAP(wr_time_stamp, wr_anchorId, wr_anchorX, wr_anchorY, wr_anchorZ, wr_valid_range, wr_distance, wr_rssi, wra_tagId, wra_tagX, wra_tagY, wra_tagZ, wra_ranges);
+
+        WifiReturnMessage2()
+        {}
+
+        WifiReturnMessage2(const msr::airlib::WifiReturnMessage2& s)
+        {
+            wr_time_stamp = s.wr_time_stamp;
+            wr_anchorId = s.wr_anchorId;
+            wr_anchorX = s.wr_anchorX;
+            wr_anchorY = s.wr_anchorY;
+            wr_anchorZ = s.wr_anchorZ;
+            wr_valid_range = s.wr_valid_range;
+            wr_distance = s.wr_distance;
+            wr_rssi = s.wr_rssi;
+            wra_tagId = s.wra_tagId;
+            wra_tagX = s.wra_tagX;
+            wra_tagY = s.wra_tagY;
+            wra_tagZ = s.wra_tagZ;
+            wra_ranges = s.wra_ranges;
+            //marLocUwbRange = s.marLocUwbRange;
+            //marLocUwbRangeArray = s.marLocUwbRangeArray;
+
+            //pose = s.pose;
+        }
+
+        msr::airlib::WifiReturnMessage2 to() const
+        {
+            msr::airlib::WifiReturnMessage2 d;
+
+            d.wr_time_stamp = wr_time_stamp;
+            d.wr_anchorId = wr_anchorId;
+            d.wr_anchorX = wr_anchorX;
+            d.wr_anchorY = wr_anchorY;
+            d.wr_anchorZ = wr_anchorZ;
+            d.wr_valid_range = wr_valid_range;
+            d.wr_distance = wr_distance;
+            d.wr_rssi = wr_rssi;
+            d.wra_tagId = wra_tagId;
+            d.wra_tagX = wra_tagX;
+            d.wra_tagY = wra_tagY;
+            d.wra_tagZ = wra_tagZ;
+            d.wra_ranges = wra_ranges;
+            return d;
+        }
+    };
+
     struct ImuData {
         msr::airlib::TTimePoint time_stamp;
         Quaternionr orientation;

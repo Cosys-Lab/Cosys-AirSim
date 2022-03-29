@@ -363,6 +363,24 @@ public: //types
 
     };
 
+    struct WifiSetting : SensorSetting {
+        // Engine & timing settings
+        uint number_of_traces = 5;	     				// Amount of traces (rays) being cast
+        float sensor_opening_angle = 180.0f;			// The opening angle in which rays will be cast from the sensor
+        float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
+        bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+                                                        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+
+        // Misc
+        std::string data_frame = AirSimSettings::kSensorLocalFrame;
+        Vector3r position = VectorMath::nanVector();
+        Rotation rotation = Rotation::nanRotation();
+
+    };
+
     struct VehicleSetting {
         //required
         std::string vehicle_name;
@@ -1537,6 +1555,22 @@ private:
         marlocUwb_setting.rotation = createRotationSetting(settings_json, marlocUwb_setting.rotation);
     }
 
+    static void initializeWifiSensorSetting(WifiSetting& wifi_setting, const Settings& settings_json)
+    {
+        wifi_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", wifi_setting.measurement_frequency);
+        wifi_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", wifi_setting.pause_after_measurement);
+        wifi_setting.number_of_traces = settings_json.getInt("NumberOfTraces", wifi_setting.number_of_traces);
+        wifi_setting.sensor_opening_angle = settings_json.getFloat("SensorOpeningAngle", wifi_setting.sensor_opening_angle);
+        wifi_setting.external = settings_json.getBool("External", wifi_setting.external);
+        wifi_setting.external_ned = settings_json.getBool("ExternalLocal", wifi_setting.external_ned);
+        wifi_setting.draw_sensor = settings_json.getBool("DrawSensor", wifi_setting.draw_sensor);
+
+        wifi_setting.data_frame = settings_json.getString("DataFrame", wifi_setting.data_frame);
+
+        wifi_setting.position = createVectorSetting(settings_json, wifi_setting.position);
+        wifi_setting.rotation = createRotationSetting(settings_json, wifi_setting.rotation);
+    }
+
     static std::unique_ptr<SensorSetting> createSensorSetting(
         SensorBase::SensorType sensor_type, const std::string& sensor_name,
         bool enabled)
@@ -1572,6 +1606,9 @@ private:
             sensor_setting = std::unique_ptr<SensorSetting>(new SensorTemplateSetting());
             break;
         case SensorBase::SensorType::MarlocUwb:
+            sensor_setting = std::unique_ptr<SensorSetting>(new MarLocUwbSetting());
+            break;
+        case SensorBase::SensorType::Wifi:
             sensor_setting = std::unique_ptr<SensorSetting>(new MarLocUwbSetting());
             break;
         default:
@@ -1619,6 +1656,9 @@ private:
             break;
         case SensorBase::SensorType::MarlocUwb:
             initializeMarLocUwbSensorSetting(*static_cast<MarLocUwbSetting*>(sensor_setting), settings_json);
+            break;
+        case SensorBase::SensorType::Wifi:
+            initializeWifiSensorSetting(*static_cast<WifiSetting*>(sensor_setting), settings_json);
             break;
         default:
             throw std::invalid_argument("Unexpected sensor type");

@@ -7,6 +7,7 @@
 #include "UnrealSensors/UnrealEchoSensor.h"
 #include "UnrealSensors/UnrealSensorTemplate.h"
 #include "UnrealSensors/UnrealMarLocUwbSensor.h"
+#include "UnrealSensors/UnrealWifiSensor.h"
 //#include "Vehicles/AirSimVehicle.h"
 
 UnrealSensorFactory::UnrealSensorFactory(AActor* actor, const NedTransform* ned_transform)
@@ -38,6 +39,9 @@ std::unique_ptr<msr::airlib::SensorBase> UnrealSensorFactory::createSensorFromSe
     case SensorBase::SensorType::MarlocUwb:
         return std::unique_ptr<UnrealMarLocUwbSensor>(new UnrealMarLocUwbSensor(
             *static_cast<const AirSimSettings::MarLocUwbSetting*>(sensor_setting), actor_, ned_transform_));
+    case SensorBase::SensorType::Wifi:
+        return std::unique_ptr<UnrealWifiSensor>(new UnrealWifiSensor(
+            *static_cast<const AirSimSettings::WifiSetting*>(sensor_setting), actor_, ned_transform_));
     default:
         return msr::airlib::SensorFactory::createSensorFromSettings(sensor_setting);
     }
