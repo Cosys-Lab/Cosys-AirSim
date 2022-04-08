@@ -14,6 +14,7 @@ class AIRSIM_API AFiducialBeacon : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AFiducialBeacon();
+	void setScale(float scale);
 
 protected:
 	// Called when the game starts or when spawned

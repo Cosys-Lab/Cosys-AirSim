@@ -431,6 +431,8 @@ public: //types
         std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
         std::vector<std::pair<std::string, std::string>> collision_blacklist;
         RCSettings rc;
+
+        float scale = 1.0f;
     };
 
     struct MavLinkConnectionInfo {
@@ -929,6 +931,7 @@ private:
         beacon_setting->beacon_pawn_name = beacon_pawn_name;
 
         //optional settings_json
+        beacon_setting->scale = settings_json.getFloat("Scale", beacon_setting->scale);
         beacon_setting->pawn_path = settings_json.getString("PawnPath", "");
         beacon_setting->default_beacon_state = settings_json.getString("DefaultbeaconState", "");
         beacon_setting->allow_api_always = settings_json.getBool("AllowAPIAlways",
