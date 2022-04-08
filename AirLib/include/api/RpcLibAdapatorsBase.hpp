@@ -831,7 +831,7 @@ public:
 
         msr::airlib::WifiSensorData to() const
         {
-            msr::airlib::WifiSensorData d;
+           msr::airlib::WifiSensorData d;
 
             d.time_stamp = time_stamp;
             //d.point_cloud = point_cloud;

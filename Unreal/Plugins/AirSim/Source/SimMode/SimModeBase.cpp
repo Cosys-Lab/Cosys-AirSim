@@ -636,6 +636,7 @@ void ASimModeBase::setupVehiclesAndCamera()
 
                 if (beacon_setting.beacon_type.compare("fiducialmarker") == 0) {
                     AFiducialBeacon* spawned_beacon = static_cast<AFiducialBeacon*>(GetWorld()->SpawnActor<AFiducialBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
+                    spawned_beacon->setScale(beacon_setting.scale);
                 }
                 else if (beacon_setting.beacon_type.compare("uwbbeacon") == 0) {
                     AUWBBeacon* spawned_beacon = static_cast<AUWBBeacon*>(GetWorld()->SpawnActor<AUWBBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));

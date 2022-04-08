@@ -5,7 +5,7 @@
 
 #include "common/Common.hpp"
 #include "GameFramework/Actor.h"
-#include "sensors/Wifi/WifiSimple.hpp"
+#include "sensors/wifi/WifiSimple.hpp"
 #include "Components/StaticMeshComponent.h"
 #include "NedTransform.h"
 #include "AirBlueprintLib.h"

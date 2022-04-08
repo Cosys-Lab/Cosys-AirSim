@@ -21,7 +21,7 @@
 #include "sensors/distance/DistanceBase.hpp"
 #include "sensors/template/SensorTemplateBase.hpp"
 #include "sensors/MarLocUwb/MarLocUwbBase.hpp"
-#include "sensors/Wifi/WifiBase.hpp"
+#include "sensors/wifi/WifiBase.hpp"
 #include "sensors/gps/GpsBase.hpp"
 #include <exception>
 #include <string>

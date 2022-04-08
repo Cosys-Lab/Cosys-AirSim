@@ -184,6 +184,11 @@ msr::airlib::MarLocUwbSensorData RpcLibClientBase::getMarLocUwbSensorData(const 
     return msr::airlib::MarLocUwbSensorData();
 }
 
+msr::airlib::WifiSensorData RpcLibClientBase::getWifiSensorData(const std::string& echo_name, const std::string& vehicle_name) const
+{
+    return msr::airlib::WifiSensorData();
+}
+
 msr::airlib::ImuBase::Output RpcLibClientBase::getImuData(const std::string& imu_name, const std::string& vehicle_name) const
 {
     return pimpl_->client.call("getImuData", imu_name, vehicle_name).as<RpcLibAdapatorsBase::ImuData>().to();

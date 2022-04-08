@@ -196,6 +196,7 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 			if (traceRayCurrentSignalStrength > traceRayMinSignalStrength) {
 				trace_hit_result = FHitResult(ForceInit);
 				trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true, true);
+				
 
 				// Stop if nothing was hit to reflect off
 				if (!trace_hit) {
@@ -262,7 +263,7 @@ void UnrealWifiSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 	total_distance += distance_traveled;
 
 	// Reflect signal 
-	trace_direction = (trace_hit_result.ImpactPoint - trace_start_position).MirrorByVector(trace_hit_result.ImpactNormal);
+	trace_direction = trace_hit_result.ImpactPoint - trace_start_position;
 	trace_direction.Normalize();
 	trace_start_position = trace_hit_result.ImpactPoint;
 	trace_length = ned_transform_->fromNed(remainingDistance(signal_attenuation, total_distance));
