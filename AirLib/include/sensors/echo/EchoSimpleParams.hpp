@@ -69,8 +69,6 @@ struct EchoSimpleParams {
 		pause_after_measurement = settings.pause_after_measurement;
 		ignore_marked = settings.ignore_marked;
 
-		testParam = settings.testParam;
-
 		name = settings.sensor_name;
 
         relative_pose.position = settings.position;
