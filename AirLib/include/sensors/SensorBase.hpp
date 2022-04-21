@@ -31,6 +31,7 @@ public:
 		GPULidar = 8,
         SensorTemplate = 9,
         MarlocUwb = 10,
+        Wifi = 11,
     };
 
     SensorBase(const std::string& sensor_name = "")

@@ -408,5 +408,77 @@ struct MarLocUwbReturnMessage2 {
     {}
 };
 
+struct WifiHit
+{
+    std::string beaconID;
+    int rssi;
+    float beaconPosX;
+    float beaconPosY;
+    float beaconPosZ;
+};
+
+struct WifiSensorData {
+
+    TTimePoint time_stamp = 0;
+    //vector<real_T> point_cloud;
+    Pose pose;
+    vector<std::string> beaconsActiveID;
+    vector<float> beaconsActiveRssi;
+    vector<float> beaconsActivePosX;
+    vector<float> beaconsActivePosY;
+    vector<float> beaconsActivePosZ;
+
+    WifiSensorData()
+    {}
+};
+
+struct WifiRange {
+    TTimePoint time_stamp = 0;
+    int anchorId;
+    std::string tagId;
+    float anchorX, anchorY, anchorZ;
+    bool valid_range;
+    float distance;
+    float rssi;
+
+    WifiRange()
+    {}
+};
+
+struct WifiRangeArray {
+    std::string tagId;
+    float tagX, tagY, tagZ;
+    vector<int> ranges;
+
+    WifiRangeArray()
+    {}
+};
+
+/*struct WifiReturnMessage {
+    std::vector<WifiRange> WifiRange;
+    std::vector<WifiRangeArray> WifiRangeArray;
+
+    WifiReturnMessage()
+    {}
+};*/
+
+struct WifiReturnMessage2 {
+    //WifiRange
+    vector <TTimePoint> wr_time_stamp;
+    vector<int> wr_anchorId;
+    vector<float> wr_anchorX, wr_anchorY, wr_anchorZ;
+    vector<bool> wr_valid_range;
+    vector<float> wr_distance;
+    vector<float> wr_rssi;
+
+    //WifiRangeArray
+    vector<std::string> wra_tagId;
+    vector<float> wra_tagX, wra_tagY, wra_tagZ;
+    vector <vector<int>> wra_ranges;
+
+    WifiReturnMessage2()
+    {}
+};
+
 }} //namespace
 #endif

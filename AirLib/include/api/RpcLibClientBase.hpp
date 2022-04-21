@@ -75,6 +75,7 @@ public:
 	msr::airlib::EchoData getEchoData(const std::string& echo_name = "", const std::string& vehicle_name = "") const;
     msr::airlib::SensorTemplateData getSensorTemplateData(const std::string& echo_name = "", const std::string& vehicle_name = "") const;
     msr::airlib::MarLocUwbSensorData getMarLocUwbSensorData(const std::string& echo_name = "", const std::string& vehicle_name = "") const;
+    msr::airlib::WifiSensorData getWifiSensorData(const std::string& echo_name = "", const std::string& vehicle_name = "") const;
     msr::airlib::ImuBase::Output getImuData(const std::string& imu_name = "", const std::string& vehicle_name = "") const;
     msr::airlib::BarometerBase::Output getBarometerData(const std::string& barometer_name = "", const std::string& vehicle_name = "") const;
     msr::airlib::MagnetometerBase::Output getMagnetometerData(const std::string& magnetometer_name = "", const std::string& vehicle_name = "") const;

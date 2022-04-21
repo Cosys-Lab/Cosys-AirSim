@@ -3,7 +3,7 @@
 
 #define DRAWDEBUGLINES
 
-#include "UnrealMarLocUwbSensor.h"
+#include "UnrealWifiSensor.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "NedTransform.h"
@@ -13,20 +13,17 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include <PxScene.h>
 #include "Runtime/Core/Public/Async/ParallelFor.h"
-#include "Beacons/UWBBeacon.h"
+#include "Beacons/WifiBeacon.h"
 #include <typeinfo>
 #include <mutex>
 #include "common/CommonStructs.hpp"
 
 using std::fill_n;
-std::mutex mtx;
+std::mutex mtxWifi;
 // ctor
-UnrealMarLocUwbSensor::UnrealMarLocUwbSensor(const AirSimSettings::MarLocUwbSetting& setting, AActor* actor, const NedTransform* ned_transform)
-	: MarLocUwbSimple(setting), actor_(actor), ned_transform_(ned_transform), saved_clockspeed_(1), sensor_params_(getParams()), external_(getParams().external)
+UnrealWifiSensor::UnrealWifiSensor(const AirSimSettings::WifiSetting& setting, AActor* actor, const NedTransform* ned_transform)
+	: WifiSimple(setting), actor_(actor), ned_transform_(ned_transform), saved_clockspeed_(1), sensor_params_(getParams()), external_(getParams().external)
 {
-	// Initialize UWB properties
-	//configureUwbProperties();
-
 	// Initialize the trace directions
 	sampleSphereCap(sensor_params_.number_of_traces, sensor_params_.sensor_opening_angle);
 
@@ -34,14 +31,14 @@ UnrealMarLocUwbSensor::UnrealMarLocUwbSensor(const AirSimSettings::MarLocUwbSett
 	traceRayMaxBounces = 5;
 	traceRayMinSignalStrength = 0.001;
 
-	for (TActorIterator<AUWBBeacon> It(actor_->GetWorld()); It; ++It)
+	for (TActorIterator<AWifiBeacon> It(actor_->GetWorld()); It; ++It)
 	{
 		beacon_actors.Add(*It);
 	}
 }
 
-// Set MarLocUwbSensor object in correct pose in physical world
-void UnrealMarLocUwbSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
+// Set WifiSensor object in correct pose in physical world
+void UnrealWifiSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
 	if (sensor_params_.draw_sensor) {
@@ -59,7 +56,7 @@ void UnrealMarLocUwbSensor::updatePose(const msr::airlib::Pose& sensor_pose, con
 }
 
 // Pause Unreal simulation
-void UnrealMarLocUwbSensor::pause(const bool is_paused) {
+void UnrealWifiSensor::pause(const bool is_paused) {
 	if (is_paused) {
 		saved_clockspeed_ = UAirBlueprintLib::getUnrealClockSpeed(actor_);
 		UAirBlueprintLib::setUnrealClockSpeed(actor_, 0);
@@ -70,16 +67,16 @@ void UnrealMarLocUwbSensor::pause(const bool is_paused) {
 } 
 
 
-// Get MarLocUwbSensor pose in Local NED
-void UnrealMarLocUwbSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
+// Get WifiSensor pose in Local NED
+void UnrealWifiSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 {
 	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1)); ;
 	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
 }
 
-/*void UnrealMarLocUwbSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
+/*void UnrealWifiSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
 {
-	// Set the physical MarLocUwbSensor mesh in the correct location in the world
+	// Set the physical WifiSensor mesh in the correct location in the world
 	updatePose(sensor_pose, vehicle_pose);
 
 	point_cloud.clear();
@@ -89,7 +86,7 @@ void UnrealMarLocUwbSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 	point_cloud.emplace_back(random_vector.z());
 }*/
 
-/*void UnrealMarLocUwbSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) {
+/*void UnrealWifiSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) {
 	// TODO consume point cloud (+ draw_time_)?
 
 	const int DATA_PER_POINT = 5;
@@ -102,7 +99,7 @@ void UnrealMarLocUwbSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 	}
 }*/
 
-void UnrealMarLocUwbSensor::updateUWBRays() {
+void UnrealWifiSensor::updateWifiRays() {
 	const GroundTruth& ground_truth = getGroundTruth();
 	
 	Vector3r sensorBase_local = Vector3r(sensor_reference_frame_.position);
@@ -110,15 +107,12 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 
 	//actor_->GetWorld()->GetPhysicsScene()->GetPxScene()->lockRead();
 
-	// Clear oldest UWB Hits 
-	while (beaconsActive_.IsValidIndex(maxUWBHits)) {
+	// Clear oldest Wifi Hits 
+	while (beaconsActive_.IsValidIndex(maxWifiHits)) {
 		beaconsActive_.RemoveAt(0);
 	}
-	// Create new log record for newest UWB measurements
-	TArray<msr::airlib::UWBHit> UWBHitLog;
-
-	//FVector lineEnd = uwbTraceMaxDistances[direction_count] * FVector(sample_direction[0], sample_direction[1], sample_direction[2]);
-	//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
+	// Create new log record for newest Wifi measurements
+	TArray<msr::airlib::WifiHit> WifiHitLog;
 
 	//ParallelFor(sample_directions_.size(), [&](int32 direction_count) {
 	for (int32 direction_count = 0; direction_count< sample_directions_.size(); direction_count++){
@@ -132,29 +126,28 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 		msr::airlib::VectorMath::toEulerianAngle(sensorOrientationQuat, roll, pitch, yaw);
 		FRotator sensorOrientationEulerDegree = FRotator(FMath::RadiansToDegrees(pitch), FMath::RadiansToDegrees(yaw), FMath::RadiansToDegrees(roll));
 
-		FVector lineEnd = uwbTraceMaxDistances[direction_count] * FVector(sample_direction[0], sample_direction[1], sample_direction[2]);
+		FVector lineEnd = wifiTraceMaxDistances[direction_count] * FVector(sample_direction[0], sample_direction[1], sample_direction[2]);
 		lineEnd = sensorOrientationEulerDegree.RotateVector(lineEnd);
 		lineEnd += sensorBase_global;
 		//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
 
 		// Trace ray, bounce and add to hitlog if beacon was hit
-		traceDirection(sensorBase_global, lineEnd, &UWBHitLog, 0, 0, 1, 0);
+		traceDirection(sensorBase_global, lineEnd, &WifiHitLog, 0, 0, 1, 0);
 	//});
 	}
 	//actor_->GetWorld()->GetPhysicsScene()->GetPxScene()->unlockRead();
-	//UWBHits.Add(UWBHitLog);
-	beaconsActive_.Add(UWBHitLog);
+	beaconsActive_.Add(WifiHitLog);
 }
 
 // Thanks Girmi
-void UnrealMarLocUwbSensor::sampleSphereCap(int num_points, float opening_angle) {
+void UnrealWifiSensor::sampleSphereCap(int num_points, float opening_angle) {
 	sample_directions_.clear();
 
-	uwbTraceMaxDistances.clear();
+	wifiTraceMaxDistances.clear();
 
-	// Add point in frontal directionl
+	// Add point in frontal direction
 	sample_directions_.emplace(sample_directions_.begin(), Vector3r(1, 0, 0));
-	uwbTraceMaxDistances.push_back(10000);
+	wifiTraceMaxDistances.push_back(10000);
 
 	//Convert opening angle to plane coordinates
 	float x_limit = FMath::Cos(FMath::DegreesToRadians(opening_angle) / 2);
@@ -188,12 +181,12 @@ void UnrealMarLocUwbSensor::sampleSphereCap(int num_points, float opening_angle)
 			Vector3r center = Vector3r(1, 0, 0);
 			float angleToCenter = FMath::RadiansToDegrees(VectorMath::angleBetween(center, Vector3r(x, y, z), true));
 			angleToCenter += 10000;
-			uwbTraceMaxDistances.push_back(angleToCenter);
+			wifiTraceMaxDistances.push_back(angleToCenter);
 		}
 	}
 }
 
-int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::UWBHit> *UWBHitLog, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug) {
+int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::WifiHit> *WifiHitLog, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug) {
 	FHitResult trace_hit_result;
 	bool trace_hit;
 	TArray<AActor*> ignore_actors_;
@@ -203,6 +196,7 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 			if (traceRayCurrentSignalStrength > traceRayMinSignalStrength) {
 				trace_hit_result = FHitResult(ForceInit);
 				trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true, true);
+				
 
 				// Stop if nothing was hit to reflect off
 				if (!trace_hit) {
@@ -222,21 +216,15 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 
 				// If beacon was hit
 				if (trace_hit_result.Actor != nullptr) {
-					//if ((trace_hit_result.Actor->GetName().Len() >= 9) && (trace_hit_result.Actor->GetName().Left(9) == "uwbBeacon")) {
-					if (trace_hit_result.Actor->IsA(AUWBBeacon::StaticClass())) {
-						mtx.lock();
+					//if ((trace_hit_result.Actor->GetName().Len() >= 10) && (trace_hit_result.Actor->GetName().Left(10) == "wifiBeacon")) {
+					if (trace_hit_result.Actor->IsA(AWifiBeacon::StaticClass())) {
+						mtxWifi.lock();
 						auto hitActor = trace_hit_result.GetActor();
-						//FString tmpName, tmpId;
-						//FString tmpName;
-						//UAirBlueprintLib::LogMessageString("Calculating the name", "as BEACON", LogDebugLevel::Informational, 1);
-
-						//std::string aaa (TCHAR_TO_UTF8(*trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId)));
-						//trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId);
-						//tmpName = trace_hit_result.Actor->GetFName().ToString();
+						
 						int tmpRssi = (int)traceRayCurrentSignalStrength;
 						FVector beaconPos = trace_hit_result.Actor->GetActorLocation();
-						//UWBHit thisHit = { FCString::Atoi(*tmpId),  tmpRssi, beaconPos[0], beaconPos[1] , beaconPos[2] };
-						msr::airlib::UWBHit thisHit;
+						
+						msr::airlib::WifiHit thisHit;
 						
 						thisHit.beaconID = TCHAR_TO_UTF8(*hitActor->GetName());
 						
@@ -244,8 +232,8 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 						thisHit.beaconPosX = beaconPos[0];
 						thisHit.beaconPosY = beaconPos[1];
 						thisHit.beaconPosZ = beaconPos[2];
-						UWBHitLog->Add(thisHit);
-						mtx.unlock();
+						WifiHitLog->Add(thisHit);
+						mtxWifi.unlock();
 					}
 				}
 
@@ -253,14 +241,14 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 					DrawDebugLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
 				}
 
-				return(traceDirection(trace_start_position, trace_end_position, UWBHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug));		
+				return(traceDirection(trace_start_position, trace_end_position, WifiHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug));		
 			}
 		}
 	}
 	return 1;
 }
 
-void UnrealMarLocUwbSensor::bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length, const FHitResult &trace_hit_result, float &total_distance, float &signal_attenuation) {
+void UnrealWifiSensor::bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length, const FHitResult &trace_hit_result, float &total_distance, float &signal_attenuation) {
 
 	float distance_traveled = ned_transform_->toNed(FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint));
 
@@ -275,13 +263,13 @@ void UnrealMarLocUwbSensor::bounceTrace(FVector &trace_start_position, FVector &
 	total_distance += distance_traveled;
 
 	// Reflect signal 
-	trace_direction = (trace_hit_result.ImpactPoint - trace_start_position).MirrorByVector(trace_hit_result.ImpactNormal);
+	trace_direction = trace_hit_result.ImpactPoint - trace_start_position;
 	trace_direction.Normalize();
 	trace_start_position = trace_hit_result.ImpactPoint;
 	trace_length = ned_transform_->fromNed(remainingDistance(signal_attenuation, total_distance));
 }
 
-float UnrealMarLocUwbSensor::angleBetweenVectors(FVector vector1, FVector vector2) {
+float UnrealWifiSensor::angleBetweenVectors(FVector vector1, FVector vector2) {
 	// Location relative to origin
 	vector1.Normalize();
 	vector2.Normalize();
@@ -289,7 +277,7 @@ float UnrealMarLocUwbSensor::angleBetweenVectors(FVector vector1, FVector vector
 	return FMath::Acos(FVector::DotProduct(vector1, vector2));
 }
 
-float UnrealMarLocUwbSensor::getFreeSpaceLoss(float previous_distance, float added_distance) {
+float UnrealWifiSensor::getFreeSpaceLoss(float previous_distance, float added_distance) {
 	float spread_attenuation;
 	float total_distance = previous_distance + added_distance;
 
@@ -307,7 +295,7 @@ float UnrealMarLocUwbSensor::getFreeSpaceLoss(float previous_distance, float add
 	return spread_attenuation;
 }
 
-float UnrealMarLocUwbSensor::getReflectionAttenuation(const FHitResult &trace_hit_result) {
+float UnrealWifiSensor::getReflectionAttenuation(const FHitResult &trace_hit_result) {
 	float materialAttenuation = 0.0f;
 
 	if (trace_hit_result.PhysMaterial.IsValid()) {
@@ -324,7 +312,7 @@ float UnrealMarLocUwbSensor::getReflectionAttenuation(const FHitResult &trace_hi
 	return materialAttenuation;
 }
 
-float UnrealMarLocUwbSensor::remainingDistance(float signal_attenuation, float total_distance) {
+float UnrealWifiSensor::remainingDistance(float signal_attenuation, float total_distance) {
 	//	float distanceFSPL;
 	//	float distanceAtmospheric = FMath::Pow(10, (signal_attenuation - attenuation_limit_) / 20) - 1;
 
@@ -336,10 +324,10 @@ float UnrealMarLocUwbSensor::remainingDistance(float signal_attenuation, float t
 	return FMath::Max(distanceLength, 0.0f);
 }
 
-FVector UnrealMarLocUwbSensor::Vector3rToFVector(const Vector3r& input_vector) {
+FVector UnrealWifiSensor::Vector3rToFVector(const Vector3r& input_vector) {
 	return FVector(input_vector.x(), input_vector.y(), -input_vector.z());
 }
 
-void UnrealMarLocUwbSensor::updateActiveBeacons() {
+void UnrealWifiSensor::updateActiveBeacons() {
 	beaconsActive_.Empty();
 }

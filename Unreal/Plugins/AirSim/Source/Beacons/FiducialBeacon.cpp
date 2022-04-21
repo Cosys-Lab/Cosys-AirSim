@@ -255,6 +255,11 @@ AFiducialBeacon::AFiducialBeacon()
 			Mesh->SetStaticMesh(loadedMesh.Object);
 		}
 	}
+	//this->Mesh = Mesh;
+}
+
+void AFiducialBeacon::setScale(float scale) {
+	this->Mesh->SetRelativeScale3D(FVector(scale, scale, scale));
 }
 
 // Called when the game starts or when spawned

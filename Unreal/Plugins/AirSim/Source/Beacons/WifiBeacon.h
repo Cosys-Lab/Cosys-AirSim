@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "FiducialBeacon.generated.h"
+#include "AirLib/include/common/AirSimSettings.hpp"
+
+#include "WifiBeacon.generated.h"
+
 
 UCLASS()
-class AIRSIM_API AFiducialBeacon : public AActor
+class AIRSIM_API AWifiBeacon : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AFiducialBeacon();
-	void setScale(float scale);
-
+	AWifiBeacon();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

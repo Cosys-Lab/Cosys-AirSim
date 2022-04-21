@@ -222,6 +222,7 @@ Backup*/
 UpgradeLog*.XML
 UpgradeLog*.htm
 *.bundle
+**/*.orig
 
 # SQL Server files
 *.mdf
