@@ -171,6 +171,10 @@ class VehicleClient:
     def simListInstanceSegmentationObjects(self):
         return self.client.call('simListInstanceSegmentationObjects')
 
+    def simListInstanceSegmentationPoses(self, ned = True):
+        poses_raw = self.client.call('simListInstanceSegmentationPoses', ned)
+        return [Pose.from_msgpack(pose_raw) for pose_raw in poses_raw]
+
     def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
         return self.client.call('simSpawnStaticMeshObject', object_class_name, object_name, pose)
 

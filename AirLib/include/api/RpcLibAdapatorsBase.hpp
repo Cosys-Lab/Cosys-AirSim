@@ -125,6 +125,25 @@ public:
         {
             return msr::airlib::Pose(position.to(), orientation.to());
         }
+
+        static std::vector<Pose> from(
+            const std::vector<msr::airlib::Pose>& poses
+        ) {
+            std::vector<Pose> pose_adaptor;
+            for (const auto& item : poses)
+                pose_adaptor.push_back(Pose(item));
+
+            return pose_adaptor;
+        }
+        static std::vector<msr::airlib::Pose> to(
+            const std::vector<Pose>& pose_adaptor
+        ) {
+            std::vector<msr::airlib::Pose> poses;
+            for (const auto& item : pose_adaptor)
+                poses.push_back(item.to());
+
+            return poses;
+        }
     };
 
     struct GeoPoint {

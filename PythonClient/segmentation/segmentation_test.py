@@ -30,7 +30,25 @@ if __name__ == '__main__':
         f.write("ObjectName,R,G,B\n")
         for index, item in enumerate(currentObjectList):
             f.write("%s,%s\n" % (item, ','.join([str(x) for x in colorMap[index,:]])))
-    print("Generated list of all current objects with a total of " + str(len(currentObjectList)) + ' objects\n')
+    print("Generated list of all current objects with their RGB value with a total of " + str(len(currentObjectList)) + ' objects\n')
+
+    # Get names of all objects in simulation world in the instance segmentation format
+    # and store in list together with the object 3D pose
+    currentPosesList = client.simListInstanceSegmentationPoses()
+    print("Generating list of all current objects poses...")
+    with open('airsim__poses_list_' +  datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.csv', 'w') as f:
+        f.write("ObjectName,x_pos,y_pos,z_pos,w_qua,x_qua,y_qua,z_qua\n")
+        for index, item in enumerate(currentObjectList):
+            currentObjectPose = currentPosesList[index]
+            currentObjectPoseString = (str(currentObjectPose.position.x_val) + "," +
+                                       str(currentObjectPose.position.y_val) + "," +
+                                       str(currentObjectPose.position.z_val) + "," +
+                                       str(currentObjectPose.orientation.w_val) + "," +
+                                       str(currentObjectPose.orientation.x_val) + "," +
+                                       str(currentObjectPose.orientation.y_val) + "," +
+                                       str(currentObjectPose.orientation.z_val))
+            f.write("%s,%s\n" % (item, currentObjectPoseString))
+    print("Generated list of all current objects with their poses a total of " + str(len(currentObjectList)) + ' objects\n')
 
     # Sort the objects from the list by class defined in the CSV and keep them in a dictionary with classname as key
     print("Sorting objects based on segmentation.csv into classes...")

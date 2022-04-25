@@ -162,6 +162,21 @@ std::vector<std::string> ASimModeBase::GetAllSegmentationMeshIDs() {
 	return retval;
 }
 
+std::vector<msr::airlib::Pose> ASimModeBase::GetAllSegmentationMeshPoses(bool ned) {
+    std::vector<msr::airlib::Pose> retval;
+    for (auto const& element : nameToComponentMap_) {
+        UAirBlueprintLib::RunCommandOnGameThread([ned, &retval, element, this]() {
+            if (ned) {
+                retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+            }
+            else {
+                retval.emplace_back(getGlobalNedTransform().toLocalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+            }
+        }, true);           
+    }
+    return retval;
+}
+
 bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex) {
 	if (is_name_regex) {
 		std::regex name_regex;
