@@ -19,14 +19,64 @@ ADynamicRackBeacon::ADynamicRackBeacon()
 	Mesh->SetupAttachment(GetRootComponent());
 	// set path for static mesh
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'"));
-	// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
-	if (loadedMesh.Succeeded())
-	{
-		// mesh = valid path
-		Mesh->SetStaticMesh(loadedMesh.Object);
+	// There are 5 rack options
+	int rackId = rand() % 5;
+
+	if (rackId ==0){
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'"));
+		// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
+		if (loadedMesh.Succeeded())
+		{
+			// mesh = valid path
+			Mesh->SetStaticMesh(loadedMesh.Object);
+		}
+	}else if (rackId == 1) {
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/dynamicRacks/DynamicRackBeacon_barrel2.DynamicRackBeacon_barrel2'"));
+		// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
+		if (loadedMesh.Succeeded())
+		{
+			// mesh = valid path
+			Mesh->SetStaticMesh(loadedMesh.Object);
+		}
+	}
+	else if (rackId == 2) {
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/dynamicRacks/DynamicRackBeacon_barrel.DynamicRackBeacon_barrel'"));
+		// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
+		if (loadedMesh.Succeeded())
+		{
+			// mesh = valid path
+			Mesh->SetStaticMesh(loadedMesh.Object);
+		}
+	}
+	else if (rackId == 3) {
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/dynamicRacks/DynamicRackBeacon_box.DynamicRackBeacon_box'"));
+		// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
+		if (loadedMesh.Succeeded())
+		{
+			// mesh = valid path
+			Mesh->SetStaticMesh(loadedMesh.Object);
+		}
+	}
+	else if (rackId == 4) {
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/dynamicRacks/DynamicRackBeacon_hose.DynamicRackBeacon_hose'"));
+		// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
+		if (loadedMesh.Succeeded())
+		{
+			// mesh = valid path
+			Mesh->SetStaticMesh(loadedMesh.Object);
+		}
+	}
+	else {
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'"));
+		// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
+		if (loadedMesh.Succeeded())
+		{
+			// mesh = valid path
+			Mesh->SetStaticMesh(loadedMesh.Object);
+		}
 	}
 }
+
 
 
 // Called when the game starts or when spawned
