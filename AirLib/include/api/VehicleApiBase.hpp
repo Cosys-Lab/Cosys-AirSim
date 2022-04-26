@@ -294,7 +294,7 @@ public:
                 sensor = current_sensor;
                 MarLocUwbSensorData output = sensor->getOutput(); // Get sensor output
 
-                // Create a new range for all beacon/tag hits in the current sensor/anchor outpu
+                // Create a new range for all beacon/tag hits in the current sensor/anchor outputs
                 for (int itId = 0; itId < output.beaconsActiveID.size(); itId++) { 
                     MarLocUwbRange newRange;
                     newRange.time_stamp = output.time_stamp;
@@ -435,7 +435,7 @@ public:
                     newRange.anchorY = output.pose.position[1];
                     newRange.anchorZ = output.pose.position[2];
                     newRange.valid_range = 1;
-                    newRange.distance = 6;
+                    newRange.distance = output.beaconsActiveDistance[itId];
                     newRange.rssi = output.beaconsActiveRssi[itId];
 
                     // Test if this ID already exists in the ranges

@@ -49,7 +49,7 @@ private:
 	std::vector<float> wifiTraceMaxDistances; // in meter
 
 	void sampleSphereCap(int num_points, float opening_angle);
-	int traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::WifiHit> *WifiHitLogfloat, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug);
+	int traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::WifiHit> *WifiHitLogfloat, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug, FVector trace_origin);
 	void bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length, const FHitResult &trace_hit_result, float &total_distance, float &signal_attenuation);
 	float angleBetweenVectors(FVector vector1, FVector vector2);
 	float getFreeSpaceLoss(float previous_distance, float added_distance);

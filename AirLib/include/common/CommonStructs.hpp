@@ -417,6 +417,7 @@ struct WifiHit
     float beaconPosX;
     float beaconPosY;
     float beaconPosZ;
+    float distance;
 };
 
 struct WifiSensorData {
@@ -429,6 +430,7 @@ struct WifiSensorData {
     vector<float> beaconsActivePosX;
     vector<float> beaconsActivePosY;
     vector<float> beaconsActivePosZ;
+    vector<float> beaconsActiveDistance;
 
     WifiSensorData()
     {}
