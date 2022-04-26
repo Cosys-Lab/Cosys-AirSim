@@ -126,6 +126,7 @@ private:
 		std::vector<float> beaconsActivePosX;
 		std::vector<float> beaconsActivePosY;
 		std::vector<float> beaconsActivePosZ;
+		std::vector<float> beaconsActiveDistance;
 		for (int i = 0; i < beaconsActive_.Num(); i++) {
 			for (int ii = 0; ii < beaconsActive_[i].Num(); ii++) {
 				beaconsActiveRSSI.push_back(beaconsActive_[i][ii].rssi);
@@ -136,6 +137,7 @@ private:
 				beaconsActivePosX.push_back(beaconsActive_[i][ii].beaconPosX);
 				beaconsActivePosY.push_back(beaconsActive_[i][ii].beaconPosY);
 				beaconsActivePosZ.push_back(beaconsActive_[i][ii].beaconPosZ);
+				beaconsActiveDistance.push_back(beaconsActive_[i][ii].distance);
 			}
 		}
 		output.beaconsActiveRssi = beaconsActiveRSSI;
@@ -143,6 +145,7 @@ private:
 		output.beaconsActivePosX = beaconsActivePosX;
 		output.beaconsActivePosY = beaconsActivePosY;
 		output.beaconsActivePosZ = beaconsActivePosZ;
+		output.beaconsActiveDistance = beaconsActiveDistance;
 		
 		//output.beaconsActiveRssi;
 		setOutput(output);

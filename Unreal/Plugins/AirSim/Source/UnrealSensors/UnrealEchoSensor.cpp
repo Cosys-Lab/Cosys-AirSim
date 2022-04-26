@@ -204,7 +204,14 @@ float UnrealEchoSensor::remainingDistance(float signal_attenuation, float total_
 		attenuationDistance = total_distance * (FMath::Pow(10, (signal_attenuation - attenuation_limit_) / 20) - 1);
 	}
 
+	if (attenuationDistance < (distance_limit_ - total_distance)) {
+		return attenuationDistance;
+	}
+	else {
+		return (distance_limit_ - total_distance);
+	}
 	return FMath::Min(attenuationDistance, distance_limit_ - total_distance);
+	
 }
 
 void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& point_cloud) {

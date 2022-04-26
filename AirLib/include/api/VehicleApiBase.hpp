@@ -26,6 +26,7 @@
 #include <exception>
 #include <string>
 
+
 namespace msr { namespace airlib {
 
 /*
@@ -41,11 +42,6 @@ public:
     virtual bool isApiControlEnabled() const = 0;
     virtual bool armDisarm(bool arm) = 0;
     virtual GeoPoint getHomeGeoPoint() const = 0;
-
-    virtual string MarLoc_test2() const
-    {
-        return "MarLoc was here two";
-    }
 
     //default implementation so derived class doesn't have to call on UpdatableObject
     virtual void reset() override
@@ -283,7 +279,7 @@ public:
                                                                // The PK of a range array is the tag/beacon ID
         vector<MarLocUwbRange> uwbRanges;                      // A list of the ranges (incl diagnostics)
         //vector<int> processedAnchorIDs;                        // A list of all anchors PK's already processed
-                                                               // The PK of a range is a combination of the tag/beacon ID and the anchor/sensor ID
+        
 
 
         uint uwb_sensor_count = getSensors().size(SensorBase::SensorType::MarlocUwb);
@@ -298,7 +294,7 @@ public:
                 sensor = current_sensor;
                 MarLocUwbSensorData output = sensor->getOutput(); // Get sensor output
 
-                // Create a new range for all beacon/tag hits in the current sensor/anchor output
+                // Create a new range for all beacon/tag hits in the current sensor/anchor outpu
                 for (int itId = 0; itId < output.beaconsActiveID.size(); itId++) { 
                     MarLocUwbRange newRange;
                     newRange.time_stamp = output.time_stamp;
@@ -308,7 +304,7 @@ public:
                     newRange.anchorY = output.pose.position[1];
                     newRange.anchorZ = output.pose.position[2];
                     newRange.valid_range = 1;
-                    newRange.distance = 6;
+                    newRange.distance = output.beaconsActiveDistance[itId];
                     newRange.rssi = output.beaconsActiveRssi[itId];
                     
                     // Test if this ID already exists in the ranges

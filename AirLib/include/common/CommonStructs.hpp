@@ -343,6 +343,7 @@ struct UWBHit
     float beaconPosX;
     float beaconPosY;
     float beaconPosZ;
+    float distance;
 };
 
 struct MarLocUwbSensorData {
@@ -355,6 +356,7 @@ struct MarLocUwbSensorData {
     vector<float> beaconsActivePosX;
     vector<float> beaconsActivePosY;
     vector<float> beaconsActivePosZ;
+    vector<float> beaconsActiveDistance;
 
     MarLocUwbSensorData()
     {}

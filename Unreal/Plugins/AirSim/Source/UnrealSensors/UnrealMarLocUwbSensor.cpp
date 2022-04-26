@@ -77,31 +77,6 @@ void UnrealMarLocUwbSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
 }
 
-/*void UnrealMarLocUwbSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud)
-{
-	// Set the physical MarLocUwbSensor mesh in the correct location in the world
-	updatePose(sensor_pose, vehicle_pose);
-
-	point_cloud.clear();
-	Vector3r random_vector = ned_transform_->toVector3r(FMath::RandPointInBox(FBox(FVector(-1, -1, -1), FVector(1, 1, 1))), 1.0f, true);
-	point_cloud.emplace_back(random_vector.x());
-	point_cloud.emplace_back(random_vector.y());
-	point_cloud.emplace_back(random_vector.z());
-}*/
-
-/*void UnrealMarLocUwbSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) {
-	// TODO consume point cloud (+ draw_time_)?
-
-	const int DATA_PER_POINT = 5;
-	for (int point_count = 0; point_count < point_cloud.size(); point_count += DATA_PER_POINT) {
-		Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);
-		Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
-		FVector point_global = ned_transform_->fromLocalNed(point_global1);
-
-		DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);
-	}
-}*/
-
 void UnrealMarLocUwbSensor::updateUWBRays() {
 	const GroundTruth& ground_truth = getGroundTruth();
 	
@@ -138,7 +113,7 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 		//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
 
 		// Trace ray, bounce and add to hitlog if beacon was hit
-		traceDirection(sensorBase_global, lineEnd, &UWBHitLog, 0, 0, 1, 0);
+		traceDirection(sensorBase_global, lineEnd, &UWBHitLog, 0, 0, 1, 0, sensorBase_global);
 	//});
 	}
 	//actor_->GetWorld()->GetPhysicsScene()->GetPxScene()->unlockRead();
@@ -193,7 +168,7 @@ void UnrealMarLocUwbSensor::sampleSphereCap(int num_points, float opening_angle)
 	}
 }
 
-int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::UWBHit> *UWBHitLog, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug) {
+int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::UWBHit> *UWBHitLog, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug, FVector trace_origin) {
 	FHitResult trace_hit_result;
 	bool trace_hit;
 	TArray<AActor*> ignore_actors_;
@@ -244,6 +219,7 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 						thisHit.beaconPosX = beaconPos[0];
 						thisHit.beaconPosY = beaconPos[1];
 						thisHit.beaconPosZ = beaconPos[2];
+						thisHit.distance = sqrt(pow(beaconPos[0] - trace_origin.X, 2) + pow(beaconPos[1] - trace_origin.Y, 2) + pow(beaconPos[2] - trace_origin.Z, 2)) / 100;
 						UWBHitLog->Add(thisHit);
 						mtx.unlock();
 					}
@@ -253,7 +229,7 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 					DrawDebugLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
 				}
 
-				return(traceDirection(trace_start_position, trace_end_position, UWBHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug));		
+				return(traceDirection(trace_start_position, trace_end_position, UWBHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug, trace_origin));
 			}
 		}
 	}
