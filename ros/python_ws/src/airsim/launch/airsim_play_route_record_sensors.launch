@@ -80,6 +80,10 @@
             <rosparam param="sensor_gpulidar_topics" subst_value="True">$(arg sensor_gpulidar_topics)</rosparam>
             <rosparam param="sensor_gpulidar_frames" subst_value="True">$(arg sensor_gpulidar_frames)</rosparam>
 
+            <rosparam param="sensor_uwb_names" subst_value="True">$(arg sensor_uwb_names)</rosparam>
+            <rosparam param="sensor_uwb_topic" subst_value="True">$(arg sensor_uwb_topic)</rosparam>
+            <rosparam param="sensor_uwb_frames" subst_value="True">$(arg sensor_uwb_frames)</rosparam>
+
             <rosparam param="sensor_camera_names" subst_value="True">$(arg sensor_camera_names)</rosparam>
             <rosparam param="sensor_camera_toggle_scene_mono" subst_value="True">$(arg sensor_camera_toggle_scene_mono)</rosparam>
             <rosparam param="sensor_camera_scene_quality" subst_value="True">$(arg sensor_camera_scene_quality)</rosparam>

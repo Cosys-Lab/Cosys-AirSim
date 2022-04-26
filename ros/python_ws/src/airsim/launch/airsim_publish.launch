@@ -101,7 +101,7 @@
             <rosparam param="sensor_gpulidar_frames" subst_value="True">$(arg sensor_gpulidar_frames)</rosparam>
 
             <rosparam param="sensor_uwb_names" subst_value="True">$(arg sensor_uwb_names)</rosparam>
-            <rosparam param="sensor_uwb_topics" subst_value="True">$(arg sensor_uwb_topics)</rosparam>
+            <rosparam param="sensor_uwb_topic" subst_value="True">$(arg sensor_uwb_topic)</rosparam>
             <rosparam param="sensor_uwb_frames" subst_value="True">$(arg sensor_uwb_frames)</rosparam>
 
             <rosparam param="sensor_camera_names" subst_value="True">$(arg sensor_camera_names)</rosparam>
