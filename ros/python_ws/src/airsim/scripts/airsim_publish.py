@@ -5,7 +5,8 @@ import airsimpy
 import rospy
 import time
 import math
-from std_msgs.msg import String, Header
+import threading
+from std_msgs.msg import String, Header, Float32, Float32MultiArray
 from geometry_msgs.msg import PoseStamped, TransformStamped, Point, Twist
 import sensor_msgs.point_cloud2 as pc2
 import tf2_ros
@@ -23,24 +24,82 @@ import sys
 import tf
 from multiprocessing import Queue
 
+
+
+class PID(object):
+    desired_speed = 0
+
+    def __init__(self, kp, ki, kd, time, topicname):
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.pe = 0
+        self.ie = 0
+        self.de = 0
+        self.time = time
+        self.integral = 0
+        self.last_err = 0
+        self.maxI = 1000000
+        self.pid_queue = Queue(1)
+        self.update_sub = rospy.Subscriber(topicname, Float32MultiArray, handle_input_command, (self.pid_queue))
+
+    def update_params(self):
+
+        # print("yeet")
+        try:
+            speed_msg = self.pid_queue.get_nowait()
+        except:
+            return
+        #print(speed_msg)
+        self.kp = speed_msg.data[0]
+        self.ki = speed_msg.data[1]
+        self.kd = speed_msg.data[2]
+
+    def getPError(self, error):
+        PError = self.kp * error
+        return PError
+
+    def getIError(self, error):
+        self.integral += error
+        if (math.fabs(self.integral) > self.maxI):
+            if (self.integral > 0):
+                self.integral = self.maxI
+            else:
+                self.integral = -self.maxI
+
+        IError = self.ki * self.integral * self.time
+        return IError
+
+    def getDError(self, error):
+        der = error - self.last_err
+        self.last_err = error
+        DError = self.kd * der / self.time
+        return DError
+
+    def getError(self, error):
+        return self.getPError(error) + self.getIError(error) + self.getDError(error)
+
+
 def Pose_2_mat(p):
     q = p.orientation
     pos = p.position
-    T = tf.transformations.quaternion_matrix([q.x,q.y,q.z,q.w])
-    T[:3,3] = np.array([pos.x,pos.y,pos.z])
+    T = tf.transformations.quaternion_matrix([q.x, q.y, q.z, q.w])
+    T[:3, 3] = np.array([pos.x, pos.y, pos.z])
     return T
 
-def T_inv(T_in):
-    R_in = T_in[:3,:3]
-    t_in = T_in[:3,[-1]]
-    R_out = R_in.T
-    t_out = -np.matmul(R_out,t_in)
-    return np.vstack((np.hstack((R_out,t_out)),np.array([0, 0, 0, 1])))
 
-def mat_2_tf(Mat,time,frame,child_frame):
+def T_inv(T_in):
+    R_in = T_in[:3, :3]
+    t_in = T_in[:3, [-1]]
+    R_out = R_in.T
+    t_out = -np.matmul(R_out, t_in)
+    return np.vstack((np.hstack((R_out, t_out)), np.array([0, 0, 0, 1])))
+
+
+def mat_2_tf(Mat, time, frame, child_frame):
     t = TransformStamped()
     scale, shear, angles, trans, persp = tf.transformations.decompose_matrix(Mat)
-    quat = tf.transformations.quaternion_from_euler(angles[0],angles[1],angles[2])
+    quat = tf.transformations.quaternion_from_euler(angles[0], angles[1], angles[2])
     t.header.stamp = time
     t.header.frame_id = frame
     t.child_frame_id = child_frame
@@ -52,6 +111,7 @@ def mat_2_tf(Mat,time,frame,child_frame):
     t.transform.rotation.z = quat[2]
     t.transform.rotation.w = quat[3]
     return t
+
 
 def get_camera_type(cameraType):
     if (cameraType == "Scene"):
@@ -126,6 +186,7 @@ def get_image_bytes(data, cameraType):
         img_rgb_string = data.image_data_uint8
     return img_rgb_string
 
+
 def handle_input_command(msg, args):
     # set the controls for car
     q = args
@@ -133,6 +194,7 @@ def handle_input_command(msg, args):
         q.put(msg)
     except:
         print("Input queue full")
+
 
 def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation_enable, carcontrol_enable, carcontrol_topic,
                    odometry_enable, odometry_topic,
@@ -148,9 +210,12 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                    sensor_camera_segmentation_topics, sensor_camera_depth_topics,
                    sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info, sensor_camera_info_topics, sensor_stereo_enable, baseline,
                    object_names, objects_coordinates_local, object_topics):
-
-
     rate = rospy.Rate(ros_rate)
+
+    speed_pid = PID(1, 0.1, 0.001, 1.0 / ros_rate, "/speed_pid")
+
+    # steering_pid = PID(0.0, 0.3, 0.05, 1.0/ros_rate, "/steer_pid")
+
 
     last_timestamps = {}
     warning_issued = {}
@@ -182,18 +247,15 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                                                              queue_size=2)
         last_timestamps[sensor_name] = None
 
-
     if (len(sensor_uwb_names) > 0):
-        uwb_diagnostics_publisher = rospy.Publisher(sensor_uwb_topics[0], Diagnostics, queue_size=10)
-        uwb_range_publisher = rospy.Publisher(sensor_uwb_topics[1], Range, queue_size=10)
-        uwb_rangeArray_publisher = rospy.Publisher(sensor_uwb_topics[2], RangeArray, queue_size=10)
-        
+        uwb_rangeArray_publisher = rospy.Publisher(sensor_uwb_topic, RangeArray, queue_size=10)
+
     for sensor_index, sensor_name in enumerate(sensor_camera_names):
         image_publishers[sensor_name + '_scene'] = rospy.Publisher(sensor_camera_scene_topics[sensor_index],
                                                                    Image, queue_size=2)
         if sensor_camera_toggle_segmentation[sensor_index] is 1:
             image_publishers[sensor_name + '_segmentation'] = rospy.Publisher(sensor_camera_segmentation_topics[sensor_index],
-                                                                       Image, queue_size=2)
+                                                                              Image, queue_size=2)
         if sensor_camera_toggle_depth[sensor_index] is 1:
             image_publishers[sensor_name + '_depth'] = rospy.Publisher(sensor_camera_depth_topics[sensor_index],
                                                                        Image, queue_size=2)
@@ -243,11 +305,15 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             response_index += 1
     if carcontrol_enable == 1:
         print("Control of car enabled")
+        desired_rotation = 0
         client.enableApiControl(True)
         queue_input_command = Queue(1)
         rospy.Subscriber(carcontrol_topic, Twist, handle_input_command, (queue_input_command))
+        requestpub = rospy.Publisher("/req_speed", Float32, queue_size=1)
+        realpub = rospy.Publisher("/real_speed", Float32, queue_size=1)
+        errorpub = rospy.Publisher("/speed_error", Float32, queue_size=1)
 
-    rospy.loginfo("Started publishers...")
+    # rospy.loginfo("Started publishers...")
 
     while not rospy.is_shutdown():
 
@@ -280,8 +346,9 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         pose_publisher.publish(pose_msg)
         T_w_veh = Pose_2_mat(pose_msg.pose)
 
+        simOdom = Odometry()
+
         if odometry_enable:
-            simOdom = Odometry()
             simOdom.header = pose_msg.header
             simOdom.child_frame_id = vehicle_base_frame
             simOdom.pose.pose = pose_msg.pose
@@ -301,12 +368,14 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         if tf_localisation_enable:
             tf_odom_pose = mat_2_tf(T_w_veh, timestamp, "odom", vehicle_base_frame)
             tf_br.sendTransform(tf_odom_pose)
-            tf_map_odom = TransformStamped()
-            tf_map_odom.header.stamp = timestamp
-            tf_map_odom.header.frame_id = pose_frame
-            tf_map_odom.child_frame_id = "odom"
-            tf_map_odom.transform.rotation.w = 1
-            tf_br.sendTransform(tf_map_odom)
+
+            # tf_map_odom = TransformStamped()
+            # tf_map_odom.header.stamp = timestamp
+            # tf_map_odom.header.frame_id = pose_frame
+            # tf_map_odom.child_frame_id = "odom"
+            # tf_map_odom.transform.rotation.w = 1
+            # tf_br.sendTransform(tf_map_odom)
+
 
         if sensor_imu_enable:
 
@@ -343,8 +412,8 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             if response.width == 0 and response.height == 0:
                 rospy.logwarn("Camera '" + sensor_name + "' could not retrieve scene image.")
             else:
-                rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
-                                                                                                response.width, 3)
+                rgb_matrix = np.frombuffer(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
+                                                                                                       response.width, 3)
                 if sensor_camera_scene_quality[sensor_index] > 0:
                     rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2BGR)
                     encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), sensor_camera_scene_quality[sensor_index]]
@@ -468,54 +537,49 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     pointcloud_publishers[sensor_name].publish(pcloud)
 
         for sensor_index, sensor_name in enumerate(sensor_uwb_names):
-            if (sensor_index == 0): # only once
+            if (sensor_index == 0):  # only once
                 uwb_data = client.getUWBData()
-                #print(uwb_data)
                 # Sanity check
                 if len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorY) or \
-                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorZ) or \
-                len(uwb_data.mur_anchorX) != len(uwb_data.mur_distance) or \
-                len(uwb_data.mur_anchorX) != len(uwb_data.mur_rssi) or \
-                len(uwb_data.mur_anchorX) != len(uwb_data.mur_time_stamp) or \
-                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorId) or \
-                len(uwb_data.mur_anchorX) != len(uwb_data.mur_valid_range):
-                  rospy.logerr("UWB sensor mur lengths do not match")
-                  rospy.signal_shutdown('Packet error.')
-                  sys.exit()
+                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorZ) or \
+                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_distance) or \
+                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_rssi) or \
+                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_time_stamp) or \
+                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorId) or \
+                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_valid_range):
+                    rospy.logerr("UWB sensor mur lengths do not match")
+                    rospy.signal_shutdown('Packet error.')
+                    sys.exit()
                 if len(uwb_data.mura_ranges) != len(uwb_data.mura_tagId) or \
-                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagX) or \
-                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagY) or \
-                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagZ):
-                  rospy.logerr("UWB sensor mur lengths do not match")
-                  rospy.signal_shutdown('Packet error.')
-                  sys.exit()
+                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagX) or \
+                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagY) or \
+                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagZ):
+                    rospy.logerr("UWB sensor mur lengths do not match")
+                    rospy.signal_shutdown('Packet error.')
+                    sys.exit()
 
-                allRanges =[]
+                allRanges = []
                 for i_mur in range(0, len(uwb_data.mur_anchorX)):
                     diag = Diagnostics()
                     diag.rssi = uwb_data.mur_rssi[i_mur]
-
-                    uwb_diagnostics_publisher.publish(diag)
 
                     rang = Range()
                     rang.stamp = timestamp
                     rang.anchorid = str(uwb_data.mur_anchorId[i_mur])
                     rang.anchor_position = Point(uwb_data.mur_anchorX[i_mur], uwb_data.mur_anchorY[i_mur], uwb_data.mur_anchorZ[i_mur])
                     rang.valid_range = uwb_data.mur_valid_range[i_mur]
-                    rang.distance = -1 # TODO
+                    rang.distance = uwb_data.mur_distance[i_mur]
                     rang.diagnostics = diag
-                    uwb_range_publisher.publish(rang)
 
                     allRanges.append(rang)
-                    
+
                 for i_mura in range(0, len(uwb_data.mura_ranges)):
                     rangeArray = RangeArray()
                     rangeArray.tagid = str(uwb_data.mura_tagId[i_mura])
                     rangeArray.tag_position = Point(uwb_data.mura_tagX[i_mura], uwb_data.mura_tagY[i_mura], uwb_data.mura_tagZ[i_mura])
                     for i_range in range(0, len(uwb_data.mura_ranges[i_mura])):
                         rangeArray.ranges.append(allRanges[i_range])
-                    #rangeArray.ranges = uwb_data.mura_ranges[i_mura]
-                    #
+
                     uwb_rangeArray_publisher.publish(rangeArray)
 
         for object_index, object_name in enumerate(object_names):
@@ -545,21 +609,53 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                 object_pose.header.frame_id = pose_frame
 
                 objectpose_publishers[object_name].publish(object_pose)
-        if carcontrol_enable ==1 :
+
+        if carcontrol_enable == 1:
             # set the controls for car
+            car_controls = airsimpy.CarControls()
+            car_controls.is_manual_gear = True
+            car_controls.manual_gear = 1
+
             try:
+                # if queue_input_command.():
+                #    msg.linear.x = 0
                 msg = queue_input_command.get_nowait()
-                car_controls = airsimpy.CarControls()
-                if (msg.linear.x < 0):
-                    car_controls.is_manual_gear = True
-                    car_controls.manual_gear = -1
-                else:
-                    car_controls.is_manual_gear = False
-                    car_controls.throttle = msg.linear.x
-                    car_controls.steering = -msg.angular.z
-                    client.setCarControls(car_controls, vehicle_name)
+
+                car_controls.is_manual_gear = True
+                speed_pid.desired_speed = msg.linear.x
+                desired_rotation = -msg.angular.z
+
             except:
-                pass #queue is empty
+                pass  # queue is empty
+
+            speed_pid.update_params()
+            v = simOdom.twist.twist.linear.x
+            error = speed_pid.desired_speed - v
+            desired_accel = speed_pid.getError(error)
+
+            wheelbase = 0.2
+            if desired_rotation == 0 or speed_pid.desired_speed == 0:
+                steer_angle = desired_rotation
+            else:
+                radius = speed_pid.desired_speed / desired_rotation
+                steer_angle = math.atan(wheelbase / radius)
+            # steer_angle = desired_rotation
+
+            if abs(steer_angle) <= 0.05:
+                steer_angle = 0
+            car_controls.steering = steer_angle
+
+            if speed_pid.desired_speed == 0 and abs(v)<=0.1 and desired_rotation == 0:
+                car_controls.brake = 0.1
+                car_controls.throttle = 0.0
+            else:
+                car_controls.throttle = desired_accel
+                car_controls.brake = 0.0
+            requestpub.publish(speed_pid.desired_speed)
+            realpub.publish(v)
+            errorpub.publish(error)
+
+            client.setCarControls(car_controls, vehicle_name)
 
         rate.sleep()
 
@@ -572,7 +668,7 @@ if __name__ == '__main__':
 
         ip = rospy.get_param('~ip', "True")
 
-        toggle_drone = rospy.get_param('~toggle_drone',"True")
+        toggle_drone = rospy.get_param('~toggle_drone', "True")
 
         vehicle_name = rospy.get_param('~vehicle_name', "True")
         vehicle_base_frame = rospy.get_param('~vehicle_base_frame', "True")
@@ -587,11 +683,11 @@ if __name__ == '__main__':
         odometry_enable = rospy.get_param('~odometry_enable', "True")
         odometry_topic = rospy.get_param('~odometry_topic', "True")
 
-        sensor_imu_enable = rospy.get_param('~sensor_imu_enable',"True")
+        sensor_imu_enable = rospy.get_param('~sensor_imu_enable', "True")
         sensor_imu_name = rospy.get_param('~sensor_imu_name', "True")
         sensor_imu_topic = rospy.get_param('~sensor_imu_topic', "True")
         sensor_imu_frame = rospy.get_param('~sensor_imu_frame', "True")
-        
+
         sensor_echo_names = rospy.get_param('~sensor_echo_names', "True")
         sensor_echo_topics = rospy.get_param('~sensor_echo_topics', "True")
         sensor_echo_frames = rospy.get_param('~sensor_echo_frames', "True")
@@ -607,7 +703,7 @@ if __name__ == '__main__':
         sensor_gpulidar_frames = rospy.get_param('~sensor_gpulidar_frames', "True")
 
         sensor_uwb_names = rospy.get_param('~sensor_uwb_names', "True")
-        sensor_uwb_topics = rospy.get_param('~sensor_uwb_topics', "True")
+        sensor_uwb_topic = rospy.get_param('~sensor_uwb_topic', "True")
         sensor_uwb_frames = rospy.get_param('~sensor_uwb_frames', "True")
 
         sensor_camera_names = rospy.get_param('~sensor_camera_names', "True")
@@ -722,8 +818,8 @@ if __name__ == '__main__':
             # Get uwb sensor data
             try:
                 uwb_data = client.getUWBSensorData(sensor_name, vehicle_name)
-                #timeStamp = uwb_data[0]
-                
+                # timeStamp = uwb_data[0]
+
             except msgpackrpc.error.RPCError:
                 rospy.logerr("UWB sensor '" + sensor_name + "' could not be found.")
                 rospy.signal_shutdown('Sensor not found.')
@@ -786,14 +882,13 @@ if __name__ == '__main__':
             static_transform.transform.rotation.w = q_rot[3]
             transform_list.append(static_transform)
 
-
             transform_list.append(static_transform)
             time.sleep(0.1)
             rospy.loginfo("Started static transform for camera sensor with ID " + sensor_name + ".")
             if sensor_stereo_enable == 1 and sensor_index == 0:
-                left_position = [pose.position.x_val,-pose.position.y_val,-pose.position.z_val]
+                left_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
             elif sensor_stereo_enable == 1 and sensor_index == 1:
-                right_position = [pose.position.x_val,-pose.position.y_val,-pose.position.z_val]
+                right_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
         if left_position != None and right_position != None:
             baseline = math.sqrt((left_position[0] - right_position[0]) ** 2 + (left_position[1] - right_position[1]) ** 2 + (left_position[2] - right_position[2]) ** 2)
         else:

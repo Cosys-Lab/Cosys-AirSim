@@ -27,6 +27,10 @@
       <arg name="sensor_gpulidar_topics" default="[airsim/lidar2/pointcloud]"/>
       <arg name="sensor_gpulidar_frames" default="[base_lidar2]"/>
 
+      <arg name="sensor_uwb_names" default="[]"/>
+      <arg name="sensor_uwb_topic" default="airsim/uwb/ranges"/>
+      <arg name="sensor_uwb_frames" default="[base_uwb1, base_uwb2]"/>
+
       <arg name="sensor_camera_names" default="[leftcamera, rightcamera]"/>
       <arg name="sensor_camera_toggle_scene_mono" default="[0, 0]"/>
       <arg name="sensor_camera_scene_quality" default="[0, 0]"/>

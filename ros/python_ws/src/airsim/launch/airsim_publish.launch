@@ -38,7 +38,7 @@
       <arg name="sensor_gpulidar_frames" default="[base_lidar2]"/>
 
       <arg name="sensor_uwb_names" default="[]"/>
-      <arg name="sensor_uwb_topics" default="[airsim/uwbX/diagnostics, airsim/uwbX/range, airsim/uwbX/rangeArray]"/>
+      <arg name="sensor_uwb_topic" default="airsim/uwb/ranges"/>
       <arg name="sensor_uwb_frames" default="[base_uwb1, base_uwb2]"/>
 
       <arg name="sensor_camera_names" default="[leftcamera, rightcamera]"/>

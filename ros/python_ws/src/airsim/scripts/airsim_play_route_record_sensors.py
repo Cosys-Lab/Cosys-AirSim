@@ -152,17 +152,17 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
         response_index += 1
         requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("Scene"),
                                               is_pixels_as_float("Scene"), False))
-        if sensor_camera_toggle_segmentation[sensor_index] is 1:
+        if sensor_camera_toggle_segmentation[sensor_index] == 1:
             requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("Segmentation"),
                                                   is_pixels_as_float("Segmentation"), False))
             response_locations[sensor_name + '_segmentation'] = response_index
             response_index += 1
-        if sensor_camera_toggle_depth[sensor_index] is 1:
+        if sensor_camera_toggle_depth[sensor_index] == 1:
             requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("DepthPlanner"),
                                                   is_pixels_as_float("DepthPlanner"), False))
             response_locations[sensor_name + '_depth'] = response_index
             response_index += 1
-        if sensor_camera_toggle_camera_info[sensor_index] is 1:
+        if sensor_camera_toggle_camera_info[sensor_index] == 1:
             cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name)
 
     print("Starting...")
@@ -175,7 +175,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
     tolerance = 0.05*period
     lastTime = 0
     first_timestamp= None
-    print(pose_topic)
+
     for topic, msg, t in route.read_messages(topics=['/' + pose_topic,'tf_static']):
 
         if rospy.is_shutdown():
@@ -212,7 +212,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                     if response.width == 0 and response.height == 0:
                         rospy.logwarn("Camera '" + sensor_name + "' could not retrieve scene image.")
                     else:
-                        rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
+                        rgb_matrix = np.frombuffer(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
                                                                                                         response.width, 3)
                         if sensor_camera_scene_quality[sensor_index] > 0:
                             rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2BGR)
@@ -221,7 +221,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             rgb_matrix = cv2.imdecode(img, 1)
                             rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_BGR2RGB)
 
-                        if sensor_camera_toggle_scene_mono is 1:
+                        if sensor_camera_toggle_scene_mono == 1:
                             camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
                         else:
                             camera_msg = cv_bridge.cv2_to_imgmsg(rgb_matrix, encoding="rgb8")
@@ -229,7 +229,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                         camera_msg.header.frame_id = sensor_camera_optical_frames[sensor_index]
                         output.write(sensor_camera_scene_topics[sensor_index], camera_msg, t=ros_timestamp)
 
-                    if sensor_camera_toggle_segmentation[sensor_index] is 1:
+                    if sensor_camera_toggle_segmentation[sensor_index] == 1:
                         response = camera_responses[response_locations[sensor_name + '_segmentation']]
                         if response.width == 0 and response.height == 0:
                             rospy.logwarn("Camera '" + sensor_name + "' could not retrieve segmentation image.")
@@ -238,7 +238,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             camera_msg.step = response.width * 3
                             camera_msg.data = rgb_string
                             output.write(sensor_camera_segmentation_topics[sensor_index], camera_msg, t=ros_timestamp)
-                    if sensor_camera_toggle_depth[sensor_index] is 1:
+                    if sensor_camera_toggle_depth[sensor_index] == 1:
                         response = camera_responses[response_locations[sensor_name + '_depth']]
                         if response.width == 0 and response.height == 0:
                             rospy.logwarn("Camera '" + sensor_name + "' could not retrieve depth image.")
@@ -248,7 +248,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             camera_msg.step = response.width * 4
                             camera_msg.data = rgb_string
                             output.write(sensor_camera_depth_topics[sensor_index], camera_msg, t=ros_timestamp)
-                    if sensor_camera_toggle_camera_info[sensor_index] is 1:
+                    if sensor_camera_toggle_camera_info[sensor_index] == 1:
                         FOV = cameraInfo_objects[sensor_name].fov
                         cam_info_msg = CameraInfo()
                         cam_info_msg.header.frame_id = sensor_camera_optical_frames[sensor_index]
@@ -310,7 +310,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
 
                             output.write(sensor_lidar_topics[sensor_index], pcloud, t=ros_timestamp)
 
-                            if sensor_lidar_toggle_segmentation[sensor_index] is 1:
+                            if sensor_lidar_toggle_segmentation[sensor_index] == 1:
                                 labels = np.array(lidar_data.groundtruth, dtype=np.dtype('U'))
                                 groundtruth = StringArray()
                                 groundtruth.data = labels.tolist()
@@ -335,6 +335,54 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             pcloud = pc2.create_cloud(pcloud.header, fields_lidar, points.tolist())
 
                             output.write(sensor_gpulidar_topics[sensor_index], pcloud, t=ros_timestamp)
+
+                for sensor_index, sensor_name in enumerate(sensor_uwb_names):
+                    if (sensor_index == 0):  # only once
+                        uwb_data = client.getUWBData()
+                        # print(uwb_data)
+                        # Sanity check
+                        if len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorY) or \
+                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorZ) or \
+                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_distance) or \
+                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_rssi) or \
+                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_time_stamp) or \
+                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorId) or \
+                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_valid_range):
+                            rospy.logerr("UWB sensor mur lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+                        if len(uwb_data.mura_ranges) != len(uwb_data.mura_tagId) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagX) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagY) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagZ):
+                            rospy.logerr("UWB sensor mur lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+
+                        allRanges = []
+                        for i_mur in range(0, len(uwb_data.mur_anchorX)):
+                            diag = Diagnostics()
+                            diag.rssi = uwb_data.mur_rssi[i_mur]
+
+                            rang = Range()
+                            rang.stamp = timestamp
+                            rang.anchorid = str(uwb_data.mur_anchorId[i_mur])
+                            rang.anchor_position = Point(uwb_data.mur_anchorX[i_mur], uwb_data.mur_anchorY[i_mur], uwb_data.mur_anchorZ[i_mur])
+                            rang.valid_range = uwb_data.mur_valid_range[i_mur]
+                            rang.distance = uwb_data.mur_distance[i_mur]
+                            rang.diagnostics = diag
+
+                            allRanges.append(rang)
+
+                        for i_mura in range(0, len(uwb_data.mura_ranges)):
+                            rangeArray = RangeArray()
+                            rangeArray.tagid = str(uwb_data.mura_tagId[i_mura])
+                            rangeArray.tag_position = Point(uwb_data.mura_tagX[i_mura], uwb_data.mura_tagY[i_mura], uwb_data.mura_tagZ[i_mura])
+                            for i_range in range(0, len(uwb_data.mura_ranges[i_mura])):
+                                rangeArray.ranges.append(allRanges[i_range])
+                            # rangeArray.ranges = uwb_data.mura_ranges[i_mura]
+                            #
+                            output.write(sensor_uwb_topic, rangeArray, t=ros_timestamp)
 
                 for object_index, object_name in enumerate(object_names):
                     if objects_coordinates_local[object_index] == 1:
@@ -402,6 +450,10 @@ if __name__ == '__main__':
         sensor_gpulidar_topics = rospy.get_param('~sensor_gpulidar_topics', "True")
         sensor_gpulidar_frames = rospy.get_param('~sensor_gpulidar_frames', "True")
 
+        sensor_uwb_names = rospy.get_param('~sensor_uwb_names', "True")
+        sensor_uwb_topic = rospy.get_param('~sensor_uwb_topic', "True")
+        sensor_uwb_frames = rospy.get_param('~sensor_uwb_frames', "True")
+
         sensor_camera_names = rospy.get_param('~sensor_camera_names', "True")
         sensor_camera_toggle_scene_mono = rospy.get_param('~sensor_camera_toggle_scene_mono', "True")
         sensor_camera_scene_quality = rospy.get_param('~sensor_camera_scene_quality', "True")
@@ -431,11 +483,11 @@ if __name__ == '__main__':
             rospy.logerr("Could not connect to AirSim.")
             rospy.signal_shutdown('no connection to airsim.')
             sys.exit()
-        print("Connected to AirSim!")
+        # print("Connected to AirSim!")
 
         client.simPause(True)
 
-        rospy.loginfo("Starting static transforms...")
+        # rospy.loginfo("Starting static transforms...")
         tf_static = tf2_msgs.msg.TFMessage()
 
         for sensor_index, sensor_name in enumerate(sensor_echo_names):
@@ -509,6 +561,35 @@ if __name__ == '__main__':
             tf_static.transforms.append(static_transform)
             time.sleep(0.1)
             rospy.loginfo("Started static transform for GPU-LiDAR sensor with ID " + sensor_name + ".")
+
+
+        for sensor_index, sensor_name in enumerate(sensor_uwb_names):
+            # Get uwb sensor data
+            try:
+                uwb_data = client.getUWBSensorData(sensor_name, vehicle_name)
+                # timeStamp = uwb_data[0]
+
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("UWB sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
+
+            if (len(uwb_data) == 2):
+                pose = uwb_data[1]
+                static_transform = TransformStamped()
+                static_transform.header.stamp = rospy.Time.now()
+                static_transform.header.frame_id = vehicle_base_frame
+                static_transform.child_frame_id = sensor_uwb_frames[sensor_index]
+                static_transform.transform.translation.x = pose['position']['x_val']
+                static_transform.transform.translation.y = -pose['position']['y_val']
+                static_transform.transform.translation.z = -pose['position']['z_val']
+                static_transform.transform.rotation.x = pose['orientation']['x_val']
+                static_transform.transform.rotation.y = pose['orientation']['y_val']
+                static_transform.transform.rotation.z = pose['orientation']['z_val']
+                static_transform.transform.rotation.w = pose['orientation']['w_val']
+                tf_static.transforms.append(static_transform)
+                time.sleep(0.1)
+                rospy.loginfo("Started static transform for UWB sensor with ID " + sensor_name + ".")
 
         left_position = None
         right_position = None
