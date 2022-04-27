@@ -156,7 +156,8 @@ void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wai
 
 std::vector<std::string> ASimModeBase::GetAllSegmentationMeshIDs() {
 	std::vector<std::string> retval;
-	for (auto const& element : nameToColorIndexMap_) {
+    TMap<FString, uint32> nameToColorIndexMapTemp = nameToColorIndexMap_;
+	for (auto const& element : nameToColorIndexMapTemp) {
 		retval.emplace_back(std::string(TCHAR_TO_UTF8(*element.Key)));
 	}
 	return retval;
@@ -164,13 +165,24 @@ std::vector<std::string> ASimModeBase::GetAllSegmentationMeshIDs() {
 
 std::vector<msr::airlib::Pose> ASimModeBase::GetAllSegmentationMeshPoses(bool ned) {
     std::vector<msr::airlib::Pose> retval;
-    for (auto const& element : nameToComponentMap_) {
+    TMap<FString, UMeshComponent*> nameToComponentMapTemp = nameToComponentMap_;
+    for (auto const& element : nameToComponentMapTemp) {
         UAirBlueprintLib::RunCommandOnGameThread([ned, &retval, element, this]() {
-            if (ned) {
-                retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+            if (element.Value->HasBegunPlay() && element.Value->IsRenderStateCreated()) {
+                if (!element.Value->IsBeingDestroyed() && !element.Value->IsPendingKillOrUnreachable()) {
+                    if (ned) {
+                        retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+                    }
+                    else {
+                        retval.emplace_back(getGlobalNedTransform().toLocalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+                    }
+                }
+                else {
+                    retval.emplace_back(msr::airlib::Pose::nanPose());
+                }
             }
-            else {
-                retval.emplace_back(getGlobalNedTransform().toLocalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+            else{
+                retval.emplace_back(msr::airlib::Pose::nanPose());
             }
         }, true);           
     }
