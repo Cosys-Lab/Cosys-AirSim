@@ -150,3 +150,7 @@ They also use the Seed randomisation so that they can be spawned at the same way
 - _GroupedTargetPoint_: These are the TargetPoints (waypoints) that the AI will walk between. Their only setting is the group ID number to decide which AI group will be able to pick this waypoint to spawn AI and be the target waypoint for them.
 - _GroupedAI_: One can manually spawn an AI by placing these in the world. They need to be assigned the Group ID manually to choose which waypoints to target.
 - _GroupedAISpawner_: To automate the spawner of AI, one can use this blueprint. It will spawn Ai at the waypoints of the same group. A setting is available to configure the fill percentage. This will set the percentage of waypoints to spawn AI upon. On also has to chose which Skeletal Meshes and their Animation Blueprints can be chosen from.                                                                      
+
+### Spline Animations
+Making statics and skeletal meshes move along a spline path at a fixed speed. See the video below for more information on how it works:
+[![Blinking LEDs](http://img.youtube.com/vi/JbPmS104ctg/0.jpg)](http://www.youtube.com/watch?v=JbPmS104ctg "Cosys-Lab Airsim Simulator - Spline Animation Tutorial")
