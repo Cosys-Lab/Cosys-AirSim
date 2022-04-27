@@ -134,8 +134,9 @@ def handle_input_command(msg, args):
     except:
         print("Input queue full")
 
-def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation_enable, carcontrol_enable, carcontrol_topic,
-                   odometry_enable, odometry_topic,
+
+def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation_enable, carcontrol_enable,
+                   carcontrol_topic, odometry_enable, odometry_topic,
                    sensor_imu_enable, sensor_imu_name, sensor_imu_topic,
                    sensor_imu_frame, sensor_echo_names,
                    sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
@@ -146,10 +147,11 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                    sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
                    sensor_camera_toggle_depth, sensor_camera_scene_topics,
                    sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                   sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info, sensor_camera_info_topics, sensor_stereo_enable, baseline,
-                   object_names, objects_coordinates_local, object_topics):
-
-
+                   sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
+                   sensor_camera_info_topics, sensor_stereo_enable, baseline,
+                   object_poses_all, object_poses_all_coordinates_local, object_poses_all_topic,
+                   object_poses_individual_names, object_poses_individual_coordinates_local,
+                   object_poses_individual_topics):
     rate = rospy.Rate(ros_rate)
 
     last_timestamps = {}
@@ -201,9 +203,14 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             image_publishers[sensor_name + '_cameraInfo'] = rospy.Publisher(sensor_camera_info_topics[sensor_index], CameraInfo, queue_size=2)
             cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name)
 
-    for object_index, object_name in enumerate(object_names):
-        objectpose_publishers[object_name] = rospy.Publisher(object_topics[object_index], PoseStamped, queue_size=1)
-        warning_issued[object_name] = False
+
+    if object_poses_all:
+        object_path_publisher = rospy.Publisher(object_poses_all_topic, Path, queue_size=1)
+    else:
+        for object_index, object_name in enumerate(object_poses_individual_names):
+            objectpose_publishers[object_name] = rospy.Publisher(object_poses_individual_topics[object_index],
+                                                                 PoseStamped, queue_size=1)
+            warning_issued[object_name] = False
 
     cv_bridge = CvBridge()
 
@@ -518,35 +525,68 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     #
                     uwb_rangeArray_publisher.publish(rangeArray)
 
-        for object_index, object_name in enumerate(object_names):
-            if objects_coordinates_local[object_index] == 1:
-                pose = client.simGetObjectPose(object_name, True)
-            else:
-                pose = client.simGetObjectPose(object_name, False)
-            if np.isnan(pose.position.x_val):
-                if warning_issued[object_name] is False:
-                    rospy.logwarn("Object '" + object_name + "' could not be found.")
-                    warning_issued[object_name] = True
-            else:
-                warning_issued[object_name] = False
-                pos = pose.position
-                orientation = pose.orientation.inverse()
+        if object_poses_all:
 
-                object_pose = PoseStamped()
-                object_pose.pose.position.x = pos.x_val
-                object_pose.pose.position.y = -pos.y_val
-                object_pose.pose.position.z = pos.z_val
-                object_pose.pose.orientation.w = orientation.w_val
-                object_pose.pose.orientation.x = orientation.x_val
-                object_pose.pose.orientation.y = orientation.y_val
-                object_pose.pose.orientation.z = orientation.z_val
-                object_pose.header.stamp = timestamp
-                object_pose.header.seq = 1
-                object_pose.header.frame_id = pose_frame
+            object_path = Path()
+            object_path.header.stamp = timestamp
+            object_path.header.frame_id = pose_frame
 
-                objectpose_publishers[object_name].publish(object_pose)
-        if carcontrol_enable ==1 :
-            # set the controls for car
+            cur_object_names = client.simListInstanceSegmentationObjects()
+            if object_poses_all_coordinates_local == 1:
+                cur_object_poses = client.simListInstanceSegmentationPoses(True)
+            else:
+                cur_object_poses = client.simListInstanceSegmentationPoses(False)
+            for index, object_name in enumerate(cur_object_names):
+                currentObjectPose = cur_object_poses[index]
+                if not np.isnan(pose.position.x_val):
+                    pos = currentObjectPose.position
+                    orientation = currentObjectPose.orientation.inverse()
+
+                    object_pose = PoseStamped()
+                    object_pose.pose.position.x = pos.x_val
+                    object_pose.pose.position.y = -pos.y_val
+                    object_pose.pose.position.z = pos.z_val
+                    object_pose.pose.orientation.w = orientation.w_val
+                    object_pose.pose.orientation.x = orientation.x_val
+                    object_pose.pose.orientation.y = orientation.y_val
+                    object_pose.pose.orientation.z = orientation.z_val
+                    object_pose.header.frame_id = object_name
+                    object_pose.header.stamp = timestamp
+                    object_path.poses.append(object_pose)
+
+            object_path_publisher.publish(object_path)
+
+        else:
+            for object_index, object_name in enumerate(object_poses_individual_names):
+                if object_poses_individual_coordinates_local[object_index] == 1:
+                    pose = client.simGetObjectPose(object_name, True)
+                else:
+                    pose = client.simGetObjectPose(object_name, False)
+                if np.isnan(pose.position.x_val):
+                    if warning_issued[object_name] is False:
+                        rospy.logwarn("Object '" + object_name + "' could not be found.")
+                        warning_issued[object_name] = True
+                else:
+                    warning_issued[object_name] = False
+                    pos = pose.position
+                    orientation = pose.orientation.inverse()
+
+                    object_pose = PoseStamped()
+                    object_pose.pose.position.x = pos.x_val
+                    object_pose.pose.position.y = -pos.y_val
+                    object_pose.pose.position.z = pos.z_val
+                    object_pose.pose.orientation.w = orientation.w_val
+                    object_pose.pose.orientation.x = orientation.x_val
+                    object_pose.pose.orientation.y = orientation.y_val
+                    object_pose.pose.orientation.z = orientation.z_val
+                    object_pose.header.stamp = timestamp
+                    object_pose.header.seq = 1
+                    object_pose.header.frame_id = pose_frame
+
+                    objectpose_publishers[object_name].publish(object_pose)
+
+        # set the controls for car
+        if carcontrol_enable == 1:
             try:
                 msg = queue_input_command.get_nowait()
                 car_controls = airsimpy.CarControls()
@@ -624,9 +664,14 @@ if __name__ == '__main__':
         sensor_camera_info_topics = rospy.get_param('~sensor_camera_info_topics', "True")
         sensor_stereo_enable = rospy.get_param('~sensor_stereo_enable', "True")
 
-        object_names = rospy.get_param('~object_names', "True")
-        objects_coordinates_local = rospy.get_param('~objects_coordinates_local', "True")
-        object_topics = rospy.get_param('~object_topics', "True")
+        object_poses_all = rospy.get_param('~object_poses_all', "True")
+        object_poses_all_coordinates_local = rospy.get_param('~object_poses_all_coordinates_local', "True")
+        object_poses_all_topic = rospy.get_param('~object_poses_all_topic', "True")
+
+        object_poses_individual_names = rospy.get_param('~object_poses_individual_names', "True")
+        object_poses_individual_coordinates_local = rospy.get_param('~object_poses_individual_coordinates_local',
+                                                                    "True")
+        object_poses_individual_topics = rospy.get_param('~object_poses_individual_topics', "True")
 
         rospy.loginfo("Connecting to AirSim...")
         if toggle_drone:
@@ -800,7 +845,8 @@ if __name__ == '__main__':
             baseline = 0
         broadcaster.sendTransform(transform_list)
 
-        airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation_enable, carcontrol_enable, carcontrol_topic,
+        airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation_enable, carcontrol_enable,
+                       carcontrol_topic,
                        odometry_enable, odometry_topic, sensor_imu_enable,
                        sensor_imu_name, sensor_imu_topic, sensor_imu_frame, sensor_echo_names,
                        sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
@@ -811,8 +857,11 @@ if __name__ == '__main__':
                        sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
                        sensor_camera_toggle_depth, sensor_camera_scene_topics,
                        sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                       sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info, sensor_camera_info_topics, sensor_stereo_enable, baseline,
-                       object_names, objects_coordinates_local, object_topics)
+                       sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
+                       sensor_camera_info_topics, sensor_stereo_enable, baseline,
+                       object_poses_all, object_poses_all_coordinates_local, object_poses_all_topic,
+                       object_poses_individual_names, object_poses_individual_coordinates_local,
+                       object_poses_individual_topics)
 
     except rospy.ROSInterruptException:
         pass

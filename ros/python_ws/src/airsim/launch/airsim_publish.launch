@@ -55,10 +55,14 @@
       <arg name="sensor_camera_info_topics" default="[airsim/leftcamera/rgb/camera_info, airsim/rightcamera/rgb/camera_info]"/>
       <arg name="sensor_stereo_enable" default="1"/>
 
+      <arg name="object_poses_all" default="0"/>
+      <arg name="object_poses_all_coordinates_local" default="1"/>
+      <arg name="object_poses_all_topic" default="airsim/objects/poses"/>
 
-      <arg name="object_names" default="[object_name]"/>
-      <arg name="objects_coordinates_local" default="[1]"/>
-      <arg name="object_topics" default="[airsim/object/object_name/pose]"/>
+      <arg name="object_poses_individual_names" default="[object_name]"/>
+      <arg name="object_poses_individual_coordinates_local" default="[1]"/>
+      <arg name="object_poses_individual_topics" default="[airsim/object/object_name/pose]"/>
+
 
       <node name="airsim_publish" pkg="airsim" type="airsim_publish.py" respawn="false" output="screen">
 
@@ -118,8 +122,12 @@
             <rosparam param="sensor_camera_info_topics" subst_value="True">$(arg sensor_camera_info_topics)</rosparam>
             <rosparam param="sensor_stereo_enable" subst_value="True">$(arg sensor_stereo_enable)</rosparam>
 
-            <rosparam param="object_names" subst_value="True">$(arg object_names)</rosparam>
-            <rosparam param="objects_coordinates_local" subst_value="True">$(arg objects_coordinates_local)</rosparam>
-            <rosparam param="object_topics" subst_value="True">$(arg object_topics)</rosparam>
+            <rosparam param="object_poses_all" subst_value="True">$(arg object_poses_all)</rosparam>
+            <rosparam param="object_poses_all_coordinates_local" subst_value="True">$(arg object_poses_all_coordinates_local)</rosparam>
+            <rosparam param="object_poses_all_topic" subst_value="True">$(arg object_poses_all_topic)</rosparam>
+
+            <rosparam param="object_poses_individual_names" subst_value="True">$(arg object_poses_individual_names)</rosparam>
+            <rosparam param="object_poses_individual_coordinates_local" subst_value="True">$(arg object_poses_individual_coordinates_local)</rosparam>
+            <rosparam param="object_poses_individual_topics" subst_value="True">$(arg object_poses_individual_topics)</rosparam>
       </node>
 </launch>
