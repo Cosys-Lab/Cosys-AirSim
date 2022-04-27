@@ -10,9 +10,9 @@ import msgpackrpc
 import sys
 import tf2_ros
 
+
 def airsim_record_route(client, ros_rate, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
                         sensor_imu_name, sensor_imu_topic, sensor_imu_frame):
-
     rate = rospy.Rate(ros_rate)
 
     pose_publisher = rospy.Publisher(pose_topic, PoseStamped, queue_size=1)
@@ -115,31 +115,6 @@ if __name__ == '__main__':
             rospy.signal_shutdown('no connection to airsim.')
             sys.exit()
         rospy.loginfo("Connected to AirSim!")
-
-        # broadcaster = tf2_ros.StaticTransformBroadcaster()
-        # transform_list = []
-        # try:
-        #     imu_data = client.getImuData(sensor_imu_name, vehicle_name)
-        # except msgpackrpc.error.RPCError:
-        #     rospy.logerr("IMU sensor '" + sensor_imu_name + "' could not be found.")
-        #     rospy.signal_shutdown('Sensor not found.')
-        #     sys.exit()
-        # pose = imu_data.pose
-        # static_transform = TransformStamped()
-        # static_transform.header.stamp = rospy.Time.now()
-        # static_transform.header.frame_id = vehicle_base_frame
-        # static_transform.child_frame_id = sensor_imu_frame
-        # static_transform.transform.translation.x = pose.position.x_val
-        # static_transform.transform.translation.y = -pose.position.y_val
-        # static_transform.transform.translation.z = -pose.position.z_val
-        # static_transform.transform.rotation.x = pose.orientation.x_val
-        # static_transform.transform.rotation.y = pose.orientation.y_val
-        # static_transform.transform.rotation.z = pose.orientation.z_val
-        # static_transform.transform.rotation.w = pose.orientation.w_val
-        # transform_list.append(static_transform)
-        # time.sleep(0.1)
-        # rospy.loginfo("Started static transform for echo sensor with ID " + sensor_name + ".")
-        # broadcaster.sendTransform(transform_list)
 
         airsim_record_route(client, ros_rate, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
                             sensor_imu_name, sensor_imu_topic, sensor_imu_frame)

@@ -210,7 +210,6 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                                                                             CameraInfo, queue_size=2)
             cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name)
 
-
     if object_poses_all:
         object_path_publisher = rospy.Publisher(object_poses_all_topic, Path, queue_size=1)
     else:

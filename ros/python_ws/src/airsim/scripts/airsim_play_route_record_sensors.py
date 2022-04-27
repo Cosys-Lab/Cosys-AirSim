@@ -11,33 +11,33 @@ from geometry_msgs.msg import PoseStamped, TransformStamped, Quaternion
 import sensor_msgs.point_cloud2 as pc2
 import tf2_ros
 from airsim.msg import StringArray
-from sensor_msgs.msg import PointCloud2, PointField,  CameraInfo
+from sensor_msgs.msg import PointCloud2, PointField, CameraInfo
 import rosbag
 import numpy as np
 import cv2
-from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 import msgpackrpc
 import sys
 import tf2_msgs
 from tf.transformations import *
 
+
 def get_camera_type(cameraType):
-    if (cameraType == "Scene"):
+    if cameraType == "Scene":
         cameraTypeClass = airsimpy.ImageType.Scene
-    elif (cameraType == "Segmentation"):
+    elif cameraType == "Segmentation":
         cameraTypeClass = airsimpy.ImageType.Segmentation
-    elif (cameraType == "DepthPerspective"):
+    elif cameraType == "DepthPerspective":
         cameraTypeClass = airsimpy.ImageType.DepthPerspective
-    elif (cameraType == "DepthPlanner"):
+    elif cameraType == "DepthPlanner":
         cameraTypeClass = airsimpy.ImageType.DepthPlanner
-    elif (cameraType == "DepthVis"):
+    elif cameraType == "DepthVis":
         cameraTypeClass = airsimpy.ImageType.DepthVis
-    elif (cameraType == "Infrared"):
+    elif cameraType == "Infrared":
         cameraTypeClass = airsimpy.ImageType.Infrared
-    elif (cameraType == "SurfaceNormals"):
+    elif cameraType == "SurfaceNormals":
         cameraTypeClass = airsimpy.ImageType.SurfaceNormals
-    elif (cameraType == "DisparityNormalized"):
+    elif cameraType == "DisparityNormalized":
         cameraTypeClass = airsimpy.ImageType.DisparityNormalized
     else:
         cameraTypeClass = airsimpy.ImageType.Scene
@@ -46,48 +46,48 @@ def get_camera_type(cameraType):
 
 
 def is_pixels_as_float(cameraType):
-    if (cameraType == "Scene"):
+    if cameraType == "Scene":
         return False
-    elif (cameraType == "Segmentation"):
+    elif cameraType == "Segmentation":
         return False
-    elif (cameraType == "DepthPerspective"):
+    elif cameraType == "DepthPerspective":
         return True
-    elif (cameraType == "DepthPlanner"):
+    elif cameraType == "DepthPlanner":
         return True
-    elif (cameraType == "DepthVis"):
+    elif cameraType == "DepthVis":
         return True
-    elif (cameraType == "Infrared"):
+    elif cameraType == "Infrared":
         return False
-    elif (cameraType == "SurfaceNormals"):
+    elif cameraType == "SurfaceNormals":
         return False
-    elif (cameraType == "DisparityNormalized"):
+    elif cameraType == "DisparityNormalized":
         return True
     else:
         return False
 
 
 def get_image_bytes(data, cameraType):
-    if (cameraType == "Scene"):
+    if cameraType == "Scene":
         img_rgb_string = data.image_data_uint8
-    elif (cameraType == "Segmentation"):
+    elif cameraType == "Segmentation":
         img_rgb_string = data.image_data_uint8
-    elif (cameraType == "DepthPerspective"):
+    elif cameraType == "DepthPerspective":
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
-    elif (cameraType == "DepthPlanner"):
+    elif cameraType == "DepthPlanner":
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
-    elif (cameraType == "DepthVis"):
+    elif cameraType == "DepthVis":
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
-    elif (cameraType == "Infrared"):
+    elif cameraType == "Infrared":
         img_rgb_string = data.image_data_uint8
-    elif (cameraType == "SurfaceNormals"):
+    elif cameraType == "SurfaceNormals":
         img_rgb_string = data.image_data_uint8
-    elif (cameraType == "DisparityNormalized"):
+    elif cameraType == "DisparityNormalized":
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
@@ -128,8 +128,6 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
     for object_index, object_name in enumerate(object_poses_individual_names):
         warning_issued[object_name] = False
 
-    cv_bridge = CvBridge()
-
     fields_echo = [
         PointField('x', 0, PointField.FLOAT32, 1),
         PointField('y', 4, PointField.FLOAT32, 1),
@@ -150,7 +148,10 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
     response_locations = {}
     cameraInfo_objects = {}
     response_index = 0
+
+    toggle_mono = False
     for sensor_index, sensor_name in enumerate(sensor_camera_names):
+        toggle_mono = True
         response_locations[sensor_name + '_scene'] = response_index
         response_index += 1
         requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("Scene"),
@@ -168,18 +169,22 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
         if sensor_camera_toggle_camera_info[sensor_index] is 1:
             cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name)
 
+    if toggle_mono:
+        from cv_bridge import CvBridge
+        cv_bridge = CvBridge()
+
     print("Starting...")
     rospy.logwarn("Ensure focus is on the screen of AirSim simulator to allow auto configuration!")
     rospy.logdebug(str(route.get_type_and_topic_info()))
 
     pose_count = route.get_message_count('/' + pose_topic)
     pose_index = 1
-    period = 1/ros_rate
-    tolerance = 0.05*period
+    period = 1 / ros_rate
+    tolerance = 0.05 * period
     lastTime = 0
-    first_timestamp= None
+    first_timestamp = None
     print(pose_topic)
-    for topic, msg, t in route.read_messages(topics=['/' + pose_topic,'tf_static']):
+    for topic, msg, t in route.read_messages(topics=['/' + pose_topic, 'tf_static']):
 
         if rospy.is_shutdown():
             break
@@ -199,7 +204,8 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                 client.simContinueForTime(period)
                 lastTime = t.to_sec()
                 position = airsimpy.Vector3r(msg.pose.position.x, -msg.pose.position.y, -msg.pose.position.z)
-                orientation = airsimpy.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z,
+                orientation = airsimpy.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y,
+                                                   msg.pose.orientation.z,
                                                    msg.pose.orientation.w).inverse()
                 orientation = airsimpy.Quaternionr(float(orientation.x_val), float(orientation.y_val),
                                                    float(orientation.z_val), float(orientation.w_val))
@@ -215,8 +221,9 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                     if response.width == 0 and response.height == 0:
                         rospy.logwarn("Camera '" + sensor_name + "' could not retrieve scene image.")
                     else:
-                        rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
-                                                                                                        response.width, 3)
+                        rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(
+                            response.height,
+                            response.width, 3)
                         if sensor_camera_scene_quality[sensor_index] > 0:
                             rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2BGR)
                             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), sensor_camera_scene_quality[sensor_index]]
@@ -225,7 +232,8 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_BGR2RGB)
 
                         if sensor_camera_toggle_scene_mono is 1:
-                            camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
+                            camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY),
+                                                                 encoding="mono8")
                         else:
                             camera_msg = cv_bridge.cv2_to_imgmsg(rgb_matrix, encoding="rgb8")
                         camera_msg.header.stamp = timestamp
@@ -269,10 +277,11 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                         cam_info_msg.P = [f, 0.0, cam_info_msg.width / 2.0, Tx,
                                           0.0, f, cam_info_msg.height / 2.0, 0.0,
                                           0.0, 0.0, 1.0, 0.0]
-                        cam_info_msg.D = [0, 0, 0, 0, 0]  # in future get from client.simGetDistortionParams(camera1Name)
+                        cam_info_msg.D = [0, 0, 0, 0,
+                                          0]  # in future get from client.simGetDistortionParams(camera1Name)
                         cam_info_msg.distortion_model = 'plumb_bob'
                         cam_info_msg.R = [1, 0, 0, 0, 1, 0, 0, 0, 1]
-                        output.write(sensor_camera_info_topics[sensor_index],cam_info_msg,t=ros_timestamp)
+                        output.write(sensor_camera_info_topics[sensor_index], cam_info_msg, t=ros_timestamp)
 
                 for sensor_index, sensor_name in enumerate(sensor_echo_names):
                     echo_data = client.getEchoData(sensor_name, vehicle_name)
@@ -319,7 +328,8 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                                 groundtruth.data = labels.tolist()
                                 groundtruth.header.frame_id = sensor_lidar_frames[sensor_index]
                                 groundtruth.header.stamp = timestamp
-                                output.write(sensor_lidar_segmentation_topics[sensor_index], groundtruth, t=ros_timestamp)
+                                output.write(sensor_lidar_segmentation_topics[sensor_index], groundtruth,
+                                             t=ros_timestamp)
 
                 for sensor_index, sensor_name in enumerate(sensor_gpulidar_names):
                     lidar_data = client.getGPULidarData(sensor_name, vehicle_name)
@@ -422,7 +432,7 @@ if __name__ == '__main__':
 
         route_rosbag = rospy.get_param('~route_rosbag', "airsim_route_only.bag")
         merged_rosbag = rospy.get_param('~merged_rosbag', "airsim_route_sensors.bag")
-        
+
         sensor_echo_names = rospy.get_param('~sensor_echo_names', "True")
         sensor_echo_topics = rospy.get_param('~sensor_echo_topics', "True")
         sensor_echo_frames = rospy.get_param('~sensor_echo_frames', "True")
@@ -584,7 +594,7 @@ if __name__ == '__main__':
             static_transform.transform.translation.x = 0
             static_transform.transform.translation.y = 0
             static_transform.transform.translation.z = 0
-            q_rot = quaternion_from_euler(-math.pi/2, 0,-math.pi/2)
+            q_rot = quaternion_from_euler(-math.pi / 2, 0, -math.pi / 2)
             static_transform.transform.rotation.x = q_rot[0]
             static_transform.transform.rotation.y = q_rot[1]
             static_transform.transform.rotation.z = q_rot[2]
@@ -598,8 +608,10 @@ if __name__ == '__main__':
                 left_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
             elif sensor_stereo_enable == 1 and sensor_index == 1:
                 right_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
-        if left_position != None and right_position != None:
-            baseline = math.sqrt((left_position[0] - right_position[0]) ** 2 + (left_position[1] - right_position[1]) ** 2 + (left_position[2] - right_position[2]) ** 2)
+        if left_position is not None and right_position is not None:
+            baseline = math.sqrt(
+                (left_position[0] - right_position[0]) ** 2 + (left_position[1] - right_position[1]) ** 2 + (
+                            left_position[2] - right_position[2]) ** 2)
         else:
             baseline = 0
 
