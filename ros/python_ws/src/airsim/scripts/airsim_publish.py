@@ -212,7 +212,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                    object_names, objects_coordinates_local, object_topics):
     rate = rospy.Rate(ros_rate)
 
-    speed_pid = PID(1, 0.1, 0.001, 1.0 / ros_rate, "/speed_pid")
+    speed_pid = PID(1, 0, 0.001, 1.0 / ros_rate, "/speed_pid")
 
     # steering_pid = PID(0.0, 0.3, 0.05, 1.0/ros_rate, "/steer_pid")
 
@@ -632,12 +632,13 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             v = simOdom.twist.twist.linear.x
             error = speed_pid.desired_speed - v
             desired_accel = speed_pid.getError(error)
-
-            wheelbase = 0.2
-            if desired_rotation == 0 or speed_pid.desired_speed == 0:
+            # if abs(desired_accel) <= 0.05:
+            #     desired_accel = 0
+            wheelbase = 0.3
+            if desired_rotation == 0 or abs(v) <= 0.1:
                 steer_angle = desired_rotation
             else:
-                radius = speed_pid.desired_speed / desired_rotation
+                radius = v / desired_rotation
                 steer_angle = math.atan(wheelbase / radius)
             # steer_angle = desired_rotation
 
