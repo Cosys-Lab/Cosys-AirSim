@@ -104,15 +104,16 @@ parfor(camera_idx = 1 : n_images)
         cur_mask_image(indexes_true) = mask_values(object_states(class_index) + 1);
     end
     cur_mask_image = reshape(cur_mask_image, size(first_camera_image, 1), size(first_camera_image, 2));
+    image_message = segmentation_images{camera_idx};
+    image_message.Encoding = 'mono8'; 
+    writeImage(image_message, cur_mask_image)
+    segmentation_images{camera_idx} = image_message;
+    parfor_progress;
     if plot_images
         subplot(1, 2, 2);
         imshow(cur_mask_image);    
         drawnow;
     end
-    image_message = segmentation_images{camera_idx};
-    image_message.Encoding = 'mono8'; 
-    writeImage(image_message, cur_mask_image)
-    parfor_progress;
 end
 
 
@@ -126,3 +127,4 @@ delete(bag_writer)
 clear bag_writer
 
 disp('Done!')
+disp(append('To merge you can run from current folder "rosrun airsim bagmerge.py ', fullfile(input_file_path, bag_file_name), ' ', fullfile(output_file_path, "masked_" + bag_file_name), ' -o ', fullfile(input_file_path, "merged_masked_" + bag_file_name), ' -t /camera/mask/image"'))
