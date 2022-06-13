@@ -839,7 +839,7 @@ if __name__ == '__main__':
             static_transform.transform.translation.x = 0
             static_transform.transform.translation.y = 0
             static_transform.transform.translation.z = 0
-            q_rot = quaternion_from_euler(-math.pi / 2, 0, -math.pi / 2)
+            q_rot = tf.transformations.quaternion_from_euler(-math.pi / 2, 0, -math.pi / 2)
             static_transform.transform.rotation.x = q_rot[0]
             static_transform.transform.rotation.y = q_rot[1]
             static_transform.transform.rotation.z = q_rot[2]
