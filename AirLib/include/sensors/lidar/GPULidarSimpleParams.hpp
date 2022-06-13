@@ -50,7 +50,7 @@ namespace msr {
 			bool external_ned = true;                    // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 			bool draw_debug_points = false;
-			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
+			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = impact angle, 4 = intensity
 			bool draw_sensor;						     // Draw the physical sensor in the world on the vehicle
 
 			real_T startup_delay = 1;                    // sec

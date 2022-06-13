@@ -53,6 +53,8 @@ public:
 	std::mt19937 gen_;
 	std::normal_distribution<float> dist_;
 
+	static int32 unique_colors_[765];
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UArrowComponent* arrow_;
 
@@ -113,7 +115,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float noise_distance_scale_ = 0;
 private: //members
- 
+
 private: //methods
 
 };
