@@ -109,6 +109,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	rain_max_intensity_ = settings.rain_max_intensity;
 	rain_constant_a_ = settings.rain_constant_a;
 	rain_constant_b_ = settings.rain_constant_b;
+	generate_noise_ = settings.generate_noise;
 	std::string material_List_content;
 	FString materialListContent;
 	bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str()));
@@ -318,7 +319,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 
 	if (rotation > fov)rotation = fov;
 	float max_angle = FMath::Fmod(current_angle_ + rotation, 360);
-	int32 first_horizontal_idx = getIndexOfMatchOrUpperClosest(horizontal_angles_, current_angle_);
+	int32 first_horizontal_idx = current_horizontal_angle_index_+1;
 	int32 last_horizontal_idx = getIndexLowerClosest(horizontal_angles_, max_angle);
 	bool within_range = true;
 	int32 icol = first_horizontal_idx;
@@ -332,7 +333,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
 		if (last_horizontal_idx == icol_circle)within_range = false;
-		
+
 		current_horizontal_angle_index_ = icol_circle;
 		float horizontal_angle = horizontal_angles_[icol_circle];
 		float horizontal_angle_converted = FMath::Fmod(horizontal_angle - current_angle_, 360) - (fov / 2);
@@ -369,10 +370,12 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			int32 v_pixel = FMath::Max(FMath::FloorToInt((sin_ver * -f_y) / (cos_ver*cos_hor) + c_y), 0);
 
 			FColor value_depth = buffer_2D_depth[h_pixel + (v_pixel * resolution_)];
-			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));	
-			float distance_noise = dist_(gen_) * (1 + ((depth / 100) / max_range_) * (noise_distance_scale_ - 1));
-			depth = depth + distance_noise;
+			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
 
+			if(generate_noise_){
+				float distance_noise = dist_(gen_) * (1 + ((depth / 100) / max_range_) * (noise_distance_scale_ - 1));
+				depth = depth + distance_noise;
+			}
 			if (depth < (max_range_ * 100)) {
 				if (generate_intensity_) {
 					float noise = dist_(gen_) * 0.02 * depth * FMath::Pow(1 - FMath::Exp(-rain_max_intensity_ * rain_value), 2);
@@ -403,7 +406,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					if((impact_angle * material_map_.at(value_intensity.A)) < (max_range_ / range_max_lambertian_percentage_ / 100) * depth / 100.0)threshold_enable = false;
 					if (draw_debug_ && draw_mode_ == 4 && threshold_enable) {
 						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, (1 / (frequency_ * 4)));
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, 2);
 					}
 	
 				}
@@ -412,7 +415,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
 					if (draw_debug_ && draw_mode_ == 1 && threshold_enable) {
 						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, (1 / (frequency_ * 4)));
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, 2);
 					}
 				}
 

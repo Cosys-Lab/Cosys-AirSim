@@ -113,6 +113,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		bool generate_intensity_ = false;
 	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
+		bool generate_noise_ = false;
+	UPROPERTY(EditAnywhere, Category = "Lidar Camera")
 		float noise_distance_scale_ = 0;
 private: //members
 
