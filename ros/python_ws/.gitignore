@@ -163,3 +163,4 @@ venv.bak/
 /.catkin_tools/VERSION
 
 ./src/CMakeLists.txt
+/src/CMakeLists.txt
