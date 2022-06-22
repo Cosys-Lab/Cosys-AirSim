@@ -127,4 +127,4 @@ delete(bag_writer)
 clear bag_writer
 
 disp('Done!')
-disp(append('To merge you can run from current folder "rosrun airsim bagmerge.py ', fullfile(input_file_path, bag_file_name), ' ', fullfile(output_file_path, "masked_" + bag_file_name), ' -o ', fullfile(input_file_path, "merged_masked_" + bag_file_name), ' -t /camera/mask/image"'))
+disp(append('To merge you can run from current folder "rosrun airsim bagmerge.py ', strrep(fullfile(input_file_path, bag_file_name), "\", "/"), ' ', strrep(fullfile(output_file_path, "masked_" + bag_file_name), "\", "/"), ' -o ', strrep(fullfile(input_file_path, "merged_masked_" + bag_file_name), "\", "/"), ' -t ', mask_topic_name, '"'))
