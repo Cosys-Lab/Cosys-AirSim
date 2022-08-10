@@ -33,7 +33,16 @@ UnrealWifiSensor::UnrealWifiSensor(const AirSimSettings::WifiSetting& setting, A
 
 	for (TActorIterator<AWifiBeacon> It(actor_->GetWorld()); It; ++It)
 	{
-		beacon_actors.Add(*It);
+		//FVector startPos = ned_transform->getLocalOffset();
+		FVector startPos = ned_transform->getGlobalOffset();
+
+		msr::airlib::Pose posi;
+		FVector actorLoc = It->GetActorLocation();
+		actorLoc -= startPos;
+		posi.position = Eigen::Vector3f(actorLoc.X, actorLoc.Y, actorLoc.Z);
+		//posi.orientation = It->GetActorRotation();
+		beacon_poses.Add(posi);
+		//beacon_actors.Add(*It);
 	}
 }
 
@@ -72,6 +81,10 @@ void UnrealWifiSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 {
 	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1)); ;
 	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
+}
+
+TArray<msr::airlib::Pose> UnrealWifiSensor::getBeaconActors() {
+	return beacon_poses;
 }
 
 void UnrealWifiSensor::updateWifiRays() {

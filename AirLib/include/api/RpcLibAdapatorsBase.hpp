@@ -614,8 +614,9 @@ public:
         msr::airlib::TTimePoint time_stamp;    // timestamp
         //std::vector<float> point_cloud;        // data
         Pose pose;
+        std::vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
         
-        MSGPACK_DEFINE(time_stamp, pose);
+        MSGPACK_DEFINE(time_stamp, pose, allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ);
 
         MarLocUwbSensorData()
         {}
@@ -623,8 +624,11 @@ public:
         MarLocUwbSensorData(const msr::airlib::MarLocUwbSensorData& s)
         {
             time_stamp = s.time_stamp;
-
             pose = s.pose;
+            allBeaconsId = s.allBeaconsId;
+            allBeaconsX = s.allBeaconsX;
+            allBeaconsY = s.allBeaconsY;
+            allBeaconsZ = s.allBeaconsZ;
             
         }
 
@@ -633,8 +637,11 @@ public:
             msr::airlib::MarLocUwbSensorData d;
 
             d.time_stamp = time_stamp;
-            //d.point_cloud = point_cloud;
             d.pose = pose.to();
+            d.allBeaconsId = allBeaconsId;
+            d.allBeaconsX = allBeaconsX;
+            d.allBeaconsY = allBeaconsY;
+            d.allBeaconsZ = allBeaconsZ;
             
             return d;
         }
@@ -743,42 +750,46 @@ public:
             return d;
         }
     };*/
-
-    struct MarLocUwbReturnMessage2 {
+    
+    struct MarLocUwbReturnMessage {
         //MarLocUwbRange
         std::vector <uint64_t> mur_time_stamp;
-        std::vector<int> mur_anchorId;
-        std::vector<float> mur_anchorX, mur_anchorY, mur_anchorZ;
+        std::vector<std::string> mur_anchorId;
+        std::vector<float> mur_anchorPosX;
+        std::vector<float> mur_anchorPosY;
+        std::vector<float> mur_anchorPosZ;
         std::vector<bool> mur_valid_range;
         std::vector<float> mur_distance;
         std::vector<float> mur_rssi;
 
         //MarLocUwbRangeArray
         std::vector<std::string> mura_tagId;
-        std::vector<float> mura_tagX, mura_tagY, mura_tagZ;
+        std::vector<float> mura_tagPosX;
+        std::vector<float> mura_tagPosY;
+        std::vector<float> mura_tagPosZ;
         std::vector <std::vector<int>> mura_ranges;
 
         //std::vector<Pose> pose;
 
-        MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorX, mur_anchorY, mur_anchorZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagX, mura_tagY, mura_tagZ, mura_ranges);
+        MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorPosX, mur_anchorPosY, mur_anchorPosZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagPosX, mura_tagPosY, mura_tagPosZ, mura_ranges);
 
-        MarLocUwbReturnMessage2()
+        MarLocUwbReturnMessage()
         {}
 
-        MarLocUwbReturnMessage2(const msr::airlib::MarLocUwbReturnMessage2& s)
+        MarLocUwbReturnMessage(const msr::airlib::MarLocUwbReturnMessage& s)
         {
             mur_time_stamp = s.mur_time_stamp;
             mur_anchorId = s.mur_anchorId;
-            mur_anchorX = s.mur_anchorX;
-            mur_anchorY = s.mur_anchorY;
-            mur_anchorZ = s.mur_anchorZ;
+            mur_anchorPosX = s.mur_anchorPosX;
+            mur_anchorPosY = s.mur_anchorPosY;
+            mur_anchorPosZ = s.mur_anchorPosZ;
             mur_valid_range = s.mur_valid_range;
             mur_distance = s.mur_distance;
             mur_rssi = s.mur_rssi;
             mura_tagId = s.mura_tagId;
-            mura_tagX = s.mura_tagX;
-            mura_tagY = s.mura_tagY;
-            mura_tagZ = s.mura_tagZ;
+            mura_tagPosX = s.mura_tagPosX;
+            mura_tagPosY = s.mura_tagPosY;
+            mura_tagPosZ = s.mura_tagPosZ;
             mura_ranges = s.mura_ranges;
             //marLocUwbRange = s.marLocUwbRange;
             //marLocUwbRangeArray = s.marLocUwbRangeArray;
@@ -786,22 +797,22 @@ public:
             //pose = s.pose;
         }
 
-        msr::airlib::MarLocUwbReturnMessage2 to() const
+        msr::airlib::MarLocUwbReturnMessage to() const
         {
-            msr::airlib::MarLocUwbReturnMessage2 d;
+            msr::airlib::MarLocUwbReturnMessage d;
 
             d.mur_time_stamp = mur_time_stamp;
             d.mur_anchorId = mur_anchorId;
-            d.mur_anchorX = mur_anchorX;
-            d.mur_anchorY = mur_anchorY;
-            d.mur_anchorZ = mur_anchorZ;
+            d.mur_anchorPosX = mur_anchorPosX;
+            d.mur_anchorPosY = mur_anchorPosY;
+            d.mur_anchorPosZ = mur_anchorPosZ;
             d.mur_valid_range = mur_valid_range;
             d.mur_distance = mur_distance;
             d.mur_rssi = mur_rssi;
             d.mura_tagId = mura_tagId;
-            d.mura_tagX = mura_tagX;
-            d.mura_tagY = mura_tagY;
-            d.mura_tagZ = mura_tagZ;
+            d.mura_tagPosX = mura_tagPosX;
+            d.mura_tagPosY = mura_tagPosY;
+            d.mura_tagPosZ = mura_tagPosZ;
             d.mura_ranges = mura_ranges;
             //d.marLocUwbRange = marLocUwbRange;
             //d.marLocUwbRangeArray = marLocUwbRangeArray;
@@ -815,8 +826,9 @@ public:
         msr::airlib::TTimePoint time_stamp;    // timestamp
         //std::vector<float> point_cloud;        // data
         Pose pose;
+        std::vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
 
-        MSGPACK_DEFINE(time_stamp, pose);
+        MSGPACK_DEFINE(time_stamp, pose, allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ);
 
         WifiSensorData()
         {}
@@ -824,9 +836,11 @@ public:
         WifiSensorData(const msr::airlib::WifiSensorData& s)
         {
             time_stamp = s.time_stamp;
-
             pose = s.pose;
-
+            allBeaconsId = s.allBeaconsId;
+            allBeaconsX = s.allBeaconsX;
+            allBeaconsY = s.allBeaconsY;
+            allBeaconsZ = s.allBeaconsZ;
         }
 
         msr::airlib::WifiSensorData to() const
@@ -834,9 +848,11 @@ public:
            msr::airlib::WifiSensorData d;
 
             d.time_stamp = time_stamp;
-            //d.point_cloud = point_cloud;
             d.pose = pose.to();
-
+            d.allBeaconsId = allBeaconsId;
+            d.allBeaconsX = allBeaconsX;
+            d.allBeaconsY = allBeaconsY;
+            d.allBeaconsZ = allBeaconsZ;
             return d;
         }
     };

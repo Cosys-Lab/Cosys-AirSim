@@ -85,6 +85,8 @@ protected:
 
 	virtual void updateWifiRays() = 0;
 
+	virtual TArray<msr::airlib::Pose> getBeaconActors() = 0;
+
 private:
 	void updateOutput()
 	{
@@ -140,14 +142,24 @@ private:
 				beaconsActiveDistance.push_back(beaconsActive_[i][ii].distance);
 			}
 		}
-		output.beaconsActiveRssi = beaconsActiveRSSI;
+		/*output.beaconsActiveRssi = beaconsActiveRSSI;
 		output.beaconsActiveID = beaconsActiveID;
 		output.beaconsActivePosX = beaconsActivePosX;
 		output.beaconsActivePosY = beaconsActivePosY;
 		output.beaconsActivePosZ = beaconsActivePosZ;
-		output.beaconsActiveDistance = beaconsActiveDistance;
+		output.beaconsActiveDistance = beaconsActiveDistance;*/
 		
-		//output.beaconsActiveRssi;
+		TArray<msr::airlib::Pose> beacon_poses = getBeaconActors();
+		msr::airlib::Pose thisPose;
+		
+		for (int i = 0; i < beacon_poses.Num(); i++) {
+			thisPose = beacon_poses[i];
+			output.allBeaconsId.push_back(thisPose.orientation.w());
+			output.allBeaconsX.push_back(thisPose.position.x() / 100);
+			output.allBeaconsY.push_back(thisPose.position.y() / 100);
+			output.allBeaconsZ.push_back(-thisPose.position.z() / 100);
+		}
+
 		setOutput(output);
 	}
 	void updateInput() {
