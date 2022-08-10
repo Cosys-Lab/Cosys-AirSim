@@ -646,110 +646,6 @@ public:
             return d;
         }
     };
-	
-    /*struct MarLocUwbRange {
-        uint64_t time_stamp;
-        int anchorId;
-        float anchorX, anchorY, anchorZ;
-        bool valid_range;
-        float distance;
-        float rssi;
-
-        //MSGPACK_DEFINE(time_stamp, anchorId, anchorX, anchorY, anchorZ, valid_range, distance, rssi);
-
-        MarLocUwbRange()
-        {}
-
-        MarLocUwbRange(const msr::airlib::MarLocUwbRange& s)
-        {
-            time_stamp = s.time_stamp;
-            anchorId = s.anchorId;
-            anchorX = s.anchorX;
-            anchorY = s.anchorY;
-            anchorZ = s.anchorZ;
-            valid_range = s.valid_range;
-            distance = s.distance;
-            rssi = s.rssi;
-        }
-
-        msr::airlib::MarLocUwbRange to() const
-        {
-            msr::airlib::MarLocUwbRange d;
-
-            d.time_stamp = time_stamp;
-            d.anchorId = anchorId;
-            d.anchorX = anchorX;
-            d.anchorY = anchorY;
-            d.anchorZ = anchorZ;
-            d.valid_range = valid_range;
-            d.distance = distance;
-            d.rssi = rssi;
-
-            return d;
-        }
-    };*/
-
-    /*struct MarLocUwbRangeArray {
-
-        int tagId;
-        float tagX, tagY, tagZ;
-        std::vector<int> ranges;
-
-        //MSGPACK_DEFINE(tagId, tagX, tagY, tagZ, ranges);
-
-        MarLocUwbRangeArray()
-        {}
-
-        MarLocUwbRangeArray(const msr::airlib::MarLocUwbRangeArray& s)
-        {
-            tagId = s.tagId;
-            tagX = s.tagX;
-            tagY = s.tagY;
-            tagZ = s.tagZ;
-            ranges = s.ranges;
-        }
-
-        msr::airlib::MarLocUwbRangeArray to() const
-        {
-            msr::airlib::MarLocUwbRangeArray d;
-
-            d.tagId = tagId;
-            d.tagX = tagX;
-            d.tagY = tagY;
-            d.tagZ = tagZ;
-            d.ranges = ranges;
-
-            return d;
-        }
-    };*/
-
-    /*struct MarLocUwbReturnMessage {
-        std::vector<msr::airlib::MarLocUwbRange> marLocUwbRange;
-        std::vector<msr::airlib::MarLocUwbRangeArray> marLocUwbRangeArray;
-        //int marLocUwbRange;
-        //int marLocUwbRangeArray;
-
-        //MSGPACK_DEFINE(marLocUwbRange, marLocUwbRangeArray);
-
-        MarLocUwbReturnMessage()
-        {}
-
-        MarLocUwbReturnMessage(const msr::airlib::MarLocUwbReturnMessage& s)
-        {
-            marLocUwbRange = s.marLocUwbRange;
-            marLocUwbRangeArray = s.marLocUwbRangeArray;
-        }
-
-        msr::airlib::MarLocUwbReturnMessage to() const
-        {
-            msr::airlib::MarLocUwbReturnMessage d;
-
-            d.marLocUwbRange = marLocUwbRange;
-            d.marLocUwbRangeArray = marLocUwbRangeArray;
-
-            return d;
-        }
-    };*/
     
     struct MarLocUwbReturnMessage {
         //MarLocUwbRange
@@ -791,10 +687,6 @@ public:
             mura_tagPosY = s.mura_tagPosY;
             mura_tagPosZ = s.mura_tagPosZ;
             mura_ranges = s.mura_ranges;
-            //marLocUwbRange = s.marLocUwbRange;
-            //marLocUwbRangeArray = s.marLocUwbRangeArray;
-
-            //pose = s.pose;
         }
 
         msr::airlib::MarLocUwbReturnMessage to() const
@@ -814,17 +706,12 @@ public:
             d.mura_tagPosY = mura_tagPosY;
             d.mura_tagPosZ = mura_tagPosZ;
             d.mura_ranges = mura_ranges;
-            //d.marLocUwbRange = marLocUwbRange;
-            //d.marLocUwbRangeArray = marLocUwbRangeArray;
-            //d.pose = pose;
             return d;
         }
     };
 
     struct WifiSensorData {
-
         msr::airlib::TTimePoint time_stamp;    // timestamp
-        //std::vector<float> point_cloud;        // data
         Pose pose;
         std::vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
 
@@ -857,41 +744,39 @@ public:
         }
     };
 
-    struct WifiReturnMessage2 {
+    struct WifiReturnMessage {
         //MarLocUwbRange
         std::vector <uint64_t> wr_time_stamp;
-        std::vector<int> wr_anchorId;
-        std::vector<float> wr_anchorX, wr_anchorY, wr_anchorZ;
+        std::vector<std::string> wr_anchorId;
+        std::vector<float> wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ;
         std::vector<bool> wr_valid_range;
         std::vector<float> wr_distance;
         std::vector<float> wr_rssi;
 
         //MarLocUwbRangeArray
         std::vector<std::string> wra_tagId;
-        std::vector<float> wra_tagX, wra_tagY, wra_tagZ;
+        std::vector<float> wra_tagPosX, wra_tagPosY, wra_tagPosZ;
         std::vector <std::vector<int>> wra_ranges;
 
-        //std::vector<Pose> pose;
+        MSGPACK_DEFINE_MAP(wr_time_stamp, wr_anchorId, wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ, wr_valid_range, wr_distance, wr_rssi, wra_tagId, wra_tagPosX, wra_tagPosY, wra_tagPosZ, wra_ranges);
 
-        MSGPACK_DEFINE_MAP(wr_time_stamp, wr_anchorId, wr_anchorX, wr_anchorY, wr_anchorZ, wr_valid_range, wr_distance, wr_rssi, wra_tagId, wra_tagX, wra_tagY, wra_tagZ, wra_ranges);
-
-        WifiReturnMessage2()
+        WifiReturnMessage()
         {}
 
-        WifiReturnMessage2(const msr::airlib::WifiReturnMessage2& s)
+        WifiReturnMessage(const msr::airlib::WifiReturnMessage& s)
         {
             wr_time_stamp = s.wr_time_stamp;
             wr_anchorId = s.wr_anchorId;
-            wr_anchorX = s.wr_anchorX;
-            wr_anchorY = s.wr_anchorY;
-            wr_anchorZ = s.wr_anchorZ;
+            wr_anchorPosX = s.wr_anchorPosX;
+            wr_anchorPosY = s.wr_anchorPosY;
+            wr_anchorPosZ = s.wr_anchorPosZ;
             wr_valid_range = s.wr_valid_range;
             wr_distance = s.wr_distance;
             wr_rssi = s.wr_rssi;
             wra_tagId = s.wra_tagId;
-            wra_tagX = s.wra_tagX;
-            wra_tagY = s.wra_tagY;
-            wra_tagZ = s.wra_tagZ;
+            wra_tagPosX = s.wra_tagPosX;
+            wra_tagPosY = s.wra_tagPosY;
+            wra_tagPosZ = s.wra_tagPosZ;
             wra_ranges = s.wra_ranges;
             //marLocUwbRange = s.marLocUwbRange;
             //marLocUwbRangeArray = s.marLocUwbRangeArray;
@@ -899,22 +784,22 @@ public:
             //pose = s.pose;
         }
 
-        msr::airlib::WifiReturnMessage2 to() const
+        msr::airlib::WifiReturnMessage to() const
         {
-            msr::airlib::WifiReturnMessage2 d;
+            msr::airlib::WifiReturnMessage d;
 
             d.wr_time_stamp = wr_time_stamp;
             d.wr_anchorId = wr_anchorId;
-            d.wr_anchorX = wr_anchorX;
-            d.wr_anchorY = wr_anchorY;
-            d.wr_anchorZ = wr_anchorZ;
+            d.wr_anchorPosX = wr_anchorPosX;
+            d.wr_anchorPosY = wr_anchorPosY;
+            d.wr_anchorPosZ = wr_anchorPosZ;
             d.wr_valid_range = wr_valid_range;
             d.wr_distance = wr_distance;
             d.wr_rssi = wr_rssi;
             d.wra_tagId = wra_tagId;
-            d.wra_tagX = wra_tagX;
-            d.wra_tagY = wra_tagY;
-            d.wra_tagZ = wra_tagZ;
+            d.wra_tagPosX = wra_tagPosX;
+            d.wra_tagPosY = wra_tagPosY;
+            d.wra_tagPosZ = wra_tagPosZ;
             d.wra_ranges = wra_ranges;
             return d;
         }

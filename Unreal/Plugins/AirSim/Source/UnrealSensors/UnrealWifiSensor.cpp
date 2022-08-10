@@ -178,6 +178,7 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 	FHitResult trace_hit_result;
 	bool trace_hit;
 	TArray<AActor*> ignore_actors_;
+	FVector startPos = this->ned_transform_->getGlobalOffset();
 
 	if (traceRayCurrentDistance < traceRayMaxDistance) {
 		if (traceRayCurrentbounces < traceRayMaxBounces) {
@@ -210,7 +211,7 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 						auto hitActor = trace_hit_result.GetActor();
 						
 						int tmpRssi = (int)traceRayCurrentSignalStrength;
-						FVector beaconPos = trace_hit_result.Actor->GetActorLocation();
+						FVector beaconPos = trace_hit_result.Actor->GetActorLocation() - startPos;
 						
 						msr::airlib::WifiHit thisHit;
 						

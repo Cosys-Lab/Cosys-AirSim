@@ -369,7 +369,6 @@ struct MarLocUwbSensorData {
 struct MarLocUwbRange {
     TTimePoint time_stamp = 0;
     std::string anchorId;
-    //std::string tagId;
     float anchorPosX, anchorPosY, anchorPosZ;
     bool valid_range;
     float distance;
@@ -409,25 +408,24 @@ struct MarLocUwbReturnMessage {
 
 struct WifiHit
 {
+    TTimePoint time_stamp = 0;
     std::string beaconID;
-    int rssi;
-    float beaconPosX;
-    float beaconPosY;
-    float beaconPosZ;
+    float beaconPosX, beaconPosY, beaconPosZ;
+    bool isValid;
     float distance;
+    float rssi;
 };
 
 struct WifiSensorData {
 
     TTimePoint time_stamp = 0;
-    //vector<real_T> point_cloud;
     Pose pose;
-    /*vector<std::string> beaconsActiveID;
+    vector<std::string> beaconsActiveID;
     vector<float> beaconsActiveRssi;
     vector<float> beaconsActivePosX;
     vector<float> beaconsActivePosY;
     vector<float> beaconsActivePosZ;
-    vector<float> beaconsActiveDistance;*/
+    vector<float> beaconsActiveDistance;
 
     vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
 
@@ -437,9 +435,8 @@ struct WifiSensorData {
 
 struct WifiRange {
     TTimePoint time_stamp = 0;
-    int anchorId;
-    std::string tagId;
-    float anchorX, anchorY, anchorZ;
+    std::string anchorId;
+    float anchorPosX, anchorPosY, anchorPosZ;
     bool valid_range;
     float distance;
     float rssi;
@@ -450,36 +447,28 @@ struct WifiRange {
 
 struct WifiRangeArray {
     std::string tagId;
-    float tagX, tagY, tagZ;
+    float tagPosX, tagPosY, tagPosZ;
     vector<int> ranges;
 
     WifiRangeArray()
     {}
 };
 
-/*struct WifiReturnMessage {
-    std::vector<WifiRange> WifiRange;
-    std::vector<WifiRangeArray> WifiRangeArray;
-
-    WifiReturnMessage()
-    {}
-};*/
-
-struct WifiReturnMessage2 {
+struct WifiReturnMessage {
     //WifiRange
     vector <TTimePoint> wr_time_stamp;
-    vector<int> wr_anchorId;
-    vector<float> wr_anchorX, wr_anchorY, wr_anchorZ;
+    vector<std::string> wr_anchorId;
+    vector<float> wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ;
     vector<bool> wr_valid_range;
     vector<float> wr_distance;
     vector<float> wr_rssi;
 
     //WifiRangeArray
     vector<std::string> wra_tagId;
-    vector<float> wra_tagX, wra_tagY, wra_tagZ;
+    vector<float> wra_tagPosX, wra_tagPosY, wra_tagPosZ;
     vector <vector<int>> wra_ranges;
 
-    WifiReturnMessage2()
+    WifiReturnMessage()
     {}
 };
 
