@@ -22,6 +22,7 @@ from sensor_msgs.msg import Image
 import msgpackrpc
 import sys
 import tf
+from tf.transformations import quaternion_from_euler
 from multiprocessing import Queue
 
 
@@ -539,49 +540,97 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         for sensor_index, sensor_name in enumerate(sensor_uwb_names):
             if (sensor_index == 0):  # only once
                 uwb_data = client.getUWBData()
+
                 # Sanity check
-                if len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorY) or \
-                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorZ) or \
-                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_distance) or \
-                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_rssi) or \
-                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_time_stamp) or \
-                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorId) or \
-                        len(uwb_data.mur_anchorX) != len(uwb_data.mur_valid_range):
+                if len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorPosY) or \
+                        len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorPosZ) or \
+                        len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_distance) or \
+                        len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_rssi) or \
+                        len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_time_stamp) or \
+                        len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorId) or \
+                        len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_valid_range):
                     rospy.logerr("UWB sensor mur lengths do not match")
                     rospy.signal_shutdown('Packet error.')
                     sys.exit()
                 if len(uwb_data.mura_ranges) != len(uwb_data.mura_tagId) or \
-                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagX) or \
-                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagY) or \
-                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagZ):
-                    rospy.logerr("UWB sensor mur lengths do not match")
+                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosX) or \
+                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosY) or \
+                        len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosZ):
+                    rospy.logerr("UWB sensor mura lengths do not match")
                     rospy.signal_shutdown('Packet error.')
                     sys.exit()
 
-                allRanges = []
-                for i_mur in range(0, len(uwb_data.mur_anchorX)):
-                    diag = Diagnostics()
-                    diag.rssi = uwb_data.mur_rssi[i_mur]
+                uwb_data.mur_anchorId = np.array(uwb_data.mur_anchorId)
 
-                    rang = Range()
-                    rang.stamp = timestamp
-                    rang.anchorid = str(uwb_data.mur_anchorId[i_mur])
-                    rang.anchor_position = Point(uwb_data.mur_anchorX[i_mur], uwb_data.mur_anchorY[i_mur], uwb_data.mur_anchorZ[i_mur])
-                    rang.valid_range = uwb_data.mur_valid_range[i_mur]
-                    rang.distance = uwb_data.mur_distance[i_mur]
-                    rang.diagnostics = diag
+                mur_time_stamp = []
+                mur_anchorId = []
+                mur_anchorPosX = []
+                mur_anchorPosY = []
+                mur_anchorPosZ = []
+                mur_valid_range = []
+                mur_distance = []
+                mur_rssi = []
+                mura_ranges = []
 
-                    allRanges.append(rang)
+                idx_offset = 0
+                
+                for rangeIdx, ranges in enumerate(uwb_data.mura_ranges):
+                    u, uniqueRangeIds = np.unique(uwb_data.mur_anchorId[ranges], return_index=True)
+                    uniqueRangeIds += idx_offset
 
-                for i_mura in range(0, len(uwb_data.mura_ranges)):
+                    mura_ranges_idx_start = len(mur_anchorPosX)
+                    mur_anchorPosX  += list(np.array(uwb_data.mur_anchorPosX)[uniqueRangeIds])
+                    mur_anchorPosY  += list(np.array(uwb_data.mur_anchorPosY)[uniqueRangeIds])
+                    mur_anchorPosZ  += list(np.array(uwb_data.mur_anchorPosZ)[uniqueRangeIds])
+                    mur_time_stamp  += list(np.array(uwb_data.mur_time_stamp)[uniqueRangeIds])
+                    mur_anchorId    += list(np.array(uwb_data.mur_anchorId)[uniqueRangeIds])
+                    mur_valid_range += list(np.array(uwb_data.mur_valid_range)[uniqueRangeIds])
+
+                    mura_ranges.append([])
+                    mura_ranges[rangeIdx] = list(range(mura_ranges_idx_start, len(mur_anchorPosX)))
+                    for arange in uniqueRangeIds:
+                        currentRanges = np.array(uwb_data.mur_anchorId)[ranges]
+                        currentRssi = np.array(uwb_data.mur_rssi)[ranges]
+                        currentDistance = np.array(uwb_data.mur_distance)[ranges]
+                        currentRssiFiltered = currentRssi * list(map(int, currentRanges == uwb_data.mur_anchorId[arange]))
+                        maxRssi = max(currentRssiFiltered)
+                        maxRssiIdx = currentRssiFiltered.argmax()
+
+                        mur_distance.append(currentDistance[maxRssiIdx])
+                        mur_rssi.append(maxRssi)
+
+                    # for arange in uniqueRangeIds:
+                    
+                    idx_offset += len(ranges)
+                    
+                for mura_idx in range(0, len(uwb_data.mura_tagId)):
                     rangeArray = RangeArray()
-                    rangeArray.tagid = str(uwb_data.mura_tagId[i_mura])
-                    rangeArray.tag_position = Point(uwb_data.mura_tagX[i_mura], uwb_data.mura_tagY[i_mura], uwb_data.mura_tagZ[i_mura])
-                    for i_range in range(0, len(uwb_data.mura_ranges[i_mura])):
-                        rangeArray.ranges.append(allRanges[i_range])
+                    rangeArray.tagid = str(uwb_data.mura_tagId[mura_idx])
+                    rangeArray.tag_position = Point(uwb_data.mura_tagPosX[mura_idx], uwb_data.mura_tagPosY[mura_idx], uwb_data.mura_tagPosZ[mura_idx])
+                    rangeArray.header.stamp = timestamp
+                    
+                    #for mur_id in range(0, len(mur_time_stamp)):
+                    for mur_id in mura_ranges[mura_idx]:
+                        diag = Diagnostics()
+                        diag.rssi = mur_rssi[mur_id]
+                        
+                        rang = Range()
+                        #rang.stamp = mur_time_stamp[mur_id]
+                        rang.stamp = timestamp
+                        rang.anchorid = str(mur_anchorId[mur_id])
+                        rang.anchor_position = Point(mur_anchorPosX[mur_id], mur_anchorPosY[mur_id], mur_anchorPosZ[mur_id])
+                        rang.valid_range = mur_valid_range[mur_id]
+                        rang.distance = mur_distance[mur_id]
+                        rang.diagnostics = diag
+
+                        rangeArray.ranges.append(rang) 
 
                     uwb_rangeArray_publisher.publish(rangeArray)
 
+                #rospy.logerr("run once")
+                #rospy.signal_shutdown('Packet error.')
+                #sys.exit()
+            
         for object_index, object_name in enumerate(object_names):
             if objects_coordinates_local[object_index] == 1:
                 pose = client.simGetObjectPose(object_name, True)
