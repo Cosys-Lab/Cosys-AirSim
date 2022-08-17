@@ -14,6 +14,7 @@ from airsim.msg import StringArray
 from sensor_msgs.msg import PointCloud2, PointField, Imu, CameraInfo
 from nav_msgs.msg import Odometry
 from uwb_msgs.msg import Diagnostics, Range, RangeArray
+from wifi_msgs.msg import DiagnosticsRSSI, RangeRSSI, RangeArrayRSSI
 import rosbag
 import numpy as np
 import cv2
@@ -250,6 +251,9 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
 
     if (len(sensor_uwb_names) > 0):
         uwb_rangeArray_publisher = rospy.Publisher(sensor_uwb_topic, RangeArray, queue_size=10)
+        
+    if (len(sensor_uwb_names) > 0):
+        wifi_rangeArray_publisher = rospy.Publisher(sensor_wifi_topic, RangeArray, queue_size=10)
 
     for sensor_index, sensor_name in enumerate(sensor_camera_names):
         image_publishers[sensor_name + '_scene'] = rospy.Publisher(sensor_camera_scene_topics[sensor_index],
@@ -630,6 +634,99 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                 #rospy.logerr("run once")
                 #rospy.signal_shutdown('Packet error.')
                 #sys.exit()
+        for sensor_index, sensor_name in enumerate(sensor_wifi_names):
+            if (sensor_index == 0):  # only once
+                wifi_data = client.getWifiData()
+
+                # Sanity check
+                if len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorPosY) or \
+                        len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorPosZ) or \
+                        len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_distance) or \
+                        len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_rssi) or \
+                        len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_time_stamp) or \
+                        len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorId) or \
+                        len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_valid_range):
+                    rospy.logerr("Wifi sensor wr lengths do not match")
+                    rospy.signal_shutdown('Packet error.')
+                    sys.exit()
+                if len(wifi_data.wra_ranges) != len(wifi_data.wra_tagId) or \
+                        len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosX) or \
+                        len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosY) or \
+                        len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosZ):
+                    rospy.logerr("Wifi sensor wra lengths do not match")
+                    rospy.signal_shutdown('Packet error.')
+                    sys.exit()
+
+                wifi_data.wr_anchorId = np.array(wifi_data.wr_anchorId)
+
+                wr_time_stamp = []
+                wr_anchorId = []
+                wr_anchorPosX = []
+                wr_anchorPosY = []
+                wr_anchorPosZ = []
+                wr_valid_range = []
+                wr_distance = []
+                wr_rssi = []
+                wra_ranges = []
+
+                idx_offset = 0
+                
+                for rangeIdx, ranges in enumerate(wifi_data.wra_ranges):
+                    u, uniqueRangeIds = np.unique(wifi_data.wr_anchorId[ranges], return_index=True)
+                    uniqueRangeIds += idx_offset
+
+                    wra_ranges_idx_start = len(wr_anchorPosX)
+                    wr_anchorPosX  += list(np.array(wifi_data.wr_anchorPosX)[uniqueRangeIds])
+                    wr_anchorPosY  += list(np.array(wifi_data.wr_anchorPosY)[uniqueRangeIds])
+                    wr_anchorPosZ  += list(np.array(wifi_data.wr_anchorPosZ)[uniqueRangeIds])
+                    wr_time_stamp  += list(np.array(wifi_data.wr_time_stamp)[uniqueRangeIds])
+                    wr_anchorId    += list(np.array(wifi_data.wr_anchorId)[uniqueRangeIds])
+                    wr_valid_range += list(np.array(wifi_data.wr_valid_range)[uniqueRangeIds])
+
+                    wra_ranges.append([])
+                    wra_ranges[rangeIdx] = list(range(wra_ranges_idx_start, len(wr_anchorPosX)))
+                    for arange in uniqueRangeIds:
+                        currentRanges = np.array(wifi_data.wr_anchorId)[ranges]
+                        currentRssi = np.array(wifi_data.wr_rssi)[ranges]
+                        currentDistance = np.array(wifi_data.wr_distance)[ranges]
+                        currentRssiFiltered = currentRssi * list(map(int, currentRanges == wifi_data.wr_anchorId[arange]))
+                        maxRssi = max(currentRssiFiltered)
+                        maxRssiIdx = currentRssiFiltered.argmax()
+
+                        wr_distance.append(currentDistance[maxRssiIdx])
+                        wr_rssi.append(maxRssi)
+
+                    # for arange in uniqueRangeIds:
+                    
+                    idx_offset += len(ranges)
+                    
+                for wra_idx in range(0, len(wifi_data.wra_tagId)):
+                    rangeArray = RangeArray()
+                    rangeArray.tagid = str(wifi_data.wra_tagId[wra_idx])
+                    rangeArray.tag_position = Point(wifi_data.wra_tagPosX[wra_idx], wifi_data.wra_tagPosY[wra_idx], wifi_data.wra_tagPosZ[wra_idx])
+                    rangeArray.header.stamp = timestamp
+                    
+                    #for wr_id in range(0, len(wr_time_stamp)):
+                    for wr_id in wra_ranges[wra_idx]:
+                        diag = Diagnostics()
+                        diag.rssi = wr_rssi[wr_id]
+                        
+                        rang = Range()
+                        #rang.stamp = wr_time_stamp[wr_id]
+                        rang.stamp = timestamp
+                        rang.anchorid = str(wr_anchorId[wr_id])
+                        rang.anchor_position = Point(wr_anchorPosX[wr_id], wr_anchorPosY[wr_id], wr_anchorPosZ[wr_id])
+                        rang.valid_range = wr_valid_range[wr_id]
+                        rang.distance = wr_distance[wr_id]
+                        rang.diagnostics = diag
+
+                        rangeArray.ranges.append(rang) 
+
+                    wifi_rangeArray_publisher.publish(rangeArray)
+
+                #rospy.logerr("run once")
+                #rospy.signal_shutdown('Packet error.')
+                #sys.exit()
             
         for object_index, object_name in enumerate(object_names):
             if objects_coordinates_local[object_index] == 1:
@@ -755,6 +852,10 @@ if __name__ == '__main__':
         sensor_uwb_names = rospy.get_param('~sensor_uwb_names', "True")
         sensor_uwb_topic = rospy.get_param('~sensor_uwb_topic', "True")
         sensor_uwb_frames = rospy.get_param('~sensor_uwb_frames', "True")
+
+        sensor_wifi_names = rospy.get_param('~sensor_wifi_names', "True")
+        sensor_wifi_topic = rospy.get_param('~sensor_wifi_topic', "True")
+        sensor_wifi_frames = rospy.get_param('~sensor_wifi_frames', "True")
 
         sensor_camera_names = rospy.get_param('~sensor_camera_names', "True")
         sensor_camera_toggle_scene_mono = rospy.get_param('~sensor_camera_toggle_scene_mono', "True")
