@@ -621,13 +621,6 @@ void ASimModeBase::setupVehiclesAndCamera()
                 //compute initial pose
                 FVector spawn_position = uu_origin.GetLocation();
                 msr::airlib::Vector3r settings_position = beacon_setting.position;
-                /*FVector globalOffset = getGlobalNedTransform().getGlobalOffset();
-
-                settings_position.x() += globalOffset.X;
-                settings_position.y() += globalOffset.Y;
-                settings_position.z() += globalOffset.Z;*/
-
-
                 if (!msr::airlib::VectorMath::hasNan(settings_position))
                     spawn_position = getGlobalNedTransform().fromGlobalNed(settings_position);
                 FRotator spawn_rotation = toFRotator(beacon_setting.rotation, uu_origin.Rotator());

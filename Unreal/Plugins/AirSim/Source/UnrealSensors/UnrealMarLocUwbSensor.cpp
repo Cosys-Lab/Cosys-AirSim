@@ -24,6 +24,9 @@ std::mutex mtx;
 UnrealMarLocUwbSensor::UnrealMarLocUwbSensor(const AirSimSettings::MarLocUwbSetting& setting, AActor* actor, const NedTransform* ned_transform)
 	: MarLocUwbSimple(setting), actor_(actor), ned_transform_(ned_transform), saved_clockspeed_(1), sensor_params_(getParams()), external_(getParams().external)
 {
+	// Initialize UWB properties
+	//configureUwbProperties();
+
 	// Initialize the trace directions
 	sampleSphereCap(sensor_params_.number_of_traces, sensor_params_.sensor_opening_angle);
 
@@ -33,16 +36,7 @@ UnrealMarLocUwbSensor::UnrealMarLocUwbSensor(const AirSimSettings::MarLocUwbSett
 
 	for (TActorIterator<AUWBBeacon> It(actor_->GetWorld()); It; ++It)
 	{
-		//FVector startPos = ned_transform->getLocalOffset();
-		FVector startPos = ned_transform->getGlobalOffset();
-
-		msr::airlib::Pose posi;
-		FVector actorLoc = It->GetActorLocation();
-		actorLoc -= startPos;
-		posi.position = Eigen::Vector3f(actorLoc.X, actorLoc.Y, actorLoc.Z);
-		//posi.orientation = It->GetActorRotation();
-		beacon_poses.Add(posi);
-		//beacon_actors.Add(*It);
+		beacon_actors.Add(*It);
 	}
 }
 
@@ -81,10 +75,6 @@ void UnrealMarLocUwbSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 {
 	FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1)); ;
 	sensor_pose = ned_transform_->toLocalNed(FTransform(sensor_direction.Rotation(), ned_transform_->toFVector(sensor_reference_frame_.position, 100, true), FVector(1, 1, 1)));
-}
-
-TArray<msr::airlib::Pose> UnrealMarLocUwbSensor::getBeaconActors() {
-	return beacon_poses;
 }
 
 void UnrealMarLocUwbSensor::updateUWBRays() {
@@ -182,8 +172,6 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 	FHitResult trace_hit_result;
 	bool trace_hit;
 	TArray<AActor*> ignore_actors_;
-	
-	FVector startPos = this->ned_transform_->getGlobalOffset();
 
 	if (traceRayCurrentDistance < traceRayMaxDistance) {
 		if (traceRayCurrentbounces < traceRayMaxBounces) {
@@ -221,9 +209,7 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 						//trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId);
 						//tmpName = trace_hit_result.Actor->GetFName().ToString();
 						int tmpRssi = (int)traceRayCurrentSignalStrength;
-						FVector beaconPos = trace_hit_result.Actor->GetActorLocation() - startPos;
-
-						//FVector beaconPos = trace_hit_result.Actor->
+						FVector beaconPos = trace_hit_result.Actor->GetActorLocation();
 						//UWBHit thisHit = { FCString::Atoi(*tmpId),  tmpRssi, beaconPos[0], beaconPos[1] , beaconPos[2] };
 						msr::airlib::UWBHit thisHit;
 						
@@ -233,7 +219,6 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 						thisHit.beaconPosX = beaconPos[0];
 						thisHit.beaconPosY = beaconPos[1];
 						thisHit.beaconPosZ = beaconPos[2];
-
 						thisHit.distance = sqrt(pow(beaconPos[0] - trace_origin.X, 2) + pow(beaconPos[1] - trace_origin.Y, 2) + pow(beaconPos[2] - trace_origin.Z, 2)) / 100;
 						UWBHitLog->Add(thisHit);
 						mtx.unlock();
