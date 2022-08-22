@@ -38,7 +38,8 @@ GroundTruth                  | Generate ground truth segmentation color values
 DrawSensor                   | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
 External                     | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.
 ExternalLocal                | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
-rangeMaxLambertianPercentage | WLambertian reflectivity percentage to max out on. Will act linear to 0% for below.
+GenerateIntensity            | Toggle intensity calculation on or off. This requires a surface material map to be available. See below for more information.
+rangeMaxLambertianPercentage | Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
 rainMaxIntensity             | Rain intensity maximum to scale from in mm/hour.
 rainConstantA                | Constant one to to calculate the extinction coefficient in rain
 rainConstantB                | Constant one to to calculate the extinction coefficient in rain
@@ -74,6 +75,7 @@ rainConstantB                | Constant one to to calculate the extinction coeff
 					"Resolution": 1024,
 					"IgnoreMarked": true,
 					"GroundTruth": false
+					"GenerateIntensity": true,
 					"rangeMaxLambertianPercentage": 80,
 					"rainMaxIntensity": 70,
 					"rainConstantA": 0.01,
@@ -84,6 +86,16 @@ rainConstantB                | Constant one to to calculate the extinction coeff
     }
 }
 ```
+## Intensity Surface Material map
+If 'GenerateIntensity' is enabled in the 'settings json, a surface material map is required. This map is used to calculate the intensity of the lidar points.
+e.g.:
+```
+wood,0.9
+alluminium,0.5
+concrete,0.3
+asphalt,0.1
+```
+This needs to be saved as 'materials.csv' in your documents folder where also your settings json file resides.
 
 ## Server side visualization for debugging
 By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. *This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
