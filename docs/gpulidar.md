@@ -18,27 +18,30 @@ Please see [general sensors](sensors.md) for information on configruation of gen
 One can set an object that should be invisible to LIDAR sensors (such as glass) by giving them an Unreal Tag called *LidarIgnore*. 
 
 ## GPU Lidar configuration
-The following parameters can be configured right now via settings json.
+The following parameters can be configured right now via settings json. For some more information check the publication on this topic [here]().
 
-Parameter                 | Description
---------------------------| ------------
-NumberOfChannels          | Number of channels/lasers of the lidar
-Range                     | Range, in meters
-MeasurementsPerCycle      | amount of measurements in one full cycle (horizontal resolution)
-RotationsPerSecond        | Rotations per second
-Resolution                | Defines the resolution of the depth camera image that generates the Lidar point cloud
-HorizontalFOVStart        | Horizontal FOV start for the lidar, in degrees
-HorizontalFOVEnd          | Horizontal FOV end for the lidar, in degrees
-VerticalFOVUpper          | Vertical FOV upper limit for the lidar, in degrees
-VerticalFOVLower          | Vertical FOV lower limit for the lidar, in degrees
-X Y Z                     | Position of the lidar relative to the vehicle (in NED, in meters)                     
-Roll Pitch Yaw            | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
-IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
-GroundTruth               | Generate ground truth segmentation color values
-DrawSensor                | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
-External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.
-ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
-
+Parameter                    | Description
+-----------------------------| ------------
+NumberOfChannels             | Number of channels/lasers of the lidar
+Range                        | Range, in meters
+MeasurementsPerCycle         | amount of measurements in one full cycle (horizontal resolution)
+RotationsPerSecond           | Rotations per second
+Resolution                   | Defines the resolution of the depth camera image that generates the Lidar point cloud
+HorizontalFOVStart           | Horizontal FOV start for the lidar, in degrees
+HorizontalFOVEnd             | Horizontal FOV end for the lidar, in degrees
+VerticalFOVUpper             | Vertical FOV upper limit for the lidar, in degrees
+VerticalFOVLower             | Vertical FOV lower limit for the lidar, in degrees
+X Y Z                        | Position of the lidar relative to the vehicle (in NED, in meters)                     
+Roll Pitch Yaw               | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
+IgnoreMarked                 | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
+GroundTruth                  | Generate ground truth segmentation color values
+DrawSensor                   | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
+External                     | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.
+ExternalLocal                | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
+rangeMaxLambertianPercentage | WLambertian reflectivity percentage to max out on. Will act linear to 0% for below.
+rainMaxIntensity             | Rain intensity maximum to scale from in mm/hour.
+rainConstantA                | Constant one to to calculate the extinction coefficient in rain
+rainConstantB                | Constant one to to calculate the extinction coefficient in rain
 ```
 {
     "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
@@ -54,20 +57,27 @@ ExternalLocal             | When in external mode, if this is enabled the retrie
 			    "gpulidar1": {
 					"SensorType": 8,
 					"Enabled" : true,
-					"NumberOfChannels": 64,
-					"Range": 100,
+					"External": false,
+					"NumberOfChannels": 128,
+					"Range": 50,
 				    "Resolution": 512,
 					"RotationsPerSecond": 10,
 					"MeasurementsPerCycle": 1024,
 					"X": 0, "Y": 0, "Z": -0.3,
 					"Roll": 0, "Pitch": 0, "Yaw" : 0,
-					"VerticalFOVUpper": 17,
-					"VerticalFOVLower": -17,
+					"VerticalFOVUpper": 45,
+					"VerticalFOVLower": -45,
 					"HorizontalFOVStart": 0,
 					"HorizontalFOVEnd": 360,
-					"DrawDebugPoints": false,
-					"Resolution": 512,
-					"IgnoreMarked": true
+					"DrawDebugPoints": true,
+					"DrawMode": 4,
+					"Resolution": 1024,
+					"IgnoreMarked": true,
+					"GroundTruth": false
+					"rangeMaxLambertianPercentage": 80,
+					"rainMaxIntensity": 70,
+					"rainConstantA": 0.01,
+					"rainConstantB": 0.6,
 				}
 			}
 		}
@@ -77,14 +87,29 @@ ExternalLocal             | When in external mode, if this is enabled the retrie
 
 ## Server side visualization for debugging
 By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. *This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
-e.g.,
+
+e.g.:
 ```
         "Lidar1": { 
              ...
              "DrawDebugPoints": true
         },
 ```
+You can also tweak the variation of debugging with the 'DrawMode' parameter:
+ - 0 = no coloring
+ - 1 = instance segmentation
+ - 2 = material
+ - 3 = impact angle
+ - 4 = intensity
 
+e.g.:
+```
+        "Lidar1": { 
+             ...
+             "DrawDebugPoints": true,
+             "DrawMode": 4 
+        },
+```
 ## Client API 
 Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar data. 
 * The API returns a Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
