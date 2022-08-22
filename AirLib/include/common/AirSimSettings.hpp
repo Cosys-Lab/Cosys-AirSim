@@ -31,7 +31,8 @@ public: //types
 	static constexpr char const * kVehicleTypeCPHusky = "cphusky";
 	static constexpr char const * kVehicleTypePioneer = "pioneer";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
-
+    static constexpr char const * kVehicleTypeUrdfBot = "urdfbot";
+    static constexpr char const * kBeaconTypeTemplate = "templateBeacon";
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
 
@@ -254,11 +255,11 @@ public: //types
 
 		// shared defaults
 		uint number_of_channels = 64;
-		real_T range = 50.0f;                            // meters
+		real_T range = 50.0f;                             // meters
         float range_max_lambertian_percentage = 80;       // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
 
         float rain_max_intensity = 70;                    // Rain intensity maximum to scale from in mm/hour.
-        float rain_constant_a = 0.01f;                     // Two constants to calculate the extinction coefficient in rain
+        float rain_constant_a = 0.01f;                    // Two constants to calculate the extinction coefficient in rain
         float rain_constant_b = 0.6f;
 
 		uint measurement_per_cycle = 2048;
@@ -287,7 +288,7 @@ public: //types
         bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 		bool draw_debug_points = false;
-		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = intensity
+		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = impact angle, 4 = intensity
         bool draw_sensor = false;						  // Draw the physical sensor in the world on the vehicle
 	};
 
@@ -320,14 +321,65 @@ public: //types
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
 		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
 
-        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 
 		// Misc
 		Vector3r position = VectorMath::nanVector();
 		Rotation rotation = Rotation::nanRotation();
 		bool ignore_marked = false;
 	};
+
+    struct SensorTemplateSetting : SensorSetting {
+        // Engine & timing settings
+        float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
+        bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+                                                        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+
+        // Misc
+        std::string data_frame = AirSimSettings::kSensorLocalFrame;
+        Vector3r position = VectorMath::nanVector();
+        Rotation rotation = Rotation::nanRotation();
+    };
+
+    struct MarLocUwbSetting : SensorSetting {
+        // Engine & timing settings
+        uint number_of_traces = 5;	     				// Amount of traces (rays) being cast
+        float sensor_opening_angle = 180.0f;			// The opening angle in which rays will be cast from the sensor
+        float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
+        bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+                                                        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        
+        // Misc
+        std::string data_frame = AirSimSettings::kSensorLocalFrame;
+        Vector3r position = VectorMath::nanVector();
+        Rotation rotation = Rotation::nanRotation();
+
+    };
+
+    struct WifiSetting : SensorSetting {
+        // Engine & timing settings
+        uint number_of_traces = 5;	     				// Amount of traces (rays) being cast
+        float sensor_opening_angle = 180.0f;			// The opening angle in which rays will be cast from the sensor
+        float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
+        bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+                                                        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
+        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+
+        // Misc
+        std::string data_frame = AirSimSettings::kSensorLocalFrame;
+        Vector3r position = VectorMath::nanVector();
+        Rotation rotation = Rotation::nanRotation();
+
+    };
 
     struct VehicleSetting {
         //required
@@ -352,6 +404,35 @@ public: //types
         std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
 
         RCSettings rc;
+    };
+
+    struct BeaconSetting {
+        //required
+        std::string beacon_name;
+        std::string beacon_type;
+        std::string beacon_pawn_name;
+
+        //optional
+        std::string default_beacon_state;
+        std::string pawn_path;
+        bool allow_api_always = true;
+        bool auto_create = true;
+        bool enable_collision_passthrough = false;
+        bool enable_trace = false;
+        bool enable_collisions = true;
+        bool is_fpv_vehicle = false;
+        float debug_symbol_scale = 0.0f;
+
+        //nan means use player start
+        Vector3r position = VectorMath::nanVector(); //in global NED
+        Rotation rotation = Rotation::nanRotation();
+
+        std::map<std::string, CameraSetting> cameras;
+        std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
+        std::vector<std::pair<std::string, std::string>> collision_blacklist;
+        RCSettings rc;
+
+        float scale = 1.0f;
     };
 
     struct MavLinkConnectionInfo {
@@ -436,6 +517,7 @@ public: //fields
     HomeGeoPoint origin_geopoint{ GeoPoint(47.641468, -122.140165, 122) }; //The geo-coordinate assigned to Unreal coordinate 0,0,0
     std::map<std::string, PawnPath> pawn_paths; //path for pawn blueprint
     std::map<std::string, std::unique_ptr<VehicleSetting>> vehicles;
+    std::map<std::string, std::unique_ptr<BeaconSetting>> beacons;
     CameraSetting camera_defaults;
     CameraDirectorSetting camera_director;
 	float speed_unit_factor =  1.0f;
@@ -476,6 +558,7 @@ public: //methods
         loadOtherSettings(settings_json);
         loadDefaultSensorSettings(simmode_name, settings_json, sensor_defaults);
         loadVehicleSettings(simmode_name, settings_json, vehicles);
+        loadBeaconSettings(simmode_name, settings_json, beacons);
 
         //this should be done last because it depends on type of vehicles we have
         loadClockSettings(settings_json);
@@ -832,6 +915,52 @@ private:
         return vehicle_setting;
     }
 
+    static std::unique_ptr<BeaconSetting> createBeaconSetting(const std::string& simmode_name, const Settings& settings_json,
+        const std::string beacon_name)
+    {
+        auto beacon_type = Utils::toLower(settings_json.getString("BeaconType", ""));
+        auto beacon_pawn_name = settings_json.getString("BeaconPawnName", "");
+
+        std::unique_ptr<BeaconSetting> beacon_setting;
+        beacon_setting = std::unique_ptr<BeaconSetting>(new BeaconSetting());
+        beacon_setting->beacon_name = beacon_name;
+
+        //required settings_json
+        beacon_setting->beacon_type = beacon_type;
+
+        beacon_setting->beacon_pawn_name = beacon_pawn_name;
+
+        //optional settings_json
+        beacon_setting->scale = settings_json.getFloat("Scale", beacon_setting->scale);
+        beacon_setting->pawn_path = settings_json.getString("PawnPath", "");
+        beacon_setting->default_beacon_state = settings_json.getString("DefaultbeaconState", "");
+        beacon_setting->allow_api_always = settings_json.getBool("AllowAPIAlways",
+            beacon_setting->allow_api_always);
+        beacon_setting->auto_create = settings_json.getBool("AutoCreate",
+            beacon_setting->auto_create);
+        beacon_setting->enable_collision_passthrough = settings_json.getBool("EnableCollisionPassthrogh",
+            beacon_setting->enable_collision_passthrough);
+        beacon_setting->enable_trace = settings_json.getBool("EnableTrace",
+            beacon_setting->enable_trace);
+        beacon_setting->enable_collisions = settings_json.getBool("EnableCollisions",
+            beacon_setting->enable_collisions);
+        //beacon_setting->is_fpv_beacon = settings_json.getBool("IsFpvbeacon",
+            //beacon_setting->is_fpv_beacon);
+
+        Settings rc_json;
+        if (settings_json.getChild("RC", rc_json)) {
+            loadRCSetting(simmode_name, rc_json, beacon_setting->rc);
+        }
+
+        beacon_setting->position = createVectorSetting(settings_json, beacon_setting->position);
+        beacon_setting->rotation = createRotationSetting(settings_json, beacon_setting->rotation);
+
+        //loadCameraSettings(settings_json, beacon_setting->cameras);
+        //loadSensorSettings(settings_json, "Sensors", beacon_setting->sensors);
+
+        return beacon_setting;
+    }
+
     static void initializeVehicleSettings(std::map<std::string, std::unique_ptr<VehicleSetting>>& vehicles)
     {
         vehicles.clear();
@@ -897,6 +1026,28 @@ private:
                 msr::airlib::Settings child;
                 vehicles_child.getChild(key, child);
                 vehicles[key] = createVehicleSetting(simmode_name, child, key);
+            }
+        }
+    }
+
+    static void loadBeaconSettings(const std::string& simmode_name, const Settings& settings_json,
+        std::map<std::string, std::unique_ptr<BeaconSetting>>& beacons)
+    {
+        //initializeVehicleSettings(vehicles);
+
+        msr::airlib::Settings beacons_child;
+        if (settings_json.getChild("Beacons", beacons_child)) {
+            std::vector<std::string> keys;
+            beacons_child.getChildNames(keys);
+
+            //remove default beacons, if values are specified in settings
+            if (keys.size())
+                beacons.clear();
+
+            for (const auto& key : keys) {
+                msr::airlib::Settings child;
+                beacons_child.getChild(key, child);
+                beacons[key] = createBeaconSetting(simmode_name, child, key);
             }
         }
     }
@@ -1023,8 +1174,6 @@ private:
         setting.external_ned = settings_json.getBool("ExternalLocal", setting.external_ned);
         setting.draw_sensor = settings_json.getBool("DrawSensor", setting.draw_sensor);
 
-        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
         loadCaptureSettings(settings_json, setting.capture_settings);
         loadNoiseSettings(settings_json, setting.noise_settings);
         Settings json_gimbal;
@@ -1378,6 +1527,53 @@ private:
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);
 	}
 
+    static void initializeSensorTemplateSetting(SensorTemplateSetting& sensortemplate_setting, const Settings& settings_json)
+    {
+        sensortemplate_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", sensortemplate_setting.measurement_frequency);
+        sensortemplate_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", sensortemplate_setting.pause_after_measurement);
+        sensortemplate_setting.external = settings_json.getBool("External", sensortemplate_setting.external);
+        sensortemplate_setting.external_ned = settings_json.getBool("ExternalLocal", sensortemplate_setting.external_ned);
+        sensortemplate_setting.draw_sensor = settings_json.getBool("DrawSensor", sensortemplate_setting.draw_sensor);
+
+        sensortemplate_setting.data_frame = settings_json.getString("DataFrame", sensortemplate_setting.data_frame);
+
+
+        sensortemplate_setting.position = createVectorSetting(settings_json, sensortemplate_setting.position);
+        sensortemplate_setting.rotation = createRotationSetting(settings_json, sensortemplate_setting.rotation);
+    }
+
+    static void initializeMarLocUwbSensorSetting(MarLocUwbSetting& marlocUwb_setting, const Settings& settings_json)
+    {
+        marlocUwb_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", marlocUwb_setting.measurement_frequency);
+        marlocUwb_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", marlocUwb_setting.pause_after_measurement);
+        marlocUwb_setting.number_of_traces = settings_json.getInt("NumberOfTraces", marlocUwb_setting.number_of_traces);
+        marlocUwb_setting.sensor_opening_angle = settings_json.getFloat("SensorOpeningAngle", marlocUwb_setting.sensor_opening_angle);
+        marlocUwb_setting.external = settings_json.getBool("External", marlocUwb_setting.external);
+        marlocUwb_setting.external_ned = settings_json.getBool("ExternalLocal", marlocUwb_setting.external_ned);
+        marlocUwb_setting.draw_sensor = settings_json.getBool("DrawSensor", marlocUwb_setting.draw_sensor);
+
+        marlocUwb_setting.data_frame = settings_json.getString("DataFrame", marlocUwb_setting.data_frame);
+
+        marlocUwb_setting.position = createVectorSetting(settings_json, marlocUwb_setting.position);
+        marlocUwb_setting.rotation = createRotationSetting(settings_json, marlocUwb_setting.rotation);
+    }
+
+    static void initializeWifiSensorSetting(WifiSetting& wifi_setting, const Settings& settings_json)
+    {
+        wifi_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", wifi_setting.measurement_frequency);
+        wifi_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", wifi_setting.pause_after_measurement);
+        wifi_setting.number_of_traces = settings_json.getInt("NumberOfTraces", wifi_setting.number_of_traces);
+        wifi_setting.sensor_opening_angle = settings_json.getFloat("SensorOpeningAngle", wifi_setting.sensor_opening_angle);
+        wifi_setting.external = settings_json.getBool("External", wifi_setting.external);
+        wifi_setting.external_ned = settings_json.getBool("ExternalLocal", wifi_setting.external_ned);
+        wifi_setting.draw_sensor = settings_json.getBool("DrawSensor", wifi_setting.draw_sensor);
+
+        wifi_setting.data_frame = settings_json.getString("DataFrame", wifi_setting.data_frame);
+
+        wifi_setting.position = createVectorSetting(settings_json, wifi_setting.position);
+        wifi_setting.rotation = createRotationSetting(settings_json, wifi_setting.rotation);
+    }
+
     static std::unique_ptr<SensorSetting> createSensorSetting(
         SensorBase::SensorType sensor_type, const std::string& sensor_name,
         bool enabled)
@@ -1408,6 +1604,15 @@ private:
 			break;
         case SensorBase::SensorType::Echo:
             sensor_setting = std::unique_ptr<SensorSetting>(new EchoSetting());
+            break;
+        case SensorBase::SensorType::SensorTemplate:
+            sensor_setting = std::unique_ptr<SensorSetting>(new SensorTemplateSetting());
+            break;
+        case SensorBase::SensorType::MarlocUwb:
+            sensor_setting = std::unique_ptr<SensorSetting>(new MarLocUwbSetting());
+            break;
+        case SensorBase::SensorType::Wifi:
+            sensor_setting = std::unique_ptr<SensorSetting>(new MarLocUwbSetting());
             break;
         default:
             throw std::invalid_argument("Unexpected sensor type");
@@ -1448,6 +1653,15 @@ private:
 			break;
 		case SensorBase::SensorType::Echo:
             initializeEchoSetting(*static_cast<EchoSetting*>(sensor_setting), settings_json);
+            break;
+        case SensorBase::SensorType::SensorTemplate:
+            initializeSensorTemplateSetting(*static_cast<SensorTemplateSetting*>(sensor_setting), settings_json);
+            break;
+        case SensorBase::SensorType::MarlocUwb:
+            initializeMarLocUwbSensorSetting(*static_cast<MarLocUwbSetting*>(sensor_setting), settings_json);
+            break;
+        case SensorBase::SensorType::Wifi:
+            initializeWifiSensorSetting(*static_cast<WifiSetting*>(sensor_setting), settings_json);
             break;
         default:
             throw std::invalid_argument("Unexpected sensor type");

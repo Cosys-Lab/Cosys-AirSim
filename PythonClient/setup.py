@@ -14,11 +14,11 @@ setuptools.setup(
     url="https://github.com/microsoft/airsim",
     packages=setuptools.find_packages(),
 	license='MIT',
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ),
+    ],
     install_requires=[
           'msgpack-rpc-python', 'numpy'
     ]

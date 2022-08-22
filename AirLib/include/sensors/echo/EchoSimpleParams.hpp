@@ -27,6 +27,7 @@ struct EchoSimpleParams {
 	float sensor_opening_angle;				// The opening angle in which rays will be cast from the sensor
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
 	bool ignore_marked = false;
+	int testParam = 1;
 
 	std::string name = "EchoSensor";
 

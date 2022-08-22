@@ -28,12 +28,18 @@ public:
         Distance = 5,
         Lidar = 6,
 		Echo = 7,
-		GPULidar = 8
+		GPULidar = 8,
+        SensorTemplate = 9,
+        MarlocUwb = 10,
+        Wifi = 11,
     };
 
     SensorBase(const std::string& sensor_name = "")
         : name_(sensor_name)
     {}
+    /*SensorBase(const std::string& sensor_name = "", const std::string& attach_link_name = "")
+        : name_(sensor_name), attach_link_name_(attach_link_name)
+    {}*/
 
 protected:
     struct GroundTruth {

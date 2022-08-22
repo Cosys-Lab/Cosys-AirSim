@@ -174,6 +174,21 @@ msr::airlib::EchoData RpcLibClientBase::getEchoData(const std::string& echo_name
 	return pimpl_->client.call("getEchoData", echo_name, vehicle_name).as<RpcLibAdapatorsBase::EchoData>().to();
 }
 
+msr::airlib::SensorTemplateData RpcLibClientBase::getSensorTemplateData(const std::string& echo_name, const std::string& vehicle_name) const
+{
+    return msr::airlib::SensorTemplateData();
+}
+
+msr::airlib::MarLocUwbSensorData RpcLibClientBase::getMarLocUwbSensorData(const std::string& echo_name, const std::string& vehicle_name) const
+{
+    return msr::airlib::MarLocUwbSensorData();
+}
+
+msr::airlib::WifiSensorData RpcLibClientBase::getWifiSensorData(const std::string& echo_name, const std::string& vehicle_name) const
+{
+    return msr::airlib::WifiSensorData();
+}
+
 msr::airlib::ImuBase::Output RpcLibClientBase::getImuData(const std::string& imu_name, const std::string& vehicle_name) const
 {
     return pimpl_->client.call("getImuData", imu_name, vehicle_name).as<RpcLibAdapatorsBase::ImuData>().to();
@@ -286,6 +301,12 @@ vector<string> RpcLibClientBase::simListSceneObjects(const string& name_regex) c
 vector<string> RpcLibClientBase::simListInstanceSegmentationObjects() const
 {
     return pimpl_->client.call("simListInstanceSegmentationObjects").as<vector<string>>();
+}
+
+vector<msr::airlib::Pose> RpcLibClientBase::simListInstanceSegmentationPoses(bool ned) const
+{
+    const auto& response_adaptor = pimpl_->client.call("simListInstanceSegmentationPoses", ned).as<vector<RpcLibAdapatorsBase::Pose>>();
+    return RpcLibAdapatorsBase::Pose::to(response_adaptor);
 }
 
 msr::airlib::Pose RpcLibClientBase::simGetObjectPose(const std::string& object_name, bool ned) const

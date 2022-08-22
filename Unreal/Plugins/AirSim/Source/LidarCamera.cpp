@@ -20,6 +20,9 @@
 #include <exception>
 #include "Misc/FileHelper.h"
 
+
+
+
 TArray<float> LinearSpacedArray(float min, float max, size_t N) {
 	TArray<float> range;
 	float delta = (max - min) / float(N - 1);
@@ -106,6 +109,7 @@ void ALidarCamera::InitializeSettings(const AirSimSettings::GPULidarSetting& set
 	rain_max_intensity_ = settings.rain_max_intensity;
 	rain_constant_a_ = settings.rain_constant_a;
 	rain_constant_b_ = settings.rain_constant_b;
+	generate_noise_ = settings.generate_noise;
 	std::string material_List_content;
 	FString materialListContent;
 	bool found = FPaths::FileExists(FString(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str()));
@@ -226,7 +230,8 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	sum_rotation_ += rotation;
 	bool refresh = false;
 	if (sum_rotation_ > horizontal_delta_) {
-		if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 180.0f));
+		//if (sum_rotation_ > target_fov_) fov = FMath::CeilToInt(FMath::Max(FMath::Min(sum_rotation_ + (2 * vertical_delta_), 179.0f), 179.0f));
+		fov = 179.0f;
 		//UAirBlueprintLib::LogMessageString("GPULidar2: ", "Chosen FOV: " + std::to_string((int)fov) + ".", LogDebugLevel::Informational);
 		capture_2D_depth_->FOVAngle = fov;
 		capture_2D_segmentation_->FOVAngle = fov;
@@ -307,14 +312,14 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 		render_target_2D_intensity = (FTextureRenderTarget2DResource*)capture_2D_intensity_->TextureTarget->Resource;
 		render_target_2D_intensity->ReadPixels(buffer_2D_intensity);
 	}
-	float c_x = resolution_ / 2.0f;
-	float c_y = resolution_ / 2.0f;
+	float c_x = (resolution_-1) / 2.0f;
+	float c_y = (resolution_-1) / 2.0f;
 	float f_x = (resolution_ / 2.0f) / FMath::Tan(FMath::DegreesToRadians(fov / 2.0f));
 	float f_y = (resolution_ / 2.0f) / FMath::Tan(FMath::DegreesToRadians(fov / 2.0f));
 
 	if (rotation > fov)rotation = fov;
 	float max_angle = FMath::Fmod(current_angle_ + rotation, 360);
-	int32 first_horizontal_idx = getIndexOfMatchOrUpperClosest(horizontal_angles_, current_angle_);
+	int32 first_horizontal_idx = current_horizontal_angle_index_+1;
 	int32 last_horizontal_idx = getIndexLowerClosest(horizontal_angles_, max_angle);
 	bool within_range = true;
 	int32 icol = first_horizontal_idx;
@@ -328,7 +333,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	while (within_range) {
 		int32 icol_circle = (icol) % measurement_per_cycle_;
 		if (last_horizontal_idx == icol_circle)within_range = false;
-		
+
 		current_horizontal_angle_index_ = icol_circle;
 		float horizontal_angle = horizontal_angles_[icol_circle];
 		float horizontal_angle_converted = FMath::Fmod(horizontal_angle - current_angle_, 360) - (fov / 2);
@@ -336,7 +341,9 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 		float cos_hor = FMath::Cos(FMath::DegreesToRadians(horizontal_angle_converted));
 		float sin_hor = FMath::Sin(FMath::DegreesToRadians(horizontal_angle_converted));
 
-		int32 h_pixel = FMath::FloorToInt(((sin_hor * f_x) / cos_hor) + c_x);
+		int32 h_pixel = FMath::Max(FMath::FloorToInt(((sin_hor * f_x) / cos_hor) + c_x), 0);
+
+		
 		for (uint32 ipx = 0; ipx < num_of_lasers_; ipx++)
 		{
 			if ((previous_horizontal_angle > FMath::Fmod(horizontal_angle, 360)) && (point_cloud.size() != 0)) {
@@ -360,13 +367,15 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 			float cos_ver = FMath::Cos(FMath::DegreesToRadians(verticle_angle));
 			float sin_ver = FMath::Sin(FMath::DegreesToRadians(verticle_angle));
 
-			int32 v_pixel = FMath::FloorToInt((sin_ver * -f_y) / (cos_ver*cos_hor) + c_y);
+			int32 v_pixel = FMath::Max(FMath::FloorToInt((sin_ver * -f_y) / (cos_ver*cos_hor) + c_y), 0);
 
 			FColor value_depth = buffer_2D_depth[h_pixel + (v_pixel * resolution_)];
-			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));	
-			float distance_noise = dist_(gen_) * (1 + ((depth / 100) / max_range_) * (noise_distance_scale_ - 1));
-			depth = depth + distance_noise;
+			float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
 
+			if(generate_noise_){
+				float distance_noise = dist_(gen_) * (1 + ((depth / 100) / max_range_) * (noise_distance_scale_ - 1));
+				depth = depth + distance_noise;
+			}
 			if (depth < (max_range_ * 100)) {
 				if (generate_intensity_) {
 					float noise = dist_(gen_) * 0.02 * depth * FMath::Pow(1 - FMath::Exp(-rain_max_intensity_ * rain_value), 2);
@@ -386,7 +395,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 
 					if (draw_debug_ && draw_mode_ == 2) {
 						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_intensity.A, 0, 0, 1), false, (1 / (frequency_ * 4)));
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(unique_colors_[value_intensity.A*3], unique_colors_[(value_intensity.A * 3) + 1], unique_colors_[(value_intensity.A * 3) + 2], 1), false, (1 / (frequency_ * 4)));
 					}
 					if (draw_debug_ && draw_mode_ == 3) {
 						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
@@ -397,7 +406,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					if((impact_angle * material_map_.at(value_intensity.A)) < (max_range_ / range_max_lambertian_percentage_ / 100) * depth / 100.0)threshold_enable = false;
 					if (draw_debug_ && draw_mode_ == 4 && threshold_enable) {
 						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, (1 / (frequency_ * 4)));
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, 2);
 					}
 	
 				}
@@ -406,7 +415,7 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 					value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
 					if (draw_debug_ && draw_mode_ == 1 && threshold_enable) {
 						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, (1 / (frequency_ * 4)));
+						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, 2);
 					}
 				}
 
@@ -445,3 +454,261 @@ bool ALidarCamera::SampleRenders(float rotation, float fov, msr::airlib::vector<
 	}
 	return refresh;
 }
+
+int32 ALidarCamera::unique_colors_[765] = {
+	0, 0, 255,
+	255, 0, 0,
+	0, 255, 0,
+	0, 0, 43,
+	255, 26, 184,
+	255, 211, 0,
+	0, 87, 0,
+	131, 131, 255,
+	158, 79, 70,
+	0, 255, 193,
+	0, 131, 149,
+	0, 0, 123,
+	149, 211, 79,
+	246, 158, 219,
+	211, 17, 255,
+	123, 26, 105,
+	246, 17, 96,
+	255, 193, 131,
+	35, 35, 8,
+	140, 167, 123,
+	246, 131, 8,
+	131, 114, 0,
+	114, 246, 255,
+	158, 193, 255,
+	114, 96, 123,
+	158, 0, 0,
+	0, 79, 255,
+	0, 70, 149,
+	211, 255, 0,
+	184, 79, 211,
+	61, 0, 26,
+	237, 255, 175,
+	255, 123, 96,
+	70, 255, 123,
+	17, 167, 96,
+	211, 167, 167,
+	211, 79, 131,
+	105, 0, 193,
+	43, 96, 70,
+	0, 149, 246,
+	8, 61, 79,
+	167, 87, 8,
+	114, 96, 61,
+	8, 149, 0,
+	158, 105, 184,
+	255, 255, 114,
+	167, 246, 202,
+	149, 175, 184,
+	175, 175, 8,
+	43, 0, 79,
+	0, 202, 255,
+	79, 35, 0,
+	0, 184, 167,
+	158, 0, 52,
+	79, 123, 175,
+	26, 70, 193,
+	87, 211, 0,
+	114, 149, 52,
+	228, 167, 52,
+	246, 140, 149,
+	105, 17, 140,
+	228, 96, 193,
+	237, 211, 255,
+	158, 255, 158,
+	255, 79, 246,
+	149, 96, 255,
+	193, 184, 96,
+	237, 43, 52,
+	175, 105, 131,
+	70, 43, 87,
+	184, 131, 87,
+	140, 8, 255,
+	70, 79, 0,
+	219, 211, 175,
+	228, 149, 255,
+	0, 0, 8,
+	96, 61, 61,
+	237, 0, 131,
+	175, 0, 149,
+	105, 0, 0,
+	184, 167, 255,
+	167, 149, 193,
+	131, 43, 79,
+	114, 123, 114,
+	219, 70, 0,
+	8, 52, 0,
+	149, 202, 123,
+	0, 17, 211,
+	184, 237, 255,
+	87, 61, 149,
+	70, 131, 70,
+	175, 255, 79,
+	70, 202, 87,
+	228, 87, 105,
+	237, 140, 70,
+	123, 79, 17,
+	96, 114, 202,
+	0, 255, 237,
+	79, 149, 131,
+	184, 0, 202,
+	255, 219, 114,
+	17, 35, 184,
+	167, 0, 105,
+	158, 114, 105,
+	26, 184, 202,
+	0, 43, 35,
+	149, 140, 79,
+	175, 211, 8,
+	184, 70, 52,
+	0, 114, 255,
+	255, 246, 0,
+	96, 167, 202,
+	87, 211, 158,
+	114, 70, 193,
+	140, 202, 184,
+	17, 52, 96,
+	131, 255, 0,
+	70, 105, 123,
+	0, 35, 131,
+	70, 0, 61,
+	175, 79, 149,
+	193, 79, 255,
+	211, 255, 140,
+	8, 26, 87,
+	61, 70, 61,
+	96, 87, 149,
+	246, 167, 140,
+	246, 123, 255,
+	228, 255, 219,
+	255, 175, 202,
+	123, 70, 114,
+	184, 123, 255,
+	96, 158, 0,
+	255, 175, 0,
+	43, 17, 8,
+	87, 255, 79,
+	211, 202, 211,
+	175, 123, 17,
+	131, 52, 8,
+	43, 131, 35,
+	105, 17, 35,
+	114, 61, 255,
+	43, 35, 52,
+	70, 175, 246,
+	52, 228, 140,
+	255, 228, 158,
+	246, 131, 175,
+	96, 114, 61,
+	149, 61, 158,
+	193, 211, 87,
+	175, 158, 131,
+	211, 114, 96,
+	140, 246, 114,
+	202, 158, 79,
+	0, 211, 61,
+	184, 123, 175,
+	255, 96, 175,
+	202, 35, 61,
+	131, 149, 219,
+	35, 0, 35,
+	158, 140, 149,
+	70, 105, 0,
+	202, 17, 96,
+	0, 96, 96,
+	0, 131, 96,
+	79, 61, 8,
+	96, 175, 79,
+	255, 26, 255,
+	0, 87, 131,
+	0, 96, 202,
+	211, 96, 43,
+	211, 35, 149,
+	140, 43, 193,
+	184, 219, 167,
+	87, 35, 105,
+	228, 219, 43,
+	255, 202, 184,
+	131, 140, 0,
+	255, 87, 140,
+	237, 184, 255,
+	211, 175, 0,
+	131, 211, 255,
+	114, 255, 211,
+	79, 8, 158,
+	79, 87, 237,
+	96, 175, 131,
+	140, 105, 211,
+	193, 211, 246,
+	61, 70, 35,
+	219, 70, 202,
+	175, 255, 246,
+	219, 255, 87,
+	158, 17, 228,
+	193, 87, 105,
+	202, 175, 123,
+	123, 140, 167,
+	17, 114, 193,
+	255, 96, 61,
+	202, 114, 0,
+	114, 70, 43,
+	123, 193, 0,
+	193, 219, 211,
+	175, 149, 17,
+	96, 43, 70,
+	211, 123, 202,
+	255, 79, 96,
+	79, 140, 255,
+	158, 17, 79,
+	70, 70, 87,
+	96, 228, 211,
+	246, 246, 140,
+	167, 96, 52,
+	0, 140, 193,
+	255, 0, 211,
+	140, 79, 87,
+	184, 105, 211,
+	211, 158, 193,
+	0, 96, 43,
+	255, 211, 228,
+	149, 17, 26,
+	105, 211, 123,
+	52, 8, 114,
+	123, 211, 219,
+	0, 26, 43,
+	219, 0, 8,
+	158, 123, 52,
+	114, 105, 35,
+	202, 131, 123,
+	158, 8, 167,
+	255, 105, 0,
+	255, 140, 237,
+	193, 255, 184,
+	193, 211, 131,
+	228, 140, 96,
+	61, 43, 167,
+	96, 167, 175,
+	158, 175, 158,
+	131, 131, 96,
+	255, 123, 52,
+	87, 87, 193,
+	79, 193, 43,
+	140, 175, 0,
+	193, 184, 246,
+	255, 219, 79,
+	114, 96, 96,
+	114, 43, 26,
+	70, 8, 0,
+	131, 70, 140,
+	105, 61, 211,
+	131, 158, 255,
+	96, 0, 105,
+	158, 52, 0,
+	123, 246, 175,
+	52, 87, 35,
+	0, 167, 123
+};

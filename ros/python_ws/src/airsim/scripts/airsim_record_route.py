@@ -8,24 +8,12 @@ from sensor_msgs.msg import Imu
 from geometry_msgs.msg import PoseStamped
 import msgpackrpc
 import sys
+import tf2_ros
 
-def airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
+
+def airsim_record_route(client, ros_rate, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
                         sensor_imu_name, sensor_imu_topic, sensor_imu_frame):
-
     rate = rospy.Rate(ros_rate)
-
-    rospy.loginfo("Connecting to AirSim...")
-    if toggle_drone:
-        client = airsimpy.MultirotorClient(ip, timeout_value=15)
-    else:
-        client = airsimpy.CarClient(ip, timeout_value=15)
-    try:
-        client.confirmConnection(rospy.get_name())
-    except msgpackrpc.error.TimeoutError:
-        rospy.logerr("Could not connect to AirSim.")
-        rospy.signal_shutdown('no connection to airsim.')
-        sys.exit()
-    rospy.loginfo("Connected to AirSim!")
 
     pose_publisher = rospy.Publisher(pose_topic, PoseStamped, queue_size=1)
     if sensor_imu_enable:
@@ -98,23 +86,37 @@ if __name__ == '__main__':
     try:
         rospy.init_node('airsim_record_route', anonymous=True)
 
-        ip = rospy.get_param('~ip', "")
+        ip = rospy.get_param('~ip', "True")
 
-        ros_rate = rospy.get_param('~rate', 100)
+        ros_rate = rospy.get_param('~rate', "True")
 
-        toggle_drone = rospy.get_param('~toggle_drone', 0)
+        toggle_drone = rospy.get_param('~toggle_drone', "True")
 
-        vehicle_name = rospy.get_param('~vehicle_name', 'airsimvehicle')
+        vehicle_name = rospy.get_param('~vehicle_name', "True")
 
-        pose_topic = rospy.get_param('~pose_topic', "airsim/gtpose")
-        pose_frame = rospy.get_param('~pose_frame', "world")
+        pose_topic = rospy.get_param('~pose_topic', "True")
+        pose_frame = rospy.get_param('~pose_frame', "True")
+        pose_frame = rospy.get_param('~vehicle_base_frame', "True")
 
-        sensor_imu_enable = rospy.get_param('~sensor_imu_enable', 1)
-        sensor_imu_name = rospy.get_param('~sensor_imu_name', "imu")
-        sensor_imu_topic = rospy.get_param('~sensor_imu_topic', "airsim/imu")
-        sensor_imu_frame = rospy.get_param('~sensor_imu_frame', "base_link")
+        sensor_imu_enable = rospy.get_param('~sensor_imu_enable', "True")
+        sensor_imu_name = rospy.get_param('~sensor_imu_name', "True")
+        sensor_imu_topic = rospy.get_param('~sensor_imu_topic', "True")
+        sensor_imu_frame = rospy.get_param('~sensor_imu_frame', "True")
+        print(ip)
+        rospy.loginfo("Connecting to AirSim...")
+        if toggle_drone:
+            client = airsimpy.MultirotorClient(ip, timeout_value=15)
+        else:
+            client = airsimpy.CarClient(ip, timeout_value=15)
+        try:
+            client.confirmConnection(rospy.get_name())
+        except msgpackrpc.error.TimeoutError:
+            rospy.logerr("Could not connect to AirSim.")
+            rospy.signal_shutdown('no connection to airsim.')
+            sys.exit()
+        rospy.loginfo("Connected to AirSim!")
 
-        airsim_record_route(ros_rate, ip, toggle_drone, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
+        airsim_record_route(client, ros_rate, vehicle_name, pose_topic, pose_frame, sensor_imu_enable,
                             sensor_imu_name, sensor_imu_topic, sensor_imu_frame)
 
     except rospy.ROSInterruptException:

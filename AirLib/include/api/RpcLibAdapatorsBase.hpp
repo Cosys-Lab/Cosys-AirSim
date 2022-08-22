@@ -125,6 +125,25 @@ public:
         {
             return msr::airlib::Pose(position.to(), orientation.to());
         }
+
+        static std::vector<Pose> from(
+            const std::vector<msr::airlib::Pose>& poses
+        ) {
+            std::vector<Pose> pose_adaptor;
+            for (const auto& item : poses)
+                pose_adaptor.push_back(Pose(item));
+
+            return pose_adaptor;
+        }
+        static std::vector<msr::airlib::Pose> to(
+            const std::vector<Pose>& pose_adaptor
+        ) {
+            std::vector<msr::airlib::Pose> poses;
+            for (const auto& item : pose_adaptor)
+                poses.push_back(item.to());
+
+            return poses;
+        }
     };
 
     struct GeoPoint {
@@ -573,7 +592,337 @@ public:
 			return d;
 		}
 	};
+
+    struct SensorTemplateData {
+
+        msr::airlib::TTimePoint time_stamp;    // timestamp
+        std::vector<float> point_cloud;        // data
+        Pose pose;
+
+        MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+
+        SensorTemplateData()
+        {}
+
+        SensorTemplateData(const msr::airlib::SensorTemplateData& s)
+        {
+            time_stamp = s.time_stamp;
+            point_cloud = s.point_cloud;
+
+            //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+            if (point_cloud.size() == 0)
+                point_cloud.push_back(0);
+
+            pose = s.pose;
+        }
+
+        msr::airlib::SensorTemplateData to() const
+        {
+            msr::airlib::SensorTemplateData d;
+
+            d.time_stamp = time_stamp;
+            d.point_cloud = point_cloud;
+            d.pose = pose.to();
+
+            return d;
+        }
+    };
+
+    struct MarLocUwbSensorData {
+
+        msr::airlib::TTimePoint time_stamp;    // timestamp
+        //std::vector<float> point_cloud;        // data
+        Pose pose;
+        
+        MSGPACK_DEFINE(time_stamp, pose);
+
+        MarLocUwbSensorData()
+        {}
+
+        MarLocUwbSensorData(const msr::airlib::MarLocUwbSensorData& s)
+        {
+            time_stamp = s.time_stamp;
+
+            pose = s.pose;
+            
+        }
+
+        msr::airlib::MarLocUwbSensorData to() const
+        {
+            msr::airlib::MarLocUwbSensorData d;
+
+            d.time_stamp = time_stamp;
+            //d.point_cloud = point_cloud;
+            d.pose = pose.to();
+            
+            return d;
+        }
+    };
 	
+    /*struct MarLocUwbRange {
+        uint64_t time_stamp;
+        int anchorId;
+        float anchorX, anchorY, anchorZ;
+        bool valid_range;
+        float distance;
+        float rssi;
+
+        //MSGPACK_DEFINE(time_stamp, anchorId, anchorX, anchorY, anchorZ, valid_range, distance, rssi);
+
+        MarLocUwbRange()
+        {}
+
+        MarLocUwbRange(const msr::airlib::MarLocUwbRange& s)
+        {
+            time_stamp = s.time_stamp;
+            anchorId = s.anchorId;
+            anchorX = s.anchorX;
+            anchorY = s.anchorY;
+            anchorZ = s.anchorZ;
+            valid_range = s.valid_range;
+            distance = s.distance;
+            rssi = s.rssi;
+        }
+
+        msr::airlib::MarLocUwbRange to() const
+        {
+            msr::airlib::MarLocUwbRange d;
+
+            d.time_stamp = time_stamp;
+            d.anchorId = anchorId;
+            d.anchorX = anchorX;
+            d.anchorY = anchorY;
+            d.anchorZ = anchorZ;
+            d.valid_range = valid_range;
+            d.distance = distance;
+            d.rssi = rssi;
+
+            return d;
+        }
+    };*/
+
+    /*struct MarLocUwbRangeArray {
+
+        int tagId;
+        float tagX, tagY, tagZ;
+        std::vector<int> ranges;
+
+        //MSGPACK_DEFINE(tagId, tagX, tagY, tagZ, ranges);
+
+        MarLocUwbRangeArray()
+        {}
+
+        MarLocUwbRangeArray(const msr::airlib::MarLocUwbRangeArray& s)
+        {
+            tagId = s.tagId;
+            tagX = s.tagX;
+            tagY = s.tagY;
+            tagZ = s.tagZ;
+            ranges = s.ranges;
+        }
+
+        msr::airlib::MarLocUwbRangeArray to() const
+        {
+            msr::airlib::MarLocUwbRangeArray d;
+
+            d.tagId = tagId;
+            d.tagX = tagX;
+            d.tagY = tagY;
+            d.tagZ = tagZ;
+            d.ranges = ranges;
+
+            return d;
+        }
+    };*/
+
+    /*struct MarLocUwbReturnMessage {
+        std::vector<msr::airlib::MarLocUwbRange> marLocUwbRange;
+        std::vector<msr::airlib::MarLocUwbRangeArray> marLocUwbRangeArray;
+        //int marLocUwbRange;
+        //int marLocUwbRangeArray;
+
+        //MSGPACK_DEFINE(marLocUwbRange, marLocUwbRangeArray);
+
+        MarLocUwbReturnMessage()
+        {}
+
+        MarLocUwbReturnMessage(const msr::airlib::MarLocUwbReturnMessage& s)
+        {
+            marLocUwbRange = s.marLocUwbRange;
+            marLocUwbRangeArray = s.marLocUwbRangeArray;
+        }
+
+        msr::airlib::MarLocUwbReturnMessage to() const
+        {
+            msr::airlib::MarLocUwbReturnMessage d;
+
+            d.marLocUwbRange = marLocUwbRange;
+            d.marLocUwbRangeArray = marLocUwbRangeArray;
+
+            return d;
+        }
+    };*/
+
+    struct MarLocUwbReturnMessage2 {
+        //MarLocUwbRange
+        std::vector <uint64_t> mur_time_stamp;
+        std::vector<int> mur_anchorId;
+        std::vector<float> mur_anchorX, mur_anchorY, mur_anchorZ;
+        std::vector<bool> mur_valid_range;
+        std::vector<float> mur_distance;
+        std::vector<float> mur_rssi;
+
+        //MarLocUwbRangeArray
+        std::vector<std::string> mura_tagId;
+        std::vector<float> mura_tagX, mura_tagY, mura_tagZ;
+        std::vector <std::vector<int>> mura_ranges;
+
+        //std::vector<Pose> pose;
+
+        MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorX, mur_anchorY, mur_anchorZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagX, mura_tagY, mura_tagZ, mura_ranges);
+
+        MarLocUwbReturnMessage2()
+        {}
+
+        MarLocUwbReturnMessage2(const msr::airlib::MarLocUwbReturnMessage2& s)
+        {
+            mur_time_stamp = s.mur_time_stamp;
+            mur_anchorId = s.mur_anchorId;
+            mur_anchorX = s.mur_anchorX;
+            mur_anchorY = s.mur_anchorY;
+            mur_anchorZ = s.mur_anchorZ;
+            mur_valid_range = s.mur_valid_range;
+            mur_distance = s.mur_distance;
+            mur_rssi = s.mur_rssi;
+            mura_tagId = s.mura_tagId;
+            mura_tagX = s.mura_tagX;
+            mura_tagY = s.mura_tagY;
+            mura_tagZ = s.mura_tagZ;
+            mura_ranges = s.mura_ranges;
+            //marLocUwbRange = s.marLocUwbRange;
+            //marLocUwbRangeArray = s.marLocUwbRangeArray;
+
+            //pose = s.pose;
+        }
+
+        msr::airlib::MarLocUwbReturnMessage2 to() const
+        {
+            msr::airlib::MarLocUwbReturnMessage2 d;
+
+            d.mur_time_stamp = mur_time_stamp;
+            d.mur_anchorId = mur_anchorId;
+            d.mur_anchorX = mur_anchorX;
+            d.mur_anchorY = mur_anchorY;
+            d.mur_anchorZ = mur_anchorZ;
+            d.mur_valid_range = mur_valid_range;
+            d.mur_distance = mur_distance;
+            d.mur_rssi = mur_rssi;
+            d.mura_tagId = mura_tagId;
+            d.mura_tagX = mura_tagX;
+            d.mura_tagY = mura_tagY;
+            d.mura_tagZ = mura_tagZ;
+            d.mura_ranges = mura_ranges;
+            //d.marLocUwbRange = marLocUwbRange;
+            //d.marLocUwbRangeArray = marLocUwbRangeArray;
+            //d.pose = pose;
+            return d;
+        }
+    };
+
+    struct WifiSensorData {
+
+        msr::airlib::TTimePoint time_stamp;    // timestamp
+        //std::vector<float> point_cloud;        // data
+        Pose pose;
+
+        MSGPACK_DEFINE(time_stamp, pose);
+
+        WifiSensorData()
+        {}
+
+        WifiSensorData(const msr::airlib::WifiSensorData& s)
+        {
+            time_stamp = s.time_stamp;
+
+            pose = s.pose;
+
+        }
+
+        msr::airlib::WifiSensorData to() const
+        {
+           msr::airlib::WifiSensorData d;
+
+            d.time_stamp = time_stamp;
+            //d.point_cloud = point_cloud;
+            d.pose = pose.to();
+
+            return d;
+        }
+    };
+
+    struct WifiReturnMessage2 {
+        //MarLocUwbRange
+        std::vector <uint64_t> wr_time_stamp;
+        std::vector<int> wr_anchorId;
+        std::vector<float> wr_anchorX, wr_anchorY, wr_anchorZ;
+        std::vector<bool> wr_valid_range;
+        std::vector<float> wr_distance;
+        std::vector<float> wr_rssi;
+
+        //MarLocUwbRangeArray
+        std::vector<std::string> wra_tagId;
+        std::vector<float> wra_tagX, wra_tagY, wra_tagZ;
+        std::vector <std::vector<int>> wra_ranges;
+
+        //std::vector<Pose> pose;
+
+        MSGPACK_DEFINE_MAP(wr_time_stamp, wr_anchorId, wr_anchorX, wr_anchorY, wr_anchorZ, wr_valid_range, wr_distance, wr_rssi, wra_tagId, wra_tagX, wra_tagY, wra_tagZ, wra_ranges);
+
+        WifiReturnMessage2()
+        {}
+
+        WifiReturnMessage2(const msr::airlib::WifiReturnMessage2& s)
+        {
+            wr_time_stamp = s.wr_time_stamp;
+            wr_anchorId = s.wr_anchorId;
+            wr_anchorX = s.wr_anchorX;
+            wr_anchorY = s.wr_anchorY;
+            wr_anchorZ = s.wr_anchorZ;
+            wr_valid_range = s.wr_valid_range;
+            wr_distance = s.wr_distance;
+            wr_rssi = s.wr_rssi;
+            wra_tagId = s.wra_tagId;
+            wra_tagX = s.wra_tagX;
+            wra_tagY = s.wra_tagY;
+            wra_tagZ = s.wra_tagZ;
+            wra_ranges = s.wra_ranges;
+            //marLocUwbRange = s.marLocUwbRange;
+            //marLocUwbRangeArray = s.marLocUwbRangeArray;
+
+            //pose = s.pose;
+        }
+
+        msr::airlib::WifiReturnMessage2 to() const
+        {
+            msr::airlib::WifiReturnMessage2 d;
+
+            d.wr_time_stamp = wr_time_stamp;
+            d.wr_anchorId = wr_anchorId;
+            d.wr_anchorX = wr_anchorX;
+            d.wr_anchorY = wr_anchorY;
+            d.wr_anchorZ = wr_anchorZ;
+            d.wr_valid_range = wr_valid_range;
+            d.wr_distance = wr_distance;
+            d.wr_rssi = wr_rssi;
+            d.wra_tagId = wra_tagId;
+            d.wra_tagX = wra_tagX;
+            d.wra_tagY = wra_tagY;
+            d.wra_tagZ = wra_tagZ;
+            d.wra_ranges = wra_ranges;
+            return d;
+        }
+    };
+
     struct ImuData {
         msr::airlib::TTimePoint time_stamp;
         Quaternionr orientation;

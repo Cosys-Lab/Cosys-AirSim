@@ -33,6 +33,7 @@ public:
 
     virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const override;
     virtual std::vector<std::string> listInstanceSegmentationObjects() const override;
+    virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true) const override;
     virtual Pose getObjectPose(const std::string& object_name, bool ned = true) const override;
     virtual bool setObjectPose(const std::string& object_name, const Pose& pose, bool teleport) override;
 

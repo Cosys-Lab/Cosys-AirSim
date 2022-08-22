@@ -17,6 +17,8 @@ class VehicleClient:
         self.client = msgpackrpc.Client(msgpackrpc.Address(ip, port), timeout = timeout_value, pack_encoding = 'utf-8', unpack_encoding = 'utf-8')
         
     # -----------------------------------  Common vehicle APIs ---------------------------------------------
+    def MarLoc_test(self):
+        return "MarLoc was here" + self.client.call('MarLoc_test_3') + "done"
     def reset(self):
         self.client.call('reset')
 
@@ -169,6 +171,10 @@ class VehicleClient:
     def simListInstanceSegmentationObjects(self):
         return self.client.call('simListInstanceSegmentationObjects')
 
+    def simListInstanceSegmentationPoses(self, ned = True):
+        poses_raw = self.client.call('simListInstanceSegmentationPoses', ned)
+        return [Pose.from_msgpack(pose_raw) for pose_raw in poses_raw]
+
     def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
         return self.client.call('simSpawnStaticMeshObject', object_class_name, object_name, pose)
 
@@ -227,6 +233,9 @@ class VehicleClient:
 
     def getEchoData(self, echo_name = '', vehicle_name = ''):
         return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))
+    
+    def getUWBData(self, echo_name = '', vehicle_name = ''):
+        return EchoData.from_msgpack(self.client.call('getUWBData', echo_name, vehicle_name))
 
     #----------- APIs to control ACharacter in scene ----------/
     def simCharSetFaceExpression(self, expression_name, value, character_name = ""):
@@ -351,6 +360,8 @@ class MultirotorClient(VehicleClient, object):
         return self.client.call_async('moveByVelocity', vx, vy, vz, duration, drivetrain, yaw_mode, vehicle_name)
     def moveByVelocityZAsync(self, vx, vy, z, duration, drivetrain = DrivetrainType.MaxDegreeOfFreedom, yaw_mode = YawMode(), vehicle_name = ''):
         return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, drivetrain, yaw_mode, vehicle_name)
+    def moveByVelocityZAsync2(self, vx, vy, z, duration, vehicle_name = ''):
+        return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, DrivetrainType.MaxDegreeOfFreedom, YawMode(), vehicle_name)
     def moveOnPathAsync(self, path, velocity, timeout_sec = 3e+38, drivetrain = DrivetrainType.MaxDegreeOfFreedom, yaw_mode = YawMode(), 
         lookahead = -1, adaptive_lookahead = 1, vehicle_name = ''):
         return self.client.call_async('moveOnPath', path, velocity, timeout_sec, drivetrain, yaw_mode, lookahead, adaptive_lookahead, vehicle_name)

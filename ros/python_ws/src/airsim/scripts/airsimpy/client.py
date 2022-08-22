@@ -169,6 +169,10 @@ class VehicleClient:
     def simListInstanceSegmentationObjects(self):
         return self.client.call('simListInstanceSegmentationObjects')
 
+    def simListInstanceSegmentationPoses(self, ned = True):
+        poses_raw = self.client.call('simListInstanceSegmentationPoses', ned)
+        return [Pose.from_msgpack(pose_raw) for pose_raw in poses_raw]
+
     def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
         return self.client.call('simSpawnStaticMeshObject', object_class_name, object_name, pose)
 
@@ -227,6 +231,12 @@ class VehicleClient:
 
     def getEchoData(self, echo_name = '', vehicle_name = ''):
         return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))
+    
+    def getUWBData(self, uwb_name = '', vehicle_name = ''):
+        return UwbData.from_msgpack(self.client.call('getUWBData', uwb_name, vehicle_name))
+    
+    def getUWBSensorData(self, uwb_name = '', vehicle_name = ''):
+        return UwbSensorData.from_msgpack(self.client.call('getUWBSensorData', uwb_name, vehicle_name))
 
     #----------- APIs to control ACharacter in scene ----------/
     def simCharSetFaceExpression(self, expression_name, value, character_name = ""):

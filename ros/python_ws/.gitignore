@@ -161,3 +161,6 @@ venv.bak/
 /.catkin_tools/profiles/default/devel_collisions.txt
 /.catkin_tools/README
 /.catkin_tools/VERSION
+
+./src/CMakeLists.txt
+/src/CMakeLists.txt
