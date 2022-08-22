@@ -1,0 +1,30 @@
+{
+  "FileVersion" : 3,
+  "Version" : "1.2.0",
+  "VersionName": "1.2.0",
+  "FriendlyName": "AirSim",
+  "Description": "AirSim - Simulator Plugin",
+  "Category" : "Science",
+  "CreatedBy": "Shital Shah",
+  "CreatedByURL": "http://cosys-lab.uantwerpen.be/",
+  "DocsURL" : "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/README.md",
+  "MarketplaceURL" : "",
+  "SupportURL" : "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/README.md",
+  "EnabledByDefault" : true,
+  "CanContainContent": true,
+  "IsBetaVersion" : true,
+  "Installed": true,
+  "Modules": [
+    {
+      "Name": "AirSim",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+	  {
+		  "Name": "PhysXVehicles",
+		  "Enabled": true
+	  }
+  ]
+}

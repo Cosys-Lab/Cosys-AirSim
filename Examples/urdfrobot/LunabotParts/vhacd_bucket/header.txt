@@ -1,0 +1,5 @@
+C:/LunabotParts/vhacd_bucket/collision_0.txt
+C:/LunabotParts/vhacd_bucket/collision_1.txt
+C:/LunabotParts/vhacd_bucket/collision_2.txt
+C:/LunabotParts/vhacd_bucket/collision_3.txt
+C:/LunabotParts/vhacd_bucket/collision_4.txt
