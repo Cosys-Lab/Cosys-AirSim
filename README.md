@@ -6,15 +6,15 @@ Our goal is to develop AirSim as a platform for AI research to experiment with d
 
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects. 
 Do note that this repository is not actively updated, provided as is, without warranty or support and its sole purpose to is to accompany the publication on [Physical LiDAR Simulation in Real-Time Engine]().
-Please cite this as:
+Please cite the specific work on the GPU LiDAR Simulation as:
 ```
 @inproceedings{lidarsim2022jansen,
   author = {Jansen, Wouter and Huebel, Nico and Steckel, Jan},
   title = {Physical LiDAR Simulation in Real-Time Engine },
   year = {2022},
   booktitle = {2022 IEEE Sensors},
-  eprint = {arXiv:1705.05065},
-  doi = {TBD}
+  eprint = {arXiv:2208.10295},
+  doi = {https://doi.org/10.48550/arXiv.2208.10295}
 }
 ```
 
@@ -110,7 +110,7 @@ Press F10 to see various options available for weather effects. You can also con
 
 ## Participate
 
-### Paper
+### AirSim Paper
 
 More technical details are available in [AirSim paper (FSR 2017 Conference)](https://arxiv.org/abs/1705.05065). Please cite this as:
 ```
