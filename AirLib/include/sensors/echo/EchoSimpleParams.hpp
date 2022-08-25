@@ -1,5 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Developed by Cosys-Lab, University of Antwerp
 
 #ifndef msr_airlib_EchoSimpleParams_hpp
 #define msr_airlib_EchoSimpleParams_hpp
@@ -10,9 +9,6 @@
 namespace msr { namespace airlib {
 
 struct EchoSimpleParams {
-
-    // default settings
-    // TODO: enable reading of these params from AirSim settings
 
     int number_of_traces;					// Amount of traces (rays) being cast 
 	float reflection_opening_angle;			// Beam width of the scattered traces
@@ -49,7 +45,7 @@ struct EchoSimpleParams {
 	bool draw_external_points;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
 
     real_T update_frequency;				// polling rate of update function, in Hz
-    real_T startup_delay;               // startup delay of sensor, in sec
+    real_T startup_delay;                   // startup delay of sensor, in sec
 
     void initializeFromSettings(const AirSimSettings::EchoSetting& settings)
     {

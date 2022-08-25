@@ -1,3 +1,5 @@
+// Developed by Cosys-Lab, University of Antwerp
+
 #include "SkidVehiclePawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
