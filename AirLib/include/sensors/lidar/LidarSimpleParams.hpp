@@ -22,7 +22,7 @@ struct LidarSimpleParams {
     uint measurement_per_cycle = 512;
     uint horizontal_rotation_frequency = 10;  // rotations/sec
     real_T horizontal_FOV_start = 0;
-    real_T horizontal_FOV_end = 359;
+    real_T horizontal_FOV_end = 360;
     real_T vertical_FOV_upper = -15;          // drones -15, car +10
     real_T vertical_FOV_lower = -45;          // drones -45, car -10
 

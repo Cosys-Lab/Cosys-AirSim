@@ -1,5 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Developed by Cosys-Lab, University of Antwerp
 
 #include "UnrealGPULidarSensor.h"
 #include "AirBlueprintLib.h"
@@ -25,7 +24,7 @@ UnrealGPULidarSensor::UnrealGPULidarSensor(const AirSimSettings::GPULidarSetting
 	if (!setting.external) {
 		lidar_camera_->AttachToActor(actor, FAttachmentTransformRules::KeepRelativeTransform);
 	}
-	lidar_camera_->InitializeSettings(setting);
+	lidar_camera_->InitializeSettingsFromAirSim(setting);
 }
 
 // Pause Unreal simulation
