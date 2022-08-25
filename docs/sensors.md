@@ -9,9 +9,9 @@ Each sensor is associated with a integer enum specifying its sensor type.
 * Gps = 3
 * Magnetometer = 4
 * Distance Sensor = 5 
-* Lidar = 6
+// * LiDAR = 6
 * Echo = 7
-* GPULidar = 8
+* GPULiDAR = 8
 
 **Note** :  Cameras are configured differently than the other sensors and do not have an enum associated with them.    Look at [general settings](settings.md) and [image API](image_apis.md) for camera config and API. 
 
@@ -116,9 +116,9 @@ e.g.,
 
 ### Sensor specific settings
 Each sensor-type has its own set of settings as well.   
-Please see [lidar](lidar.md) for example of Lidar specific settings.
+Please see [LiDAR](lidar.md) for example of LiDAR specific settings.
 Please see [echo](echo.md) for example of Echo specific settings.
-Please see [GPU lidar](gpulidar.md) for example of GPU Lidar specific settings.
+Please see [GPU LiDAR](gpulidar.md) for example of GPU LiDAR specific settings.
 
 ## Sensor APIs 
 - Barometer
@@ -156,11 +156,11 @@ Please see [GPU lidar](gpulidar.md) for example of GPU Lidar specific settings.
     distance_sensor_name = getDistanceSensorData(distance_sensor_name = "", vehicle_name = "")
     ```
 
-- Lidar   
-    See [lidar](lidar.md) for Lidar API.
+- LiDAR   
+    See [LiDAR](lidar.md) for LiDAR API.
     
 - Echo   
     See [echo](echo.md) for Echo API.
 
-- GPU Lidar   
-    See [GPU Lidar](gpulidar.md) for GPU Lidar API.
+- GPU LiDAR   
+    See [GPU Lidar](gpulidar.md) for GPU LiDAR API.
