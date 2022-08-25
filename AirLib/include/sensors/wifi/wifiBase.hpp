@@ -1,5 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Developed by Cosys-Lab, University of Antwerp
 
 #ifndef msr_airlib_WifiBase_hpp
 #define msr_airlib_WifiBase_hpp

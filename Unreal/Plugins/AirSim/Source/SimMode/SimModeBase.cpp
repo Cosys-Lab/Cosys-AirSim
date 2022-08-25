@@ -134,7 +134,7 @@ void ASimModeBase::setStencilIDs()
 		UAirBlueprintLib::InitializeMeshStencilIDs(true, materialListContent);
 	}
 	else {
-		UAirBlueprintLib::LogMessage("Material list '%s' was not found. Cannot start stencil initialization.",
+		UAirBlueprintLib::LogMessage("Cannot start stencil initialization. Material list was not found:",
             UTF8_TO_TCHAR(getSettings().material_list_file.c_str()), LogDebugLevel::Failure);
 	}
 }

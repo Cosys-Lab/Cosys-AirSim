@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Developed by Cosys-Lab, University of Antwerp
 
 #pragma once
 
