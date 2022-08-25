@@ -164,10 +164,10 @@ Please note that `Roadwetness`, `RoadSnow` and `RoadLeaf` effects requires addin
 
 Please see [example code](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/PythonClient/computer_vision/weather.py) for more details.
 
-### Lidar APIs
-AirSim offers API to retrieve point cloud data from (GPU)Lidar sensors on vehicles. You can set the number of channels, points per second, horizontal and vertical FOV, etc parameters in [settings.json](settings.md). 
+### LiDAR APIs
+AirSim offers API to retrieve point cloud data from (GPU)LiDAR sensors on vehicles. You can set the number of channels, points per second, horizontal and vertical FOV, etc parameters in [settings.json](settings.md). 
 
-More on [lidar APIs and settings](lidar.md), [GPUlidar APIs and settings](gpulidar.md) and [sensor settings](sensors.md)
+More on [LiDAR APIs and settings](lidar.md), [GPULiDAR APIs and settings](gpulidar.md) and [sensor settings](sensors.md)
 
 ### Multiple Vehicles
 AirSim supports multiple vehicles and control them through APIs. Please [Multiple Vehicles](multi_vehicle.md) doc.

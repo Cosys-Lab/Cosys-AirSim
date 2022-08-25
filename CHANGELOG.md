@@ -15,7 +15,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVIDIA tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
-* Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
+* Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
 * Dropped support for Unity Environments.
 * 
@@ -26,7 +26,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
 * Highly efficient [NoDisplay view mode](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
 * [Enable/disable sensors](https://github.com/Microsoft/AirSim/pull/1479) via settings
-* [Lidar Sensor](docs/lidar.md)
+* [LiDAR Sensor](docs/lidar.md)
 * [Support for Flysky FS-SM100 RC](https://github.com/Microsoft/AirSim/commit/474214364676b6631c01b3ed79d00c83ba5bccf5) USB adapter
 * Case Study: [Formula Student Technion Driverless](https://github.com/Microsoft/AirSim/wiki/technion)
 * [Multi-Vehicle Capability](docs/multi_vehicle.md)
