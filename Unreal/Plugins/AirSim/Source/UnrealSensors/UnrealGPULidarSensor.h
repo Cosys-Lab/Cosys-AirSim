@@ -1,5 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Developed by Cosys-Lab, University of Antwerp
 
 #pragma once
 
@@ -10,7 +9,7 @@
 #include "LidarCamera.h"
 #include <random>
 
-// UnrealLidarSensor implementation that uses a rotating depth camera to accelerate the Lidar Simulation
+// Implementation of a LiDAR sensor that uses a rotating virtual cameras to accelerate the LiDAR Simulation on the GPU
 class UnrealGPULidarSensor : public msr::airlib::GPULidarSimple {
 public:
 	typedef msr::airlib::AirSimSettings AirSimSettings;
@@ -24,12 +23,9 @@ protected:
 	virtual void pause(const bool is_paused);
 	virtual void getLocalPose(msr::airlib::Pose& sensor_pose);
 
-
 private:
 	using Vector3r = msr::airlib::Vector3r;
 	using VectorMath = msr::airlib::VectorMath;
-
-
 
 private:
 	AActor* actor_;

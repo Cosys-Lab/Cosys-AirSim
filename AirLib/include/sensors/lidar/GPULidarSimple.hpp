@@ -1,5 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Developed by Cosys-Lab, University of Antwerp
 
 #ifndef msr_airlib_GPULidar_hpp
 #define msr_airlib_GPULidar_hpp
@@ -40,9 +39,6 @@ namespace msr {
 				GPULidarBase::update(delta);
 				freq_limiter_.update(delta);
 				updateOutput();
-				//if (freq_limiter_.isWaitComplete()) {
-				//	updateOutput();
-				//}
 			}
 
 			virtual void reportState(StateReporter& reporter) override
