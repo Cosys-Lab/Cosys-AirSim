@@ -225,7 +225,7 @@ public: //types
         uint measurement_per_cycle = 512;
         uint horizontal_rotation_frequency = 10;          // rotations/sec
         float horizontal_FOV_start = 0;                   // degrees
-        float horizontal_FOV_end = 359;                   // degrees
+        float horizontal_FOV_end = 360;                   // degrees
 		float update_frequency = 10;				      // how frequently to update the data in Hz
 		bool limit_points = true;						  // limit the amount of points per measurement to 100000
 		bool pause_after_measurement = false;			  // Pause the simulation after each measurement. Useful for API interaction to be synced
@@ -253,43 +253,39 @@ public: //types
 
 	struct GPULidarSetting : SensorSetting {
 
-		// shared defaults
-		uint number_of_channels = 64;
-		real_T range = 50.0f;                             // meters
-        float range_max_lambertian_percentage = 80;       // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below.
+        // shared defaults
+        uint number_of_channels = 64;				 // Amount of lasers of the sensor
+        real_T range = 50.0f;                        // maximum range a point is detected in meters
+        uint measurement_per_cycle = 2048;		     // The horizontal measurement count/frequency
+        real_T horizontal_rotation_frequency = 10;   // rotation frequency of the sensor in Hz
+        real_T horizontal_FOV_start = 0;			 // starting angle of rotation in degrees
+        real_T horizontal_FOV_end = 360;			 // ending angle of rotation in degrees, by default it works as a full horizontal FOV of 360 degrees
+        uint resolution = 512;					     // Resolution of the render texture, influences performance on the GPU
+        bool ground_truth = false;                   // Generate ground truth segmentation color values, if false will set to zero
+        bool ignore_marked = false;					 // If enabled, it will not detect objects marked to be ignored (with the 'MarkedIgnore' tag)
+        bool generate_noise = false;			     // Toggle range based noise
+        real_T min_noise_standard_deviation = 0;     // Minimum noise standard deviation
+        real_T noise_distance_scale = 1;		     // Factor to scale noise based on distance
+        bool generate_intensity = false;             // Toggle intensity calculation on or off
+        float range_max_lambertian_percentage = 80;  // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below
+        float rain_max_intensity = 70;               // Rain intensity maximum to scale from in mm/hour
+        std::string material_list_file = "";         // String holding all material data
+        float rain_constant_a = 0.01;                // Two constants to calculate the extinction coefficient in rain
+        float rain_constant_b = 0.6;                 // Two constants to calculate the extinction coefficient in rain
+        bool external = false;                       // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
+        bool external_ned = true;                    // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        real_T update_frequency = 10;                // Frequency to update the sensor at in Hz
 
-        float rain_max_intensity = 70;                    // Rain intensity maximum to scale from in mm/hour.
-        float rain_constant_a = 0.01f;                    // Two constants to calculate the extinction coefficient in rain
-        float rain_constant_b = 0.6f;
+        // debug settings
+        bool draw_debug_points = false;				 // Enable the drawing of debug cubes of the pointcloud. Disable this for real measurements as it is impacted(detected) by the virtual camera! 
+        uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = impact angle, 4 = intensity
+        bool draw_sensor;						     // Draw the physical sensor in the world on the vehicle with a 3d colored axis
 
-		uint measurement_per_cycle = 2048;
-		float horizontal_rotation_frequency = 10;         // rotations/sec
-		float horizontal_FOV_start = 0;                   // degrees
-		float horizontal_FOV_end = 359;                   // degrees
-		float update_frequency = 10;				      // how frequently to update the data in Hz
-		uint resolution = 512;
-		bool ground_truth = false;                        // Generate ground truth segmentation color values
-		bool generate_noise = false;					  // Toggle range based noise
-
-		bool ignore_marked = false;
-		real_T min_noise_standard_deviation = 0;		  // Minimum noise standard deviation
-		real_T noise_distance_scale = 1;			      // Factor to scale noise based on distance
-
-		// defaults specific to a mode
-		float vertical_FOV_upper = Utils::nan<float>();   // drones -15, car +10
-		float vertical_FOV_lower = Utils::nan<float>();   // drones -45, car -10
-		Vector3r position = VectorMath::nanVector();
-		Rotation rotation = Rotation::nanRotation();
-
-		bool generate_intensity = false;                  // Toggle intensity calculation on or off
-        std::string material_list_file = "";              // String holding all material data
-
-        bool external = false;                            // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                         // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
-
-		bool draw_debug_points = false;
-		uint draw_mode = 0;								  // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = impact angle, 4 = intensity
-        bool draw_sensor = false;						  // Draw the physical sensor in the world on the vehicle
+        // defaults specific to a mode
+        float vertical_FOV_upper = Utils::nan<float>();
+        float vertical_FOV_lower = Utils::nan<float>();
+        Vector3r position = VectorMath::nanVector();
+        Rotation rotation = Rotation::nanRotation();
 	};
 
 	struct EchoSetting : SensorSetting {
@@ -523,7 +519,6 @@ public: //fields
 	float speed_unit_factor =  1.0f;
 	std::string speed_unit_label = "m\\s";
     std::map<std::string, std::unique_ptr<SensorSetting>> sensor_defaults;
-
     std::string material_list_file = "";
 
 public: //methods

@@ -1,3 +1,5 @@
+// Developed by Cosys-Lab, University of Antwerp
+
 #include "SkidVehiclePawn.h"
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/Controller.h"

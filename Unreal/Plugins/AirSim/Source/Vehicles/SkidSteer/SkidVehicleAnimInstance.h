@@ -1,5 +1,6 @@
 // Based on the work by Leon Rosengarten and Boone Adkins.
 // https://github.com/b-adkins/UE4-TankVehiclePlugin
+// Developed by Cosys-Lab, University of Antwerp
 
 #pragma once
 

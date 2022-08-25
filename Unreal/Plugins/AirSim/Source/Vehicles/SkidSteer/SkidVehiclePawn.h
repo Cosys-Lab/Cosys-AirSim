@@ -1,3 +1,5 @@
+// Developed by Cosys-Lab, University of Antwerp
+
 #pragma once
 
 #include "CoreMinimal.h"

@@ -1,3 +1,5 @@
+// Developed by Cosys-Lab, University of Antwerp
+
 #include "SimModeSkidVehicle.h"
 #include "ConstructorHelpers.h"
 
