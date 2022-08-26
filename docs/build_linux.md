@@ -8,10 +8,10 @@ The current recommended and tested environment is **Ubuntu 18.04 LTS**. Theoreti
 This branch uses a custom version of the Unreal Engine!
 - Make sure you are [registered with Epic Games](https://docs.unrealengine.com/latest/INT/Platforms/Linux/BeginnerLinuxDeveloper/SettingUpAnUnrealWorkflow/1/index.html). This is required to get source code access for Unreal Engine.
 
-- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.24.4 (Cosys-Lab) at present.
+- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.24.4 ([Cosys-Lab fork](https://github.com/Cosys-Lab/UnrealEngine.git)) at present.
    ```bash
    # go to the folder where you clone GitHub projects
-   git clone https://github.com/WouterJansen/UnrealEngine.git
+   git clone https://github.com/Cosys-Lab/UnrealEngine.git
    cd UnrealEngine
    ./Setup.sh
    ./GenerateProjectFiles.sh
