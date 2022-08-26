@@ -9,7 +9,7 @@ Each sensor is associated with a integer enum specifying its sensor type.
 * Gps = 3
 * Magnetometer = 4
 * Distance Sensor = 5 
-// * LiDAR = 6
+* LiDAR = 6
 * Echo = 7
 * GPULiDAR = 8
 
