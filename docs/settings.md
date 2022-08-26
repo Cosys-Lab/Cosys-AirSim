@@ -61,8 +61,8 @@ Below are complete list of settings available along with their default values. I
         "OrthoWidth": 5.12,
         "MotionBlurAmount": 1,
         "MotionBlurMax": 10,
-        "ChromaticAberrationScale": 2
-		"IgnoreMarked": false
+        "ChromaticAberrationScale": 2,
+	"IgnoreMarked": false
       }
     ],
     "NoiseSettings": [
@@ -230,7 +230,7 @@ For example, `CaptureSettings` element is json array so you can add settings for
 
 ### CaptureSettings
 The `CaptureSettings` determines how different image types such as scene, depth, disparity, surface normals and segmentation views are rendered. The Width, Height and FOV settings should be self explanatory. The AutoExposureSpeed decides how fast eye adaptation works. We set to generally high value such as 100 to avoid artifacts in image capture. Similarly we set MotionBlurAmount to 0 by default to avoid artifacts in ground truth images. The `ProjectionMode` decides the projection used by the capture camera and can take value "perspective" (default) or "orthographic". If projection mode is "orthographic" then `OrthoWidth` determines width of projected area captured in meters.
-To disable the rendering of certain objects on specific cameras or all, use the "IgnoreMarked" boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_. You can also tweak the motion blur and chromatic Aberration here. 
+To disable the rendering of certain objects on specific cameras or all, use the `IgnoreMarked` boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_. You can also tweak the motion blur and chromatic Aberration here. 
 
 For explanation of other settings, please see [this article](https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/AutomaticExposure/). 
 
