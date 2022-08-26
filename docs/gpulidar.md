@@ -87,7 +87,7 @@ rainConstantB                | Constant one to to calculate the extinction coeff
 }
 ```
 ## Intensity Surface Material map
-If 'GenerateIntensity' is enabled in the 'settings json, a surface material map is required. This map is used to calculate the intensity of the LiDAR points.
+If 'GenerateIntensity' is enabled in the settings json, a surface material map is required. This map is used to calculate the intensity of the LiDAR points.
 e.g.:
 ```
 wood,0.9
@@ -144,6 +144,6 @@ Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU LiDAR d
         rgb[index, 2] = rgb_value & 0xFF
     ```
     * intensity represents the reflection strength as a float.
-* Echo Pose:
-    * Default: Echo sensor pose in the vehicle frame. 
+* Pose:
+    * Default: sensor pose in the vehicle frame. 
     * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
