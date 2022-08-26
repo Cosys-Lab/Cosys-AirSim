@@ -3,7 +3,7 @@
 AirSim supports a GPU accelerated Lidar for multirotors and cars. It uses a depth camera that rotates around to simulate a Lidar while exploiting the GPU to do most of the work. Should allow for a large increase in amount of points that can be simulated.
 
 The enablement of a GPU lidar and the other lidar settings can be configured via AirSimSettings json.
-Please see [general sensors](sensors.md) for information on configruation of general/shared sensor settings.
+Please see [general sensors](sensors.md) for information on configuration of general/shared sensor settings.
 
 ## Enabling GPU lidar on a vehicle
 * By default, GPU lidars are not enabled. To enable the sensor, set the SensorType and Enabled attributes in settings json.
@@ -87,7 +87,7 @@ rainConstantB                | Constant one to to calculate the extinction coeff
 }
 ```
 ## Intensity Surface Material map
-If 'GenerateIntensity' is enabled in the 'settings json, a surface material map is required. This map is used to calculate the intensity of the lidar points.
+If 'GenerateIntensity' is enabled in the settings json, a surface material map is required. This map is used to calculate the intensity of the lidar points.
 e.g.:
 ```
 wood,0.9
@@ -145,5 +145,5 @@ Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar d
     ```
     * intensity represents the reflection strength as a float.
 * Echo Pose:
-    * Default: Echo sensor pose in the vehicle frame. 
+    * Default: sensor pose in the vehicle frame. 
     * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
