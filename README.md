@@ -1,12 +1,20 @@
-# Welcome to AirSim
+# Welcome to CoSys-AirSim
 
-AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. Similarly, we have an experimental release for a Unity plugin. 
+AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment.
 
 Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
 
-Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects. 
-Do note that this repository is not actively updated, provided as is, without warranty or support and its sole purpose to is to accompany the publication on [Physical LiDAR Simulation in Real-Time Engine]().
-Please cite the specific work on the GPU LiDAR Simulation as:
+## CoSys-Lab Modifications
+
+Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
+Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to colaborate. 
+Please note our [licence](COSYSLICENSE) which applies to all changes made by Cosys-Lab in case you plan to anything within this repository.
+The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
+Do note that this repository is provided as is, will not be actively updated, comes without warranty or support. 
+
+### Associated publications
+
+- [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)
 ```
 @inproceedings{lidarsim2022jansen,
   author = {Jansen, Wouter and Huebel, Nico and Steckel, Jan},
@@ -17,16 +25,25 @@ Please cite the specific work on the GPU LiDAR Simulation as:
   doi = {https://doi.org/10.48550/arXiv.2208.10295}
 }
 ```
+- [Simulation of Pulse-Echo Radar for Vehicle Control and SLAM](https://www.mdpi.com/1424-8220/21/2/523)
+```
+@Article{echosim2021schouten,
+  author = {Schouten, Girmi and Jansen, Wouter and Steckel, Jan},
+  title = {Simulation of Pulse-Echo Radar for Vehicle Control and SLAM},
+  JOURNAL = {Sensors},
+  volume = {21},
+  year = {2021},
+  number = {2},
+  article-number = {523},
+  doi = {10.3390/s21020523}
+}
+```
 
-Please contact a Cosys-Lab researcher to get more in depth information.
-Please note our [licence](COSYSLICENSE) that applies to all changes made by Cosys-Lab in case you plan to anything within this repository.
-The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
+### Main Modifications 
 
-## CoSys-Lab Modifications
 * Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
-* Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
 * Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
@@ -39,9 +56,6 @@ The [original AirSim MIT license](LICENSE) applies to all native AirSim source f
 * Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
 * Dropped support for Unity Environments.
-
-
-For complete list of changes, view our [Changelog](CHANGELOG.md)
 
 ## How to Get It
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
@@ -108,9 +122,7 @@ Press F10 to see various options available for weather effects. You can also con
 - [The Autonomous Driving Cookbook](https://aka.ms/AutonomousDrivingCookbook) by Microsoft Deep Learning and Robotics Garage Chapter
 - [Using TensorFlow for simple collision avoidance](https://github.com/simondlevy/AirSimTensorFlow) by Simon Levy and WLU team
 
-## Participate
-
-### AirSim Paper
+## Original AirSim Publication
 
 More technical details are available in [AirSim paper (FSR 2017 Conference)](https://arxiv.org/abs/1705.05065). Please cite this as:
 ```
@@ -124,6 +136,7 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
 }
 ```
 
-## License
+## Licensing
 
-This project is released under the MIT License. Please review the [License file](LICENSE) for more details.
+This original AirSim project is released under the MIT License. Please review the [License file](LICENSE) for more details.
+All changes made by Cosys-Lab are released under our custom license. Please review the [Cosys-Lab License file]() for more details.
