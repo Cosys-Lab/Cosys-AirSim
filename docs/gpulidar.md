@@ -79,7 +79,7 @@ rainConstantB                | Constant one to to calculate the extinction coeff
 					"rangeMaxLambertianPercentage": 80,
 					"rainMaxIntensity": 70,
 					"rainConstantA": 0.01,
-					"rainConstantB": 0.6,
+					"rainConstantB": 0.6
 				}
 			}
 		}
