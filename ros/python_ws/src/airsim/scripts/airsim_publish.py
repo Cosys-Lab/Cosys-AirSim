@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 import setup_path
 import airsimpy
 import rospy
@@ -252,7 +253,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
     if (len(sensor_uwb_names) > 0):
         uwb_rangeArray_publisher = rospy.Publisher(sensor_uwb_topic, RangeArray, queue_size=10)
         
-    if (len(sensor_uwb_names) > 0):
+    if (len(sensor_wifi_names) > 0):
         wifi_rangeArray_publisher = rospy.Publisher(sensor_wifi_topic, RangeArray, queue_size=10)
 
     for sensor_index, sensor_name in enumerate(sensor_camera_names):
@@ -621,7 +622,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                         rang = Range()
                         #rang.stamp = mur_time_stamp[mur_id]
                         rang.stamp = timestamp
-                        rang.anchorid = str(mur_anchorId[mur_id])
+                        rang.anchorid = str(mur_anchorId[mur_id]).split(":")[-1]
                         rang.anchor_position = Point(mur_anchorPosX[mur_id], mur_anchorPosY[mur_id], mur_anchorPosZ[mur_id])
                         rang.valid_range = mur_valid_range[mur_id]
                         rang.distance = mur_distance[mur_id]

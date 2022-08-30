@@ -12,6 +12,7 @@ import tf2_ros
 from airsim.msg import StringArray
 from sensor_msgs.msg import PointCloud2, PointField,  CameraInfo
 from uwb_msgs.msg import Diagnostics, Range, RangeArray
+from wifi_msgs.msg import DiagnosticsRSSI, RangeRSSI, RangeArrayRSSI
 import rosbag
 import numpy as np
 import cv2
@@ -340,50 +341,188 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                 for sensor_index, sensor_name in enumerate(sensor_uwb_names):
                     if (sensor_index == 0):  # only once
                         uwb_data = client.getUWBData()
-                        # print(uwb_data)
+
                         # Sanity check
-                        if len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorY) or \
-                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorZ) or \
-                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_distance) or \
-                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_rssi) or \
-                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_time_stamp) or \
-                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_anchorId) or \
-                                len(uwb_data.mur_anchorX) != len(uwb_data.mur_valid_range):
+                        if len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorPosY) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorPosZ) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_distance) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_rssi) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_time_stamp) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorId) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_valid_range):
                             rospy.logerr("UWB sensor mur lengths do not match")
                             rospy.signal_shutdown('Packet error.')
                             sys.exit()
                         if len(uwb_data.mura_ranges) != len(uwb_data.mura_tagId) or \
-                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagX) or \
-                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagY) or \
-                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagZ):
-                            rospy.logerr("UWB sensor mur lengths do not match")
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosX) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosY) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosZ):
+                            rospy.logerr("UWB sensor mura lengths do not match")
                             rospy.signal_shutdown('Packet error.')
                             sys.exit()
 
-                        allRanges = []
-                        for i_mur in range(0, len(uwb_data.mur_anchorX)):
-                            diag = Diagnostics()
-                            diag.rssi = uwb_data.mur_rssi[i_mur]
+                        uwb_data.mur_anchorId = np.array(uwb_data.mur_anchorId)
 
-                            rang = Range()
-                            rang.stamp = timestamp
-                            rang.anchorid = str(uwb_data.mur_anchorId[i_mur])
-                            rang.anchor_position = Point(uwb_data.mur_anchorX[i_mur], uwb_data.mur_anchorY[i_mur], uwb_data.mur_anchorZ[i_mur])
-                            rang.valid_range = uwb_data.mur_valid_range[i_mur]
-                            rang.distance = uwb_data.mur_distance[i_mur]
-                            rang.diagnostics = diag
+                        mur_time_stamp = []
+                        mur_anchorId = []
+                        mur_anchorPosX = []
+                        mur_anchorPosY = []
+                        mur_anchorPosZ = []
+                        mur_valid_range = []
+                        mur_distance = []
+                        mur_rssi = []
+                        mura_ranges = []
 
-                            allRanges.append(rang)
+                        idx_offset = 0
 
-                        for i_mura in range(0, len(uwb_data.mura_ranges)):
+                        for rangeIdx, ranges in enumerate(uwb_data.mura_ranges):
+                            u, uniqueRangeIds = np.unique(uwb_data.mur_anchorId[ranges], return_index=True)
+                            uniqueRangeIds += idx_offset
+
+                            mura_ranges_idx_start = len(mur_anchorPosX)
+                            mur_anchorPosX += list(np.array(uwb_data.mur_anchorPosX)[uniqueRangeIds])
+                            mur_anchorPosY += list(np.array(uwb_data.mur_anchorPosY)[uniqueRangeIds])
+                            mur_anchorPosZ += list(np.array(uwb_data.mur_anchorPosZ)[uniqueRangeIds])
+                            mur_time_stamp += list(np.array(uwb_data.mur_time_stamp)[uniqueRangeIds])
+                            mur_anchorId += list(np.array(uwb_data.mur_anchorId)[uniqueRangeIds])
+                            mur_valid_range += list(np.array(uwb_data.mur_valid_range)[uniqueRangeIds])
+
+                            mura_ranges.append([])
+                            mura_ranges[rangeIdx] = list(range(mura_ranges_idx_start, len(mur_anchorPosX)))
+                            for arange in uniqueRangeIds:
+                                currentRanges = np.array(uwb_data.mur_anchorId)[ranges]
+                                currentRssi = np.array(uwb_data.mur_rssi)[ranges]
+                                currentDistance = np.array(uwb_data.mur_distance)[ranges]
+                                currentRssiFiltered = currentRssi * list(map(int, currentRanges == uwb_data.mur_anchorId[arange]))
+                                maxRssi = max(currentRssiFiltered)
+                                maxRssiIdx = currentRssiFiltered.argmax()
+
+                                mur_distance.append(currentDistance[maxRssiIdx])
+                                mur_rssi.append(maxRssi)
+
+                            # for arange in uniqueRangeIds:
+
+                            idx_offset += len(ranges)
+
+                        for mura_idx in range(0, len(uwb_data.mura_tagId)):
                             rangeArray = RangeArray()
-                            rangeArray.tagid = str(uwb_data.mura_tagId[i_mura])
-                            rangeArray.tag_position = Point(uwb_data.mura_tagX[i_mura], uwb_data.mura_tagY[i_mura], uwb_data.mura_tagZ[i_mura])
-                            for i_range in range(0, len(uwb_data.mura_ranges[i_mura])):
-                                rangeArray.ranges.append(allRanges[i_range])
-                            # rangeArray.ranges = uwb_data.mura_ranges[i_mura]
-                            #
+                            rangeArray.tagid = str(uwb_data.mura_tagId[mura_idx])
+                            rangeArray.tag_position = Point(uwb_data.mura_tagPosX[mura_idx], uwb_data.mura_tagPosY[mura_idx], uwb_data.mura_tagPosZ[mura_idx])
+                            rangeArray.header.stamp = timestamp
+
+                            # for mur_id in range(0, len(mur_time_stamp)):
+                            for mur_id in mura_ranges[mura_idx]:
+                                diag = Diagnostics()
+                                diag.rssi = mur_rssi[mur_id]
+
+                                rang = Range()
+                                # rang.stamp = mur_time_stamp[mur_id]
+                                rang.stamp = timestamp
+                                rang.anchorid = str(mur_anchorId[mur_id]).split(":")[-1]
+                                rang.anchor_position = Point(mur_anchorPosX[mur_id], mur_anchorPosY[mur_id], mur_anchorPosZ[mur_id])
+                                rang.valid_range = mur_valid_range[mur_id]
+                                rang.distance = mur_distance[mur_id]
+                                rang.diagnostics = diag
+
+                                rangeArray.ranges.append(rang)
                             output.write(sensor_uwb_topic, rangeArray, t=ros_timestamp)
+
+                        # rospy.logerr("run once")
+                        # rospy.signal_shutdown('Packet error.')
+                        # sys.exit()
+                for sensor_index, sensor_name in enumerate(sensor_wifi_names):
+                    if (sensor_index == 0):  # only once
+                        wifi_data = client.getWifiData()
+
+                        # Sanity check
+                        if len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorPosY) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorPosZ) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_distance) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_rssi) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_time_stamp) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorId) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_valid_range):
+                            rospy.logerr("Wifi sensor wr lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+                        if len(wifi_data.wra_ranges) != len(wifi_data.wra_tagId) or \
+                                len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosX) or \
+                                len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosY) or \
+                                len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosZ):
+                            rospy.logerr("Wifi sensor wra lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+
+                        wifi_data.wr_anchorId = np.array(wifi_data.wr_anchorId)
+
+                        wr_time_stamp = []
+                        wr_anchorId = []
+                        wr_anchorPosX = []
+                        wr_anchorPosY = []
+                        wr_anchorPosZ = []
+                        wr_valid_range = []
+                        wr_distance = []
+                        wr_rssi = []
+                        wra_ranges = []
+
+                        idx_offset = 0
+
+                        for rangeIdx, ranges in enumerate(wifi_data.wra_ranges):
+                            u, uniqueRangeIds = np.unique(wifi_data.wr_anchorId[ranges], return_index=True)
+                            uniqueRangeIds += idx_offset
+
+                            wra_ranges_idx_start = len(wr_anchorPosX)
+                            wr_anchorPosX += list(np.array(wifi_data.wr_anchorPosX)[uniqueRangeIds])
+                            wr_anchorPosY += list(np.array(wifi_data.wr_anchorPosY)[uniqueRangeIds])
+                            wr_anchorPosZ += list(np.array(wifi_data.wr_anchorPosZ)[uniqueRangeIds])
+                            wr_time_stamp += list(np.array(wifi_data.wr_time_stamp)[uniqueRangeIds])
+                            wr_anchorId += list(np.array(wifi_data.wr_anchorId)[uniqueRangeIds])
+                            wr_valid_range += list(np.array(wifi_data.wr_valid_range)[uniqueRangeIds])
+
+                            wra_ranges.append([])
+                            wra_ranges[rangeIdx] = list(range(wra_ranges_idx_start, len(wr_anchorPosX)))
+                            for arange in uniqueRangeIds:
+                                currentRanges = np.array(wifi_data.wr_anchorId)[ranges]
+                                currentRssi = np.array(wifi_data.wr_rssi)[ranges]
+                                currentDistance = np.array(wifi_data.wr_distance)[ranges]
+                                currentRssiFiltered = currentRssi * list(map(int, currentRanges == wifi_data.wr_anchorId[arange]))
+                                maxRssi = max(currentRssiFiltered)
+                                maxRssiIdx = currentRssiFiltered.argmax()
+
+                                wr_distance.append(currentDistance[maxRssiIdx])
+                                wr_rssi.append(maxRssi)
+
+                            # for arange in uniqueRangeIds:
+
+                            idx_offset += len(ranges)
+
+                        for wra_idx in range(0, len(wifi_data.wra_tagId)):
+                            rangeArray = RangeArray()
+                            rangeArray.tagid = str(wifi_data.wra_tagId[wra_idx])
+                            rangeArray.tag_position = Point(wifi_data.wra_tagPosX[wra_idx], wifi_data.wra_tagPosY[wra_idx], wifi_data.wra_tagPosZ[wra_idx])
+                            rangeArray.header.stamp = timestamp
+
+                            # for wr_id in range(0, len(wr_time_stamp)):
+                            for wr_id in wra_ranges[wra_idx]:
+                                diag = Diagnostics()
+                                diag.rssi = wr_rssi[wr_id]
+
+                                rang = Range()
+                                # rang.stamp = wr_time_stamp[wr_id]
+                                rang.stamp = timestamp
+                                rang.anchorid = str(wr_anchorId[wr_id])
+                                rang.anchor_position = Point(wr_anchorPosX[wr_id], wr_anchorPosY[wr_id], wr_anchorPosZ[wr_id])
+                                rang.valid_range = wr_valid_range[wr_id]
+                                rang.distance = wr_distance[wr_id]
+                                rang.diagnostics = diag
+
+                                rangeArray.ranges.append(rang)
+
+                            output.write(sensor_wifi_topic, rangeArray, t=ros_timestamp)
+
+                        # rospy.logerr("run once")
+                        # rospy.signal_shutdown('Packet error.')
+                        # sys.exit()
 
                 for object_index, object_name in enumerate(object_names):
                     if objects_coordinates_local[object_index] == 1:
@@ -454,6 +593,10 @@ if __name__ == '__main__':
         sensor_uwb_names = rospy.get_param('~sensor_uwb_names', "True")
         sensor_uwb_topic = rospy.get_param('~sensor_uwb_topic', "True")
         sensor_uwb_frames = rospy.get_param('~sensor_uwb_frames', "True")
+
+        sensor_wifi_names = rospy.get_param('~sensor_wifi_names', "True")
+        sensor_wifi_topic = rospy.get_param('~sensor_wifi_topic', "True")
+        sensor_wifi_frames = rospy.get_param('~sensor_wifi_frames', "True")
 
         sensor_camera_names = rospy.get_param('~sensor_camera_names', "True")
         sensor_camera_toggle_scene_mono = rospy.get_param('~sensor_camera_toggle_scene_mono', "True")
@@ -563,8 +706,8 @@ if __name__ == '__main__':
             time.sleep(0.1)
             rospy.loginfo("Started static transform for GPU-LiDAR sensor with ID " + sensor_name + ".")
 
-
         for sensor_index, sensor_name in enumerate(sensor_uwb_names):
+
             # Get uwb sensor data
             try:
                 uwb_data = client.getUWBSensorData(sensor_name, vehicle_name)
@@ -588,10 +731,9 @@ if __name__ == '__main__':
                 static_transform.transform.rotation.y = pose['orientation']['y_val']
                 static_transform.transform.rotation.z = pose['orientation']['z_val']
                 static_transform.transform.rotation.w = pose['orientation']['w_val']
-                tf_static.transforms.append(static_transform)
+                transform_list.append(static_transform)
                 time.sleep(0.1)
                 rospy.loginfo("Started static transform for UWB sensor with ID " + sensor_name + ".")
-
         left_position = None
         right_position = None
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
