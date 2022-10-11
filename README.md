@@ -8,7 +8,7 @@ Our goal is to develop AirSim as a platform for AI research to experiment with d
 
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
 Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to colaborate. 
-Please note our [licence](COSYSLICENSE) which applies to all changes made by Cosys-Lab in case you plan to anything within this repository.
+Please note our [licence](COSYSLICENSE) which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
 The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
 Do note that this repository is provided as is, will not be actively updated, comes without warranty or support. 
 
@@ -41,9 +41,9 @@ Do note that this repository is provided as is, will not be actively updated, co
 
 ### Main Modifications 
 
-* Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
+* Updated the camera, Echo and (GPU)LiDAR sensors to be able to uncouple from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
+* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is deprecated.
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
 * Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
@@ -54,7 +54,7 @@ Do note that this repository is provided as is, will not be actively updated, co
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
-* Updated Unreal to 4.24 (custom fork: [https://github.com/Cosys-Lab/UnrealEngine](https://github.com/Cosys-Lab/UnrealEngine))
+* Updated Unreal to 4.24 (custom fork needed for instance segmentation: [https://github.com/Cosys-Lab/UnrealEngine](https://github.com/Cosys-Lab/UnrealEngine))
 * Dropped support for Unity Environments.
 
 ## How to Get It
