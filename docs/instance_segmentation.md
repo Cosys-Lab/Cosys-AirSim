@@ -1,6 +1,6 @@
 # Instance Segmentation in AirSim
 
-An Instance segmentation system is implemented into AirSim. It uses Vertex Color rendering to get allow for each object in the world to get its own color.
+An Instance segmentation system is implemented into AirSim. It uses Vertex Color rendering to allow for each object in the world to get its own color.
 
 ## Limitations
 * 2744000 different colors are currently available to be assigned to unique objects. If your environment during a run requires more colors, you will generate errors and new objects will be assigned color [0,0,0].
