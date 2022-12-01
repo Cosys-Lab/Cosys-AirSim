@@ -144,6 +144,6 @@ Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar d
         rgb[index, 2] = rgb_value & 0xFF
     ```
     * intensity represents the reflection strength as a float.
-* Echo Pose:
+* Lidar Pose:
     * Default: sensor pose in the vehicle frame. 
     * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
