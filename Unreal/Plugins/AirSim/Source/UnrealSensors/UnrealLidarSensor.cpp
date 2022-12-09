@@ -276,8 +276,7 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 			Vector3r impact_point_local = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * ((hit_result.Distance / 100) + distance_noise) + start;
 			impact_point = ned_transform_->fromLocalNed(impact_point_local);
 		}
-
-		if (false && UAirBlueprintLib::IsInGameThread())
+		if (sensor_params_.draw_debug_points && UAirBlueprintLib::IsInGameThread())
 		{
 			// Debug code for very specific cases.
 			// Mostly shouldn't be needed. Use SimModeBase::drawLidarDebugPoints()
@@ -285,9 +284,9 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 				actor_->GetWorld(),
 				impact_point,
 				5,                       //size
-				FColor::Red,
-				true,                    //persistent (never goes away)
-				0.1                      //point leaves a trail on moving object
+				FColor::Green,
+				false,                    //persistent (never goes away)
+				(1 / (sensor_params_.horizontal_rotation_frequency * 2))                //point leaves a trail on moving object
 			);
 		}
 

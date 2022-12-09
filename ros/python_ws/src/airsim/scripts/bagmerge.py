@@ -57,11 +57,11 @@ def merge_bag(main_bagfile, bagfile, outfile = None, topics = None,
             outfile = pattern%index
             index += 1
     #output some information
-    print "merge bag %s in %s"%(bagfile, main_bagfile)
-    print "topics filter: ", topics
-    print "writing to %s."%outfile
+    print("merge bag %s in %s"%(bagfile, main_bagfile))
+    print("topics filter: ", topics)
+    print("writing to %s."%outfile)
     if prefix:
-        print "secondary prefix: %s"%prefix
+        print("secondary prefix: %s"%prefix)
     #merge bagfile
     outbag = rosbag.Bag(outfile, 'w')
     main_bag = rosbag.Bag(main_bagfile).__iter__()
@@ -86,7 +86,7 @@ def merge_bag(main_bagfile, bagfile, outfile = None, topics = None,
         outbag.close()
 
 def get_limits(bagfile):
-    print "Determine start and end index of %s..."%bagfile
+    print("Determine start and end index of %s..."%bagfile)
     end_time = None
     start_time = None
 
@@ -99,7 +99,7 @@ def get_limits(bagfile):
     
 if __name__ == "__main__":
     args = parse_args()
-    print args
+    print(args)
     if args.t != None:
         args.t = args.t.split(',')
     merge_bag(args.main_bagfile, 
