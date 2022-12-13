@@ -6,6 +6,7 @@
 #include "NedTransform.h"
 #include "DrawDebugHelpers.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Engine/Engine.h"
 #include <random>
 
 // ctor
@@ -41,9 +42,9 @@ void UnrealGPULidarSensor::pause(const bool is_paused) {
 // returns a point-cloud for the tick
 bool UnrealGPULidarSensor::getPointCloud(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final)
 {	
-	if (sensor_params_.draw_sensor) {
-		DrawDebugPoint(actor_->GetWorld(), lidar_camera_->GetActorTransform().GetLocation(), 5, FColor::Black, false, draw_time_);
-		DrawDebugCoordinateSystem(actor_->GetWorld(), lidar_camera_->GetActorLocation(), lidar_camera_->GetActorRotation(), 25, false, draw_time_, 10);
+	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), lidar_camera_->GetActorTransform().GetLocation(), 5, FColor::Black, false, draw_time_);
+		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), lidar_camera_->GetActorLocation(), lidar_camera_->GetActorRotation(), 25, false, draw_time_, 10);
 	}
 	return lidar_camera_->Update(delta_time, point_cloud, point_cloud_final);
 }

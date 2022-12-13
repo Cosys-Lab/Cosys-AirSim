@@ -15,6 +15,7 @@
 #include "Beacons/UWBBeacon.h"
 #include <typeinfo>
 #include <mutex>
+#include "Engine/Engine.h"
 #include "common/CommonStructs.hpp"
 
 using std::fill_n;
@@ -43,7 +44,7 @@ UnrealMarLocUwbSensor::UnrealMarLocUwbSensor(const AirSimSettings::MarLocUwbSett
 void UnrealMarLocUwbSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
-	if (sensor_params_.draw_sensor) {
+	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
 		FVector sensor_position;
 		if (external_) {
 			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
@@ -51,9 +52,9 @@ void UnrealMarLocUwbSensor::updatePose(const msr::airlib::Pose& sensor_pose, con
 		else {
 			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 		}
-		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3);
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3);
 		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
-		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3, 10);
+		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3, 10);
 	}
 }
 
@@ -97,7 +98,7 @@ void UnrealMarLocUwbSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 		Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
 		FVector point_global = ned_transform_->fromLocalNed(point_global1);
 
-		DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);
 	}
 }*/
 
@@ -117,7 +118,7 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 	TArray<msr::airlib::UWBHit> UWBHitLog;
 
 	//FVector lineEnd = uwbTraceMaxDistances[direction_count] * FVector(sample_direction[0], sample_direction[1], sample_direction[2]);
-	//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
+	//UAirBlueprintLib::DrawLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
 
 	//ParallelFor(sample_directions_.size(), [&](int32 direction_count) {
 	for (int32 direction_count = 0; direction_count< sample_directions_.size(); direction_count++){
@@ -134,7 +135,7 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 		FVector lineEnd = uwbTraceMaxDistances[direction_count] * FVector(sample_direction[0], sample_direction[1], sample_direction[2]);
 		lineEnd = sensorOrientationEulerDegree.RotateVector(lineEnd);
 		lineEnd += sensorBase_global;
-		//DrawDebugLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
+		//UAirBlueprintLib::DrawLine(actor_->GetWorld(), sensorBase_global, lineEnd, FColor::Red, false, 1);
 
 		// Trace ray, bounce and add to hitlog if beacon was hit
 		traceDirection(sensorBase_global, lineEnd, &UWBHitLog, 0, 0, 1, 0);
@@ -205,8 +206,8 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 
 				// Stop if nothing was hit to reflect off
 				if (!trace_hit) {
-					if (drawDebug) {
-						DrawDebugLine(actor_->GetWorld(), trace_start_position, trace_end_position, FColor::Red, false, 0.1);
+					if (drawDebug && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+						UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_position, trace_end_position, FColor::Red, false, 0.1);
 					}
 					return 1;
 				}
@@ -248,8 +249,8 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 					}
 				}
 
-				if (drawDebug) {
-					DrawDebugLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
+				if (drawDebug && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+					UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
 				}
 
 				return(traceDirection(trace_start_position, trace_end_position, UWBHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug));		
