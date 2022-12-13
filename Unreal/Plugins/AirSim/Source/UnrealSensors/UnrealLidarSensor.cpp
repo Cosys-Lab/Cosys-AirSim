@@ -6,6 +6,7 @@
 #include "common/Common.hpp"
 #include "NedTransform.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/Engine.h"
 #include <random>
 
 // ctor
@@ -63,7 +64,7 @@ void UnrealLidarSensor::updatePose(const msr::airlib::Pose& sensor_pose, const m
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
 	// DRAW DEBUG
-	if (sensor_params_.draw_sensor) {
+	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
 		FVector sensor_position;
 		if (external_) {
 			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
@@ -71,9 +72,9 @@ void UnrealLidarSensor::updatePose(const msr::airlib::Pose& sensor_pose, const m
 		else {
 			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 		}
-		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, draw_time_);
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, draw_time_);
 		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
-		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_, 10);
+		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, draw_time_, 10);
 	}
 }
 
@@ -276,11 +277,11 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 			Vector3r impact_point_local = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * ((hit_result.Distance / 100) + distance_noise) + start;
 			impact_point = ned_transform_->fromLocalNed(impact_point_local);
 		}
-		if (sensor_params_.draw_debug_points && UAirBlueprintLib::IsInGameThread())
+		if (sensor_params_.draw_debug_points && UAirBlueprintLib::IsInGameThread() && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer))
 		{
 			// Debug code for very specific cases.
 			// Mostly shouldn't be needed. Use SimModeBase::drawLidarDebugPoints()
-			DrawDebugPoint(
+			UAirBlueprintLib::DrawPoint(
 				actor_->GetWorld(),
 				impact_point,
 				5,                       //size

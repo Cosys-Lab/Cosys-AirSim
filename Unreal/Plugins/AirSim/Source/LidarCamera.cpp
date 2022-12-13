@@ -18,6 +18,7 @@
 #include "Weather/WeatherLib.h"
 #include <random>
 #include "AirBlueprintLib.h"
+#include "Engine/Engine.h"
 #include <string>
 #include <exception>
 #include "Misc/FileHelper.h"
@@ -494,21 +495,21 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 						if ((impact_angle * material_map_.at(value_intensity.A)) < (max_range_ / max_range_lambertian_percentage_ / 100) * depth / 100.0)threshold_enable = false;
 
 						// If in the right debug drawing mode, draw the surface material type to screen in the final pointcloud formation
-						if (draw_debug_ && debug_draw_mode_ == 2 && threshold_enable) {
+						if (draw_debug_ && debug_draw_mode_ == 2 && threshold_enable && (GEngine->GetNetMode(this->GetWorld()) != NM_DedicatedServer)) {
 							FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-							DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(unique_colors_[value_intensity.A * 3], unique_colors_[(value_intensity.A * 3) + 1], unique_colors_[(value_intensity.A * 3) + 2], 1), false, (1 / (sensor_rotation_frequency_ * 4)));
+							UAirBlueprintLib::DrawPoint(this->GetWorld(), point_draw, 5, FColor(unique_colors_[value_intensity.A * 3], unique_colors_[(value_intensity.A * 3) + 1], unique_colors_[(value_intensity.A * 3) + 2], 1), false, (1 / (sensor_rotation_frequency_ * 4)));
 						}
 
 						// If in the right debug drawing mode, draw the impact angle to screen in the final pointcloud formation
-						if (draw_debug_ && debug_draw_mode_ == 3 && threshold_enable) {
+						if (draw_debug_ && debug_draw_mode_ == 3 && threshold_enable && (GEngine->GetNetMode(this->GetWorld()) != NM_DedicatedServer)) {
 							FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-							DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, FMath::FloorToInt(impact_angle * 254), 0, 1), false, (1 / (sensor_rotation_frequency_ * 4)));
+							UAirBlueprintLib::DrawPoint(this->GetWorld(), point_draw, 5, FColor(0, FMath::FloorToInt(impact_angle * 254), 0, 1), false, (1 / (sensor_rotation_frequency_ * 4)));
 						}
 
 						// If in the right debug drawing mode, draw the final intensity to screen in the final pointcloud formation
-						if (draw_debug_ && debug_draw_mode_ == 4 && threshold_enable) {
+						if (draw_debug_ && debug_draw_mode_ == 4 && threshold_enable && (GEngine->GetNetMode(this->GetWorld()) != NM_DedicatedServer)) {
 							FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-							DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, 2);
+							UAirBlueprintLib::DrawPoint(this->GetWorld(), point_draw, 5, FColor(0, 0, FMath::FloorToInt(final_intensity * 254), 1), false, 2);
 						}
 
 					}
@@ -518,9 +519,9 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 						value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
 
 						// If in the right debug drawing mode, draw the instance segmentation color to screen in the final pointcloud formation
-						if (draw_debug_ && debug_draw_mode_ == 1 && threshold_enable) {
+						if (draw_debug_ && debug_draw_mode_ == 1 && threshold_enable && (GEngine->GetNetMode(this->GetWorld()) != NM_DedicatedServer)) {
 							FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-							DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, 2);
+							UAirBlueprintLib::DrawPoint(this->GetWorld(), point_draw, 5, FColor(value_segmentation.R, value_segmentation.G, value_segmentation.B, 1), false, 2);
 						}
 					}
 
@@ -542,9 +543,9 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 					}
 
 					// If in the right debug drawing mode, draw the final pointcloud formation to the screen in a static color
-					if (draw_debug_ && debug_draw_mode_ == 0 && threshold_enable) {
+					if (draw_debug_ && debug_draw_mode_ == 0 && threshold_enable && (GEngine->GetNetMode(this->GetWorld()) != NM_DedicatedServer)) {
 						FVector point_draw = this->GetActorRotation().RotateVector(point) + this->GetActorLocation();
-						DrawDebugPoint(this->GetWorld(), point_draw, 5, FColor::Blue, false, (1 / (sensor_rotation_frequency_ * 4)));
+						UAirBlueprintLib::DrawPoint(this->GetWorld(), point_draw, 5, FColor::Blue, false, (1 / (sensor_rotation_frequency_ * 4)));
 					}
 				}
 				else if (used_by_airsim_) {

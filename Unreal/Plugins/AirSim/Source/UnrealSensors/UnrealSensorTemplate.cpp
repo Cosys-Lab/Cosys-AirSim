@@ -10,6 +10,7 @@
 #include "CoreMinimal.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include <PxScene.h>
+#include "Engine/Engine.h"
 #include "Runtime/Core/Public/Async/ParallelFor.h"
 
 // ctor
@@ -23,7 +24,7 @@ UnrealSensorTemplate::UnrealSensorTemplate(const AirSimSettings::SensorTemplateS
 void UnrealSensorTemplate::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
-	if (sensor_params_.draw_sensor) {
+	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
 		FVector sensor_position;
 		if (external_) {
 			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
@@ -31,9 +32,9 @@ void UnrealSensorTemplate::updatePose(const msr::airlib::Pose& sensor_pose, cons
 		else {
 			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 		}
-		DrawDebugPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3);
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3);
 		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
-		DrawDebugCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3, 10);
+		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3, 10);
 	}
 }
 
@@ -74,8 +75,9 @@ void UnrealSensorTemplate::setPointCloud(const msr::airlib::Pose& sensor_pose, m
 		Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);
 		Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
 		FVector point_global = ned_transform_->fromLocalNed(point_global1);
-
-		DrawDebugPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);
+		if ((GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+			UAirBlueprintLib::DrawPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);
+		}		
 	}
 }
 
