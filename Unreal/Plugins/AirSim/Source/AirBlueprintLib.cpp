@@ -57,6 +57,28 @@ static float GetLineLifeTime(ULineBatchComponent* LineBatcher, float LifeTime, b
 	return bPersistent ? -1.0f : ((LifeTime > 0.f) ? LifeTime : LineBatcher->DefaultLifeTime);
 }
 
+void UAirBlueprintLib::DrawCoordinateSystem(const UWorld* InWorld, FVector const& AxisLoc, FRotator const& AxisRot, float Scale, bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness)
+{
+    // no debug line drawing on dedicated server
+    if (GEngine->GetNetMode(InWorld) != NM_DedicatedServer)
+    {
+        FRotationMatrix R(AxisRot);
+        FVector const X = R.GetScaledAxis(EAxis::X);
+        FVector const Y = R.GetScaledAxis(EAxis::Y);
+        FVector const Z = R.GetScaledAxis(EAxis::Z);
+
+        // this means foreground lines can't be persistent
+        ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
+        if (LineBatcher != NULL)
+        {
+            float const LineLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
+            LineBatcher->DrawLine(AxisLoc, AxisLoc + X * Scale, FColor::Red, DepthPriority, Thickness, LineLifeTime);
+            LineBatcher->DrawLine(AxisLoc, AxisLoc + Y * Scale, FColor::Green, DepthPriority, Thickness, LineLifeTime);
+            LineBatcher->DrawLine(AxisLoc, AxisLoc + Z * Scale, FColor::Blue, DepthPriority, Thickness, LineLifeTime);
+        }
+    }
+}
+
 void UAirBlueprintLib::DrawLine(const UWorld* InWorld, FVector const& LineStart, FVector const& LineEnd, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness)
 {
 	// no debug line drawing on dedicated server
