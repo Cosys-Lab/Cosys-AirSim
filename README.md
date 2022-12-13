@@ -8,8 +8,8 @@ Our goal is to develop AirSim as a platform for AI research to experiment with d
 
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
 Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to colaborate. 
-Please note our [licence](COSYSLICENSE) which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
 The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
+Please note that we use that same [MIT license](LICENSE) as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
 Do note that this repository is provided as is, will not be actively updated, comes without warranty or support. 
 
 ### Associated publications
