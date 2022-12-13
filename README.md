@@ -1,4 +1,4 @@
-# Welcome to CoSys-AirSim
+# Welcome to Cosys-AirSim
 
 AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment.
 
