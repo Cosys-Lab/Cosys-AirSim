@@ -75,7 +75,7 @@ airsim.write_png(os.path.normpath(filename + '.png'), img_rgb)
 
 ### Python
 
-For a more complete ready to run sample code please see [sample code in AirSimClient project](https://github.com/Microsoft/AirSim/tree/master/PythonClient//multirotor/hello_drone.py) for multirotors or [HelloCar sample](https://github.com/Microsoft/AirSim/tree/master/PythonClient//car/hello_car.py). This code also demonstrates simple activities such as saving images in files or using `numpy` to manipulate images.
+For a more complete ready to run sample code please see [sample code in AirSimClient project](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient//multirotor/hello_drone.py) for multirotors or [HelloCar sample](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient//car/hello_car.py). This code also demonstrates simple activities such as saving images in files or using `numpy` to manipulate images.
 
 ## Available Cameras
 ### Car
@@ -101,7 +101,7 @@ To active this mode, edit [settings.json](settings.md) that you can find in your
 }
 ```
 
-[Here's the Python code example](https://github.com/Microsoft/AirSim/tree/master/PythonClient//computer_vision/cv_mode.py) to move camera around and capture images.
+[Here's the Python code example](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient//computer_vision/cv_mode.py) to move camera around and capture images.
 
 This mode was inspired from [UnrealCV project](http://unrealcv.org/).
 
@@ -121,7 +121,7 @@ client.simSetCameraOrientation(0, airsim.to_quaternion(0.261799, 0, 0)); #radian
 ### Gimbal
 You can set stabilization for pitch, roll or yaw for any camera [using settings](settings.md#gimbal).
 
-Please see [example usage](https://github.com/Microsoft/AirSim/tree/master/PythonClient//computer_vision/cv_mode.py).
+Please see [example usage](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient//computer_vision/cv_mode.py).
 
 ## Changing Resolution and Camera Parameters
 To change resolution, FOV etc, you can use [settings.json](settings.md). For example, below addition in settings.json sets parameters for scene capture and uses "Computer Vision" mode described above. If you omit any setting then below default values will be used. For more information see [settings doc](settings.md). If you are using stereo camera, currently the distance between left and right is fixed at 25 cm.
@@ -231,4 +231,4 @@ Please see the [instance segmentation documentation](instance_segmentation.md) f
 Currently, this is just a map from object ID to grey scale 0-255. So any mesh with object ID 42 shows up with color (42, 42, 42). Please see [segmentation section](#segmentation) for more details on how to set object IDs. Typically noise setting can be applied for this image type to get slightly more realistic effect. We are still working on adding other infrared artifacts and any contributions are welcome.
 
 ## Example Code
-A complete example of setting vehicle positions at random locations and orientations and then taking images can be found in [GenerateImageGenerator.hpp](https://github.com/Microsoft/AirSim/tree/master/Examples/DataCollection/StereoImageGenerator.hpp). This example generates specified number of stereo images and ground truth disparity image and saving it to [pfm format](pfm.md).
+A complete example of setting vehicle positions at random locations and orientations and then taking images can be found in [GenerateImageGenerator.hpp](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/Examples/DataCollection/StereoImageGenerator.hpp). This example generates specified number of stereo images and ground truth disparity image and saving it to [pfm format](pfm.md).

@@ -12,6 +12,7 @@
 
 # Jetbrains Project
 /.idea
+/site/*
 
 # Build results
 [Dd]ebug/

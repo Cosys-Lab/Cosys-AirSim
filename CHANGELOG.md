@@ -2,21 +2,21 @@
 
 Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. This list updated every few months. For complete detailed changes, please review [commit history](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/commits/master).
 
-## CoSys-Lab Modifications
-* Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
+## Cosys-Lab Modifications
+* Updated the camera, Echo and (GPU)LiDAR sensors to be able to uncouple from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
-* Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
-* Added [Instance Segmentation](docs/instance_segmentation.md). 
-* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
-* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
-* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
+* Updated Python [ROS implementation](https://cosys-lab.github.io/ros/) with completely new implementation and feature set. C++ version is deprecated.
+* Added [Echo sensor type](https://cosys-lab.github.io/echo/) for simulation of sensors like sonar and radar.
+* Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation/). 
+* Added [GPU LIDAR sensor type](https://cosys-lab.github.io/gpulidar/): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
+* Updated [ComputerVision mode](https://cosys-lab.github.io/image_apis/#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
+* Updated [LIDAR sensor type](https://cosys-lab.github.io/lidar/): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Added option to hot-reload plugin through Unreal Editor (faster development).
-* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVIDIA tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Added [skid steering SimMode and vehicle type](https://cosys-lab.github.io/skid_steer_vehicle/) based on NVIDIA tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
-* Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
-* Updated Unreal to 4.24 (custom fork: [https://github.com/Cosys-Lab/UnrealEngine](https://github.com/Cosys-Lab/UnrealEngine))
+* Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](https://cosys-lab.github.io/settings/).
+* Updated Unreal to 4.24 (custom fork needed for instance segmentation: [https://github.com/Cosys-Lab/UnrealEngine](https://github.com/Cosys-Lab/UnrealEngine))
 * Dropped support for Unity Environments.
 
 ## Default AirSim Changelog up to November 2018
