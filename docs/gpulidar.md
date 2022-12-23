@@ -131,18 +131,18 @@ Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU LiDAR d
     * rgb represents a float32 representation of the RGB8 value that is linked to the instance segmentation system. See the [Image API documentation](image_apis.md#segmentation) and the [instance segmentation documentation](instance_segmentation.md).
       The float32 comes from binary concatenation of the RGB8 values :`rgb = value_segmentation.R << 16 | value_segmentation.G << 8 | value_segmentation.B`\\
       It can be retrieved from the API and converted back to RGB8 with for example the following Python code:
-    ```python 
-    LiDAR_data = client.getGPULidarData('LiDAR', 'vehicle')
-    points = np.array(LiDAR_data.point_cloud, dtype=np.dtype('f4'))
-    points = np.reshape(points, (int(points.shape[0] / 5), 5))
-    rgb_values = points[:, 3].astype(np.uint32)
-    rgb = np.zeros((np.shape(points)[0], 3))
-    xyz = points[:, 0:3]
-    for index, rgb_value in enumerate(rgb_values):
-        rgb[index, 0] = (rgb_value >> 16) & 0xFF
-        rgb[index, 1] = (rgb_value >> 8) & 0xFF
-        rgb[index, 2] = rgb_value & 0xFF
-    ```
+	```
+	    LiDAR_data = client.getGPULidarData('LiDAR', 'vehicle')
+	    points = np.array(LiDAR_data.point_cloud, dtype=np.dtype('f4'))
+	    points = np.reshape(points, (int(points.shape[0] / 5), 5))
+	    rgb_values = points[:, 3].astype(np.uint32)
+	    rgb = np.zeros((np.shape(points)[0], 3))
+	    xyz = points[:, 0:3]
+	    for index, rgb_value in enumerate(rgb_values):
+		rgb[index, 0] = (rgb_value >> 16) & 0xFF
+		rgb[index, 1] = (rgb_value >> 8) & 0xFF
+		rgb[index, 2] = rgb_value & 0xFF
+	```
     * intensity represents the reflection strength as a float.
 * Pose:
     * Default: sensor pose in the vehicle frame. 
