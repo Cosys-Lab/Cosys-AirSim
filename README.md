@@ -141,4 +141,4 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
 ## Licensing
 
 This original AirSim project is released under the MIT License. Please review the [License file](LICENSE) for more details.
-All changes made by Cosys-Lab are released under our custom license. Please review the [Cosys-Lab License file]() for more details.
+All changes made by Cosys-Lab are released under the same MIT License. Please review the [License file](LICENSE) for more details.
