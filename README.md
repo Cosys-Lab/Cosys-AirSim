@@ -17,25 +17,27 @@ Do note that this repository is provided as is, will not be actively updated, co
 - [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)
 ```
 @inproceedings{lidarsim2022jansen,
-  author = {Jansen, Wouter and Huebel, Nico and Steckel, Jan},
-  title = {Physical LiDAR Simulation in Real-Time Engine },
-  year = {2022},
-  booktitle = {2022 IEEE Sensors},
-  eprint = {arXiv:2208.10295},
-  doi = {https://doi.org/10.48550/arXiv.2208.10295}
+  author={Jansen, Wouter and Huebel, Nico and Steckel, Jan},
+  booktitle={2022 IEEE Sensors}, 
+  title={Physical LiDAR Simulation in Real-Time Engine}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1-4},
+  doi={10.1109/SENSORS52175.2022.9967197}}
 }
 ```
 - [Simulation of Pulse-Echo Radar for Vehicle Control and SLAM](https://www.mdpi.com/1424-8220/21/2/523)
 ```
 @Article{echosim2021schouten,
-  author = {Schouten, Girmi and Jansen, Wouter and Steckel, Jan},
-  title = {Simulation of Pulse-Echo Radar for Vehicle Control and SLAM},
-  JOURNAL = {Sensors},
-  volume = {21},
-  year = {2021},
-  number = {2},
-  article-number = {523},
-  doi = {10.3390/s21020523}
+  author={Schouten, Girmi and Jansen, Wouter and Steckel, Jan},
+  title={Simulation of Pulse-Echo Radar for Vehicle Control and SLAM},
+  JOURNAL={Sensors},
+  volume={21},
+  year={2021},
+  number={2},
+  article-number={523},
+  doi={10.3390/s21020523}
 }
 ```
 
