@@ -45,17 +45,17 @@ Do note that this repository is provided as is, will not be actively updated and
 
 * Updated the camera, Echo and (GPU)LiDAR sensors to be able to uncouple from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is deprecated.
-* Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
-* Added [Instance Segmentation](docs/instance_segmentation.md). 
-* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
-* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
-* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
+* Updated Python [ROS implementation](https://cosys-lab.github.io/ros.md) with completely new implementation and feature set. C++ version is deprecated.
+* Added [Echo sensor type](https://cosys-lab.github.io/echo.md) for simulation of sensors like sonar and radar.
+* Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation.md). 
+* Added [GPU LIDAR sensor type](https://cosys-lab.github.io/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
+* Updated [ComputerVision mode](https://cosys-lab.github.io/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
+* Updated [LIDAR sensor type](https://cosys-lab.github.io/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Added option to hot-reload plugin through Unreal Editor (faster development).
-* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md) based on NVIDIA tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Added [skid steering SimMode and vehicle type](https://cosys-lab.github.io/skid_steer_vehicle.md) based on NVIDIA tank PhysX vehicle model. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
-* Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
+* Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](https://cosys-lab.github.io/settings.md).
 * Updated Unreal to 4.24 (custom fork needed for instance segmentation: [https://github.com/Cosys-Lab/UnrealEngine](https://github.com/Cosys-Lab/UnrealEngine))
 * Dropped support for Unity Environments.
 
@@ -63,22 +63,22 @@ Do note that this repository is provided as is, will not be actively updated and
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
 ### Windows
-* [Build it](docs/build_windows.md)
+* [Build it](https://cosys-lab.github.io/build_windows.md)
 
 ### Linux
-* [Build it](docs/build_linux.md)
+* [Build it](https://cosys-lab.github.io/build_linux.md)
 
 ## How to Use It
 
 ### Documentation
 
-View our [detailed documentation](docs) on all aspects of AirSim.
+View our [detailed documentation](https://cosys-lab.github.io) on all aspects of AirSim.
 
 ### Manual drive
 
 If you have remote control (RC) as shown below, you can manually control the drone in the simulator. For cars, you can use arrow keys to drive manually.
 
-[More details](docs/remote_control.md)
+[More details](https://cosys-lab.github.io/remote_control.md)
 
 ![record screenshot](docs/images/AirSimDroneManual.gif)
 
@@ -91,9 +91,9 @@ AirSim exposes APIs so you can interact with the vehicle in the simulation progr
 
 These APIs are also available as part of a separate, independent cross-platform library, so you can deploy them on a companion computer on your vehicle. This way you can write and test your code in the simulator, and later execute it on the real vehicles. Transfer learning and related research is one of our focus areas.
 
-Note that you can use [SimMode setting](docs/settings.md) to specify the default vehicle or the new [ComputerVision mode](docs/image_apis.md) so you don't get prompted each time you start AirSim.
+Note that you can use [SimMode setting](https://cosys-lab.github.io/settings.md) to specify the default vehicle or the new [ComputerVision mode](https://cosys-lab.github.io/image_apis.md) so you don't get prompted each time you start AirSim.
 
-[More details](docs/apis.md)
+[More details](https://cosys-lab.github.io/apis.md)
 
 ### Gathering training data
 
@@ -107,11 +107,11 @@ A better way to generate training data exactly the way you want is by accessing 
 
 Yet another way to use AirSim is the so-called "Computer Vision" mode. In this mode, you don't have vehicles or physics. You can use the keyboard to move around the scene, or use APIs to position available cameras in any arbitrary pose, and collect images such as depth, disparity, surface normals or object segmentation. 
 
-[More details](docs/image_apis.md)
+[More details](https://cosys-lab.github.io/image_apis.md)
 
 ### Weather Effects
 
-Press F10 to see various options available for weather effects. You can also control the weather using [APIs](docs/apis.md). Press F1 to see other options available.
+Press F10 to see various options available for weather effects. You can also control the weather using [APIs](https://cosys-lab.github.io/apis.md). Press F1 to see other options available.
 
 ![record screenshot](docs/images/weather_menu.png)
 
@@ -120,7 +120,7 @@ Press F10 to see various options available for weather effects. You can also con
 - [Video - Setting up AirSim with Pixhawk Tutorial](https://youtu.be/1oY8Qu5maQQ) by Chris Lovett
 - [Video - Using AirSim with Pixhawk Tutorial](https://youtu.be/HNWdYrtw3f0) by Chris Lovett
 - [Video - Using off-the-self environments with AirSim](https://www.youtube.com/watch?v=y09VbdQWvQY) by Jim Piavis
-- [Reinforcement Learning with AirSim](docs/reinforcement_learning.md) by Ashish Kapoor
+- [Reinforcement Learning with AirSim](https://cosys-lab.github.io/reinforcement_learning.md) by Ashish Kapoor
 - [The Autonomous Driving Cookbook](https://aka.ms/AutonomousDrivingCookbook) by Microsoft Deep Learning and Robotics Garage Chapter
 - [Using TensorFlow for simple collision avoidance](https://github.com/simondlevy/AirSimTensorFlow) by Simon Levy and WLU team
 
