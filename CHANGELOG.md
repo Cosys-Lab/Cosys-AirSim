@@ -1,6 +1,6 @@
 # What's new
 
-Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. This list updated every few months. For complete detailed changes, please review [commit history](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/commits/master).
+Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. 
 
 ## Cosys-Lab Modifications
 * Updated the camera, Echo and (GPU)LiDAR sensors to be able to uncouple from the vehicle and be placed as external world sensors.
