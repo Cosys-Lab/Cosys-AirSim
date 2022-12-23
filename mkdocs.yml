@@ -13,7 +13,7 @@ edit_uri: https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/
 nav:
   - "Home":
     - "Home": 'README.md'
-  - "Changelog": 'CHANGELOG.md'
+  - "Changelog": 'https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md'
   - "Building AirSim":
     - "Build on Windows": 'build_windows.md'
     - "Build on Linux": 'build_linux.md'
