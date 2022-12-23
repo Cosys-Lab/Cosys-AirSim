@@ -4,7 +4,7 @@ AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https:
 
 Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
 
-## CoSys-Lab Modifications
+## Cosys-Lab Modifications
 
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
 Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to colaborate. 
