@@ -30,7 +30,7 @@ If you don't already have a catkin workspace, you should first work through the 
 In the ROS package directory you made, copy the ROS node scripts from the _AirSim/ros/python_ws/src/airsim_ directory to your ROS package. Change the code below to match your AirSim and catkin workspace paths.
 
 ```
-cp AirSim/ros/python_ws/src/airsim/scripts ../catkin_ws/src/airsim
+cp AirSim/ros/python_ws/src/airsim/scripts https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/catkin_ws/src/airsim
 ```
 
 #### Option B: Use provided workspace

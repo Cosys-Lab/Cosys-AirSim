@@ -15,9 +15,9 @@ Please see the [Image API documentation](image_apis.md#segmentation) on how to m
 
 The easiest way to get the images from segmentation cameras, is through ros. See the [ROS documentation](ros.md) for more information. 
 
-For an example of the Instance Segmentation API, please see the script  [segmentation_test.py](../PythonClient/segmentation/segmentation_test.py).
+For an example of the Instance Segmentation API, please see the script  [segmentation_test.py](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/segmentation/segmentation_test.py).
 
-For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../PythonClient/segmentation/segmentation_generate_list.py).
+For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/segmentation/segmentation_generate_list.py).
 
 When a new object is spawned in your environment by for example a c++ or blueprint extension you made,
 and you want it to work with the instance segmentation system, you can use the extended function `ASimModeBase::AddNewActorToSegmentation(AActor)` which is also available in blueprints. 
