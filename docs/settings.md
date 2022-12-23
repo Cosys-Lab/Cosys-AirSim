@@ -235,7 +235,7 @@ To disable the rendering of certain objects on specific cameras or all, use the 
 For explanation of other settings, please see [this article](https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/AutomaticExposure/). 
 
 ### NoiseSettings
-The `NoiseSettings` allows to add noise to the specified image type with a goal of simulating camera sensor noise, interference and other artifacts. By default no noise is added, i.e., `Enabled: false`. If you set `Enabled: true` then following different types of noise and interference artifacts are enabled, each can be further tuned using setting. The noise effects are implemented as shader created as post processing material in Unreal Engine called [CameraSensorNoise](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/Unreal/Plugins/AirSim/Content/HUDAssets/CameraSensorNoise.uasset).
+The `NoiseSettings` allows to add noise to the specified image type with a goal of simulating camera sensor noise, interference and other artifacts. By default no noise is added, i.e., `Enabled: false`. If you set `Enabled: true` then following different types of noise and interference artifacts are enabled, each can be further tuned using setting. The noise effects are implemented as shader created as post processing material in Unreal Engine called [CameraSensorNoise](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/Unreal/Plugins/AirSim/Content/HUDAssets/CameraSensorNoise.uasset).
 
 Demo of camera noise and interference simulation:
 

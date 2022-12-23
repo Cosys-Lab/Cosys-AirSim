@@ -48,7 +48,7 @@ See [Using APIs](apis.md) and [settings.json](settings.md) for various options a
 The other environments available often need additional asset packs to be downloaded first, read [here](environments.md) for more information.
 
 # AirSim on Unity (Experimental)
-[Unity](https://unity3d.com/) is another great game engine platform and we have an [experimental release](https://github.com/Microsoft/AirSim/tree/master/Unity) of AirSim on Unity. Please note that this is work in progress and all features may not work yet. 
+[Unity](https://unity3d.com/) is another great game engine platform and we have an [experimental release](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/Unity) of AirSim on Unity. Please note that this is work in progress and all features may not work yet. 
 
 # FAQ
 #### I get `error C100 : An internal error has occurred in the compiler` when running build.cmd

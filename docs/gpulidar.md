@@ -45,7 +45,7 @@ rainConstantA                | Constant one to to calculate the extinction coeff
 rainConstantB                | Constant one to to calculate the extinction coefficient in rain
 ```
 {
-    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
+    "SeeDocsAt": "https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/settings.md",
     "SettingsVersion": 1.2,
 
     "SimMode": "SkidVehicle",
