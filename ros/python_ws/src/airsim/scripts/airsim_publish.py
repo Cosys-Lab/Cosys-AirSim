@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import setup_path
 import airsimpy
@@ -363,7 +363,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             if response.width == 0 and response.height == 0:
                 rospy.logwarn("Camera '" + sensor_name + "' could not retrieve scene image.")
             else:
-                rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
+                rgb_matrix = np.frombuffer(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
                                                                                                        response.width,
                                                                                                        3)
                 if sensor_camera_scene_quality[sensor_index] > 0:
