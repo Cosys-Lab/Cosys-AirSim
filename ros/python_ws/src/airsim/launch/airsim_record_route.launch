@@ -1,7 +1,7 @@
 <launch>
       <arg name="rate" default="10"/>
 
-      <arg name="ip"  default=""/>
+      <arg name="ip"  default="172.29.32.1"/>
 
       <arg name="toggle_drone" default="0" />
 
@@ -38,5 +38,5 @@
             <rosparam param="sensor_imu_frame" subst_value="True">$(arg sensor_imu_frame)</rosparam>
       </node>
 
-      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o ./airsim_route_only -a"/>
+      <node pkg="rosbag" type="record" name="rosbag_record" args="record -o /mnt/c/Users/woute/airsim_route_only -a"/>
 </launch>
