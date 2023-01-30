@@ -10,12 +10,6 @@ MultirotorPawnSimApi::MultirotorPawnSimApi(const Params& params)
     : PawnSimApi(params),
       pawn_events_(static_cast<MultirotorPawnEvents*>(params.pawn_events))
 {
-    //reset roll & pitch of vehicle as multirotors required to be on plain surface at start
-    Pose pose = getPose();
-    float pitch, roll, yaw;
-    VectorMath::toEulerianAngle(pose.orientation, pitch, roll, yaw);
-    pose.orientation = VectorMath::toQuaternion(0, 0, yaw);
-    setPose(pose, false);
 }
 
 void MultirotorPawnSimApi::initialize()
@@ -35,10 +29,15 @@ void MultirotorPawnSimApi::initialize()
     vehicle_api_->setSimulatedGroundTruth(getGroundTruthKinematics(), getGroundTruthEnvironment());
 
     //initialize private vars
-    last_phys_pose_ = pending_phys_pose_ = Pose::nanPose();
+    last_phys_pose_ = Pose::nanPose();
     pending_pose_status_ = PendingPoseStatus::NonePending;
     reset_pending_ = false;
     did_reset_ = false;
+    Pose pose = getPose();
+    float pitch, roll, yaw;
+    VectorMath::toEulerianAngle(pose.orientation, pitch, roll, yaw);
+    pose.orientation = VectorMath::toQuaternion(0, 0, yaw);
+    setPose(pose, false);
 }
 
 void MultirotorPawnSimApi::pawnTick(float dt)
@@ -61,11 +60,6 @@ void MultirotorPawnSimApi::updateRenderedState(float dt)
     //move collision info from rendering engine to vehicle
     const CollisionInfo& collision_info = getCollisionInfo();
     phys_vehicle_->setCollisionInfo(collision_info);
-
-    if (pending_pose_status_ == PendingPoseStatus::RenderStatePending) {
-        phys_vehicle_->setPose(pending_phys_pose_);
-        pending_pose_status_ = PendingPoseStatus::RenderPending;
-    }
         
     last_phys_pose_ = phys_vehicle_->getPose();
     
@@ -131,9 +125,12 @@ void MultirotorPawnSimApi::updateRendering(float dt)
 
 void MultirotorPawnSimApi::setPose(const Pose& pose, bool ignore_collision)
 {
-    pending_phys_pose_ = pose;
+    phys_vehicle_->lock();
+    phys_vehicle_->setPose(pose);
+    phys_vehicle_->setGrounded(false);
+    phys_vehicle_->unlock();
     pending_pose_collisions_ = ignore_collision;
-    pending_pose_status_ = PendingPoseStatus::RenderStatePending;
+    pending_pose_status_ = PendingPoseStatus::RenderPending;
 }
 
 //*** Start: UpdatableState implementation ***//
