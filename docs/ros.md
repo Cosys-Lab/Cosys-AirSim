@@ -6,7 +6,7 @@ AirSim and ROS can be integrated using Python. Some example ROS node are provide
 
 ## Prerequisites
 
-These instructions are for Ubuntu 20.04, ROS Noetic, UE4 4.24.4 and latest AirSim release.
+These instructions are for Ubuntu 18.04/20.04, ROS Melodic/Noetic, UE4 4.24.4 and latest AirSim release.
 You should have these components installed and working before proceeding
 
 ## Implemented nodes
@@ -42,7 +42,7 @@ Change directory to your top level catkin workspace folder i.e. ```cd ~/catkin_w
 This will build the AirSim package.  Next, run ```source devel/setup.bash``` so ROS can find the new package.
 You can add this command to your _~/.bashrc_ to load your catkin workspace automatically.
 
-**NOTE FOR OLDER ROS VERSIONS:** If you use Python2, change the scripts to use ```#!/usr/bin/env python``` at the top instead of ```#!/usr/bin/env python3```
+**NOTE FOR NOETIC:** If you use Python3, change the scripts to use ```#!/usr/bin/env python3``` at the top instead of ```#!/usr/bin/env python```
 ## How to run ROS AirSim nodes
 
 First make sure UE4 is running an AirSim project and the simulations is playing.

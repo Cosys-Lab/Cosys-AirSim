@@ -57,7 +57,6 @@
 
       <arg name="object_poses_all" default="0"/>
       <arg name="object_poses_all_coordinates_local" default="1"/>
-      <arg name="object_poses_all_once" default="1"/>
       <arg name="object_poses_all_topic" default="airsim/objects/poses"/>
 
       <arg name="object_poses_individual_names" default="[object_name]"/>
@@ -125,7 +124,6 @@
 
             <rosparam param="object_poses_all" subst_value="True">$(arg object_poses_all)</rosparam>
             <rosparam param="object_poses_all_coordinates_local" subst_value="True">$(arg object_poses_all_coordinates_local)</rosparam>
-            <rosparam param="object_poses_all_once" subst_value="True">$(arg object_poses_all_once)</rosparam>
             <rosparam param="object_poses_all_topic" subst_value="True">$(arg object_poses_all_topic)</rosparam>
 
             <rosparam param="object_poses_individual_names" subst_value="True">$(arg object_poses_individual_names)</rosparam>
