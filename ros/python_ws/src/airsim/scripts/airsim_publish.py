@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import setup_path
 import airsimpy
@@ -154,7 +154,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                    sensor_camera_segmentation_topics, sensor_camera_depth_topics,
                    sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
                    sensor_camera_info_topics, sensor_stereo_enable, baseline,
-                   object_poses_all, object_poses_all_coordinates_local, object_poses_all_once, object_poses_all_topic,
+                   object_poses_all, object_poses_all_coordinates_local, object_poses_all_topic,
                    object_poses_individual_names, object_poses_individual_coordinates_local,
                    object_poses_individual_topics):
     rate = rospy.Rate(ros_rate)
@@ -181,7 +181,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         pointcloud_publishers[sensor_name] = rospy.Publisher(sensor_lidar_topics[sensor_index], PointCloud2,
                                                              queue_size=2)
         last_timestamps[sensor_name] = None
-        if sensor_lidar_toggle_segmentation[sensor_index] == 1:
+        if sensor_lidar_toggle_segmentation[sensor_index] is 1:
             string_segmentation_publishers[sensor_name] = \
                 rospy.Publisher(sensor_lidar_segmentation_topics[sensor_index], StringArray, queue_size=1)
     for sensor_index, sensor_name in enumerate(sensor_gpulidar_names):
@@ -199,13 +199,13 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         toggle_mono = True
         image_publishers[sensor_name + '_scene'] = rospy.Publisher(sensor_camera_scene_topics[sensor_index],
                                                                    Image, queue_size=2)
-        if sensor_camera_toggle_segmentation[sensor_index] == 1:
+        if sensor_camera_toggle_segmentation[sensor_index] is 1:
             image_publishers[sensor_name + '_segmentation'] = \
                 rospy.Publisher(sensor_camera_segmentation_topics[sensor_index], Image, queue_size=2)
-        if sensor_camera_toggle_depth[sensor_index] == 1:
+        if sensor_camera_toggle_depth[sensor_index] is 1:
             image_publishers[sensor_name + '_depth'] = rospy.Publisher(sensor_camera_depth_topics[sensor_index],
                                                                        Image, queue_size=2)
-        if sensor_camera_toggle_camera_info[sensor_index] == 1:
+        if sensor_camera_toggle_camera_info[sensor_index] is 1:
             image_publishers[sensor_name + '_cameraInfo'] = rospy.Publisher(sensor_camera_info_topics[sensor_index],
                                                                             CameraInfo, queue_size=2)
             cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name)
@@ -246,12 +246,12 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         response_index += 1
         requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("Scene"),
                                               is_pixels_as_float("Scene"), False))
-        if sensor_camera_toggle_segmentation[sensor_index] == 1:
+        if sensor_camera_toggle_segmentation[sensor_index] is 1:
             requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("Segmentation"),
                                                   is_pixels_as_float("Segmentation"), False))
             response_locations[sensor_name + '_segmentation'] = response_index
             response_index += 1
-        if sensor_camera_toggle_depth[sensor_index] == 1:
+        if sensor_camera_toggle_depth[sensor_index] is 1:
             requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("DepthPlanner"),
                                                   is_pixels_as_float("DepthPlanner"), False))
             response_locations[sensor_name + '_depth'] = response_index
@@ -264,7 +264,6 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
 
     rospy.loginfo("Started publishers...")
 
-    first_message = True
     while not rospy.is_shutdown():
 
         timestamp = rospy.Time.now()
@@ -363,7 +362,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             if response.width == 0 and response.height == 0:
                 rospy.logwarn("Camera '" + sensor_name + "' could not retrieve scene image.")
             else:
-                rgb_matrix = np.frombuffer(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
+                rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
                                                                                                        response.width,
                                                                                                        3)
                 if sensor_camera_scene_quality[sensor_index] > 0:
@@ -381,7 +380,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                 camera_msg.header.frame_id = sensor_camera_optical_frames[sensor_index]
                 image_publishers[sensor_name + '_scene'].publish(camera_msg)
 
-            if sensor_camera_toggle_segmentation[sensor_index] == 1:
+            if sensor_camera_toggle_segmentation[sensor_index] is 1:
                 response = camera_responses[response_locations[sensor_name + '_segmentation']]
                 if response.width == 0 and response.height == 0:
                     rospy.logwarn("Camera '" + sensor_name + "' could not retrieve segmentation image.")
@@ -390,7 +389,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     camera_msg.step = response.width * 3
                     camera_msg.data = rgb_string
                     image_publishers[sensor_name + '_segmentation'].publish(camera_msg)
-            if sensor_camera_toggle_depth[sensor_index] == 1:
+            if sensor_camera_toggle_depth[sensor_index] is 1:
                 response = camera_responses[response_locations[sensor_name + '_depth']]
                 if response.width == 0 and response.height == 0:
                     rospy.logwarn("Camera '" + sensor_name + "' could not retrieve depth image.")
@@ -400,7 +399,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     camera_msg.step = response.width * 4
                     camera_msg.data = rgb_string
                     image_publishers[sensor_name + '_depth'].publish(camera_msg)
-            if sensor_camera_toggle_camera_info[sensor_index] == 1:
+            if sensor_camera_toggle_camera_info[sensor_index] is 1:
                 FOV = cameraInfo_objects[sensor_name].fov
                 cam_info_msg = CameraInfo()
                 cam_info_msg.header.frame_id = sensor_camera_optical_frames[sensor_index]
@@ -462,7 +461,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
 
                     pointcloud_publishers[sensor_name].publish(pcloud)
 
-                    if sensor_lidar_toggle_segmentation[sensor_index] == 1:
+                    if sensor_lidar_toggle_segmentation[sensor_index] is 1:
                         labels = np.array(lidar_data.groundtruth, dtype=np.dtype('U'))
                         groundtruth = StringArray()
                         groundtruth.data = labels.tolist()
@@ -482,16 +481,9 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     pcloud = PointCloud2()
                     points = np.array(lidar_data.point_cloud, dtype=np.dtype('f4'))
                     points = np.reshape(points, (int(points.shape[0] / 5), 5))
-                    points_x = points[:, 0]
-                    points_y = points[:, 1]
-                    points_z = points[:, 2]
-                    points_rgb = points[:, 3].astype('uint32')
-                    points_intensity = points[:, 4]
-                    points_list = [points_x, points_y, points_z, points_rgb, points_intensity]
-                    points_list_transposed = [list(i) for i in zip(*points_list)]
                     pcloud.header.frame_id = sensor_gpulidar_frames[sensor_index]
                     pcloud.header.stamp = timestamp
-                    pcloud = pc2.create_cloud(pcloud.header, fields_lidar, points_list_transposed)
+                    pcloud = pc2.create_cloud(pcloud.header, fields_lidar, points.tolist())
 
                     pointcloud_publishers[sensor_name].publish(pcloud)
 
@@ -549,35 +541,35 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     uwb_rangeArray_publisher.publish(rangeArray)
 
         if object_poses_all:
-            if not object_poses_all_once or (object_poses_all_once and first_message):
-                object_path = Path()
-                object_path.header.stamp = timestamp
-                object_path.header.frame_id = pose_frame
 
-                cur_object_names = client.simListInstanceSegmentationObjects()
-                if object_poses_all_coordinates_local == 1:
-                    cur_object_poses = client.simListInstanceSegmentationPoses(True)
-                else:
-                    cur_object_poses = client.simListInstanceSegmentationPoses(False)
-                for index, object_name in enumerate(cur_object_names):
-                    currentObjectPose = cur_object_poses[index]
-                    if not np.isnan(currentObjectPose.position.x_val):
-                        pos = currentObjectPose.position
-                        orientation = currentObjectPose.orientation.inverse()
+            object_path = Path()
+            object_path.header.stamp = timestamp
+            object_path.header.frame_id = pose_frame
 
-                        object_pose = PoseStamped()
-                        object_pose.pose.position.x = pos.x_val
-                        object_pose.pose.position.y = -pos.y_val
-                        object_pose.pose.position.z = pos.z_val
-                        object_pose.pose.orientation.w = orientation.w_val
-                        object_pose.pose.orientation.x = orientation.x_val
-                        object_pose.pose.orientation.y = orientation.y_val
-                        object_pose.pose.orientation.z = orientation.z_val
-                        object_pose.header.frame_id = object_name
-                        object_pose.header.stamp = timestamp
-                        object_path.poses.append(object_pose)
+            cur_object_names = client.simListInstanceSegmentationObjects()
+            if object_poses_all_coordinates_local == 1:
+                cur_object_poses = client.simListInstanceSegmentationPoses(True)
+            else:
+                cur_object_poses = client.simListInstanceSegmentationPoses(False)
+            for index, object_name in enumerate(cur_object_names):
+                currentObjectPose = cur_object_poses[index]
+                if not np.isnan(pose.position.x_val):
+                    pos = currentObjectPose.position
+                    orientation = currentObjectPose.orientation.inverse()
 
-                object_path_publisher.publish(object_path)
+                    object_pose = PoseStamped()
+                    object_pose.pose.position.x = pos.x_val
+                    object_pose.pose.position.y = -pos.y_val
+                    object_pose.pose.position.z = pos.z_val
+                    object_pose.pose.orientation.w = orientation.w_val
+                    object_pose.pose.orientation.x = orientation.x_val
+                    object_pose.pose.orientation.y = orientation.y_val
+                    object_pose.pose.orientation.z = orientation.z_val
+                    object_pose.header.frame_id = object_name
+                    object_pose.header.stamp = timestamp
+                    object_path.poses.append(object_pose)
+
+            object_path_publisher.publish(object_path)
 
         else:
             for object_index, object_name in enumerate(object_poses_individual_names):
@@ -623,7 +615,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     client.setCarControls(car_controls, vehicle_name)
             except:
                 pass  # queue is empty
-        first_message = False
+
         rate.sleep()
 
 
@@ -689,7 +681,6 @@ if __name__ == '__main__':
 
         object_poses_all = rospy.get_param('~object_poses_all', "True")
         object_poses_all_coordinates_local = rospy.get_param('~object_poses_all_coordinates_local', "True")
-        object_poses_all_once = rospy.get_param('~object_poses_all_once', "True")
         object_poses_all_topic = rospy.get_param('~object_poses_all_topic', "True")
 
         object_poses_individual_names = rospy.get_param('~object_poses_individual_names', "True")
@@ -699,9 +690,9 @@ if __name__ == '__main__':
 
         rospy.loginfo("Connecting to AirSim...")
         if toggle_drone:
-            client = airsimpy.MultirotorClient(ip)
+            client = airsimpy.MultirotorClient(ip, timeout_value=15)
         else:
-            client = airsimpy.CarClient(ip)
+            client = airsimpy.CarClient(ip, timeout_value=15)
         try:
             client.confirmConnection(rospy.get_name())
         except msgpackrpc.error.TimeoutError:
@@ -884,8 +875,8 @@ if __name__ == '__main__':
                        sensor_camera_segmentation_topics, sensor_camera_depth_topics,
                        sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
                        sensor_camera_info_topics, sensor_stereo_enable, baseline,
-                       object_poses_all, object_poses_all_coordinates_local, object_poses_all_once,
-                       object_poses_all_topic, object_poses_individual_names, object_poses_individual_coordinates_local,
+                       object_poses_all, object_poses_all_coordinates_local, object_poses_all_topic,
+                       object_poses_individual_names, object_poses_individual_coordinates_local,
                        object_poses_individual_topics)
 
     except rospy.ROSInterruptException:
