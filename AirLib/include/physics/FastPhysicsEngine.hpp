@@ -70,7 +70,7 @@ private:
     void updatePhysics(PhysicsBody& body)
     {
         TTimeDelta dt = clock()->updateSince(body.last_kinematics_time);
-
+        body.lock();
         //get current kinematics state of the body - this state existed since last dt seconds
         const Kinematics::State& current = body.getKinematics();
         Kinematics::State next;
@@ -97,7 +97,7 @@ private:
 
         body.setWrench(next_wrench);
         body.updateKinematics(next);
-
+        body.unlock();
 
 		//TODO: this is now being done in PawnSimApi::update. We need to re-think this sequence
         //with below commented out - Arducopter GPS may not work.
