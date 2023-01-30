@@ -13,14 +13,7 @@ NedTransform::NedTransform(const AActor* pivot, const FTransform& global_transfo
     : global_transform_(global_transform), world_to_meters_(world_to_meters)
 {
     if (pivot != nullptr) {
-        //normally pawns have their center as origin. If we use this as 0,0,0 in NED then
-        //when we tell vehicle to go to 0,0,0 - it will try to go in the ground
-        //so we get the bounds and subtract z to get bottom as 0,0,0
-        FVector mesh_origin, mesh_bounds;
-        pivot->GetActorBounds(true, mesh_origin, mesh_bounds);
-
-        FVector ground_offset = FVector(0, 0, mesh_bounds.Z);
-        local_ned_offset_ = pivot->GetActorLocation() - ground_offset;
+        local_ned_offset_ = pivot->GetActorLocation();
     }
     else
         local_ned_offset_ = FVector::ZeroVector;
