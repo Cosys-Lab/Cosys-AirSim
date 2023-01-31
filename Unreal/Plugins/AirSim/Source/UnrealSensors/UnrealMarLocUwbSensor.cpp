@@ -89,13 +89,13 @@ TArray<msr::airlib::Pose> UnrealMarLocUwbSensor::getBeaconActors() {
 
 void UnrealMarLocUwbSensor::updateUWBRays() {
 	const GroundTruth& ground_truth = getGroundTruth();
-
+	
 	Vector3r sensorBase_local = Vector3r(sensor_reference_frame_.position);
 	FVector sensorBase_global = ned_transform_->fromLocalNed(sensorBase_local);
 
 	//actor_->GetWorld()->GetPhysicsScene()->GetPxScene()->lockRead();
 
-	// Clear oldest UWB Hits
+	// Clear oldest UWB Hits 
 	while (beaconsActive_.IsValidIndex(maxUWBHits)) {
 		beaconsActive_.RemoveAt(0);
 	}
@@ -109,7 +109,7 @@ void UnrealMarLocUwbSensor::updateUWBRays() {
 	for (int32 direction_count = 0; direction_count< sample_directions_.size(); direction_count++){
 		Vector3r sample_direction = sample_directions_[direction_count];
 
-		//FVector trace_direction = ned_transform_->toFVector(VectorMath::rotateVector(sample_direction, sensor_reference_frame_.orientation, 1), 1.0f, true);
+		//FVector trace_direction = ned_transform_->toFVector(VectorMath::rotateVector(sample_direction, sensor_reference_frame_.orientation, 1), 1.0f, true); 
 
 		msr::airlib::Quaternionr sensorOrientationQuat = sensor_reference_frame_.orientation;
 		float roll, pitch, yaw;
@@ -182,7 +182,6 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 	FHitResult trace_hit_result;
 	bool trace_hit;
 	TArray<AActor*> ignore_actors_;
-
 
 	FVector startPos = this->ned_transform_->getGlobalOffset();
 

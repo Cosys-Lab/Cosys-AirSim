@@ -33,6 +33,7 @@ protected:
 	//virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
 
 	void updateUWBRays();
+	TArray<msr::airlib::Pose> getBeaconActors();
 private:
 	using Vector3r = msr::airlib::Vector3r;
 	using VectorMath = msr::airlib::VectorMath;
@@ -47,14 +48,8 @@ private:
 	const bool external_;
 	std::vector<float> uwbTraceMaxDistances; // in meter
 
-	/*struct UWBHit
-	{
-		FString beaconID;
-		int rssi;
-	};*/
-
 	void sampleSphereCap(int num_points, float opening_angle);
-	int traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::UWBHit> *UWBHitLogfloat, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug);
+	int traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::UWBHit> *UWBHitLogfloat, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug, FVector trace_origin);
 	void bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length, const FHitResult &trace_hit_result, float &total_distance, float &signal_attenuation);
 	float angleBetweenVectors(FVector vector1, FVector vector2);
 	float getFreeSpaceLoss(float previous_distance, float added_distance);
@@ -70,7 +65,8 @@ private:
 	float traceRayMaxBounces;
 	float traceRayMinSignalStrength;
 
-	TArray<AActor*> beacon_actors;
+	//TArray<AActor*> beacon_actors;
+	TArray<msr::airlib::Pose> beacon_poses;
 
 	//TArray<TArray<UWBHit>> UWBHits;
 	int maxUWBHits = 5;
