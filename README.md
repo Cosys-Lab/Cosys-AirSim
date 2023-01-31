@@ -4,10 +4,47 @@ AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https:
 
 Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
 
-Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects. Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
+## Cosys-Lab Modifications
+
+Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
+Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to colaborate. 
+The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
+Please note that we use that same [MIT license](LICENSE) as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
+Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
+Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 The biggest difference is that this requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
 
-## CoSys-Lab Modifications
+A manually maintained fork of this repository is available to the public: https://github.com/Cosys-Lab/Cosys-AirSim
+### Associated publications
+
+- [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)
+```
+@inproceedings{lidarsim2022jansen,
+  author={Jansen, Wouter and Huebel, Nico and Steckel, Jan},
+  booktitle={2022 IEEE Sensors}, 
+  title={Physical LiDAR Simulation in Real-Time Engine}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1-4},
+  doi={10.1109/SENSORS52175.2022.9967197}}
+}
+```
+- [Simulation of Pulse-Echo Radar for Vehicle Control and SLAM](https://www.mdpi.com/1424-8220/21/2/523)
+```
+@Article{echosim2021schouten,
+  author={Schouten, Girmi and Jansen, Wouter and Steckel, Jan},
+  title={Simulation of Pulse-Echo Radar for Vehicle Control and SLAM},
+  JOURNAL={Sensors},
+  volume={21},
+  year={2021},
+  number={2},
+  article-number={523},
+  doi={10.3390/s21020523}
+}
+```
+
+## Cosys-Lab Modifications
 * Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
@@ -24,10 +61,7 @@ The biggest difference is that this requires custom Unreal Engine! See [document
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
 * Dropped support for Unity Environments.
-
-
-For complete list of changes, view our [Changelog](CHANGELOG.md)
-
+* 
 ## How to Get It
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
