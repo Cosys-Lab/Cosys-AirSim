@@ -415,8 +415,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                                 currentRanges = np.array(uwb_data.mur_anchorId)[ranges]
                                 currentRssi = np.array(uwb_data.mur_rssi)[ranges]
                                 currentDistance = np.array(uwb_data.mur_distance)[ranges]
-                                currentRssiFiltered = currentRssi * list(
-                                    map(int, currentRanges == uwb_data.mur_anchorId[arange]))
+                                currentRssiFiltered = currentRssi * list(map(int, currentRanges == uwb_data.mur_anchorId[arange]))
                                 maxRssi = max(currentRssiFiltered)
                                 maxRssiIdx = currentRssiFiltered.argmax()
 
@@ -430,9 +429,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                         for mura_idx in range(0, len(uwb_data.mura_tagId)):
                             rangeArray = RangeArray()
                             rangeArray.tagid = str(uwb_data.mura_tagId[mura_idx])
-                            rangeArray.tag_position = Point(uwb_data.mura_tagPosX[mura_idx],
-                                                            uwb_data.mura_tagPosY[mura_idx],
-                                                            uwb_data.mura_tagPosZ[mura_idx])
+                            rangeArray.tag_position = Point(uwb_data.mura_tagPosX[mura_idx], uwb_data.mura_tagPosY[mura_idx], uwb_data.mura_tagPosZ[mura_idx])
                             rangeArray.header.stamp = timestamp
 
                             # for mur_id in range(0, len(mur_time_stamp)):
@@ -444,8 +441,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                                 # rang.stamp = mur_time_stamp[mur_id]
                                 rang.stamp = timestamp
                                 rang.anchorid = str(mur_anchorId[mur_id]).split(":")[-1]
-                                rang.anchor_position = Point(mur_anchorPosX[mur_id], mur_anchorPosY[mur_id],
-                                                             mur_anchorPosZ[mur_id])
+                                rang.anchor_position = Point(mur_anchorPosX[mur_id], mur_anchorPosY[mur_id], mur_anchorPosZ[mur_id])
                                 rang.valid_range = mur_valid_range[mur_id]
                                 rang.distance = mur_distance[mur_id]
                                 rang.diagnostics = diag
@@ -511,8 +507,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                                 currentRanges = np.array(wifi_data.wr_anchorId)[ranges]
                                 currentRssi = np.array(wifi_data.wr_rssi)[ranges]
                                 currentDistance = np.array(wifi_data.wr_distance)[ranges]
-                                currentRssiFiltered = currentRssi * list(
-                                    map(int, currentRanges == wifi_data.wr_anchorId[arange]))
+                                currentRssiFiltered = currentRssi * list(map(int, currentRanges == wifi_data.wr_anchorId[arange]))
                                 maxRssi = max(currentRssiFiltered)
                                 maxRssiIdx = currentRssiFiltered.argmax()
 
@@ -526,9 +521,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                         for wra_idx in range(0, len(wifi_data.wra_tagId)):
                             rangeArray = RangeArray()
                             rangeArray.tagid = str(wifi_data.wra_tagId[wra_idx])
-                            rangeArray.tag_position = Point(wifi_data.wra_tagPosX[wra_idx],
-                                                            wifi_data.wra_tagPosY[wra_idx],
-                                                            wifi_data.wra_tagPosZ[wra_idx])
+                            rangeArray.tag_position = Point(wifi_data.wra_tagPosX[wra_idx], wifi_data.wra_tagPosY[wra_idx], wifi_data.wra_tagPosZ[wra_idx])
                             rangeArray.header.stamp = timestamp
 
                             # for wr_id in range(0, len(wr_time_stamp)):
@@ -540,8 +533,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                                 # rang.stamp = wr_time_stamp[wr_id]
                                 rang.stamp = timestamp
                                 rang.anchorid = str(wr_anchorId[wr_id])
-                                rang.anchor_position = Point(wr_anchorPosX[wr_id], wr_anchorPosY[wr_id],
-                                                             wr_anchorPosZ[wr_id])
+                                rang.anchor_position = Point(wr_anchorPosX[wr_id], wr_anchorPosY[wr_id], wr_anchorPosZ[wr_id])
                                 rang.valid_range = wr_valid_range[wr_id]
                                 rang.distance = wr_distance[wr_id]
                                 rang.diagnostics = diag

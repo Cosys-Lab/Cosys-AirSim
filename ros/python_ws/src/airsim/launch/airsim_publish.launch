@@ -42,7 +42,7 @@
       <arg name="sensor_uwb_frames" default="[base_uwb1, base_uwb2]"/>
 
       <arg name="sensor_wifi_names" default="[]"/>
-      <arg name="sensor_wifi_topic" default=""/>
+      <arg name="sensor_wifi_topic" default="airsim/wifi/ranges"/>
       <arg name="sensor_wifi_frames" default="[base_wifi1, base_wifi2]"/>
 
       <arg name="sensor_camera_names" default="[leftcamera, rightcamera]"/>
