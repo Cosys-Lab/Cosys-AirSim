@@ -164,3 +164,6 @@ venv.bak/
 
 ./src/CMakeLists.txt
 /src/CMakeLists.txt
+/setuptools-44.1.1/
+/setuptools-44.1.1.zip
+

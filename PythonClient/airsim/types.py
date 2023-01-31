@@ -14,13 +14,16 @@ class MsgpackMixin:
     @classmethod
     def from_msgpack(cls, encoded):
         obj = cls()
-        ww = encoded.items()
+        #ww = encoded.items()
         # obj.__dict__ = {k.decode('utf-8'): (from_msgpack(v.__class__, v) if hasattr(v, "__dict__") else v) for k, v in encoded.items()}
-        for k, v in encoded.items():
-            if (isinstance(v, dict) and hasattr(getattr(obj, k).__class__, 'from_msgpack')):
-                obj.__dict__[k] = getattr(getattr(obj, k).__class__, 'from_msgpack')(v)
-            else:
-                obj.__dict__[k] = v
+        if isinstance(encoded, dict):
+            for k, v in encoded.items():
+                if (isinstance(v, dict) and hasattr(getattr(obj, k).__class__, 'from_msgpack')):
+                    obj.__dict__[k] = getattr(getattr(obj, k).__class__, 'from_msgpack')(v)
+                else:
+                    obj.__dict__[k] = v
+        else:
+            obj = encoded
 
         # obj.__dict__ = { k : (v if not isinstance(v, dict) else getattr(getattr(obj, k).__class__, "from_msgpack")(v)) for k, v in encoded.items()}
         # return cls(**msgpack.unpack(encoded))
@@ -382,12 +385,59 @@ class GPULidarData(MsgpackMixin):
     point_cloud = 0.0
     time_stamp = np.uint64(0)
     pose = Pose()
-    groundtruth = ''
 
 class EchoData(MsgpackMixin):
     point_cloud = 0.0
     time_stamp = np.uint64(0)
     pose = Pose()
+
+class UwbSensorData(MsgpackMixin):
+    time_stamp = np.uint64(0)
+    pose = Pose()
+    beaconsActiveID = []
+    beaconsActiveRssi = []
+    beaconsActivePosX = []
+    beaconsActivePosY = []
+    beaconsActivePosZ = []
+    
+class UwbData(MsgpackMixin):
+    time_stamp = []
+    mur_achorId = []
+    mur_anchorX = []
+    mur_anchorY = []
+    mur_anchorZ = []
+    mur_anchor_valid_range = []
+    mur_anchor_distance = []
+    mur_anchor_rssi = []
+    mura_tagId = []
+    mura_tagX = []
+    mura_tagY = []
+    mura_tagZ = []
+    mura_ranges = []
+
+class WifiSensorData(MsgpackMixin):
+    time_stamp = np.uint64(0)
+    pose = Pose()
+    beaconsActiveID = []
+    beaconsActiveRssi = []
+    beaconsActivePosX = []
+    beaconsActivePosY = []
+    beaconsActivePosZ = []
+
+class WifiData(MsgpackMixin):
+    time_stamp = []
+    wr_achorId = []
+    wr_anchorX = []
+    wr_anchorY = []
+    wr_anchorZ = []
+    wr_anchor_valid_range = []
+    wr_anchor_distance = []
+    wr_anchor_rssi = []
+    wra_tagId = []
+    wra_tagX = []
+    wra_tagY = []
+    wra_tagZ = []
+    wra_ranges = []
 
 class ImuData(MsgpackMixin):
     time_stamp = np.uint64(0)

@@ -239,9 +239,9 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         return RpcLibAdapatorsBase::EnvironmentState(result);
     });
 
-    pimpl_->server.bind("getUWBData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::MarLocUwbReturnMessage2 {
+    pimpl_->server.bind("getUWBData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::MarLocUwbReturnMessage {
         const auto& marLocUwbReturnMessage = getVehicleApi(vehicle_name)->getUWBData(sensor_name);
-        return RpcLibAdapatorsBase::MarLocUwbReturnMessage2(marLocUwbReturnMessage);
+        return RpcLibAdapatorsBase::MarLocUwbReturnMessage(marLocUwbReturnMessage);
     });
 
     pimpl_->server.bind("getUWBSensorData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::MarLocUwbSensorData {
@@ -249,14 +249,14 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         return RpcLibAdapatorsBase::MarLocUwbSensorData(marLocUwbSensorData);
     });
 
-    pimpl_->server.bind("getWifiData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::WifiReturnMessage2 {
+    pimpl_->server.bind("getWifiData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::WifiReturnMessage {
         const auto& wifiReturnMessage = getVehicleApi(vehicle_name)->getWifiData(sensor_name);
-        return RpcLibAdapatorsBase::WifiReturnMessage2(wifiReturnMessage);
+        return RpcLibAdapatorsBase::WifiReturnMessage(wifiReturnMessage);
     });
 
-    pimpl_->server.bind("getWifiSensorData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::MarLocUwbSensorData {
-        const auto& marLocUwbSensorData = getVehicleApi(vehicle_name)->getUWBSensorData(sensor_name);
-        return RpcLibAdapatorsBase::MarLocUwbSensorData(marLocUwbSensorData);
+    pimpl_->server.bind("getWifiSensorData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::WifiSensorData {
+        const auto& wifiSensorData = getVehicleApi(vehicle_name)->getWifiSensorData(sensor_name);
+        return RpcLibAdapatorsBase::WifiSensorData(wifiSensorData);
     });
 
     pimpl_->server.bind("cancelLastTask", [&](const std::string& vehicle_name) -> void {

@@ -905,7 +905,7 @@ private:
         vehicle_setting->rotation = createRotationSetting(settings_json, vehicle_setting->rotation);
 
         loadCameraSettings(settings_json, vehicle_setting->cameras);
-        loadSensorSettings(settings_json, "Sensors", vehicle_setting->sensors);
+        loadSensorSettings(settings_json, "Sensors", vehicle_setting->sensors, simmode_name);
        
         return vehicle_setting;
     }
@@ -951,7 +951,7 @@ private:
         beacon_setting->rotation = createRotationSetting(settings_json, beacon_setting->rotation);
 
         //loadCameraSettings(settings_json, beacon_setting->cameras);
-        //loadSensorSettings(settings_json, "Sensors", beacon_setting->sensors);
+        //loadSensorSettings(settings_json, "Sensors", beacon_setting->sensors  simmode_name);
 
         return beacon_setting;
     }
@@ -1665,8 +1665,10 @@ private:
 
     // creates and intializes sensor settings from json
     static void loadSensorSettings( const Settings& settings_json, const std::string& collectionName,
-        std::map<std::string, std::unique_ptr<SensorSetting>>& sensors)
+        std::map<std::string, std::unique_ptr<SensorSetting>>& sensors, const std::string& simmode_name)
     {
+
+        settings_json.getString("SimMode", "");
         msr::airlib::Settings sensors_child;
         if (settings_json.getChild(collectionName, sensors_child)) {
             std::vector<std::string> keys;
@@ -1678,9 +1680,14 @@ private:
 
                 auto sensor_type = Utils::toEnum<SensorBase::SensorType>(child.getInt("SensorType", 0));
                 auto enabled = child.getBool("Enabled", false);
-       
-                sensors[key] = createSensorSetting(sensor_type, key, enabled);
-                initializeSensorSetting(sensors[key].get(), child);
+
+                if (simmode_name == "Multirotor" && sensor_type == SensorBase::SensorType::GPULidar && enabled) {
+                    throw std::invalid_argument(std::string("GPULiDAR sensor from MultiRotor vehicle as this combination is not supported. Please remove or disable."));
+                }
+                else {
+                    sensors[key] = createSensorSetting(sensor_type, key, enabled);
+                    initializeSensorSetting(sensors[key].get(), child);
+                }
             }
         }
     }
@@ -1707,7 +1714,7 @@ private:
     {
         msr::airlib::Settings sensors_child;
         if (settings_json.getChild("DefaultSensors", sensors_child))
-            loadSensorSettings(settings_json, "DefaultSensors", sensors);
+            loadSensorSettings(settings_json, "DefaultSensors", sensors, simmode_name);
         else
             createDefaultSensorSettings(simmode_name, sensors);
     }

@@ -73,7 +73,7 @@ protected:
     }
 
 private:
-	MarLocUwbSensorData output_;
+    MarLocUwbSensorData output_;
     int id_;
 	mutable MarLocUwbSensorData input_;
 };
