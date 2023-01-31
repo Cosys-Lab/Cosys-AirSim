@@ -373,7 +373,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     rgb_matrix = cv2.imdecode(img, 1)
                     rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_BGR2RGB)
 
-                if sensor_camera_toggle_scene_mono is 1:
+                if sensor_camera_toggle_scene_mono == 1:
                     camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
                 else:
                     camera_msg = cv_bridge.cv2_to_imgmsg(rgb_matrix, encoding="rgb8")
