@@ -8,6 +8,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * Updated Python [ROS implementation](https://cosys-lab.github.io/ros/) with completely new implementation and feature set. C++ version is deprecated.
 * Added [Echo sensor type](https://cosys-lab.github.io/echo/) for simulation of sensors like sonar and radar.
 * Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation/). 
+* Added experimental and undocumented WiFi and UWB sensor types.
 * Added [GPU LIDAR sensor type](https://cosys-lab.github.io/gpulidar/): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
 * Updated [ComputerVision mode](https://cosys-lab.github.io/image_apis/#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](https://cosys-lab.github.io/lidar/): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.

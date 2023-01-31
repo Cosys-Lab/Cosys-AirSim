@@ -5,6 +5,8 @@ AirSim supports a GPU accelerated LiDAR for multirotors and cars. It uses a dept
 The enablement of a GPU LiDAR and the other LiDAR settings can be configured via AirSimSettings json.
 Please see [general sensors](sensors.md) for information on configuration of general/shared sensor settings.
 
+Note that this sensor type is currently not supported for Multirotor mode. It only works for Car and Computervision.
+
 ## Enabling GPU LiDAR on a vehicle
 * By default, GPU LiDARs are not enabled. To enable the sensor, set the SensorType and Enabled attributes in settings json.
 ```

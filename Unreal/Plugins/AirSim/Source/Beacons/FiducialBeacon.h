@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
+	UMaterial* Material;
+	UMaterialInstanceDynamic* DynamicMaterial;
+	UTexture* Texture;
 };

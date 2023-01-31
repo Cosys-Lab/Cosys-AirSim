@@ -414,7 +414,31 @@ class UwbData(MsgpackMixin):
     mura_tagY = []
     mura_tagZ = []
     mura_ranges = []
-    
+
+class WifiSensorData(MsgpackMixin):
+    time_stamp = np.uint64(0)
+    pose = Pose()
+    beaconsActiveID = []
+    beaconsActiveRssi = []
+    beaconsActivePosX = []
+    beaconsActivePosY = []
+    beaconsActivePosZ = []
+
+class WifiData(MsgpackMixin):
+    time_stamp = []
+    wr_achorId = []
+    wr_anchorX = []
+    wr_anchorY = []
+    wr_anchorZ = []
+    wr_anchor_valid_range = []
+    wr_anchor_distance = []
+    wr_anchor_rssi = []
+    wra_tagId = []
+    wra_tagX = []
+    wra_tagY = []
+    wra_tagZ = []
+    wra_ranges = []
+
 class ImuData(MsgpackMixin):
     time_stamp = np.uint64(0)
     orientation = Quaternionr()
