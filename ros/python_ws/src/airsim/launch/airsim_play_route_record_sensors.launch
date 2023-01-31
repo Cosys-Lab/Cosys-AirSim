@@ -27,6 +27,14 @@
       <arg name="sensor_gpulidar_topics" default="[airsim/lidar2/pointcloud]"/>
       <arg name="sensor_gpulidar_frames" default="[base_lidar2]"/>
 
+      <arg name="sensor_uwb_names" default="[]"/>
+      <arg name="sensor_uwb_topic" default="airsim/uwb/ranges"/>
+      <arg name="sensor_uwb_frames" default="[base_uwb1, base_uwb2]"/>
+
+      <arg name="sensor_wifi_names" default="[]"/>
+      <arg name="sensor_wifi_topic" default="airsim/wifi/ranges"/>
+      <arg name="sensor_wifi_frames" default="[base_wifi1, base_wifi2]"/>
+
       <arg name="sensor_camera_names" default="[leftcamera, rightcamera]"/>
       <arg name="sensor_camera_toggle_scene_mono" default="[0, 0]"/>
       <arg name="sensor_camera_scene_quality" default="[0, 0]"/>
@@ -59,7 +67,7 @@
             <rosparam param="toggle_drone" subst_value="True">$(arg toggle_drone)</rosparam>
 
             <rosparam param="vehicle_name" subst_value="True">$(arg vehicle_name)</rosparam>
-            <rosparam param="vehicle_base_frame" subst_value="True">$(arg vehicle_base_frame)</rosparam>   
+            <rosparam param="vehicle_base_frame" subst_value="True">$(arg vehicle_base_frame)</rosparam>
 
             <rosparam param="pose_topic" subst_value="True">$(arg pose_topic)</rosparam>
             <rosparam param="pose_frame" subst_value="True">$(arg pose_frame)</rosparam>
@@ -80,6 +88,14 @@
             <rosparam param="sensor_gpulidar_names" subst_value="True">$(arg sensor_gpulidar_names)</rosparam>
             <rosparam param="sensor_gpulidar_topics" subst_value="True">$(arg sensor_gpulidar_topics)</rosparam>
             <rosparam param="sensor_gpulidar_frames" subst_value="True">$(arg sensor_gpulidar_frames)</rosparam>
+
+            <rosparam param="sensor_uwb_names" subst_value="True">$(arg sensor_uwb_names)</rosparam>
+            <rosparam param="sensor_uwb_topic" subst_value="True">$(arg sensor_uwb_topic)</rosparam>
+            <rosparam param="sensor_uwb_frames" subst_value="True">$(arg sensor_uwb_frames)</rosparam>
+
+            <rosparam param="sensor_wifi_names" subst_value="True">$(arg sensor_wifi_names)</rosparam>
+            <rosparam param="sensor_wifi_topic" subst_value="True">$(arg sensor_wifi_topic)</rosparam>
+            <rosparam param="sensor_wifi_frames" subst_value="True">$(arg sensor_wifi_frames)</rosparam>
 
             <rosparam param="sensor_camera_names" subst_value="True">$(arg sensor_camera_names)</rosparam>
             <rosparam param="sensor_camera_toggle_scene_mono" subst_value="True">$(arg sensor_camera_toggle_scene_mono)</rosparam>
