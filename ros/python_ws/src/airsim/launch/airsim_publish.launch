@@ -38,11 +38,11 @@
       <arg name="sensor_gpulidar_frames" default="[base_lidar2]"/>
 
       <arg name="sensor_uwb_names" default="[]"/>
-      <arg name="sensor_uwb_topic" default="    "/>
+      <arg name="sensor_uwb_topic" default="airsim/uwb/ranges"/>
       <arg name="sensor_uwb_frames" default="[base_uwb1, base_uwb2]"/>
 
       <arg name="sensor_wifi_names" default="[]"/>
-      <arg name="sensor_wifi_topic" default="airsim/wifi/ranges"/>
+      <arg name="sensor_wifi_topic" default=""/>
       <arg name="sensor_wifi_frames" default="[base_wifi1, base_wifi2]"/>
 
       <arg name="sensor_camera_names" default="[leftcamera, rightcamera]"/>
@@ -61,6 +61,7 @@
 
       <arg name="object_poses_all" default="0"/>
       <arg name="object_poses_all_coordinates_local" default="1"/>
+      <arg name="object_poses_all_once" default="1"/>
       <arg name="object_poses_all_topic" default="airsim/objects/poses"/>
 
       <arg name="object_poses_individual_names" default="[object_name]"/>
@@ -77,7 +78,7 @@
             <rosparam param="toggle_drone" subst_value="True">$(arg toggle_drone)</rosparam>
 
             <rosparam param="vehicle_name" subst_value="True">$(arg vehicle_name)</rosparam>
-            <rosparam param="vehicle_base_frame" subst_value="True">$(arg vehicle_base_frame)</rosparam>            
+            <rosparam param="vehicle_base_frame" subst_value="True">$(arg vehicle_base_frame)</rosparam>
 
             <rosparam param="pose_topic" subst_value="True">$(arg pose_topic)</rosparam>
             <rosparam param="pose_frame" subst_value="True">$(arg pose_frame)</rosparam>
@@ -91,8 +92,8 @@
 
             <rosparam param="sensor_imu_enable" subst_value="True">$(arg sensor_imu_enable)</rosparam>
             <rosparam param="sensor_imu_name" subst_value="True">$(arg sensor_imu_name)</rosparam>
-            <rosparam param="sensor_imu_topic" subst_value="True">$(arg sensor_imu_topic)</rosparam> 
-            <rosparam param="sensor_imu_frame" subst_value="True">$(arg sensor_imu_frame)</rosparam>            
+            <rosparam param="sensor_imu_topic" subst_value="True">$(arg sensor_imu_topic)</rosparam>
+            <rosparam param="sensor_imu_frame" subst_value="True">$(arg sensor_imu_frame)</rosparam>
 
             <rosparam param="sensor_echo_names" subst_value="True">$(arg sensor_echo_names)</rosparam>
             <rosparam param="sensor_echo_topics" subst_value="True">$(arg sensor_echo_topics)</rosparam>
@@ -132,6 +133,7 @@
 
             <rosparam param="object_poses_all" subst_value="True">$(arg object_poses_all)</rosparam>
             <rosparam param="object_poses_all_coordinates_local" subst_value="True">$(arg object_poses_all_coordinates_local)</rosparam>
+            <rosparam param="object_poses_all_once" subst_value="True">$(arg object_poses_all_once)</rosparam>
             <rosparam param="object_poses_all_topic" subst_value="True">$(arg object_poses_all_topic)</rosparam>
 
             <rosparam param="object_poses_individual_names" subst_value="True">$(arg object_poses_individual_names)</rosparam>
