@@ -238,6 +238,12 @@ class VehicleClient:
     def getUWBSensorData(self, uwb_name = '', vehicle_name = ''):
         return UwbSensorData.from_msgpack(self.client.call('getUWBSensorData', uwb_name, vehicle_name))
 
+    def getWifiData(self, wifi_name = '', vehicle_name = ''):
+        return WifiData.from_msgpack(self.client.call('getWifiData', wifi_name, vehicle_name))
+
+    def getWifiSensorData(self, wifi_name = '', vehicle_name = ''):
+        return WifiSensorData.from_msgpack(self.client.call('getWifiSensorData', wifi_name, vehicle_name))
+
     #----------- APIs to control ACharacter in scene ----------/
     def simCharSetFaceExpression(self, expression_name, value, character_name = ""):
         self.client.call('simCharSetFaceExpression', expression_name, value, character_name)
