@@ -33,7 +33,6 @@ protected:
 	//virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
 
 	void updateWifiRays();
-	TArray<msr::airlib::Pose> getBeaconActors();
 private:
 	using Vector3r = msr::airlib::Vector3r;
 	using VectorMath = msr::airlib::VectorMath;
@@ -49,7 +48,7 @@ private:
 	std::vector<float> wifiTraceMaxDistances; // in meter
 
 	void sampleSphereCap(int num_points, float opening_angle);
-	int traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::WifiHit> *WifiHitLogfloat, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug, FVector trace_origin);
+	int traceDirection(FVector trace_start_position, FVector trace_end_position, TArray<msr::airlib::WifiHit> *WifiHitLogfloat, float traceRayCurrentDistance, float traceRayCurrentbounces, float traceRayCurrentSignalStrength, bool drawDebug);
 	void bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length, const FHitResult &trace_hit_result, float &total_distance, float &signal_attenuation);
 	float angleBetweenVectors(FVector vector1, FVector vector2);
 	float getFreeSpaceLoss(float previous_distance, float added_distance);
@@ -64,7 +63,8 @@ private:
 	float traceRayMaxDistance; // Meter
 	float traceRayMaxBounces;
 	float traceRayMinSignalStrength;
-	TArray<msr::airlib::Pose> beacon_poses;
+
+	TArray<AActor*> beacon_actors;
 
 	int maxWifiHits = 5;
 

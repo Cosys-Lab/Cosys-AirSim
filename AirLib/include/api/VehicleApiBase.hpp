@@ -26,7 +26,6 @@
 #include <exception>
 #include <string>
 
-
 namespace msr { namespace airlib {
 
 /*
@@ -42,6 +41,11 @@ public:
     virtual bool isApiControlEnabled() const = 0;
     virtual bool armDisarm(bool arm) = 0;
     virtual GeoPoint getHomeGeoPoint() const = 0;
+
+    virtual string MarLoc_test2() const
+    {
+        return "MarLoc was here two";
+    }
 
     //default implementation so derived class doesn't have to call on UpdatableObject
     virtual void reset() override
@@ -266,58 +270,117 @@ public:
         }
         if (sensor == nullptr)
             throw VehicleControllerException(Utils::stringf("No uwb sensor with name %s exist on vehicle", sensor_name.c_str()));
+
         return sensor->getOutput();
     }
 
-    virtual MarLocUwbReturnMessage getUWBData(const std::string& sensor_name) const
+    virtual MarLocUwbReturnMessage2 getUWBData(const std::string& sensor_name) const
     {
-        MarLocUwbReturnMessage toReturn;                      // The entire DB (ranges and rangeArrays)
+        MarLocUwbReturnMessage2 toReturn;                      // The entire DB (ranges and rangeArrays)
+        const MarLocUwbBase* sensor = nullptr;                 // The used sensor
         vector<MarLocUwbRangeArray> uwbRangesArray;            // A list of the range arrays
         vector<std::string> processedRangeArrays;              // A list of all RangeArray PK's we already have 
                                                                // The PK of a range array is the tag/beacon ID
-        vector<MarLocUwbRange> uwbRanges;                      // A list of the ranges 
+        vector<MarLocUwbRange> uwbRanges;                      // A list of the ranges (incl diagnostics)
         //vector<int> processedAnchorIDs;                        // A list of all anchors PK's already processed
-        
-        const MarLocUwbBase* sensor = nullptr;
+                                                               // The PK of a range is a combination of the tag/beacon ID and the anchor/sensor ID
+
 
         uint uwb_sensor_count = getSensors().size(SensorBase::SensorType::MarlocUwb);
+
         int RangeNumber = 0;
 
-        // Find uwb with the given name (for empty input name, return the first one found)
-        // Not efficient but should suffice given small number of uwbs
-
-        for (uint i = 0; i < uwb_sensor_count; i++)
-        {
+        for (uint i = 0; i < uwb_sensor_count; i++)            // For all uwb sensors
+        {                                                      // Get current sensor
             const MarLocUwbBase* current_sensor = static_cast<const MarLocUwbBase*>(getSensors().getByType(SensorBase::SensorType::MarlocUwb, i));
-            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
+            if (current_sensor != nullptr && (current_sensor->getName().substr(0, 9) == sensor_name || sensor_name == "")) // If current sensor matches
             {
                 sensor = current_sensor;
                 MarLocUwbSensorData output = sensor->getOutput(); // Get sensor output
-                vector<int> ranges;
-                                
-                toReturn.mura_tagId.push_back(std::to_string(sensor->getID()));
-                toReturn.mura_tagPosX.push_back(output.pose.position[0]);
-                toReturn.mura_tagPosY.push_back(output.pose.position[1]);
-                toReturn.mura_tagPosZ.push_back(output.pose.position[2]);
 
-                // Create a new range for all beacon/tag hits in the current sensor/anchor outputs
-                for (int itId = 0; itId < output.beaconsActiveID.size(); itId++) {
-                    ranges.push_back(RangeNumber++);
-                    toReturn.mur_time_stamp.push_back(output.time_stamp);
-                    toReturn.mur_anchorId.push_back(output.beaconsActiveID[itId]);
-                    toReturn.mur_rssi.push_back(output.beaconsActiveRssi[itId]);
-                    toReturn.mur_anchorPosX.push_back(output.beaconsActivePosX[itId]/100);
-                    toReturn.mur_anchorPosY.push_back(output.beaconsActivePosY[itId]/100);
-                    toReturn.mur_anchorPosZ.push_back(output.beaconsActivePosZ[itId]/-100);
-                    toReturn.mur_valid_range.push_back(true);
-                    toReturn.mur_distance.push_back(output.beaconsActiveDistance[itId]);
+                // Create a new range for all beacon/tag hits in the current sensor/anchor output
+                for (int itId = 0; itId < output.beaconsActiveID.size(); itId++) { 
+                    MarLocUwbRange newRange;
+                    newRange.time_stamp = output.time_stamp;
+                    newRange.anchorId = sensor->getID();
+                    newRange.tagId = output.beaconsActiveID[itId];
+                    newRange.anchorX = output.pose.position[0];
+                    newRange.anchorY = output.pose.position[1];
+                    newRange.anchorZ = output.pose.position[2];
+                    newRange.valid_range = 1;
+                    newRange.distance = 6;
+                    newRange.rssi = output.beaconsActiveRssi[itId];
+                    
+                    // Test if this ID already exists in the ranges
+                    // If it does not yet exist, add it
+                    // if it does exist, keep the highest rssi
+                    bool rangeExists = 0;
+                    for (auto& uwbRange : uwbRanges) {
+                        // Match PK (anchorID + tagID)
+                        if (uwbRange.anchorId == newRange.anchorId && uwbRange.tagId == newRange.tagId) { // it exists
+                            if (newRange.rssi < uwbRange.rssi) {
+                                uwbRange.rssi = newRange.rssi;
+                            }
+                            rangeExists = 1;
+                        }
+                    }
+                    if (!rangeExists) {// it does not yet exist
+                        uwbRanges.push_back(newRange);
+                        RangeNumber++;
+
+                        // Test if a rangeArray for this beacon/tag already exists
+                        if (count(processedRangeArrays.begin(), processedRangeArrays.end(), output.beaconsActiveID[itId]) == 0) { // If this beacon (tag) is not in the list
+                            processedRangeArrays.push_back(output.beaconsActiveID[itId]); // Create a new entry in the rangeArray list
+                            MarLocUwbRangeArray newUwbRangesArray;
+
+                            newUwbRangesArray.tagId = output.beaconsActiveID[itId];
+                            newUwbRangesArray.tagX = output.beaconsActivePosX[itId];
+                            newUwbRangesArray.tagY = output.beaconsActivePosY[itId];
+                            newUwbRangesArray.tagZ = output.beaconsActivePosZ[itId];
+
+                            uwbRangesArray.push_back(newUwbRangesArray);
+                        }
+
+                        //Add this range to the rangeArray[ranges]
+                        for (auto& rangeArray : uwbRangesArray) {  // For all rangeArrays
+                            if (rangeArray.tagId == output.beaconsActiveID[itId]) { // If beacon/tag matches
+                                rangeArray.ranges.push_back(RangeNumber); // 
+                                //rangeArray.ranges.push_back(newRange.anchorId);
+                                //for (auto& range : uwbRanges) {
+                                //    if 
+                                //}
+                                // don't push the id but the index
+                            }
+                        }
+                    }
                 }
-                toReturn.mura_ranges.push_back(ranges);
             }
         }
         if (sensor == nullptr)
-            throw VehicleControllerException(Utils::stringf("No uwb sensor with name %s exist on vehicle", sensor_name.c_str()));
+            throw VehicleControllerException(Utils::stringf("No sensor with name %s exist on vehicle", sensor_name.c_str()));
 
+
+        for (std::vector<MarLocUwbRange>::iterator it = uwbRanges.begin(); it != uwbRanges.end(); ++it) {
+            toReturn.mur_time_stamp.push_back(it->time_stamp);
+            toReturn.mur_anchorId.push_back(it->anchorId);
+            toReturn.mur_anchorX.push_back(it->anchorX);
+            toReturn.mur_anchorY.push_back(it->anchorY);
+            toReturn.mur_anchorZ.push_back(it->anchorZ);
+            toReturn.mur_valid_range.push_back(it->valid_range);
+            toReturn.mur_distance.push_back(it->distance);
+            toReturn.mur_rssi.push_back(it->rssi);
+        }
+
+        for (std::vector<MarLocUwbRangeArray>::iterator it = uwbRangesArray.begin(); it != uwbRangesArray.end(); ++it) {
+            toReturn.mura_tagId.push_back(it->tagId);
+            toReturn.mura_tagX.push_back(it->tagX);
+            toReturn.mura_tagY.push_back(it->tagY);
+            toReturn.mura_tagZ.push_back(it->tagZ);
+            toReturn.mura_ranges.push_back(it->ranges);
+        }
+            
+        //toReturn.marLocUwbRange = uwbRanges;
+        //toReturn.marLocUwbRangeArray = uwbRangesArray;
         return toReturn;
     }
 
@@ -344,53 +407,103 @@ public:
         return sensor->getOutput();
     }
 
-    virtual WifiReturnMessage getWifiData(const std::string& sensor_name) const
+    virtual WifiReturnMessage2 getWifiData(const std::string& sensor_name) const
     {
-        WifiReturnMessage toReturn;                           // The entire DB (ranges and rangeArrays)
+        WifiReturnMessage2 toReturn;                           // The entire DB (ranges and rangeArrays)
+        const WifiBase* sensor = nullptr;                      // The used sensor
         vector<WifiRangeArray> wifiRangesArray;                // A list of the range arrays
         vector<std::string> processedRangeArrays;              // A list of all RangeArray PK's we already have 
                                                                // The PK of a range array is the tag/beacon ID
-        vector<WifiRange> wifiRanges;                          // A list of the ranges
-        const WifiBase* sensor = nullptr;
+        vector<WifiRange> wifiRanges;                          // A list of the ranges (incl diagnostics)
+        //vector<int> processedAnchorIDs;                        // A list of all anchors PK's already processed
         
         uint wifi_sensor_count = getSensors().size(SensorBase::SensorType::Wifi);
 
         int RangeNumber = 0;
 
-        // Find wifi sensor with the given name (for empty input name, return the first one found)
-        // Not efficient but should suffice given small number of sensors
-
-        for (uint i = 0; i < wifi_sensor_count; i++)
-        {
+        for (uint i = 0; i < wifi_sensor_count; i++)           // For all wifi sensors
+        {                                                      // Get current sensor
             const WifiBase* current_sensor = static_cast<const WifiBase*>(getSensors().getByType(SensorBase::SensorType::Wifi, i));
-            if (current_sensor != nullptr && (current_sensor->getName() == sensor_name || sensor_name == ""))
+            if (current_sensor != nullptr && (current_sensor->getName().substr(0, 10) == sensor_name || sensor_name == "")) // If current sensor matches
             {
                 sensor = current_sensor;
                 WifiSensorData output = sensor->getOutput(); // Get sensor output
-                vector<int> ranges;
 
-                toReturn.wra_tagId.push_back(std::to_string(sensor->getID()));
-                toReturn.wra_tagPosX.push_back(output.pose.position[0]);
-                toReturn.wra_tagPosY.push_back(output.pose.position[1]);
-                toReturn.wra_tagPosZ.push_back(output.pose.position[2]);
-
-                // Create a new range for all beacon/tag hits in the current sensor/anchor outputs
+                // Create a new range for all beacon/tag hits in the current sensor/anchor output
                 for (int itId = 0; itId < output.beaconsActiveID.size(); itId++) {
-                    ranges.push_back(RangeNumber++);
-                    toReturn.wr_time_stamp.push_back(output.time_stamp);
-                    toReturn.wr_anchorId.push_back(output.beaconsActiveID[itId]);
-                    toReturn.wr_rssi.push_back(output.beaconsActiveRssi[itId]);
-                    toReturn.wr_anchorPosX.push_back(output.beaconsActivePosX[itId] / 100);
-                    toReturn.wr_anchorPosY.push_back(output.beaconsActivePosY[itId] / 100);
-                    toReturn.wr_anchorPosZ.push_back(output.beaconsActivePosZ[itId] / -100);
-                    toReturn.wr_valid_range.push_back(true);
-                    toReturn.wr_distance.push_back(output.beaconsActiveDistance[itId]);
+                    WifiRange newRange;
+                    newRange.time_stamp = output.time_stamp;
+                    newRange.anchorId = sensor->getID();
+                    newRange.tagId = output.beaconsActiveID[itId];
+                    newRange.anchorX = output.pose.position[0];
+                    newRange.anchorY = output.pose.position[1];
+                    newRange.anchorZ = output.pose.position[2];
+                    newRange.valid_range = 1;
+                    newRange.distance = 6;
+                    newRange.rssi = output.beaconsActiveRssi[itId];
+
+                    // Test if this ID already exists in the ranges
+                    // If it does not yet exist, add it
+                    // if it does exist, keep the highest rssi
+                    bool rangeExists = 0;
+                    for (auto& wifiRange : wifiRanges) {
+                        // Match PK (anchorID + tagID)
+                        if (wifiRange.anchorId == newRange.anchorId && wifiRange.tagId == newRange.tagId) { // it exists
+                            if (newRange.rssi < wifiRange.rssi) {
+                                wifiRange.rssi = newRange.rssi;
+                            }
+                            rangeExists = 1;
+                        }
+                    }
+                    if (!rangeExists) {// it does not yet exist
+                        wifiRanges.push_back(newRange);
+                        RangeNumber++;
+
+                        // Test if a rangeArray for this beacon/tag already exists
+                        if (count(processedRangeArrays.begin(), processedRangeArrays.end(), output.beaconsActiveID[itId]) == 0) { // If this beacon (tag) is not in the list
+                            processedRangeArrays.push_back(output.beaconsActiveID[itId]); // Create a new entry in the rangeArray list
+                            WifiRangeArray newWifiRangesArray;
+
+                            newWifiRangesArray.tagId = output.beaconsActiveID[itId];
+                            newWifiRangesArray.tagX = output.beaconsActivePosX[itId];
+                            newWifiRangesArray.tagY = output.beaconsActivePosY[itId];
+                            newWifiRangesArray.tagZ = output.beaconsActivePosZ[itId];
+
+                            wifiRangesArray.push_back(newWifiRangesArray);
+                        }
+
+                        //Add this range to the rangeArray[ranges]
+                        for (auto& rangeArray : wifiRangesArray) {  // For all rangeArrays
+                            if (rangeArray.tagId == output.beaconsActiveID[itId]) { // If beacon/tag matches
+                                rangeArray.ranges.push_back(RangeNumber); // 
+                            }
+                        }
+                    }
                 }
-                toReturn.wra_ranges.push_back(ranges);
             }
         }
         if (sensor == nullptr)
-            throw VehicleControllerException(Utils::stringf("No wifi sensor with name %s exist on vehicle", sensor_name.c_str()));
+            throw VehicleControllerException(Utils::stringf("No sensor with name %s exist on vehicle", sensor_name.c_str()));
+
+
+        for (std::vector<WifiRange>::iterator it = wifiRanges.begin(); it != wifiRanges.end(); ++it) {
+            toReturn.wr_time_stamp.push_back(it->time_stamp);
+            toReturn.wr_anchorId.push_back(it->anchorId);
+            toReturn.wr_anchorX.push_back(it->anchorX);
+            toReturn.wr_anchorY.push_back(it->anchorY);
+            toReturn.wr_anchorZ.push_back(it->anchorZ);
+            toReturn.wr_valid_range.push_back(it->valid_range);
+            toReturn.wr_distance.push_back(it->distance);
+            toReturn.wr_rssi.push_back(it->rssi);
+        }
+
+        for (std::vector<WifiRangeArray>::iterator it = wifiRangesArray.begin(); it != wifiRangesArray.end(); ++it) {
+            toReturn.wra_tagId.push_back(it->tagId);
+            toReturn.wra_tagX.push_back(it->tagX);
+            toReturn.wra_tagY.push_back(it->tagY);
+            toReturn.wra_tagZ.push_back(it->tagZ);
+            toReturn.wra_ranges.push_back(it->ranges);
+        }
 
         return toReturn;
     }

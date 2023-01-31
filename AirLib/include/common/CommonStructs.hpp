@@ -338,14 +338,12 @@ struct SensorTemplateData {
 
 struct UWBHit
 {
-    TTimePoint time_stamp = 0;
     std::string beaconID;
-    float beaconPosX, beaconPosY, beaconPosZ;
-    bool isValid;
-    float distance;
-    float rssi;
+    int rssi;
+    float beaconPosX;
+    float beaconPosY;
+    float beaconPosZ;
 };
-
 
 struct MarLocUwbSensorData {
 
@@ -357,19 +355,16 @@ struct MarLocUwbSensorData {
     vector<float> beaconsActivePosX;
     vector<float> beaconsActivePosY;
     vector<float> beaconsActivePosZ;
-    vector<float> beaconsActiveDistance;
-
-    vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
 
     MarLocUwbSensorData()
     {}
 };
 
-
 struct MarLocUwbRange {
     TTimePoint time_stamp = 0;
-    std::string anchorId;
-    float anchorPosX, anchorPosY, anchorPosZ;
+    int anchorId;
+    std::string tagId;
+    float anchorX, anchorY, anchorZ;
     bool valid_range;
     float distance;
     float rssi;
@@ -378,56 +373,60 @@ struct MarLocUwbRange {
     {}
 };
 
-
 struct MarLocUwbRangeArray {
     std::string tagId;
-    float tagPosX, tagPosY, tagPosZ;
+    float tagX, tagY, tagZ;
     vector<int> ranges;
 
     MarLocUwbRangeArray()
     {}
 };
 
-struct MarLocUwbReturnMessage {
+/*struct MarLocUwbReturnMessage {
+    std::vector<MarLocUwbRange> marLocUwbRange;
+    std::vector<MarLocUwbRangeArray> marLocUwbRangeArray;
+
+    MarLocUwbReturnMessage()
+    {}
+};*/
+
+struct MarLocUwbReturnMessage2 {
     //MarLocUwbRange
     vector <TTimePoint> mur_time_stamp;
-    vector<std::string> mur_anchorId;
-    vector<float> mur_anchorPosX, mur_anchorPosY, mur_anchorPosZ;
+    vector<int> mur_anchorId;
+    vector<float> mur_anchorX, mur_anchorY, mur_anchorZ;
     vector<bool> mur_valid_range;
     vector<float> mur_distance;
     vector<float> mur_rssi;
     
     //MarLocUwbRangeArray
     vector<std::string> mura_tagId;
-    vector<float> mura_tagPosX, mura_tagPosY, mura_tagPosZ;
+    vector<float> mura_tagX, mura_tagY, mura_tagZ;
     vector <vector<int>> mura_ranges;
 
-    MarLocUwbReturnMessage()
+    MarLocUwbReturnMessage2()
     {}
 };
 
 struct WifiHit
 {
-    TTimePoint time_stamp = 0;
     std::string beaconID;
-    float beaconPosX, beaconPosY, beaconPosZ;
-    bool isValid;
-    float distance;
-    float rssi;
+    int rssi;
+    float beaconPosX;
+    float beaconPosY;
+    float beaconPosZ;
 };
 
 struct WifiSensorData {
 
     TTimePoint time_stamp = 0;
+    //vector<real_T> point_cloud;
     Pose pose;
     vector<std::string> beaconsActiveID;
     vector<float> beaconsActiveRssi;
     vector<float> beaconsActivePosX;
     vector<float> beaconsActivePosY;
     vector<float> beaconsActivePosZ;
-    vector<float> beaconsActiveDistance;
-
-    vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
 
     WifiSensorData()
     {}
@@ -435,8 +434,9 @@ struct WifiSensorData {
 
 struct WifiRange {
     TTimePoint time_stamp = 0;
-    std::string anchorId;
-    float anchorPosX, anchorPosY, anchorPosZ;
+    int anchorId;
+    std::string tagId;
+    float anchorX, anchorY, anchorZ;
     bool valid_range;
     float distance;
     float rssi;
@@ -447,28 +447,36 @@ struct WifiRange {
 
 struct WifiRangeArray {
     std::string tagId;
-    float tagPosX, tagPosY, tagPosZ;
+    float tagX, tagY, tagZ;
     vector<int> ranges;
 
     WifiRangeArray()
     {}
 };
 
-struct WifiReturnMessage {
+/*struct WifiReturnMessage {
+    std::vector<WifiRange> WifiRange;
+    std::vector<WifiRangeArray> WifiRangeArray;
+
+    WifiReturnMessage()
+    {}
+};*/
+
+struct WifiReturnMessage2 {
     //WifiRange
     vector <TTimePoint> wr_time_stamp;
-    vector<std::string> wr_anchorId;
-    vector<float> wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ;
+    vector<int> wr_anchorId;
+    vector<float> wr_anchorX, wr_anchorY, wr_anchorZ;
     vector<bool> wr_valid_range;
     vector<float> wr_distance;
     vector<float> wr_rssi;
 
     //WifiRangeArray
     vector<std::string> wra_tagId;
-    vector<float> wra_tagPosX, wra_tagPosY, wra_tagPosZ;
+    vector<float> wra_tagX, wra_tagY, wra_tagZ;
     vector <vector<int>> wra_ranges;
 
-    WifiReturnMessage()
+    WifiReturnMessage2()
     {}
 };
 
