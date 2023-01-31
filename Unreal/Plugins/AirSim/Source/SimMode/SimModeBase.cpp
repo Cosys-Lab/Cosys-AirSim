@@ -26,6 +26,8 @@
 #include "Beacons/FiducialBeacon.h"
 #include "Beacons/UWBBeacon.h"
 #include "Beacons/WifiBeacon.h"
+#include "Beacons/DynamicBlockBeacon.h"
+#include "Beacons/DynamicRackBeacon.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -646,6 +648,13 @@ void ASimModeBase::setupVehiclesAndCamera()
                 //compute initial pose
                 FVector spawn_position = uu_origin.GetLocation();
                 msr::airlib::Vector3r settings_position = beacon_setting.position;
+                /*FVector globalOffset = getGlobalNedTransform().getGlobalOffset();
+
+                settings_position.x() += globalOffset.X;
+                settings_position.y() += globalOffset.Y;
+                settings_position.z() += globalOffset.Z;*/
+
+
                 if (!msr::airlib::VectorMath::hasNan(settings_position))
                     spawn_position = getGlobalNedTransform().fromGlobalNed(settings_position);
                 FRotator spawn_rotation = toFRotator(beacon_setting.rotation, uu_origin.Rotator());
@@ -670,6 +679,12 @@ void ASimModeBase::setupVehiclesAndCamera()
                 }
                 else if (beacon_setting.beacon_type.compare("wifibeacon") == 0) {
                     AWifiBeacon* spawned_beacon = static_cast<AWifiBeacon*>(GetWorld()->SpawnActor<AWifiBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
+                } 
+                else if (beacon_setting.beacon_type.compare("dynamicblockbeacon") == 0) {
+                    ADynamicBlockBeacon* spawned_beacon = static_cast<ADynamicBlockBeacon*>(GetWorld()->SpawnActor<ADynamicBlockBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
+                }
+                else if (beacon_setting.beacon_type.compare("dynamicrackbeacon") == 0) {
+                    ADynamicRackBeacon* spawned_beacon = static_cast<ADynamicRackBeacon*>(GetWorld()->SpawnActor<ADynamicRackBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
                 }
                 else {
                     ATemplateBeacon* spawned_beacon = static_cast<ATemplateBeacon*>(GetWorld()->SpawnActor<ATemplateBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));

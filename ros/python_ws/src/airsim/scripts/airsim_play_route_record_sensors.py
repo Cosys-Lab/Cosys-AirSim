@@ -6,38 +6,39 @@ import rospy
 import time
 import math
 from std_msgs.msg import String, Header
-from nav_msgs.msg import Path
-from geometry_msgs.msg import PoseStamped, TransformStamped, Quaternion
+from geometry_msgs.msg import PoseStamped, TransformStamped, Point, Quaternion
 import sensor_msgs.point_cloud2 as pc2
 import tf2_ros
 from airsim.msg import StringArray
-from sensor_msgs.msg import PointCloud2, PointField, CameraInfo
+from sensor_msgs.msg import PointCloud2, PointField,  CameraInfo
+from uwb_msgs.msg import Diagnostics, Range, RangeArray
+from wifi_msgs.msg import DiagnosticsRSSI, RangeRSSI, RangeArrayRSSI
 import rosbag
 import numpy as np
 import cv2
+from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 import msgpackrpc
 import sys
 import tf2_msgs
 from tf.transformations import *
-import tf
 
 def get_camera_type(cameraType):
-    if cameraType == "Scene":
+    if (cameraType == "Scene"):
         cameraTypeClass = airsimpy.ImageType.Scene
-    elif cameraType == "Segmentation":
+    elif (cameraType == "Segmentation"):
         cameraTypeClass = airsimpy.ImageType.Segmentation
-    elif cameraType == "DepthPerspective":
+    elif (cameraType == "DepthPerspective"):
         cameraTypeClass = airsimpy.ImageType.DepthPerspective
-    elif cameraType == "DepthPlanner":
+    elif (cameraType == "DepthPlanner"):
         cameraTypeClass = airsimpy.ImageType.DepthPlanner
-    elif cameraType == "DepthVis":
+    elif (cameraType == "DepthVis"):
         cameraTypeClass = airsimpy.ImageType.DepthVis
-    elif cameraType == "Infrared":
+    elif (cameraType == "Infrared"):
         cameraTypeClass = airsimpy.ImageType.Infrared
-    elif cameraType == "SurfaceNormals":
+    elif (cameraType == "SurfaceNormals"):
         cameraTypeClass = airsimpy.ImageType.SurfaceNormals
-    elif cameraType == "DisparityNormalized":
+    elif (cameraType == "DisparityNormalized"):
         cameraTypeClass = airsimpy.ImageType.DisparityNormalized
     else:
         cameraTypeClass = airsimpy.ImageType.Scene
@@ -46,48 +47,48 @@ def get_camera_type(cameraType):
 
 
 def is_pixels_as_float(cameraType):
-    if cameraType == "Scene":
+    if (cameraType == "Scene"):
         return False
-    elif cameraType == "Segmentation":
+    elif (cameraType == "Segmentation"):
         return False
-    elif cameraType == "DepthPerspective":
+    elif (cameraType == "DepthPerspective"):
         return True
-    elif cameraType == "DepthPlanner":
+    elif (cameraType == "DepthPlanner"):
         return True
-    elif cameraType == "DepthVis":
+    elif (cameraType == "DepthVis"):
         return True
-    elif cameraType == "Infrared":
+    elif (cameraType == "Infrared"):
         return False
-    elif cameraType == "SurfaceNormals":
+    elif (cameraType == "SurfaceNormals"):
         return False
-    elif cameraType == "DisparityNormalized":
+    elif (cameraType == "DisparityNormalized"):
         return True
     else:
         return False
 
 
 def get_image_bytes(data, cameraType):
-    if cameraType == "Scene":
+    if (cameraType == "Scene"):
         img_rgb_string = data.image_data_uint8
-    elif cameraType == "Segmentation":
+    elif (cameraType == "Segmentation"):
         img_rgb_string = data.image_data_uint8
-    elif cameraType == "DepthPerspective":
+    elif (cameraType == "DepthPerspective"):
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
-    elif cameraType == "DepthPlanner":
+    elif (cameraType == "DepthPlanner"):
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
-    elif cameraType == "DepthVis":
+    elif (cameraType == "DepthVis"):
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
-    elif cameraType == "Infrared":
+    elif (cameraType == "Infrared"):
         img_rgb_string = data.image_data_uint8
-    elif cameraType == "SurfaceNormals":
+    elif (cameraType == "SurfaceNormals"):
         img_rgb_string = data.image_data_uint8
-    elif cameraType == "DisparityNormalized":
+    elif (cameraType == "DisparityNormalized"):
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
@@ -105,12 +106,10 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                                      sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
                                      sensor_camera_toggle_depth, sensor_camera_scene_topics,
                                      sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                                     sensor_camera_frames, sensor_camera_optical_frames,
-                                     sensor_camera_toggle_camera_info, sensor_camera_info_topics, sensor_stereo_enable,
-                                     baseline,
-                                     object_poses_all, object_poses_all_coordinates_local, object_poses_all_topic,
-                                     object_poses_individual_names, object_poses_individual_coordinates_local,
-                                     object_poses_individual_topics, route_rosbag, merged_rosbag):
+                                     sensor_camera_frames,sensor_camera_optical_frames, sensor_camera_toggle_camera_info, sensor_camera_info_topics, sensor_stereo_enable, baseline,
+                                     object_names, objects_coordinates_local, object_topics,
+                                     route_rosbag, merged_rosbag):
+
     rospy.loginfo("Reading route...")
     route = rosbag.Bag(route_rosbag)
     output = rosbag.Bag(merged_rosbag, 'w')
@@ -125,8 +124,10 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
         last_timestamps[sensor_name] = None
     for sensor_index, sensor_name in enumerate(sensor_gpulidar_names):
         last_timestamps[sensor_name] = None
-    for object_index, object_name in enumerate(object_poses_individual_names):
+    for object_index, object_name in enumerate(object_names):
         warning_issued[object_name] = False
+
+    cv_bridge = CvBridge()
 
     fields_echo = [
         PointField('x', 0, PointField.FLOAT32, 1),
@@ -148,30 +149,23 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
     response_locations = {}
     cameraInfo_objects = {}
     response_index = 0
-
-    toggle_mono = False
     for sensor_index, sensor_name in enumerate(sensor_camera_names):
-        toggle_mono = True
         response_locations[sensor_name + '_scene'] = response_index
         response_index += 1
         requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("Scene"),
                                               is_pixels_as_float("Scene"), False))
-        if sensor_camera_toggle_segmentation[sensor_index] is 1:
+        if sensor_camera_toggle_segmentation[sensor_index] == 1:
             requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("Segmentation"),
                                                   is_pixels_as_float("Segmentation"), False))
             response_locations[sensor_name + '_segmentation'] = response_index
             response_index += 1
-        if sensor_camera_toggle_depth[sensor_index] is 1:
+        if sensor_camera_toggle_depth[sensor_index] == 1:
             requests.append(airsimpy.ImageRequest(sensor_name, get_camera_type("DepthPlanner"),
                                                   is_pixels_as_float("DepthPlanner"), False))
             response_locations[sensor_name + '_depth'] = response_index
             response_index += 1
-        if sensor_camera_toggle_camera_info[sensor_index] is 1:
+        if sensor_camera_toggle_camera_info[sensor_index] == 1:
             cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name)
-
-    if toggle_mono:
-        from cv_bridge import CvBridge
-        cv_bridge = CvBridge()
 
     print("Starting...")
     rospy.logwarn("Ensure focus is on the screen of AirSim simulator to allow auto configuration!")
@@ -179,12 +173,12 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
 
     pose_count = route.get_message_count('/' + pose_topic)
     pose_index = 1
-    period = 1 / ros_rate
-    tolerance = 0.05 * period
+    period = 1/ros_rate
+    tolerance = 0.05*period
     lastTime = 0
-    first_timestamp = None
-    print(pose_topic)
-    for topic, msg, t in route.read_messages(topics=['/' + pose_topic, 'tf_static']):
+    first_timestamp= None
+
+    for topic, msg, t in route.read_messages(topics=['/' + pose_topic,'tf_static']):
 
         if rospy.is_shutdown():
             break
@@ -204,8 +198,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                 client.simContinueForTime(period)
                 lastTime = t.to_sec()
                 position = airsimpy.Vector3r(msg.pose.position.x, -msg.pose.position.y, -msg.pose.position.z)
-                orientation = airsimpy.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y,
-                                                   msg.pose.orientation.z,
+                orientation = airsimpy.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z,
                                                    msg.pose.orientation.w).inverse()
                 orientation = airsimpy.Quaternionr(float(orientation.x_val), float(orientation.y_val),
                                                    float(orientation.z_val), float(orientation.w_val))
@@ -221,9 +214,8 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                     if response.width == 0 and response.height == 0:
                         rospy.logwarn("Camera '" + sensor_name + "' could not retrieve scene image.")
                     else:
-                        rgb_matrix = np.fromstring(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(
-                            response.height,
-                            response.width, 3)
+                        rgb_matrix = np.frombuffer(get_image_bytes(response, "Scene"), dtype=np.uint8).reshape(response.height,
+                                                                                                        response.width, 3)
                         if sensor_camera_scene_quality[sensor_index] > 0:
                             rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2BGR)
                             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), sensor_camera_scene_quality[sensor_index]]
@@ -231,16 +223,15 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             rgb_matrix = cv2.imdecode(img, 1)
                             rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_BGR2RGB)
 
-                        if sensor_camera_toggle_scene_mono is 1:
-                            camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY),
-                                                                 encoding="mono8")
+                        if sensor_camera_toggle_scene_mono == 1:
+                            camera_msg = cv_bridge.cv2_to_imgmsg(cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2GRAY), encoding="mono8")
                         else:
                             camera_msg = cv_bridge.cv2_to_imgmsg(rgb_matrix, encoding="rgb8")
                         camera_msg.header.stamp = timestamp
                         camera_msg.header.frame_id = sensor_camera_optical_frames[sensor_index]
                         output.write(sensor_camera_scene_topics[sensor_index], camera_msg, t=ros_timestamp)
 
-                    if sensor_camera_toggle_segmentation[sensor_index] is 1:
+                    if sensor_camera_toggle_segmentation[sensor_index] == 1:
                         response = camera_responses[response_locations[sensor_name + '_segmentation']]
                         if response.width == 0 and response.height == 0:
                             rospy.logwarn("Camera '" + sensor_name + "' could not retrieve segmentation image.")
@@ -249,7 +240,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             camera_msg.step = response.width * 3
                             camera_msg.data = rgb_string
                             output.write(sensor_camera_segmentation_topics[sensor_index], camera_msg, t=ros_timestamp)
-                    if sensor_camera_toggle_depth[sensor_index] is 1:
+                    if sensor_camera_toggle_depth[sensor_index] == 1:
                         response = camera_responses[response_locations[sensor_name + '_depth']]
                         if response.width == 0 and response.height == 0:
                             rospy.logwarn("Camera '" + sensor_name + "' could not retrieve depth image.")
@@ -259,7 +250,7 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                             camera_msg.step = response.width * 4
                             camera_msg.data = rgb_string
                             output.write(sensor_camera_depth_topics[sensor_index], camera_msg, t=ros_timestamp)
-                    if sensor_camera_toggle_camera_info[sensor_index] is 1:
+                    if sensor_camera_toggle_camera_info[sensor_index] == 1:
                         FOV = cameraInfo_objects[sensor_name].fov
                         cam_info_msg = CameraInfo()
                         cam_info_msg.header.frame_id = sensor_camera_optical_frames[sensor_index]
@@ -277,11 +268,10 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
                         cam_info_msg.P = [f, 0.0, cam_info_msg.width / 2.0, Tx,
                                           0.0, f, cam_info_msg.height / 2.0, 0.0,
                                           0.0, 0.0, 1.0, 0.0]
-                        cam_info_msg.D = [0, 0, 0, 0,
-                                          0]  # in future get from client.simGetDistortionParams(camera1Name)
+                        cam_info_msg.D = [0, 0, 0, 0, 0]  # in future get from client.simGetDistortionParams(camera1Name)
                         cam_info_msg.distortion_model = 'plumb_bob'
                         cam_info_msg.R = [1, 0, 0, 0, 1, 0, 0, 0, 1]
-                        output.write(sensor_camera_info_topics[sensor_index], cam_info_msg, t=ros_timestamp)
+                        output.write(sensor_camera_info_topics[sensor_index],cam_info_msg,t=ros_timestamp)
 
                 for sensor_index, sensor_name in enumerate(sensor_echo_names):
                     echo_data = client.getEchoData(sensor_name, vehicle_name)
@@ -322,14 +312,13 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
 
                             output.write(sensor_lidar_topics[sensor_index], pcloud, t=ros_timestamp)
 
-                            if sensor_lidar_toggle_segmentation[sensor_index] is 1:
+                            if sensor_lidar_toggle_segmentation[sensor_index] == 1:
                                 labels = np.array(lidar_data.groundtruth, dtype=np.dtype('U'))
                                 groundtruth = StringArray()
                                 groundtruth.data = labels.tolist()
                                 groundtruth.header.frame_id = sensor_lidar_frames[sensor_index]
                                 groundtruth.header.stamp = timestamp
-                                output.write(sensor_lidar_segmentation_topics[sensor_index], groundtruth,
-                                             t=ros_timestamp)
+                                output.write(sensor_lidar_segmentation_topics[sensor_index], groundtruth, t=ros_timestamp)
 
                 for sensor_index, sensor_name in enumerate(sensor_gpulidar_names):
                     lidar_data = client.getGPULidarData(sensor_name, vehicle_name)
@@ -349,65 +338,219 @@ def airsim_play_route_record_sensors(client, vehicle_name, pose_topic, pose_fram
 
                             output.write(sensor_gpulidar_topics[sensor_index], pcloud, t=ros_timestamp)
 
-                if object_poses_all:
-                    object_path = Path()
-                    object_path.header.stamp = timestamp
-                    object_path.header.frame_id = pose_frame
+                for sensor_index, sensor_name in enumerate(sensor_uwb_names):
+                    if (sensor_index == 0):  # only once
+                        uwb_data = client.getUWBData()
 
-                    cur_object_names = client.simListInstanceSegmentationObjects()
-                    if object_poses_all_coordinates_local == 1:
-                        cur_object_poses = client.simListInstanceSegmentationPoses(True)
+                        # Sanity check
+                        if len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorPosY) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorPosZ) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_distance) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_rssi) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_time_stamp) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorId) or \
+                                len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_valid_range):
+                            rospy.logerr("UWB sensor mur lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+                        if len(uwb_data.mura_ranges) != len(uwb_data.mura_tagId) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosX) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosY) or \
+                                len(uwb_data.mura_ranges) != len(uwb_data.mura_tagPosZ):
+                            rospy.logerr("UWB sensor mura lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+
+                        uwb_data.mur_anchorId = np.array(uwb_data.mur_anchorId)
+
+                        mur_time_stamp = []
+                        mur_anchorId = []
+                        mur_anchorPosX = []
+                        mur_anchorPosY = []
+                        mur_anchorPosZ = []
+                        mur_valid_range = []
+                        mur_distance = []
+                        mur_rssi = []
+                        mura_ranges = []
+
+                        idx_offset = 0
+
+                        for rangeIdx, ranges in enumerate(uwb_data.mura_ranges):
+                            u, uniqueRangeIds = np.unique(uwb_data.mur_anchorId[ranges], return_index=True)
+                            uniqueRangeIds += idx_offset
+
+                            mura_ranges_idx_start = len(mur_anchorPosX)
+                            mur_anchorPosX += list(np.array(uwb_data.mur_anchorPosX)[uniqueRangeIds])
+                            mur_anchorPosY += list(np.array(uwb_data.mur_anchorPosY)[uniqueRangeIds])
+                            mur_anchorPosZ += list(np.array(uwb_data.mur_anchorPosZ)[uniqueRangeIds])
+                            mur_time_stamp += list(np.array(uwb_data.mur_time_stamp)[uniqueRangeIds])
+                            mur_anchorId += list(np.array(uwb_data.mur_anchorId)[uniqueRangeIds])
+                            mur_valid_range += list(np.array(uwb_data.mur_valid_range)[uniqueRangeIds])
+
+                            mura_ranges.append([])
+                            mura_ranges[rangeIdx] = list(range(mura_ranges_idx_start, len(mur_anchorPosX)))
+                            for arange in uniqueRangeIds:
+                                currentRanges = np.array(uwb_data.mur_anchorId)[ranges]
+                                currentRssi = np.array(uwb_data.mur_rssi)[ranges]
+                                currentDistance = np.array(uwb_data.mur_distance)[ranges]
+                                currentRssiFiltered = currentRssi * list(map(int, currentRanges == uwb_data.mur_anchorId[arange]))
+                                maxRssi = max(currentRssiFiltered)
+                                maxRssiIdx = currentRssiFiltered.argmax()
+
+                                mur_distance.append(currentDistance[maxRssiIdx])
+                                mur_rssi.append(maxRssi)
+
+                            # for arange in uniqueRangeIds:
+
+                            idx_offset += len(ranges)
+
+                        for mura_idx in range(0, len(uwb_data.mura_tagId)):
+                            rangeArray = RangeArray()
+                            rangeArray.tagid = str(uwb_data.mura_tagId[mura_idx])
+                            rangeArray.tag_position = Point(uwb_data.mura_tagPosX[mura_idx], uwb_data.mura_tagPosY[mura_idx], uwb_data.mura_tagPosZ[mura_idx])
+                            rangeArray.header.stamp = timestamp
+
+                            # for mur_id in range(0, len(mur_time_stamp)):
+                            for mur_id in mura_ranges[mura_idx]:
+                                diag = Diagnostics()
+                                diag.rssi = mur_rssi[mur_id]
+
+                                rang = Range()
+                                # rang.stamp = mur_time_stamp[mur_id]
+                                rang.stamp = timestamp
+                                rang.anchorid = str(mur_anchorId[mur_id]).split(":")[-1]
+                                rang.anchor_position = Point(mur_anchorPosX[mur_id], mur_anchorPosY[mur_id], mur_anchorPosZ[mur_id])
+                                rang.valid_range = mur_valid_range[mur_id]
+                                rang.distance = mur_distance[mur_id]
+                                rang.diagnostics = diag
+
+                                rangeArray.ranges.append(rang)
+                            output.write(sensor_uwb_topic, rangeArray, t=ros_timestamp)
+
+                        # rospy.logerr("run once")
+                        # rospy.signal_shutdown('Packet error.')
+                        # sys.exit()
+                for sensor_index, sensor_name in enumerate(sensor_wifi_names):
+                    if (sensor_index == 0):  # only once
+                        wifi_data = client.getWifiData()
+
+                        # Sanity check
+                        if len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorPosY) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorPosZ) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_distance) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_rssi) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_time_stamp) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorId) or \
+                                len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_valid_range):
+                            rospy.logerr("Wifi sensor wr lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+                        if len(wifi_data.wra_ranges) != len(wifi_data.wra_tagId) or \
+                                len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosX) or \
+                                len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosY) or \
+                                len(wifi_data.wra_ranges) != len(wifi_data.wra_tagPosZ):
+                            rospy.logerr("Wifi sensor wra lengths do not match")
+                            rospy.signal_shutdown('Packet error.')
+                            sys.exit()
+
+                        wifi_data.wr_anchorId = np.array(wifi_data.wr_anchorId)
+
+                        wr_time_stamp = []
+                        wr_anchorId = []
+                        wr_anchorPosX = []
+                        wr_anchorPosY = []
+                        wr_anchorPosZ = []
+                        wr_valid_range = []
+                        wr_distance = []
+                        wr_rssi = []
+                        wra_ranges = []
+
+                        idx_offset = 0
+
+                        for rangeIdx, ranges in enumerate(wifi_data.wra_ranges):
+                            u, uniqueRangeIds = np.unique(wifi_data.wr_anchorId[ranges], return_index=True)
+                            uniqueRangeIds += idx_offset
+
+                            wra_ranges_idx_start = len(wr_anchorPosX)
+                            wr_anchorPosX += list(np.array(wifi_data.wr_anchorPosX)[uniqueRangeIds])
+                            wr_anchorPosY += list(np.array(wifi_data.wr_anchorPosY)[uniqueRangeIds])
+                            wr_anchorPosZ += list(np.array(wifi_data.wr_anchorPosZ)[uniqueRangeIds])
+                            wr_time_stamp += list(np.array(wifi_data.wr_time_stamp)[uniqueRangeIds])
+                            wr_anchorId += list(np.array(wifi_data.wr_anchorId)[uniqueRangeIds])
+                            wr_valid_range += list(np.array(wifi_data.wr_valid_range)[uniqueRangeIds])
+
+                            wra_ranges.append([])
+                            wra_ranges[rangeIdx] = list(range(wra_ranges_idx_start, len(wr_anchorPosX)))
+                            for arange in uniqueRangeIds:
+                                currentRanges = np.array(wifi_data.wr_anchorId)[ranges]
+                                currentRssi = np.array(wifi_data.wr_rssi)[ranges]
+                                currentDistance = np.array(wifi_data.wr_distance)[ranges]
+                                currentRssiFiltered = currentRssi * list(map(int, currentRanges == wifi_data.wr_anchorId[arange]))
+                                maxRssi = max(currentRssiFiltered)
+                                maxRssiIdx = currentRssiFiltered.argmax()
+
+                                wr_distance.append(currentDistance[maxRssiIdx])
+                                wr_rssi.append(maxRssi)
+
+                            # for arange in uniqueRangeIds:
+
+                            idx_offset += len(ranges)
+
+                        for wra_idx in range(0, len(wifi_data.wra_tagId)):
+                            rangeArray = RangeArray()
+                            rangeArray.tagid = str(wifi_data.wra_tagId[wra_idx])
+                            rangeArray.tag_position = Point(wifi_data.wra_tagPosX[wra_idx], wifi_data.wra_tagPosY[wra_idx], wifi_data.wra_tagPosZ[wra_idx])
+                            rangeArray.header.stamp = timestamp
+
+                            # for wr_id in range(0, len(wr_time_stamp)):
+                            for wr_id in wra_ranges[wra_idx]:
+                                diag = Diagnostics()
+                                diag.rssi = wr_rssi[wr_id]
+
+                                rang = Range()
+                                # rang.stamp = wr_time_stamp[wr_id]
+                                rang.stamp = timestamp
+                                rang.anchorid = str(wr_anchorId[wr_id])
+                                rang.anchor_position = Point(wr_anchorPosX[wr_id], wr_anchorPosY[wr_id], wr_anchorPosZ[wr_id])
+                                rang.valid_range = wr_valid_range[wr_id]
+                                rang.distance = wr_distance[wr_id]
+                                rang.diagnostics = diag
+
+                                rangeArray.ranges.append(rang)
+
+                            output.write(sensor_wifi_topic, rangeArray, t=ros_timestamp)
+
+                        # rospy.logerr("run once")
+                        # rospy.signal_shutdown('Packet error.')
+                        # sys.exit()
+
+                for object_index, object_name in enumerate(object_names):
+                    if objects_coordinates_local[object_index] == 1:
+                        pose = client.simGetObjectPose(object_name, True)
                     else:
-                        cur_object_poses = client.simListInstanceSegmentationPoses(False)
-                    for index, object_name in enumerate(cur_object_names):
-                        currentObjectPose = cur_object_poses[index]
-                        if not np.isnan(pose.position.x_val):
-                            pos = currentObjectPose.position
-                            orientation = currentObjectPose.orientation.inverse()
+                        pose = client.simGetObjectPose(object_name, False)
+                    if np.isnan(pose.position.x_val):
+                        if warning_issued[object_name] is False:
+                            rospy.logwarn("Object '" + object_name + "' could not be found.")
+                            warning_issued[object_name] = True
+                    else:
+                        warning_issued[object_name] = False
+                        pos = pose.position
+                        orientation = pose.orientation.inverse()
+                        object_pose = PoseStamped()
+                        object_pose.pose.position.x = pos.x_val
+                        object_pose.pose.position.y = -pos.y_val
+                        object_pose.pose.position.z = pos.z_val
+                        object_pose.pose.orientation.w = orientation.w_val
+                        object_pose.pose.orientation.x = orientation.x_val
+                        object_pose.pose.orientation.y = orientation.y_val
+                        object_pose.pose.orientation.z = orientation.z_val
+                        object_pose.header.stamp = timestamp
+                        object_pose.header.seq = 1
+                        object_pose.header.frame_id = pose_frame
 
-                            object_pose = PoseStamped()
-                            object_pose.pose.position.x = pos.x_val
-                            object_pose.pose.position.y = -pos.y_val
-                            object_pose.pose.position.z = pos.z_val
-                            object_pose.pose.orientation.w = orientation.w_val
-                            object_pose.pose.orientation.x = orientation.x_val
-                            object_pose.pose.orientation.y = orientation.y_val
-                            object_pose.pose.orientation.z = orientation.z_val
-                            object_pose.header.frame_id = object_name
-                            object_pose.header.stamp = timestamp
-                            object_path.poses.append(object_pose)
-
-                    output.write(object_poses_all_topic, object_path, t=ros_timestamp)
-
-                else:
-                    for object_index, object_name in enumerate(object_poses_individual_names):
-                        if object_poses_individual_coordinates_local[object_index] == 1:
-                            pose = client.simGetObjectPose(object_name, True)
-                        else:
-                            pose = client.simGetObjectPose(object_name, False)
-                        if np.isnan(pose.position.x_val):
-                            if warning_issued[object_name] is False:
-                                rospy.logwarn("Object '" + object_name + "' could not be found.")
-                                warning_issued[object_name] = True
-                        else:
-                            warning_issued[object_name] = False
-                            pos = pose.position
-                            orientation = pose.orientation.inverse()
-                            object_pose = PoseStamped()
-                            object_pose.pose.position.x = pos.x_val
-                            object_pose.pose.position.y = -pos.y_val
-                            object_pose.pose.position.z = pos.z_val
-                            object_pose.pose.orientation.w = orientation.w_val
-                            object_pose.pose.orientation.x = orientation.x_val
-                            object_pose.pose.orientation.y = orientation.y_val
-                            object_pose.pose.orientation.z = orientation.z_val
-                            object_pose.header.stamp = timestamp
-                            object_pose.header.seq = 1
-                            object_pose.header.frame_id = pose_frame
-
-                            output.write(object_poses_individual_topics[sensor_index], object_pose, t=ros_timestamp)
-
-    output.write('/tf_static', tf_static, first_timestamp)
+                        output.write(object_topics[sensor_index], object_pose, t=ros_timestamp)
+    output.write('/tf_static',tf_static,first_timestamp)
     print("Process completed. Writing all messages to merged rosbag...")
     for topic, msg, t in route.read_messages():
         if topic != 'tf/static':
@@ -432,7 +575,7 @@ if __name__ == '__main__':
 
         route_rosbag = rospy.get_param('~route_rosbag', "airsim_route_only.bag")
         merged_rosbag = rospy.get_param('~merged_rosbag', "airsim_route_sensors.bag")
-
+        
         sensor_echo_names = rospy.get_param('~sensor_echo_names', "True")
         sensor_echo_topics = rospy.get_param('~sensor_echo_topics', "True")
         sensor_echo_frames = rospy.get_param('~sensor_echo_frames', "True")
@@ -446,6 +589,14 @@ if __name__ == '__main__':
         sensor_gpulidar_names = rospy.get_param('~sensor_gpulidar_names', "True")
         sensor_gpulidar_topics = rospy.get_param('~sensor_gpulidar_topics', "True")
         sensor_gpulidar_frames = rospy.get_param('~sensor_gpulidar_frames', "True")
+
+        sensor_uwb_names = rospy.get_param('~sensor_uwb_names', "True")
+        sensor_uwb_topic = rospy.get_param('~sensor_uwb_topic', "True")
+        sensor_uwb_frames = rospy.get_param('~sensor_uwb_frames', "True")
+
+        sensor_wifi_names = rospy.get_param('~sensor_wifi_names', "True")
+        sensor_wifi_topic = rospy.get_param('~sensor_wifi_topic', "True")
+        sensor_wifi_frames = rospy.get_param('~sensor_wifi_frames', "True")
 
         sensor_camera_names = rospy.get_param('~sensor_camera_names', "True")
         sensor_camera_toggle_scene_mono = rospy.get_param('~sensor_camera_toggle_scene_mono', "True")
@@ -461,14 +612,9 @@ if __name__ == '__main__':
         sensor_camera_info_topics = rospy.get_param('~sensor_camera_info_topics', "True")
         sensor_stereo_enable = rospy.get_param('~sensor_stereo_enable', "True")
 
-        object_poses_all = rospy.get_param('~object_poses_all', "True")
-        object_poses_all_coordinates_local = rospy.get_param('~object_poses_all_coordinates_local', "True")
-        object_poses_all_topic = rospy.get_param('~object_poses_all_topic', "True")
-
-        object_poses_individual_names = rospy.get_param('~object_poses_individual_names', "True")
-        object_poses_individual_coordinates_local = rospy.get_param('~object_poses_individual_coordinates_local',
-                                                                    "True")
-        object_poses_individual_topics = rospy.get_param('~object_poses_individual_topics', "True")
+        object_names = rospy.get_param('~object_names', "True")
+        objects_coordinates_local = rospy.get_param('~objects_coordinates_local', "True")
+        object_topics = rospy.get_param('~object_topics', "True")
 
         print("Connecting to AirSim...")
         if toggle_drone:
@@ -481,11 +627,11 @@ if __name__ == '__main__':
             rospy.logerr("Could not connect to AirSim.")
             rospy.signal_shutdown('no connection to airsim.')
             sys.exit()
-        print("Connected to AirSim!")
+        # print("Connected to AirSim!")
 
         client.simPause(True)
 
-        rospy.loginfo("Starting static transforms...")
+        # rospy.loginfo("Starting static transforms...")
         tf_static = tf2_msgs.msg.TFMessage()
 
         for sensor_index, sensor_name in enumerate(sensor_echo_names):
@@ -560,6 +706,34 @@ if __name__ == '__main__':
             time.sleep(0.1)
             rospy.loginfo("Started static transform for GPU-LiDAR sensor with ID " + sensor_name + ".")
 
+        for sensor_index, sensor_name in enumerate(sensor_uwb_names):
+
+            # Get uwb sensor data
+            try:
+                uwb_data = client.getUWBSensorData(sensor_name, vehicle_name)
+                # timeStamp = uwb_data[0]
+
+            except msgpackrpc.error.RPCError:
+                rospy.logerr("UWB sensor '" + sensor_name + "' could not be found.")
+                rospy.signal_shutdown('Sensor not found.')
+                sys.exit()
+
+            if (len(uwb_data) == 2):
+                pose = uwb_data[1]
+                static_transform = TransformStamped()
+                static_transform.header.stamp = rospy.Time.now()
+                static_transform.header.frame_id = vehicle_base_frame
+                static_transform.child_frame_id = sensor_uwb_frames[sensor_index]
+                static_transform.transform.translation.x = pose['position']['x_val']
+                static_transform.transform.translation.y = -pose['position']['y_val']
+                static_transform.transform.translation.z = -pose['position']['z_val']
+                static_transform.transform.rotation.x = pose['orientation']['x_val']
+                static_transform.transform.rotation.y = pose['orientation']['y_val']
+                static_transform.transform.rotation.z = pose['orientation']['z_val']
+                static_transform.transform.rotation.w = pose['orientation']['w_val']
+                transform_list.append(static_transform)
+                time.sleep(0.1)
+                rospy.loginfo("Started static transform for UWB sensor with ID " + sensor_name + ".")
         left_position = None
         right_position = None
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
@@ -594,7 +768,7 @@ if __name__ == '__main__':
             static_transform.transform.translation.x = 0
             static_transform.transform.translation.y = 0
             static_transform.transform.translation.z = 0
-            q_rot = tf.transformations.quaternion_from_euler(-math.pi / 2, 0, -math.pi / 2)
+            q_rot = quaternion_from_euler(-math.pi/2, 0,-math.pi/2)
             static_transform.transform.rotation.x = q_rot[0]
             static_transform.transform.rotation.y = q_rot[1]
             static_transform.transform.rotation.z = q_rot[2]
@@ -608,10 +782,8 @@ if __name__ == '__main__':
                 left_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
             elif sensor_stereo_enable == 1 and sensor_index == 1:
                 right_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
-        if left_position is not None and right_position is not None:
-            baseline = math.sqrt(
-                (left_position[0] - right_position[0]) ** 2 + (left_position[1] - right_position[1]) ** 2 + (
-                            left_position[2] - right_position[2]) ** 2)
+        if left_position != None and right_position != None:
+            baseline = math.sqrt((left_position[0] - right_position[0]) ** 2 + (left_position[1] - right_position[1]) ** 2 + (left_position[2] - right_position[2]) ** 2)
         else:
             baseline = 0
 
@@ -625,13 +797,8 @@ if __name__ == '__main__':
                                          sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
                                          sensor_camera_toggle_depth, sensor_camera_scene_topics,
                                          sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                                         sensor_camera_frames, sensor_camera_optical_frames,
-                                         sensor_camera_toggle_camera_info, sensor_camera_info_topics,
-                                         sensor_stereo_enable, baseline,
-                                         object_poses_all, object_poses_all_coordinates_local, object_poses_all_topic,
-                                         object_poses_individual_names, object_poses_individual_coordinates_local,
-                                         object_poses_individual_topics, route_rosbag,
-                                         merged_rosbag)
+                                         sensor_camera_frames, sensor_camera_optical_frames, sensor_camera_toggle_camera_info, sensor_camera_info_topics, sensor_stereo_enable, baseline,
+                                         object_names, objects_coordinates_local,object_topics, route_rosbag, merged_rosbag)
 
     except rospy.ROSInterruptException:
         pass
