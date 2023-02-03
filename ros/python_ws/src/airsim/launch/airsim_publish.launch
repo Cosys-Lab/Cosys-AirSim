@@ -9,14 +9,22 @@
       <arg name="vehicle_base_frame" default="base_link" />
 
       <arg name="pose_topic" default="airsim/gtpose" />
-      <arg name="pose_frame" default="world" />
-      <arg name="tf_localisation_enable" default="1" />
+      <arg name="map_frame" default="map" />
 
       <arg name="carcontrol_enable" default="0" />
       <arg name="carcontrol_topic" default="/airsim/carcontrol" />
 
       <arg name="odometry_enable" default="1" />
       <arg name="odometry_topic" default="airsim/odom" />
+      <arg name="odom_frame" default="odom" />
+      <arg name="tf_odom_enable" default="1" />
+
+      <arg name="pose_offset_x" default="0" />
+      <arg name="pose_offset_y" default="0" />
+      <arg name="pose_offset_z" default="0" />
+      <arg name="pose_offset_roll" default="0" />
+      <arg name="pose_offset_pitch" default="0" />
+      <arg name="pose_offset_yaw" default="0" />
 
       <arg name="sensor_imu_enable" default="1" />
       <arg name="sensor_imu_name" default="imu" />
@@ -81,8 +89,16 @@
             <rosparam param="vehicle_base_frame" subst_value="True">$(arg vehicle_base_frame)</rosparam>
 
             <rosparam param="pose_topic" subst_value="True">$(arg pose_topic)</rosparam>
-            <rosparam param="pose_frame" subst_value="True">$(arg pose_frame)</rosparam>
-            <rosparam param="tf_localisation_enable" subst_value="True">$(arg tf_localisation_enable)</rosparam>
+            <rosparam param="map_frame" subst_value="True">$(arg map_frame)</rosparam>
+            <rosparam param="odom_frame" subst_value="True">$(arg odom_frame)</rosparam>
+            <rosparam param="tf_odom_enable" subst_value="True">$(arg tf_odom_enable)</rosparam>
+
+            <rosparam param="pose_offset_x" subst_value="True">$(arg pose_offset_x)</rosparam>
+            <rosparam param="pose_offset_y" subst_value="True">$(arg pose_offset_y)</rosparam>
+            <rosparam param="pose_offset_z" subst_value="True">$(arg pose_offset_z)</rosparam>
+            <rosparam param="pose_offset_roll" subst_value="True">$(arg pose_offset_roll)</rosparam>
+            <rosparam param="pose_offset_pitch" subst_value="True">$(arg pose_offset_pitch)</rosparam>
+            <rosparam param="pose_offset_yaw" subst_value="True">$(arg pose_offset_yaw)</rosparam>
 
             <rosparam param="carcontrol_enable" subst_value="True">$(arg carcontrol_enable)</rosparam>
             <rosparam param="carcontrol_topic" subst_value="True">$(arg carcontrol_topic)</rosparam>

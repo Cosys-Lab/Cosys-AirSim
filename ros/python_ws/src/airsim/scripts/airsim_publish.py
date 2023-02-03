@@ -195,8 +195,9 @@ def handle_input_command(msg, args):
         print("Input queue full")
 
 
-def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation_enable, carcontrol_enable,
-                   carcontrol_topic, odometry_enable, odometry_topic,
+def airsim_publish(client, vehicle_name, pose_topic, map_frame, odom_frame, tf_odom_enable,
+                   pose_offset_x, pose_offset_y, pose_offset_z, pose_offset_yaw, pose_offset_pitch, pose_offset_roll,
+                   carcontrol_enable, carcontrol_topic, odometry_enable, odometry_topic,
                    sensor_imu_enable, sensor_imu_name, sensor_imu_topic,
                    sensor_imu_frame, sensor_echo_names,
                    sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
@@ -226,7 +227,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         imu_publisher = rospy.Publisher(sensor_imu_topic, Imu, queue_size=1)
     if odometry_enable:
         odomPub = rospy.Publisher(odometry_topic, Odometry, queue_size=1)
-    if tf_localisation_enable:
+    if tf_odom_enable:
         tf_br = tf2_ros.TransformBroadcaster()
     objectpose_publishers = {}
     pointcloud_publishers = {}
@@ -269,7 +270,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
         if sensor_camera_toggle_camera_info[sensor_index] == 1:
             image_publishers[sensor_name + '_cameraInfo'] = rospy.Publisher(sensor_camera_info_topics[sensor_index],
                                                                             CameraInfo, queue_size=2)
-            cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name)
+            cameraInfo_objects[sensor_name] = client.simGetCameraInfo(sensor_name, vehicle_name)
 
     if object_poses_all:
         object_path_publisher = rospy.Publisher(object_poses_all_topic, Path, queue_size=1)
@@ -317,10 +318,11 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                                                   is_pixels_as_float("DepthPlanner"), False))
             response_locations[sensor_name + '_depth'] = response_index
             response_index += 1
+
     if carcontrol_enable == 1:
         print("Control of car enabled")
         desired_rotation = 0
-        client.enableApiControl(True)
+        client.enableApiControl(True, vehicle_name=vehicle_name)
         queue_input_command = Queue(1)
         rospy.Subscriber(carcontrol_topic, Twist, handle_input_command, (queue_input_command))
         requestpub = rospy.Publisher("/req_speed", Float32, queue_size=1)
@@ -346,28 +348,32 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
 
         pose_msg = PoseStamped()
         pose_msg.header.stamp = timestamp
-        pose_msg.header.frame_id = pose_frame
+        pose_msg.header.frame_id = map_frame
         pose_msg.header.seq = 1
 
-        pose_msg.pose.position.x = pos.x_val
-        pose_msg.pose.position.y = -pos.y_val
-        pose_msg.pose.position.z = -pos.z_val
-
-        pose_msg.pose.orientation.w = orientation.w_val
-        pose_msg.pose.orientation.x = orientation.x_val
-        pose_msg.pose.orientation.y = orientation.y_val
-        pose_msg.pose.orientation.z = orientation.z_val
-
+        pose_msg.pose.position.x = pos.x_val + pose_offset_x
+        pose_msg.pose.position.y = -pos.y_val + pose_offset_y
+        pose_msg.pose.position.z = -pos.z_val + pose_offset_z
+        (pitch, roll, yaw) = airsimpy.to_eularian_angles(orientation)
+        final_pitch = pitch + math.radians(pose_offset_pitch)
+        final_roll = roll + math.radians(pose_offset_roll)
+        final_yaw = yaw + math.radians(pose_offset_yaw)
+        final_q = airsimpy.to_quaternion(final_pitch, final_roll, final_yaw)
+        pose_msg.pose.orientation.w = final_q.w_val
+        pose_msg.pose.orientation.x = final_q.x_val
+        pose_msg.pose.orientation.y = final_q.y_val
+        pose_msg.pose.orientation.z = final_q.z_val
         pose_publisher.publish(pose_msg)
-        T_w_veh = Pose_2_mat(pose_msg.pose)
 
         simOdom = Odometry()
-
         if odometry_enable:
             simOdom.header = pose_msg.header
             simOdom.child_frame_id = vehicle_base_frame
             simOdom.pose.pose = pose_msg.pose
             kinematics = client.simGetGroundTruthKinematics(vehicle_name)
+            T_w_veh = tf.transformations.quaternion_matrix([orientation.x_val, orientation.y_val,
+                                                            orientation.z_val, orientation.w_val])
+            T_w_veh[:3, 3] = np.array([pos.x_val, -pos.y_val, -pos.z_val])
             T_veh_w = T_inv(T_w_veh)
 
             local_linear = np.matmul(T_veh_w[:3, :3], np.array(
@@ -384,16 +390,16 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             simOdom.twist.twist.angular.z = local_angular[2]
             odomPub.publish(simOdom)
 
-        if tf_localisation_enable:
-            tf_odom_pose = mat_2_tf(T_w_veh, timestamp, "odom", vehicle_base_frame)
+        if tf_odom_enable:
+            tf_odom_pose = mat_2_tf(Pose_2_mat(pose_msg.pose), timestamp, map_frame, odom_frame)
             tf_br.sendTransform(tf_odom_pose)
 
-            # tf_map_odom = TransformStamped()
-            # tf_map_odom.header.stamp = timestamp
-            # tf_map_odom.header.frame_id = pose_frame
-            # tf_map_odom.child_frame_id = "odom"
-            # tf_map_odom.transform.rotation.w = 1
-            # tf_br.sendTransform(tf_map_odom)
+            tf_map_odom = TransformStamped()
+            tf_map_odom.header.stamp = timestamp
+            tf_map_odom.header.frame_id = odom_frame
+            tf_map_odom.child_frame_id = vehicle_base_frame
+            tf_map_odom.transform.rotation.w = 1
+            tf_br.sendTransform(tf_map_odom)
 
         if sensor_imu_enable:
 
@@ -423,7 +429,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
 
             imu_publisher.publish(imu_msg)
 
-        camera_responses = client.simGetImages(requests)
+        camera_responses = client.simGetImages(requests, vehicle_name)
 
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
             response = camera_responses[response_locations[sensor_name + '_scene']]
@@ -564,7 +570,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
 
         for sensor_index, sensor_name in enumerate(sensor_uwb_names):
             if (sensor_index == 0):  # only once
-                uwb_data = client.getUWBData()
+                uwb_data = client.getUWBData(vehicle_name=vehicle_name)
 
                 # Sanity check
                 if len(uwb_data.mur_anchorPosX) != len(uwb_data.mur_anchorPosY) or \
@@ -660,7 +666,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                 # sys.exit()
         for sensor_index, sensor_name in enumerate(sensor_wifi_names):
             if (sensor_index == 0):  # only once
-                wifi_data = client.getWifiData()
+                wifi_data = client.getWifiData(vehicle_name=vehicle_name)
 
                 # Sanity check
                 if len(wifi_data.wr_anchorPosX) != len(wifi_data.wr_anchorPosY) or \
@@ -758,7 +764,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
             if not object_poses_all_once or (object_poses_all_once and first_message):
                 object_path = Path()
                 object_path.header.stamp = timestamp
-                object_path.header.frame_id = pose_frame
+                object_path.header.frame_id = map_frame
 
                 cur_object_names = client.simListInstanceSegmentationObjects()
                 if object_poses_all_coordinates_local == 1:
@@ -810,7 +816,7 @@ def airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation
                     object_pose.pose.orientation.z = orientation.z_val
                     object_pose.header.stamp = timestamp
                     object_pose.header.seq = 1
-                    object_pose.header.frame_id = pose_frame
+                    object_pose.header.frame_id = map_frame
 
                     objectpose_publishers[object_name].publish(object_pose)
 
@@ -879,14 +885,22 @@ if __name__ == '__main__':
         vehicle_base_frame = rospy.get_param('~vehicle_base_frame', "True")
 
         pose_topic = rospy.get_param('~pose_topic', "True")
-        pose_frame = rospy.get_param('~pose_frame', "True")
-        tf_localisation_enable = rospy.get_param('~tf_localisation_enable', "True")
+        map_frame = rospy.get_param('~map_frame', "True")
 
         carcontrol_enable = rospy.get_param('~carcontrol_enable', "True")
         carcontrol_topic = rospy.get_param('~carcontrol_topic', "True")
 
         odometry_enable = rospy.get_param('~odometry_enable', "True")
         odometry_topic = rospy.get_param('~odometry_topic', "True")
+        odom_frame = rospy.get_param('~odom_frame', "True")
+        tf_odom_enable = rospy.get_param('~tf_odom_enable', "True")
+
+        pose_offset_x = rospy.get_param('~pose_offset_x', "True")
+        pose_offset_y = rospy.get_param('~pose_offset_y', "True")
+        pose_offset_z = rospy.get_param('~pose_offset_z', "True")
+        pose_offset_yaw = rospy.get_param('~pose_offset_yaw', "True")
+        pose_offset_pitch = rospy.get_param('~pose_offset_pitch', "True")
+        pose_offset_roll = rospy.get_param('~pose_offset_roll', "True")
 
         sensor_imu_enable = rospy.get_param('~sensor_imu_enable', "True")
         sensor_imu_name = rospy.get_param('~sensor_imu_name', "True")
@@ -1060,7 +1074,7 @@ if __name__ == '__main__':
         right_position = None
         for sensor_index, sensor_name in enumerate(sensor_camera_names):
             try:
-                camera_data = client.simGetCameraInfo(sensor_name)
+                camera_data = client.simGetCameraInfo(sensor_name, vehicle_name=vehicle_name)
             except msgpackrpc.error.RPCError:
                 rospy.logerr("camera sensor '" + sensor_name + "' could not be found.")
                 rospy.signal_shutdown('Sensor not found.')
@@ -1104,7 +1118,7 @@ if __name__ == '__main__':
                 left_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
             elif sensor_stereo_enable == 1 and sensor_index == 1:
                 right_position = [pose.position.x_val, -pose.position.y_val, -pose.position.z_val]
-        if left_position != None and right_position != None:
+        if left_position is not None and right_position is not None:
             baseline = math.sqrt((left_position[0] - right_position[0]) ** 2 + (left_position[1]
                                                                                 - right_position[1]) ** 2
                                  + (left_position[2] - right_position[2]) ** 2)
@@ -1112,8 +1126,9 @@ if __name__ == '__main__':
             baseline = 0
         broadcaster.sendTransform(transform_list)
 
-        airsim_publish(client, vehicle_name, pose_topic, pose_frame, tf_localisation_enable, carcontrol_enable,
-                       carcontrol_topic,
+        airsim_publish(client, vehicle_name, pose_topic, map_frame, odom_frame, tf_odom_enable,
+                       pose_offset_x, pose_offset_y, pose_offset_z,
+                       pose_offset_yaw, pose_offset_pitch, pose_offset_roll, carcontrol_enable, carcontrol_topic,
                        odometry_enable, odometry_topic, sensor_imu_enable,
                        sensor_imu_name, sensor_imu_topic, sensor_imu_frame, sensor_echo_names,
                        sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
