@@ -197,6 +197,79 @@ def to_quaternion(pitch, roll, yaw):
     q.z_val = sy * cr * cp - cy * sr * sp #z
     return q
 
+
+def get_camera_type(cameraType):
+    if cameraType == "Scene":
+        cameraTypeClass = ImageType.Scene
+    elif cameraType == "Segmentation":
+        cameraTypeClass = ImageType.Segmentation
+    elif cameraType == "DepthPerspective":
+        cameraTypeClass = ImageType.DepthPerspective
+    elif cameraType == "DepthPlanner":
+        cameraTypeClass = ImageType.DepthPlanner
+    elif cameraType == "DepthVis":
+        cameraTypeClass = ImageType.DepthVis
+    elif cameraType == "Infrared":
+        cameraTypeClass = ImageType.Infrared
+    elif cameraType == "SurfaceNormals":
+        cameraTypeClass = ImageType.SurfaceNormals
+    elif cameraType == "DisparityNormalized":
+        cameraTypeClass = ImageType.DisparityNormalized
+    else:
+        cameraTypeClass = ImageType.Scene
+    return cameraTypeClass
+
+
+def is_pixels_as_float(cameraType):
+    if cameraType == "Scene":
+        return False
+    elif cameraType == "Segmentation":
+        return False
+    elif cameraType == "DepthPerspective":
+        return True
+    elif cameraType == "DepthPlanner":
+        return True
+    elif cameraType == "DepthVis":
+        return True
+    elif cameraType == "Infrared":
+        return False
+    elif cameraType == "SurfaceNormals":
+        return False
+    elif cameraType == "DisparityNormalized":
+        return True
+    else:
+        return False
+
+
+def get_image_bytes(data, cameraType):
+    if cameraType == "Scene":
+        img_rgb_string = data.image_data_uint8
+    elif cameraType == "Segmentation":
+        img_rgb_string = data.image_data_uint8
+    elif cameraType == "DepthPerspective":
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
+    elif cameraType == "DepthPlanner":
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
+    elif cameraType == "DepthVis":
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
+    elif cameraType == "Infrared":
+        img_rgb_string = data.image_data_uint8
+    elif cameraType == "SurfaceNormals":
+        img_rgb_string = data.image_data_uint8
+    elif cameraType == "DisparityNormalized":
+        img_depth_float = data.image_data_float
+        img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
+        img_rgb_string = img_depth_float32.tobytes()
+    else:
+        img_rgb_string = data.image_data_uint8
+    return img_rgb_string
+
     
 def wait_key(message = ''):
     ''' Wait for a key press on the console and return it. '''
