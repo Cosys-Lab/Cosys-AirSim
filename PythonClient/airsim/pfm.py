@@ -38,11 +38,11 @@ def read_pfm(file):
             raise Exception('Malformed PFM header: width, height cannot be found')
 
     scale = float(file.readline().rstrip())
-    if scale < 0: # little-endian
+    if scale < 0:  # little-endian
         endian = '<'
         scale = -scale
     else:
-        endian = '>' # big-endian
+        endian = '>'  # big-endian
 
     data = np.fromfile(file, endian + 'f')
     shape = (height, width, 3) if color else (height, width)
@@ -50,7 +50,7 @@ def read_pfm(file):
     data = np.reshape(data, shape)
     # DEY: I don't know why this was there.
     file.close()
-    
+
     return data, scale
 
 
@@ -63,9 +63,9 @@ def write_pfm(file, image, scale=1):
     if image.dtype.name != 'float32':
         raise Exception('Image dtype must be float32.')
 
-    if len(image.shape) == 3 and image.shape[2] == 3: # color image
+    if len(image.shape) == 3 and image.shape[2] == 3:  # color image
         color = True
-    elif len(image.shape) == 2 or len(image.shape) == 3 and image.shape[2] == 1: # greyscale
+    elif len(image.shape) == 2 or len(image.shape) == 3 and image.shape[2] == 1:  # greyscale
         color = False
     else:
         raise Exception('Image must have H x W x 3, H x W x 1 or H x W dimensions.')
