@@ -959,7 +959,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, saved_static_
             sim_odom = Odometry()
             if odometry_enable:
                 sim_odom.header = pose_msg.header
-                sim_odom.child_frame_id = vehicle_base_frame
+                sim_odom.child_frame_id = odom_frame
                 sim_odom.pose.pose = pose_msg.pose
                 kinematics = client.simGetGroundTruthKinematics(vehicle_name)
                 t_w_veh = tf.transformations.quaternion_matrix([cur_orientation.x_val, cur_orientation.y_val,
