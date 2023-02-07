@@ -122,36 +122,26 @@ Please see [GPU LiDAR](gpulidar.md) for example of GPU LiDAR specific settings.
 
 ## Sensor APIs 
 - Barometer
-
-- Python
     ```python
     barometer_data = getBarometerData(barometer_name = "", vehicle_name = "")
     ```
 
 - IMU
-
-    Python
     ```python
     imu_data = getImuData(imu_name = "", vehicle_name = "")
     ```
 
 - GPS
-
-    Python
     ```python
     gps_data = getGpsData(gps_name = "", vehicle_name = "")
     ```
 
 - Magnetometer
-
-    Python
     ```python
     magnetometer_data = getMagnetometerData(magnetometer_name = "", vehicle_name = "")
     ```
 
 - Distance sensor
-
-    Python
     ```python
     distance_sensor_name = getDistanceSensorData(distance_sensor_name = "", vehicle_name = "")
     ```
