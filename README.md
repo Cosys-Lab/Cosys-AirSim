@@ -61,7 +61,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
 * Dropped support for Unity Environments.
-* 
+
 ## How to Get It
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
