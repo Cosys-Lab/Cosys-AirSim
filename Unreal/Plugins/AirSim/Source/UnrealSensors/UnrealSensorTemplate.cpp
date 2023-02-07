@@ -24,7 +24,7 @@ UnrealSensorTemplate::UnrealSensorTemplate(const AirSimSettings::SensorTemplateS
 void UnrealSensorTemplate::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
-	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+	if (sensor_params_.draw_sensor) {
 		FVector sensor_position;
 		if (external_) {
 			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
@@ -75,9 +75,7 @@ void UnrealSensorTemplate::setPointCloud(const msr::airlib::Pose& sensor_pose, m
 		Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);
 		Vector3r point_global1 = VectorMath::transformToWorldFrame(point_local, sensor_pose, true);
 		FVector point_global = ned_transform_->fromLocalNed(point_global1);
-		if ((GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
-			UAirBlueprintLib::DrawPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);
-		}		
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), point_global, 10, FColor::Orange, false, 1.05f / sensor_params_.measurement_frequency);	
 	}
 }
 

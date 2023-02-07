@@ -64,7 +64,7 @@ void UnrealLidarSensor::updatePose(const msr::airlib::Pose& sensor_pose, const m
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
 	// DRAW DEBUG
-	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+	if (sensor_params_.draw_sensor) {
 		FVector sensor_position;
 		if (external_) {
 			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
@@ -277,7 +277,7 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 			Vector3r impact_point_local = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * ((hit_result.Distance / 100) + distance_noise) + start;
 			impact_point = ned_transform_->fromLocalNed(impact_point_local);
 		}
-		if (sensor_params_.draw_debug_points && UAirBlueprintLib::IsInGameThread() && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer))
+		if (sensor_params_.draw_debug_points)
 		{
 			// Debug code for very specific cases.
 			// Mostly shouldn't be needed. Use SimModeBase::drawLidarDebugPoints()
