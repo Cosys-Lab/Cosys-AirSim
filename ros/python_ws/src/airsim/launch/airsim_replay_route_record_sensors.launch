@@ -6,9 +6,10 @@
 
       <arg name="tf_sensors_enable" default="1"/>
 
-      <arg name="use_route" default="1" />
-      <arg name="route_rosbag" default="./airsim_route_only.bag" />
-      <arg name="merged_rosbag" default="./airsim_sensor_data.bag" />
+      <arg name="use_route" default="1"/>
+      <arg name="route_rosbag" default="./airsim_route_only.bag"/>
+      <arg name="merged_rosbag" default="./airsim_sensor_data.bag"/>
+      <arg name="generate_gt_map" default="1"/>
 
       <arg name="vehicle_name" default="airsimvehicle"/>
       <arg name="vehicle_base_frame" default="base_link"/>
@@ -73,6 +74,7 @@
             <rosparam param="use_route" subst_value="True">$(arg use_route)</rosparam>
             <rosparam param="route_rosbag" subst_value="True">$(arg route_rosbag)</rosparam>
             <rosparam param="merged_rosbag" subst_value="True">$(arg merged_rosbag)</rosparam>
+            <rosparam param="generate_gt_map" subst_value="True">$(arg generate_gt_map)</rosparam>
 
             <rosparam param="vehicle_name" subst_value="True">$(arg vehicle_name)</rosparam>
             <rosparam param="vehicle_base_frame" subst_value="True">$(arg vehicle_base_frame)</rosparam>
