@@ -23,6 +23,7 @@ import tf
 import tf2_msgs
 from multiprocessing import Queue
 import rosbag
+from datetime import datetime
 
 
 class PID(object):
@@ -249,7 +250,7 @@ def get_car_control_ros_message(c, cur_queue_input_command, cur_speed_pid, cur_o
 
     c.setCarControls(car_controls, cur_vehicle_name)
 
-    return cur_speed_pid.desired_speed, v, er, cur_desired_rotation
+    return cur_speed_pid.desired_speed, v, error, cur_desired_rotation
 
 
 def get_all_objects_ros_path_message(c, cur_timestamp, cur_first_message, cur_object_poses_all_once, cur_map_frame,
@@ -593,9 +594,9 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
         return None, None
 
 
-def airsim_publish(client, use_route, route_rosbag, merged_rosbag, saved_static_tf,
+def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_map, saved_static_tf,
                    vehicle_name, pose_topic, map_frame, odom_frame, tf_odom_enable,
-                   pose_offset_x, pose_offset_y, pose_offset_z, pose_offset_yaw, pose_offset_pitch, pose_offset_roll,
+                   pose_offset_x, pose_offset_y, pose_offset_z,
                    carcontrol_enable, carcontrol_topic, odometry_enable, odometry_topic,
                    sensor_imu_enable, sensor_imu_name, sensor_imu_topic,
                    sensor_imu_frame, sensor_echo_names,
@@ -916,13 +917,27 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, saved_static_
                     pose_index += 1
                     
         output.write('/tf_static', saved_static_tf, first_timestamp)
-        print("Process completed. Writing all other messages to merged rosbag...")
+        rospy.loginfo("Process completed. Writing all other messages to merged rosbag...")
         for topic, msg, t in route.read_messages():
             if topic != 'tf/static':
                 output.write(topic, msg, t)
         output.close()
-        print("Merged rosbag with route and sensor data created!")
+        rospy.loginfo("Merged rosbag with route and sensor data created!")
+        if generate_gt_map:
+            rospy.loginfo("Generating segmentation colormap, this takes a while...")
+            colorMap = client.simGetSegmentationColorMap()
+            rospy.loginfo("Generated segmentation colormap.")
+
+            currentObjectList = client.simListInstanceSegmentationObjects()
+            rospy.loginfo("Generating list of all current objects...")
+            with open('airsim_gt_map_' + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.csv', 'w') as f:
+                f.write("ObjectName,R,G,B\n")
+                for index, item in enumerate(currentObjectList):
+                    f.write("%s,%s\n" % (item, ','.join([str(x) for x in colorMap[index, :]])))
+            rospy.loginfo("Generated ground truth map of " + str(len(currentObjectList)) + ' objects.')
+
     else:
+        segmentation_warning_issued = False
         while not rospy.is_shutdown():
 
             timestamp = rospy.Time.now()
@@ -945,15 +960,10 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, saved_static_
             pose_msg.pose.position.x = cur_pos.x_val + pose_offset_x
             pose_msg.pose.position.y = -cur_pos.y_val + pose_offset_y
             pose_msg.pose.position.z = -cur_pos.z_val + pose_offset_z
-            (pitch, roll, yaw) = airsimpy.to_eularian_angles(cur_orientation)
-            final_pitch = pitch + math.radians(pose_offset_pitch)
-            final_roll = roll + math.radians(pose_offset_roll)
-            final_yaw = yaw + math.radians(pose_offset_yaw)
-            final_q = airsimpy.to_quaternion(final_pitch, final_roll, final_yaw)
-            pose_msg.pose.orientation.w = final_q.w_val
-            pose_msg.pose.orientation.x = final_q.x_val
-            pose_msg.pose.orientation.y = final_q.y_val
-            pose_msg.pose.orientation.z = final_q.z_val
+            pose_msg.pose.orientation.w = cur_orientation.w_val
+            pose_msg.pose.orientation.x = cur_orientation.x_val
+            pose_msg.pose.orientation.y = cur_orientation.y_val
+            pose_msg.pose.orientation.z = cur_orientation.z_val
             pose_publisher.publish(pose_msg)
 
             sim_odom = Odometry()
@@ -1015,6 +1025,10 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, saved_static_
                     else:
                         camera_msg = get_segmentation_camera_ros_message(camera_msg, response)
                         image_publishers[cur_sensor_name + '_segmentation'].publish(camera_msg)
+                    if not segmentation_warning_issued:
+                        segmentation_warning_issued = True
+                        rospy.logwarn("Instance segmentation is being used."
+                                      " Do not forget to generate ground truth map!")
                 if sensor_camera_toggle_depth[cur_sensor_index] == 1:
                     response = camera_responses[response_locations[cur_sensor_name + '_depth']]
                     if response.width == 0 and response.height == 0:
@@ -1061,6 +1075,10 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, saved_static_
                         string_segmentation_publishers[cur_sensor_name].publish(groundtruth)
 
             for cur_sensor_index, cur_sensor_name in enumerate(sensor_gpulidar_names):
+                if not segmentation_warning_issued:
+                    segmentation_warning_issued = True
+                    rospy.logwarn("Instance segmentation is being used."
+                                  " Do not forget to generate ground truth map!")
                 pcloud, last_timestamp_return = get_gpulidar_ros_message(client, cur_sensor_name, vehicle_name,
                                                                          last_timestamps[cur_sensor_name],
                                                                          fields_lidar,
@@ -1131,6 +1149,7 @@ if __name__ == '__main__':
         use_route = rospy.get_param('~use_route', 0)
         route_rosbag = rospy.get_param('~route_rosbag', "./airsim_route_only.bag")
         merged_rosbag = rospy.get_param('~merged_rosbag', "./airsim_sensor_data.bag")
+        generate_gt_map = rospy.get_param('~generate_gt_map', 0)
 
         vehicle_name = rospy.get_param('~vehicle_name', "airsimvehicle")
         vehicle_base_frame = rospy.get_param('~vehicle_base_frame', "base_link")
@@ -1149,9 +1168,6 @@ if __name__ == '__main__':
         pose_offset_x = rospy.get_param('~pose_offset_x', 0)
         pose_offset_y = rospy.get_param('~pose_offset_y', 0)
         pose_offset_z = rospy.get_param('~pose_offset_z', 0)
-        pose_offset_yaw = rospy.get_param('~pose_offset_yaw', 0)
-        pose_offset_pitch = rospy.get_param('~pose_offset_pitch', 0)
-        pose_offset_roll = rospy.get_param('~pose_offset_roll', 0)
 
         sensor_imu_enable = rospy.get_param('~sensor_imu_enable', 0)
         sensor_imu_name = rospy.get_param('~sensor_imu_name', "imu")
@@ -1437,10 +1453,10 @@ if __name__ == '__main__':
         else:
             baseline = 0
 
-        airsim_publish(client, use_route, route_rosbag, merged_rosbag, tf_static,
+        airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_map, tf_static,
                        vehicle_name, pose_topic, map_frame, odom_frame, tf_odom_enable,
                        pose_offset_x, pose_offset_y, pose_offset_z,
-                       pose_offset_yaw, pose_offset_pitch, pose_offset_roll, carcontrol_enable, carcontrol_topic,
+                       carcontrol_enable, carcontrol_topic,
                        odometry_enable, odometry_topic, sensor_imu_enable,
                        sensor_imu_name, sensor_imu_topic, sensor_imu_frame, sensor_echo_names,
                        sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,

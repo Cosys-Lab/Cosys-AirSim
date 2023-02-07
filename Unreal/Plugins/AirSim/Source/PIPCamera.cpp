@@ -223,7 +223,7 @@ void APIPCamera::Tick(float DeltaTime)
 
         this->SetActorRotation(rotator);
     }
-    if (sensor_params_.draw_sensor && (GEngine->GetNetMode(this->GetWorld()) != NM_DedicatedServer)) {
+    if (sensor_params_.draw_sensor) {
         UAirBlueprintLib::DrawPoint(this->GetWorld(), this->GetActorTransform().GetLocation(), 5, FColor::Black, false, 0.3);
         UAirBlueprintLib::DrawCoordinateSystem(this->GetWorld(), this->GetActorLocation(), this->GetActorRotation(), 25, false, 0.3, 10);
     }
