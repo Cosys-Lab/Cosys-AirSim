@@ -153,9 +153,10 @@ def generate_colormap():
     colorMap = np.asarray(colorMap)
     return colorMap
 
+
 # helper method for converting getOrientation to roll/pitch/yaw
 # https:#en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-def to_eularian_angles(q):
+def quaternion_to_euler_angles(q):
     z = q.z_val
     y = q.y_val
     x = q.x_val
@@ -179,24 +180,57 @@ def to_eularian_angles(q):
     cosy_cosp = +1.0 - 2.0 * (y*y + z*z)
     yaw = math.atan2(siny_cosp, cosy_cosp)
 
-    return pitch, roll, yaw
+    return roll, pitch, yaw
 
     
-def to_quaternion(pitch, roll, yaw):
-    cy = math.cos(yaw * 0.5)
-    sy = math.sin(yaw * 0.5)
+def euler_to_quaternion(roll, pitch, yaw):
     cr = math.cos(roll * 0.5)
     sr = math.sin(roll * 0.5)
     cp = math.cos(pitch * 0.5)
     sp = math.sin(pitch * 0.5)
+    cy = math.cos(yaw * 0.5)
+    sy = math.sin(yaw * 0.5)
 
     q = Quaternionr()
-    q.w_val = cy * cr * cp + sy * sr * sp #w
-    q.x_val = cy * sr * cp - sy * cr * sp #x
-    q.y_val = cy * cr * sp + sy * sr * cp #y
-    q.z_val = sy * cr * cp - cy * sr * sp #z
+    q.w_val = cy * cr * cp + sy * sr * sp
+    q.x_val = cy * sr * cp - sy * cr * sp
+    q.y_val = cy * cr * sp + sy * sr * cp
+    q.z_val = sy * cr * cp - cy * sr * sp
     return q
 
+
+def euler_to_rotation_matrix(roll, pitch, yaw):
+    cx = math.cos(roll * 0.5)
+    sx = math.sin(roll * 0.5)
+    cy = math.cos(pitch * 0.5)
+    sy = math.sin(pitch * 0.5)
+    cz = math.cos(yaw * 0.5)
+    sz = math.sin(yaw * 0.5)
+
+    r11 = cy*cz
+    r12 = -cy*sz
+    r13 = sy
+    r21 = cx*sz + cz*sx*sy
+    r22 = cx*cz - sx*sy*sz
+    r23 = -cy*sx
+    r31 = sx*sz - cx*cz*sy
+    r32 = cz*sx + cx*sy*sz
+    r33 = cx*cy
+
+    R = [[r11, r12, r13], [r21, r22, r23], [r31, r32, r33]]
+
+    return R
+
+
+def apply_rotation_offset(position, pitch, yaw, roll):
+    R = euler_to_rotation_matrix(roll, pitch, yaw)
+
+    rotated_position = Vector3r()
+    rotated_position.x_val = position.x_val * R[0][0] + position.y_val * R[0][1] + position.z_val * R[0][2]
+    rotated_position.y_val = position.x_val * R[1][0] + position.y_val * R[1][1] + position.z_val * R[1][2]
+    rotated_position.z_val = position.x_val * R[2][0] + position.y_val * R[2][1] + position.z_val * R[2][2]
+
+    return rotated_position
 
 def get_camera_type(cameraType):
     if cameraType == "Scene":

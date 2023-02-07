@@ -12,36 +12,34 @@ from .types import *
 
 def string_to_uint8_array(bstr):
     return np.fromstring(bstr, np.uint8)
-
-
+    
 def string_to_float_array(bstr):
     return np.fromstring(bstr, np.float32)
-
-
+    
 def list_to_2d_float_array(flst, width, height):
     return np.reshape(np.asarray(flst, np.float32), (height, width))
-
-
+    
 def get_pfm_array(response):
     return list_to_2d_float_array(response.image_data_float, response.width, response.height)
 
-
+    
 def get_public_fields(obj):
     return [attr for attr in dir(obj)
-            if not (attr.startswith("_")
-                    or inspect.isbuiltin(attr)
-                    or inspect.isfunction(attr)
-                    or inspect.ismethod(attr))]
+                            if not (attr.startswith("_") 
+                            or inspect.isbuiltin(attr)
+                            or inspect.isfunction(attr)
+                            or inspect.ismethod(attr))]
 
 
+    
 def to_dict(obj):
     return dict([attr, getattr(obj, attr)] for attr in get_public_fields(obj))
 
-
+    
 def to_str(obj):
     return str(to_dict(obj))
 
-
+    
 def write_file(filename, bstr):
     with open(filename, 'wb') as afile:
         afile.write(bstr)
@@ -158,19 +156,19 @@ def generate_colormap():
 
 # helper method for converting getOrientation to roll/pitch/yaw
 # https:#en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-def to_eularian_angles(q):
+def quaternion_to_euler_angles(q):
     z = q.z_val
     y = q.y_val
     x = q.x_val
     w = q.w_val
 
     # roll (x-axis rotation)
-    sinr_cosp = +2.0 * (w * x + y * z)
-    cosr_cosp = +1.0 - 2.0 * (x * x + y * y)
+    sinr_cosp  = +2.0 * (w*x + y*z)
+    cosr_cosp = +1.0 - 2.0*(x*x + y*y)
     roll = math.atan2(sinr_cosp, cosr_cosp)
 
     # pitch (y-axis rotation)
-    t2 = +2.0 * (w * y - z * x)
+    t2 = +2.0 * (w*y - z*x)
     if (t2 > 1.0):
         t2 = 1
     if (t2 < -1.0):
@@ -178,28 +176,61 @@ def to_eularian_angles(q):
     pitch = math.asin(t2)
 
     # yaw (z-axis rotation)
-    siny_cosp = +2.0 * (w * z + x * y)
-    cosy_cosp = +1.0 - 2.0 * (y * y + z * z)
+    siny_cosp = +2.0 * (w*z + x*y)
+    cosy_cosp = +1.0 - 2.0 * (y*y + z*z)
     yaw = math.atan2(siny_cosp, cosy_cosp)
 
-    return pitch, roll, yaw
+    return roll, pitch, yaw
 
-
-def to_quaternion(pitch, roll, yaw):
-    cy = math.cos(yaw * 0.5)
-    sy = math.sin(yaw * 0.5)
+    
+def euler_to_quaternion(roll, pitch, yaw):
     cr = math.cos(roll * 0.5)
     sr = math.sin(roll * 0.5)
     cp = math.cos(pitch * 0.5)
     sp = math.sin(pitch * 0.5)
+    cy = math.cos(yaw * 0.5)
+    sy = math.sin(yaw * 0.5)
 
     q = Quaternionr()
-    q.w_val = cy * cr * cp + sy * sr * sp  # w
-    q.x_val = cy * sr * cp - sy * cr * sp  # x
-    q.y_val = cy * cr * sp + sy * sr * cp  # y
-    q.z_val = sy * cr * cp - cy * sr * sp  # z
+    q.w_val = cy * cr * cp + sy * sr * sp
+    q.x_val = cy * sr * cp - sy * cr * sp
+    q.y_val = cy * cr * sp + sy * sr * cp
+    q.z_val = sy * cr * cp - cy * sr * sp
     return q
 
+
+def euler_to_rotation_matrix(roll, pitch, yaw):
+    cx = math.cos(roll * 0.5)
+    sx = math.sin(roll * 0.5)
+    cy = math.cos(pitch * 0.5)
+    sy = math.sin(pitch * 0.5)
+    cz = math.cos(yaw * 0.5)
+    sz = math.sin(yaw * 0.5)
+
+    r11 = cy*cz
+    r12 = -cy*sz
+    r13 = sy
+    r21 = cx*sz + cz*sx*sy
+    r22 = cx*cz - sx*sy*sz
+    r23 = -cy*sx
+    r31 = sx*sz - cx*cz*sy
+    r32 = cz*sx + cx*sy*sz
+    r33 = cx*cy
+
+    R = [[r11, r12, r13], [r21, r22, r23], [r31, r32, r33]]
+
+    return R
+
+
+def apply_rotation_offset(position, pitch, yaw, roll):
+    R = euler_to_rotation_matrix(roll, pitch, yaw)
+
+    rotated_position = Vector3r()
+    rotated_position.x_val = position.x_val * R[0][0] + position.y_val * R[0][1] + position.z_val * R[0][2]
+    rotated_position.y_val = position.x_val * R[1][0] + position.y_val * R[1][1] + position.z_val * R[1][2]
+    rotated_position.z_val = position.x_val * R[2][0] + position.y_val * R[2][1] + position.z_val * R[2][2]
+
+    return rotated_position
 
 def get_camera_type(cameraType):
     if cameraType == "Scene":
@@ -273,11 +304,11 @@ def get_image_bytes(data, cameraType):
         img_rgb_string = data.image_data_uint8
     return img_rgb_string
 
-
-def wait_key(message=''):
+    
+def wait_key(message = ''):
     ''' Wait for a key press on the console and return it. '''
     if message != '':
-        print(message)
+        print (message)
 
     result = None
     if os.name == 'nt':
@@ -301,7 +332,7 @@ def wait_key(message=''):
 
     return result
 
-
+    
 def read_pfm(file):
     """ Read a pfm file """
     file = open(file, 'rb')
@@ -329,11 +360,11 @@ def read_pfm(file):
         raise Exception('Malformed PFM header.')
 
     scale = float(file.readline().rstrip())
-    if scale < 0:  # little-endian
+    if scale < 0: # little-endian
         endian = '<'
         scale = -scale
     else:
-        endian = '>'  # big-endian
+        endian = '>' # big-endian
 
     data = np.fromfile(file, endian + 'f')
     shape = (height, width, 3) if color else (height, width)
@@ -341,10 +372,10 @@ def read_pfm(file):
     data = np.reshape(data, shape)
     # DEY: I don't know why this was there.
     file.close()
-
+    
     return data, scale
 
-
+    
 def write_pfm(file, image, scale=1):
     """ Write a pfm file """
     file = open(file, 'wb')
@@ -354,14 +385,14 @@ def write_pfm(file, image, scale=1):
     if image.dtype.name != 'float32':
         raise Exception('Image dtype must be float32.')
 
-    if len(image.shape) == 3 and image.shape[2] == 3:  # color image
+    if len(image.shape) == 3 and image.shape[2] == 3: # color image
         color = True
-    elif len(image.shape) == 2 or len(image.shape) == 3 and image.shape[2] == 1:  # grayscale
+    elif len(image.shape) == 2 or len(image.shape) == 3 and image.shape[2] == 1: # grayscale
         color = False
     else:
         raise Exception('Image must have H x W x 3, H x W x 1 or H x W dimensions.')
 
-    file.write('PF\n'.encode('utf-8') if color else 'Pf\n'.encode('utf-8'))
+    file.write('PF\n'.encode('utf-8')  if color else 'Pf\n'.encode('utf-8'))
     temp_str = '%d %d\n' % (image.shape[1], image.shape[0])
     file.write(temp_str.encode('utf-8'))
 
@@ -375,7 +406,7 @@ def write_pfm(file, image, scale=1):
 
     image.tofile(file)
 
-
+    
 def write_png(filename, image):
     """ image must be numpy array H X W X channels
     """
