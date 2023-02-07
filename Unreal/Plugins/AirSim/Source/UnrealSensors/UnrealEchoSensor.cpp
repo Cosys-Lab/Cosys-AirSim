@@ -113,7 +113,7 @@ void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const ms
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
 	// DRAW DEBUG
-	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+	if (sensor_params_.draw_sensor) {
 		FVector sensor_position;
 		if (external_) {
 			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
@@ -228,7 +228,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, trace_end_position, trace_hit_result, ignore_actors_, ECC_Visibility, true);
 
 		// DRAW DEBUG
-		if (sensor_params_.draw_bounce_lines && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+		if (sensor_params_.draw_bounce_lines) {
 			FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (signal_attenuation / attenuation_limit_));
 			UAirBlueprintLib::DrawLine
 			(actor_->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, line_color, false, draw_time_, 0, line_thinkness_);
@@ -241,7 +241,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		}
 
 		// DRAW DEBUG
-		if (sensor_params_.draw_initial_points && signal_attenuation == 0 && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+		if (sensor_params_.draw_initial_points && signal_attenuation == 0) {
 			UAirBlueprintLib::DrawPoint(actor_->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, false, draw_time_);
 		}
 		// Bounce trace
@@ -300,10 +300,10 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 			point_cloud.emplace_back(total_distance);
 
 			// DRAW DEBUG
-			if (sensor_params_.draw_reflected_points && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+			if (sensor_params_.draw_reflected_points) {
 				UAirBlueprintLib::DrawPoint(actor_->GetWorld(), trace_start_position, 5, FColor::Red, false, draw_time_);
 			}
-			if (sensor_params_.draw_reflected_paths && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+			if (sensor_params_.draw_reflected_paths) {
 				UAirBlueprintLib::DrawLine(actor_->GetWorld(), sensor_position, trace_path[0], FColor::Red, false, draw_time_, 0, line_thinkness_);
 				for (int trace_count = 0; trace_count < trace_path.Num() - 1; trace_count++)
 				{
@@ -311,7 +311,7 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 				}
 				UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_path.Last(), sensor_position, FColor::Red, false, draw_time_, 0, line_thinkness_);
 			}
-			if (sensor_params_.draw_reflected_lines && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+			if (sensor_params_.draw_reflected_lines) {
 				FVector draw_location = trace_start_position + trace_direction * distance_to_sensor;
 
 				UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_position, draw_location, FColor::Red, false, draw_time_, 0, line_thinkness_);
@@ -348,7 +348,7 @@ void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace
 void UnrealEchoSensor::setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp){
 	// TODO consume point cloud (+ draw_time_)?
 
-	if (sensor_params_.draw_external_points && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+	if (sensor_params_.draw_external_points) {
 		const int DATA_PER_POINT = 5;
 		for (int point_count = 0; point_count < point_cloud.size(); point_count += DATA_PER_POINT) {
 			Vector3r point_local = Vector3r(point_cloud[point_count], point_cloud[point_count + 1], point_cloud[point_count + 2]);

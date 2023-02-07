@@ -50,7 +50,7 @@ UnrealWifiSensor::UnrealWifiSensor(const AirSimSettings::WifiSetting& setting, A
 void UnrealWifiSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
-	if (sensor_params_.draw_sensor && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+	if (sensor_params_.draw_sensor) {
 		FVector sensor_position;
 		if (external_) {
 			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
@@ -189,7 +189,7 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 
 				// Stop if nothing was hit to reflect off
 				if (!trace_hit) {
-					if (drawDebug && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+					if (drawDebug) {
 						UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_position, trace_end_position, FColor::Red, false, 0.1);
 					}
 					return 1;
@@ -227,7 +227,7 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 					}
 				}
 
-				if (drawDebug && (GEngine->GetNetMode(actor_->GetWorld()) != NM_DedicatedServer)) {
+				if (drawDebug) {
 					UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
 				}
 
