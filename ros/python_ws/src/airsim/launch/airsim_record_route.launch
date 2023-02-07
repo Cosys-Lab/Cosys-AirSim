@@ -20,9 +20,6 @@
       <arg name="pose_offset_x" default="0"/>
       <arg name="pose_offset_y" default="0"/>
       <arg name="pose_offset_z" default="0"/>
-      <arg name="pose_offset_roll" default="0"/>
-      <arg name="pose_offset_pitch" default="0"/>
-      <arg name="pose_offset_yaw" default="0"/>
 
       <arg name="sensor_imu_enable" default="1"/>
       <arg name="sensor_imu_name" default="imu"/>
@@ -51,9 +48,6 @@
             <rosparam param="pose_offset_x" subst_value="True">$(arg pose_offset_x)</rosparam>
             <rosparam param="pose_offset_y" subst_value="True">$(arg pose_offset_y)</rosparam>
             <rosparam param="pose_offset_z" subst_value="True">$(arg pose_offset_z)</rosparam>
-            <rosparam param="pose_offset_roll" subst_value="True">$(arg pose_offset_roll)</rosparam>
-            <rosparam param="pose_offset_pitch" subst_value="True">$(arg pose_offset_pitch)</rosparam>
-            <rosparam param="pose_offset_yaw" subst_value="True">$(arg pose_offset_yaw)</rosparam>
 
             <rosparam param="sensor_imu_enable" subst_value="True">$(arg sensor_imu_enable)</rosparam>
             <rosparam param="sensor_imu_name" subst_value="True">$(arg sensor_imu_name)</rosparam>
