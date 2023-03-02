@@ -250,7 +250,7 @@ def get_car_control_ros_message(c, cur_queue_input_command, cur_speed_pid, cur_o
 
     c.setCarControls(car_controls, cur_vehicle_name)
 
-    return cur_speed_pid.desired_speed, v, er, cur_desired_rotation
+    return cur_speed_pid.desired_speed, v, error, cur_desired_rotation
 
 
 def get_all_objects_ros_path_message(c, cur_timestamp, cur_first_message, cur_object_poses_all_once, cur_map_frame,
@@ -596,7 +596,7 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
 
 def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_map, saved_static_tf,
                    vehicle_name, pose_topic, map_frame, odom_frame, tf_odom_enable,
-                   pose_offset_x, pose_offset_y, pose_offset_z, pose_offset_yaw, pose_offset_pitch, pose_offset_roll,
+                   pose_offset_x, pose_offset_y, pose_offset_z,
                    carcontrol_enable, carcontrol_topic, odometry_enable, odometry_topic,
                    sensor_imu_enable, sensor_imu_name, sensor_imu_topic,
                    sensor_imu_frame, sensor_echo_names,
@@ -960,15 +960,10 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
             pose_msg.pose.position.x = cur_pos.x_val + pose_offset_x
             pose_msg.pose.position.y = -cur_pos.y_val + pose_offset_y
             pose_msg.pose.position.z = -cur_pos.z_val + pose_offset_z
-            (pitch, roll, yaw) = airsimpy.to_eularian_angles(cur_orientation)
-            final_pitch = pitch + math.radians(pose_offset_pitch)
-            final_roll = roll + math.radians(pose_offset_roll)
-            final_yaw = yaw + math.radians(pose_offset_yaw)
-            final_q = airsimpy.to_quaternion(final_pitch, final_roll, final_yaw)
-            pose_msg.pose.orientation.w = final_q.w_val
-            pose_msg.pose.orientation.x = final_q.x_val
-            pose_msg.pose.orientation.y = final_q.y_val
-            pose_msg.pose.orientation.z = final_q.z_val
+            pose_msg.pose.orientation.w = cur_orientation.w_val
+            pose_msg.pose.orientation.x = cur_orientation.x_val
+            pose_msg.pose.orientation.y = cur_orientation.y_val
+            pose_msg.pose.orientation.z = cur_orientation.z_val
             pose_publisher.publish(pose_msg)
 
             sim_odom = Odometry()
@@ -1173,9 +1168,6 @@ if __name__ == '__main__':
         pose_offset_x = rospy.get_param('~pose_offset_x', 0)
         pose_offset_y = rospy.get_param('~pose_offset_y', 0)
         pose_offset_z = rospy.get_param('~pose_offset_z', 0)
-        pose_offset_yaw = rospy.get_param('~pose_offset_yaw', 0)
-        pose_offset_pitch = rospy.get_param('~pose_offset_pitch', 0)
-        pose_offset_roll = rospy.get_param('~pose_offset_roll', 0)
 
         sensor_imu_enable = rospy.get_param('~sensor_imu_enable', 0)
         sensor_imu_name = rospy.get_param('~sensor_imu_name', "imu")
@@ -1464,7 +1456,7 @@ if __name__ == '__main__':
         airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_map, tf_static,
                        vehicle_name, pose_topic, map_frame, odom_frame, tf_odom_enable,
                        pose_offset_x, pose_offset_y, pose_offset_z,
-                       pose_offset_yaw, pose_offset_pitch, pose_offset_roll, carcontrol_enable, carcontrol_topic,
+                       carcontrol_enable, carcontrol_topic,
                        odometry_enable, odometry_topic, sensor_imu_enable,
                        sensor_imu_name, sensor_imu_topic, sensor_imu_frame, sensor_echo_names,
                        sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
