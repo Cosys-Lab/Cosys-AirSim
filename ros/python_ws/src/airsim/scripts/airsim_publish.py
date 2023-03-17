@@ -269,7 +269,7 @@ def get_all_objects_ros_path_message(c, cur_timestamp, cur_first_message, cur_ob
             cur_object_pose = cur_object_poses[index]
             if not np.isnan(cur_object_pose.position.x_val):
                 cur_pos = cur_object_pose.position
-                cur_orientation = cur_object_pose.cur_orientation.inverse()
+                cur_orientation = cur_object_pose.orientation.inverse()
 
                 object_pose = PoseStamped()
                 object_pose.pose.position.x = cur_pos.x_val

@@ -82,14 +82,6 @@
             <rosparam param="pose_topic" subst_value="True">$(arg pose_topic)</rosparam>
             <rosparam param="map_frame" subst_value="True">$(arg map_frame)</rosparam>
 
-            <rosparam param="carcontrol_enable" subst_value="True">$(arg carcontrol_enable)</rosparam>
-            <rosparam param="carcontrol_topic" subst_value="True">$(arg carcontrol_topic)</rosparam>
-
-            <rosparam param="sensor_imu_enable" subst_value="True">$(arg sensor_imu_enable)</rosparam>
-            <rosparam param="sensor_imu_name" subst_value="True">$(arg sensor_imu_name)</rosparam>
-            <rosparam param="sensor_imu_topic" subst_value="True">$(arg sensor_imu_topic)</rosparam>
-            <rosparam param="sensor_imu_frame" subst_value="True">$(arg sensor_imu_frame)</rosparam>
-
             <rosparam param="sensor_echo_names" subst_value="True">$(arg sensor_echo_names)</rosparam>
             <rosparam param="sensor_echo_topics" subst_value="True">$(arg sensor_echo_topics)</rosparam>
             <rosparam param="sensor_echo_frames" subst_value="True">$(arg sensor_echo_frames)</rosparam>
