@@ -916,6 +916,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
     
                     pose_index += 1
                     first_message = False
+                    time.sleep(1)
                     
         output.write('/tf_static', saved_static_tf, first_timestamp)
         rospy.loginfo("Process completed. Writing all other messages to merged rosbag...")
