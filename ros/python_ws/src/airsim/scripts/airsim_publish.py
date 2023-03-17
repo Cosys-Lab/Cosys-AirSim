@@ -1141,6 +1141,7 @@ if __name__ == '__main__':
 
         ros_rate = rospy.get_param('~rate', 10)
         ip = rospy.get_param('~ip', "localhost")
+        port = rospy.get_param('~port', 41451)
 
         tf_sensors_enable = rospy.get_param('~tf_sensors_enable', 0)
 
@@ -1232,9 +1233,9 @@ if __name__ == '__main__':
 
         rospy.loginfo("Connecting to AirSim...")
         if toggle_drone:
-            client = airsimpy.MultirotorClient(ip)
+            client = airsimpy.MultirotorClient(ip=ip, port=port)
         else:
-            client = airsimpy.CarClient(ip)
+            client = airsimpy.CarClient(ip=ip, port=port)
         try:
             client.confirmConnection(rospy.get_name())
         except msgpackrpc.error.TimeoutError:

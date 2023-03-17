@@ -15,7 +15,7 @@ namespace msr { namespace airlib {
 
 class CarRpcLibServer : public RpcLibServerBase {
 public:
-    CarRpcLibServer(ApiProvider* api_provider, string server_address, uint16_t port = 41451);
+    CarRpcLibServer(ApiProvider* api_provider, string server_address, uint16_t port = RpcLibPort);
     virtual ~CarRpcLibServer();
 
 protected:
