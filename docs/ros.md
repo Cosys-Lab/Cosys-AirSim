@@ -9,14 +9,14 @@ You should have these components installed and working before proceeding.
 
 ## Publish node
 There is one single Python script `airsim_publish.py` that can be used as a ROS Node. It can be used in two ways:
-* Get and publish the entire TF tree of map, vehicle and sensors; vehicle movement groundtruth ; all sensor data as well as the poses of world objects. 
-* Replays a _route_ rosbag that holds an existing trajectory of a vehicle. The script will then replay this trajectory while recording all sensor data for each pose of the trajectory.  It generates a new rosbag holding both the route and sensor data as well as all TF information. This allows for better performance and deterministic datasets over the same route.
+- Get and publish the entire TF tree of map, vehicle and sensors; vehicle movement groundtruth ; all sensor data as well as the poses of world objects. 
+- Replays a _route_ rosbag that holds an existing trajectory of a vehicle. The script will then replay this trajectory while recording all sensor data for each pose of the trajectory.  It generates a new rosbag holding both the route and sensor data as well as all TF information. This allows for better performance and deterministic datasets over the same route.
 
 ## Example launch files
 Some basic launch files are available for the ROS node in these two configurations mentioned above.
-* `airsim_publish.launch` : This shows all available parameters for the node. It also shows how to use the node in the first configuration.
-* `record_route.launch` : This is a variant of the one above but only exposing and enabling those to create a _route_ rosbag for the second configuration. It will automatically record a rosbag as well.
-* `replay_route_record_sensors.launch`: This is the script to use a _route_ rosbag created with the previous launch file type to replay it and record all sensor and TF data and create a single merged rosbag.
+ - `airsim_publish.launch` : This shows all available parameters for the node. It also shows how to use the node in the first configuration.
+ - `record_route.launch` : This is a variant of the one above but only exposing and enabling those to create a _route_ rosbag for the second configuration. It will automatically record a rosbag as well.
+ - `replay_route_record_sensors.launch`: This is the script to use a _route_ rosbag created with the previous launch file type to replay it and record all sensor and TF data and create a single merged rosbag.
 
 ## Setup
 
