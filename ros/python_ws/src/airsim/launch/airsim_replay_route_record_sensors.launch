@@ -1,6 +1,7 @@
 <launch>
       <arg name="rate" default="10"/>
       <arg name="ip" default=""/>
+      <arg name="port" default=""/>
 
       <arg name="toggle_drone" default="0"/>
 
@@ -66,6 +67,7 @@
 
             <rosparam param="rate" subst_value="True">$(arg rate)</rosparam>
             <param name="ip" type="string" value="$(arg ip)"/>
+            <param name="port" value="$(arg port)"/>
 
             <rosparam param="tf_sensors_enable" subst_value="True">$(arg tf_sensors_enable)</rosparam>
 
@@ -81,14 +83,6 @@
 
             <rosparam param="pose_topic" subst_value="True">$(arg pose_topic)</rosparam>
             <rosparam param="map_frame" subst_value="True">$(arg map_frame)</rosparam>
-
-            <rosparam param="carcontrol_enable" subst_value="True">$(arg carcontrol_enable)</rosparam>
-            <rosparam param="carcontrol_topic" subst_value="True">$(arg carcontrol_topic)</rosparam>
-
-            <rosparam param="sensor_imu_enable" subst_value="True">$(arg sensor_imu_enable)</rosparam>
-            <rosparam param="sensor_imu_name" subst_value="True">$(arg sensor_imu_name)</rosparam>
-            <rosparam param="sensor_imu_topic" subst_value="True">$(arg sensor_imu_topic)</rosparam>
-            <rosparam param="sensor_imu_frame" subst_value="True">$(arg sensor_imu_frame)</rosparam>
 
             <rosparam param="sensor_echo_names" subst_value="True">$(arg sensor_echo_names)</rosparam>
             <rosparam param="sensor_echo_topics" subst_value="True">$(arg sensor_echo_topics)</rosparam>

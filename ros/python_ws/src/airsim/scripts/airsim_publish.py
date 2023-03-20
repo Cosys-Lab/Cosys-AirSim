@@ -269,7 +269,7 @@ def get_all_objects_ros_path_message(c, cur_timestamp, cur_first_message, cur_ob
             cur_object_pose = cur_object_poses[index]
             if not np.isnan(cur_object_pose.position.x_val):
                 cur_pos = cur_object_pose.position
-                cur_orientation = cur_object_pose.cur_orientation.inverse()
+                cur_orientation = cur_object_pose.orientation.inverse()
 
                 object_pose = PoseStamped()
                 object_pose.pose.position.x = cur_pos.x_val
@@ -915,6 +915,8 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                                                  t=ros_timestamp)   
     
                     pose_index += 1
+                    first_message = False
+                    time.sleep(1)
                     
         output.write('/tf_static', saved_static_tf, first_timestamp)
         rospy.loginfo("Process completed. Writing all other messages to merged rosbag...")
@@ -1132,6 +1134,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                 real_speed_publisher.publish(v)
                 error_speed_publisher.publish(error)
 
+            first_message = False
             rate.sleep()
     
 
@@ -1141,6 +1144,7 @@ if __name__ == '__main__':
 
         ros_rate = rospy.get_param('~rate', 10)
         ip = rospy.get_param('~ip', "localhost")
+        port = rospy.get_param('~port', 41451)
 
         tf_sensors_enable = rospy.get_param('~tf_sensors_enable', 0)
 
@@ -1232,9 +1236,9 @@ if __name__ == '__main__':
 
         rospy.loginfo("Connecting to AirSim...")
         if toggle_drone:
-            client = airsimpy.MultirotorClient(ip)
+            client = airsimpy.MultirotorClient(ip=ip, port=port)
         else:
-            client = airsimpy.CarClient(ip)
+            client = airsimpy.CarClient(ip=ip, port=port)
         try:
             client.confirmConnection(rospy.get_name())
         except msgpackrpc.error.TimeoutError:
