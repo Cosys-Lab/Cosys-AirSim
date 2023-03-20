@@ -16,7 +16,7 @@ namespace msr { namespace airlib {
 
 class ComputerVisionRpcLibClient : public RpcLibClientBase {
 public:
-    ComputerVisionRpcLibClient(const string& ip_address = "localhost", uint16_t port = 41451, float timeout_sec = 60);
+    ComputerVisionRpcLibClient(const string& ip_address = "localhost", uint16_t port = RpcLibPort, float timeout_sec = 60);
 
     ComputerVisionApiBase::ComputerVisionState getComputerVisionState(const std::string& vehicle_name = "");
 

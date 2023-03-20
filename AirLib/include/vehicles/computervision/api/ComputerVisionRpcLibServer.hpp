@@ -15,7 +15,7 @@ namespace msr { namespace airlib {
 
 class ComputerVisionRpcLibServer : public RpcLibServerBase {
 public:
-    ComputerVisionRpcLibServer(ApiProvider* api_provider, string server_address, uint16_t port = 41451);
+    ComputerVisionRpcLibServer(ApiProvider* api_provider, string server_address, uint16_t port = RpcLibPort);
     virtual ~ComputerVisionRpcLibServer();
 
 protected:
