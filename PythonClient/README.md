@@ -13,5 +13,5 @@ Some examples also requires opencv.
 ## More Info
 
 More information on AirSim Python APIs can be found at:
-https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/apis.md
+https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docs/apis.md
 

@@ -21,7 +21,7 @@ This branch uses a custom version of the Unreal Engine!
 - Clone AirSim and build it:
    ```bash
    # go to the folder where you clone GitHub projects
-   git clone https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git
+   git clone https://github.com/Cosys-Lab/Cosys-AirSim.git
    cd AirSim
    ./setup.sh
    ./build.sh
