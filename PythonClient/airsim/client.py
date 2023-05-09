@@ -326,7 +326,7 @@ class VehicleClient:
 
     # legacy handling
     # TODO: remove below legacy wrappers in future major releases
-    upgrade_api_help = "\nPlease see https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/upgrade_apis.md for more info."
+    upgrade_api_help = "\nPlease see https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docs/upgrade_apis.md for more info."
 
     def simGetPose(self):
         logging.warning(

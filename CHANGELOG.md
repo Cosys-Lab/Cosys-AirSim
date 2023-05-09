@@ -27,7 +27,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * Added [Time of Day API](docs/apis.md#time-of-day-api)
 * An experimental integration of [AirSim on Unity](https://github.com/Microsoft/AirSim/tree/master/Unity) is now available. Learn more in [Unity blog post](https://blogs.unity3d.com/2018/11/14/airsim-on-unity-experiment-with-autonomous-vehicle-simulation). 
 * [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
-* Highly efficient [NoDisplay view mode](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
+* Highly efficient [NoDisplay view mode](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
 * [Enable/disable sensors](https://github.com/Microsoft/AirSim/pull/1479) via settings
 * [LiDAR Sensor](docs/lidar.md)
 * [Support for Flysky FS-SM100 RC](https://github.com/Microsoft/AirSim/commit/474214364676b6631c01b3ed79d00c83ba5bccf5) USB adapter
@@ -36,7 +36,7 @@ Below is summarized list of important changes. This does not include minor/less 
 * [Custom speed units](https://github.com/Microsoft/AirSim/pull/1181)
 * [ROS publisher](https://github.com/Microsoft/AirSim/pull/1135)
 * [simSetObjectPose API](https://github.com/Microsoft/AirSim/pull/1161)
-* [Character Control APIs](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/PythonClient/airsim/client.py#L137) (works on TalkingHeads binaries in release)
+* [Character Control APIs](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/airsim/client.py#L137) (works on TalkingHeads binaries in release)
 * [Arducopter Solo Support](https://github.com/Microsoft/AirSim/pull/1387)
 * [Linux install without sudo access](https://github.com/Microsoft/AirSim/pull/1434)
 * [Kinect like ROS publisher](https://github.com/Microsoft/AirSim/pull/1298)
