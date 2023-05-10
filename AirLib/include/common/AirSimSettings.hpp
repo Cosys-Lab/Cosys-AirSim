@@ -1262,7 +1262,7 @@ private:
         //because for docker container default is 0.0.0.0 and people get really confused why things
         //don't work
         api_server_address = settings_json.getString("LocalHostIp", "");
-        api_port = settings_json.getInt("ApiServerPort", RpcLibPort);
+        api_port = static_cast<uint16_t>(settings_json.getInt("ApiServerPort", RpcLibPort));
         is_record_ui_visible = settings_json.getBool("RecordUIVisible", true);
         engine_sound = settings_json.getBool("EngineSound", false);
         enable_rpc = settings_json.getBool("EnableRpc", enable_rpc);
