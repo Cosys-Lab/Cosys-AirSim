@@ -1,7 +1,7 @@
 <launch>
       <arg name="rate" default="10"/>
       <arg name="ip" default=""/>
-      <arg name="port" default=""/>
+      <arg name="port" default="41451"/>
 
       <arg name="toggle_drone" default="0"/>
 

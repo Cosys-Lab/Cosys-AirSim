@@ -6,6 +6,8 @@ Linux: `~/Documents/AirSim`
 
 The file is in usual [json format](https://en.wikipedia.org/wiki/JSON). On first startup AirSim would create `settings.json` file with no settings. To avoid problems, always use ASCII format to save json file.
 
+A good usable example can also be found in the docs folder [here](settings.json).
+
 ## How to Chose Between Car and Multirotor?
 The default is to use multirotor. To use car simple set `"SimMode": "Car"` like this:
 

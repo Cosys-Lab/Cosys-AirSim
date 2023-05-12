@@ -18,6 +18,8 @@ Some basic launch files are available for the ROS node in these two configuratio
  - `record_route.launch` : This is a variant of the one above but only exposing and enabling those to create a _route_ rosbag for the second configuration. It will automatically record a rosbag as well.
  - `replay_route_record_sensors.launch`: This is the script to use a _route_ rosbag created with the previous launch file type to replay it and record all sensor and TF data and create a single merged rosbag.
 
+2 other launch files are also available, which match the configurations of the two example vehicles (car and drone) found in the example settings.json file found [here](settings.json).
+
 ## Setup
 
 ## Setup workspace and Airsim package

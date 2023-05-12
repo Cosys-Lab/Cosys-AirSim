@@ -4,7 +4,7 @@
       <arg name="ip" default=""/>
       <arg name="port" default="41451"/>
 
-      <arg name="toggle_drone" default="0"/>
+      <arg name="toggle_drone" default="1"/>
 
       <arg name="tf_sensors_enable" default="1"/>
 
@@ -13,7 +13,7 @@
       <arg name="merged_rosbag" default="./airsim_sensor_data.bag"/>
       <arg name="generate_gt_map" default="0"/>
 
-      <arg name="vehicle_name" default="airsimvehicle"/>
+      <arg name="vehicle_name" default="drone"/>
       <arg name="vehicle_base_frame" default="base_link"/>
 
       <arg name="pose_topic" default="airsim/gtpose"/>
@@ -27,34 +27,34 @@
       <arg name="odom_frame" default="odom"/>
       <arg name="tf_odom_enable" default="1"/>
 
-      <arg name="pose_offset_x" default="0"/>
-      <arg name="pose_offset_y" default="0"/>
+      <arg name="pose_offset_x" default="-5"/>
+      <arg name="pose_offset_y" default="7"/>
       <arg name="pose_offset_z" default="0"/>
 
-      <arg name="sensor_imu_enable" default="1"/>
+      <arg name="sensor_imu_enable" default="0"/>
       <arg name="sensor_imu_name" default="imu"/>
       <arg name="sensor_imu_topic" default="airsim/imu"/>
       <arg name="sensor_imu_frame" default="base_imu"/>
 
-      <arg name="sensor_echo_names" default="[echo1]"/>
-      <arg name="sensor_echo_topics" default="[airsim/echo1/pointcloud]"/>
-      <arg name="sensor_echo_frames" default="[base_echo1]"/>
+      <arg name="sensor_echo_names" default="[]"/>
+      <arg name="sensor_echo_topics" default="[]"/>
+      <arg name="sensor_echo_frames" default="[]"/>
 
-      <arg name="sensor_lidar_names" default="[lidar1]"/>
-      <arg name="sensor_lidar_toggle_groundtruth" default="[1]"/>
-      <arg name="sensor_lidar_topics" default="[airsim/lidar1/pointcloud]"/>
-      <arg name="sensor_lidar_segmentation_topics" default="[airsim/lidar1/segmentation]"/>
-      <arg name="sensor_lidar_frames" default="[base_lidar1]"/>
+      <arg name="sensor_lidar_names" default="[LidarSensor1, LidarSensor2]"/>
+      <arg name="sensor_lidar_toggle_groundtruth" default="[1, 1]"/>
+      <arg name="sensor_lidar_topics" default="[airsim/lidar1/pointcloud, airsim/lidar2/pointcloud]"/>
+      <arg name="sensor_lidar_segmentation_topics" default="[airsim/lidar1/segmentation, airsim/lidar2/segmentation]"/>
+      <arg name="sensor_lidar_frames" default="[base_lidar1, base_lidar2]"/>
 
-      <arg name="sensor_gpulidar_names" default="[lidar2]"/>
-      <arg name="sensor_gpulidar_topics" default="[airsim/lidar2/pointcloud]"/>
-      <arg name="sensor_gpulidar_frames" default="[base_lidar2]"/>
+      <arg name="sensor_gpulidar_names" default="[]"/>
+      <arg name="sensor_gpulidar_topics" default="[]"/>
+      <arg name="sensor_gpulidar_frames" default="[]"/>
 
-      <arg name="sensor_uwb_names" default="[uwb1]"/>
+      <arg name="sensor_uwb_names" default="[MarLocUwb_1]"/>
       <arg name="sensor_uwb_topic" default="airsim/uwb1/ranges"/>
       <arg name="sensor_uwb_frames" default="[base_uwb1]"/>
 
-      <arg name="sensor_wifi_names" default="[wifi1]"/>
+      <arg name="sensor_wifi_names" default="[wifi]"/>
       <arg name="sensor_wifi_topic" default="airsim/wifi1/ranges"/>
       <arg name="sensor_wifi_frames" default="[base_wifi1]"/>
 
@@ -74,12 +74,12 @@
 
       <arg name="object_poses_all" default="0"/>
       <arg name="object_poses_all_coordinates_local" default="1"/>
-      <arg name="object_poses_all_once" default="1"/>
+      <arg name="object_poses_all_once" default="0"/>
       <arg name="object_poses_all_topic" default="airsim/objects/poses"/>
 
-      <arg name="object_poses_individual_names" default="[object_name]"/>
-      <arg name="object_poses_individual_coordinates_local" default="[1]"/>
-      <arg name="object_poses_individual_topics" default="[airsim/object/object_name/pose]"/>
+      <arg name="object_poses_individual_names" default="[]"/>
+      <arg name="object_poses_individual_coordinates_local" default="[]"/>
+      <arg name="object_poses_individual_topics" default="[]"/>
 
 
       <node name="airsim_publish" pkg="airsim" type="airsim_publish.py" respawn="false" output="screen">
