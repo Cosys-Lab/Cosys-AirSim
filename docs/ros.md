@@ -51,3 +51,5 @@ First make sure you are running an AirSim project and that the simulation is pla
 The implemented AirSim node can be run using ```rosrun airsim airsim_publish.py```.
 
 Or alternatively you can use launch files such as the example ones that can be found in _AirSim/ros/python_ws/src/airsim/launch_ like ```rosrun airsim airsim_publish.launch```.
+
+You can also make use of WSL to run ROS nodes on Windows. See [here](ROS_on_Windows_with_WSL.md) for more information.
