@@ -37,7 +37,9 @@ nav:
       - "GPU LIDAR": 'gpulidar.md'
       - "Pulse Echo": 'echo.md'
       - "Infrared Camera": "InfraredCamera.md"
-    - "ROS: AirSim ROS Wrapper": "ros.md"
+    - "ROS":
+      - "ROS: AirSim ROS Wrapper": "ros.md"
+      - "Using ROS on Windows with WSL": "ROS_on_Windows_with_WSL.md"
     - "Playing Logs": 'playback.md'
   - "Design":
     - "Architecture": 'design.md'
