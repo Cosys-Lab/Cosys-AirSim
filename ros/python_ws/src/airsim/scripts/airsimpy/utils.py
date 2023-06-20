@@ -46,7 +46,7 @@ def write_file(filename, bstr):
 
 
 def get_colormap_channel_values():
-    values = np.zeros(258, dtype=np.int)
+    values = np.zeros(258, dtype=int)
     step = 256
     iter = 0
     values[0] = 0
