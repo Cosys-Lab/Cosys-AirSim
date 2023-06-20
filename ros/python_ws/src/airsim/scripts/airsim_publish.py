@@ -808,14 +808,14 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                                                                       cv_bridge, 
                                                                       sensor_camera_scene_quality[cur_sensor_index],
                                                                       sensor_camera_toggle_scene_mono[cur_sensor_index])
-                            output.write(sensor_camera_scene_topics[sensor_index], camera_msg, t=ros_timestamp)
+                            output.write(sensor_camera_scene_topics[cur_sensor_index], camera_msg, t=ros_timestamp)
                         if sensor_camera_toggle_segmentation[cur_sensor_index] == 1:
                             response = camera_responses[response_locations[cur_sensor_name + '_segmentation']]
                             if response.width == 0 and response.height == 0:
                                 rospy.logwarn("Camera '" + cur_sensor_name + "' could not retrieve segmentation image.")
                             else:
                                 camera_msg = get_segmentation_camera_ros_message(camera_msg, response)
-                                output.write(sensor_camera_segmentation_topics[sensor_index], camera_msg,
+                                output.write(sensor_camera_segmentation_topics[cur_sensor_index], camera_msg,
                                              t=ros_timestamp)
                         if sensor_camera_toggle_depth[cur_sensor_index] == 1:
                             response = camera_responses[response_locations[cur_sensor_name + '_depth']]
@@ -823,7 +823,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                                 rospy.logwarn("Camera '" + cur_sensor_name + "' could not retrieve depth image.")
                             else:
                                 camera_msg = get_depth_camera_ros_message(camera_msg, response)
-                                output.write(sensor_camera_depth_topics[sensor_index], camera_msg,
+                                output.write(sensor_camera_depth_topics[cur_sensor_index], camera_msg,
                                              t=ros_timestamp)
                         if sensor_camera_toggle_camera_info[cur_sensor_index] == 1:
                             if cur_sensor_index == 1:
@@ -834,7 +834,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                                                                        sensor_camera_optical_frames[cur_sensor_index],
                                                                        timestamp, response.width, response.height,
                                                                        sensor_stereo_enable, baseline, first_sensor)
-                            output.write(sensor_camera_info_topics[sensor_index], cam_info_msg, t=ros_timestamp)
+                            output.write(sensor_camera_info_topics[cur_sensor_index], cam_info_msg, t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_echo_names):
                         pcloud, last_timestamp_return = get_echo_ros_message(client, cur_sensor_name, vehicle_name,
@@ -845,7 +845,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                         if last_timestamp_return is not None:
                             last_timestamps[cur_sensor_name] = last_timestamp_return
                         if pcloud is not None:
-                            output.write(sensor_echo_topics[sensor_index], pcloud, t=ros_timestamp)
+                            output.write(sensor_echo_topics[cur_sensor_index], pcloud, t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_lidar_names):
                         seg_enable = sensor_lidar_toggle_segmentation[cur_sensor_index]
@@ -860,10 +860,10 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                         if last_timestamp_return is not None:
                             last_timestamps[cur_sensor_name] = last_timestamp_return
                         if pcloud is not None:
-                            output.write(sensor_lidar_topics[sensor_index], pcloud, t=ros_timestamp)
+                            output.write(sensor_lidar_topics[cur_sensor_index], pcloud, t=ros_timestamp)
                         if sensor_lidar_toggle_segmentation[cur_sensor_index] == 1:
                             if groundtruth is not None:
-                                output.write(sensor_lidar_segmentation_topics[sensor_index], groundtruth,
+                                output.write(sensor_lidar_segmentation_topics[cur_sensor_index], groundtruth,
                                              t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_gpulidar_names):
@@ -876,7 +876,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                         if last_timestamp_return is not None:
                             last_timestamps[cur_sensor_name] = last_timestamp_return
                         if pcloud is not None:
-                            output.write(sensor_gpulidar_topics[sensor_index], pcloud, t=ros_timestamp)
+                            output.write(sensor_gpulidar_topics[cur_sensor_index], pcloud, t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_uwb_names):
                         if cur_sensor_index == 0:  # only once
@@ -911,7 +911,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                             warning_issued[object_name] = warning_issued_result
                             if not warning_issued_result:
                                 if object_pose is not None:
-                                    output.write(object_poses_individual_topics[sensor_index], object_pose,
+                                    output.write(object_poses_individual_topics[object_index], object_pose,
                                                  t=ros_timestamp)   
     
                     pose_index += 1
