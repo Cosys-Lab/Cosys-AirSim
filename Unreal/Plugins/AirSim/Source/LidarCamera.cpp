@@ -104,15 +104,15 @@ void ALidarCamera::PostInitializeComponents()
 	// Set the position, rotation and source type of each capture component and attach it to the root of the Actor
 	capture_2D_depth_->SetRelativeRotation(FRotator(0, 0, 0));
 	capture_2D_depth_->SetRelativeLocation(FVector(0, 0, 0));
-	capture_2D_depth_->AttachTo(this->RootComponent);
+	capture_2D_depth_->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	capture_2D_depth_->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 	capture_2D_segmentation_->SetRelativeRotation(FRotator(0, 0, 0));
 	capture_2D_segmentation_->SetRelativeLocation(FVector(0, 0, 0));
-	capture_2D_segmentation_->AttachTo(this->RootComponent);
+	capture_2D_segmentation_->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	capture_2D_segmentation_->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 	capture_2D_intensity_->SetRelativeRotation(FRotator(0, 0, 0));
 	capture_2D_intensity_->SetRelativeLocation(FVector(0, 0, 0));
-	capture_2D_intensity_->AttachTo(this->RootComponent);
+	capture_2D_intensity_->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	capture_2D_intensity_->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 }
 
