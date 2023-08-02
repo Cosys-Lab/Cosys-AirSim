@@ -17,6 +17,19 @@ The biggest difference is that this requires custom Unreal Engine! See [document
 A manually maintained fork of this repository is available to the public: https://github.com/Cosys-Lab/Cosys-AirSim
 ### Associated publications
 
+- [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
+```
+@inproceedings{cosysairsim2023jansen,
+  author={Jansen, Wouter and Verreycken, Erik and Schenck, Anthony and Blanquart, Jean-Edouard and Verhulst, Connor and Huebel, Nico and Steckel, Jan},
+  booktitle={2023 Annual Modeling and Simulation Conference (ANNSIM)}, 
+  title={COSYS-AIRSIM: A Real-Time Simulation Framework Expanded for Complex Industrial Applications}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={37-48},
+  doi={}}
+```
+
 - [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)
 ```
 @inproceedings{lidarsim2022jansen,
