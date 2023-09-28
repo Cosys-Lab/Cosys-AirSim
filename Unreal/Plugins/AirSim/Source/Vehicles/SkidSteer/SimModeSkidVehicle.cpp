@@ -1,7 +1,7 @@
 // Developed by Cosys-Lab, University of Antwerp
 
 #include "SimModeSkidVehicle.h"
-#include "ConstructorHelpers.h"
+#include "UObject/ConstructorHelpers.h"
 
 #include "AirBlueprintLib.h"
 #include "common/AirSimSettings.hpp"
