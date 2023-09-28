@@ -1,7 +1,7 @@
 // Developed by Cosys-Lab, University of Antwerp
 
 #include "LidarCamera.h"
-#include "ConstructorHelpers.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/ArrowComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -252,11 +252,11 @@ void ALidarCamera::InitializeSensor()
 
 	// Find all objects that have a tag called 'MarkedIgnore' which is an optional setting to also mask out these objects to the virtual cameras
 	if (ignore_marked_) {
-		static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
+		static const FName marked_ignore_tag = TEXT("MarkedIgnore");
 		for (TActorIterator<AActor> ActorIterator(GetWorld()); ActorIterator; ++ActorIterator)
 		{
 			AActor* Actor = *ActorIterator;
-			if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))actors.Add(Actor);
+			if (Actor && Actor != this && Actor->Tags.Contains(marked_ignore_tag))actors.Add(Actor);
 		}
 	}
 	capture_2D_depth_->HiddenActors = actors;
