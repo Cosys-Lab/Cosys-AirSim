@@ -6,7 +6,7 @@ The current recommended and tested environment is **Ubuntu 18.04 LTS**. Theoreti
 
 ### Build Unreal Engine and Airsim
 This branch uses a custom version of the Unreal Engine!
-- Make sure you are [registered with Epic Games](https://www.unrealengine.com/en-US/ue-on-github). This is required to get source code access for Unreal Engine.
+- Make sure you are [registered with Epic Games and have linked your Epic Games account with your GitHub account](https://www.unrealengine.com/en-US/ue-on-github). This is required to get source code access for Unreal Engine.
 
 - Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.24.4 (Cosys-Lab) at present.
    ```bash
