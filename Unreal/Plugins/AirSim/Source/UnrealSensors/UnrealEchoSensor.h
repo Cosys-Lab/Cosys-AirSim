@@ -19,6 +19,21 @@ public:
 	UnrealEchoSensor(const AirSimSettings::EchoSetting& setting,
 		AActor* actor, const NedTransform* ned_transform);
 
+	using Vector3r = msr::airlib::Vector3r;
+	using VectorMath = msr::airlib::VectorMath;
+
+	static void sampleHorizontalSlice(int num_points, float lower_azimuth_limit, float upper_azimuth_limit, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
+	static void sampleSphereCap(int num_points, float lower_azimuth_limit, float upper_azimuth_limit, float lower_elevation_limit, float upper_elevation_limit, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
+	void applyFreeSpaceLoss(float& signal_attenuation, float previous_distance, float added_distance);
+	float remainingDistance(float signal_attenuation, float total_distance);
+	void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& points);
+	void bounceTrace(FVector& trace_start_position, FVector& trace_direction, float& trace_length,
+		             const FHitResult& trace_hit_result, float& total_distance, float& signal_attenuation);
+	FVector Vector3rToFVector(const Vector3r& input_vector);
+	Vector3r FVectorToVector3r(const FVector& input_vector);
+	float angleBetweenVectors(FVector vector1, FVector vector2);
+	float receptionAttenuation(float reception_angle);
+
 protected:
 	virtual void getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose,
 		msr::airlib::vector<msr::airlib::real_T>& point_cloud) override;
@@ -32,21 +47,9 @@ protected:
 	virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
 
 private:
-	using Vector3r = msr::airlib::Vector3r;
-	using VectorMath = msr::airlib::VectorMath;
 
-	void generateSampleDirections();
-	void sampleHorizontalSlice(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
-	void sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
-	void applyFreeSpaceLoss(float &signal_attenuation, float previous_distance, float added_distance);
-	float remainingDistance(float signal_attenuation, float total_distance);
-	void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T> &points);
-    void bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length,
-		const FHitResult &trace_hit_result, float &total_distance, float &signal_attenuation);
-    FVector Vector3rToFVector(const Vector3r &input_vector);
-	Vector3r FVectorToVector3r(const FVector &input_vector);
-	float angleBetweenVectors(FVector vector1, FVector vector2);
-	float receptionAttenuation(float reception_angle);
+
+	void generateSampleDirections();	
 
 private:
 	AActor* actor_;

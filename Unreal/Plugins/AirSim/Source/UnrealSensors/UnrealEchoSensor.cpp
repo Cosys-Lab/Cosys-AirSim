@@ -40,52 +40,47 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 void UnrealEchoSensor::generateSampleDirections()
 {
 	int num_traces = sensor_params_.number_of_traces;
-	float opening_angle = sensor_params_.sensor_opening_angle;  // deg, = full hemisphere
-
+	float lower_azimuth_limit = sensor_params_.sensor_lower_azimuth_limit;
+	float upper_azimuth_limit = sensor_params_.sensor_upper_azimuth_limit;
+	float lower_elevation_limit = -sensor_params_.sensor_upper_elevation_limit; // yes I know this is backwards. might fix one day
+	float upper_elevation_limit = -sensor_params_.sensor_lower_elevation_limit;
 	if (num_traces < 0)
 	{
-		sampleHorizontalSlice(num_traces, opening_angle, sample_directions_);
+		sampleHorizontalSlice(num_traces, lower_azimuth_limit, upper_azimuth_limit, sample_directions_);
 	}
 	else
 	{
-		sampleSphereCap(num_traces, opening_angle, sample_directions_);
+		sampleSphereCap(num_traces, lower_azimuth_limit, upper_azimuth_limit, lower_elevation_limit, upper_elevation_limit, sample_directions_);
 	}
 }
 
-void UnrealEchoSensor::sampleHorizontalSlice(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
+void UnrealEchoSensor::sampleHorizontalSlice(int num_points, float lower_azimuth_limit, float upper_azimuth_limit, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
 	num_points = -num_points;
 	
 	point_cloud.clear();
 
-	float angle_step = FMath::DegreesToRadians(opening_angle / (num_points-1));
-	float angle_offset = FMath::DegreesToRadians(opening_angle / 2);
+	float angle_step = FMath::DegreesToRadians((upper_azimuth_limit - lower_azimuth_limit) / (num_points-1));
 	for (auto i = 0; i < num_points; ++i)
 	{
-		float angle = angle_step * i - angle_offset + PI/2;
+		float angle = FMath::DegreesToRadians(lower_azimuth_limit) + i * angle_step;
 
-		float x = FMath::Sin(angle);
-		float y = FMath::Cos(angle);
+		float y = FMath::Sin(angle);
+		float x = FMath::Cos(angle);
 		float z = 0;
 
 		point_cloud.emplace_back(Vector3r(x, y, z));
 	}
 }
 
-void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
+void UnrealEchoSensor::sampleSphereCap(int num_points, float lower_azimuth_limit, float upper_azimuth_limit, float lower_elevation_limit, float upper_elevation_limit, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud) {
 	point_cloud.clear();
 
 	// Add point in frontal directionl
 	point_cloud.emplace(point_cloud.begin(), Vector3r(1, 0, 0));
 
-	//Convert opening angle to plane coordinates
-	float x_limit = FMath::Cos(FMath::DegreesToRadians(opening_angle) / 2);
-
-	// Calculate ratio of sphere surface to cap surface.
-	// Scale points accordingly, e.g. if nPoints = 10 and ratio = 0.01,
-	// generate 1000 points on the sphere
-	float h = 1 - x_limit;
-	float surface_ratio = h / 2;  // (4 * pi * R^2) / (2 * pi * R * h)
-	int num_sphere_points = FMath::CeilToInt(num_points * 1 / surface_ratio);
+	float surface_area = (FMath::DegreesToRadians(upper_azimuth_limit) - FMath::DegreesToRadians(lower_azimuth_limit)) * (FMath::Sin(FMath::DegreesToRadians(upper_elevation_limit)) - FMath::Sin(FMath::DegreesToRadians(lower_elevation_limit)));
+	float surface_scaler = 4 * PI / surface_area;
+	int num_sphere_points = FMath::CeilToInt(num_points * surface_scaler);
 
 	// Generate points on the sphere, retain those within the opening angle
 	float offset = 2.0f / num_sphere_points;
@@ -96,14 +91,17 @@ void UnrealEchoSensor::sampleSphereCap(int num_points, float opening_angle, msr:
 		float r = FMath::Sqrt(1 - FMath::Pow(y, 2));
 		float phi = ((i + 1) % num_sphere_points) * increment;
 		float x = FMath::Cos(phi) * r;
+		float z = FMath::Sin(phi) * r;
 		if (point_cloud.size() == num_points)
 		{
 			return;
 		}
-		else if (x >= x_limit)
+		else
 		{
-			float z = FMath::Sin(phi) * r;
-			point_cloud.emplace_back(Vector3r(x, y, z));
+			float az = FMath::RadiansToDegrees(FMath::Atan2(y, x));
+			float el = FMath::RadiansToDegrees(FMath::Atan2(z, FMath::Sqrt(FMath::Pow(x, 2) + FMath::Pow(y, 2))));
+			if(az > lower_azimuth_limit && az < upper_azimuth_limit && el > lower_elevation_limit && el < upper_elevation_limit)
+				point_cloud.emplace_back(Vector3r(x, y, z));
 		}
 	}
 }

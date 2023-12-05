@@ -20,7 +20,10 @@ The following parameters can be configured right now via settings json.
 Parameter                 | Description
 --------------------------| ------------
 NumberOfTraces            | Amount of traces (rays) being cast. If set to a negative value, it will only do 2D sensing in horizontal plane!
-SensorOpeningAngle        | The angle for receiving signals on the sensor
+SensorLowerAzimuthLimit   | The lower azimuth angle limit in degrees for receiving signals on the sensor
+SensorUpperAzimuthLimit   | The upper azimuth angle limit in degrees for receiving signals on the sensor
+SensorLowerElevationLimit | The lower elevation angle limit in degrees for receiving signals on the sensor
+SensorUpperElevationLimit | The upper elevation angle limit in degrees for receiving signals on the sensor
 ReflectionOpeningAngle    | Opening angle of reflections
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)

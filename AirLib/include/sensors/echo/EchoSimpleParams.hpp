@@ -20,7 +20,10 @@ struct EchoSimpleParams {
 	real_T reflection_distance_limit;		// Maximum distance between reflection locations.
 	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
 	real_T sensor_diameter;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
-	float sensor_opening_angle;				// The opening angle in which rays will be cast from the sensor
+	float sensor_lower_azimuth_limit;		// The lower azimuth limit of the sensor opening angle in degrees.
+	float sensor_upper_azimuth_limit;		// The upper azimuth limit of the sensor opening angle in degrees.
+	float sensor_lower_elevation_limit;		// The lower elevation limit of the sensor opening angle in degrees.
+	float sensor_upper_elevation_limit;		// The upper elevation limit of the sensor opening angle in degrees.
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
 	bool ignore_marked = false;
 	int testParam = 1;
@@ -53,7 +56,10 @@ struct EchoSimpleParams {
 
 		number_of_traces = settings.number_of_traces;
 		reflection_opening_angle = settings.reflection_opening_angle;
-		sensor_opening_angle = settings.sensor_opening_angle;
+		sensor_lower_azimuth_limit = settings.sensor_lower_azimuth_limit;
+		sensor_upper_azimuth_limit = settings.sensor_upper_azimuth_limit;
+		sensor_lower_elevation_limit = settings.sensor_lower_elevation_limit;
+		sensor_upper_elevation_limit = settings.sensor_upper_elevation_limit;
 		attenuation_per_distance = settings.attenuation_per_distance;
 		attenuation_per_reflection = settings.attenuation_per_reflection;
 		attenuation_limit = settings.attenuation_limit;
