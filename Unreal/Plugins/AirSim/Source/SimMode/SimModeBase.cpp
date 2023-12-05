@@ -81,7 +81,7 @@ void ASimModeBase::BeginPlay()
     setupClockSpeed();
 
     setStencilIDs();
-	InitializeMeshVertexColorIDs();
+	
     
     record_tick_count = 0;
     setupInputBindings();
@@ -101,6 +101,8 @@ void ASimModeBase::BeginPlay()
         UWeatherLib::initWeather(World, spawned_actors_);
         //UWeatherLib::showWeatherMenu(World);
     }
+
+    InitializeMeshVertexColorIDs();
 }
 
 const NedTransform& ASimModeBase::getGlobalNedTransform()
