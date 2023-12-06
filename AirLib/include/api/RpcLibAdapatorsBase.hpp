@@ -562,9 +562,10 @@ public:
 
 		msr::airlib::TTimePoint time_stamp;    // timestamp
 		std::vector<float> point_cloud;        // data
+        std::vector<std::string> groundtruth;  // ground truth labels
 		Pose pose;
 
-		MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+		MSGPACK_DEFINE_MAP(time_stamp, point_cloud, groundtruth, pose);
 
 		EchoData()
 		{}
@@ -573,6 +574,7 @@ public:
 		{
 			time_stamp = s.time_stamp;
 			point_cloud = s.point_cloud;
+            groundtruth = s.groundtruth;
 
 			//TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
 			if (point_cloud.size() == 0)
@@ -587,6 +589,7 @@ public:
 
 			d.time_stamp = time_stamp;
 			d.point_cloud = point_cloud;
+            d.groundtruth = groundtruth;
 			d.pose = pose.to();
 
 			return d;

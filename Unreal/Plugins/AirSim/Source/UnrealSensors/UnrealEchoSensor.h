@@ -24,19 +24,23 @@ public:
 
 	static void sampleHorizontalSlice(int num_points, float lower_azimuth_limit, float upper_azimuth_limit, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
 	static void sampleSphereCap(int num_points, float lower_azimuth_limit, float upper_azimuth_limit, float lower_elevation_limit, float upper_elevation_limit, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
-	void applyFreeSpaceLoss(float& signal_attenuation, float previous_distance, float added_distance);
-	float remainingDistance(float signal_attenuation, float total_distance);
-	void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& points);
-	void bounceTrace(FVector& trace_start_position, FVector& trace_direction, float& trace_length,
-		             const FHitResult& trace_hit_result, float& total_distance, float& signal_attenuation);
-	FVector Vector3rToFVector(const Vector3r& input_vector);
-	Vector3r FVectorToVector3r(const FVector& input_vector);
-	float angleBetweenVectors(FVector vector1, FVector vector2);
-	float receptionAttenuation(float reception_angle);
+	static void applyFreeSpaceLoss(float& signal_attenuation, float previous_distance, float added_distance);
+	static float remainingDistance(float signal_attenuation, float total_distance, float attenuation_limit, float distance_limit);
+	static void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& points, msr::airlib::vector<std::string>& groundtruth, const NedTransform* ned_transform, const msr::airlib::Pose& pose,
+		                       float distance_limit, int reflection_limit, float attenuation_limit, float reflection_distance_limit, float reflection_opening_angle,
+		                       float attenuation_per_distance, float attenuation_per_reflection, TArray<AActor*> ignore_actors, AActor* cur_actor, bool external,
+		                       float draw_time, float line_thickness, bool debug_draw_reflected_paths = false, bool debug_draw_bounce_lines = false, bool debug_draw_initial_points = false,
+		                       bool debug_draw_reflected_points = false, bool debug_draw_reflected_lines = false, bool check_return = true);
+	static void bounceTrace(FVector& trace_start_position, FVector& trace_direction, float& trace_length, const FHitResult& trace_hit_result, float& total_distance,
+		float& signal_attenuation, float attenuation_per_distance, float attenuation_per_reflection, float distance_limit, float attenuation_limit, const NedTransform* ned_transform);
+	static FVector Vector3rToFVector(const Vector3r& input_vector);
+	static Vector3r FVectorToVector3r(const FVector& input_vector);
+	static float angleBetweenVectors(FVector vector1, FVector vector2);
+	static float receptionAttenuation(float reception_angle);
 
 protected:
 	virtual void getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose,
-		msr::airlib::vector<msr::airlib::real_T>& point_cloud) override;
+		msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth) override;
 
 	virtual void updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose);
 
@@ -69,6 +73,6 @@ private:
 	const float reflection_distance_limit_;
 	const float reflection_opening_angle_;
 	const float draw_time_;
-	const float line_thinkness_;
+	const float line_thickness_;
 	const bool external_;
 };
