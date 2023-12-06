@@ -543,7 +543,7 @@ def get_lidar_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timesta
     if cur_lidar_data.time_stamp != cur_last_timestamp:
         if len(cur_lidar_data.point_cloud) < 4:
             last_timestamp_return = cur_lidar_data.time_stamp
-            return None, last_timestamp_return
+            return None, None, last_timestamp_return
         else:
             last_timestamp_return = cur_lidar_data.time_stamp
 
@@ -577,7 +577,7 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
     if cur_echo_data.time_stamp != cur_last_timestamp:
         if len(cur_echo_data.point_cloud) < 4:
             last_timestamp_return = cur_timestamp
-            return None, last_timestamp_return
+            return None, None, last_timestamp_return
         else:
             last_timestamp_return = cur_timestamp
 
@@ -589,9 +589,15 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
             header.frame_id = cur_sensor_echo_frame
             pcloud = pc2.create_cloud(header, cur_fields_echo, points_list)
             pcloud.header.stamp = cur_timestamp
-        return pcloud, last_timestamp_return
+
+            labels = np.array(cur_echo_data.groundtruth, dtype=np.dtype('U'))
+            groundtruth = StringArray()
+            groundtruth.data = labels.tolist()
+            groundtruth.header.frame_id = cur_sensor_echo_frame
+            groundtruth.header.stamp = cur_timestamp
+        return pcloud, groundtruth, last_timestamp_return
     else:
-        return None, None
+        return None, None, None
 
 
 def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_map, saved_static_tf,
@@ -600,7 +606,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                    carcontrol_enable, carcontrol_topic, odometry_enable, odometry_topic,
                    sensor_imu_enable, sensor_imu_name, sensor_imu_topic,
                    sensor_imu_frame, sensor_echo_names,
-                   sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
+                   sensor_echo_topics, sensor_echo_segmentation_topics, sensor_echo_frames, sensor_lidar_names,
                    sensor_lidar_toggle_segmentation,
                    sensor_lidar_topics, sensor_lidar_segmentation_topics, sensor_lidar_frames,
                    sensor_gpulidar_names, sensor_gpulidar_topics,
@@ -642,6 +648,8 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         for cur_sensor_index, cur_sensor_name in enumerate(sensor_lidar_names):
             pointcloud_publishers[cur_sensor_name] = rospy.Publisher(sensor_lidar_topics[cur_sensor_index], PointCloud2,
                                                                      queue_size=2)
+            string_segmentation_publishers[cur_sensor_name] = \
+                rospy.Publisher(sensor_echo_segmentation_topics[cur_sensor_index], StringArray, queue_size=1)
             last_timestamps[cur_sensor_name] = None
             if sensor_lidar_toggle_segmentation[cur_sensor_index] == 1:
                 string_segmentation_publishers[cur_sensor_name] = \
@@ -837,15 +845,22 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                             output.write(sensor_camera_info_topics[cur_sensor_index], cam_info_msg, t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_echo_names):
-                        pcloud, last_timestamp_return = get_echo_ros_message(client, cur_sensor_name, vehicle_name,
-                                                                             last_timestamps[cur_sensor_name],
-                                                                             fields_echo,
-                                                                             sensor_echo_frames[cur_sensor_index],
-                                                                             timestamp)
+                        pcloud, groundtruth, last_timestamp_return = get_echo_ros_message(client, cur_sensor_name,
+                                                                                          vehicle_name,
+                                                                                          last_timestamps[
+                                                                                              cur_sensor_name],
+                                                                                          fields_echo,
+                                                                                          sensor_echo_frames[
+                                                                                              cur_sensor_index],
+                                                                                          timestamp)
                         if last_timestamp_return is not None:
                             last_timestamps[cur_sensor_name] = last_timestamp_return
                         if pcloud is not None:
                             output.write(sensor_echo_topics[cur_sensor_index], pcloud, t=ros_timestamp)
+
+                        if groundtruth is not None:
+                            output.write(sensor_echo_segmentation_topics[cur_sensor_index], groundtruth,
+                                         t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_lidar_names):
                         seg_enable = sensor_lidar_toggle_segmentation[cur_sensor_index]
@@ -1050,14 +1065,17 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                     image_publishers[cur_sensor_name + '_cameraInfo'].publish(cam_info_msg)
 
             for cur_sensor_index, cur_sensor_name in enumerate(sensor_echo_names):
-                pcloud, last_timestamp_return = get_echo_ros_message(client, cur_sensor_name, vehicle_name,
-                                                                     last_timestamps[cur_sensor_name],
-                                                                     fields_echo, sensor_echo_frames[cur_sensor_index],
-                                                                     timestamp)
+                pcloud, groundtruth, last_timestamp_return = get_echo_ros_message(client, cur_sensor_name, vehicle_name,
+                                                                                  last_timestamps[cur_sensor_name],
+                                                                                  fields_echo,
+                                                                                  sensor_echo_frames[cur_sensor_index],
+                                                                                  timestamp)
                 if last_timestamp_return is not None:
                     last_timestamps[cur_sensor_name] = last_timestamp_return
                 if pcloud is not None:
                     pointcloud_publishers[cur_sensor_name].publish(pcloud)
+                if groundtruth is not None:
+                    string_segmentation_publishers[cur_sensor_name].publish(groundtruth)
 
             for cur_sensor_index, cur_sensor_name in enumerate(sensor_lidar_names):
                 seg_enable = sensor_lidar_toggle_segmentation[cur_sensor_index]
@@ -1180,6 +1198,8 @@ if __name__ == '__main__':
 
         sensor_echo_names = rospy.get_param('~sensor_echo_names', [])
         sensor_echo_topics = rospy.get_param('~sensor_echo_topics', "airsim/echo1/pointcloud")
+        sensor_echo_segmentation_topics = rospy.get_param('~sensor_echo_segmentation_topics',
+                                                          "airsim/echo1/segmentation")
         sensor_echo_frames = rospy.get_param('~sensor_echo_frames', "base_echo1")
 
         sensor_lidar_names = rospy.get_param('~sensor_lidar_names', [])
@@ -1463,7 +1483,7 @@ if __name__ == '__main__':
                        carcontrol_enable, carcontrol_topic,
                        odometry_enable, odometry_topic, sensor_imu_enable,
                        sensor_imu_name, sensor_imu_topic, sensor_imu_frame, sensor_echo_names,
-                       sensor_echo_topics, sensor_echo_frames, sensor_lidar_names,
+                       sensor_echo_topics, sensor_echo_segmentation_topics, sensor_echo_frames, sensor_lidar_names,
                        sensor_lidar_toggle_groundtruth,
                        sensor_lidar_topics, sensor_lidar_segmentation_topics, sensor_lidar_frames,
                        sensor_gpulidar_names, sensor_gpulidar_topics,
