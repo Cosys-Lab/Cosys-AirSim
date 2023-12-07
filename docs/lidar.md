@@ -102,6 +102,6 @@ Use `getLidarData(sensor name, vehicle name)` API to retrieve the Lidar data.
 * Pose:
     * Default: Sensor pose in the vehicle frame. 
     * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
-* Lidar Groundtruth:
+* Groundtruth:
     * for each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to
     * a laser that didn't reflect anything will have label _out_of_range_.

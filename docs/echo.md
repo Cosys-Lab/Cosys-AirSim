@@ -98,5 +98,6 @@ Use `getEchoData(sensor name, vehicle name)` API to retrieve the echo sensor dat
 * Echo Pose:
     * Default: Echo sensor pose in the vehicle frame. 
     * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
-    
+* Groundtruth:
+    * For each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to.
 Use `setEchoData(sensor name, vehicle name, echo data)` API to render an external pointcloud back to the simulation. It expects it to be [x,y,z] as a flat array of floats.
