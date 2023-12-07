@@ -74,7 +74,8 @@ public:
     }
 
 protected:
-    virtual void getPointCloud(const Pose& echo_pose, const Pose& vehicle_pose, vector<real_T>& point_cloud, vector<std::string>& groundtruth) = 0;
+    virtual void getPointCloud(const Pose& echo_pose, const Pose& vehicle_pose, vector<real_T>& point_cloud, vector<std::string>& groundtruth,
+		                       vector<real_T>& passive_beacons_point_cloud, vector<std::string>& passive_beacons_groundtruth) = 0;
 
 	virtual void updatePose(const Pose& echo_pose, const Pose& vehicle_pose) = 0;
 
@@ -89,6 +90,8 @@ private:
 	{
 		point_cloud_.clear();
 		groundtruth_.clear();
+		passive_beacons_point_cloud_.clear();
+		passive_beacons_groundtruth_.clear();
 
 		const GroundTruth& ground_truth = getGroundTruth();
 		Pose const pose_offset = params_.external ? Pose() : ground_truth.kinematics->pose;
@@ -96,7 +99,7 @@ private:
 		double start = FPlatformTime::Seconds();
 		getPointCloud(params_.relative_pose, // relative echo pose
 			pose_offset,   // relative vehicle pose			
-			point_cloud_, groundtruth_);
+			point_cloud_, groundtruth_, passive_beacons_point_cloud_, passive_beacons_groundtruth_);
 		double end = FPlatformTime::Seconds();
 		UAirBlueprintLib::LogMessageString("Echo: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
 
@@ -104,6 +107,8 @@ private:
 		output.point_cloud = point_cloud_;
 		output.time_stamp = last_time_;
 		output.groundtruth = groundtruth_;
+		output.passive_beacons_point_cloud = passive_beacons_point_cloud_;
+		output.passive_beacons_groundtruth = passive_beacons_groundtruth_;
 		if (params_.external && params_.external_ned) {
 			getLocalPose(output.pose);
 		}
@@ -120,7 +125,8 @@ private:
     EchoSimpleParams params_;
     vector<real_T> point_cloud_;
 	vector<std::string> groundtruth_;
-
+	vector<real_T> passive_beacons_point_cloud_;
+	vector<std::string> passive_beacons_groundtruth_;
     FrequencyLimiter freq_limiter_;
     TTimePoint last_time_;
 	bool last_tick_measurement_ = false;

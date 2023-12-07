@@ -322,6 +322,8 @@ public: //types
 
         bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
         bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        bool passive = false;                           // Sense and capture passive echo beacon data
+        bool active = true;                             // Sense and capture active echo beacon data (enable emission)
 
 		// Misc
 		Vector3r position = VectorMath::nanVector();
@@ -1525,7 +1527,8 @@ private:
 
         echo_setting.external = settings_json.getBool("External", echo_setting.external);
         echo_setting.external_ned = settings_json.getBool("ExternalLocal", echo_setting.external_ned);
-
+        echo_setting.passive = settings_json.getBool("sensePassive", echo_setting.passive);
+        echo_setting.active = settings_json.getBool("senseActive", echo_setting.active);
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);
 	}

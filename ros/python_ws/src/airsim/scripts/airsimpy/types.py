@@ -417,7 +417,8 @@ class EchoData(MsgpackMixin):
     time_stamp = np.uint64(0)
     pose = Pose()
     groundtruth = ''
-
+    passive_point_cloud = 0.0
+    passive_groundtruth = ''
 
 class UwbSensorData(MsgpackMixin):
     time_stamp = np.uint64(0)

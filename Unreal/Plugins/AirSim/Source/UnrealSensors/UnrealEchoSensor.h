@@ -28,9 +28,9 @@ public:
 	static float remainingDistance(float signal_attenuation, float total_distance, float attenuation_limit, float distance_limit);
 	static void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& points, msr::airlib::vector<std::string>& groundtruth, const NedTransform* ned_transform, const msr::airlib::Pose& pose,
 		                       float distance_limit, int reflection_limit, float attenuation_limit, float reflection_distance_limit, float reflection_opening_angle,
-		                       float attenuation_per_distance, float attenuation_per_reflection, TArray<AActor*> ignore_actors, AActor* cur_actor, bool external,
+		                       float attenuation_per_distance, float attenuation_per_reflection, TArray<AActor*> ignore_actors, AActor* cur_actor, bool external, bool result_uu,
 		                       float draw_time, float line_thickness, bool debug_draw_reflected_paths = false, bool debug_draw_bounce_lines = false, bool debug_draw_initial_points = false,
-		                       bool debug_draw_reflected_points = false, bool debug_draw_reflected_lines = false, bool check_return = true);
+		                       bool debug_draw_reflected_points = false, bool debug_draw_reflected_lines = false, bool check_return = true, bool save_normal = false, bool save_source = false, std::string source_label = "");
 	static void bounceTrace(FVector& trace_start_position, FVector& trace_direction, float& trace_length, const FHitResult& trace_hit_result, float& total_distance,
 		float& signal_attenuation, float attenuation_per_distance, float attenuation_per_reflection, float distance_limit, float attenuation_limit, const NedTransform* ned_transform);
 	static FVector Vector3rToFVector(const Vector3r& input_vector);
@@ -40,7 +40,8 @@ public:
 
 protected:
 	virtual void getPointCloud(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose,
-		msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth) override;
+		msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<std::string>& groundtruth,
+		msr::airlib::vector<msr::airlib::real_T>& passive_beacons_point_cloud, msr::airlib::vector<std::string>& passive_beacons_groundtruth) override;
 
 	virtual void updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose);
 
@@ -51,16 +52,13 @@ protected:
 	virtual void setPointCloud(const msr::airlib::Pose& sensor_pose, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::TTimePoint time_stamp) override;
 
 private:
-
-
-	void generateSampleDirections();	
+	void generateSampleDirectionPoints();
 
 private:
 	AActor* actor_;
 	const NedTransform* ned_transform_;
 	float saved_clockspeed_;
-	msr::airlib::vector<msr::airlib::Vector3r> sample_directions_;
-	msr::airlib::vector<msr::airlib::Vector3r> spread_directions_;
+	msr::airlib::vector<msr::airlib::Vector3r> sample_direction_points_;
 	msr::airlib::Pose sensor_reference_frame_;
 	TArray<AActor*> ignore_actors_;
 

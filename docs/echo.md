@@ -12,7 +12,12 @@ Please see [general sensors](sensors.md) for information on configuration of gen
              "SensorType": 7,
              "Enabled" : true,
 ```
-* Multiple echo sensors can be enabled on a vehicle.
+* Multiple echo sensors can be enabled on a vehicle .
+
+
+## Passive Echo Beacons
+TODO
+
 
 ## Echo configuration
 The following parameters can be configured right now via settings json.
@@ -46,6 +51,8 @@ DrawSensor                | Draw the physical sensor in the world on the vehicle
 IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
 External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
 ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
+sensePassive              | Enable passive sensing where the sensor will receive signals from other active sources in the world (Passive Echo Beacons, see above)
+senseActive               | Enable active sensing where the sensor will emit a signal and receive signals from the reflections
 e.g.,
 ```
 {
@@ -71,9 +78,7 @@ e.g.,
                       "DistanceLimit": 5,
                       "SensorDiameter": 0.1,
                       "SensorOpeningAngle": 180,
-                      "Wavelength": 0.01,
                       "AttenuationLimit": -100,
-                      "ReflectionDepth": 3,
                       "ReflectionDistanceLimit": 1,
                       "ReflectionOpeningAngle": 10,
                       "DrawInitialPoints": false,
@@ -93,11 +98,15 @@ e.g.,
 ## Client API 
 Use `getEchoData(sensor name, vehicle name)` API to retrieve the echo sensor data. 
 * The API returns a Point-Cloud as a flat array of floats, the final attenuation, total distance along with the timestamp of the capture and sensor pose.
-* Point-Cloud: 
-  * The floats represent [x, y, z, attenuation, total_distance] for each point hit within the range in the last scan. 
 * Echo Pose:
     * Default: Echo sensor pose in the vehicle frame. 
     * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
-* Groundtruth:
-    * For each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to.
+* Active Point-Cloud: 
+  * The floats represent [x, y, z, attenuation, total_distance] for each point hit within the range in the last scan.
+* Active Groundtruth:
+    * For each point of the Active Point-Cloud a label string is kept that has the name of the object that the point belongs to.
+* Passive Point-Cloud: 
+  * The floats represent [x, y, z, attenuation, total_distance, reflection angle x, reflection angle y, reflection angle z] for each point hit within the range in the last scan. 
+* Passive Groundtruth:
+    * For each point two strings are kept of the Passive Point-Cloud. The first a label string representing the object of the reflection and second the name of the Passive Echo Beacon that was the source of this reflection. 
 Use `setEchoData(sensor name, vehicle name, echo data)` API to render an external pointcloud back to the simulation. It expects it to be [x,y,z] as a flat array of floats.

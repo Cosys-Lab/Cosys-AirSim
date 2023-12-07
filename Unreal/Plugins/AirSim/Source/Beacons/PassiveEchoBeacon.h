@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Developed by Cosys-Lab, University of Antwerp
 
 #pragma once
 
@@ -83,16 +83,16 @@ public:
 
 private:
 
-	void generateSampleDirections();
+	void generateSampleDirectionPoints();
 	void getPointCloud();
+	void drawPointCloud();
 
 private:
 	using Vector3r = msr::airlib::Vector3r;
 	using VectorMath = msr::airlib::VectorMath;
 	float line_thickness_ = 1;
 	const NedTransform* ned_transform_;
-	msr::airlib::vector<msr::airlib::Vector3r> sample_directions_;
-	msr::airlib::vector<msr::airlib::Vector3r> spread_directions_;
+	msr::airlib::vector<msr::airlib::Vector3r> sample_direction_points_;
 	msr::airlib::vector<msr::airlib::real_T> point_cloud_;
 	msr::airlib::vector<std::string> groundtruth_;
 	msr::airlib::Pose beacon_reference_frame_;
