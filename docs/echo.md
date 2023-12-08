@@ -24,35 +24,38 @@ The following parameters can be configured right now via settings json.
 
 Parameter                 | Description
 --------------------------| ------------
+X Y Z                     | Position of the echo relative to the vehicle (in NED, in meters)                     
+Roll Pitch Yaw            | Orientation of the echo relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
+External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
+ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
+SenseActive               | Enable active sensing where the sensor will emit a signal and receive signals from the reflections
+SensePassive              | Enable passive sensing where the sensor will receive signals from other active sources in the world (Passive Echo Beacons, see above)
+PassiveRadius             | The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled
 NumberOfTraces            | Amount of traces (rays) being cast. If set to a negative value, it will only do 2D sensing in horizontal plane!
-SensorLowerAzimuthLimit   | The lower azimuth angle limit in degrees for receiving signals on the sensor
-SensorUpperAzimuthLimit   | The upper azimuth angle limit in degrees for receiving signals on the sensor
-SensorLowerElevationLimit | The lower elevation angle limit in degrees for receiving signals on the sensor
-SensorUpperElevationLimit | The upper elevation angle limit in degrees for receiving signals on the sensor
-ReflectionOpeningAngle    | Opening angle of reflections
+SensorLowerAzimuthLimit   | The lower azimuth angle limit in degrees for receiving signals on the sensor (default = -90)
+SensorUpperAzimuthLimit   | The upper azimuth angle limit in degrees for receiving signals on the sensor (default = 90)
+SensorLowerElevationLimit | The lower elevation angle limit in degrees for receiving signals on the sensor (default = -90)
+SensorUpperElevationLimit | The upper elevation angle limit in degrees for receiving signals on the sensor (default = 90)
+MeasurementFrequency      | The frequency of the sensor (measurements/s)
+SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
+ReflectionOpeningAngle    | Opening angle of reflections (degrees)
+ReflectionLimit           | Maximum amount of reflections that can happen
+ReflectionDistanceLimit   | Maximum distance between two reflections (meters)
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)
 AttenuationLimit          | Attenuation at which the signal is considered dissipated (dB)
-DistanceLimit             | Maximum distance a reflection can travel
-ReflectionLimit           | Maximum amount of reflections that can happen
-ReflectionDistanceLimit   | Maximum distance between two reflections 
-MeasurementFrequency      | The frequency of the sensor (measurements/s)
-SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
+DistanceLimit             | Maximum distance a reflection can travel (meters)
 PauseAfterMeasurement     | Pause the simulation after each measurement. Useful for API interaction to be synced
-X Y Z                     | Position of the echo relative to the vehicle (in NED, in meters)                     
-Roll Pitch Yaw            | Orientation of the echo relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
+IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
 DrawReflectedPoints       | Draw debug points in world where reflected points are captured by the sensor
 DrawReflectedLines        | Draw debug lines in world from reflected points to the sensor
 DrawReflectedPaths        | Draw the full paths of the reflected points
 DrawInitialPoints         | Draw the points of the initial half sphere where the traces (rays) are cast
 DrawExternalPoints        | Draw a pointcloud coming through the API from an external source
 DrawBounceLines           | Draw lines of all bouncing reflections of the traces with their color depending on attenuation
+DrawPassiveSources        | Draw debug points and reflection lines for all detected passive echo sources (original sources and their reflection echos against objects)
+DrawPassiveLines          | Draw debug lines of the sensor to the passive echo sources that are detected with line of sight. 
 DrawSensor                | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
-IgnoreMarked              | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
-External                  | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
-ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
-sensePassive              | Enable passive sensing where the sensor will receive signals from other active sources in the world (Passive Echo Beacons, see above)
-senseActive               | Enable active sensing where the sensor will emit a signal and receive signals from the reflections
 e.g.,
 ```
 {
@@ -73,21 +76,22 @@ e.g.,
                       "Roll": 0,
                       "Pitch": 0,
                       "Yaw": 0,
+                      "SenseActive": true,
+		              "SensePassive": false,
                       "MeasurementFrequency": 5,
-                      "NumberOfTraces": 30000,
-                      "DistanceLimit": 5,
-                      "SensorDiameter": 0.1,
-                      "SensorOpeningAngle": 180,
+                      "NumberOfTraces": 10000,
+                      "SensorDiameter": 0.5,
+                      "SensorLowerAzimuthLimit": -90,
+                      "SensorUpperAzimuthLimit": 90,
+                      "SensorLowerElevationLimit": -90,
+                      "SensorUpperElevationLimit": 90,
+                      "AttenuationPerDistance": 0,
+                      "AttenuationPerReflection": 0,
                       "AttenuationLimit": -100,
-                      "ReflectionDistanceLimit": 1,
+                      "DistanceLimit": 10,
+                      "ReflectionLimit": 3,
+                      "ReflectionDistanceLimit": 0.4,
                       "ReflectionOpeningAngle": 10,
-                      "DrawInitialPoints": false,
-                      "DrawBounceLines": false,
-                      "DrawReflectedPoints": true,
-                      "DrawReflectedLines": false,
-                      "DrawReflectedPaths": false,
-                      "DrawExternalPoints": false,
-                      "DrawSensor": false
 				}	
 			}
 		}

@@ -4,6 +4,7 @@
 
 #include "common/Common.hpp"
 #include "GameFramework/Actor.h"
+#include "Beacons/PassiveEchoBeacon.h"
 #include "sensors/echo/EchoSimple.hpp"
 #include "Components/StaticMeshComponent.h"
 #include "NedTransform.h"
@@ -14,6 +15,15 @@ class UnrealEchoSensor : public msr::airlib::EchoSimple {
 
 public:
 	typedef msr::airlib::AirSimSettings AirSimSettings;
+
+	struct EchoPoint {
+		FVector point;
+		FVector direction;
+		std::string reflection_object;
+		std::string source_object;
+		float total_distance;
+		float total_attenuation;
+	};
 
 public:
 	UnrealEchoSensor(const AirSimSettings::EchoSetting& setting,
@@ -70,7 +80,9 @@ private:
 	const int reflection_limit_;
 	const float reflection_distance_limit_;
 	const float reflection_opening_angle_;
+	const float sensor_passive_radius_;
 	const float draw_time_;
 	const float line_thickness_;
 	const bool external_;
+	TArray<UnrealEchoSensor::EchoPoint> passive_points_;
 };

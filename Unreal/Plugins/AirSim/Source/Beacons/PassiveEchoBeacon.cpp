@@ -33,7 +33,6 @@ void APassiveEchoBeacon::getPointCloud()
 
 	std::string source_label = TCHAR_TO_UTF8(*this->GetName());
 
-	FVector trace_direction = UnrealEchoSensor::Vector3rToFVector(VectorMath::rotateVector(sample_direction_points_[0], beacon_reference_frame_.orientation, 1));
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetLocation().X);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetLocation().Y);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetLocation().Z);
@@ -60,23 +59,42 @@ void APassiveEchoBeacon::getPointCloud()
 	}
 }
 
-void APassiveEchoBeacon::drawPointCloud()
+void APassiveEchoBeacon::parsePointCloud()
 {
 	bool persistent_lines = false;
 	if (draw_debug_duration_ == -1)persistent_lines = true;
-	int point_stride = 8;
-	for (auto point_count = 0u; point_count < (int) point_cloud_.size() / (float)point_stride; ++point_count)
+
+	int float_stride = 8;
+	int string_stride = 2;
+	for (auto point_count = 0u; point_count < (int) point_cloud_.size() / (float)float_stride; ++point_count)
 	{
-		FVector draw_point = FVector(point_cloud_[point_count * point_stride], point_cloud_[point_count * point_stride + 1], point_cloud_[point_count * point_stride + 2]);
+		FVector point = FVector(point_cloud_[point_count * float_stride], point_cloud_[point_count * float_stride + 1], point_cloud_[point_count * float_stride + 2]);
+		float signal_attenuation = point_cloud_[point_count * float_stride + 3];
+		float signal_distance = point_cloud_[point_count * float_stride + 4];
+		FVector direction = FVector(point_cloud_[point_count * float_stride + 5], point_cloud_[point_count * float_stride + 6], point_cloud_[point_count * float_stride + 7]);	
+		std::string reflection_object = groundtruth_[point_count * string_stride];
+		std::string source_object = groundtruth_[point_count * string_stride + 1];
 
-		FVector draw_trace_direction = FVector(point_cloud_[point_count * point_stride + 5], point_cloud_[point_count * point_stride + 6], point_cloud_[point_count * point_stride + 7]);
-		FVector draw_line_end_point = draw_point + draw_trace_direction * 100;
+		UnrealEchoSensor::EchoPoint echo_point; 
+		echo_point.point = point;
+		echo_point.direction = direction;
+		echo_point.reflection_object = reflection_object;
+		echo_point.source_object = source_object;
+		echo_point.total_distance = signal_distance;
+		echo_point.total_attenuation = signal_attenuation;
+		points_.Add(echo_point);
 
-		float signal_attenuation = point_cloud_[point_count * point_stride + 3];
-		FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (signal_attenuation / attenuation_limit_));
-
-		UAirBlueprintLib::DrawLine(this->GetWorld(), draw_point, draw_line_end_point, line_color, persistent_lines, draw_debug_duration_, 0, line_thickness_);
+		if (draw_debug_all_points_) {
+			UAirBlueprintLib::DrawPoint(this->GetWorld(), point, 5, FColor::Red, persistent_lines, draw_debug_duration_);
+			FVector draw_line_end_point = point + direction * 100;
+			FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (signal_attenuation / attenuation_limit_));
+			UAirBlueprintLib::DrawLine(this->GetWorld(), point, draw_line_end_point, line_color, persistent_lines, draw_debug_duration_, 0, line_thickness_);
+		}		
 	}
+}
+
+TArray<UnrealEchoSensor::EchoPoint> APassiveEchoBeacon::getPoints() {
+	return points_;
 }
 
 // Called when the game starts or when spawned
@@ -100,7 +118,7 @@ void APassiveEchoBeacon::BeginPlay()
 		point_cloud_.clear();
 		groundtruth_.clear();
 		getPointCloud();
-		if (draw_debug_all_points_)drawPointCloud();
+		parsePointCloud();
 	}
 }
 

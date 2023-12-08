@@ -7,6 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 #include "Engine/Engine.h"
+#include "Math/GenericOctree.h"
 #include "CoreMinimal.h"
 
 // ctor
@@ -20,6 +21,7 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	reflection_limit_(getParams().reflection_limit),
 	reflection_distance_limit_(ned_transform_->fromNed(getParams().reflection_distance_limit)),
 	reflection_opening_angle_(FMath::DegreesToRadians(getParams().reflection_opening_angle)),
+	sensor_passive_radius_(getParams().sensor_passive_radius * 100),
 	draw_time_(1.05f / sensor_params_.measurement_frequency),
 	line_thickness_(1.0f),
 	external_(getParams().external)
@@ -34,11 +36,26 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 			if (Actor && Actor != actor && Actor->Tags.Contains(lidar_ignore_tag))ignore_actors_.Add(Actor);
 		}
 	}
+
+	TSubclassOf<APassiveEchoBeacon> passive_beacon_class = APassiveEchoBeacon::StaticClass();
+	TArray<AActor*> found_beacons;
+	UGameplayStatics::GetAllActorsOfClass(actor_->GetWorld(), passive_beacon_class, found_beacons);
+	for (AActor* beacon_actor : found_beacons) {
+		APassiveEchoBeacon* beacon = Cast<APassiveEchoBeacon>(beacon_actor);
+		passive_points_.Append(beacon->getPoints());
+	}
+	passive_points_.Sort([](const EchoPoint& ip1, const EchoPoint& ip2) {
+		if (ip1.point.X != ip2.point.X)
+			return ip1.point.X < ip2.point.X;
+		if (ip1.point.Y != ip2.point.Y)
+			return ip1.point.Y < ip2.point.Y;
+		return ip1.point.Z < ip2.point.Z;
+		});
 }
 
 // initializes information based on echo configuration
 void UnrealEchoSensor::generateSampleDirectionPoints()
-{
+{	
 	int num_traces = sensor_params_.number_of_traces;
 	float lower_azimuth_limit = sensor_params_.sensor_lower_azimuth_limit;
 	float upper_azimuth_limit = sensor_params_.sensor_upper_azimuth_limit;
@@ -181,7 +198,75 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 	}	
 
 	if (sensor_params_.passive) {
-		// TODO
+
+		bool persistent_lines = false;
+		if (draw_time_ == -1)persistent_lines = true;
+
+		float min_x, max_x, min_y, max_y, min_z, max_z = 0;
+		FVector sensor_position;
+		if (external_) {
+			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
+		}
+		else {
+			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
+		}
+		min_x = sensor_position.X - sensor_passive_radius_;
+		max_x = sensor_position.X + sensor_passive_radius_;
+		min_y = sensor_position.Y - sensor_passive_radius_;
+		max_y = sensor_position.Y + sensor_passive_radius_;
+		min_z = sensor_position.Z - sensor_passive_radius_;
+		max_z = sensor_position.Z + sensor_passive_radius_;
+
+		TArray<UnrealEchoSensor::EchoPoint> passive_points_allowed;
+		passive_points_allowed = passive_points_.FilterByPredicate([min_x, max_x, min_y, max_y, min_z, max_z](const EchoPoint& cur_point) {
+																													return (cur_point.point.X >= min_x &&
+																															cur_point.point.X <= max_x &&
+																															cur_point.point.Y >= min_y &&
+																															cur_point.point.Y <= max_y &&
+																															cur_point.point.Z >= min_z &&
+																															cur_point.point.Z <= max_z);});
+		for (EchoPoint passive_point_allowed : passive_points_allowed) {
+
+			FHitResult trace_hit_result = FHitResult(ForceInit);
+			bool trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, sensor_position, passive_point_allowed.point, trace_hit_result, ignore_actors_, ECC_Visibility, true);
+
+			if (!trace_hit || FVector::Dist(trace_hit_result.ImpactPoint, passive_point_allowed.point) <= 0.1) {
+
+				if (sensor_params_.draw_passive_sources) {
+					UAirBlueprintLib::DrawPoint(actor_->GetWorld(), passive_point_allowed.point, 5, FColor::Red, persistent_lines, draw_time_);
+					FVector draw_line_end_point = passive_point_allowed.point + passive_point_allowed.direction * 100;
+					FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (passive_point_allowed.total_attenuation / attenuation_limit_));
+					UAirBlueprintLib::DrawLine(actor_->GetWorld(), passive_point_allowed.point, draw_line_end_point, line_color, persistent_lines, draw_time_, 0, line_thickness_);
+				}
+				if (sensor_params_.draw_passive_lines) {
+					UAirBlueprintLib::DrawLine(actor_->GetWorld(), sensor_position, passive_point_allowed.point, FColor(177, 0, 151), persistent_lines, draw_time_, 0, line_thickness_);
+				}
+
+				Vector3r point_sensor_frame;
+				if (external_) {
+					point_sensor_frame = ned_transform_->toVector3r(passive_point_allowed.point, 0.01, true);
+				}
+				else {
+					point_sensor_frame = ned_transform_->toLocalNed(passive_point_allowed.point);
+				}
+				point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
+
+				passive_beacons_point_cloud.emplace_back(point_sensor_frame.x());
+				passive_beacons_point_cloud.emplace_back(point_sensor_frame.y());
+				passive_beacons_point_cloud.emplace_back(point_sensor_frame.z());
+
+				passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_attenuation);
+				passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_distance);
+
+				FVector point_direction = Vector3rToFVector(VectorMath::rotateVector(FVectorToVector3r(passive_point_allowed.direction), sensor_reference_frame_.orientation, 1));
+				passive_beacons_point_cloud.emplace_back(point_direction.X);
+				passive_beacons_point_cloud.emplace_back(point_direction.Y);
+				passive_beacons_point_cloud.emplace_back(point_direction.Z);
+
+				passive_beacons_groundtruth.emplace_back(passive_point_allowed.reflection_object);
+				passive_beacons_groundtruth.emplace_back(passive_point_allowed.source_object);
+			}
+		}
 	}
 }
 

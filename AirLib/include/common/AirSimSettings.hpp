@@ -307,6 +307,7 @@ public: //types
         float sensor_upper_azimuth_limit = 90;			// The upper azimuth limit of the sensor opening angle in degrees.
         float sensor_lower_elevation_limit = -90;		// The lower elevation limit of the sensor opening angle in degrees.
         float sensor_upper_elevation_limit = 90;		// The upper elevation limit of the sensor opening angle in degrees.
+        float sensor_passive_radius = 10;               // The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled. 
 
 		// Engine & timing settings
 		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
@@ -319,6 +320,8 @@ public: //types
 		bool draw_reflected_paths = false;				// Draw debug lines for the full path of reflected points to the sensor
 		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
 		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
+        bool draw_passive_sources = false;				// Draw debug points and reflection lines for all detected passive echo sources (original sources and their reflection echos against objects).
+        bool draw_passive_lines = false;				// Draw debug lines of the sensor to the passive echo sources that are detected with line of sight. 
 
         bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
         bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
@@ -1515,6 +1518,7 @@ private:
 		echo_setting.measurement_frequency = settings_json.getFloat("MeasurementFrequency", echo_setting.measurement_frequency);
 		echo_setting.sensor_diameter = settings_json.getFloat("SensorDiameter", echo_setting.sensor_diameter);
 		echo_setting.pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", echo_setting.pause_after_measurement);
+        echo_setting.sensor_passive_radius = settings_json.getFloat("PassiveRadius", echo_setting.sensor_passive_radius);
 
 		echo_setting.draw_reflected_points = settings_json.getBool("DrawReflectedPoints", echo_setting.draw_reflected_points);
 		echo_setting.draw_reflected_lines = settings_json.getBool("DrawReflectedLines", echo_setting.draw_reflected_lines);
@@ -1523,12 +1527,14 @@ private:
 		echo_setting.draw_bounce_lines = settings_json.getBool("DrawBounceLines", echo_setting.draw_bounce_lines);
 		echo_setting.draw_sensor = settings_json.getBool("DrawSensor", echo_setting.draw_sensor);
 		echo_setting.draw_external_points = settings_json.getBool("DrawExternalPoints", echo_setting.draw_external_points);
-		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
+        echo_setting.draw_passive_sources = settings_json.getBool("DrawPassiveSources", echo_setting.draw_passive_sources);
+        echo_setting.draw_passive_lines = settings_json.getBool("DrawPassiveLines", echo_setting.draw_passive_lines);
 
+		echo_setting.ignore_marked = settings_json.getBool("IgnoreMarked", echo_setting.ignore_marked);
         echo_setting.external = settings_json.getBool("External", echo_setting.external);
         echo_setting.external_ned = settings_json.getBool("ExternalLocal", echo_setting.external_ned);
-        echo_setting.passive = settings_json.getBool("sensePassive", echo_setting.passive);
-        echo_setting.active = settings_json.getBool("senseActive", echo_setting.active);
+        echo_setting.passive = settings_json.getBool("SensePassive", echo_setting.passive);
+        echo_setting.active = settings_json.getBool("SenseActive", echo_setting.active);
 		echo_setting.position = createVectorSetting(settings_json, echo_setting.position);
 		echo_setting.rotation = createRotationSetting(settings_json, echo_setting.rotation);
 	}

@@ -80,12 +80,13 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	TArray<UnrealEchoSensor::EchoPoint> getPoints();
 
 private:
 
 	void generateSampleDirectionPoints();
 	void getPointCloud();
-	void drawPointCloud();
+	void parsePointCloud();
 
 private:
 	using Vector3r = msr::airlib::Vector3r;
@@ -95,6 +96,7 @@ private:
 	msr::airlib::vector<msr::airlib::Vector3r> sample_direction_points_;
 	msr::airlib::vector<msr::airlib::real_T> point_cloud_;
 	msr::airlib::vector<std::string> groundtruth_;
+	TArray<UnrealEchoSensor::EchoPoint> points_;
 	msr::airlib::Pose beacon_reference_frame_;
 	TArray<AActor*> ignore_actors_;
 };
