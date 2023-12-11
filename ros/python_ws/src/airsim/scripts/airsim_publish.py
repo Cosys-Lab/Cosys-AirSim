@@ -574,40 +574,48 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
                          passive_enable):
     cur_echo_data = c.getEchoData(cur_sensor_name, cur_vehicle_name)
     if cur_echo_data.time_stamp != cur_last_timestamp:
-        if len(cur_echo_data.point_cloud) < 4:
+        if len(cur_echo_data.point_cloud) < 6 and len(cur_echo_data.passive_beacons_point_cloud) < 9:
             last_timestamp_return = cur_timestamp
             return None, None, last_timestamp_return, None, None
         else:
             last_timestamp_return = cur_timestamp
-
-            points = np.array(cur_echo_data.point_cloud, dtype=np.dtype('f4'))
-            points = np.reshape(points, (int(points.shape[0] / 5), 5))
-            points = points * np.array([1, -1, -1, 1, 1])
-            points_list = points.tolist()
             header = Header()
             header.frame_id = cur_sensor_echo_frame
-            pcloud = pc2.create_cloud(header, cur_fields_echo, points_list)
-            pcloud.header.stamp = cur_timestamp
 
-            labels = np.array(cur_echo_data.groundtruth, dtype=np.dtype('U'))
-            groundtruth = StringArray()
-            groundtruth.data = labels.tolist()
-            groundtruth.header.frame_id = cur_sensor_echo_frame
-            groundtruth.header.stamp = cur_timestamp
+            if len(cur_echo_data.point_cloud) > 4:
+                points = np.array(cur_echo_data.point_cloud, dtype=np.dtype('f4'))
+                points = np.reshape(points, (int(points.shape[0] / 5), 5))
+                points = points * np.array([1, -1, -1, 1, 1])
+                points_list = points.tolist()
+                pcloud = pc2.create_cloud(header, cur_fields_echo, points_list)
+                pcloud.header.stamp = cur_timestamp
+
+                labels = np.array(cur_echo_data.groundtruth, dtype=np.dtype('U'))
+                groundtruth = StringArray()
+                groundtruth.data = labels.tolist()
+                groundtruth.header.frame_id = cur_sensor_echo_frame
+                groundtruth.header.stamp = cur_timestamp
+            else:
+                pcloud = None
+                groundtruth = None
 
             if passive_enable:
-                pointsp = np.array(cur_echo_data.passive_point_cloud, dtype=np.dtype('f4'))
-                pointsp = np.reshape(pointsp, (int(points.shape[0] / 8), 8))
-                pointsp = pointsp * np.array([1, -1, -1, 1, 1, 1, 1, 1])
-                pointsp_list = pointsp.tolist()
-                pcloud_passive = pc2.create_cloud(header, cur_fields_echo_passive, pointsp_list)
-                pcloud_passive.header.stamp = cur_timestamp
+                if len(cur_echo_data.passive_beacons_point_cloud) > 7:
+                    pointsp = np.array(cur_echo_data.passive_beacons_point_cloud, dtype=np.dtype('f4'))
+                    pointsp = np.reshape(pointsp, (int(pointsp.shape[0] / 8), 8))
+                    pointsp = pointsp * np.array([1, -1, -1, 1, 1, 1, 1, 1])
+                    pointsp_list = pointsp.tolist()
+                    pcloud_passive = pc2.create_cloud(header, cur_fields_echo_passive, pointsp_list)
+                    pcloud_passive.header.stamp = cur_timestamp
 
-                labelsp = np.array(cur_echo_data.passive_groundtruth, dtype=np.dtype('U'))
-                groundtruth_passive = StringArray()
-                groundtruth_passive.data = labelsp.tolist()
-                groundtruth_passive.header.frame_id = cur_sensor_echo_frame
-                groundtruth_passive.header.stamp = cur_timestamp
+                    labelsp = np.array(cur_echo_data.passive_beacons_groundtruth, dtype=np.dtype('U'))
+                    groundtruth_passive = StringArray()
+                    groundtruth_passive.data = labelsp.tolist()
+                    groundtruth_passive.header.frame_id = cur_sensor_echo_frame
+                    groundtruth_passive.header.stamp = cur_timestamp
+                else:
+                    pcloud_passive = None
+                    groundtruth_passive = None
         return pcloud, groundtruth, last_timestamp_return, pcloud_passive, groundtruth_passive
     else:
         return None, None, None, None, None
@@ -1238,10 +1246,14 @@ if __name__ == '__main__':
         sensor_imu_frame = rospy.get_param('~sensor_imu_frame', "base_imu")
 
         sensor_echo_names = rospy.get_param('~sensor_echo_names', [])
-        sensor_echo_topics = rospy.get_param('~sensor_echo_topics', "airsim/echo1/pointcloud")
+        sensor_echo_topics = rospy.get_param('~sensor_echo_topics', "airsim/echo1/active/pointcloud")
         sensor_echo_segmentation_topics = rospy.get_param('~sensor_echo_segmentation_topics',
-                                                          "airsim/echo1/segmentation")
+                                                          "airsim/echo1/active/segmentation")
         sensor_echo_frames = rospy.get_param('~sensor_echo_frames', "base_echo1")
+        sensor_echo_toggle_passive = rospy.get_param('~sensor_echo_toggle_passive', 1)
+        sensor_echo_passive_topics = rospy.get_param('~sensor_echo_passive_topics', "airsim/echo1/passive/pointcloud")
+        sensor_echo_passive_segmentation_topics = rospy.get_param('~sensor_echo_passive_segmentation_topics',
+                                                                  "airsim/echo1/passive/segmentation")
 
         sensor_lidar_names = rospy.get_param('~sensor_lidar_names', [])
         sensor_lidar_toggle_groundtruth = rospy.get_param('~sensor_lidar_toggle_groundtruth', 1)
