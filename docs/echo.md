@@ -34,7 +34,7 @@ SensorUpperElevationLimit | The upper elevation angle limit in degrees for recei
 MeasurementFrequency      | The frequency of the sensor (measurements/s)
 SensorDiameter            | The diameter of the sensor plane used to capture the reflecting traces (meter)
 ReflectionOpeningAngle    | Opening angle of reflections (degrees)
-ReflectionLimit           | Maximum amount of reflections that can happen
+ReflectionLimit           | Maximum amount of reflections that can happen.
 ReflectionDistanceLimit   | Maximum distance between two reflections (meters)
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)
@@ -107,22 +107,22 @@ Parameter                 | Description
 --------------------------| ------------
 X Y Z                     | Position of the beacon relative to the Unreal World origin, so not in robot reference frame! (in NED, in meters)                     
 Roll Pitch Yaw            | Orientation of the beacon relative to the Unreal World origin, so not in robot reference frame! (in degrees, yaw-pitch-roll order to front vector +X)
-Enabe                     | Toggle the beacon on or off
+Enabe                     | Toggle the beacon on or off.
 InitialDirections         | Amount of traces (rays) being cast. This defines the resolution of the resulting reflection point cloud. 
-SensorLowerAzimuthLimit   | The lower azimuth angle limit in degrees for sending out the initial rays of the source (default = -90)
-SensorUpperAzimuthLimit   | The upper azimuth angle limit in degrees for sending out the initial rays of the source (default = 90)
-SensorLowerElevationLimit | The lower elevation angle limit in degrees for sending out the initial rays of the source (default = -90)
-SensorUpperElevationLimit | The upper elevation angle limit in degrees for sending out the initial rays of the source (default = 90)
-ReflectionLimit           | Maximum amount of reflections that can happen
+SensorLowerAzimuthLimit   | The lower azimuth angle limit in degrees for sending out the initial rays of the source. (default = -90)
+SensorUpperAzimuthLimit   | The upper azimuth angle limit in degrees for sending out the initial rays of the source. (default = 90)
+SensorLowerElevationLimit | The lower elevation angle limit in degrees for sending out the initial rays of the source. (default = -90)
+SensorUpperElevationLimit | The upper elevation angle limit in degrees for sending out the initial rays of the source. (default = 90)
+ReflectionLimit           | Maximum amount of reflections that can happen.
 ReflectionDistanceLimit   | Maximum distance between two reflections (meters)
 AttenuationPerDistance    | Attenuation of signal wrt distance traveled (dB/m)
 AttenuationPerReflection  | Attenuation of signal wrt reflections (dB)
 AttenuationLimit          | Attenuation at which the signal is considered dissipated (dB)
 DistanceLimit             | Maximum distance a reflection can travel (meters)
-DrawDebugAllPoints        |  Draw debug points in world where reflected points are happening due to this source. It will also show the reflection direction with a line
+DrawDebugAllPoints        | Draw debug points in world where reflected points are happening due to this source. It will also show the reflection direction with a line
 DrawDebugAllLines         | Draw all lines that are being cast from the source to the reflections, not only the ones that are reflected
 DrawDebugLocation         | Draw a 3D axes shown where the source is
-
+DrawDebugDuration         | Duration in seconds that the debug points and lines will be shown in the world. -1 is infinite.
 In the settings file this can look like this example : 
 ```
 {
@@ -171,7 +171,8 @@ In the settings file this can look like this example :
 		  "ReflectionLimit": 3,		 
 		  "DrawDebugAllPoints": true,
 		  "DrawDebugAllLines": false,
-		  "DrawDebugLocation": true		  
+		  "DrawDebugLocation": true,
+		  "DrawDebugDuration": -1
       }
   }
 }

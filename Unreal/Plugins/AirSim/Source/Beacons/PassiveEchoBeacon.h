@@ -21,54 +21,69 @@ public:
 	// Sets default values for this actor's properties
 	APassiveEchoBeacon();
 
+	/** Toggle the beacon on or off. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		bool enable_ = true;
 	
+	/** Amount of traces (rays) being cast. This defines the resolution of the resulting reflection point cloud. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		int32 initial_directions_ = 1000;
 
+	/** The lower azimuth angle limit in degrees for sending out the initial rays of the source. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		float initial_lower_azimuth_limit_ = -90;
 
+	/** The upper azimuth angle limit in degrees for sending out the initial rays of the source. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		float initial_upper_azimuth_limit_ = 90;
 
+	/** The lower elevation angle limit in degrees for sending out the initial rays of the source. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		float initial_lower_elevation_limit_ = -90;
 
+	/** The upper elevation angle limit in degrees for sending out the initial rays of the source. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		float initial_upper_elevation_limit_ = 90;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
-		float attenuation_limit_ = -100;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
-		float reflection_distance_limit_ = 0.4;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
-		float attenuation_per_distance_ = 0;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
-		float attenuation_per_reflection_ = 0;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
-		float distance_limit_ = 3;
-
+	/** Maximum amount of reflections that can happen. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		int reflection_limit_ = 3;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|Debug")
-		bool draw_debug_location_ = false;
+	/** Maximum distance between two reflections (meters) */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
+		float reflection_distance_limit_ = 0.4;
 
+	/** Attenuation of signal wrt distance traveled (dB/m) */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
+		float attenuation_per_distance_ = 0;
+
+	/** Attenuation of signal wrt reflections (dB) */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
+		float attenuation_per_reflection_ = 0;
+
+	/** Attenuation at which the signal is considered dissipated (dB) */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
+		float attenuation_limit_ = -100;
+
+	/** Maximum distance a reflection can travel (meters) */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
+		float distance_limit_ = 3;
+
+	/** Draw debug points in world where reflected points are happening due to this source. It will also show the reflection direction with a line. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|Debug")
 		bool draw_debug_all_points_ = false;
 
+	/** Draw all lines that are being cast from the source to the reflections, not only the ones that are reflected. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|Debug")
 		bool draw_debug_all_lines_ = false;
 
+	/** Draw a 3D axes shown where the source is. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|Debug")
+		bool draw_debug_location_ = false;
+
+	/** Duration in seconds that the debug points and lines will be shown in the world. -1 is infinite. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|Debug")
 		float draw_debug_duration_ = -1.f;
-
 
 protected:
 	// Called when the game starts or when spawned

@@ -303,10 +303,10 @@ public: //types
 		// Sensor settings
 		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
 		float sensor_diameter = 0.5;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
-        float sensor_lower_azimuth_limit = -90;		    // The lower azimuth limit of the echo source opening angle in degrees.
-        float sensor_upper_azimuth_limit = 90;			// The upper azimuth limit of the echo source opening angle in degrees.
-        float sensor_lower_elevation_limit = -90;		// The lower elevation limit of the echo source opening angle in degrees.
-        float sensor_upper_elevation_limit = 90;		// The upper elevation limit of the echo source opening angle in degrees.
+        float sensor_lower_azimuth_limit = -90;		    // The lower azimuth limit of the sensor opening angle in degrees.
+        float sensor_upper_azimuth_limit = 90;			// The upper azimuth limit of the sensor opening angle in degrees.
+        float sensor_lower_elevation_limit = -90;		// The lower elevation limit of the sensor opening angle in degrees.
+        float sensor_upper_elevation_limit = 90;		// The upper elevation limit of the sensor opening angle in degrees.
         float sensor_passive_radius = 10;               // The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled. 
 
 		// Engine & timing settings
