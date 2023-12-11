@@ -203,19 +203,12 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 		if (draw_time_ == -1)persistent_lines = true;
 
 		float min_x, max_x, min_y, max_y, min_z, max_z = 0;
-		FVector sensor_position;
-		if (external_) {
-			sensor_position = ned_transform_->toFVector(sensor_reference_frame_.position, 100, true);
-		}
-		else {
-			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
-		}
-		min_x = sensor_position.X - sensor_passive_radius_;
-		max_x = sensor_position.X + sensor_passive_radius_;
-		min_y = sensor_position.Y - sensor_passive_radius_;
-		max_y = sensor_position.Y + sensor_passive_radius_;
-		min_z = sensor_position.Z - sensor_passive_radius_;
-		max_z = sensor_position.Z + sensor_passive_radius_;
+		min_x = trace_start_position.X - sensor_passive_radius_;
+		max_x = trace_start_position.X + sensor_passive_radius_;
+		min_y = trace_start_position.Y - sensor_passive_radius_;
+		max_y = trace_start_position.Y + sensor_passive_radius_;
+		min_z = trace_start_position.Z - sensor_passive_radius_;
+		max_z = trace_start_position.Z + sensor_passive_radius_;
 
 		TArray<UnrealEchoSensor::EchoPoint> passive_points_allowed;
 		passive_points_allowed = passive_points_.FilterByPredicate([min_x, max_x, min_y, max_y, min_z, max_z](const EchoPoint& cur_point) {
@@ -227,45 +220,52 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 																															cur_point.point.Z <= max_z);});
 		for (EchoPoint passive_point_allowed : passive_points_allowed) {
 
-			FHitResult trace_hit_result = FHitResult(ForceInit);
-			bool trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, sensor_position, passive_point_allowed.point, trace_hit_result, ignore_actors_, ECC_Visibility, true);
+			Vector3r local_point_position = FVectorToVector3r(passive_point_allowed.point - trace_start_position);
+			Vector3r rotated_local_point_position = VectorMath::rotateVector(local_point_position, sensor_reference_frame_.orientation.conjugate(), 1);
 
-			if (!trace_hit || FVector::Dist(trace_hit_result.ImpactPoint, passive_point_allowed.point) <= 0.1) {
+			float az = FMath::RadiansToDegrees(FMath::Atan2(rotated_local_point_position.y(), rotated_local_point_position.x()));
+			float el = FMath::RadiansToDegrees(FMath::Atan2(rotated_local_point_position.z(), FMath::Sqrt(FMath::Pow(rotated_local_point_position.x(), 2) + FMath::Pow(rotated_local_point_position.y(), 2))));
+			if (az > sensor_params_.sensor_lower_azimuth_limit && az < sensor_params_.sensor_upper_azimuth_limit && el > -sensor_params_.sensor_upper_elevation_limit && el < -sensor_params_.sensor_lower_elevation_limit) {
+				FHitResult trace_hit_result = FHitResult(ForceInit);
+				bool trace_hit = UAirBlueprintLib::GetObstacleAdv(actor_, trace_start_position, passive_point_allowed.point, trace_hit_result, ignore_actors_, ECC_Visibility, true);
 
-				if (sensor_params_.draw_passive_sources) {
-					UAirBlueprintLib::DrawPoint(actor_->GetWorld(), passive_point_allowed.point, 5, FColor::Red, persistent_lines, draw_time_);
-					FVector draw_line_end_point = passive_point_allowed.point + passive_point_allowed.direction * 100;
-					FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (passive_point_allowed.total_attenuation / attenuation_limit_));
-					UAirBlueprintLib::DrawLine(actor_->GetWorld(), passive_point_allowed.point, draw_line_end_point, line_color, persistent_lines, draw_time_, 0, line_thickness_);
+				if (!trace_hit || FVector::Dist(trace_hit_result.ImpactPoint, passive_point_allowed.point) <= 0.1) {
+
+					if (sensor_params_.draw_passive_sources) {
+						UAirBlueprintLib::DrawPoint(actor_->GetWorld(), passive_point_allowed.point, 5, FColor::Red, persistent_lines, draw_time_);
+						FVector draw_line_end_point = passive_point_allowed.point + passive_point_allowed.direction * 100;
+						FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (passive_point_allowed.total_attenuation / attenuation_limit_));
+						UAirBlueprintLib::DrawLine(actor_->GetWorld(), passive_point_allowed.point, draw_line_end_point, line_color, persistent_lines, draw_time_, 0, line_thickness_);
+					}
+					if (sensor_params_.draw_passive_lines) {
+						UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_position, passive_point_allowed.point, FColor(177, 0, 151), persistent_lines, draw_time_, 0, line_thickness_);
+					}
+
+					Vector3r point_sensor_frame;
+					if (external_) {
+						point_sensor_frame = ned_transform_->toVector3r(passive_point_allowed.point, 0.01, true);
+					}
+					else {
+						point_sensor_frame = ned_transform_->toLocalNed(passive_point_allowed.point);
+					}
+					point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
+
+					passive_beacons_point_cloud.emplace_back(point_sensor_frame.x());
+					passive_beacons_point_cloud.emplace_back(point_sensor_frame.y());
+					passive_beacons_point_cloud.emplace_back(point_sensor_frame.z());
+
+					passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_attenuation);
+					passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_distance);
+
+					FVector point_direction = Vector3rToFVector(VectorMath::rotateVector(FVectorToVector3r(passive_point_allowed.direction), sensor_reference_frame_.orientation, 1));
+					passive_beacons_point_cloud.emplace_back(point_direction.X);
+					passive_beacons_point_cloud.emplace_back(point_direction.Y);
+					passive_beacons_point_cloud.emplace_back(point_direction.Z);
+
+					passive_beacons_groundtruth.emplace_back(passive_point_allowed.reflection_object);
+					passive_beacons_groundtruth.emplace_back(passive_point_allowed.source_object);
 				}
-				if (sensor_params_.draw_passive_lines) {
-					UAirBlueprintLib::DrawLine(actor_->GetWorld(), sensor_position, passive_point_allowed.point, FColor(177, 0, 151), persistent_lines, draw_time_, 0, line_thickness_);
-				}
-
-				Vector3r point_sensor_frame;
-				if (external_) {
-					point_sensor_frame = ned_transform_->toVector3r(passive_point_allowed.point, 0.01, true);
-				}
-				else {
-					point_sensor_frame = ned_transform_->toLocalNed(passive_point_allowed.point);
-				}
-				point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, sensor_reference_frame_, true);
-
-				passive_beacons_point_cloud.emplace_back(point_sensor_frame.x());
-				passive_beacons_point_cloud.emplace_back(point_sensor_frame.y());
-				passive_beacons_point_cloud.emplace_back(point_sensor_frame.z());
-
-				passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_attenuation);
-				passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_distance);
-
-				FVector point_direction = Vector3rToFVector(VectorMath::rotateVector(FVectorToVector3r(passive_point_allowed.direction), sensor_reference_frame_.orientation, 1));
-				passive_beacons_point_cloud.emplace_back(point_direction.X);
-				passive_beacons_point_cloud.emplace_back(point_direction.Y);
-				passive_beacons_point_cloud.emplace_back(point_direction.Z);
-
-				passive_beacons_groundtruth.emplace_back(passive_point_allowed.reflection_object);
-				passive_beacons_groundtruth.emplace_back(passive_point_allowed.source_object);
-			}
+			}			
 		}
 	}
 }
