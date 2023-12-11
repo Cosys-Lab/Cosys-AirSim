@@ -563,9 +563,11 @@ public:
 		msr::airlib::TTimePoint time_stamp;    // timestamp
 		std::vector<float> point_cloud;        // data
         std::vector<std::string> groundtruth;  // ground truth labels
+        std::vector<float> passive_beacons_point_cloud;        // passive data
+        std::vector<std::string> passive_beacons_groundtruth;  // passive ground truth labels
 		Pose pose;
 
-		MSGPACK_DEFINE_MAP(time_stamp, point_cloud, groundtruth, pose);
+		MSGPACK_DEFINE_MAP(time_stamp, point_cloud, groundtruth, pose, passive_beacons_point_cloud, passive_beacons_groundtruth);
 
 		EchoData()
 		{}
@@ -575,10 +577,14 @@ public:
 			time_stamp = s.time_stamp;
 			point_cloud = s.point_cloud;
             groundtruth = s.groundtruth;
+            passive_beacons_point_cloud = s.passive_beacons_point_cloud;
+            passive_beacons_groundtruth = s.passive_beacons_groundtruth;
 
 			//TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
 			if (point_cloud.size() == 0)
 				point_cloud.push_back(0);
+            if (passive_beacons_point_cloud.size() == 0)
+                passive_beacons_point_cloud.push_back(0);
 
 			pose = s.pose;
 		}
@@ -590,6 +596,8 @@ public:
 			d.time_stamp = time_stamp;
 			d.point_cloud = point_cloud;
             d.groundtruth = groundtruth;
+            d.passive_beacons_point_cloud = passive_beacons_point_cloud;
+            d.passive_beacons_groundtruth = passive_beacons_groundtruth;
 			d.pose = pose.to();
 
 			return d;
