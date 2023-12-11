@@ -722,7 +722,7 @@ void ASimModeBase::setupVehiclesAndCamera()
             FActorSpawnParameters actor_spawn_params;
             actor_spawn_params.Name = FName(passive_echo_beacon_setting.name.c_str());
             actor_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-            actor_spawn_params.bDeferConstruction = false;
+            actor_spawn_params.bDeferConstruction = true;
             APassiveEchoBeacon* spawned_passive_echo_beacon = static_cast<APassiveEchoBeacon*>(GetWorld()->SpawnActor<APassiveEchoBeacon>(spawn_position, spawn_rotation, actor_spawn_params));
             spawned_passive_echo_beacon->SetActorLabel(FString(passive_echo_beacon_setting.name.c_str()));
             spawned_passive_echo_beacon->enable_ = passive_echo_beacon_setting.enable;
@@ -741,6 +741,7 @@ void ASimModeBase::setupVehiclesAndCamera()
             spawned_passive_echo_beacon->draw_debug_all_points_ = passive_echo_beacon_setting.draw_debug_all_points;
             spawned_passive_echo_beacon->draw_debug_all_lines_ = passive_echo_beacon_setting.draw_debug_all_lines;
             spawned_passive_echo_beacon->draw_debug_duration_ = passive_echo_beacon_setting.draw_debug_duration;
+            spawned_passive_echo_beacon->FinishSpawning(FTransform(spawn_rotation, spawn_position));
         }
 
         //create API objects for each pawn we have
