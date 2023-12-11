@@ -123,7 +123,6 @@ def handle_input_command(msg, args):
 
 
 def get_imu_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_timestamp, cur_frame):
-
     imu_data = c.getImuData(cur_sensor_name, cur_vehicle_name)
 
     imu_msg = Imu()
@@ -571,13 +570,13 @@ def get_lidar_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timesta
 
 
 def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestamp,
-                         cur_fields_echo, cur_sensor_echo_frame, cur_timestamp):
-
+                         cur_fields_echo, cur_fields_echo_passive, cur_sensor_echo_frame, cur_timestamp,
+                         passive_enable):
     cur_echo_data = c.getEchoData(cur_sensor_name, cur_vehicle_name)
     if cur_echo_data.time_stamp != cur_last_timestamp:
         if len(cur_echo_data.point_cloud) < 4:
             last_timestamp_return = cur_timestamp
-            return None, None, last_timestamp_return
+            return None, None, last_timestamp_return, None, None
         else:
             last_timestamp_return = cur_timestamp
 
@@ -595,9 +594,23 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
             groundtruth.data = labels.tolist()
             groundtruth.header.frame_id = cur_sensor_echo_frame
             groundtruth.header.stamp = cur_timestamp
-        return pcloud, groundtruth, last_timestamp_return
+
+            if passive_enable:
+                pointsp = np.array(cur_echo_data.passive_point_cloud, dtype=np.dtype('f4'))
+                pointsp = np.reshape(pointsp, (int(points.shape[0] / 8), 8))
+                pointsp = pointsp * np.array([1, -1, -1, 1, 1, 1, 1, 1])
+                pointsp_list = pointsp.tolist()
+                pcloud_passive = pc2.create_cloud(header, cur_fields_echo_passive, pointsp_list)
+                pcloud_passive.header.stamp = cur_timestamp
+
+                labelsp = np.array(cur_echo_data.passive_groundtruth, dtype=np.dtype('U'))
+                groundtruth_passive = StringArray()
+                groundtruth_passive.data = labelsp.tolist()
+                groundtruth_passive.header.frame_id = cur_sensor_echo_frame
+                groundtruth_passive.header.stamp = cur_timestamp
+        return pcloud, groundtruth, last_timestamp_return, pcloud_passive, groundtruth_passive
     else:
-        return None, None, None
+        return None, None, None, None, None
 
 
 def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_map, saved_static_tf,
@@ -606,8 +619,9 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                    carcontrol_enable, carcontrol_topic, odometry_enable, odometry_topic,
                    sensor_imu_enable, sensor_imu_name, sensor_imu_topic,
                    sensor_imu_frame, sensor_echo_names,
-                   sensor_echo_topics, sensor_echo_segmentation_topics, sensor_echo_frames, sensor_lidar_names,
-                   sensor_lidar_toggle_segmentation,
+                   sensor_echo_topics, sensor_echo_segmentation_topics, sensor_echo_frames,
+                   sensor_echo_toggle_passive, sensor_echo_passive_topics, sensor_echo_passive_segmentation_topics,
+                   sensor_lidar_names, sensor_lidar_toggle_segmentation,
                    sensor_lidar_topics, sensor_lidar_segmentation_topics, sensor_lidar_frames,
                    sensor_gpulidar_names, sensor_gpulidar_topics,
                    sensor_gpulidar_frames, sensor_camera_names, sensor_camera_toggle_scene_mono,
@@ -620,7 +634,6 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                    object_poses_individual_names, object_poses_individual_coordinates_local,
                    object_poses_individual_topics, sensor_uwb_names, sensor_uwb_topic,
                    sensor_wifi_names, sensor_wifi_topic):
-
     if not use_route:
         rate = rospy.Rate(ros_rate)
 
@@ -644,18 +657,25 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         for cur_sensor_index, cur_sensor_name in enumerate(sensor_echo_names):
             pointcloud_publishers[cur_sensor_name] = rospy.Publisher(sensor_echo_topics[cur_sensor_index], PointCloud2,
                                                                      queue_size=2)
+            string_segmentation_publishers[cur_sensor_name] = \
+                rospy.Publisher(sensor_echo_segmentation_topics[cur_sensor_index], StringArray, queue_size=1)
             last_timestamps[cur_sensor_name] = None
+            if sensor_echo_toggle_passive[cur_sensor_index] == 1:
+                pointcloud_publishers[cur_sensor_name + '_passive'] = \
+                    rospy.Publisher(sensor_echo_passive_topics[cur_sensor_index], PointCloud2, queue_size=2)
+                last_timestamps[cur_sensor_name + '_passive'] = None
+                string_segmentation_publishers[cur_sensor_name + '_passive'] = \
+                    rospy.Publisher(sensor_echo_passive_segmentation_topics[cur_sensor_index], StringArray,
+                                    queue_size=1)
         for cur_sensor_index, cur_sensor_name in enumerate(sensor_lidar_names):
             pointcloud_publishers[cur_sensor_name] = rospy.Publisher(sensor_lidar_topics[cur_sensor_index], PointCloud2,
                                                                      queue_size=2)
-            string_segmentation_publishers[cur_sensor_name] = \
-                rospy.Publisher(sensor_echo_segmentation_topics[cur_sensor_index], StringArray, queue_size=1)
             last_timestamps[cur_sensor_name] = None
             if sensor_lidar_toggle_segmentation[cur_sensor_index] == 1:
                 string_segmentation_publishers[cur_sensor_name] = \
                     rospy.Publisher(sensor_lidar_segmentation_topics[cur_sensor_index], StringArray, queue_size=1)
         for cur_sensor_index, cur_sensor_name in enumerate(sensor_gpulidar_names):
-            pointcloud_publishers[cur_sensor_name] = rospy.Publisher(sensor_gpulidar_topics[cur_sensor_index], 
+            pointcloud_publishers[cur_sensor_name] = rospy.Publisher(sensor_gpulidar_topics[cur_sensor_index],
                                                                      PointCloud2, queue_size=2)
             last_timestamps[cur_sensor_name] = None
 
@@ -695,7 +715,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
             rospy.Subscriber(carcontrol_topic, Twist, handle_input_command, queue_input_command)
             request_speed_publisher = rospy.Publisher("/req_speed", Float32, queue_size=1)
             real_speed_publisher = rospy.Publisher("/real_speed", Float32, queue_size=1)
-            error_speed_publisher = rospy.Publisher("/speed_error", Float32, queue_size=1)    
+            error_speed_publisher = rospy.Publisher("/speed_error", Float32, queue_size=1)
 
         rospy.loginfo("Started publishers...")
     else:
@@ -767,6 +787,17 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         PointField('d', 16, PointField.FLOAT32, 1)
     ]
 
+    fields_echo_passive = [
+        PointField('x', 0, PointField.FLOAT32, 1),
+        PointField('y', 4, PointField.FLOAT32, 1),
+        PointField('z', 8, PointField.FLOAT32, 1),
+        PointField('a', 12, PointField.FLOAT32, 1),
+        PointField('d', 16, PointField.FLOAT32, 1),
+        PointField('xd', 20, PointField.FLOAT32, 1),
+        PointField('yd', 24, PointField.FLOAT32, 1),
+        PointField('zd', 28, PointField.FLOAT32, 1),
+    ]
+
     fields_lidar = [
         PointField('x', 0, PointField.FLOAT32, 1),
         PointField('y', 4, PointField.FLOAT32, 1),
@@ -774,7 +805,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         PointField('rgb', 12, PointField.UINT32, 1),
         PointField('intensity', 16, PointField.FLOAT32, 1)
     ]
-    
+
     if use_route:
         for topic, msg, t in route.read_messages(topics=['/' + pose_topic, 'tf_static']):
 
@@ -801,7 +832,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                     cur_orientation = airsimpy.Quaternionr(float(cur_orientation.x_val), float(cur_orientation.y_val),
                                                            float(cur_orientation.z_val), float(cur_orientation.w_val))
                     client.simSetVehiclePose(airsimpy.Pose(cur_position, cur_orientation), True, vehicle_name)
-    
+
                     rospy.loginfo("Setting vehicle pose " + str(pose_index) + ' of ' + str(pose_count)
                                   + ' to record sensor data...')
 
@@ -813,7 +844,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                         else:
                             camera_msg = get_scene_camera_ros_message(response, timestamp,
                                                                       sensor_camera_optical_frames[cur_sensor_index],
-                                                                      cv_bridge, 
+                                                                      cv_bridge,
                                                                       sensor_camera_scene_quality[cur_sensor_index],
                                                                       sensor_camera_toggle_scene_mono[cur_sensor_index])
                             output.write(sensor_camera_scene_topics[cur_sensor_index], camera_msg, t=ros_timestamp)
@@ -845,14 +876,11 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                             output.write(sensor_camera_info_topics[cur_sensor_index], cam_info_msg, t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_echo_names):
-                        pcloud, groundtruth, last_timestamp_return = get_echo_ros_message(client, cur_sensor_name,
-                                                                                          vehicle_name,
-                                                                                          last_timestamps[
-                                                                                              cur_sensor_name],
-                                                                                          fields_echo,
-                                                                                          sensor_echo_frames[
-                                                                                              cur_sensor_index],
-                                                                                          timestamp)
+                        pcloud, groundtruth, last_timestamp_return, pcloud_passive, groundtruth_passive = (
+                            get_echo_ros_message(client, cur_sensor_name, vehicle_name,
+                                                 last_timestamps[cur_sensor_name], fields_echo, fields_echo_passive,
+                                                 sensor_echo_frames[cur_sensor_index], timestamp,
+                                                 sensor_echo_toggle_passive[cur_sensor_index]))
                         if last_timestamp_return is not None:
                             last_timestamps[cur_sensor_name] = last_timestamp_return
                         if pcloud is not None:
@@ -861,6 +889,14 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                         if groundtruth is not None:
                             output.write(sensor_echo_segmentation_topics[cur_sensor_index], groundtruth,
                                          t=ros_timestamp)
+                        if sensor_echo_toggle_passive[cur_sensor_index]:
+                            if pcloud_passive is not None:
+                                output.write(sensor_echo_passive_topics[cur_sensor_index], pcloud_passive,
+                                             t=ros_timestamp)
+
+                            if groundtruth_passive is not None:
+                                output.write(sensor_echo_passive_segmentation_topics[cur_sensor_index],
+                                             groundtruth_passive, t=ros_timestamp)
 
                     for cur_sensor_index, cur_sensor_name in enumerate(sensor_lidar_names):
                         seg_enable = sensor_lidar_toggle_segmentation[cur_sensor_index]
@@ -927,12 +963,12 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                             if not warning_issued_result:
                                 if object_pose is not None:
                                     output.write(object_poses_individual_topics[object_index], object_pose,
-                                                 t=ros_timestamp)   
-    
+                                                 t=ros_timestamp)
+
                     pose_index += 1
                     first_message = False
                     time.sleep(1)
-                    
+
         output.write('/tf_static', saved_static_tf, first_timestamp)
         rospy.loginfo("Process completed. Writing all other messages to merged rosbag...")
         for topic, msg, t in route.read_messages():
@@ -1065,22 +1101,27 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                     image_publishers[cur_sensor_name + '_cameraInfo'].publish(cam_info_msg)
 
             for cur_sensor_index, cur_sensor_name in enumerate(sensor_echo_names):
-                pcloud, groundtruth, last_timestamp_return = get_echo_ros_message(client, cur_sensor_name, vehicle_name,
-                                                                                  last_timestamps[cur_sensor_name],
-                                                                                  fields_echo,
-                                                                                  sensor_echo_frames[cur_sensor_index],
-                                                                                  timestamp)
+                pcloud, groundtruth, last_timestamp_return, pcloud_passive, groundtruth_passive = (
+                    get_echo_ros_message(client, cur_sensor_name, vehicle_name, last_timestamps[cur_sensor_name],
+                                         fields_echo, fields_echo_passive, sensor_echo_frames[cur_sensor_index],
+                                         timestamp, sensor_echo_toggle_passive[cur_sensor_index]))
                 if last_timestamp_return is not None:
                     last_timestamps[cur_sensor_name] = last_timestamp_return
                 if pcloud is not None:
                     pointcloud_publishers[cur_sensor_name].publish(pcloud)
                 if groundtruth is not None:
                     string_segmentation_publishers[cur_sensor_name].publish(groundtruth)
+                if sensor_echo_toggle_passive[cur_sensor_index]:
+                    if pcloud_passive is not None:
+                        pointcloud_publishers[cur_sensor_name + "_passive"].publish(pcloud_passive)
+
+                    if groundtruth_passive is not None:
+                        string_segmentation_publishers[cur_sensor_name + "_passive"].publish(groundtruth_passive)
 
             for cur_sensor_index, cur_sensor_name in enumerate(sensor_lidar_names):
                 seg_enable = sensor_lidar_toggle_segmentation[cur_sensor_index]
                 cur_frame = sensor_lidar_frames[cur_sensor_index]
-                pcloud, groundtruth, last_timestamp_return = get_lidar_ros_message(client, cur_sensor_name, 
+                pcloud, groundtruth, last_timestamp_return = get_lidar_ros_message(client, cur_sensor_name,
                                                                                    vehicle_name,
                                                                                    last_timestamps[cur_sensor_name],
                                                                                    cur_frame,
@@ -1141,7 +1182,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                             objectpose_publishers[object_name].publish(object_pose)
 
             if carcontrol_enable == 1:
-                desired_speed, v, error, desired_rotation_return = get_car_control_ros_message(client, 
+                desired_speed, v, error, desired_rotation_return = get_car_control_ros_message(client,
                                                                                                queue_input_command,
                                                                                                speed_pid,
                                                                                                sim_odom,
@@ -1154,7 +1195,7 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
 
             first_message = False
             rate.sleep()
-    
+
 
 if __name__ == '__main__':
     try:
@@ -1483,8 +1524,9 @@ if __name__ == '__main__':
                        carcontrol_enable, carcontrol_topic,
                        odometry_enable, odometry_topic, sensor_imu_enable,
                        sensor_imu_name, sensor_imu_topic, sensor_imu_frame, sensor_echo_names,
-                       sensor_echo_topics, sensor_echo_segmentation_topics, sensor_echo_frames, sensor_lidar_names,
-                       sensor_lidar_toggle_groundtruth,
+                       sensor_echo_topics, sensor_echo_segmentation_topics, sensor_echo_frames,
+                       sensor_echo_toggle_passive, sensor_echo_passive_topics, sensor_echo_passive_segmentation_topics,
+                       sensor_lidar_names, sensor_lidar_toggle_groundtruth,
                        sensor_lidar_topics, sensor_lidar_segmentation_topics, sensor_lidar_frames,
                        sensor_gpulidar_names, sensor_gpulidar_topics,
                        sensor_gpulidar_frames, sensor_camera_names, sensor_camera_toggle_scene_mono,
@@ -1495,8 +1537,8 @@ if __name__ == '__main__':
                        sensor_camera_info_topics, sensor_stereo_enable, baseline,
                        object_poses_all, object_poses_all_coordinates_local, object_poses_all_once,
                        object_poses_all_topic, object_poses_individual_names, object_poses_individual_coordinates_local,
-                       object_poses_individual_topics, sensor_uwb_names, sensor_uwb_topic,
-                       sensor_wifi_names, sensor_wifi_topic)
+                       object_poses_individual_topics, sensor_uwb_names, sensor_uwb_topic, sensor_wifi_names,
+                       sensor_wifi_topic)
 
     except rospy.ROSInterruptException:
         pass
