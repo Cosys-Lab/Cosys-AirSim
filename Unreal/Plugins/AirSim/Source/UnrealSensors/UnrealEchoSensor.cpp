@@ -21,7 +21,7 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	reflection_limit_(getParams().reflection_limit),
 	reflection_distance_limit_(ned_transform_->fromNed(getParams().reflection_distance_limit)),
 	reflection_opening_angle_(FMath::DegreesToRadians(getParams().reflection_opening_angle)),
-	sensor_passive_radius_(getParams().sensor_passive_radius * 100),
+	sensor_passive_radius_(ned_transform_->fromNed(getParams().sensor_passive_radius)),
 	draw_time_(1.05f / sensor_params_.measurement_frequency),
 	line_thickness_(1.0f),
 	external_(getParams().external)
@@ -127,7 +127,7 @@ void UnrealEchoSensor::sampleSphereCap(int num_points, float lower_azimuth_limit
 void UnrealEchoSensor::updatePose(const msr::airlib::Pose& sensor_pose, const msr::airlib::Pose& vehicle_pose)
 {
 	sensor_reference_frame_ = VectorMath::add(sensor_pose, vehicle_pose);
-	// DRAW DEBUG
+
 	if (sensor_params_.draw_sensor) {
 		FVector sensor_position;
 		if (external_) {
@@ -256,8 +256,9 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 
 					passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_attenuation);
 					passive_beacons_point_cloud.emplace_back(passive_point_allowed.total_distance);
+					passive_beacons_point_cloud.emplace_back(passive_point_allowed.reflections);
 
-					FVector point_direction = Vector3rToFVector(VectorMath::rotateVector(FVectorToVector3r(passive_point_allowed.direction), sensor_reference_frame_.orientation, 1));
+					FVector point_direction = Vector3rToFVector(VectorMath::rotateVectorReverse(FVectorToVector3r(passive_point_allowed.direction), sensor_reference_frame_.orientation, 1));
 					passive_beacons_point_cloud.emplace_back(point_direction.X);
 					passive_beacons_point_cloud.emplace_back(point_direction.Y);
 					passive_beacons_point_cloud.emplace_back(point_direction.Z);
@@ -313,23 +314,23 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 	                                  const NedTransform* ned_transform, const msr::airlib::Pose& pose,	float distance_limit, int reflection_limit, float attenuation_limit, float reflection_distance_limit,
 	                                  float reflection_opening_angle, float attenuation_per_distance, float attenuation_per_reflection, TArray<AActor*> ignore_actors, AActor* cur_actor, bool external, bool result_uu,
 	                                  float draw_time, float line_thickness, bool debug_draw_reflected_paths, bool debug_draw_bounce_lines, bool debug_draw_initial_points, bool debug_draw_reflected_points,
-	                                  bool debug_draw_reflected_lines, bool check_return, bool save_normal, bool save_source, std::string source_label) {
+	                                  bool debug_draw_reflected_lines, bool check_return, bool save_normal, bool save_source, bool only_final_reflection, std::string source_label) {
 	float total_distance = 0.0f;
 	float signal_attenuation = 0.0f;
 	int reflection_count = 0;
 	TArray<FVector> trace_path = TArray<FVector>{};
-
-	FHitResult trace_hit_result, hit_result_temp;
+	FHitResult trace_hit_result, hit_result_temp, trace_hit_previous;
 	bool trace_hit;
-
+	std::string label;
+	AActor* hitActor;
+	FVector previous_direction; 
 	bool persistent_lines = false;
-	if(draw_time == -1)persistent_lines = true;
 
+	if (draw_time == -1)persistent_lines = true;
 	while(total_distance < distance_limit && reflection_count < reflection_limit && signal_attenuation > attenuation_limit) {
 		trace_hit_result = FHitResult(ForceInit);
 		trace_hit = UAirBlueprintLib::GetObstacleAdv(cur_actor, trace_start_position, trace_end_position, trace_hit_result, ignore_actors, ECC_Visibility, true);
 
-		// DRAW DEBUG
 		if (debug_draw_bounce_lines) {
 			FColor line_color = FColor::MakeRedToGreenColorFromScalar(1 - (signal_attenuation / attenuation_limit));
 			UAirBlueprintLib::DrawLine(cur_actor->GetWorld(), trace_start_position, trace_hit ? trace_hit_result.ImpactPoint : trace_end_position, line_color, persistent_lines, draw_time, 0, line_thickness);
@@ -338,13 +339,22 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		// Stop if nothing was hit to reflect off, or 
 		// if distance between reflections is above distance limit (after emission)
 		if (!trace_hit || (reflection_count > 0 && FVector::Distance(trace_start_position, trace_hit_result.ImpactPoint) > reflection_distance_limit)) {
+
+			if (!check_return && only_final_reflection && reflection_count > 0) {
+				hitActor = trace_hit_previous.GetActor();
+				if (hitActor != nullptr)
+				{
+					label = TCHAR_TO_UTF8(*hitActor->GetName());
+				}
+				SavePoint(trace_hit_previous, previous_direction, signal_attenuation, total_distance, reflection_count, label, ned_transform, pose, points, groundtruth, external, result_uu, save_normal, save_source, source_label);
+			}
 			return;
 		}
 
-		// DRAW DEBUG
 		if (debug_draw_initial_points && signal_attenuation == 0) {
 			UAirBlueprintLib::DrawPoint(cur_actor->GetWorld(), trace_hit_result.ImpactPoint, 5, FColor::Green, persistent_lines, draw_time);
 		}
+
 		// Bounce trace
 		FVector trace_direction;
 		float trace_length;
@@ -361,16 +371,16 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 			sensor_position = ned_transform->fromLocalNed(pose.position);
 		}
 
-		float distance_to_sensor = FVector::Distance(trace_start_position, sensor_position);
-
-		std::string label;
-		auto hitActor = trace_hit_result.GetActor();
+		hitActor = trace_hit_result.GetActor();
 		if (hitActor != nullptr)
 		{
 			label = TCHAR_TO_UTF8(*hitActor->GetName());
 		}
 
 		if (check_return) {
+
+			float distance_to_sensor = FVector::Distance(trace_start_position, sensor_position);
+
 			// Stop if signal can't travel far enough to return
 			if (distance_to_sensor > trace_length) {
 				return;
@@ -391,39 +401,10 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 				trace_hit = UAirBlueprintLib::GetObstacleAdv(cur_actor, trace_start_position, sensor_position, hit_result_temp, ignore_actors, ECC_Visibility, true);
 				if (trace_hit) {  // Hit = no clear LoS to sensor
 					continue;
-				}
+				}				
 
-				if (result_uu) {
-					points.emplace_back(trace_hit_result.ImpactPoint.X);
-					points.emplace_back(trace_hit_result.ImpactPoint.Y);
-					points.emplace_back(trace_hit_result.ImpactPoint.Z);
-				}
-				else{
-					Vector3r point_sensor_frame;
-					if (external) {
-						point_sensor_frame = ned_transform->toVector3r(trace_hit_result.ImpactPoint, 0.01, true);
-					}
-					else {
-						point_sensor_frame = ned_transform->toLocalNed(trace_hit_result.ImpactPoint);
-					}
-					point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, pose, true);
-
-					points.emplace_back(point_sensor_frame.x());
-					points.emplace_back(point_sensor_frame.y());
-					points.emplace_back(point_sensor_frame.z());
-				}
-
-				points.emplace_back(received_attenuation);
-				points.emplace_back(total_distance);
-				if (save_normal) {
-					points.emplace_back(trace_direction.X);
-					points.emplace_back(trace_direction.Y);
-					points.emplace_back(trace_direction.Z);
-				}
-				groundtruth.emplace_back(label);
-				if (save_source)groundtruth.emplace_back(source_label);
-
-				// DRAW DEBUG
+				SavePoint(trace_hit_result, trace_direction, signal_attenuation, total_distance, reflection_count, label, ned_transform, pose, points, groundtruth, external, result_uu, save_normal, save_source, source_label);
+	
 				if (debug_draw_reflected_points) {
 					UAirBlueprintLib::DrawPoint(cur_actor->GetWorld(), trace_start_position, 5, FColor::Red, persistent_lines, draw_time);
 				}
@@ -451,42 +432,57 @@ void UnrealEchoSensor::traceDirection(FVector trace_start_position, FVector trac
 		}
 		else {	
 
-			if (result_uu) {
-				points.emplace_back(trace_hit_result.ImpactPoint.X);
-				points.emplace_back(trace_hit_result.ImpactPoint.Y);
-				points.emplace_back(trace_hit_result.ImpactPoint.Z);
+			if (!only_final_reflection) {
+
+				SavePoint(trace_hit_result, trace_direction, signal_attenuation, total_distance, reflection_count, label, ned_transform, pose, points, groundtruth, external, result_uu, save_normal, save_source, source_label);
+	
+				if (debug_draw_reflected_points) {
+					UAirBlueprintLib::DrawPoint(cur_actor->GetWorld(), trace_start_position, 5, FColor::Red, persistent_lines, draw_time);
+				}
 			}
 			else {
-				Vector3r point_sensor_frame;
-				if (external) {
-					point_sensor_frame = ned_transform->toVector3r(trace_hit_result.ImpactPoint, 0.01, true);
-				}
-				else {
-					point_sensor_frame = ned_transform->toLocalNed(trace_hit_result.ImpactPoint);
-				}
-				point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, pose, true);
-
-				points.emplace_back(point_sensor_frame.x());
-				points.emplace_back(point_sensor_frame.y());
-				points.emplace_back(point_sensor_frame.z());
-			}			
-
-			points.emplace_back(signal_attenuation);
-			points.emplace_back(total_distance);
-			if (save_normal) {
-				points.emplace_back(trace_direction.X);
-				points.emplace_back(trace_direction.Y);
-				points.emplace_back(trace_direction.Z);
-			}
-			groundtruth.emplace_back(label);
-			if (save_source)groundtruth.emplace_back(source_label);
-
-			// DRAW DEBUG
-			if (debug_draw_reflected_points) {
-				UAirBlueprintLib::DrawPoint(cur_actor->GetWorld(), trace_start_position, 5, FColor::Red, persistent_lines, draw_time);
+				trace_hit_previous = trace_hit_result;
+				previous_direction = trace_direction;
 			}
 		}
 	}
+}
+
+void UnrealEchoSensor::SavePoint(FHitResult trace_hit_result, FVector direction, float signal_attenuation, float total_distance, float reflection_count, std::string label,
+							     const NedTransform* ned_transform, const msr::airlib::Pose& pose, msr::airlib::vector<msr::airlib::real_T>& points, msr::airlib::vector<std::string>& groundtruth,
+	                             bool external, bool result_uu, bool save_normal, bool save_source, std::string source_label) {
+
+	if (result_uu) {
+		points.emplace_back(trace_hit_result.ImpactPoint.X);
+		points.emplace_back(trace_hit_result.ImpactPoint.Y);
+		points.emplace_back(trace_hit_result.ImpactPoint.Z);
+	}
+	else {
+		Vector3r point_sensor_frame;
+		if (external) {
+			point_sensor_frame = ned_transform->toVector3r(trace_hit_result.ImpactPoint, 0.01, true);
+		}
+		else {
+			point_sensor_frame = ned_transform->toLocalNed(trace_hit_result.ImpactPoint);
+		}
+		point_sensor_frame = VectorMath::transformToBodyFrame(point_sensor_frame, pose, true);
+
+		points.emplace_back(point_sensor_frame.x());
+		points.emplace_back(point_sensor_frame.y());
+		points.emplace_back(point_sensor_frame.z());
+	}
+
+	points.emplace_back(signal_attenuation);
+	points.emplace_back(total_distance);
+	points.emplace_back(reflection_count);
+
+	if (save_normal) {
+		points.emplace_back(direction.X);
+		points.emplace_back(direction.Y);
+		points.emplace_back(direction.Z);
+	}
+	groundtruth.emplace_back(label);
+	if (save_source)groundtruth.emplace_back(source_label);
 }
 
 void UnrealEchoSensor::bounceTrace(FVector &trace_start_position, FVector &trace_direction, float &trace_length, const FHitResult &trace_hit_result,

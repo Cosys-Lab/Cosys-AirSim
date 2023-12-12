@@ -574,7 +574,7 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
                          passive_enable):
     cur_echo_data = c.getEchoData(cur_sensor_name, cur_vehicle_name)
     if cur_echo_data.time_stamp != cur_last_timestamp:
-        if len(cur_echo_data.point_cloud) < 6 and len(cur_echo_data.passive_beacons_point_cloud) < 9:
+        if len(cur_echo_data.point_cloud) < 7 and len(cur_echo_data.passive_beacons_point_cloud) < 10:
             last_timestamp_return = cur_timestamp
             return None, None, last_timestamp_return, None, None
         else:
@@ -582,10 +582,10 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
             header = Header()
             header.frame_id = cur_sensor_echo_frame
 
-            if len(cur_echo_data.point_cloud) > 4:
+            if len(cur_echo_data.point_cloud) > 5:
                 points = np.array(cur_echo_data.point_cloud, dtype=np.dtype('f4'))
-                points = np.reshape(points, (int(points.shape[0] / 5), 5))
-                points = points * np.array([1, -1, -1, 1, 1])
+                points = np.reshape(points, (int(points.shape[0] / 6), 6))
+                points = points * np.array([1, -1, -1, 1, 1, 1])
                 points_list = points.tolist()
                 pcloud = pc2.create_cloud(header, cur_fields_echo, points_list)
                 pcloud.header.stamp = cur_timestamp
@@ -600,10 +600,10 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
                 groundtruth = None
 
             if passive_enable:
-                if len(cur_echo_data.passive_beacons_point_cloud) > 7:
+                if len(cur_echo_data.passive_beacons_point_cloud) > 8:
                     pointsp = np.array(cur_echo_data.passive_beacons_point_cloud, dtype=np.dtype('f4'))
-                    pointsp = np.reshape(pointsp, (int(pointsp.shape[0] / 8), 8))
-                    pointsp = pointsp * np.array([1, -1, -1, 1, 1, 1, 1, 1])
+                    pointsp = np.reshape(pointsp, (int(pointsp.shape[0] / 9), 9))
+                    pointsp = pointsp * np.array([1, -1, -1, 1, 1, 1, 1, -1, 1])
                     pointsp_list = pointsp.tolist()
                     pcloud_passive = pc2.create_cloud(header, cur_fields_echo_passive, pointsp_list)
                     pcloud_passive.header.stamp = cur_timestamp
@@ -792,7 +792,8 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         PointField('y', 4, PointField.FLOAT32, 1),
         PointField('z', 8, PointField.FLOAT32, 1),
         PointField('a', 12, PointField.FLOAT32, 1),
-        PointField('d', 16, PointField.FLOAT32, 1)
+        PointField('d', 16, PointField.FLOAT32, 1),
+        PointField('r', 16, PointField.FLOAT32, 1)
     ]
 
     fields_echo_passive = [
@@ -801,9 +802,10 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         PointField('z', 8, PointField.FLOAT32, 1),
         PointField('a', 12, PointField.FLOAT32, 1),
         PointField('d', 16, PointField.FLOAT32, 1),
-        PointField('xd', 20, PointField.FLOAT32, 1),
-        PointField('yd', 24, PointField.FLOAT32, 1),
-        PointField('zd', 28, PointField.FLOAT32, 1),
+        PointField('r', 20, PointField.FLOAT32, 1),
+        PointField('xd', 24, PointField.FLOAT32, 1),
+        PointField('yd', 28, PointField.FLOAT32, 1),
+        PointField('zd', 32, PointField.FLOAT32, 1),
     ]
 
     fields_lidar = [

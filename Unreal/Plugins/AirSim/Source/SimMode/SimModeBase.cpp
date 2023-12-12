@@ -733,6 +733,7 @@ void ASimModeBase::setupVehiclesAndCamera()
             spawned_passive_echo_beacon->initial_upper_elevation_limit_ = passive_echo_beacon_setting.initial_upper_elevation_limit;
             spawned_passive_echo_beacon->attenuation_limit_ = passive_echo_beacon_setting.attenuation_limit;
             spawned_passive_echo_beacon->reflection_distance_limit_ = passive_echo_beacon_setting.reflection_distance_limit;
+            spawned_passive_echo_beacon->reflection_only_final_ = passive_echo_beacon_setting.reflection_only_final;
             spawned_passive_echo_beacon->attenuation_per_distance_ = passive_echo_beacon_setting.attenuation_per_distance;
             spawned_passive_echo_beacon->attenuation_per_reflection_ = passive_echo_beacon_setting.attenuation_per_reflection;
             spawned_passive_echo_beacon->distance_limit_ = passive_echo_beacon_setting.distance_limit;

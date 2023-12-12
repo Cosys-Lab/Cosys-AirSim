@@ -38,6 +38,7 @@ void APassiveEchoBeacon::getPointCloud()
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetLocation().Z);
 	point_cloud_.emplace_back(0);
 	point_cloud_.emplace_back(0);
+	point_cloud_.emplace_back(0);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetRotation().Rotator().Vector().X);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetRotation().Rotator().Vector().Y);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetRotation().Rotator().Vector().Z);
@@ -54,8 +55,8 @@ void APassiveEchoBeacon::getPointCloud()
 
 		// Shoot trace and get the impact point and remaining attenuation, if any returns
 		UnrealEchoSensor::traceDirection(trace_start_position, trace_end_position, point_cloud_, groundtruth_, ned_transform_, beacon_reference_frame_,
-			distance_limit_, reflection_limit_, attenuation_limit_, reflection_distance_limit_, 0, attenuation_per_distance_, attenuation_per_reflection_, ignore_actors_, this, false, true,
-			draw_debug_duration_, line_thickness_ / 2, false, draw_debug_all_lines_, false, false, false, false, true, true, source_label);
+			distance_limit_, reflection_limit_, attenuation_limit_, reflection_distance_limit_cm_, 0, attenuation_per_distance_, attenuation_per_reflection_, ignore_actors_, this, false, true,
+			draw_debug_duration_, line_thickness_ / 2, false, draw_debug_all_lines_, false, false, false, false, true, true, reflection_only_final_, source_label);
 	}
 }
 
@@ -64,14 +65,15 @@ void APassiveEchoBeacon::parsePointCloud()
 	bool persistent_lines = false;
 	if (draw_debug_duration_ == -1)persistent_lines = true;
 
-	int float_stride = 8;
+	int float_stride = 9;
 	int string_stride = 2;
 	for (auto point_count = 0u; point_count < (int) point_cloud_.size() / (float)float_stride; ++point_count)
 	{
 		FVector point = FVector(point_cloud_[point_count * float_stride], point_cloud_[point_count * float_stride + 1], point_cloud_[point_count * float_stride + 2]);
 		float signal_attenuation = point_cloud_[point_count * float_stride + 3];
 		float signal_distance = point_cloud_[point_count * float_stride + 4];
-		FVector direction = FVector(point_cloud_[point_count * float_stride + 5], point_cloud_[point_count * float_stride + 6], point_cloud_[point_count * float_stride + 7]);	
+		float reflections = point_cloud_[point_count * float_stride + 5];
+		FVector direction = FVector(point_cloud_[point_count * float_stride + 6], point_cloud_[point_count * float_stride + 7], point_cloud_[point_count * float_stride + 8]);	
 		std::string reflection_object = groundtruth_[point_count * string_stride];
 		std::string source_object = groundtruth_[point_count * string_stride + 1];
 
@@ -82,6 +84,7 @@ void APassiveEchoBeacon::parsePointCloud()
 		echo_point.source_object = source_object;
 		echo_point.total_distance = signal_distance;
 		echo_point.total_attenuation = signal_attenuation;
+		echo_point.reflections = reflections;
 		points_.Add(echo_point);
 
 		if (draw_debug_all_points_) {
@@ -106,7 +109,7 @@ void APassiveEchoBeacon::BeginPlay()
 
 	beacon_reference_frame_ = msr::airlib::Pose();
 
-
+	reflection_distance_limit_cm_ = ned_transform_->fromNed(reflection_distance_limit_);
 
 	if (draw_debug_location_) {
 		bool persistent_lines = false;

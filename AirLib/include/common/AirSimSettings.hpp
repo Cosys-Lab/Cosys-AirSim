@@ -450,6 +450,7 @@ public: //types
         float initial_upper_elevation_limit = 90;
         float attenuation_limit = -100;
         float reflection_distance_limit = 0.4;
+        bool reflection_only_final = false;
         float attenuation_per_distance = 0;
         float attenuation_per_reflection = 0;
         float distance_limit = 3;
@@ -1008,6 +1009,7 @@ private:
         passive_echo_beacon_setting->initial_upper_elevation_limit = settings_json.getFloat("SensorUpperElevationLimit", passive_echo_beacon_setting->initial_upper_elevation_limit);
         passive_echo_beacon_setting->attenuation_limit = settings_json.getFloat("AttenuationLimit", passive_echo_beacon_setting->attenuation_limit);
         passive_echo_beacon_setting->reflection_distance_limit = settings_json.getFloat("ReflectionDistanceLimit", passive_echo_beacon_setting->reflection_distance_limit);
+        passive_echo_beacon_setting->reflection_only_final = settings_json.getBool("ReflectionOnlyFinal", passive_echo_beacon_setting->reflection_only_final);
         passive_echo_beacon_setting->attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", passive_echo_beacon_setting->attenuation_per_distance);
         passive_echo_beacon_setting->attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", passive_echo_beacon_setting->attenuation_per_reflection);
         passive_echo_beacon_setting->distance_limit = settings_json.getFloat("DistanceLimit", passive_echo_beacon_setting->distance_limit);

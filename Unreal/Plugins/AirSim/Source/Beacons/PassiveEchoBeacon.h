@@ -53,6 +53,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		float reflection_distance_limit_ = 0.4;
 
+	/** Only save the final reflection along a trace. This will ignore all other reflections that happen along the trace in the data */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
+		bool reflection_only_final_ = false;
+
 	/** Attenuation of signal wrt distance traveled (dB/m) */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		float attenuation_per_distance_ = 0;
@@ -114,4 +118,5 @@ private:
 	TArray<UnrealEchoSensor::EchoPoint> points_;
 	msr::airlib::Pose beacon_reference_frame_;
 	TArray<AActor*> ignore_actors_;
+	float reflection_distance_limit_cm_;
 };
