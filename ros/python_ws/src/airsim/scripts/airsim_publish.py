@@ -273,7 +273,7 @@ def get_all_objects_ros_path_message(c, cur_timestamp, cur_first_message, cur_ob
                 object_pose = PoseStamped()
                 object_pose.pose.position.x = cur_pos.x_val
                 object_pose.pose.position.y = -cur_pos.y_val
-                object_pose.pose.position.z = cur_pos.z_val
+                object_pose.pose.position.z = -cur_pos.z_val
                 object_pose.pose.orientation.w = cur_orientation.w_val
                 object_pose.pose.orientation.x = cur_orientation.x_val
                 object_pose.pose.orientation.y = cur_orientation.y_val
@@ -305,7 +305,7 @@ def get_object_pose_ros_message(c, object_pose_individual_coordinates_local, cur
         object_pose = PoseStamped()
         object_pose.pose.position.x = cur_pos.x_val
         object_pose.pose.position.y = -cur_pos.y_val
-        object_pose.pose.position.z = cur_pos.z_val
+        object_pose.pose.position.z = -cur_pos.z_val
         object_pose.pose.orientation.w = cur_orientation.w_val
         object_pose.pose.orientation.x = cur_orientation.x_val
         object_pose.pose.orientation.y = cur_orientation.y_val
