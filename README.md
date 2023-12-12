@@ -61,6 +61,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
+* Added [Matlab API](docs/matlab.md) implementation.
 * Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
