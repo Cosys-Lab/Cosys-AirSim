@@ -92,10 +92,11 @@ classdef AirSimClient < handle
         function [sensorPose, timestamp, activePointCloud, activeData, activeLabels, passivePointCloud, passiveData, passiveLabels, passiveReflectionLabels] = getEchoData(obj, sensorName, enablePassive)
             %GET_ECHO_DATA Get sensor data from an echo sensor
             %
-            % The activeData and passiveData contains the attenuation and distance
-            % data saved for each point of the pointcloud.
-            % The reflection direction for the passive pointcloud is saved
-            % in the normal datafield.  
+            % The activeData and passiveData contains the attenuation,
+            % distance and reflection count data saved for each point
+            % of the pointcloud. The reflection direction for 
+            % the passive pointcloud is saved 
+            % in the normal field of the pointcloud.  
             
             echoData = obj.rpc_client.call("getEchoData", sensorName, obj.vehicle_name);
 
@@ -118,23 +119,25 @@ classdef AirSimClient < handle
             reflectorPointcloudRaw = cell2mat(cell(echoData{"point_cloud"}));
             reflectorPointcloudPassiveRaw = cell2mat(cell(echoData{"passive_beacons_point_cloud"}));
             
-            if mod(numel(reflectorPointcloudRaw), 5) == 0 % Discard malformed point clouds
+            if mod(numel(reflectorPointcloudRaw), 6) == 0 % Discard malformed point clouds
                 activeLabels = string(cell(echoData{"groundtruth"}));
 
-                reflectorPointcloudRaw = reshape(reflectorPointcloudRaw, 5, []).';
+                reflectorPointcloudRaw = reshape(reflectorPointcloudRaw, 6, []).';
                 reflectorPointcloudRaw = obj.nedToRightHandCoordinates(reflectorPointcloudRaw);
-                activeData = reflectorPointcloudRaw(:, 4:5); 
+                activeData = reflectorPointcloudRaw(:, 4:6); 
                 activePointCloud = pointCloud(reflectorPointcloudRaw(:, 1:3), Intensity=reflectorPointcloudRaw(:, 4)); % attenuation is also saved in the intensity channel   
             end
             
-            if enablePassive && mod(numel(reflectorPointcloudPassiveRaw), 8) == 0
+            if enablePassive && mod(numel(reflectorPointcloudPassiveRaw), 9) == 0
                 allPassiveLabels = string(cell(echoData{"passive_beacons_groundtruth"}));
                 passiveLabels = allPassiveLabels(2:2:length(allPassiveLabels));
                 passiveReflectionLabels = allPassiveLabels(1:2:length(allPassiveLabels));
-                reflectorPointcloudPassiveRaw = reshape(reflectorPointcloudPassiveRaw, 8, []).';
+                reflectorPointcloudPassiveRaw = reshape(reflectorPointcloudPassiveRaw, 9, []).';
                 reflectorPointcloudPassiveRaw = obj.nedToRightHandCoordinates(reflectorPointcloudPassiveRaw);
-                passiveData = reflectorPointcloudPassiveRaw(:, 4:5); 
-                passivePointCloud = pointCloud(reflectorPointcloudPassiveRaw(:, 1:3), Intensity=reflectorPointcloudPassiveRaw(:, 4), Normal=reflectorPointcloudPassiveRaw(:, 6:8));
+                passiveData = reflectorPointcloudPassiveRaw(:, 4:6); 
+                normalData = reflectorPointcloudPassiveRaw(:, 7:9);
+                normalData(:,2) = -normalData(:,2) ;
+                passivePointCloud = pointCloud(reflectorPointcloudPassiveRaw(:, 1:3), Intensity=reflectorPointcloudPassiveRaw(:, 4), Normal=normalData);
             end               
         end       
         
