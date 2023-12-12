@@ -1,6 +1,5 @@
 classdef AirSimWeather < uint32
-    %AIRSIMWEATHER Summary of this class goes here
-    %   Detailed explanation goes here
+    %AIRSIMWEATHER
     
     enumeration
         Rain        (0)

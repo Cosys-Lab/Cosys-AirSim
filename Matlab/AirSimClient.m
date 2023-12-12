@@ -75,7 +75,7 @@ classdef AirSimClient < handle
         function [colorMap] = getInstanceSegmentationColormap()
             % GET_INSTANCE_SEGMENTATION_COLORMAP Get full RGB colormap
             %
-            % You can generate manually (see GenerateColorMap.m)
+            % You can generate manually (see AirSimGenerateColorMap.m)
             % but this will save an hour.
 
             colorMap = uint8(readmatrix("colormap.csv"));            
@@ -90,7 +90,7 @@ classdef AirSimClient < handle
             argParser.addOptional("IsDrone", false, @islogical);
             argParser.addOptional("ApiControl", false, @islogical);
             argParser.addOptional("IP", "127.0.0.1", @isstring);
-            argParser.addOptional("Port", 41451, @isstring);
+            argParser.addOptional("Port", 41451, @isnumeric);
             argParser.addOptional("VehicleName", "airsimvehicle", @isstring);
             argParser.parse(varargin{:});
 
@@ -135,6 +135,7 @@ classdef AirSimClient < handle
             newPose.position.x_val = position(1);
             newPose.position.y_val = -position(2);
             newPose.position.z_val = -position(3);
+            orientation = quatinv(orientation);
             
             newPose.orientation.w_val = orientation(1);
             newPose.orientation.x_val = orientation(2);
@@ -257,7 +258,7 @@ classdef AirSimClient < handle
             reflectorPointcloudPassiveRaw = cell2mat(cell(echoData{"passive_beacons_point_cloud"}));
             
             if mod(numel(reflectorPointcloudRaw), 6) == 0 % Discard malformed point clouds
-                activeData.labels = string(cell(echoData{"groundtruth"}));
+                activeData.labels = string(cell(echoData{"groundtruth"}))';
                 reflectorPointcloudRaw = reshape(reflectorPointcloudRaw, 6, []).';
                 reflectorPointcloudRaw = obj.nedToRightHandCoordinates(reflectorPointcloudRaw);
                 activeData.attenuation = reflectorPointcloudRaw(:, 4); 
@@ -268,8 +269,8 @@ classdef AirSimClient < handle
             
             if enablePassive && mod(numel(reflectorPointcloudPassiveRaw), 9) == 0
                 allPassiveLabels = string(cell(echoData{"passive_beacons_groundtruth"}));
-                passiveData.labels = allPassiveLabels(2:2:length(allPassiveLabels));
-                passiveData.reflectionLabels = allPassiveLabels(1:2:length(allPassiveLabels));
+                passiveData.labels = allPassiveLabels(2:2:length(allPassiveLabels))';
+                passiveData.reflectionLabels = allPassiveLabels(1:2:length(allPassiveLabels))';
                 reflectorPointcloudPassiveRaw = reshape(reflectorPointcloudPassiveRaw, 9, []).';
                 reflectorPointcloudPassiveRaw = obj.nedToRightHandCoordinates(reflectorPointcloudPassiveRaw);
                 passiveData.attenuation = reflectorPointcloudPassiveRaw(:, 4); 
@@ -284,24 +285,24 @@ classdef AirSimClient < handle
         function [lidarPointCloud, lidarLabels, timestamp, sensorPose] = getLidarData(obj, sensorName, enableLabels)
             % GET_LIDAR_DATA Get sensor data from a lidar sensor
             
-            echoData = obj.rpc_client.call("getLidarData", sensorName, obj.vehicle_name);
+            lidarData = obj.rpc_client.call("getLidarData", sensorName, obj.vehicle_name);
 
-            timestamp = double(echoData{"time_stamp"});
+            timestamp = double(lidarData{"time_stamp"});
 
             % Get the sensor pose
-            sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(echoData{"pose"}{"position"})));
-            sensorPose.orientation = quatinv(struct2array(struct(echoData{"pose"}{"orientation"})));
+            sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(lidarData{"pose"}{"position"})));
+            sensorPose.orientation = quatinv(struct2array(struct(lidarData{"pose"}{"orientation"})));
             
             % Get pointcloud data
             lidarPointCloud = [];
             lidarLabels = [];
 
-            lidarPointcloudRaw = cell2mat(cell(echoData{"point_cloud"}));
+            lidarPointcloudRaw = cell2mat(cell(lidarData{"point_cloud"}));
             
             if mod(numel(lidarPointcloudRaw), 3) == 0 % Discard malformed point clouds
 
                 if enableLabels
-                    lidarLabels = string(cell(echoData{"groundtruth"}));
+                    lidarLabels = string(cell(lidarData{"groundtruth"}))';
                 end
                 lidarPointcloudRaw = reshape(lidarPointcloudRaw, 3, []).';
                 lidarPointcloudRaw = obj.nedToRightHandCoordinates(lidarPointcloudRaw);
@@ -312,29 +313,31 @@ classdef AirSimClient < handle
         function [lidarPointCloud, timestamp, sensorPose] = getGPULidarData(obj, sensorName)
             % GET_LIDAR_DATA Get sensor data from a GPU lidar sensor
             
-            echoData = obj.rpc_client.call("getGPULidarData", sensorName, obj.vehicle_name);
+            lidarData = obj.rpc_client.call("getGPULidarData", sensorName, obj.vehicle_name);
 
-            timestamp = double(echoData{"time_stamp"});
+            timestamp = double(lidarData{"time_stamp"});
 
             % Get the sensor pose
-            sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(echoData{"pose"}{"position"})));
-            sensorPose.orientation = quatinv(struct2array(struct(echoData{"pose"}{"orientation"})));
+            sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(lidarData{"pose"}{"position"})));
+            sensorPose.orientation = quatinv(struct2array(struct(lidarData{"pose"}{"orientation"})));
             
             % Get pointcloud data
             lidarPointCloud = [];
 
-            lidarPointcloudRaw = cell2mat(cell(echoData{"point_cloud"}));
+            lidarPointcloudRaw = cell2mat(cell(lidarData{"point_cloud"}));
             
             if mod(numel(lidarPointcloudRaw), 5) == 0 % Discard malformed point clouds
                 lidarPointcloudRaw = reshape(lidarPointcloudRaw, 5, []).';
-                lidarPointcloudRaw = obj.nedToRightHandCoordinates(lidarPointcloudRaw);
                 colorValues = uint32(lidarPointcloudRaw(:, 4));
                 lidarLabelColors = zeros(size(lidarPointcloudRaw, 1), 3, 'uint8');
-                for index = 1:numel(colorValues)
-                    lidarLabelColors(index, 1) = bitshift(bitand(colorValues(index), hex2dec('FF0000')), -16);
-                    lidarLabelColors(index, 2) = bitshift(bitand(colorValues(index), hex2dec('00FF00')), -8);
-                    lidarLabelColors(index, 3) = bitand(colorValues(index), hex2dec('0000FF'));
-                end
+                lidarLabelColors(:, 1) = bitshift(bitand(colorValues, hex2dec('FF0000')), -16);
+                lidarLabelColors(:, 2) = bitshift(bitand(colorValues, hex2dec('00FF00')), -8);
+                lidarLabelColors(:, 3) = bitand(colorValues, hex2dec('0000FF'));
+                % for index = 1:numel(colorValues)
+                %     lidarLabelColors(index, 1) = bitshift(bitand(colorValues(index), hex2dec('FF0000')), -16);
+                %     lidarLabelColors(index, 2) = bitshift(bitand(colorValues(index), hex2dec('00FF00')), -8);
+                %     lidarLabelColors(index, 3) = bitand(colorValues(index), hex2dec('0000FF'));
+                % end
                 lidarPointCloud = pointCloud(lidarPointcloudRaw(:,1:3), Color=lidarLabelColors, Intensity=lidarPointcloudRaw(:, 5)); 
             end    
         end    
@@ -360,7 +363,36 @@ classdef AirSimClient < handle
                 image_reshaped = reshape(image_bytes, 3, camera_image.width.int32, camera_image.height.int32);
                 image = rescale(permute(image_reshaped,[3 2 1]));
             end
+            timestamp = camera_image.time_stamp;
+        end
 
+        function [images, timestamp] = getCameraImages(obj, sensorName, cameraTypes)
+            % GET_CAMERA_IMAGES Get syncedcamera data from a camera sensor
+            images = {};
+            image_requests = [];
+            for i = 1: numel(cameraTypes)
+                if cameraTypes(i) == 1 || cameraTypes(i) == 2
+                    image_requests{i} = py.airsim.ImageRequest(sensorName, int32(cameraTypes(i)), true, false);
+                else
+                    image_requests{i} = py.airsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false);
+                end
+            end
+            image_request_list = py.list(image_requests);
+            camera_image_response_request = obj.rpc_client.call("simGetImages", image_request_list, obj.vehicle_name);
+
+            for i = 1: numel(cameraTypes)
+                image_response = py.airsim.ImageResponse();
+                camera_image = image_response.from_msgpack(camera_image_response_request{i});
+                if cameraTypes(i) == 1 || cameraTypes(i) == 2
+                    image_bytes = single(camera_image.image_data_float);
+                    image_reshaped = reshape(image_bytes, camera_image.width.int32, camera_image.height.int32);
+                    images{i} = permute(image_reshaped,[2 1]);
+                else
+                    image_bytes = uint8(camera_image.image_data_uint8);
+                    image_reshaped = reshape(image_bytes, 3, camera_image.width.int32, camera_image.height.int32);
+                    images{i} = rescale(permute(image_reshaped,[3 2 1]));
+                end
+            end
             timestamp = camera_image.time_stamp;
         end
 
@@ -372,7 +404,7 @@ classdef AirSimClient < handle
             cameraData = obj.rpc_client.call("simGetCameraInfo", sensorName, obj.vehicle_name);
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(cameraData{"pose"}{"position"})));
             sensorPose.orientation = quatinv(struct2array(struct(cameraData{"pose"}{"orientation"})));
-            curFov = struct2array(struct(cameraData{"fov"}));
+            curFov = cameraData{"fov"};
             tempRequest = py.airsim.ImageRequest(sensorName, int32(1), true, false);
             tempRequestList = py.list({tempRequest});
             tempCameraResponseRequest = obj.rpc_client.call("simGetImages", tempRequestList, obj.vehicle_name);
@@ -380,8 +412,8 @@ classdef AirSimClient < handle
             tempCameraImage = testImageResponse.from_msgpack(tempCameraResponseRequest{1});
             cameraWidth = tempCameraImage.width.int32;
             cameraHeight = tempCameraImage.height.int32;
-            focalLength = (cameraWidth / 2.0) / tan(curFov * pi / 360);
-            intrinsics = cameraIntrinsics([focalLength, focalLength], [cameraWidth / 2, cameraHeight / 2], [cameraWidth, cameraHeight]);
+            focalLength = (double(cameraWidth) / 2.0) / tan(curFov * pi / 360);
+            intrinsics = cameraIntrinsics([focalLength, focalLength], [double(cameraWidth / 2), double(cameraHeight / 2)], [double(cameraWidth), double(cameraHeight)]);
         end
 
         function [imuData, timestamp] = getIMUData(obj, sensorName)
@@ -389,13 +421,13 @@ classdef AirSimClient < handle
             %
             % The IMU is always at the center of the vehicle.
 
-            imuData = obj.rpc_client.call("getImuData", sensorName, obj.vehicle_name);
+            data = obj.rpc_client.call("getImuData", sensorName, obj.vehicle_name);
 
-            timestamp = double(imuData{"time_stamp"});
+            timestamp = double(data{"time_stamp"});
 
-            imuData.orientation = quatinv(struct2array(struct(imuData{"orientation"})));
-            imuData.angularVelocity = obj.nedToRightHandCoordinates(struct2array(struct(imuData{"angular_velocity"})));
-            imuData.linearAcceleration = obj.nedToRightHandCoordinates(struct2array(struct(imuData{"linear_acceleration"})));
+            imuData.orientation = quatinv(struct2array(struct(data{"orientation"})));
+            imuData.angularVelocity = obj.nedToRightHandCoordinates(struct2array(struct(data{"angular_velocity"})));
+            imuData.linearAcceleration = obj.nedToRightHandCoordinates(struct2array(struct(data{"linear_acceleration"})));
         end
 
         function [objectList] = getInstanceSegmentationObjectList(obj)
@@ -405,10 +437,10 @@ classdef AirSimClient < handle
             objectList = string(cell(obj.rpc_client.call("simListInstanceSegmentationObjects")))';
         end
 
-        function [objectPose] = getObjectPose(obj, objectName)
+        function [objectPose] = getObjectPose(obj, objectName, local)
             % GET_OBJECT_POSE Get 3D pose of a object by name.
 
-            objectData = obj.rpc_client.call("simGetObjectPose", objectName, obj.vehicle_name);      
+            objectData = obj.rpc_client.call("simGetObjectPose", objectName, local);      
             objectPose.position = obj.nedToRightHandCoordinates(struct2array(struct(objectData{"position"})));
             objectPose.orientation = quatinv(struct2array(struct(objectData{"orientation"})));
         end
