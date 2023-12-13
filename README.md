@@ -1,13 +1,13 @@
 # Welcome to AirSim
 
-AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. Similarly, we have an experimental release for a Unity plugin. 
-
+AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment.
 Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
+* Based on public AirSim release from November 2018.
 
 ## Cosys-Lab Modifications
 
-Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
-Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to colaborate. 
+Cosys-Lab made extensive modifications to the AirSim platform (based on November 2018 release) to support multiple projects and research goals. 
+Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to collaborate. 
 The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
 Please note that we use that same [MIT license](LICENSE) as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
@@ -76,6 +76,8 @@ A manually maintained fork of this repository is available to the public: https:
 * Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
 * Dropped support for Unity Environments.
 
+Some more details on our changes can be found in the [changelog](CHANGELOG.md).
+
 ## How to Get It
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
@@ -143,7 +145,7 @@ Press F10 to see various options available for weather effects. You can also con
 
 ## Participate
 
-### Paper
+### Original AirSim Paper
 
 More technical details are available in [AirSim paper (FSR 2017 Conference)](https://arxiv.org/abs/1705.05065). Please cite this as:
 ```
