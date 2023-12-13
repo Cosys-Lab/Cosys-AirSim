@@ -110,8 +110,9 @@ To move around the environment using APIs you can use `simSetVehiclePose` API. T
 
 ## Camera APIs
 The `simGetCameraInfo` returns the FOV(in degrees), projection matrix of a camera as well as the pose which can be:
- - Default: The pose of the camera in the vehicle frame. 
- - External: If set to `External` the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
+
+* Default: The pose of the camera in the vehicle frame. 
+* External: If set to `External` the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 
 The `simSetCameraOrientation` sets the orientation for the specified camera as quaternion in NED frame. The handy `airsim.to_quaternion()` function allows to convert pitch, roll, yaw to quaternion. For example, to set camera-0 to 15-degree pitch, you can use:
 ```
