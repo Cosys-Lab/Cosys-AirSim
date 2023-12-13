@@ -20,6 +20,7 @@ python hello_car.py
 
 If you are using Visual Studio then just open AirSim.sln, set PythonClient as startup project and choose `car\hello_car.py` as your startup script.
 
+You can also install the AirSim python module to your Python environment to use anywhere by running  `pip install .` in the _PythonClient_ folder. 
 ## Hello Car
 Here's how to use AirSim APIs using Python to control simulated car (see also [C++ example](apis_cpp.md#hello_car)):
 
