@@ -23,7 +23,7 @@ The following parameters can be configured right now via settings json. For some
 
 Parameter                    | Description
 -----------------------------| ------------
-NumberOfChannels             | Number of channels/lasers of the lidar
+NumberOfChannels             | Number of channels/lasers of the lidar. When set to 1 it will act as a 2D horizontal LiDAR and will use the VerticalFOVUpper value as the vertical angle to scan.
 Range                        | Range, in meters
 MeasurementsPerCycle         | amount of measurements in one full cycle (horizontal resolution)
 RotationsPerSecond           | Rotations per second
