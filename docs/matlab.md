@@ -17,15 +17,15 @@ You should have these components installed and working before proceeding.
 
 ## Usage
 The files are in the _Matlab_ folder. A test script _airsim_full_test.m_ is also provided to see how to interact with the client to:
- * Connect to AirSim
- * Get/set vehicle pose
- * Get instance segmentation groundtruth table
- * Get object pose(s)
- * Get sensor data (imu, echo (active/passive), (gpu)LiDAR, camera (info, rgb, depth, segmentation))
+* Connect to AirSim
+* Get/set vehicle pose
+* Get instance segmentation groundtruth table
+* Get object pose(s)
+* Get sensor data (imu, echo (active/passive), (gpu)LiDAR, camera (info, rgb, depth, segmentation))
 
 Do note the test script requires next to the toolboxes listed above in the Preqrequisites the following Matlab toolboxes:
- * Lidar Toolbox
- * Navigation Toolbox
- * Robotics System Toolbox
- * ROS Toolbox
- * UAV Toolbox
+* Lidar Toolbox
+* Navigation Toolbox
+* Robotics System Toolbox
+* ROS Toolbox
+* UAV Toolbox
