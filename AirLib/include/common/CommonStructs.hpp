@@ -320,7 +320,10 @@ struct EchoData {
 
 	TTimePoint time_stamp = 0;
 	vector<real_T> point_cloud;
+    vector<std::string> groundtruth;
 	Pose pose;
+    vector<std::string> passive_beacons_groundtruth;
+    vector<real_T> passive_beacons_point_cloud;
 
 	EchoData()
 	{}

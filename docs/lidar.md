@@ -22,7 +22,7 @@ The following parameters can be configured right now via settings json.
 
 Parameter                 | Description
 --------------------------| ------------
-NumberOfChannels          | Number of channels/lasers of the lidar
+NumberOfChannels          | Number of channels/lasers of the lidar. When set to 1 it will act as a 2D horizontal LiDAR and will use the VerticalFOVUpper value as the vertical angle to scan.
 Range                     | Range, in meters
 MeasurementsPerCycle      | Horizontal resolution. Amount of points in one cycle.
 RotationsPerSecond        | Rotations per second
@@ -102,6 +102,6 @@ Use `getLidarData(sensor name, vehicle name)` API to retrieve the Lidar data.
 * Pose:
     * Default: Sensor pose in the vehicle frame. 
     * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
-* Lidar Groundtruth:
+* Groundtruth:
     * for each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to
     * a laser that didn't reflect anything will have label _out_of_range_.
