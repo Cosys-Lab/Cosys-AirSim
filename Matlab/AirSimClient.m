@@ -241,8 +241,7 @@ classdef AirSimClient < handle
             
             echoData = obj.rpc_client.call("getEchoData", sensorName, obj.vehicle_name);
 
-            timestamp = double(echoData{"time_stamp"});
-
+            timestamp = floor(double(double(echoData{"time_stamp"}))/1e9);
 
             % Get the sensor pose
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(echoData{"pose"}{"position"})));
@@ -287,7 +286,7 @@ classdef AirSimClient < handle
             
             lidarData = obj.rpc_client.call("getLidarData", sensorName, obj.vehicle_name);
 
-            timestamp = double(lidarData{"time_stamp"});
+            timestamp = floor(double(double(lidarData{"time_stamp"}))/1e9);
 
             % Get the sensor pose
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(lidarData{"pose"}{"position"})));
@@ -315,7 +314,7 @@ classdef AirSimClient < handle
             
             lidarData = obj.rpc_client.call("getGPULidarData", sensorName, obj.vehicle_name);
 
-            timestamp = double(lidarData{"time_stamp"});
+            timestamp = floor(double(double(lidarData{"time_stamp"}))/1e9);
 
             % Get the sensor pose
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(lidarData{"pose"}{"position"})));
@@ -363,7 +362,7 @@ classdef AirSimClient < handle
                 image_reshaped = reshape(image_bytes, 3, camera_image.width.int32, camera_image.height.int32);
                 image = rescale(permute(image_reshaped,[3 2 1]));
             end
-            timestamp = camera_image.time_stamp;
+            timestamp = floor(double(double(camera_image.time_stamp))/1e9);
         end
 
         function [images, timestamp] = getCameraImages(obj, sensorName, cameraTypes)
@@ -393,7 +392,7 @@ classdef AirSimClient < handle
                     images{i} = rescale(permute(image_reshaped,[3 2 1]));
                 end
             end
-            timestamp = camera_image.time_stamp;
+            timestamp = floor(double(double(camera_image.time_stamp))/1e9);
         end
 
         function [intrinsics, sensorPose] = getCameraInfo(obj, sensorName)
@@ -423,7 +422,7 @@ classdef AirSimClient < handle
 
             data = obj.rpc_client.call("getImuData", sensorName, obj.vehicle_name);
 
-            timestamp = double(data{"time_stamp"});
+            timestamp = floor(double(double(data{"time_stamp"}))/1e9);
 
             imuData.orientation = quatinv(struct2array(struct(data{"orientation"})));
             imuData.angularVelocity = obj.nedToRightHandCoordinates(struct2array(struct(data{"angular_velocity"})));

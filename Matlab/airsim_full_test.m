@@ -58,6 +58,7 @@ xlabel("X (m)")
 ylabel("Y (m)")
 zlabel("Z (m)")
 title("World Plot")
+drawnow
 
 %% Set vehicle pose
 
@@ -108,6 +109,7 @@ zlabel("Z (m)")
 xlim([0 10])
 ylim([-10 10])
 zlim([-10 10])
+drawnow
 
 %% LiDAR sensor data
 % Example plots lidar pointcloud and getting the groundtruth labels
@@ -129,6 +131,7 @@ zlabel("Z (m)")
 xlim([0 10])
 ylim([-10 10])
 zlim([-10 10])
+drawnow
 
 %% GPU LiDAR sensor data
 % Example plots GPU lidar pointcloud with its RGB segmentation colors
@@ -150,6 +153,7 @@ zlabel("Z (m)")
 xlim([0 10])
 ylim([-10 10])
 zlim([-10 10])
+drawnow
 
 %% Get camera info data
 
@@ -173,6 +177,7 @@ title("Segmentation Camera Image")
 subplot(3, 1, 3);
 imshow(depthImage ./ max(max(depthImage)).* 255, gray)
 title("Depth Camera Image")
+drawnow
 
 %% Get synced camera images
 % By combining the image requests they will be synced 
@@ -190,3 +195,4 @@ title("Synced Segmentation Camera Image")
 subplot(3, 1, 3);
 imshow(images{3} ./ max(max(images{3})).* 255, gray)
 title("Synced Depth Camera Image")
+drawnow
