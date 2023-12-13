@@ -124,7 +124,9 @@ e.g.:
         },
 ```
 ## Client API 
+
 Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar data. The API returns a Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
+
 * **Point-Cloud:** The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan.
 * **Lidar Pose:** Default: sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 
