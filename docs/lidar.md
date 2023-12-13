@@ -42,7 +42,7 @@ External                  | Uncouple the sensor from the vehicle. If enabled, th
 ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
 ```
 {
-    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
+    "SeeDocsAt": "https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/settings.md",
     "SettingsVersion": 1.2,
 
     "SimMode": "Multirotor",
@@ -95,13 +95,9 @@ e.g.,
 ```
 
 ## Client API 
-Use `getLidarData(sensor name, vehicle name)` API to retrieve the Lidar data. 
-* The API returns a full scan Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
-* Point-Cloud: 
-  * The floats represent [x,y,z] coordinate for each point hit within the range in the last scan. It will be [0,0,0] for a laser that didn't get any reflection (out of range).
-* Pose:
-    * Default: Sensor pose in the vehicle frame. 
-    * External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
-* Groundtruth:
-    * for each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to
-    * a laser that didn't reflect anything will have label _out_of_range_.
+
+Use `getLidarData(sensor name, vehicle name)` API to retrieve the Lidar data. The API returns a full scan Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
+
+* **Point-Cloud:** The floats represent [x,y,z] coordinate for each point hit within the range in the last scan. It will be [0,0,0] for a laser that didn't get any reflection (out of range).
+* **Pose:** Default: Sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
+* **Groundtruth:** For each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to a laser that didn't reflect anything will have label _out_of_range_.
