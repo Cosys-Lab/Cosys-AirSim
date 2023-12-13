@@ -181,7 +181,9 @@ In the settings file this can look like this example :
 ```
 
 ## Client API 
+
 Use `getEchoData(sensor name, vehicle name)` API to retrieve the echo sensor data. The API returns Point-Cloud(s) as a flat array of floats, the final attenuation, total distance and reflection count (+ reflection normal for passive beacon reflections) along with the timestamp of the capture and sensor pose.
+
 * **Echo Pose:** Default:Active Point-Cloud: Echo sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 * **** The floats represent [x, y, z, attenuation, total_distance, reflection_count] for each point hit within the range in the last scan.
 * **Active Groundtruth:** For each point of the Active Point-Cloud a label string is kept that has the name of the object that the point belongs to.
