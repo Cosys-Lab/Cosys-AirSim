@@ -14,7 +14,7 @@ ADynamicBlockBeacon::ADynamicBlockBeacon()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	// set the mesh
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Beacon mesh"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Passive Source Mesh"));
 	// attach to root component
 	Mesh->SetupAttachment(GetRootComponent());
 	// set path for static mesh

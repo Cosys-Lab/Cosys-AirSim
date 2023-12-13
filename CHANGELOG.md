@@ -1,11 +1,23 @@
 # What's new
+Below is summarized list of important changes since December 2023 by date.
 
-Below is summarized list of important changes. This does not include minor/less important changes or bug fixes or documentation update. 
+### December 2023
+* Added this changelog.
+* Added [Matlab API](https://cosys-lab.github.io/matlab) implementation.
+* Added [Passive Echo Beacons](https://cosys-lab.github.io/echo) to simulate passive echo-based sources (ex. ultrasound sources) that can be captured by echo sensors.
+* Added the player pawn vehicle to the [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation) initial run so it gets a color ID and is the LUT.
+* Updated [Echo sensor type](docs/echo.md) to support groundtruth label retrieval and custom FOV limits.
+* Updated HySLAM environment with better lightning and more random racks. Requires update of assets pack.
+* Updated Car and SkidVehicle spawning/resetting to disable the toggling of physics to fix issues with custom vehicles.
+* Fixed bug in GPULidar not allowing for 2D mode (1 channel). Updated [documentation](https://cosys-lab.github.io/gpulidar) for 2D mode as well. 
+* Fixed issues with ROS Client and object pose retrieval.
 
-## Cosys-Lab Modifications
-* Updated the camera, Echo and (GPU)LiDAR sensors to be able to uncouple from the vehicle and be placed as external world sensors.
+# General Cosys-Lab Modifications before December 2023
+
+* Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated Python [ROS implementation](https://cosys-lab.github.io/ros/) with completely new implementation and feature set. C++ version is deprecated.
+* Added [Matlab API](https://cosys-lab.github.io/matlab) implementation.
 * Added [Echo sensor type](https://cosys-lab.github.io/echo/) for simulation of sensors like sonar and radar.
 * Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation/). 
 * Added experimental and undocumented WiFi and UWB sensor types.
@@ -20,23 +32,20 @@ Below is summarized list of important changes. This does not include minor/less 
 * Updated Unreal to 4.24 (custom fork needed for instance segmentation: [https://github.com/WouterJansen/UnrealEngine](https://github.com/WouterJansen/UnrealEngine))
 * Dropped support for Unity Environments.
 
-## Default AirSim Changelog up to November 2018
+# Public Microsoft AirSim Changelog based on November 2018 build
 
 ### November, 2018
-* Added Weather Effects and [APIs](docs/apis.md#weather-apis)
-* Added [Time of Day API](docs/apis.md#time-of-day-api)
-* An experimental integration of [AirSim on Unity](https://github.com/Microsoft/AirSim/tree/master/Unity) is now available. Learn more in [Unity blog post](https://blogs.unity3d.com/2018/11/14/airsim-on-unity-experiment-with-autonomous-vehicle-simulation). 
 * [New environments](https://github.com/Microsoft/AirSim/releases/tag/v1.2.1): Forest, Plains (windmill farm), TalkingHeads (human head simulation), TrapCam (animal detection via camera)
-* Highly efficient [NoDisplay view mode](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
+* Highly efficient [NoDisplay view mode](https://github.com/Microsoft/AirSim/blob/master/docs/settings.md#viewmode) to turn off main screen rendering so you can capture images at high rate
 * [Enable/disable sensors](https://github.com/Microsoft/AirSim/pull/1479) via settings
-* [LiDAR Sensor](docs/lidar.md)
+* [Lidar Sensor](docs/lidar.md)
 * [Support for Flysky FS-SM100 RC](https://github.com/Microsoft/AirSim/commit/474214364676b6631c01b3ed79d00c83ba5bccf5) USB adapter
 * Case Study: [Formula Student Technion Driverless](https://github.com/Microsoft/AirSim/wiki/technion)
 * [Multi-Vehicle Capability](docs/multi_vehicle.md)
 * [Custom speed units](https://github.com/Microsoft/AirSim/pull/1181)
 * [ROS publisher](https://github.com/Microsoft/AirSim/pull/1135)
 * [simSetObjectPose API](https://github.com/Microsoft/AirSim/pull/1161)
-* [Character Control APIs](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/airsim/client.py#L137) (works on TalkingHeads binaries in release)
+* [Character Control APIs](https://github.com/Microsoft/AirSim/blob/master/PythonClient/airsim/client.py#L137) (works on TalkingHeads binaries in release)
 * [Arducopter Solo Support](https://github.com/Microsoft/AirSim/pull/1387)
 * [Linux install without sudo access](https://github.com/Microsoft/AirSim/pull/1434)
 * [Kinect like ROS publisher](https://github.com/Microsoft/AirSim/pull/1298)
@@ -117,17 +126,4 @@ Below is summarized list of important changes. This does not include minor/less 
 * The [reinforcement learning example](docs/reinforcement_learning.md) with AirSim
 * New built-in flight controller called [simple_flight](docs/simple_flight.md) that "just works" without any additional setup. It is also now *default*. 
 * AirSim now also generates [depth as well as disparity images](docs/image_apis.md) that is in camera plan. 
-* We also have official Linux build now!
-
-## Sep 2017
-- We have added [car model](docs/using_car.md)!
-
-## Aug 2017
-- [simple_flight](docs/simple_flight.md) is now default flight controller for drones. If you want to use PX4, you will need to modify settings.json as per [PX4 setup doc](docs/px4_setup.md).
-- Linux build is official and currently uses Unreal 4.17 due to various bug fixes required
-- ImageType enum has breaking changes with several new additions and clarifying existing ones
-- SubWindows are now configurable from settings.json
-- PythonClient is now complete and has parity with C++ APIs. Some of these would have breaking changes.
-
-## Feb 2017
-- First release!
+* We also have official Linux build now! If you have been using AirSim with PX4, you might want to read the [release notes](docs/release_notes.md).

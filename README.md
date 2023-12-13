@@ -1,29 +1,30 @@
 # Welcome to Cosys-AirSim
 
 AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment.
-
 Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
+* Based on public AirSim release from November 2018.
 
 ## Cosys-Lab Modifications
 
-Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
-Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to colaborate. 
+Cosys-Lab made extensive modifications to the AirSim platform (based on November 2018 release) to support multiple projects and research goals. 
+Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to collaborate. 
 The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
 Please note that we use that same [MIT license](LICENSE) as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 
 ### Associated publications
+
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
 ```
-@inproceedings{jansen2023cosysairsim,
-      title={Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications}, 
-      author={Jansen, Wouter and Verreycken, Erik and Schenck, Anthony and Blanquart, Jean-Edouard and Verhulst, Connor and Huebel, Nico and Steckel, Jan},
-      booktitle={Accepted at Annual Modeling and Simulation Conference, ANNSIM 202}, 
-      year={2023},
-      eprint={2303.13381},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO}
-}
+@inproceedings{cosysairsim2023jansen,
+  author={Jansen, Wouter and Verreycken, Erik and Schenck, Anthony and Blanquart, Jean-Edouard and Verhulst, Connor and Huebel, Nico and Steckel, Jan},
+  booktitle={2023 Annual Modeling and Simulation Conference (ANNSIM)}, 
+  title={COSYS-AIRSIM: A Real-Time Simulation Framework Expanded for Complex Industrial Applications}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={37-48},
+  doi={}}
 ```
 
 You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSIM '23 conference [here](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/annsim23_tutorial) together with the associated videos.
@@ -54,11 +55,11 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 }
 ```
 
-### Main Modifications 
-
-* Updated the camera, Echo and (GPU)LiDAR sensors to be able to uncouple from the vehicle and be placed as external world sensors.
+## Cosys-Lab Modifications
+* Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
 * Updated Python [ROS implementation](https://cosys-lab.github.io/ros/) with completely new implementation and feature set. C++ version is deprecated.
+* Added [Matlab API](https://cosys-lab.github.io/matlab) implementation.
 * Added [Echo sensor type](https://cosys-lab.github.io/echo/) for simulation of sensors like sonar and radar.
 * Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation/). 
 * Added experimental and undocumented WiFi and UWB sensor types.
@@ -72,6 +73,8 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 * Added option to Cameras, EchoSensor and GPULiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](https://cosys-lab.github.io/settings/).
 * Updated Unreal to 4.24 (custom fork needed for instance segmentation: [https://github.com/WouterJansen/UnrealEngine](https://github.com/WouterJansen/UnrealEngine))
 * Dropped support for Unity Environments.
+
+Some more details on our changes can be found in the [changelog](CHANGELOG.md).
 
 ## How to Get It
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 

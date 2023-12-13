@@ -10,15 +10,15 @@ List of all contributors since our first release in February 2017 can be [found 
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
 ```
-@inproceedings{jansen2023cosysairsim,
-      title={Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications}, 
-      author={Jansen, Wouter and Verreycken, Erik and Schenck, Anthony and Blanquart, Jean-Edouard and Verhulst, Connor and Huebel, Nico and Steckel, Jan},
-      booktitle={Accepted at Annual Modeling and Simulation Conference, ANNSIM 202}, 
-      year={2023},
-      eprint={2303.13381},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO}
-}
+@inproceedings{cosysairsim2023jansen,
+  author={Jansen, Wouter and Verreycken, Erik and Schenck, Anthony and Blanquart, Jean-Edouard and Verhulst, Connor and Huebel, Nico and Steckel, Jan},
+  booktitle={2023 Annual Modeling and Simulation Conference (ANNSIM)}, 
+  title={COSYS-AIRSIM: A Real-Time Simulation Framework Expanded for Complex Industrial Applications}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={37-48},
+  doi={}}
 ```
 
 - [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)

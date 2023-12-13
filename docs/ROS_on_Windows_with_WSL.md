@@ -1,4 +1,4 @@
-# Using ROS on Windows with WSL
+# Using Ros on Windows with WSL
 
 In Windows command prompt as admin:
 `wsl --install`
