@@ -31,7 +31,7 @@ public:
         UpdatableObject::reportState(reporter);
 
         reporter.writeValue("Echo-Timestamp", output_.time_stamp);
-        reporter.writeValue("Echo-NumPoints", static_cast<int>(output_.point_cloud.size() / 3));
+        reporter.writeValue("Echo-NumPoints", static_cast<int>(output_.point_cloud.size() / 5));
     }
 
 	const EchoData& getOutput() const

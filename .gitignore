@@ -377,3 +377,4 @@ xcuserdata/
 *IndustryPropsPack6/
 /build_release/
 /Scripts/GenerateMaskFromBag/parfor_progress.txt
+*.asv
