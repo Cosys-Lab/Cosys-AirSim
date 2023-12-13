@@ -20,7 +20,11 @@
 
       <arg name="sensor_echo_names" default="[echo1]"/>
       <arg name="sensor_echo_topics" default="[airsim/echo1/pointcloud]"/>
+      <arg name="sensor_echo_segmentation_topics" default="[airsim/echo1/segmentation]"/>
       <arg name="sensor_echo_frames" default="[base_echo1]"/>
+      <arg name="sensor_echo_toggle_passive" default="[1]"/>
+      <arg name="sensor_echo_passive_topics" default="[airsim/echo1/passive/pointcloud]"/>
+      <arg name="sensor_echo_passive_segmentation_topics" default="[airsim/echo1/passive/segmentation]"/>
 
       <arg name="sensor_lidar_names" default="[lidar1]"/>
       <arg name="sensor_lidar_toggle_groundtruth" default="[1]"/>
@@ -86,7 +90,11 @@
 
             <rosparam param="sensor_echo_names" subst_value="True">$(arg sensor_echo_names)</rosparam>
             <rosparam param="sensor_echo_topics" subst_value="True">$(arg sensor_echo_topics)</rosparam>
+            <rosparam param="sensor_echo_segmentation_topics" subst_value="True">$(arg sensor_echo_segmentation_topics)</rosparam>
             <rosparam param="sensor_echo_frames" subst_value="True">$(arg sensor_echo_frames)</rosparam>
+            <rosparam param="sensor_echo_toggle_passive" subst_value="True">$(arg sensor_echo_toggle_passive)</rosparam>
+            <rosparam param="sensor_echo_passive_topics" subst_value="True">$(arg sensor_echo_passive_topics)</rosparam>
+            <rosparam param="sensor_echo_passive_segmentation_topics" subst_value="True">$(arg sensor_echo_passive_segmentation_topics)</rosparam>
 
             <rosparam param="sensor_lidar_names" subst_value="True">$(arg sensor_lidar_names)</rosparam>
             <rosparam param="sensor_lidar_toggle_groundtruth" subst_value="True">$(arg sensor_lidar_toggle_groundtruth)</rosparam>

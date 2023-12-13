@@ -416,6 +416,9 @@ class EchoData(MsgpackMixin):
     point_cloud = 0.0
     time_stamp = np.uint64(0)
     pose = Pose()
+    groundtruth = ''
+    passive_beacons_point_cloud = 0.0
+    passive_beacons_groundtruth = ''
 
 
 class UwbSensorData(MsgpackMixin):

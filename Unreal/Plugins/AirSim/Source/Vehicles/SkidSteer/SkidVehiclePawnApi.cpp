@@ -74,7 +74,7 @@ void SkidVehiclePawnApi::reset()
 		for (auto* phys_comp : phys_comps) {
 			phys_comp->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 			phys_comp->SetPhysicsLinearVelocity(FVector::ZeroVector);
-			phys_comp->SetSimulatePhysics(false);
+			//phys_comp->SetSimulatePhysics(false);
 		}
 		movement_->ResetMoveState();
 		movement_->SetActive(false);
@@ -91,10 +91,10 @@ void SkidVehiclePawnApi::reset()
 		}
 	}, true);
 
-	UAirBlueprintLib::RunCommandOnGameThread([this, &phys_comps]() {
-		for (auto* phys_comp : phys_comps)
-			phys_comp->SetSimulatePhysics(true);
-	}, true);
+	//UAirBlueprintLib::RunCommandOnGameThread([this, &phys_comps]() {
+	//	for (auto* phys_comp : phys_comps)
+	//		phys_comp->SetSimulatePhysics(true);
+	//}, true);
 }
 
 void SkidVehiclePawnApi::update(float delta)
