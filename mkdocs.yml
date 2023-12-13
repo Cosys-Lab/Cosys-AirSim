@@ -40,6 +40,7 @@ nav:
     - "ROS":
       - "ROS: AirSim ROS Wrapper": "ros.md"
       - "Using ROS on Windows with WSL": "ROS_on_Windows_with_WSL.md"
+    - "Matlab": 'matlab.md'
     - "Playing Logs": 'playback.md'
   - "Design":
     - "Architecture": 'design.md'
