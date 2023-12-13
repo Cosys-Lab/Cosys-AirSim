@@ -6,7 +6,7 @@ Below is summarized list of important changes since December 2023 by date.
 * Added [Matlab API](https://cosys-lab.github.io/matlab) implementation.
 * Added [Passive Echo Beacons](https://cosys-lab.github.io/echo) to simulate passive echo-based sources (ex. ultrasound sources) that can be captured by echo sensors.
 * Added the player pawn vehicle to the [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation) initial run so it gets a color ID and is the LUT.
-* Updated [Echo sensor type](docs/echo.md) to support groundtruth label retrieval and custom FOV limits.
+* Updated [Echo sensor type](https://cosys-lab.github.io/echo) to support groundtruth label retrieval and custom FOV limits.
 * Updated Car and SkidVehicle spawning/resetting to disable the toggling of physics to fix issues with custom vehicles.
 * Fixed bug in GPULidar not allowing for 2D mode (1 channel). Updated [documentation](https://cosys-lab.github.io/gpulidar) for 2D mode as well. 
 * Fixed issues with ROS Client and object pose retrieval.
