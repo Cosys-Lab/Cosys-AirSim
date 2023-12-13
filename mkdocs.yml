@@ -43,7 +43,6 @@ nav:
     - "Matlab": 'matlab.md'
     - "Playing Logs": 'playback.md'
   - "Design":
-    - "Architecture": 'design.md'
     - "Code Structure": 'code_structure.md'
     - "Modifying Recording Data": 'modify_recording_data.md'
     - "Coding Guidelines": 'coding_guidelines.md'
