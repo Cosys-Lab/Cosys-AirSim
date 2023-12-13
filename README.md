@@ -98,9 +98,9 @@ If you have remote control (RC) as shown below, you can manually control the dro
 
 [More details](https://cosys-lab.github.io/remote_control/)
 
-![record screenshot](docs/images/AirSimDroneManual.gif)
+![record screenshot](https://cosys-lab.github.io/images/AirSimDroneManual.gif)
 
-![record screenshot](docs/images/AirSimCarManual.gif)
+![record screenshot](https://cosys-lab.github.io/images/AirSimCarManual.gif)
 
 
 ### Programmatic control
@@ -117,7 +117,7 @@ Note that you can use [SimMode setting](https://cosys-lab.github.io/settings/) t
 
 There are two ways you can generate training data from AirSim for deep learning. The easiest way is to simply press the record button in the lower right corner. This will start writing pose and images for each frame. The data logging code is pretty simple and you can modify it to your heart's content.
 
-![record screenshot](docs/images/record_data.png)
+![record screenshot](https://cosys-lab.github.io/images/record_data.png)
 
 A better way to generate training data exactly the way you want is by accessing the APIs. This allows you to be in full control of how, what, where and when you want to log data. 
 
@@ -131,7 +131,7 @@ Yet another way to use AirSim is the so-called "Computer Vision" mode. In this m
 
 Press F10 to see various options available for weather effects. You can also control the weather using [APIs](https://cosys-lab.github.io/apis/). Press F1 to see other options available.
 
-![record screenshot](docs/images/weather_menu.png)
+![record screenshot](https://cosys-lab.github.io/images/weather_menu.png)
 
 ## Tutorials
 
