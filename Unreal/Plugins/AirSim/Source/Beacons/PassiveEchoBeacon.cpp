@@ -1,9 +1,10 @@
 // Developed by Cosys-Lab, University of Antwerp
 
+#include "PassiveEchoBeacon.h"
 #include "AirBlueprintLib.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
-#include "PassiveEchoBeacon.h"
+
 
 // Sets default values
 APassiveEchoBeacon::APassiveEchoBeacon()
