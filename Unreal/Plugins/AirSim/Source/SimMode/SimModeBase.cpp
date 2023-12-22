@@ -724,7 +724,6 @@ void ASimModeBase::setupVehiclesAndCamera()
             actor_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
             actor_spawn_params.bDeferConstruction = true;
             APassiveEchoBeacon* spawned_passive_echo_beacon = static_cast<APassiveEchoBeacon*>(GetWorld()->SpawnActor<APassiveEchoBeacon>(spawn_position, spawn_rotation, actor_spawn_params));
-            spawned_passive_echo_beacon->SetActorLabel(FString(passive_echo_beacon_setting.name.c_str()));
             spawned_passive_echo_beacon->enable_ = passive_echo_beacon_setting.enable;
             spawned_passive_echo_beacon->initial_directions_ = passive_echo_beacon_setting.initial_directions;
             spawned_passive_echo_beacon->initial_lower_azimuth_limit_ = passive_echo_beacon_setting.initial_lower_azimuth_limit;
