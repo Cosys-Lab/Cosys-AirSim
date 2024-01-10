@@ -443,13 +443,13 @@ public: //types
         //required
         std::string name;
         bool enable = true;
-        int32 initial_directions = 1000;
+        int initial_directions = 1000;
         float initial_lower_azimuth_limit = -90;
         float initial_upper_azimuth_limit = 90;
         float initial_lower_elevation_limit = -90;
         float initial_upper_elevation_limit = 90;
         float attenuation_limit = -100;
-        float reflection_distance_limit = 0.4;
+        float reflection_distance_limit = 0.4f;
         bool reflection_only_final = false;
         float attenuation_per_distance = 0;
         float attenuation_per_reflection = 0;
@@ -499,7 +499,7 @@ public: //types
         uint8_t vehicle_sysid = 135;
         int vehicle_compid = 1;
 
-        // if you want to select a specific local network adapter so you can reach certain remote machines (e.g. wifi versus ethernet) 
+        // if you want to select a specific local network adapter so you can reach certain remote machines (e.g. wifi versus ethernet)
         // then you will want to change the LocalHostIp accordingly.  This default only works when log viewer and QGC are also on the
         // same machine.  Whatever network you choose it has to be the same one for external
         std::string local_host_ip = "127.0.0.1";
@@ -533,7 +533,7 @@ public: //fields
 
     std::vector<std::string> warning_messages;
     std::vector<std::string> error_messages;
-    
+
     bool is_record_ui_visible = false;
     int initial_view_mode = 2; //ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FLY_WITH_ME
     bool enable_rpc = true;
@@ -558,7 +558,7 @@ public: //fields
     std::string material_list_file = "";
 
 public: //methods
-    static AirSimSettings& singleton() 
+    static AirSimSettings& singleton()
     {
         static AirSimSettings instance;
         return instance;
@@ -634,7 +634,7 @@ private:
         if (upgrade_required) {
             bool auto_upgrade = false;
 
-            //if we have default setting file not modified by user then we will 
+            //if we have default setting file not modified by user then we will
             //just auto-upgrade it
             if (has_default_settings) {
                 auto_upgrade = true;
@@ -768,7 +768,7 @@ private:
     {
         Settings rc_json;
         if (settings_json.getChild("RC", rc_json)) {
-            rc_setting.remote_control_id = rc_json.getInt("RemoteControlID", 
+            rc_setting.remote_control_id = rc_json.getInt("RemoteControlID",
                 simmode_name == "Multirotor" ? 0 : -1);
             rc_setting.allow_api_when_disconnected = rc_json.getBool("AllowAPIWhenDisconnected",
                 rc_setting.allow_api_when_disconnected);
@@ -777,7 +777,7 @@ private:
 
     static std::string getCameraName(const Settings& settings_json)
     {
-        return settings_json.getString("CameraName", 
+        return settings_json.getString("CameraName",
             //TODO: below exist only due to legacy reason and can be replaced by "" in future
             std::to_string(settings_json.getInt("CameraID", 0)));
     }
@@ -829,7 +829,7 @@ private:
         Settings json_parent;
         if (settings_json.getChild("CaptureSettings", json_parent)) {
             for (size_t child_index = 0; child_index < json_parent.size(); ++child_index) {
-                Settings json_settings_child;     
+                Settings json_settings_child;
                 if (json_parent.getChild(child_index, json_settings_child)) {
                     CaptureSetting capture_setting;
                     createCaptureSettings(json_settings_child, capture_setting);
@@ -839,7 +839,7 @@ private:
         }
     }
 
-    static std::unique_ptr<VehicleSetting> createMavLinkVehicleSetting(const Settings& settings_json) 
+    static std::unique_ptr<VehicleSetting> createMavLinkVehicleSetting(const Settings& settings_json)
     {
         //these settings_json are expected in same section, not in another child
         std::unique_ptr<VehicleSetting> vehicle_setting_p = std::unique_ptr<VehicleSetting>(new MavLinkVehicleSetting());
@@ -884,8 +884,8 @@ private:
 
     static Vector3r createVectorSetting(const Settings& settings_json, const Vector3r& default_vec)
     {
-        return Vector3r(settings_json.getFloat("X", default_vec.x()), 
-            settings_json.getFloat("Y", default_vec.y()), 
+        return Vector3r(settings_json.getFloat("X", default_vec.x()),
+            settings_json.getFloat("Y", default_vec.y()),
             settings_json.getFloat("Z", default_vec.z()));
     }
     static Rotation createRotationSetting(const Settings& settings_json, const Rotation& default_rot)
@@ -920,11 +920,11 @@ private:
         //optional settings_json
         vehicle_setting->pawn_path = settings_json.getString("PawnPath", "");
         vehicle_setting->default_vehicle_state = settings_json.getString("DefaultVehicleState", "");
-        vehicle_setting->allow_api_always = settings_json.getBool("AllowAPIAlways", 
+        vehicle_setting->allow_api_always = settings_json.getBool("AllowAPIAlways",
             vehicle_setting->allow_api_always);
         vehicle_setting->auto_create = settings_json.getBool("AutoCreate",
             vehicle_setting->auto_create);
-        vehicle_setting->enable_collision_passthrough = settings_json.getBool("EnableCollisionPassthrogh", 
+        vehicle_setting->enable_collision_passthrough = settings_json.getBool("EnableCollisionPassthrogh",
             vehicle_setting->enable_collision_passthrough);
         vehicle_setting->enable_trace = settings_json.getBool("EnableTrace",
             vehicle_setting->enable_trace);
@@ -943,7 +943,7 @@ private:
 
         loadCameraSettings(settings_json, vehicle_setting->cameras);
         loadSensorSettings(settings_json, "Sensors", vehicle_setting->sensors, simmode_name);
-       
+
         return vehicle_setting;
     }
 
@@ -993,8 +993,7 @@ private:
         return beacon_setting;
     }
 
-    static std::unique_ptr<PassiveEchoBeaconSetting> createPassiveEchoBeaconSetting(const std::string& simmode_name, const Settings& settings_json,
-        const std::string passive_echo_beacon_name)
+    static std::unique_ptr<PassiveEchoBeaconSetting> createPassiveEchoBeaconSetting(const Settings& settings_json, const std::string passive_echo_beacon_name)
     {
         std::unique_ptr<PassiveEchoBeaconSetting> passive_echo_beacon_setting;
         passive_echo_beacon_setting = std::unique_ptr<PassiveEchoBeaconSetting>(new PassiveEchoBeaconSetting());
@@ -1131,7 +1130,7 @@ private:
             for (const auto& key : keys) {
                 msr::airlib::Settings child;
                 passive_echo_beacons_child.getChild(key, child);
-                passive_echo_beacons[key] = createPassiveEchoBeaconSetting(simmode_name, child, key);
+                passive_echo_beacons[key] = createPassiveEchoBeaconSetting(child, key);
             }
         }
     }
