@@ -443,13 +443,13 @@ public: //types
         //required
         std::string name;
         bool enable = true;
-        int32 initial_directions = 1000;
+        int initial_directions = 1000;
         float initial_lower_azimuth_limit = -90;
         float initial_upper_azimuth_limit = 90;
         float initial_lower_elevation_limit = -90;
         float initial_upper_elevation_limit = 90;
         float attenuation_limit = -100;
-        float reflection_distance_limit = 0.4;
+        float reflection_distance_limit = 0.4f;
         bool reflection_only_final = false;
         float attenuation_per_distance = 0;
         float attenuation_per_reflection = 0;
@@ -993,8 +993,7 @@ private:
         return beacon_setting;
     }
 
-    static std::unique_ptr<PassiveEchoBeaconSetting> createPassiveEchoBeaconSetting(const std::string& simmode_name, const Settings& settings_json,
-        const std::string passive_echo_beacon_name)
+    static std::unique_ptr<PassiveEchoBeaconSetting> createPassiveEchoBeaconSetting(const Settings& settings_json, const std::string passive_echo_beacon_name)
     {
         std::unique_ptr<PassiveEchoBeaconSetting> passive_echo_beacon_setting;
         passive_echo_beacon_setting = std::unique_ptr<PassiveEchoBeaconSetting>(new PassiveEchoBeaconSetting());
@@ -1131,7 +1130,7 @@ private:
             for (const auto& key : keys) {
                 msr::airlib::Settings child;
                 passive_echo_beacons_child.getChild(key, child);
-                passive_echo_beacons[key] = createPassiveEchoBeaconSetting(simmode_name, child, key);
+                passive_echo_beacons[key] = createPassiveEchoBeaconSetting(child, key);
             }
         }
     }
