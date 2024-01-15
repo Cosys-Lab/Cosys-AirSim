@@ -590,7 +590,7 @@ public: //methods
         loadDefaultSensorSettings(simmode_name, settings_json, sensor_defaults);
         loadVehicleSettings(simmode_name, settings_json, vehicles);
         loadBeaconSettings(simmode_name, settings_json, beacons);
-        loadPassiveEchoBeaconSettings(simmode_name, settings_json, passive_echo_beacons);
+        loadPassiveEchoBeaconSettings(settings_json, passive_echo_beacons);
 
         //this should be done last because it depends on type of vehicles we have
         loadClockSettings(settings_json);
@@ -1115,7 +1115,7 @@ private:
         }
     }
 
-    static void loadPassiveEchoBeaconSettings(const std::string& simmode_name, const Settings& settings_json,
+    static void loadPassiveEchoBeaconSettings(const Settings& settings_json,
         std::map<std::string, std::unique_ptr<PassiveEchoBeaconSetting>>& passive_echo_beacons)
     {
         msr::airlib::Settings passive_echo_beacons_child;
