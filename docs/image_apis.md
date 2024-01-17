@@ -217,7 +217,7 @@ currentObjectList = client.simListInstanceSegmentationObjects()
 This will use an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).
 Note that this provides a different result from `simListSceneObjects()` as this one will make a simple list of all Unreal Actors in the scene, without keeping the hierarchy in mind. 
 
-An extension to `simListInstanceSegmentationObjects()` is `simListInstanceSegmentationPoses(ned=True)` which will retrieve the 3D object pose of each element in the same order as the first mentioned function.
+An extension to `simListInstanceSegmentationObjects()` is `simListInstanceSegmentationPoses(ned=True, only_visible=True)` which will retrieve the 3D object pose of each element in the same order as the first mentioned function. _only_visible_ allows you to only get the objects that are physically visible in the scene. 
 
 #### Startup Object IDs
 At the start, AirSim assigns color indexes to each object found in environment of type `UStaticMeshComponent` or `USkinnedMeshComponent`. It then makes an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).
