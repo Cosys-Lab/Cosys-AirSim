@@ -303,9 +303,9 @@ vector<string> RpcLibClientBase::simListInstanceSegmentationObjects() const
     return pimpl_->client.call("simListInstanceSegmentationObjects").as<vector<string>>();
 }
 
-vector<msr::airlib::Pose> RpcLibClientBase::simListInstanceSegmentationPoses(bool ned) const
+vector<msr::airlib::Pose> RpcLibClientBase::simListInstanceSegmentationPoses(bool ned, bool only_visible) const
 {
-    const auto& response_adaptor = pimpl_->client.call("simListInstanceSegmentationPoses", ned).as<vector<RpcLibAdapatorsBase::Pose>>();
+    const auto& response_adaptor = pimpl_->client.call("simListInstanceSegmentationPoses", ned, only_visible).as<vector<RpcLibAdapatorsBase::Pose>>();
     return RpcLibAdapatorsBase::Pose::to(response_adaptor);
 }
 
