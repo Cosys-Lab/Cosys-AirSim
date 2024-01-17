@@ -169,8 +169,8 @@ class VehicleClient:
     def simListInstanceSegmentationObjects(self):
         return self.client.call('simListInstanceSegmentationObjects')
 
-    def simListInstanceSegmentationPoses(self, ned = True):
-        poses_raw = self.client.call('simListInstanceSegmentationPoses', ned)
+    def simListInstanceSegmentationPoses(self, ned=True, only_visible=False):
+        poses_raw = self.client.call('simListInstanceSegmentationPoses', ned, only_visible)
         return [Pose.from_msgpack(pose_raw) for pose_raw in poses_raw]
 
     def simSpawnStaticMeshObject(self, object_class_name, object_name, pose):
@@ -285,7 +285,7 @@ class VehicleClient:
 
     # legacy handling
     # TODO: remove below legacy wrappers in future major releases
-    upgrade_api_help = "\nPlease see https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docs/upgrade_apis.md for more info."
+    upgrade_api_help = "\nPlease see https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/upgrade_apis.md for more info."
     def simGetPose(self):
         logging.warning("simGetPose API is renamed to simGetVehiclePose. Please update your code." + self.upgrade_api_help)
         return self.simGetVehiclePose()

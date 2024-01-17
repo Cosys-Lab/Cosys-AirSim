@@ -72,9 +72,9 @@ std::vector<std::string> WorldSimApi::listInstanceSegmentationObjects() const
     return simmode_->GetAllSegmentationMeshIDs();
 }
 
-std::vector <msr::airlib::Pose> WorldSimApi::listInstanceSegmentationPoses(bool ned) const
+std::vector <msr::airlib::Pose> WorldSimApi::listInstanceSegmentationPoses(bool ned, bool only_visible) const
 {
-    return simmode_->GetAllSegmentationMeshPoses(ned);
+    return simmode_->GetAllSegmentationMeshPoses(ned, only_visible);
 }
 
 
