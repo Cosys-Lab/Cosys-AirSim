@@ -168,18 +168,23 @@ std::vector<std::string> ASimModeBase::GetAllSegmentationMeshIDs() {
 	return retval;
 }
 
-std::vector<msr::airlib::Pose> ASimModeBase::GetAllSegmentationMeshPoses(bool ned) {
+std::vector<msr::airlib::Pose> ASimModeBase::GetAllSegmentationMeshPoses(bool ned, bool only_visible) {
     std::vector<msr::airlib::Pose> retval;
     TMap<FString, UMeshComponent*> nameToComponentMapTemp = nameToComponentMap_;
     for (auto const& element : nameToComponentMapTemp) {
-        UAirBlueprintLib::RunCommandOnGameThread([ned, &retval, element, this]() {
+        UAirBlueprintLib::RunCommandOnGameThread([ned, only_visible, &retval, element, this]() {
             if (element.Value->HasBegunPlay() && element.Value->IsRenderStateCreated()) {
                 if (!element.Value->IsBeingDestroyed() && !element.Value->IsPendingKillOrUnreachable()) {
-                    if (ned) {
-                        retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+                    if (!only_visible || element.Value->GetVisibleFlag()) {
+                        if (ned) {
+                            retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+                        }
+                        else {
+                            retval.emplace_back(getGlobalNedTransform().toLocalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+                        }
                     }
                     else {
-                        retval.emplace_back(getGlobalNedTransform().toLocalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
+                        retval.emplace_back(msr::airlib::Pose::nanPose());
                     }
                 }
                 else {

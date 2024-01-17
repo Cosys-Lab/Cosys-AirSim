@@ -217,8 +217,8 @@ RpcLibServerBase::RpcLibServerBase(ApiProvider* api_provider, const std::string&
         return getWorldSimApi()->listInstanceSegmentationObjects();
     });
 
-    pimpl_->server.bind("simListInstanceSegmentationPoses", [&](bool ned) -> std::vector<RpcLibAdapatorsBase::Pose> {
-        return RpcLibAdapatorsBase::Pose::from(getWorldSimApi()->listInstanceSegmentationPoses(ned));
+    pimpl_->server.bind("simListInstanceSegmentationPoses", [&](bool ned, bool only_visible) -> std::vector<RpcLibAdapatorsBase::Pose> {
+        return RpcLibAdapatorsBase::Pose::from(getWorldSimApi()->listInstanceSegmentationPoses(ned, only_visible));
     });
 
     pimpl_->server.bind("simGetObjectPose", [&](const std::string& object_name, bool ned) -> RpcLibAdapatorsBase::Pose {
