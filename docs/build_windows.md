@@ -45,8 +45,6 @@ Once AirSim is set up by following above steps, you can,
 
 See [Using APIs](apis.md) and [settings.json](settings.md) for various options available.
 
-The other environments available often need additional asset packs to be downloaded first, read [here](environments.md) for more information.
-
 # AirSim on Unity (Experimental)
 [Unity](https://unity3d.com/) is another great game engine platform and we have an [experimental release](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/Unity) of AirSim on Unity. Please note that this is work in progress and all features may not work yet. 
 

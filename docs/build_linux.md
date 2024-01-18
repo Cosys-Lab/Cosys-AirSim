@@ -48,8 +48,6 @@ Once AirSim is set up by following above steps, you can,
 
 See [Using APIs](apis.md) and [settings.json](settings.md) for various options available.
 
-The other environments available often need additional asset packs to be downloaded first, read [here](environments.md) for more information.
-
 ## FAQs
 
 - I'm getting error "<MyProject> could not be compiled. Try rebuilding from source manually".
