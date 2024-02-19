@@ -44,8 +44,15 @@ The default sensor list can be configured in settings json:
          "Enabled" : true
     },
     "Imu": {
-         "SensorType": 2,
-         "Enabled" : true
+        "SensorType": 2,
+        "Enabled" : true,
+        "GenerateNoise": true,
+        "AngularRandomWalk": 0.3,
+        "GyroBiasStabilityTau": 500,
+        "GyroBiasStability": 4.6,
+        "VelocityRandomWalk": 0.24,
+        "AccelBiasStabilityTau": 800,
+        "AccelBiasStability": 36
     },
     "Gps": {
          "SensorType": 3,

@@ -18,7 +18,7 @@ public:
         : ImuBase(setting.sensor_name)
     {
         // initialize params
-        params_.initializeFromSettings(setting);
+        add_noise = params_.initializeFromSettings(setting);
 
         gyro_bias_stability_norm = params_.gyro.bias_stability / sqrt(params_.gyro.tau);
         accel_bias_stability_norm = params_.accel.bias_stability / sqrt(params_.accel.tau);
@@ -62,9 +62,11 @@ private: //methods
             ground_truth.kinematics->pose.orientation, true);
 
         //add noise
-        addNoise(output.linear_acceleration, output.angular_velocity);
-        // TODO: Add noise in orientation?
-
+        if (add_noise) {
+            // TODO: Add noise in orientation?
+            addNoise(output.linear_acceleration, output.angular_velocity);
+        }
+ 
         output.time_stamp = clock()->nowNanos();
 
         setOutput(output);
@@ -103,6 +105,7 @@ private: //fields
 
     //cached calculated values
     real_T gyro_bias_stability_norm, accel_bias_stability_norm;
+    bool add_noise;
 
     struct State {
         Vector3r gyroscope_bias;
