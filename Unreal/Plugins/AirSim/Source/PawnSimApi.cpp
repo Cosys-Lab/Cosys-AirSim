@@ -517,26 +517,32 @@ void PawnSimApi::updateKinematics(float dt)
 	next_kinematics.pose = getPose();
 	next_kinematics.twist.linear = getNedTransform().toLocalNedVelocity(getPawn()->GetVelocity());
 
-	// New method (Getting angular velocity from Unreal primitive component)
-	UPrimitiveComponent* primitive = Cast<UPrimitiveComponent>(getPawn()->GetRootComponent());
+    next_kinematics.twist.angular = msr::airlib::VectorMath::toAngularVelocity(
+        kinematics_->getPose().orientation, next_kinematics.pose.orientation, dt);
 
-	if (primitive) {
-		next_kinematics.twist.angular = getNedTransform().toVector3r(primitive->GetPhysicsAngularVelocityInRadians(), 1.0f, false);
-	}
-	else { // If no primitive component can be found, use old method. This is the case for ComputerVision SimMode.
-		next_kinematics.twist.angular = msr::airlib::VectorMath::toAngularVelocity(
-			kinematics_->getPose().orientation, next_kinematics.pose.orientation, dt);
-	}
+    next_kinematics.accelerations.linear = dt > 0 ? (next_kinematics.twist.linear - kinematics_->getTwist().linear) / dt : next_kinematics.accelerations.linear;
+    next_kinematics.accelerations.angular = dt > 0 ? (next_kinematics.twist.angular - kinematics_->getTwist().angular) / dt : next_kinematics.accelerations.angular;
 
-	// Old Method (Getting angular velocity from orientation difference between this and previous frame)
-	//next_kinematics.twist.angular = msr::airlib::VectorMath::toAngularVelocity(
-	//	kinematics_->getPose().orientation, next_kinematics.pose.orientation, dt);
+	//// New method (Getting angular velocity from Unreal primitive component)
+	//UPrimitiveComponent* primitive = Cast<UPrimitiveComponent>(getPawn()->GetRootComponent());
 
-	//UAirBlueprintLib::LogMessageString("Relative Angular Velocity: ", "X: " + std::to_string(next_kinematics.twist.angular[0]) + ", Y: " + std::to_string(next_kinematics.twist.angular[1]) + ", Z:" + std::to_string(next_kinematics.twist.angular[2]), LogDebugLevel::Informational);
-	//UAirBlueprintLib::LogMessageString("Absolute Linear Velocity: ", "X: " + std::to_string(next_kinematics.twist.linear[0]) + ", Y: " + std::to_string(next_kinematics.twist.linear[1]) + ", Z:" + std::to_string(next_kinematics.twist.linear[2]), LogDebugLevel::Informational);
+	//if (primitive) {
+	//	next_kinematics.twist.angular = getNedTransform().toVector3r(primitive->GetPhysicsAngularVelocityInRadians(), 1.0f, false);
+	//}
+	//else { // If no primitive component can be found, use old method. This is the case for ComputerVision SimMode.
+	//	next_kinematics.twist.angular = msr::airlib::VectorMath::toAngularVelocity(
+	//		kinematics_->getPose().orientation, next_kinematics.pose.orientation, dt);
+	//}
 
-	next_kinematics.accelerations.linear = (next_kinematics.twist.linear - kinematics_->getTwist().linear) / dt;
-	next_kinematics.accelerations.angular = (next_kinematics.twist.angular - kinematics_->getTwist().angular) / dt;
+	//// Old Method (Getting angular velocity from orientation difference between this and previous frame)
+	////next_kinematics.twist.angular = msr::airlib::VectorMath::toAngularVelocity(
+	////	kinematics_->getPose().orientation, next_kinematics.pose.orientation, dt);
+
+	////UAirBlueprintLib::LogMessageString("Relative Angular Velocity: ", "X: " + std::to_string(next_kinematics.twist.angular[0]) + ", Y: " + std::to_string(next_kinematics.twist.angular[1]) + ", Z:" + std::to_string(next_kinematics.twist.angular[2]), LogDebugLevel::Informational);
+	////UAirBlueprintLib::LogMessageString("Absolute Linear Velocity: ", "X: " + std::to_string(next_kinematics.twist.linear[0]) + ", Y: " + std::to_string(next_kinematics.twist.linear[1]) + ", Z:" + std::to_string(next_kinematics.twist.linear[2]), LogDebugLevel::Informational);
+
+	//next_kinematics.accelerations.linear = (next_kinematics.twist.linear - kinematics_->getTwist().linear) / dt;
+	//next_kinematics.accelerations.angular = (next_kinematics.twist.angular - kinematics_->getTwist().angular) / dt;
 
 	kinematics_->setState(next_kinematics);
 	kinematics_->update();
