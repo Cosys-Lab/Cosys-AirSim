@@ -330,9 +330,9 @@ public:
 		RealT p_e, r_e, y_e;
 		toEulerianAngle(end, p_e, r_e, y_e);
 
-		RealT p_rate = (p_e - p_s) / dt;
-		RealT r_rate = (r_e - r_s) / dt;
-		RealT y_rate = (y_e - y_s) / dt;
+		RealT p_rate = normalizeAngle(p_e - p_s, (RealT)(2 * M_PI)) / dt;
+		RealT r_rate = normalizeAngle(r_e - r_s, (RealT)(2 * M_PI)) / dt;
+		RealT y_rate = normalizeAngle(y_e - y_s, (RealT)(2 * M_PI)) / dt;
 
 		//TODO: optimize below
 		//Sec 1.3, https://ocw.mit.edu/courses/mechanical-engineering/2-154-maneuvering-and-control-of-surface-and-underwater-vehicles-13-49-fall-2004/lecture-notes/lec1.pdf
