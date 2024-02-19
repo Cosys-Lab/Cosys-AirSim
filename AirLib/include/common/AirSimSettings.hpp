@@ -206,6 +206,13 @@ public: //types
     };
 
     struct ImuSetting : SensorSetting {
+        float angular_random_walk = Utils::nan<float>();
+        float gyro_bias_stability_tau = 500;
+        float gyro_bias_stability = Utils::nan<float>();
+        float velocity_random_walk = Utils::nan<float>();
+        float accel_bias_stability_tau = 800;
+        float accel_bias_stability = Utils::nan<float>();
+        bool generate_noise = true;
     };
 
     struct GpsSetting : SensorSetting {
@@ -1475,10 +1482,25 @@ private:
 
     static void initializeImuSetting(ImuSetting& imu_setting, const Settings& settings_json)
     {
-        unused(imu_setting);
-        unused(settings_json);
-
-        //TODO: set from json as needed
+        float arw = settings_json.getFloat("AngularRandomWalk", imu_setting.angular_random_walk);
+        if (!std::isnan(arw)) {
+            imu_setting.angular_random_walk = arw / sqrt(3600.0f) * M_PIf / 180; // //deg/sqrt(hour) converted to rad/sqrt(sec)
+        }
+        imu_setting.gyro_bias_stability_tau = settings_json.getFloat("GyroBiasStabilityTau", imu_setting.gyro_bias_stability_tau);
+        float bias_stability = settings_json.getFloat("GyroBiasStability", imu_setting.gyro_bias_stability);
+        if (!std::isnan(bias_stability)) {
+            imu_setting.gyro_bias_stability = bias_stability / 3600 * M_PIf / 180; //deg/hr converted to rad/sec
+        }
+        auto vrw = settings_json.getFloat("VelocityRandomWalk", imu_setting.velocity_random_walk);
+        if (!std::isnan(vrw)) {
+            imu_setting.velocity_random_walk = vrw * EarthUtils::Gravity / 1.0E3f; //mg converted to m/s^2
+        }
+        imu_setting.accel_bias_stability_tau = settings_json.getFloat("AccelBiasStabilityTau", imu_setting.accel_bias_stability_tau);
+        bias_stability = settings_json.getFloat("AccelBiasStability", imu_setting.accel_bias_stability);
+        if (!std::isnan(bias_stability)) {
+            imu_setting.accel_bias_stability = bias_stability * 1E-6f * EarthUtils::Gravity; //ug converted to m/s^2
+        }
+        imu_setting.generate_noise = settings_json.getBool("GenerateNoise", imu_setting.generate_noise);
     }
 
     static void initializeGpsSetting(GpsSetting& gps_setting, const Settings& settings_json)
