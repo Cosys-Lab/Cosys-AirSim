@@ -292,7 +292,7 @@ def get_object_pose_ros_message(c, object_pose_individual_coordinates_local, cur
         cur_pose = c.simGetObjectPose(cur_object_name, True)
     else:
         cur_pose = c.simGetObjectPose(cur_object_name, False)
-    if np.isnan(pose.position.x_val):
+    if np.isnan(cur_pose.position.x_val):
         if cur_warning_issued is False:
             cur_rospy.logwarn("Object '" + cur_object_name + "' could not be found.")
             warning_issued_result = True
