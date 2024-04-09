@@ -132,7 +132,7 @@ std::unique_ptr<PawnSimApi> ASimModeComputerVision::createVehicleSimApi(
 }
 
 msr::airlib::VehicleApiBase* ASimModeComputerVision::getVehicleApi(const PawnSimApi::Params& pawn_sim_api_params,
-    const PawnSimApi* sim_api) const
+                                                                   const PawnSimApi* sim_api) const
 {
     const auto computer_vision_sim_api = static_cast<const ComputerVisionPawnSimApi*>(sim_api);
     return computer_vision_sim_api->getVehicleApi();

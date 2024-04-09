@@ -3,27 +3,26 @@
 #include "CoreMinimal.h"
 
 #include "PawnSimApi.h"
-#include "vehicles/multirotor/MultiRotor.hpp"
+#include "vehicles/multirotor/MultiRotorPhysicsBody.hpp"
 #include "vehicles/multirotor/MultiRotorParams.hpp"
 #include "physics//Kinematics.hpp"
 #include "common/Common.hpp"
 #include "common/CommonStructs.hpp"
-#include "common/common_utils/UniqueValueMap.hpp" 
+#include "common/common_utils/UniqueValueMap.hpp"
 #include "MultirotorPawnEvents.h"
 #include <future>
-
 
 class MultirotorPawnSimApi : public PawnSimApi
 {
 public:
     typedef msr::airlib::real_T real_T;
     typedef msr::airlib::Utils Utils;
-    typedef msr::airlib::MultiRotor MultiRotor;
+    typedef msr::airlib::MultiRotorPhysicsBody MultiRotor;
     typedef msr::airlib::StateReporter StateReporter;
     typedef msr::airlib::UpdatableObject UpdatableObject;
     typedef msr::airlib::Pose Pose;
 
-    typedef MultirotorPawnEvents::RotorInfo RotorInfo;
+    typedef MultirotorPawnEvents::RotorActuatorInfo RotorActuatorInfo;
 
 public:
     virtual void initialize() override;
@@ -38,12 +37,13 @@ public:
 
     //PhysicsBody interface
     //this just wrapped around MultiRotor physics body
-    virtual void reset() override;
+    virtual void resetImplementation() override;
     virtual void update(float delta = 0) override;
     virtual void reportState(StateReporter& reporter) override;
     virtual UpdatableObject* getPhysicsBody() override;
 
     virtual void setPose(const Pose& pose, bool ignore_collision) override;
+    virtual void setKinematics(const Kinematics::State& state, bool ignore_collision) override;
     virtual void pawnTick(float dt) override;
 
     msr::airlib::MultirotorApiBase* getVehicleApi() const
@@ -60,9 +60,9 @@ private:
     std::unique_ptr<msr::airlib::MultirotorApiBase> vehicle_api_;
     std::unique_ptr<msr::airlib::MultiRotorParams> vehicle_params_;
 
-    std::unique_ptr<MultiRotor> phys_vehicle_;
+    std::unique_ptr<MultiRotor> multirotor_physics_body_;
     unsigned int rotor_count_;
-    std::vector<RotorInfo> rotor_info_;
+    std::vector<RotorActuatorInfo> rotor_actuator_info_;
 
     //show info on collision response from physics engine
     CollisionResponse collision_response;
@@ -71,8 +71,10 @@ private:
 
     //when pose needs to set from non-physics thread, we set it as pending
     bool pending_pose_collisions_;
-    enum class PendingPoseStatus {
-        NonePending, RenderPending
+    enum class PendingPoseStatus
+    {
+        NonePending,
+        RenderPending
     } pending_pose_status_;
     Pose pending_phys_pose_; //force new pose through API
 
@@ -83,4 +85,5 @@ private:
 
     Pose last_phys_pose_; //for trace lines showing vehicle path
     std::vector<std::string> vehicle_api_messages_;
+    RotorStates rotor_states_;
 };

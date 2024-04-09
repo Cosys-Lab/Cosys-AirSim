@@ -7,11 +7,14 @@ Please see [general sensors](sensors.md) for information on configruation of gen
 
 ## Enabling lidar on a vehicle
 * By default, lidars are not enabled. To enable lidar, set the SensorType and Enabled attributes in settings json.
+
+```json
+    "Lidar1": {
+         "SensorType": 6,
+         "Enabled" : true,
+    }
 ```
-        "Lidar1": { 
-             "SensorType": 6,
-             "Enabled" : true,
-```
+
 * Multiple lidars can be enabled on a vehicle.
 
 ## Ignoring glass and other material types
@@ -42,7 +45,7 @@ External                  | Uncouple the sensor from the vehicle. If enabled, th
 ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
 ```
 {
-    "SeeDocsAt": "https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/settings.md",
+    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
     "SettingsVersion": 1.2,
 
     "SimMode": "Multirotor",
@@ -85,13 +88,14 @@ ExternalLocal             | When in external mode, if this is enabled the retrie
 ```
 
 ## Server side visualization for debugging
-Be default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json.
-e.g.,
-```
-        "Lidar1": { 
-             ...
-             "DrawDebugPoints": true
-        },
+
+By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting `DrawDebugPoints` via settings json.
+
+```json
+    "Lidar1": {
+         ...
+         "DrawDebugPoints": true
+    },
 ```
 
 ## Client API 

@@ -152,7 +152,7 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 		else {
 			current_horizontal_angle_index_ += 1;
 		}
-		
+
 		float horizontal_angle = horizontal_angles_[current_horizontal_angle_index_];
 		//UE_LOG(LogTemp, Display, TEXT("horizontal_angle: %f "), horizontal_angle);
 
@@ -164,7 +164,7 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 					if ((((int)point_cloud.size() / 3) != params.measurement_per_cycle * number_of_lasers) || (groundtruth.size() != params.measurement_per_cycle * number_of_lasers))
 					{
 						UE_LOG(LogTemp, Warning, TEXT("Pointcloud or labels incorrect size! points:%i labels:%i"), (int)(point_cloud.size() / 3), groundtruth.size());
-					}		
+					}
 					//UE_LOG(LogTemp, Display, TEXT("Pointcloud completed! points:%i labels:%i"), (int)(point_cloud.size() / 3), groundtruth.size());
 					point_cloud_final = point_cloud;
 					groundtruth_final = groundtruth;
@@ -173,7 +173,7 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 					refresh = true;
 				}
 			}
-			
+
 			// check if horizontal angle is a duplicate
 			if ((horizontal_angle - previous_horizontal_angle) <= 0.00005f && (horizontal_angle - 0) >= 0.00005f) {
 				UE_LOG(LogTemp, Display, TEXT("duplicate horizontal angle! angle! previous:%f current:%f"), previous_horizontal_angle, horizontal_angle);
@@ -184,7 +184,7 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 			if (!VectorMath::isAngleBetweenAngles(horizontal_angle, laser_start, laser_end)) {
 				UE_LOG(LogTemp, Display, TEXT("outside of FOV: %f "), horizontal_angle);
 				continue;
-			}			
+			}
 
 			Vector3r point;
 			std::string label;

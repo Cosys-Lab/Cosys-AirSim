@@ -4,13 +4,13 @@
 This branch uses a custom version of the Unreal Engine!
 - Make sure you are [registered with Epic Games and have linked your Epic Games account with your GitHub account](https://www.unrealengine.com/en-US/ue-on-github). This is required to get source code access for Unreal Engine.
 
-- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.24.4 (Cosys-Lab fork) at present.
+- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.27.3 (Cosys-Lab fork) at present.
    ```bash
    # go to the folder where you clone GitHub projects
    git clone https://github.com/WouterJansen/UnrealEngine.git
    cd UnrealEngine
    ```
- -Visual Studio 2019 is required for building. 
+ -Visual Studio 2012 is required for building. 
 - To install the correct components for UE4 development, check the "Game Development with C++" workload and the “.net 4.6.2”, "Unreal Engine Installer" and "Nuget Package Manager" optional individual components.
 - run `Setup.bat`
 - run `GenerateProjectFiles.bat ` as administrator 
@@ -21,13 +21,13 @@ This branch uses a custom version of the Unreal Engine!
 - please run `Engine\Binaries\Win64\UnrealVersionSelector-Win64-Shipping.exe` once so it is detectable by your system. 
 
 ## Build AirSim
-* Start `x64 Native Tools Command Prompt for VS 2019`. 
+* Start `x64 Native Tools Command Prompt for VS 2022`. 
 * Clone the repo: `git clone https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git`, and go the AirSim directory by `cd AirSim`. 
 * Run `build.cmd` from the command line. This will create ready to use plugin bits in the `Unreal\Plugins` folder that can be dropped into any Unreal project.
 
 ## Build Unreal Project
 
-Finally, you will need an Unreal project that hosts the environment for your vehicles. AirSim comes with a built-in "Blocks Environment" which you can use, or you can create your own. Please see [setting up Unreal Environment](unreal_proj.md).
+Finally, you will need an Unreal project that hosts the environment for your vehicles. Make sure to close and re-open the Unreal Engine and the Epic Games Launcher before building your first environment if you haven't done so already. After restarting the Epic Games Launcher it will ask you to associate project file extensions with Unreal Engine, click on 'fix now' to fix it. AirSim comes with a built-in "Blocks Environment" which you can use, or you can create your own. Please see [setting up Unreal Environment](unreal_proj.md).
 
 ## Setup Remote Control (Multirotor only)
 
@@ -39,16 +39,19 @@ Alternatively, you can use [APIs](apis.md) for programmatic control or use the s
 
 Once AirSim is set up by following above steps, you can,
 
-1. Double click on .sln file to load for example the Blocks project in `Unreal\Environments\Blocks` (or .sln file in your own [custom](unreal_custenv.md) Unreal project). If you don't see .sln file then you probably haven't completed steps in Build Unreal Project section above.
+1. Double click on .sln file to load the Blocks project in `Unreal\Environments\Blocks` (or .sln file in your own [custom](unreal_custenv.md) Unreal project). If you don't see .sln file then you probably haven't completed steps in Build Unreal Project section above.
+
+    **Note**: Unreal 4.27 will auto-generate the .sln file targetting Visual Studio 2019. Visual Studio 2022 will be able to load and run this .sln, but if you want full Visual Studio 2022 support, you will need to explicitly enable support by going to 'Edit->Editor Preferences->Source Code' and selecting 'Visual Studio 2022' for the 'Source Code Editor' setting.
+
 2. Select your Unreal project as Start Up project (for example, Blocks project) and make sure Build config is set to "Develop Editor" and x64.
-3. After Unreal Editor loads, press Play button. Tip: go to 'Edit->Editor Preferences', in the 'Search' box type 'CPU' and ensure that the 'Use Less CPU when in Background' is unchecked.
+3. After Unreal Editor loads, press Play button. 
+
+!!! tip
+    Go to 'Edit->Editor Preferences', in the 'Search' box type 'CPU' and ensure that the 'Use Less CPU when in Background' is unchecked.
 
 See [Using APIs](apis.md) and [settings.json](settings.md) for various options available.
 
 The other environments available often need additional asset packs to be downloaded first, read [here](environments.md) for more information.
-
-# AirSim on Unity (Experimental)
-[Unity](https://unity3d.com/) is another great game engine platform and we have an [experimental release](https://github.com/Microsoft/AirSim/tree/master/Unity) of AirSim on Unity. Please note that this is work in progress and all features may not work yet. 
 
 # FAQ
 #### I get `error C100 : An internal error has occurred in the compiler` when running build.cmd

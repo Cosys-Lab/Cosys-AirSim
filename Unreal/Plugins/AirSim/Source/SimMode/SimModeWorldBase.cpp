@@ -1,7 +1,8 @@
 #include "SimModeWorldBase.h"
+#include "physics/FastPhysicsEngine.hpp"
+#include "physics/ExternalPhysicsEngine.hpp"
 #include <exception>
 #include "AirBlueprintLib.h"
-
 
 void ASimModeWorldBase::BeginPlay()
 {
@@ -18,7 +19,16 @@ void ASimModeWorldBase::initializeForPlay()
     std::unique_ptr<PhysicsEngineBase> physics_engine = createPhysicsEngine();
     physics_engine_ = physics_engine.get();
     physics_world_.reset(new msr::airlib::PhysicsWorld(std::move(physics_engine),
-        vehicles, getPhysicsLoopPeriod()));
+                                                       vehicles,
+                                                       getPhysicsLoopPeriod()));
+}
+
+void ASimModeWorldBase::registerPhysicsBody(msr::airlib::VehicleSimApiBase* physicsBody)
+{
+    // Reset the vehicle as well before registering it
+    // Similar to what happens in initializeForPlay() above
+    physicsBody->reset();
+    physics_world_.get()->addBody(physicsBody);
 }
 
 void ASimModeWorldBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -33,6 +43,7 @@ void ASimModeWorldBase::startAsyncUpdator()
 {
     physics_world_->startAsyncUpdator();
 }
+
 void ASimModeWorldBase::stopAsyncUpdator()
 {
     physics_world_->stopAsyncUpdator();
@@ -42,7 +53,7 @@ long long ASimModeWorldBase::getPhysicsLoopPeriod() const //nanoseconds
 {
     return physics_loop_period_;
 }
-void ASimModeWorldBase::setPhysicsLoopPeriod(long long  period)
+void ASimModeWorldBase::setPhysicsLoopPeriod(long long period)
 {
     physics_loop_period_ = period;
 }
@@ -61,10 +72,15 @@ std::unique_ptr<ASimModeWorldBase::PhysicsEngineBase> ASimModeWorldBase::createP
         else {
             physics_engine.reset(new msr::airlib::FastPhysicsEngine());
         }
+
+        physics_engine->setWind(getSettings().wind);
+    }
+    else if (physics_engine_name == "ExternalPhysicsEngine") {
+        physics_engine.reset(new msr::airlib::ExternalPhysicsEngine());
     }
     else {
         physics_engine.reset();
-        UAirBlueprintLib::LogMessageString("Unrecognized physics engine name: ",  physics_engine_name, LogDebugLevel::Failure);
+        UAirBlueprintLib::LogMessageString("Unrecognized physics engine name: ", physics_engine_name, LogDebugLevel::Failure);
     }
 
     return physics_engine;
@@ -78,12 +94,46 @@ bool ASimModeWorldBase::isPaused() const
 void ASimModeWorldBase::pause(bool is_paused)
 {
     physics_world_->pause(is_paused);
+    ASimModeBase::pause(is_paused);
 }
 
 void ASimModeWorldBase::continueForTime(double seconds)
 {
-    physics_world_->continueForTime(seconds);
+    int64 start_frame_number = UKismetSystemLibrary::GetFrameCount();
+    if (physics_world_->isPaused()) {
+        physics_world_->pause(false);
+        UGameplayStatics::SetGamePaused(this->GetWorld(), false);
+    }
 
+    physics_world_->continueForTime(seconds);
+    while (!physics_world_->isPaused()) {
+        continue;
+    }
+    // wait if no new frame is renderd
+    while (start_frame_number == UKismetSystemLibrary::GetFrameCount()) {
+        continue;
+    }
+    UGameplayStatics::SetGamePaused(this->GetWorld(), true);
+}
+
+void ASimModeWorldBase::continueForFrames(uint32_t frames)
+{
+    if (physics_world_->isPaused()) {
+        physics_world_->pause(false);
+        UGameplayStatics::SetGamePaused(this->GetWorld(), false);
+    }
+
+    physics_world_->setFrameNumber((uint32_t)GFrameNumber);
+    physics_world_->continueForFrames(frames);
+    while (!physics_world_->isPaused()) {
+        physics_world_->setFrameNumber((uint32_t)GFrameNumber);
+    }
+    UGameplayStatics::SetGamePaused(this->GetWorld(), true);
+}
+
+void ASimModeWorldBase::setWind(const msr::airlib::Vector3r& wind) const
+{
+    physics_engine_->setWind(wind);
 }
 
 void ASimModeWorldBase::updateDebugReport(msr::airlib::StateReporterWrapper& debug_reporter)
@@ -117,8 +167,9 @@ void ASimModeWorldBase::reset()
 {
     UAirBlueprintLib::RunCommandOnGameThread([this]() {
         physics_world_->reset();
-    }, true);
-    
+    },
+                                             true);
+
     //no need to call base reset because of our custom implementation
 }
 

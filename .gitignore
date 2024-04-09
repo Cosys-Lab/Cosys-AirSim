@@ -36,7 +36,7 @@ CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
 
-# Unreal Engine
+#Unreal Engine
 StarterContent/
 Saved/
 !DefaultEditorPerProjectUserSettings.ini #contains use less CPU setting
@@ -222,7 +222,6 @@ Backup*/
 UpgradeLog*.XML
 UpgradeLog*.htm
 *.bundle
-**/*.orig
 
 # SQL Server files
 *.mdf
@@ -293,12 +292,14 @@ ModelManifest.xml
 /cmake/MavLinkCom/Makefile
 /cmake/Makefile
 /cmake/HelloDrone/Makefile
+/cmake/HelloSpawnedDrones/Makefile
 /cmake/DroneShell/Makefile
 /cmake/DroneServer/Makefile
 /cmake/AirLib/Makefile
 /cmake/AirLibUnity/Makefile
 /cmake/AirLibUnity/AirLibUnity
 /cmake/HelloDrone/HelloDrone
+/cmake/HelloSpawnedDrones/HelloSpawnedDrones
 /cmake/DroneShell/DroneShell
 /cmake/DroneServer/DroneServer
 cmake/AirLibUnitTests/Makefile
@@ -314,6 +315,7 @@ cmake_build/
 /boost
 /[Ee]igen
 /build_debug
+/build_release
 /cmake/CPackSourceConfig.cmake
 /cmake/CPackConfig.cmake
 /cmake/arch.c
@@ -364,17 +366,31 @@ xcuserdata/
 !*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 
-/Unity/UnityDemo/Library
-/Unity/UnityDemo/Assembly-CSharp.csproj
-/Unity/UnityDemo/UnityDemo.sln
-/Unity/UnityDemo/Logs/
-/Unity/UnityDemo/Assets/Plugins/AirsimWrapper.dll
-/Builds/
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
 
-### External assests ###
+# ROS
+ros/.catkin_tools/
+ros/devel/
+ros/logs/
+ros/.catkin_workspace
+ros/src/CMakeLists.txt
 
-*GenericNPCAnimPack/
-*IndustryPropsPack6/
-/build_release/
-/Scripts/GenerateMaskFromBag/parfor_progress.txt
-*.asv
+# ROS2
+ros2/install/
+ros2/log/
+ros2/src/log
+
+# docs
+docs/README.md
+build_docs/
+
+# api docs
+PythonClient/docs/_build
+
+# Docker
+/docker/Blocks/
+
+# clangd generated folder, for e.g. from VSCode clangd extension
+.cache/

@@ -1,3 +1,0 @@
-[submodule "ros/fm_msgs"]
-	path = ros/fm_msgs
-	url = git@github.com:kurtgeebelen/fm_msgs.git

@@ -11,13 +11,13 @@
 #include "SimModeSkidVehicle.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class AIRSIM_API ASimModeSkidVehicle : public ASimModeBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;

@@ -1,11 +1,12 @@
 import setuptools
+from airsim import __version__
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="airsim",
-    version="1.2.4",
+    version=__version__,
     author="Shital Shah & Cosys-Lab",
     author_email="wouter.jansen@uantwerpen.be",
     description="Open source simulator based on Unreal Engine for autonomous vehicles",
@@ -20,6 +21,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-          'msgpack-rpc-python', 'numpy'
+          'msgpack-rpc-python', 'numpy', 'opencv-contrib-python'
     ]
 )

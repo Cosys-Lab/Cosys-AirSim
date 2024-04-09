@@ -5,18 +5,18 @@
 #include "common/Common.hpp"
 #include "AirBlueprintLib.h"
 
-
 class AUnrealLog : public msr::airlib::Utils::Logger
 {
 public:
-    virtual void log(int level, const std::string& message) override 
+    virtual void log(int level, const std::string& message) override
     {
         size_t tab_pos;
         static const std::string delim = ":\t";
         if ((tab_pos = message.find(delim)) != std::string::npos) {
-            UAirBlueprintLib::LogMessageString(message.substr(0, tab_pos), 
-                message.substr(tab_pos + delim.size(), std::string::npos), LogDebugLevel::Informational);
-            
+            UAirBlueprintLib::LogMessageString(message.substr(0, tab_pos),
+                                               message.substr(tab_pos + delim.size(), std::string::npos),
+                                               LogDebugLevel::Informational);
+
             return; //display only
         }
 
@@ -29,11 +29,11 @@ public:
         else {
             UE_LOG(LogTemp, Log, TEXT("%s"), *FString(message.c_str()));
         }
-  
-//#ifdef _MSC_VER
-//        //print to VS output window
-//        OutputDebugString(std::wstring(message.begin(), message.end()).c_str());
-//#endif
+
+        //#ifdef _MSC_VER
+        //        //print to VS output window
+        //        OutputDebugString(std::wstring(message.begin(), message.end()).c_str());
+        //#endif
 
         //also do default logging
         msr::airlib::Utils::Logger::log(level, message);
@@ -65,11 +65,10 @@ AAirSimGameMode::AAirSimGameMode(const FObjectInitializer& ObjectInitializer)
 
 void AAirSimGameMode::StartPlay()
 {
-	Super::StartPlay();
+    Super::StartPlay();
 
-	//UGameUserSettings* game_settings = GetGameUserSettings();
-	//game_settings->SetFullscreenMode(EWindowMode::WindowedFullscreen);
-	//game_settings->ApplySettings(true);
+    //UGameUserSettings* game_settings = GetGameUserSettings();
+    //game_settings->SetFullscreenMode(EWindowMode::WindowedFullscreen);
+    //game_settings->ApplySettings(true);
 }
-
 

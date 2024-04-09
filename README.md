@@ -1,9 +1,10 @@
 # Welcome to AirSim
 
-AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment.
-Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
-* Based on public AirSim release from November 2018.
+AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/) (we now also have an experimental [Unity](https://unity3d.com/) release). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. Similarly, we have an experimental release for a Unity plugin. 
 
+Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
+* Based on last public AirSim release from Microsoft's GitHub.
+* 
 ## Cosys-Lab Modifications
 
 Cosys-Lab made extensive modifications to the AirSim platform (based on November 2018 release) to support multiple projects and research goals. 
@@ -73,7 +74,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
-* Updated Unreal to 4.24 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.24-cosys))
+* Updated Unreal to 4.27 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys))
 * Dropped support for Unity Environments.
 
 Some more details on our changes can be found in the [changelog](CHANGELOG.md).
@@ -81,9 +82,9 @@ Some more details on our changes can be found in the [changelog](CHANGELOG.md).
 ## How to Get It
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
+
 ### Windows
 * [Build it](docs/build_windows.md)
-
 ### Linux
 * [Build it](docs/build_linux.md)
 
@@ -92,56 +93,6 @@ This branch uses a custom Unreal Engine version! Please read the documentation c
 ### Documentation
 
 View our [detailed documentation](docs) on all aspects of AirSim.
-
-### Manual drive
-
-If you have remote control (RC) as shown below, you can manually control the drone in the simulator. For cars, you can use arrow keys to drive manually.
-
-[More details](docs/remote_control.md)
-
-![record screenshot](docs/images/AirSimDroneManual.gif)
-
-![record screenshot](docs/images/AirSimCarManual.gif)
-
-
-### Programmatic control
-
-AirSim exposes APIs so you can interact with the vehicle in the simulation programmatically. You can use these APIs to retrieve images, get state, control the vehicle and so on. The APIs are exposed through the RPC, and are accessible via a variety of languages, including C++, Python, C# and Java.
-
-These APIs are also available as part of a separate, independent cross-platform library, so you can deploy them on a companion computer on your vehicle. This way you can write and test your code in the simulator, and later execute it on the real vehicles. Transfer learning and related research is one of our focus areas.
-
-Note that you can use [SimMode setting](docs/settings.md) to specify the default vehicle or the new [ComputerVision mode](docs/image_apis.md) so you don't get prompted each time you start AirSim.
-
-[More details](docs/apis.md)
-
-### Gathering training data
-
-There are two ways you can generate training data from AirSim for deep learning. The easiest way is to simply press the record button in the lower right corner. This will start writing pose and images for each frame. The data logging code is pretty simple and you can modify it to your heart's content.
-
-![record screenshot](docs/images/record_data.png)
-
-A better way to generate training data exactly the way you want is by accessing the APIs. This allows you to be in full control of how, what, where and when you want to log data. 
-
-### Computer Vision mode
-
-Yet another way to use AirSim is the so-called "Computer Vision" mode. In this mode, you don't have vehicles or physics. You can use the keyboard to move around the scene, or use APIs to position available cameras in any arbitrary pose, and collect images such as depth, disparity, surface normals or object segmentation. 
-
-[More details](docs/image_apis.md)
-
-### Weather Effects
-
-Press F10 to see various options available for weather effects. You can also control the weather using [APIs](docs/apis.md). Press F1 to see other options available.
-
-![record screenshot](docs/images/weather_menu.png)
-
-## Tutorials
-
-- [Video - Setting up AirSim with Pixhawk Tutorial](https://youtu.be/1oY8Qu5maQQ) by Chris Lovett
-- [Video - Using AirSim with Pixhawk Tutorial](https://youtu.be/HNWdYrtw3f0) by Chris Lovett
-- [Video - Using off-the-self environments with AirSim](https://www.youtube.com/watch?v=y09VbdQWvQY) by Jim Piavis
-- [Reinforcement Learning with AirSim](docs/reinforcement_learning.md) by Ashish Kapoor
-- [The Autonomous Driving Cookbook](https://aka.ms/AutonomousDrivingCookbook) by Microsoft Deep Learning and Robotics Garage Chapter
-- [Using TensorFlow for simple collision avoidance](https://github.com/simondlevy/AirSimTensorFlow) by Simon Levy and WLU team
 
 ## Participate
 

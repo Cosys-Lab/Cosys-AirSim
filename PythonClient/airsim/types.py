@@ -1,7 +1,6 @@
 from __future__ import print_function
-import msgpackrpc  # install as admin: pip install msgpack-rpc-python
-import numpy as np  # pip install numpy
-
+import msgpackrpc #install as admin: pip install msgpack-rpc-python
+import numpy as np #pip install numpy
 
 class MsgpackMixin:
     def __repr__(self):
@@ -29,27 +28,53 @@ class MsgpackMixin:
         # return cls(**msgpack.unpack(encoded))
         return obj
 
+class _ImageType(type):
+    @property
+    def Scene(cls):
+        return 0
+    def DepthPlanar(cls):
+        return 1
+    def DepthPerspective(cls):
+        return 2
+    def DepthVis(cls):
+        return 3
+    def DisparityNormalized(cls):
+        return 4
+    def Segmentation(cls):
+        return 5
+    def SurfaceNormals(cls):
+        return 6
+    def Infrared(cls):
+        return 7
+    def OpticalFlow(cls):
+        return 8
+    def OpticalFlowVis(cls):
+        return 9
 
-class ImageType:
+    def __getattr__(self, key):
+        if key == 'DepthPlanner':
+            print('\033[31m'+"DepthPlanner has been (correctly) renamed to DepthPlanar. Please use ImageType.DepthPlanar instead."+'\033[0m')
+            raise AttributeError
+
+class ImageType(metaclass=_ImageType):
     Scene = 0
-    DepthPlanner = 1
+    DepthPlanar = 1
     DepthPerspective = 2
     DepthVis = 3
     DisparityNormalized = 4
     Segmentation = 5
     SurfaceNormals = 6
     Infrared = 7
-
+    OpticalFlow = 8
+    OpticalFlowVis = 9
 
 class DrivetrainType:
     MaxDegreeOfFreedom = 0
     ForwardOnly = 1
 
-
 class LandedState:
     Landed = 0
     Flying = 1
-
 
 class WeatherParameter:
     Rain = 0
@@ -62,6 +87,13 @@ class WeatherParameter:
     Fog = 7
     Enabled = 8
 
+class Vector2r(MsgpackMixin):
+    x_val = 0.0
+    y_val = 0.0
+
+    def __init__(self, x_val = 0.0, y_val = 0.0):
+        self.x_val = x_val
+        self.y_val = y_val
 
 class Vector3r(MsgpackMixin):
     x_val = 0.0
@@ -77,6 +109,9 @@ class Vector3r(MsgpackMixin):
     def nanVector3r():
         return Vector3r(np.nan, np.nan, np.nan)
 
+    def containsNan(self):
+        return (math.isnan(self.x_val) or math.isnan(self.y_val) or math.isnan(self.z_val))
+
     def __add__(self, other):
         return Vector3r(self.x_val + other.x_val, self.y_val + other.y_val, self.z_val + other.z_val)
 
@@ -85,36 +120,34 @@ class Vector3r(MsgpackMixin):
 
     def __truediv__(self, other):
         if type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
-            return Vector3r(self.x_val / other, self.y_val / other, self.z_val / other)
+            return Vector3r( self.x_val / other, self.y_val / other, self.z_val / other)
         else:
-            raise TypeError('unsupported operand type(s) for /: %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for /: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def __mul__(self, other):
         if type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
-            return Vector3r(self.x_val * other, self.y_val * other, self.z_val * other)
+            return Vector3r(self.x_val*other, self.y_val*other, self.z_val*other)
         else:
-            raise TypeError('unsupported operand type(s) for *: %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for *: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def dot(self, other):
         if type(self) == type(other):
-            return self.x_val * other.x_val + self.y_val * other.y_val + self.z_val * other.z_val
+            return self.x_val*other.x_val + self.y_val*other.y_val + self.z_val*other.z_val
         else:
-            raise TypeError('unsupported operand type(s) for \'dot\': %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for \'dot\': %s and %s' % ( str(type(self)), str(type(other))) )
 
     def cross(self, other):
         if type(self) == type(other):
             cross_product = np.cross(self.to_numpy_array(), other.to_numpy_array())
             return Vector3r(cross_product[0], cross_product[1], cross_product[2])
         else:
-            raise TypeError(
-                'unsupported operand type(s) for \'cross\': %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for \'cross\': %s and %s' % ( str(type(self)), str(type(other))) )
 
     def get_length(self):
-        return (self.x_val ** 2 + self.y_val ** 2 + self.z_val ** 2) ** 0.5
+        return ( self.x_val**2 + self.y_val**2 + self.z_val**2 )**0.5
 
     def distance_to(self, other):
-        return ((self.x_val - other.x_val) ** 2 + (self.y_val - other.y_val) ** 2 + (
-                    self.z_val - other.z_val) ** 2) ** 0.5
+        return ( (self.x_val-other.x_val)**2 + (self.y_val-other.y_val)**2 + (self.z_val-other.z_val)**2 )**0.5
 
     def to_Quaternionr(self):
         return Quaternionr(self.x_val, self.y_val, self.z_val, 0)
@@ -122,6 +155,8 @@ class Vector3r(MsgpackMixin):
     def to_numpy_array(self):
         return np.array([self.x_val, self.y_val, self.z_val], dtype=np.float32)
 
+    def __iter__(self):
+        return iter((self.x_val, self.y_val, self.z_val))
 
 class Quaternionr(MsgpackMixin):
     w_val = 0.0
@@ -129,7 +164,7 @@ class Quaternionr(MsgpackMixin):
     y_val = 0.0
     z_val = 0.0
 
-    def __init__(self, x_val=0.0, y_val=0.0, z_val=0.0, w_val=1.0):
+    def __init__(self, x_val = 0.0, y_val = 0.0, z_val = 0.0, w_val = 1.0):
         self.x_val = x_val
         self.y_val = y_val
         self.z_val = z_val
@@ -139,51 +174,51 @@ class Quaternionr(MsgpackMixin):
     def nanQuaternionr():
         return Quaternionr(np.nan, np.nan, np.nan, np.nan)
 
+    def containsNan(self):
+        return (math.isnan(self.w_val) or math.isnan(self.x_val) or math.isnan(self.y_val) or math.isnan(self.z_val))
+
     def __add__(self, other):
         if type(self) == type(other):
-            return Quaternionr(self.x_val + other.x_val, self.y_val + other.y_val, self.z_val + other.z_val,
-                               self.w_val + other.w_val)
+            return Quaternionr( self.x_val+other.x_val, self.y_val+other.y_val, self.z_val+other.z_val, self.w_val+other.w_val )
         else:
-            raise TypeError('unsupported operand type(s) for +: %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for +: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def __mul__(self, other):
         if type(self) == type(other):
             t, x, y, z = self.w_val, self.x_val, self.y_val, self.z_val
             a, b, c, d = other.w_val, other.x_val, other.y_val, other.z_val
-            return Quaternionr(w_val=a * t - b * x - c * y - d * z,
-                               x_val=b * t + a * x + d * y - c * z,
-                               y_val=c * t + a * y + b * z - d * x,
-                               z_val=d * t + z * a + c * x - b * y)
+            return Quaternionr( w_val = a*t - b*x - c*y - d*z,
+                                x_val = b*t + a*x + d*y - c*z,
+                                y_val = c*t + a*y + b*z - d*x,
+                                z_val = d*t + z*a + c*x - b*y)
         else:
-            raise TypeError('unsupported operand type(s) for *: %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for *: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def __truediv__(self, other):
         if type(other) == type(self):
             return self * other.inverse()
         elif type(other) in [int, float] + np.sctypes['int'] + np.sctypes['uint'] + np.sctypes['float']:
-            return Quaternionr(self.x_val / other, self.y_val / other, self.z_val / other, self.w_val / other)
+            return Quaternionr( self.x_val / other, self.y_val / other, self.z_val / other, self.w_val / other)
         else:
-            raise TypeError('unsupported operand type(s) for /: %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for /: %s and %s' % ( str(type(self)), str(type(other))) )
 
     def dot(self, other):
         if type(self) == type(other):
-            return self.x_val * other.x_val + self.y_val * other.y_val + self.z_val * other.z_val + self.w_val * other.w_val
+            return self.x_val*other.x_val + self.y_val*other.y_val + self.z_val*other.z_val + self.w_val*other.w_val
         else:
-            raise TypeError('unsupported operand type(s) for \'dot\': %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for \'dot\': %s and %s' % ( str(type(self)), str(type(other))) )
 
     def cross(self, other):
         if type(self) == type(other):
             return (self * other - other * self) / 2
         else:
-            raise TypeError(
-                'unsupported operand type(s) for \'cross\': %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for \'cross\': %s and %s' % ( str(type(self)), str(type(other))) )
 
     def outer_product(self, other):
         if type(self) == type(other):
-            return (self.inverse() * other - other.inverse() * self) / 2
+            return ( self.inverse()*other - other.inverse()*self ) / 2
         else:
-            raise TypeError(
-                'unsupported operand type(s) for \'outer_product\': %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for \'outer_product\': %s and %s' % ( str(type(self)), str(type(other))) )
 
     def rotate(self, other):
         if type(self) == type(other):
@@ -192,8 +227,7 @@ class Quaternionr(MsgpackMixin):
             else:
                 raise ValueError('length of the other Quaternionr must be 1')
         else:
-            raise TypeError(
-                'unsupported operand type(s) for \'rotate\': %s and %s' % (str(type(self)), str(type(other))))
+            raise TypeError('unsupported operand type(s) for \'rotate\': %s and %s' % ( str(type(self)), str(type(other))) )        
 
     def conjugate(self):
         return Quaternionr(-self.x_val, -self.y_val, -self.z_val, self.w_val)
@@ -208,7 +242,7 @@ class Quaternionr(MsgpackMixin):
         return self / self.get_length()
 
     def get_length(self):
-        return (self.x_val ** 2 + self.y_val ** 2 + self.z_val ** 2 + self.w_val ** 2) ** 0.5
+        return ( self.x_val**2 + self.y_val**2 + self.z_val**2 + self.w_val**2 )**0.5
 
     def from_numpy_array(self, array):
         return Quaternionr(array[0], array[1], array[2], array[3])
@@ -216,12 +250,16 @@ class Quaternionr(MsgpackMixin):
     def to_numpy_array(self):
         return np.array([self.x_val, self.y_val, self.z_val, self.w_val], dtype=np.float32)
 
+    def __iter__(self):
+        return iter((self.x_val, self.y_val, self.z_val, self.w_val))
 
 class Pose(MsgpackMixin):
     position = Vector3r()
     orientation = Quaternionr()
 
-    def __init__(self, position_val=Vector3r(), orientation_val=Quaternionr()):
+    def __init__(self, position_val = None, orientation_val = None):
+        position_val = position_val if position_val is not None else Vector3r()
+        orientation_val = orientation_val if orientation_val is not None else Quaternionr()
         self.position = position_val
         self.orientation = orientation_val
 
@@ -229,6 +267,11 @@ class Pose(MsgpackMixin):
     def nanPose():
         return Pose(Vector3r.nanVector3r(), Quaternionr.nanQuaternionr())
 
+    def containsNan(self):
+        return (self.position.containsNan() or self.orientation.containsNan())
+
+    def __iter__(self):
+        return iter((self.position, self.orientation))
 
 class Twist(MsgpackMixin):
     linear = Vector3r()
@@ -249,33 +292,27 @@ class CollisionInfo(MsgpackMixin):
     object_name = ""
     object_id = -1
 
-
 class GeoPoint(MsgpackMixin):
     latitude = 0.0
     longitude = 0.0
     altitude = 0.0
 
-
 class YawMode(MsgpackMixin):
     is_rate = True
     yaw_or_rate = 0.0
-
-    def __init__(self, is_rate=True, yaw_or_rate=0.0):
+    def __init__(self, is_rate = True, yaw_or_rate = 0.0):
         self.is_rate = is_rate
         self.yaw_or_rate = yaw_or_rate
 
-
 class RCData(MsgpackMixin):
     timestamp = 0
-    pitch, roll, throttle, yaw = (0.0,) * 4  # init 4 variable to 0.0
-    switch1, switch2, switch3, switch4 = (0,) * 4
-    switch5, switch6, switch7, switch8 = (0,) * 4
+    pitch, roll, throttle, yaw = (0.0,)*4 #init 4 variable to 0.0
+    switch1, switch2, switch3, switch4 = (0,)*4
+    switch5, switch6, switch7, switch8 = (0,)*4
     is_initialized = False
     is_valid = False
-
-    def __init__(self, timestamp=0, pitch=0.0, roll=0.0, throttle=0.0, yaw=0.0, switch1=0,
-                 switch2=0, switch3=0, switch4=0, switch5=0, switch6=0, switch7=0, switch8=0, is_initialized=False,
-                 is_valid=False):
+    def __init__(self, timestamp = 0, pitch = 0.0, roll = 0.0, throttle = 0.0, yaw = 0.0, switch1 = 0,
+                 switch2 = 0, switch3 = 0, switch4 = 0, switch5 = 0, switch6 = 0, switch7 = 0, switch8 = 0, is_initialized = False, is_valid = False):
         self.timestamp = timestamp
         self.pitch = pitch
         self.roll = roll
@@ -292,14 +329,13 @@ class RCData(MsgpackMixin):
         self.is_initialized = is_initialized
         self.is_valid = is_valid
 
-
 class ImageRequest(MsgpackMixin):
     camera_name = '0'
     image_type = ImageType.Scene
     pixels_as_float = False
     compress = False
 
-    def __init__(self, camera_name, image_type, pixels_as_float=False, compress=True):
+    def __init__(self, camera_name, image_type, pixels_as_float = False, compress = True):
         # todo: in future remove str(), it's only for compatibility to pre v1.2
         self.camera_name = str(camera_name)
         self.image_type = image_type
@@ -320,7 +356,6 @@ class ImageResponse(MsgpackMixin):
     height = 0
     image_type = ImageType.Scene
 
-
 class CarControls(MsgpackMixin):
     throttle = 0.0
     steering = 0.0
@@ -330,8 +365,8 @@ class CarControls(MsgpackMixin):
     manual_gear = 0
     gear_immediate = True
 
-    def __init__(self, throttle=0, steering=0, brake=0,
-                 handbrake=False, is_manual_gear=False, manual_gear=0, gear_immediate=True):
+    def __init__(self, throttle = 0, steering = 0, brake = 0,
+        handbrake = False, is_manual_gear = False, manual_gear = 0, gear_immediate = True):
         self.throttle = throttle
         self.steering = steering
         self.brake = brake
@@ -340,16 +375,16 @@ class CarControls(MsgpackMixin):
         self.manual_gear = manual_gear
         self.gear_immediate = gear_immediate
 
+
     def set_throttle(self, throttle_val, forward):
         if (forward):
-            is_manual_gear = False
-            manual_gear = 0
-            throttle = abs(throttle_val)
+            self.is_manual_gear = False
+            self.manual_gear = 0
+            self.throttle = abs(throttle_val)
         else:
-            is_manual_gear = False
-            manual_gear = -1
-            throttle = - abs(throttle_val)
-
+            self.is_manual_gear = False
+            self.manual_gear = -1
+            self.throttle = - abs(throttle_val)
 
 class KinematicsState(MsgpackMixin):
     position = Vector3r()
@@ -359,7 +394,6 @@ class KinematicsState(MsgpackMixin):
     linear_acceleration = Vector3r()
     angular_acceleration = Vector3r()
 
-
 class EnvironmentState(MsgpackMixin):
     position = Vector3r()
     geo_point = GeoPoint()
@@ -368,36 +402,38 @@ class EnvironmentState(MsgpackMixin):
     temperature = 0.0
     air_density = 0.0
 
-
 class CarState(MsgpackMixin):
     speed = 0.0
     gear = 0
     rpm = 0.0
     maxrpm = 0.0
     handbrake = False
-    collision = CollisionInfo();
+    collision = CollisionInfo()
     kinematics_estimated = KinematicsState()
     timestamp = np.uint64(0)
 
-
 class MultirotorState(MsgpackMixin):
-    collision = CollisionInfo();
+    collision = CollisionInfo()
     kinematics_estimated = KinematicsState()
     gps_location = GeoPoint()
     timestamp = np.uint64(0)
     landed_state = LandedState.Landed
     rc_data = RCData()
+    ready = False
+    ready_message = ""
+    can_arm = False
 
+class RotorStates(MsgpackMixin):
+    timestamp = np.uint64(0)
+    rotors = []
 
 class ProjectionMatrix(MsgpackMixin):
     matrix = []
-
 
 class CameraInfo(MsgpackMixin):
     pose = Pose()
     fov = -1
     proj_mat = ProjectionMatrix()
-
 
 class LidarData(MsgpackMixin):
     point_cloud = 0.0
@@ -479,19 +515,16 @@ class ImuData(MsgpackMixin):
     angular_velocity = Vector3r()
     linear_acceleration = Vector3r()
 
-
 class BarometerData(MsgpackMixin):
     time_stamp = np.uint64(0)
     altitude = Quaternionr()
     pressure = Vector3r()
     qnh = Vector3r()
 
-
 class MagnetometerData(MsgpackMixin):
     time_stamp = np.uint64(0)
     magnetic_field_body = Vector3r()
     magnetic_field_covariance = 0.0
-
 
 class GnssFixType(MsgpackMixin):
     GNSS_FIX_NO_FIX = 0
@@ -499,146 +532,138 @@ class GnssFixType(MsgpackMixin):
     GNSS_FIX_2D_FIX = 2
     GNSS_FIX_3D_FIX = 3
 
-
 class GnssReport(MsgpackMixin):
-    geo_point = GeoPoint();
+    geo_point = GeoPoint()
     eph = 0.0
-    epv = 0.0;
-    velocity = Vector3r();
-    fix_type = GnssFixType();
-    time_utc = np.uint64(0);
-
+    epv = 0.0
+    velocity = Vector3r()
+    fix_type = GnssFixType()
+    time_utc = np.uint64(0)
 
 class GpsData(MsgpackMixin):
     time_stamp = np.uint64(0)
     gnss = GnssReport()
     is_valid = False
 
+class DistanceSensorData(MsgpackMixin):
+    time_stamp = np.uint64(0)
+    distance = 0.0
+    min_distance = 0.0
+    max_distance = 0.0
+    relative_pose = Pose()
 
-class AddAngularForce(MsgpackMixin):
-    force_name = ''
-    link_name = ''
-    axis = Vector3r()
+class Box2D(MsgpackMixin):
+    min = Vector2r()
+    max = Vector2r()
 
-    def __init__(self, force_name_val='', link_name_val='', axis_val=Vector3r()):
-        self.force_name = force_name_val
-        self.link_name = link_name_val
-        self.axis = axis_val
+class Box3D(MsgpackMixin):
+    min = Vector3r()
+    max = Vector3r()
 
+class DetectionInfo(MsgpackMixin):
+    name = ''
+    geo_point = GeoPoint()
+    box2D = Box2D()
+    box3D = Box3D()
+    relative_pose = Pose()
 
-class AddLinearForce(MsgpackMixin):
-    force_name = ''
-    link_name = ''
-    application_point = Vector3r()
-    axis = Vector3r()
+class PIDGains():
+    """
+    Struct to store values of PID gains. Used to transmit controller gain values while instantiating
+    AngleLevel/AngleRate/Velocity/PositionControllerGains objects.
 
-    def __init__(self, force_name_val='', link_name_val='', application_point_val=Vector3r(), axis_val=Vector3r()):
-        self.force_name = force_name_val
-        self.link_name = link_name_val
-        self.application_point = application_point_val
-        self.axis = axis_val
+    Attributes:
+        kP (float): Proportional gain
+        kI (float): Integrator gain
+        kD (float): Derivative gain
+    """
+    def __init__(self, kp, ki, kd):
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
 
+    def to_list(self):
+        return [self.kp, self.ki, self.kd]
 
-class UpdateForceMagnitude(MsgpackMixin):
-    force_name = ''
-    magnitude = 0.0
+class AngleRateControllerGains():
+    """
+    Struct to contain controller gains used by angle level PID controller
 
-    def __init__(self, force_name_val='', magnitude_val=0.0):
-        self.force_name = force_name_val
-        self.magnitude = magnitude_val
+    Attributes:
+        roll_gains (PIDGains): kP, kI, kD for roll axis
+        pitch_gains (PIDGains): kP, kI, kD for pitch axis
+        yaw_gains (PIDGains): kP, kI, kD for yaw axis
+    """
+    def __init__(self, roll_gains = PIDGains(0.25, 0, 0),
+                       pitch_gains = PIDGains(0.25, 0, 0),
+                       yaw_gains = PIDGains(0.25, 0, 0)):
+        self.roll_gains = roll_gains
+        self.pitch_gains = pitch_gains
+        self.yaw_gains = yaw_gains
 
+    def to_lists(self):
+        return [self.roll_gains.kp, self.pitch_gains.kp, self.yaw_gains.kp], [self.roll_gains.ki, self.pitch_gains.ki, self.yaw_gains.ki], [self.roll_gains.kd, self.pitch_gains.kd, self.yaw_gains.kd]
 
-class LinkInformation(MsgpackMixin):
-    link_name = ''
-    link_relative_pose = Pose()
-    link_relative_twist = Twist()
+class AngleLevelControllerGains():
+    """
+    Struct to contain controller gains used by angle rate PID controller
 
-    def __init__(self, link_name_val='', link_relative_pose_val=Pose(), link_relative_twist_val=Twist()):
-        self.link_name = link_name_val
-        self.link_relative_pose = link_relative_pose_val
-        self.link_relative_twist = link_relative_twist_val
+    Attributes:
+        roll_gains (PIDGains): kP, kI, kD for roll axis
+        pitch_gains (PIDGains): kP, kI, kD for pitch axis
+        yaw_gains (PIDGains): kP, kI, kD for yaw axis
+    """
+    def __init__(self, roll_gains = PIDGains(2.5, 0, 0),
+                       pitch_gains = PIDGains(2.5, 0, 0),
+                       yaw_gains = PIDGains(2.5, 0, 0)):
+        self.roll_gains = roll_gains
+        self.pitch_gains = pitch_gains
+        self.yaw_gains = yaw_gains
 
+    def to_lists(self):
+        return [self.roll_gains.kp, self.pitch_gains.kp, self.yaw_gains.kp], [self.roll_gains.ki, self.pitch_gains.ki, self.yaw_gains.ki], [self.roll_gains.kd, self.pitch_gains.kd, self.yaw_gains.kd]
 
-class UrdfBotState(MsgpackMixin):
-    link_information = []
-    kinematics_estimated = KinematicsState()
-    controlled_motion_component_states = {}
+class VelocityControllerGains():
+    """
+    Struct to contain controller gains used by velocity PID controller
 
-    def __init__(self, link_information_val=[], kinematics_estimated_val=KinematicsState(),
-                 controlled_motion_component_states={}):
-        self.link_information = link_information_val
-        self.kinematics_estimated = kinematics_estimated_val
-        self.controlled_motion_component_states = controlled_motion_component_states
+    Attributes:
+        x_gains (PIDGains): kP, kI, kD for X axis
+        y_gains (PIDGains): kP, kI, kD for Y axis
+        z_gains (PIDGains): kP, kI, kD for Z axis
+    """
+    def __init__(self, x_gains = PIDGains(0.2, 0, 0),
+                       y_gains = PIDGains(0.2, 0, 0),
+                       z_gains = PIDGains(2.0, 2.0, 0)):
+        self.x_gains = x_gains
+        self.y_gains = y_gains
+        self.z_gains = z_gains
 
+    def to_lists(self):
+        return [self.x_gains.kp, self.y_gains.kp, self.z_gains.kp], [self.x_gains.ki, self.y_gains.ki, self.z_gains.ki], [self.x_gains.kd, self.y_gains.kd, self.z_gains.kd]
 
-class UrdfBotControlledMotionComponentControlSignal(MsgpackMixin):
-    component_name = ''
-    control_signal_values = {}
+class PositionControllerGains():
+    """
+    Struct to contain controller gains used by position PID controller
 
-    def __init__(self, component_name='', control_signal_values={}):
-        self.component_name = component_name
-        self.control_signal_values = control_signal_values
+    Attributes:
+        x_gains (PIDGains): kP, kI, kD for X axis
+        y_gains (PIDGains): kP, kI, kD for Y axis
+        z_gains (PIDGains): kP, kI, kD for Z axis
+    """
+    def __init__(self, x_gains = PIDGains(0.25, 0, 0),
+                       y_gains = PIDGains(0.25, 0, 0),
+                       z_gains = PIDGains(0.25, 0, 0)):
+        self.x_gains = x_gains
+        self.y_gains = y_gains
+        self.z_gains = z_gains
 
+    def to_lists(self):
+        return [self.x_gains.kp, self.y_gains.kp, self.z_gains.kp], [self.x_gains.ki, self.y_gains.ki, self.z_gains.ki], [self.x_gains.kd, self.y_gains.kd, self.z_gains.kd]
 
-class CameraPose(MsgpackMixin):
-    camera_name = ''
-    translation = Vector3r()
-    rotation = Quaternionr()
-
-    def __init__(self, camera_name, translation, rotation):
-        self.camera_name = camera_name
-        self.translation = translation
-        self.rotation = rotation
-
-
-class RayCastRequest(MsgpackMixin):
+class MeshPositionVertexBuffersResponse(MsgpackMixin):
     position = Vector3r()
-    direction = Vector3r()
-    reference_frame_link = ''
-    through_blocking = False
-    persist_seconds = 0
-
-    def __init__(self, position, direction, reference_frame_link, through_blocking, persist_seconds):
-        self.position = position
-        self.direction = direction
-        self.reference_frame_link = reference_frame_link
-        self.through_blocking = through_blocking
-        self.persist_seconds = persist_seconds
-
-
-class RayCastHit:
-    collided_actor_name = ''
-    hit_point = Vector3r()
-    hit_normal = Vector3r()
-
-    def __init__(self, collided_actor_name='', hit_point=Vector3r(), hit_normal=Vector3r()):
-        self.collided_actor_name = collided_actor_name
-        self.hit_point = hit_point
-        self.hit_normal = hit_normal
-
-
-class RayCastResponse(MsgpackMixin):
-    hits = []
-
-    def __init__(self, hits=[]):
-        self.hits = hits
-
-
-class DrawableShape(MsgpackMixin):
-    reference_frame_link = ''
-    type = 0
-    shape_params = []
-
-    def __init__(self, reference_frame_link, type, shape_params):
-        self.reference_frame_link = reference_frame_link
-        self.type = type
-        self.shape_params = shape_params
-
-
-class DrawableShapeRequest(MsgpackMixin):
-    shapes = {}
-    persist_unmentioned = False
-
-    def __init__(self, shapes={}, persist_unmentioned=False):
-        self.shapes = shapes
-        self.persist_unmentioned = persist_unmentioned
+    orientation = Quaternionr()
+    vertices = 0.0
+    indices = 0.0
+    name = ''

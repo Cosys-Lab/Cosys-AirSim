@@ -1,6 +1,6 @@
 
 # In settings.json first activate computer vision mode: 
-# https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/image_apis.md#computer-vision-mode
+# https://github.com/Microsoft/AirSim/blob/main/docs/image_apis.md#computer-vision-mode
 
 import setup_path 
 import airsim
@@ -182,7 +182,7 @@ limit_yaw = 5
 step = 0.1
 
 responses = client.simGetImages([
-    airsim.ImageRequest("1", airsim.ImageType.DepthPlanner, True)])
+    airsim.ImageRequest("1", airsim.ImageType.DepthPlanar, True)])
 response = responses[0]
 
 #initial position
@@ -197,7 +197,7 @@ for z in range(10000): # do few times
 
     # get response
     responses = client.simGetImages([
-        airsim.ImageRequest("1", airsim.ImageType.DepthPlanner, True)])
+        airsim.ImageRequest("1", airsim.ImageType.DepthPlanar, True)])
     response = responses[0]
 
     # get numpy array
