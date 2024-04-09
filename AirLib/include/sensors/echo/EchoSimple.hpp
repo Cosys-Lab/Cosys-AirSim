@@ -96,13 +96,9 @@ private:
 		const GroundTruth& ground_truth = getGroundTruth();
 		Pose const pose_offset = params_.external ? Pose() : ground_truth.kinematics->pose;
 
-		double start = FPlatformTime::Seconds();
 		getPointCloud(params_.relative_pose, // relative echo pose
 			pose_offset,   // relative vehicle pose			
 			point_cloud_, groundtruth_, passive_beacons_point_cloud_, passive_beacons_groundtruth_);
-		double end = FPlatformTime::Seconds();
-		UAirBlueprintLib::LogMessageString("Echo: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
-
 		EchoData output;
 		output.point_cloud = point_cloud_;
 		output.time_stamp = last_time_;

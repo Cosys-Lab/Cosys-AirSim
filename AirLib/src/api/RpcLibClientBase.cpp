@@ -186,12 +186,12 @@ __pragma(warning(disable : 4239))
 
         msr::airlib::GPULidarData RpcLibClientBase::getGPULidarData(const std::string& lidar_name, const std::string& vehicle_name) const
         {
-            return pimpl_->client.call("getGPULidarData", lidar_name, vehicle_name).as<RpcLibAdapatorsBase::GPULidarData>().to();
+            return pimpl_->client.call("getGPULidarData", lidar_name, vehicle_name).as<RpcLibAdaptorsBase::GPULidarData>().to();
         }
 
         msr::airlib::EchoData RpcLibClientBase::getEchoData(const std::string& echo_name, const std::string& vehicle_name) const
         {
-            return pimpl_->client.call("getEchoData", echo_name, vehicle_name).as<RpcLibAdapatorsBase::EchoData>().to();
+            return pimpl_->client.call("getEchoData", echo_name, vehicle_name).as<RpcLibAdaptorsBase::EchoData>().to();
         }
 
         msr::airlib::SensorTemplateData RpcLibClientBase::getSensorTemplateData(const std::string& echo_name, const std::string& vehicle_name) const
@@ -520,8 +520,8 @@ __pragma(warning(disable : 4239))
 
         vector<msr::airlib::Pose> RpcLibClientBase::simListInstanceSegmentationPoses(bool ned, bool only_visible) const
         {
-            const auto& response_adaptor = pimpl_->client.call("simListInstanceSegmentationPoses", ned, only_visible).as<vector<RpcLibAdapatorsBase::Pose>>();
-            return RpcLibAdapatorsBase::Pose::to(response_adaptor);
+            const auto& response_adaptor = pimpl_->client.call("simListInstanceSegmentationPoses", ned, only_visible).as<vector<RpcLibAdaptorsBase::Pose>>();
+            return RpcLibAdaptorsBase::Pose::to(response_adaptor);
         }
 
         std::vector<std::string> RpcLibClientBase::simSwapTextures(const std::string& tags, int tex_id, int component_id, int material_id)
@@ -562,7 +562,7 @@ __pragma(warning(disable : 4239))
 
         msr::airlib::Pose RpcLibClientBase::simGetObjectPose(const std::string& object_name, bool ned) const
         {
-            return pimpl_->client.call("simGetObjectPose", object_name, ned).as<RpcLibAdapatorsBase::Pose>().to();
+            return pimpl_->client.call("simGetObjectPose", object_name, ned).as<RpcLibAdaptorsBase::Pose>().to();
         }
 
         bool RpcLibClientBase::simSetObjectPose(const std::string& object_name, const msr::airlib::Pose& pose, bool teleport)
@@ -682,6 +682,5 @@ __pragma(warning(disable : 4239))
         }
     }
 } //namespace
-
 #endif
 #endif

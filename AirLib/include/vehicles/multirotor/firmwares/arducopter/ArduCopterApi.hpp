@@ -56,9 +56,9 @@ namespace airlib
         }
 
         // Update sensor data & send to Ardupilot
-        virtual void update() override
+        virtual void update(float delta = 0) override
         {
-            MultirotorApiBase::update();
+            MultirotorApiBase::update(delta);
 
             sendSensors();
             recvRotorControl();

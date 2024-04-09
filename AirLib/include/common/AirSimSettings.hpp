@@ -44,6 +44,7 @@ namespace airlib
         static constexpr char const * kBeaconTypeTemplate = "templateBeacon";
         static constexpr char const* kSimModeTypeMultirotor = "Multirotor";
         static constexpr char const* kSimModeTypeCar = "Car";
+        static constexpr char const* kSimModeTypeSkidVehicle = "SkidVehicle";
         static constexpr char const* kSimModeTypeComputerVision = "ComputerVision";
 
         struct SubwindowSetting
@@ -573,7 +574,6 @@ namespace airlib
 
         std::vector<SubwindowSetting> subwindow_settings;
         RecordingSetting recording_setting;
-        SegmentationSetting segmentation_setting;
         TimeOfDaySetting tod_setting;
 
         std::vector<std::string> warning_messages;
@@ -636,7 +636,6 @@ namespace airlib
             loadOtherSettings(settings_json);
             loadDefaultSensorSettings(simmode_name, settings_json, sensor_defaults);
             loadVehicleSettings(simmode_name, settings_json, vehicles, sensor_defaults, camera_defaults);
-            loadExternalCameraSettings(settings_json, external_cameras, camera_defaults);
             loadBeaconSettings(simmode_name, settings_json, beacons);
             loadPassiveEchoBeaconSettings(settings_json, passive_echo_beacons);
 
@@ -1052,7 +1051,7 @@ namespace airlib
             vehicle_setting->rotation = createRotationSetting(settings_json, vehicle_setting->rotation);
 
             loadCameraSettings(settings_json, vehicle_setting->cameras, camera_defaults);
-            loadSensorSettings(settings_json, "Sensors", vehicle_setting->sensors, sensor_defaults);
+            loadSensorSettings(settings_json, "Sensors", vehicle_setting->sensors, sensor_defaults, simmode_name);
 
             return vehicle_setting;
         }
@@ -1199,6 +1198,49 @@ namespace airlib
                 }
             }
         }
+
+        static void loadBeaconSettings(const std::string& simmode_name, const Settings& settings_json,
+                                       std::map<std::string, std::unique_ptr<BeaconSetting>>& beacons)
+        {
+            //initializeVehicleSettings(vehicles);
+
+            msr::airlib::Settings beacons_child;
+            if (settings_json.getChild("Beacons", beacons_child)) {
+                std::vector<std::string> keys;
+                beacons_child.getChildNames(keys);
+
+                //remove default beacons, if values are specified in settings
+                if (keys.size())
+                    beacons.clear();
+
+                for (const auto& key : keys) {
+                    msr::airlib::Settings child;
+                    beacons_child.getChild(key, child);
+                    beacons[key] = createBeaconSetting(simmode_name, child, key);
+                }
+            }
+        }
+
+        static void loadPassiveEchoBeaconSettings(const Settings& settings_json,
+            std::map<std::string, std::unique_ptr<PassiveEchoBeaconSetting>>& passive_echo_beacons)
+        {
+            msr::airlib::Settings passive_echo_beacons_child;
+            if (settings_json.getChild("PassiveEchoBeacons", passive_echo_beacons_child)) {
+                std::vector<std::string> keys;
+                passive_echo_beacons_child.getChildNames(keys);
+
+                //remove default beacons, if values are specified in settings
+                if (keys.size())
+                    passive_echo_beacons.clear();
+
+                for (const auto& key : keys) {
+                    msr::airlib::Settings child;
+                    passive_echo_beacons_child.getChild(key, child);
+                    passive_echo_beacons[key] = createPassiveEchoBeaconSetting(child, key);
+                }
+            }
+        }
+
 
         static void initializePawnPaths(std::map<std::string, PawnPath>& pawn_paths)
         {
@@ -1611,7 +1653,8 @@ namespace airlib
         // creates and intializes sensor settings from json
         static void loadSensorSettings(const Settings& settings_json, const std::string& collectionName,
                                        std::map<std::string, std::shared_ptr<SensorSetting>>& sensors,
-                                       std::map<std::string, std::shared_ptr<SensorSetting>>& sensor_defaults, const std::string& simmode_name)
+                                       std::map<std::string, std::shared_ptr<SensorSetting>>& sensor_defaults,
+                                       const std::string& simmode_name)
 
         {
             // NOTE: Increase type if number of sensors goes above 8

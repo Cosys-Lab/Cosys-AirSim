@@ -27,7 +27,6 @@ namespace airlib
         real_T min_noise_standard_deviation = 0;  // Minimum noise standard deviation
         real_T noise_distance_scale = 1;		  // Factor to scale noise based on distance
 
-        real_T update_frequency = 10;             // Hz
         bool limit_points = true;			      // how frequently to update the data in Hz
         bool pause_after_measurement = false;	  // Pause the simulation after each measurement. Useful for API interaction to be synced
                                                   // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)

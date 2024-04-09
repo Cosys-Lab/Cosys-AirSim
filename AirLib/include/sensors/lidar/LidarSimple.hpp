@@ -93,13 +93,10 @@ namespace airlib
             const GroundTruth& ground_truth = getGroundTruth();
             Pose const pose_offset = params_.external ? Pose() : ground_truth.kinematics->pose;
 
-            double start = FPlatformTime::Seconds();
             bool refresh = getPointCloud(params_.relative_pose, // relative lidar pose
                 pose_offset,   // relative vehicle pose
                 delta_time,
                 point_cloud_temp_, groundtruth_temp_, point_cloud_, groundtruth_);
-            double end = FPlatformTime::Seconds();
-            UAirBlueprintLib::LogMessageString("Lidar: ", "Sensor data generation took " + std::to_string(end - start) + " and generated " + std::to_string(point_cloud_.size() / 3) + " points", LogDebugLevel::Informational);
             if (refresh) {
                 LidarData output;
                 output.point_cloud = point_cloud_;

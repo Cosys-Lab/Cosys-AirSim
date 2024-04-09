@@ -315,17 +315,17 @@ namespace airlib
             return RpcLibAdaptorsBase::ImuData(imu_data);
         });
 
-        pimpl_->server.bind("getGPULidarData", [&](const std::string& lidar_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::GPULidarData {
+        pimpl_->server.bind("getGPULidarData", [&](const std::string& lidar_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::GPULidarData {
 		const auto& lidar_data = getVehicleApi(vehicle_name)->getGPULidarData(lidar_name);
-		return RpcLibAdapatorsBase::GPULidarData(lidar_data);
+		return RpcLibAdaptorsBase::GPULidarData(lidar_data);
         });
 
-        pimpl_->server.bind("getEchoData", [&](const std::string& echo_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::EchoData {
+        pimpl_->server.bind("getEchoData", [&](const std::string& echo_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::EchoData {
             const auto& echo_data = getVehicleApi(vehicle_name)->getEchoData(echo_name);
-            return RpcLibAdapatorsBase::EchoData(echo_data);
+            return RpcLibAdaptorsBase::EchoData(echo_data);
         });
 
-        pimpl_->server.bind("setEchoData", [&](const std::string& echo_name, const std::string& vehicle_name, RpcLibAdapatorsBase::EchoData echo_data) -> void {
+        pimpl_->server.bind("setEchoData", [&](const std::string& echo_name, const std::string& vehicle_name, RpcLibAdaptorsBase::EchoData echo_data) -> void {
             getVehicleApi(vehicle_name)->setEchoData(echo_name, echo_data.to());
         });
 
@@ -400,13 +400,13 @@ namespace airlib
             return getWorldSimApi()->listInstanceSegmentationObjects();
         });
 
-        pimpl_->server.bind("simListInstanceSegmentationPoses", [&](bool ned, bool only_visible) -> std::vector<RpcLibAdapatorsBase::Pose> {
-            return RpcLibAdapatorsBase::Pose::from(getWorldSimApi()->listInstanceSegmentationPoses(ned, only_visible));
+        pimpl_->server.bind("simListInstanceSegmentationPoses", [&](bool ned, bool only_visible) -> std::vector<RpcLibAdaptorsBase::Pose> {
+            return RpcLibAdaptorsBase::Pose::from(getWorldSimApi()->listInstanceSegmentationPoses(ned, only_visible));
         });
 
-        pimpl_->server.bind("simGetObjectPose", [&](const std::string& object_name, bool ned) -> RpcLibAdapatorsBase::Pose {
+        pimpl_->server.bind("simGetObjectPose", [&](const std::string& object_name, bool ned) -> RpcLibAdaptorsBase::Pose {
             const auto& pose = getWorldSimApi()->getObjectPose(object_name, ned);
-            return RpcLibAdapatorsBase::Pose(pose);
+            return RpcLibAdaptorsBase::Pose(pose);
         });
 
 
@@ -493,24 +493,24 @@ namespace airlib
             return getWorldSimApi()->setLightIntensity(light_name, intensity);
         });
 
-        pimpl_->server.bind("getUWBData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::MarLocUwbReturnMessage {
+        pimpl_->server.bind("getUWBData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::MarLocUwbReturnMessage {
             const auto& marLocUwbReturnMessage = getVehicleApi(vehicle_name)->getUWBData(sensor_name);
-            return RpcLibAdapatorsBase::MarLocUwbReturnMessage(marLocUwbReturnMessage);
+            return RpcLibAdaptorsBase::MarLocUwbReturnMessage(marLocUwbReturnMessage);
         });
 
-        pimpl_->server.bind("getUWBSensorData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::MarLocUwbSensorData {
+        pimpl_->server.bind("getUWBSensorData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::MarLocUwbSensorData {
             const auto& marLocUwbSensorData = getVehicleApi(vehicle_name)->getUWBSensorData(sensor_name);
-            return RpcLibAdapatorsBase::MarLocUwbSensorData(marLocUwbSensorData);
+            return RpcLibAdaptorsBase::MarLocUwbSensorData(marLocUwbSensorData);
         });
 
-        pimpl_->server.bind("getWifiData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::WifiReturnMessage {
+        pimpl_->server.bind("getWifiData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::WifiReturnMessage {
             const auto& wifiReturnMessage = getVehicleApi(vehicle_name)->getWifiData(sensor_name);
-            return RpcLibAdapatorsBase::WifiReturnMessage(wifiReturnMessage);
+            return RpcLibAdaptorsBase::WifiReturnMessage(wifiReturnMessage);
         });
 
-        pimpl_->server.bind("getWifiSensorData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdapatorsBase::WifiSensorData {
+        pimpl_->server.bind("getWifiSensorData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::WifiSensorData {
             const auto& wifiSensorData = getVehicleApi(vehicle_name)->getWifiSensorData(sensor_name);
-            return RpcLibAdapatorsBase::WifiSensorData(wifiSensorData);
+            return RpcLibAdaptorsBase::WifiSensorData(wifiSensorData);
         });
 
         pimpl_->server.bind("cancelLastTask", [&](const std::string& vehicle_name) -> void {

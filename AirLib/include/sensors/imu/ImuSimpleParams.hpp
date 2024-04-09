@@ -48,7 +48,7 @@ namespace airlib
 
         real_T min_sample_time = 1 / 1000.0f; //internal IMU frequency
 
-        void initializeFromSettings(const AirSimSettings::ImuSetting& settings)
+        bool initializeFromSettings(const AirSimSettings::ImuSetting& settings)
         {
             const auto& json = settings.settings;
             float arw = json.getFloat("AngularRandomWalk", Utils::nan<float>());
@@ -69,6 +69,8 @@ namespace airlib
             if (!std::isnan(bias_stability)) {
                 accel.bias_stability = bias_stability * 1E-6f * EarthUtils::Gravity; //ug converted to m/s^2
             }
+
+            return json.getBool("GenerateNoise", false);
         }
     };
 }

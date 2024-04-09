@@ -182,7 +182,6 @@ namespace airlib
         struct impl;
         std::unique_ptr<impl> pimpl_;
     };
-}
 } //namespace
-
+}
 #endif

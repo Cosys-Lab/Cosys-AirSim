@@ -381,12 +381,11 @@ namespace airlib
         }
     };
 
-struct LidarData {
-
-    TTimePoint time_stamp = 0;
-    vector<real_T> point_cloud;
-    vector<std::string> groundtruth;
-    Pose pose;
+    struct LidarData {
+        TTimePoint time_stamp = 0;
+        vector<real_T> point_cloud;
+        vector<std::string> groundtruth;
+        Pose pose;
 
         LidarData()
         {
@@ -437,176 +436,175 @@ struct LidarData {
                                   external);
         }
     };
-}
-} //namespace
-struct GPULidarData {
 
-	TTimePoint time_stamp = 0;
-	vector<real_T> point_cloud;
-	Pose pose;
+    struct GPULidarData {
 
-	GPULidarData()
-	{}
-};
+        TTimePoint time_stamp = 0;
+        vector<real_T> point_cloud;
+        Pose pose;
 
-struct EchoData {
+        GPULidarData()
+        {}
+    };
 
-	TTimePoint time_stamp = 0;
-	vector<real_T> point_cloud;
-    vector<std::string> groundtruth;
-	Pose pose;
-    vector<std::string> passive_beacons_groundtruth;
-    vector<real_T> passive_beacons_point_cloud;
+    struct EchoData {
 
-	EchoData()
-	{}
-};
+        TTimePoint time_stamp = 0;
+        vector<real_T> point_cloud;
+        vector<std::string> groundtruth;
+        Pose pose;
+        vector<std::string> passive_beacons_groundtruth;
+        vector<real_T> passive_beacons_point_cloud;
 
-struct SensorTemplateData {
+        EchoData()
+        {}
+    };
 
-    TTimePoint time_stamp = 0;
-    vector<real_T> point_cloud;
-    Pose pose;
+    struct SensorTemplateData {
 
-    SensorTemplateData()
-    {}
-};
+        TTimePoint time_stamp = 0;
+        vector<real_T> point_cloud;
+        Pose pose;
 
-struct UWBHit
-{
-    TTimePoint time_stamp = 0;
-    std::string beaconID;
-    float beaconPosX, beaconPosY, beaconPosZ;
-    bool isValid;
-    float distance;
-    float rssi;
-};
+        SensorTemplateData()
+        {}
+    };
 
-
-struct MarLocUwbSensorData {
-
-    TTimePoint time_stamp = 0;
-    //vector<real_T> point_cloud;
-    Pose pose;
-    vector<std::string> beaconsActiveID;
-    vector<float> beaconsActiveRssi;
-    vector<float> beaconsActivePosX;
-    vector<float> beaconsActivePosY;
-    vector<float> beaconsActivePosZ;
-    vector<float> beaconsActiveDistance;
-
-    vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
-
-    MarLocUwbSensorData()
-    {}
-};
+    struct UWBHit
+    {
+        TTimePoint time_stamp = 0;
+        std::string beaconID;
+        float beaconPosX, beaconPosY, beaconPosZ;
+        bool isValid;
+        float distance;
+        float rssi;
+    };
 
 
-struct MarLocUwbRange {
-    TTimePoint time_stamp = 0;
-    std::string anchorId;
-    float anchorPosX, anchorPosY, anchorPosZ;
-    bool valid_range;
-    float distance;
-    float rssi;
+    struct MarLocUwbSensorData {
 
-    MarLocUwbRange()
-    {}
-};
+        TTimePoint time_stamp = 0;
+        //vector<real_T> point_cloud;
+        Pose pose;
+        vector<std::string> beaconsActiveID;
+        vector<float> beaconsActiveRssi;
+        vector<float> beaconsActivePosX;
+        vector<float> beaconsActivePosY;
+        vector<float> beaconsActivePosZ;
+        vector<float> beaconsActiveDistance;
+
+        vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
+
+        MarLocUwbSensorData()
+        {}
+    };
 
 
-struct MarLocUwbRangeArray {
-    std::string tagId;
-    float tagPosX, tagPosY, tagPosZ;
-    vector<int> ranges;
+    struct MarLocUwbRange {
+        TTimePoint time_stamp = 0;
+        std::string anchorId;
+        float anchorPosX, anchorPosY, anchorPosZ;
+        bool valid_range;
+        float distance;
+        float rssi;
 
-    MarLocUwbRangeArray()
-    {}
-};
+        MarLocUwbRange()
+        {}
+    };
 
-struct MarLocUwbReturnMessage {
-    //MarLocUwbRange
-    vector <TTimePoint> mur_time_stamp;
-    vector<std::string> mur_anchorId;
-    vector<float> mur_anchorPosX, mur_anchorPosY, mur_anchorPosZ;
-    vector<bool> mur_valid_range;
-    vector<float> mur_distance;
-    vector<float> mur_rssi;
 
-    //MarLocUwbRangeArray
-    vector<std::string> mura_tagId;
-    vector<float> mura_tagPosX, mura_tagPosY, mura_tagPosZ;
-    vector <vector<int>> mura_ranges;
+    struct MarLocUwbRangeArray {
+        std::string tagId;
+        float tagPosX, tagPosY, tagPosZ;
+        vector<int> ranges;
 
-    MarLocUwbReturnMessage()
-    {}
-};
+        MarLocUwbRangeArray()
+        {}
+    };
 
-struct WifiHit
-{
-    TTimePoint time_stamp = 0;
-    std::string beaconID;
-    float beaconPosX, beaconPosY, beaconPosZ;
-    bool isValid;
-    float distance;
-    float rssi;
-};
+    struct MarLocUwbReturnMessage {
+        //MarLocUwbRange
+        vector <TTimePoint> mur_time_stamp;
+        vector<std::string> mur_anchorId;
+        vector<float> mur_anchorPosX, mur_anchorPosY, mur_anchorPosZ;
+        vector<bool> mur_valid_range;
+        vector<float> mur_distance;
+        vector<float> mur_rssi;
 
-struct WifiSensorData {
+        //MarLocUwbRangeArray
+        vector<std::string> mura_tagId;
+        vector<float> mura_tagPosX, mura_tagPosY, mura_tagPosZ;
+        vector <vector<int>> mura_ranges;
 
-    TTimePoint time_stamp = 0;
-    Pose pose;
-    vector<std::string> beaconsActiveID;
-    vector<float> beaconsActiveRssi;
-    vector<float> beaconsActivePosX;
-    vector<float> beaconsActivePosY;
-    vector<float> beaconsActivePosZ;
-    vector<float> beaconsActiveDistance;
+        MarLocUwbReturnMessage()
+        {}
+    };
 
-    vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
+    struct WifiHit
+    {
+        TTimePoint time_stamp = 0;
+        std::string beaconID;
+        float beaconPosX, beaconPosY, beaconPosZ;
+        bool isValid;
+        float distance;
+        float rssi;
+    };
 
-    WifiSensorData()
-    {}
-};
+    struct WifiSensorData {
 
-struct WifiRange {
-    TTimePoint time_stamp = 0;
-    std::string anchorId;
-    float anchorPosX, anchorPosY, anchorPosZ;
-    bool valid_range;
-    float distance;
-    float rssi;
+        TTimePoint time_stamp = 0;
+        Pose pose;
+        vector<std::string> beaconsActiveID;
+        vector<float> beaconsActiveRssi;
+        vector<float> beaconsActivePosX;
+        vector<float> beaconsActivePosY;
+        vector<float> beaconsActivePosZ;
+        vector<float> beaconsActiveDistance;
 
-    WifiRange()
-    {}
-};
+        vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
 
-struct WifiRangeArray {
-    std::string tagId;
-    float tagPosX, tagPosY, tagPosZ;
-    vector<int> ranges;
+        WifiSensorData()
+        {}
+    };
 
-    WifiRangeArray()
-    {}
-};
+    struct WifiRange {
+        TTimePoint time_stamp = 0;
+        std::string anchorId;
+        float anchorPosX, anchorPosY, anchorPosZ;
+        bool valid_range;
+        float distance;
+        float rssi;
 
-struct WifiReturnMessage {
-    //WifiRange
-    vector <TTimePoint> wr_time_stamp;
-    vector<std::string> wr_anchorId;
-    vector<float> wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ;
-    vector<bool> wr_valid_range;
-    vector<float> wr_distance;
-    vector<float> wr_rssi;
+        WifiRange()
+        {}
+    };
 
-    //WifiRangeArray
-    vector<std::string> wra_tagId;
-    vector<float> wra_tagPosX, wra_tagPosY, wra_tagPosZ;
-    vector <vector<int>> wra_ranges;
+    struct WifiRangeArray {
+        std::string tagId;
+        float tagPosX, tagPosY, tagPosZ;
+        vector<int> ranges;
 
-    WifiReturnMessage()
-    {}
-};
+        WifiRangeArray()
+        {}
+    };
+
+    struct WifiReturnMessage {
+        //WifiRange
+        vector <TTimePoint> wr_time_stamp;
+        vector<std::string> wr_anchorId;
+        vector<float> wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ;
+        vector<bool> wr_valid_range;
+        vector<float> wr_distance;
+        vector<float> wr_rssi;
+
+        //WifiRangeArray
+        vector<std::string> wra_tagId;
+        vector<float> wra_tagPosX, wra_tagPosY, wra_tagPosZ;
+        vector <vector<int>> wra_ranges;
+
+        WifiReturnMessage()
+        {}
+    };
 
 }} //namespace
 #endif

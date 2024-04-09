@@ -55,7 +55,7 @@ namespace airlib
         }
         virtual void update(float delta = 0) override
         {
-            MultirotorApiBase::update(float delta = 0);
+            MultirotorApiBase::update(delta);
 
             //update controller which will update actuator control signal
             firmware_->update();

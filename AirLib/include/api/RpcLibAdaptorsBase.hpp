@@ -156,6 +156,25 @@ namespace airlib_rpclib
             {
                 return msr::airlib::Pose(position.to(), orientation.to());
             }
+
+            static std::vector<Pose> from(
+                const std::vector<msr::airlib::Pose>& poses
+            ) {
+                std::vector<Pose> pose_adaptor;
+                for (const auto& item : poses)
+                    pose_adaptor.push_back(Pose(item));
+
+                return pose_adaptor;
+            }
+            static std::vector<msr::airlib::Pose> to(
+                const std::vector<Pose>& pose_adaptor
+            ) {
+                std::vector<msr::airlib::Pose> poses;
+                for (const auto& item : pose_adaptor)
+                    poses.push_back(item.to());
+
+                return poses;
+            }
         };
 
         struct GeoPoint
@@ -610,23 +629,27 @@ namespace airlib_rpclib
         struct LidarData
         {
 
-            msr::airlib::TTimePoint time_stamp; // timestamp
-            std::vector<float> point_cloud; // data
-            Pose pose;
-            std::vector<int> segmentation;
+            msr::airlib::TTimePoint time_stamp;    // timestamp
+            std::vector<float> point_cloud;        // data
+            std::vector<std::string> groundtruth;  // ground truth labels
 
-            MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose, segmentation);
+            Pose pose;
+
+            MSGPACK_DEFINE_MAP(time_stamp, point_cloud, groundtruth, pose);
 
             LidarData()
-            {
-            }
+            {}
 
             LidarData(const msr::airlib::LidarData& s)
             {
                 time_stamp = s.time_stamp;
                 point_cloud = s.point_cloud;
+                groundtruth = s.groundtruth;
+
+                //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+                if (point_cloud.size() == 0)
+                    point_cloud.push_back(0);
                 pose = s.pose;
-                segmentation = s.segmentation;
             }
 
             msr::airlib::LidarData to() const
@@ -635,9 +658,321 @@ namespace airlib_rpclib
 
                 d.time_stamp = time_stamp;
                 d.point_cloud = point_cloud;
+                d.groundtruth = groundtruth;
                 d.pose = pose.to();
-                d.segmentation = segmentation;
 
+                return d;
+            }
+        };
+
+        struct GPULidarData {
+
+            msr::airlib::TTimePoint time_stamp;    // timestamp
+            std::vector<float> point_cloud;        // data
+
+            Pose pose;
+
+            MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+
+            GPULidarData()
+            {}
+
+            GPULidarData(const msr::airlib::GPULidarData& s)
+            {
+                time_stamp = s.time_stamp;
+                point_cloud = s.point_cloud;
+
+                //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+                if (point_cloud.size() == 0)
+                    point_cloud.push_back(0);
+                pose = s.pose;
+            }
+
+            msr::airlib::GPULidarData to() const
+            {
+                msr::airlib::GPULidarData d;
+
+                d.time_stamp = time_stamp;
+                d.point_cloud = point_cloud;
+                d.pose = pose.to();
+
+                return d;
+            }
+        };
+
+        struct EchoData {
+
+            msr::airlib::TTimePoint time_stamp;    // timestamp
+            std::vector<float> point_cloud;        // data
+            std::vector<std::string> groundtruth;  // ground truth labels
+            std::vector<float> passive_beacons_point_cloud;        // passive data
+            std::vector<std::string> passive_beacons_groundtruth;  // passive ground truth labels
+            Pose pose;
+
+            MSGPACK_DEFINE_MAP(time_stamp, point_cloud, groundtruth, pose, passive_beacons_point_cloud, passive_beacons_groundtruth);
+
+            EchoData()
+            {}
+
+            EchoData(const msr::airlib::EchoData& s)
+            {
+                time_stamp = s.time_stamp;
+                point_cloud = s.point_cloud;
+                groundtruth = s.groundtruth;
+                passive_beacons_point_cloud = s.passive_beacons_point_cloud;
+                passive_beacons_groundtruth = s.passive_beacons_groundtruth;
+
+                //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+                if (point_cloud.size() == 0)
+                    point_cloud.push_back(0);
+                if (passive_beacons_point_cloud.size() == 0)
+                    passive_beacons_point_cloud.push_back(0);
+
+                pose = s.pose;
+            }
+
+            msr::airlib::EchoData to() const
+            {
+                msr::airlib::EchoData d;
+
+                d.time_stamp = time_stamp;
+                d.point_cloud = point_cloud;
+                d.groundtruth = groundtruth;
+                d.passive_beacons_point_cloud = passive_beacons_point_cloud;
+                d.passive_beacons_groundtruth = passive_beacons_groundtruth;
+                d.pose = pose.to();
+
+                return d;
+            }
+        };
+
+        struct SensorTemplateData {
+
+            msr::airlib::TTimePoint time_stamp;    // timestamp
+            std::vector<float> point_cloud;        // data
+            Pose pose;
+
+            MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
+
+            SensorTemplateData()
+            {}
+
+            SensorTemplateData(const msr::airlib::SensorTemplateData& s)
+            {
+                time_stamp = s.time_stamp;
+                point_cloud = s.point_cloud;
+
+                //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
+                if (point_cloud.size() == 0)
+                    point_cloud.push_back(0);
+
+                pose = s.pose;
+            }
+
+            msr::airlib::SensorTemplateData to() const
+            {
+                msr::airlib::SensorTemplateData d;
+
+                d.time_stamp = time_stamp;
+                d.point_cloud = point_cloud;
+                d.pose = pose.to();
+
+                return d;
+            }
+        };
+
+        struct MarLocUwbSensorData {
+
+            msr::airlib::TTimePoint time_stamp;    // timestamp
+            //std::vector<float> point_cloud;        // data
+            Pose pose;
+            std::vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
+
+            MSGPACK_DEFINE(time_stamp, pose, allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ);
+
+            MarLocUwbSensorData()
+            {}
+
+            MarLocUwbSensorData(const msr::airlib::MarLocUwbSensorData& s)
+            {
+                time_stamp = s.time_stamp;
+                pose = s.pose;
+                allBeaconsId = s.allBeaconsId;
+                allBeaconsX = s.allBeaconsX;
+                allBeaconsY = s.allBeaconsY;
+                allBeaconsZ = s.allBeaconsZ;
+
+            }
+
+            msr::airlib::MarLocUwbSensorData to() const
+            {
+                msr::airlib::MarLocUwbSensorData d;
+
+                d.time_stamp = time_stamp;
+                d.pose = pose.to();
+                d.allBeaconsId = allBeaconsId;
+                d.allBeaconsX = allBeaconsX;
+                d.allBeaconsY = allBeaconsY;
+                d.allBeaconsZ = allBeaconsZ;
+
+                return d;
+            }
+        };
+
+        struct MarLocUwbReturnMessage {
+            //MarLocUwbRange
+            std::vector <uint64_t> mur_time_stamp;
+            std::vector<std::string> mur_anchorId;
+            std::vector<float> mur_anchorPosX;
+            std::vector<float> mur_anchorPosY;
+            std::vector<float> mur_anchorPosZ;
+            std::vector<bool> mur_valid_range;
+            std::vector<float> mur_distance;
+            std::vector<float> mur_rssi;
+
+            //MarLocUwbRangeArray
+            std::vector<std::string> mura_tagId;
+            std::vector<float> mura_tagPosX;
+            std::vector<float> mura_tagPosY;
+            std::vector<float> mura_tagPosZ;
+            std::vector <std::vector<int>> mura_ranges;
+
+            //std::vector<Pose> pose;
+
+            MSGPACK_DEFINE_MAP(mur_time_stamp, mur_anchorId, mur_anchorPosX, mur_anchorPosY, mur_anchorPosZ, mur_valid_range, mur_distance, mur_rssi, mura_tagId, mura_tagPosX, mura_tagPosY, mura_tagPosZ, mura_ranges);
+
+            MarLocUwbReturnMessage()
+            {}
+
+            MarLocUwbReturnMessage(const msr::airlib::MarLocUwbReturnMessage& s)
+            {
+                mur_time_stamp = s.mur_time_stamp;
+                mur_anchorId = s.mur_anchorId;
+                mur_anchorPosX = s.mur_anchorPosX;
+                mur_anchorPosY = s.mur_anchorPosY;
+                mur_anchorPosZ = s.mur_anchorPosZ;
+                mur_valid_range = s.mur_valid_range;
+                mur_distance = s.mur_distance;
+                mur_rssi = s.mur_rssi;
+                mura_tagId = s.mura_tagId;
+                mura_tagPosX = s.mura_tagPosX;
+                mura_tagPosY = s.mura_tagPosY;
+                mura_tagPosZ = s.mura_tagPosZ;
+                mura_ranges = s.mura_ranges;
+            }
+
+            msr::airlib::MarLocUwbReturnMessage to() const
+            {
+                msr::airlib::MarLocUwbReturnMessage d;
+
+                d.mur_time_stamp = mur_time_stamp;
+                d.mur_anchorId = mur_anchorId;
+                d.mur_anchorPosX = mur_anchorPosX;
+                d.mur_anchorPosY = mur_anchorPosY;
+                d.mur_anchorPosZ = mur_anchorPosZ;
+                d.mur_valid_range = mur_valid_range;
+                d.mur_distance = mur_distance;
+                d.mur_rssi = mur_rssi;
+                d.mura_tagId = mura_tagId;
+                d.mura_tagPosX = mura_tagPosX;
+                d.mura_tagPosY = mura_tagPosY;
+                d.mura_tagPosZ = mura_tagPosZ;
+                d.mura_ranges = mura_ranges;
+                return d;
+            }
+        };
+
+        struct WifiSensorData {
+            msr::airlib::TTimePoint time_stamp;    // timestamp
+            Pose pose;
+            std::vector<float> allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ;
+
+            MSGPACK_DEFINE(time_stamp, pose, allBeaconsId, allBeaconsX, allBeaconsY, allBeaconsZ);
+
+            WifiSensorData()
+            {}
+
+            WifiSensorData(const msr::airlib::WifiSensorData& s)
+            {
+                time_stamp = s.time_stamp;
+                pose = s.pose;
+                allBeaconsId = s.allBeaconsId;
+                allBeaconsX = s.allBeaconsX;
+                allBeaconsY = s.allBeaconsY;
+                allBeaconsZ = s.allBeaconsZ;
+            }
+
+            msr::airlib::WifiSensorData to() const
+            {
+               msr::airlib::WifiSensorData d;
+
+                d.time_stamp = time_stamp;
+                d.pose = pose.to();
+                d.allBeaconsId = allBeaconsId;
+                d.allBeaconsX = allBeaconsX;
+                d.allBeaconsY = allBeaconsY;
+                d.allBeaconsZ = allBeaconsZ;
+                return d;
+            }
+        };
+
+        struct WifiReturnMessage {
+            //MarLocUwbRange
+            std::vector <uint64_t> wr_time_stamp;
+            std::vector<std::string> wr_anchorId;
+            std::vector<float> wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ;
+            std::vector<bool> wr_valid_range;
+            std::vector<float> wr_distance;
+            std::vector<float> wr_rssi;
+
+            //MarLocUwbRangeArray
+            std::vector<std::string> wra_tagId;
+            std::vector<float> wra_tagPosX, wra_tagPosY, wra_tagPosZ;
+            std::vector <std::vector<int>> wra_ranges;
+
+            MSGPACK_DEFINE_MAP(wr_time_stamp, wr_anchorId, wr_anchorPosX, wr_anchorPosY, wr_anchorPosZ, wr_valid_range, wr_distance, wr_rssi, wra_tagId, wra_tagPosX, wra_tagPosY, wra_tagPosZ, wra_ranges);
+
+            WifiReturnMessage()
+            {}
+
+            WifiReturnMessage(const msr::airlib::WifiReturnMessage& s)
+            {
+                wr_time_stamp = s.wr_time_stamp;
+                wr_anchorId = s.wr_anchorId;
+                wr_anchorPosX = s.wr_anchorPosX;
+                wr_anchorPosY = s.wr_anchorPosY;
+                wr_anchorPosZ = s.wr_anchorPosZ;
+                wr_valid_range = s.wr_valid_range;
+                wr_distance = s.wr_distance;
+                wr_rssi = s.wr_rssi;
+                wra_tagId = s.wra_tagId;
+                wra_tagPosX = s.wra_tagPosX;
+                wra_tagPosY = s.wra_tagPosY;
+                wra_tagPosZ = s.wra_tagPosZ;
+                wra_ranges = s.wra_ranges;
+                //marLocUwbRange = s.marLocUwbRange;
+                //marLocUwbRangeArray = s.marLocUwbRangeArray;
+
+                //pose = s.pose;
+            }
+
+            msr::airlib::WifiReturnMessage to() const
+            {
+                msr::airlib::WifiReturnMessage d;
+
+                d.wr_time_stamp = wr_time_stamp;
+                d.wr_anchorId = wr_anchorId;
+                d.wr_anchorPosX = wr_anchorPosX;
+                d.wr_anchorPosY = wr_anchorPosY;
+                d.wr_anchorPosZ = wr_anchorPosZ;
+                d.wr_valid_range = wr_valid_range;
+                d.wr_distance = wr_distance;
+                d.wr_rssi = wr_rssi;
+                d.wra_tagId = wra_tagId;
+                d.wra_tagPosX = wra_tagPosX;
+                d.wra_tagPosY = wra_tagPosY;
+                d.wra_tagPosZ = wra_tagPosZ;
+                d.wra_ranges = wra_ranges;
                 return d;
             }
         };

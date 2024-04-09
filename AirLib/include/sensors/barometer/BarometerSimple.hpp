@@ -53,7 +53,7 @@ namespace airlib
 
         virtual void update(float delta = 0) override
         {
-            BarometerBase::updatedelta();
+            BarometerBase::update(delta);
 
             freq_limiter_.update(delta);
 

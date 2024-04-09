@@ -77,11 +77,8 @@ namespace msr {
 
 				TTimeDelta delta_time = clock()->updateSince(last_time_);
 
-				double start = FPlatformTime::Seconds();
 				bool refresh = getPointCloud(delta_time, point_cloud_temp_, point_cloud_);
-				double end = FPlatformTime::Seconds();
-				UAirBlueprintLib::LogMessageString("GPULidar: ", "Sensor data generation took " + std::to_string(end - start) + " and generated " + std::to_string(point_cloud_.size() / 5) + " points", LogDebugLevel::Informational);
-			
+
 				if (refresh) {
 					GPULidarData output;
 					output.point_cloud = point_cloud_;

@@ -98,13 +98,9 @@ private:
 		//    ImageResponse for cameras and pose returned by getCameraInfo API.
 		//    Do we need to convert pose to Global NED frame before returning to clients?
 
-		double start = FPlatformTime::Seconds();
 		getPointCloud(params_.relative_pose, // relative sensor pose
 			pose_offset,   // relative vehicle pose			
 			point_cloud_);
-		double end = FPlatformTime::Seconds();
-		UAirBlueprintLib::LogMessageString("SensorTemplate: ", "Sensor data generation took " + std::to_string(end - start), LogDebugLevel::Informational);
-
 		SensorTemplateData output;
 		output.point_cloud = point_cloud_;
 		output.time_stamp = last_time_;

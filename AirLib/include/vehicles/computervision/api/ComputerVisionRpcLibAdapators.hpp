@@ -6,7 +6,7 @@
 
 #include "common/Common.hpp"
 #include "common/CommonStructs.hpp"
-#include "api/RpcLibAdapatorsBase.hpp"
+#include "api/RpcLibAdaptorsBase.hpp"
 #include "common/ImageCaptureBase.hpp"
 #include "vehicles/computervision/api/ComputerVisionApiBase.hpp"
 
@@ -16,7 +16,7 @@
 
 namespace msr { namespace airlib_rpclib {
 
-class ComputerVisionRpcLibAdapators : public RpcLibAdapatorsBase {
+class ComputerVisionRpcLibAdapators : public RpcLibAdaptorsBase {
 public:
     
     struct ComputerVisionState {

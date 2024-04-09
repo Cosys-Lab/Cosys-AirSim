@@ -53,6 +53,7 @@ The default sensor list can be configured in settings json:
     "Imu": {
         "SensorType": 2,
         "Enabled" : true,
+        "GenerateNoise": false,        
         "AngularRandomWalk": 0.3,
         "GyroBiasStabilityTau": 500,
         "GyroBiasStability": 4.6,
