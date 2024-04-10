@@ -51,12 +51,21 @@ void ASimModeComputerVision::pause(bool is_paused)
 void ASimModeComputerVision::continueForTime(double seconds)
 {
 	pause_period_start_ = ClockFactory::get()->nowNanos();
-	pause_period_ = seconds;
+	pause_period_ = seconds * current_clockspeed_;
+	pause(false);
+}
+
+void ASimModeComputerVision::continueForFrames(uint32_t frames)
+{
+	targetFrameNumber_ = GFrameNumber + frames;
+	frame_countdown_enabled_ = true;
 	pause(false);
 }
 
 void ASimModeComputerVision::setupClockSpeed()
 {
+	Super::setupClockSpeed();
+
 	current_clockspeed_ = getSettings().clock_speed;
 
 	//setup clock in PhysX
@@ -66,20 +75,33 @@ void ASimModeComputerVision::setupClockSpeed()
 
 void ASimModeComputerVision::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds);
+    Super::Tick(DeltaSeconds);
 
-	if (pause_period_start_ > 0) {
-		if (ClockFactory::get()->elapsedSince(pause_period_start_) >= pause_period_) {
-			if (!isPaused())
-				pause(true);
+    if (!isPaused())
+        ClockFactory::get()->stepBy(DeltaSeconds);
 
-			pause_period_start_ = 0;
-		}
-	}
+    if (pause_period_start_ > 0) {
+        if (ClockFactory::get()->elapsedSince(pause_period_start_) >= pause_period_) {
+            if (!isPaused())
+                pause(true);
+
+            pause_period_start_ = 0;
+        }
+    }
+
+    if (frame_countdown_enabled_) {
+        if (targetFrameNumber_ <= GFrameNumber) {
+            if (!isPaused())
+                pause(true);
+
+            frame_countdown_enabled_ = false;
+}
+    }
 }
 
 std::unique_ptr<msr::airlib::ApiServerBase> ASimModeComputerVision::createApiServer() const
 {
+
 #ifdef AIRLIB_NO_RPC
     return ASimModeBase::createApiServer();
 #else
@@ -125,10 +147,11 @@ void ASimModeComputerVision::initializeVehiclePawn(APawn* pawn)
 std::unique_ptr<PawnSimApi> ASimModeComputerVision::createVehicleSimApi(
     const PawnSimApi::Params& pawn_sim_api_params) const
 {
-	auto vehicle_sim_api = std::unique_ptr<PawnSimApi>(new ComputerVisionPawnSimApi(pawn_sim_api_params));
-	vehicle_sim_api->initialize();
-	vehicle_sim_api->reset();
-	return vehicle_sim_api;
+    auto vehicle_pawn = static_cast<TVehiclePawn*>(pawn_sim_api_params.pawn);
+    auto vehicle_sim_api = std::unique_ptr<PawnSimApi>(new ComputerVisionPawnSimApi(pawn_sim_api_params));
+    vehicle_sim_api->initialize();
+    vehicle_sim_api->reset();
+    return vehicle_sim_api;
 }
 
 msr::airlib::VehicleApiBase* ASimModeComputerVision::getVehicleApi(const PawnSimApi::Params& pawn_sim_api_params,

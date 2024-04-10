@@ -10,7 +10,7 @@ ComputerVisionPawnApi::ComputerVisionPawnApi(AComputerVisionPawn* pawn, const ms
 
 msr::airlib::ComputerVisionApiBase::ComputerVisionState ComputerVisionPawnApi::getComputerVisionState() const
 {
-    ComputerVisionApiBase::ComputerVisionState state(
+    msr::airlib::ComputerVisionApiBase::ComputerVisionState state(
         *pawn_kinematics_,
         msr::airlib::ClockFactory::get()->nowNanos()
     );

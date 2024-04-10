@@ -7,6 +7,7 @@
 #include "PawnEvents.h"
 #include "PawnSimApi.h"
 #include "vehicles/computervision/api/ComputerVisionApiBase.hpp"
+#include "vehicles/computervision/api/ComputerVisionApi.hpp"
 #include "physics//Kinematics.hpp"
 #include "common/Common.hpp"
 #include "common/CommonStructs.hpp"

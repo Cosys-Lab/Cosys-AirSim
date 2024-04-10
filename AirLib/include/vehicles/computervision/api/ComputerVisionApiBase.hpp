@@ -21,6 +21,10 @@ public:
         Kinematics::State kinematics_estimated;
         uint64_t timestamp;
 
+        ComputerVisionState()
+        {
+        }
+
         ComputerVisionState(const Kinematics::State& kinematics_estimated_val, uint64_t timestamp_val)
             : kinematics_estimated(kinematics_estimated_val), timestamp(timestamp_val)
         {
@@ -93,7 +97,7 @@ public:
         sensor_factory_->createSensorsFromSettings(sensor_settings, sensors_, sensor_storage_);
     }
 
-    virtual ComputerVisionState getComputerVisionState() const = 0;
+    virtual const ComputerVisionState& getComputerVisionState() const = 0;
     virtual void updateComputerVisionState(const ComputerVisionState& state) = 0;
 
     virtual ~ComputerVisionApiBase() = default;
