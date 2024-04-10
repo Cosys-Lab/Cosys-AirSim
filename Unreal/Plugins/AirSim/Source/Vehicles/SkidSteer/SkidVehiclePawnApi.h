@@ -14,7 +14,7 @@ public:
 
 	SkidVehiclePawnApi(ASkidVehiclePawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics, msr::airlib::CarApiBase* vehicle_api);
 
-	void updateMovement(const msr::airlib::CarApiBase::CarControls&& controls);
+	void updateMovement(const msr::airlib::CarApiBase::CarControls& controls);
 
 	msr::airlib::CarApiBase::CarState getCarState() const;
 

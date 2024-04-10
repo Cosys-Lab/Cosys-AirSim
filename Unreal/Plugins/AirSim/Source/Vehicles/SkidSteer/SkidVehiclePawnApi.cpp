@@ -45,7 +45,6 @@ msr::airlib::CarApiBase::CarState SkidVehiclePawnApi::getCarState() const
 		last_controls_.handbrake,
 		*pawn_kinematics_,
 		vehicle_api_->clock()->nowNanos());
-	);
 	return state;
 }
 
