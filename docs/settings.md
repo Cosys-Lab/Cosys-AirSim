@@ -271,7 +271,6 @@ The recording feature allows you to record data such as position, orientation, v
     * When `PixelsAsFloat` is true, image is saved as [pfm](pfm.md) file instead of png file.
     * `VehicleName` option allows you to specify separate cameras for individual vehicles. If the `Cameras` element isn't present, `Scene` image from the default camera of each vehicle will be recorded.
     * If you don't want to record any images and just the vehicle's physics data, then specify the `Cameras` element but leave it empty, like this: `"Cameras": []`
-    * External cameras are currently not supported in recording
 
 For example, the `Cameras` element below records scene & segmentation images for `Car1` & scene for `Car2`-
 
@@ -364,9 +363,6 @@ The `Gimbal` element allows to freeze camera orientation for pitch, roll and/or 
 ### UnrealEngine
 This element contains settings specific to the Unreal Engine. These will be ignored in the Unity project.
 * `PixelFormatOverride`: This contains a list of elements that have both a `ImageType` and `PixelFormat` setting. Each element allows you to override the default pixel format of the UTextureRenderTarget2D object instantiated for the capture specified by the `ImageType` setting. Specifying this element allows you to prevent crashes caused by unexpected pixel formats (see [#4120](https://github.com/microsoft/AirSim/issues/4120) and [#4339](https://github.com/microsoft/AirSim/issues/4339) for examples of these crashes). A full list of pixel formats can be viewed [here](https://docs.unrealengine.com/4.27/en-US/API/Runtime/Core/EPixelFormat/).
-
-## External Cameras
-This element allows specifying cameras which are separate from the cameras attached to the vehicle, such as a CCTV camera. These are fixed cameras, and don't move along with the vehicles. The key in the element is the name of the camera, and the value i.e. settings are the same as `CameraDefaults` described above. All the camera APIs work with external cameras, including capturing images, changing the pose, etc by passing the parameter `external=True` in the API call.
 
 ## Vehicles Settings
 Each simulation mode will go through the list of vehicles specified in this setting and create the ones that has `"AutoCreate": true`. Each vehicle specified in this setting has key which becomes the name of the vehicle. If `"Vehicles"` element is missing then this list is populated with default car named "PhysXCar" and default multirotor named "SimpleFlight".
