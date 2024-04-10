@@ -13,7 +13,8 @@
 
 namespace msr { namespace airlib {
 
-class ComputerVisionApiBase : public VehicleApiBase  {
+class ComputerVisionApiBase : public VehicleApiBase
+{
 public:
 
     struct ComputerVisionState {
@@ -23,6 +24,16 @@ public:
         ComputerVisionState(const Kinematics::State& kinematics_estimated_val, uint64_t timestamp_val)
             : kinematics_estimated(kinematics_estimated_val), timestamp(timestamp_val)
         {
+        }
+
+        //shortcuts
+        const Vector3r& getPosition() const
+        {
+            return kinematics_estimated.pose.position;
+        }
+        const Quaternionr& getOrientation() const
+        {
+            return kinematics_estimated.pose.orientation;
         }
     };
 
@@ -38,14 +49,6 @@ public:
         initialize(vehicle_setting, sensor_factory, state, environment);
     }
 
-    //default implementation so derived class doesn't have to call on VehicleApiBase
-    virtual void resetImplementation() override
-    {
-        VehicleApiBase::reset();
-
-        //reset sensors last after their ground truth has been reset
-        getSensors().reset();
-    }
 
     virtual void update(float delta = 0) override
     {
@@ -91,12 +94,22 @@ public:
     }
 
     virtual ComputerVisionState getComputerVisionState() const = 0;
+    virtual void updateComputerVisionState(const ComputerVisionState& state) = 0;
 
     virtual ~ComputerVisionApiBase() = default;
 
     std::shared_ptr<const SensorFactory> sensor_factory_;
     SensorCollection sensors_; //maintains sensor type indexed collection of sensors
     vector<shared_ptr<SensorBase>> sensor_storage_; //RAII for created sensors
+    
+protected:
+    //default implementation so derived class doesn't have to call on VehicleApiBase
+    virtual void resetImplementation() override
+    {
+
+        //reset sensors last after their ground truth has been reset
+        getSensors().reset();
+    }
 };
 
 

@@ -7,7 +7,7 @@
 using namespace msr::airlib;
 
 ComputerVisionPawnSimApi::ComputerVisionPawnSimApi(const Params& params)
-    : PawnSimApi(params), params_(params)
+    : PawnSimApi(params)
 {
 }
 
@@ -15,19 +15,16 @@ void ComputerVisionPawnSimApi::initialize()
 {
     PawnSimApi::initialize();
 
-    createVehicleApi(static_cast<AComputerVisionPawn*>(params_.pawn), params_.home_geopoint);
+    //create vehicle params
+    std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());
+    vehicle_api_ = std::unique_ptr<ComputerVisionApiBase>(new ComputerVisionPawnApi(getVehicleSetting(),sensor_factory, getGroundTruthKinematics(), home_geopoint,
+        getVehicleSetting(), sensor_factory,
+        (*getGroundTruthKinematics()), (*getGroundTruthEnvironment())));
+    pawn_api_ = std::unique_ptr<ComputerVisionPawnApi>(new ComputerVisionPawnApi(static_cast<AComputerVisionPawn*>(getPawn()), getGroundTruthKinematics(), vehicle_api_.get()));
 
     //TODO: should do reset() here?
 }
 
-void ComputerVisionPawnSimApi::createVehicleApi(AComputerVisionPawn* pawn, const msr::airlib::GeoPoint& home_geopoint)
-{
-    //create vehicle params
-    std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());
-    vehicle_api_ = std::unique_ptr<ComputerVisionApiBase>(new ComputerVisionPawnApi(pawn, getGroundTruthKinematics(), home_geopoint,
-        getVehicleSetting(), sensor_factory, 
-        (*getGroundTruthKinematics()), (*getGroundTruthEnvironment())));
-}
 
 //these are called on render ticks
 void ComputerVisionPawnSimApi::updateRenderedState(float dt)

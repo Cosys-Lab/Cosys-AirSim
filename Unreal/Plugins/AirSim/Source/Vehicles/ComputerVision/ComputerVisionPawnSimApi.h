@@ -27,8 +27,10 @@ public:
     //implements game interface to update pawn
     ComputerVisionPawnSimApi(const Params& params);
 
-    virtual void resetImplementation() override;
     virtual void update(float delta = 0) override;
+    virtual void reportState(StateReporter& reporter) override;
+
+    virtual std::string getRecordFileLine(bool is_header_line) const override;
 
     virtual void updateRenderedState(float dt) override;
     virtual void updateRendering(float dt) override;
@@ -43,12 +45,14 @@ public:
         return vehicle_api_.get();
     }
 
-private:
-    void createVehicleApi(AComputerVisionPawn* pawn, const msr::airlib::GeoPoint& home_geopoint);
+protected:
+    virtual void resetImplementation() override;
+
 
 private:
-    Params params_;
+
 
     std::unique_ptr<msr::airlib::ComputerVisionApiBase> vehicle_api_;
+    std::unique_ptr<ComputerVisionPawnApi> pawn_api_;
     std::vector<std::string> vehicle_api_messages_;
 };
