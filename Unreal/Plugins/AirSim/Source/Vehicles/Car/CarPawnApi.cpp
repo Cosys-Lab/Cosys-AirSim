@@ -65,9 +65,8 @@ void CarPawnApi::reset()
         if (pvd) {
             pvd->mDriveDynData.setToRestState();
         }
-    },
-                                             true);                                             true);
-    //UAirBlueprintLib::RunCommandOnGameThread([this, &phys_comps]() {
+    }, true);                                         
+     //UAirBlueprintLib::RunCommandOnGameThread([this, &phys_comps]() {
     //    for (auto* phys_comp : phys_comps)
     //        phys_comp->SetSimulatePhysics(true);
     //}, true);
@@ -76,7 +75,7 @@ void CarPawnApi::reset()
 void CarPawnApi::update(float delta)
 {
     vehicle_api_->updateCarState(getCarState());
-    vehicle_api_->update(float delta);
+    vehicle_api_->update(delta);
 }
 
 CarPawnApi::~CarPawnApi() = default;

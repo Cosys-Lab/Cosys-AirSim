@@ -13,6 +13,7 @@
 #include "physics//Kinematics.hpp"
 #include "common/Common.hpp"
 #include "common/CommonStructs.hpp"
+#include "vehicles/car/CarApiFactory.hpp"
 
 class SkidVehiclePawnSimApi : public PawnSimApi
 {
@@ -29,10 +30,11 @@ public:
 	//VehicleSimApiBase interface
 	//implements game interface to update pawn
 	SkidVehiclePawnSimApi(const Params& params,
-		const SkidVehiclePawnApi::CarControls&  keyboard_controls, USkidVehicleMovementComponent* movement);
+		                  const msr::airlib::CarApiBase::CarControls& keyboard_controls);
 
-	virtual void reset() override;
 	virtual void update(float delta = 0) override;
+
+	virtual void reportState(StateReporter& reporter) override;
 
 	virtual std::string getRecordFileLine(bool is_header_line) const override;
 
@@ -49,19 +51,21 @@ public:
 		return vehicle_api_.get();
 	}
 
+
+protected:
+	virtual void resetImplementation() override;
+
 private:
-	void createVehicleApi(ASkidVehiclePawn* pawn, const msr::airlib::GeoPoint& home_geopoint);
 	void updateCarControls();
 
 private:
-	Params params_;
-
 	std::unique_ptr<msr::airlib::CarApiBase> vehicle_api_;
 	std::vector<std::string> vehicle_api_messages_;
+	std::unique_ptr<SkidVehiclePawnApi> pawn_api_;
 
 	//storing reference from pawn
-	const SkidVehiclePawnApi::CarControls& keyboard_controls_;
+	const msr::airlib::CarApiBase::CarControls& keyboard_controls_;
 
-	SkidVehiclePawnApi::CarControls joystick_controls_;
-	SkidVehiclePawnApi::CarControls current_controls_;
+	msr::airlib::CarApiBase::CarControls joystick_controls_;
+	msr::airlib::CarApiBase::CarControls current_controls_;
 };

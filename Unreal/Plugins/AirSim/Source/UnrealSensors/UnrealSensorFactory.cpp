@@ -28,19 +28,19 @@ std::shared_ptr<msr::airlib::SensorBase> UnrealSensorFactory::createSensorFromSe
         return std::shared_ptr<UnrealLidarSensor>(new UnrealLidarSensor(
             *static_cast<const AirSimSettings::LidarSetting*>(sensor_setting), actor_, ned_transform_));
 	case SensorBase::SensorType::GPULidar:
-		return std::unique_ptr<UnrealGPULidarSensor>(new UnrealGPULidarSensor(
+		return std::shared_ptr<UnrealGPULidarSensor>(new UnrealGPULidarSensor(
 			*static_cast<const AirSimSettings::GPULidarSetting*>(sensor_setting), actor_, ned_transform_));
     case SensorBase::SensorType::Echo:
-        return std::unique_ptr<UnrealEchoSensor>(new UnrealEchoSensor(
+        return std::shared_ptr<UnrealEchoSensor>(new UnrealEchoSensor(
             *static_cast<const AirSimSettings::EchoSetting*>(sensor_setting), actor_, ned_transform_));
     case SensorBase::SensorType::SensorTemplate:
-        return std::unique_ptr<UnrealSensorTemplate>(new UnrealSensorTemplate(
+        return std::shared_ptr<UnrealSensorTemplate>(new UnrealSensorTemplate(
             *static_cast<const AirSimSettings::SensorTemplateSetting*>(sensor_setting), actor_, ned_transform_));
     case SensorBase::SensorType::MarlocUwb:
-        return std::unique_ptr<UnrealMarLocUwbSensor>(new UnrealMarLocUwbSensor(
+        return std::shared_ptr<UnrealMarLocUwbSensor>(new UnrealMarLocUwbSensor(
             *static_cast<const AirSimSettings::MarLocUwbSetting*>(sensor_setting), actor_, ned_transform_));
     case SensorBase::SensorType::Wifi:
-        return std::unique_ptr<UnrealWifiSensor>(new UnrealWifiSensor(
+        return std::shared_ptr<UnrealWifiSensor>(new UnrealWifiSensor(
             *static_cast<const AirSimSettings::WifiSetting*>(sensor_setting), actor_, ned_transform_));
     default:
         return msr::airlib::SensorFactory::createSensorFromSettings(sensor_setting);

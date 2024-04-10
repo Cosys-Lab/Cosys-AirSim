@@ -26,7 +26,7 @@ public:
     }
 
     //*** Start: UpdatableState implementation ***//
-    virtual void reset() override
+    virtual void resetImplementation() override
     {
 		SensorTemplateBase::reset();
 

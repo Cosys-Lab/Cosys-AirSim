@@ -28,7 +28,7 @@ public:
     }
 
     //*** Start: UpdatableState implementation ***//
-    virtual void reset() override
+    virtual void resetImplementation() override
     {
 		WifiBase::reset();
 

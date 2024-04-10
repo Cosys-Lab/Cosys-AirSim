@@ -15,7 +15,7 @@ public:
 
     virtual ComputerVisionApiBase::ComputerVisionState getComputerVisionState() const override;
 
-    virtual void reset() override;
+    virtual void resetImplementation() override;
     virtual void update(float delta = 0) override;
 
     virtual msr::airlib::GeoPoint getHomeGeoPoint() const override;

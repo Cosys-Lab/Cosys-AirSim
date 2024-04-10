@@ -162,7 +162,7 @@ void CarPawnSimApi::update(float delta)
 {
     pawn_api_->update(delta);
 
-    PawnSimApi::updatedelta();
+    PawnSimApi::update(delta);
 }
 
 void CarPawnSimApi::reportState(StateReporter& reporter)

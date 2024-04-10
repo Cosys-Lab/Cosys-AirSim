@@ -57,6 +57,10 @@ namespace airlib
         virtual void setKinematics(const Kinematics::State& state, bool ignore_collision) = 0;
         virtual const msr::airlib::Environment* getGroundTruthEnvironment() const = 0;
 
+        virtual CameraInfo getCameraInfo(const std::string& camera_name) const = 0;
+        virtual void setCameraOrientation(const std::string& camera_name, const Quaternionr& orientation) = 0;
+
+
         virtual CollisionInfo getCollisionInfo() const = 0;
         virtual CollisionInfo getCollisionInfoAndReset() = 0;
         virtual int getRemoteControlID() const = 0; //which RC to use, 0 is first one, -1 means disable RC (use keyborad)

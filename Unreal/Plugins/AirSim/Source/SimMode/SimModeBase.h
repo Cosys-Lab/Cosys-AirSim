@@ -130,7 +130,7 @@ public:
         return external_image_capture_.get();
     }
 
-    const UnrealImageCapture* getImageCapture(const std::string& vehicle_name = "", bool external = false) const;
+    const UnrealImageCapture* getImageCapture(const std::string& vehicle_name = "") const;
 
     TMap<FString, FAssetData> asset_map;
     TMap<FString, AActor*> scene_object_map;

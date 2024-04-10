@@ -102,7 +102,7 @@ namespace airlib
         virtual std::vector<float> getDistortionParams(const CameraDetails& camera_details) const = 0;
 
         virtual std::vector<ImageCaptureBase::ImageResponse> getImages(const std::vector<ImageCaptureBase::ImageRequest>& requests,
-                                                                       const std::string& vehicle_name, bool external) const = 0;
+                                                                       const std::string& vehicle_name) const = 0;
         virtual std::vector<uint8_t> getImage(ImageCaptureBase::ImageType image_type, const CameraDetails& camera_details) const = 0;
 
         //CinemAirSim

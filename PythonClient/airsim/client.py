@@ -218,7 +218,7 @@ class VehicleClient:
 #camera control
 #simGetImage returns compressed png in array of bytes
 #image_type uses one of the ImageType members
-    def simGetImage(self, camera_name, image_type, vehicle_name = '', external = False):
+    def simGetImage(self, camera_name, image_type, vehicle_name = ''):
         """
         Get a single image
 
@@ -230,7 +230,6 @@ class VehicleClient:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
             image_type (ImageType): Type of image required
             vehicle_name (str, optional): Name of the vehicle with the camera
-            external (bool, optional): Whether the camera is an External Camera
 
         Returns:
             Binary string literal of compressed png image
@@ -239,7 +238,7 @@ class VehicleClient:
         camera_name = str(camera_name)
 
 #because this method returns std::vector < uint8>, msgpack decides to encode it as a string unfortunately.
-        result = self.client.call('simGetImage', camera_name, image_type, vehicle_name, external)
+        result = self.client.call('simGetImage', camera_name, image_type, vehicle_name)
         if (result == "" or result == "\0"):
             return None
         return result
@@ -247,7 +246,7 @@ class VehicleClient:
 #camera control
 #simGetImage returns compressed png in array of bytes
 #image_type uses one of the ImageType members
-    def simGetImages(self, requests, vehicle_name = '', external = False):
+    def simGetImages(self, requests, vehicle_name = ''):
         """
         Get multiple images
 
@@ -256,76 +255,75 @@ class VehicleClient:
         Args:
             requests (list[ImageRequest]): Images required
             vehicle_name (str, optional): Name of vehicle associated with the camera
-            external (bool, optional): Whether the camera is an External Camera
 
         Returns:
             list[ImageResponse]:
         """
-        responses_raw = self.client.call('simGetImages', requests, vehicle_name, external)
+        responses_raw = self.client.call('simGetImages', requests, vehicle_name)
         return [ImageResponse.from_msgpack(response_raw) for response_raw in responses_raw]
 
 
 
 #CinemAirSim
-    def simGetPresetLensSettings(self, camera_name, vehicle_name = '', external = False):
-        result = self.client.call('simGetPresetLensSettings', camera_name, vehicle_name, external)
+    def simGetPresetLensSettings(self, camera_name, vehicle_name = ''):
+        result = self.client.call('simGetPresetLensSettings', camera_name, vehicle_name)
         if (result == "" or result == "\0"):
             return None
         return result
 
-    def simGetLensSettings(self, camera_name, vehicle_name = '', external = False):
-        result = self.client.call('simGetLensSettings', camera_name, vehicle_name, external)
+    def simGetLensSettings(self, camera_name, vehicle_name = ''):
+        result = self.client.call('simGetLensSettings', camera_name, vehicle_name)
         if (result == "" or result == "\0"):
             return None
         return result
 
-    def simSetPresetLensSettings(self, preset_lens_settings, camera_name, vehicle_name = '', external = False):
-        self.client.call("simSetPresetLensSettings", preset_lens_settings, camera_name, vehicle_name, external)
+    def simSetPresetLensSettings(self, preset_lens_settings, camera_name, vehicle_name = ''):
+        self.client.call("simSetPresetLensSettings", preset_lens_settings, camera_name, vehicle_name)
 
-    def simGetPresetFilmbackSettings(self, camera_name, vehicle_name = '', external = False):
-        result = self.client.call('simGetPresetFilmbackSettings', camera_name, vehicle_name, external)
+    def simGetPresetFilmbackSettings(self, camera_name, vehicle_name = ''):
+        result = self.client.call('simGetPresetFilmbackSettings', camera_name, vehicle_name)
         if (result == "" or result == "\0"):
             return None
         return result
 
-    def simSetPresetFilmbackSettings(self, preset_filmback_settings, camera_name, vehicle_name = '', external = False):
-        self.client.call("simSetPresetFilmbackSettings", preset_filmback_settings, camera_name, vehicle_name, external)
+    def simSetPresetFilmbackSettings(self, preset_filmback_settings, camera_name, vehicle_name = ''):
+        self.client.call("simSetPresetFilmbackSettings", preset_filmback_settings, camera_name, vehicle_name)
 
-    def simGetFilmbackSettings(self, camera_name, vehicle_name = '', external = False):
-        result = self.client.call('simGetFilmbackSettings', camera_name, vehicle_name, external)
+    def simGetFilmbackSettings(self, camera_name, vehicle_name = ''):
+        result = self.client.call('simGetFilmbackSettings', camera_name, vehicle_name)
         if (result == "" or result == "\0"):
             return None
         return result
 
-    def simSetFilmbackSettings(self, sensor_width, sensor_height, camera_name, vehicle_name = '', external = False):
-        return self.client.call("simSetFilmbackSettings", sensor_width, sensor_height, camera_name, vehicle_name, external)
+    def simSetFilmbackSettings(self, sensor_width, sensor_height, camera_name, vehicle_name = ''):
+        return self.client.call("simSetFilmbackSettings", sensor_width, sensor_height, camera_name, vehicle_name)
 
-    def simGetFocalLength(self, camera_name, vehicle_name = '', external = False):
-        return self.client.call("simGetFocalLength", camera_name, vehicle_name, external)
+    def simGetFocalLength(self, camera_name, vehicle_name = ''):
+        return self.client.call("simGetFocalLength", camera_name, vehicle_name)
 
-    def simSetFocalLength(self, focal_length, camera_name, vehicle_name = '', external = False):
-        self.client.call("simSetFocalLength", focal_length, camera_name, vehicle_name, external)
+    def simSetFocalLength(self, focal_length, camera_name, vehicle_name = ''):
+        self.client.call("simSetFocalLength", focal_length, camera_name, vehicle_name)
 
-    def simEnableManualFocus(self, enable, camera_name, vehicle_name = '', external = False):
-        self.client.call("simEnableManualFocus", enable, camera_name, vehicle_name, external)
+    def simEnableManualFocus(self, enable, camera_name, vehicle_name = ''):
+        self.client.call("simEnableManualFocus", enable, camera_name, vehicle_name)
 
-    def simGetFocusDistance(self, camera_name, vehicle_name = '', external = False):
-        return self.client.call("simGetFocusDistance", camera_name, vehicle_name, external)
+    def simGetFocusDistance(self, camera_name, vehicle_name = ''):
+        return self.client.call("simGetFocusDistance", camera_name, vehicle_name)
 
-    def simSetFocusDistance(self, focus_distance, camera_name, vehicle_name = '', external = False):
-        self.client.call("simSetFocusDistance", focus_distance, camera_name, vehicle_name, external)
+    def simSetFocusDistance(self, focus_distance, camera_name, vehicle_name = ''):
+        self.client.call("simSetFocusDistance", focus_distance, camera_name, vehicle_name)
 
-    def simGetFocusAperture(self, camera_name, vehicle_name = '', external = False):
-        return self.client.call("simGetFocusAperture", camera_name, vehicle_name, external)
+    def simGetFocusAperture(self, camera_name, vehicle_name = ''):
+        return self.client.call("simGetFocusAperture", camera_name, vehicle_name)
 
-    def simSetFocusAperture(self, focus_aperture, camera_name, vehicle_name = '', external = False):
-        self.client.call("simSetFocusAperture", focus_aperture, camera_name, vehicle_name, external)
+    def simSetFocusAperture(self, focus_aperture, camera_name, vehicle_name = ''):
+        self.client.call("simSetFocusAperture", focus_aperture, camera_name, vehicle_name)
 
-    def simEnableFocusPlane(self, enable, camera_name, vehicle_name = '', external = False):
-        self.client.call("simEnableFocusPlane", enable, camera_name, vehicle_name, external)
+    def simEnableFocusPlane(self, enable, camera_name, vehicle_name = ''):
+        self.client.call("simEnableFocusPlane", enable, camera_name, vehicle_name)
 
-    def simGetCurrentFieldOfView(self, camera_name, vehicle_name = '', external = False):
-        return self.client.call("simGetCurrentFieldOfView", camera_name, vehicle_name, external)
+    def simGetCurrentFieldOfView(self, camera_name, vehicle_name = ''):
+        return self.client.call("simGetCurrentFieldOfView", camera_name, vehicle_name)
 
 #End CinemAirSim
     def simTestLineOfSightToPoint(self, point, vehicle_name = ''):
@@ -570,37 +568,35 @@ class VehicleClient:
         """
         self.client.call('simPrintLogMessage', message, message_param, severity)
 
-    def simGetCameraInfo(self, camera_name, vehicle_name='', external=False):
+    def simGetCameraInfo(self, camera_name, vehicle_name=''):
         """
         Get details about the camera
 
         Args:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
 
         Returns:
             CameraInfo:
         """
         # TODO : below str() conversion is only needed for legacy reason and should be removed in future
-        return CameraInfo.from_msgpack(self.client.call('simGetCameraInfo', str(camera_name), vehicle_name, external))
+        return CameraInfo.from_msgpack(self.client.call('simGetCameraInfo', str(camera_name), vehicle_name))
 
-    def simGetDistortionParams(self, camera_name, vehicle_name='', external=False):
+    def simGetDistortionParams(self, camera_name, vehicle_name=''):
         """
         Get camera distortion parameters
 
         Args:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
 
         Returns:
             List (float): List of distortion parameter values corresponding to K1, K2, K3, P1, P2 respectively.
         """
 
-        return self.client.call('simGetDistortionParams', str(camera_name), vehicle_name, external)
+        return self.client.call('simGetDistortionParams', str(camera_name), vehicle_name)
 
-    def simSetDistortionParams(self, camera_name, distortion_params, vehicle_name = '', external = False):
+    def simSetDistortionParams(self, camera_name, distortion_params, vehicle_name = ''):
         """
         Set camera distortion parameters
 
@@ -609,13 +605,12 @@ class VehicleClient:
             distortion_params (dict): Dictionary of distortion param names and corresponding values
                                         {"K1": 0.0, "K2": 0.0, "K3": 0.0, "P1": 0.0, "P2": 0.0}
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
         """
 
         for param_name, value in distortion_params.items():
-            self.simSetDistortionParam(camera_name, param_name, value, vehicle_name, external)
+            self.simSetDistortionParam(camera_name, param_name, value, vehicle_name)
 
-    def simSetDistortionParam(self, camera_name, param_name, value, vehicle_name = '', external = False):
+    def simSetDistortionParam(self, camera_name, param_name, value, vehicle_name = ''):
         """
         Set single camera distortion parameter
 
@@ -624,11 +619,10 @@ class VehicleClient:
             param_name (str): Name of distortion parameter
             value (float): Value of distortion parameter
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
         """
-        self.client.call('simSetDistortionParam', str(camera_name), param_name, value, vehicle_name, external)
+        self.client.call('simSetDistortionParam', str(camera_name), param_name, value, vehicle_name)
 
-    def simSetCameraPose(self, camera_name, pose, vehicle_name = '', external = False):
+    def simSetCameraPose(self, camera_name, pose, vehicle_name = ''):
         """
         - Control the pose of a selected camera
 
@@ -636,12 +630,11 @@ class VehicleClient:
             camera_name (str): Name of the camera to be controlled
             pose (Pose): Pose representing the desired position and orientation of the camera
             vehicle_name (str, optional): Name of vehicle which the camera corresponds to
-            external (bool, optional): Whether the camera is an External Camera
         """
 #TODO : below str() conversion is only needed for legacy reason and should be removed in future
-        self.client.call('simSetCameraPose', str(camera_name), pose, vehicle_name, external)
+        self.client.call('simSetCameraPose', str(camera_name), pose, vehicle_name)
 
-    def simSetCameraFov(self, camera_name, fov_degrees, vehicle_name = '', external = False):
+    def simSetCameraFov(self, camera_name, fov_degrees, vehicle_name = ''):
         """
         - Control the field of view of a selected camera
 
@@ -649,10 +642,9 @@ class VehicleClient:
             camera_name (str): Name of the camera to be controlled
             fov_degrees (float): Value of field of view in degrees
             vehicle_name (str, optional): Name of vehicle which the camera corresponds to
-            external (bool, optional): Whether the camera is an External Camera
         """
 #TODO : below str() conversion is only needed for legacy reason and should be removed in future
-        self.client.call('simSetCameraFov', str(camera_name), fov_degrees, vehicle_name, external)
+        self.client.call('simSetCameraFov', str(camera_name), fov_degrees, vehicle_name)
 
     def simGetGroundTruthKinematics(self, vehicle_name = ''):
         """

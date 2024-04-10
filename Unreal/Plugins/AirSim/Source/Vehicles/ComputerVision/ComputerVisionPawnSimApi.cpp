@@ -54,7 +54,7 @@ void ComputerVisionPawnSimApi::updateRendering(float dt)
 }
 
 //*** Start: UpdatableState implementation ***//
-void ComputerVisionPawnSimApi::reset()
+void ComputerVisionPawnSimApi::resetImplementation()
 {
     PawnSimApi::reset();
 

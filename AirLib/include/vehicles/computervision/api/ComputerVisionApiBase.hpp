@@ -39,7 +39,7 @@ public:
     }
 
     //default implementation so derived class doesn't have to call on VehicleApiBase
-    virtual void reset() override
+    virtual void resetImplementation() override
     {
         VehicleApiBase::reset();
 
@@ -86,12 +86,7 @@ public:
 
     void addSensorsFromSettings(const AirSimSettings::VehicleSetting* vehicle_setting)
     {
-        // use sensors from vehicle settings; if empty list, use default sensors.
-        // note that the vehicle settings completely override the default sensor "list";
-        // there is no piecemeal add/remove/update per sensor.
-        const std::map<std::string, std::unique_ptr<AirSimSettings::SensorSetting>>& sensor_settings
-            = vehicle_setting->sensors.size() > 0 ? vehicle_setting->sensors : AirSimSettings::AirSimSettings::singleton().sensor_defaults;
-
+        const auto& sensor_settings = vehicle_setting->sensors;
         sensor_factory_->createSensorsFromSettings(sensor_settings, sensors_, sensor_storage_);
     }
 
@@ -101,7 +96,7 @@ public:
 
     std::shared_ptr<const SensorFactory> sensor_factory_;
     SensorCollection sensors_; //maintains sensor type indexed collection of sensors
-    vector<unique_ptr<SensorBase>> sensor_storage_; //RAII for created sensors
+    vector<shared_ptr<SensorBase>> sensor_storage_; //RAII for created sensors
 };
 
 

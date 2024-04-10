@@ -181,17 +181,12 @@ public:
     }
     static void setLogMessagesVisibility(bool is_visible);
 
-    static void SetMeshNamingMethod(msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType method)
-    {
-        mesh_naming_method_ = method;
-    }
-
     static void enableWorldRendering(AActor* context, bool enable);
     static void DrawCoordinateSystem(const UWorld* InWorld, FVector const& AxisLoc, FRotator const& AxisRot, float Scale, bool bPersistentLines = false, float LifeTime = -1.f, uint8 DepthPriority = 0, float Thickness = 0.f);
 	static void DrawLine(const UWorld* InWorld, FVector const& LineStart, FVector const& LineEnd, FColor const& Color, bool bPersistentLines = false, float LifeTime = -1.f, uint8 DepthPriority = 0, float Thickness = 0.f);
 	static void DrawPoint(const UWorld* InWorld, FVector const& Position, float Size, FColor const& Color, bool bPersistentLines = false, float LifeTime = -1.f, uint8 DepthPriority = 0);
 	static void DrawCircle(const UWorld* InWorld, const FMatrix& TransformMatrix, float Radius, int32 Segments, const FColor& Color, bool bPersistentLines = false, float LifeTime = -1.f, uint8 DepthPriority = 0, float Thickness = 0.f, bool bDrawAxis = true);
-	static void DrawCircle(const UWorld* InWorld, FVector Center, float Radius, int32 Segments, const FColor& Color, bool bPersistentLines = false, float LifeTime = -1.f, uint8 DepthPriority = 0, float Thickness = 0.f, FVector YAxis = FVector(0.f, 1.f, 0.f), FVector ZAxis = FVector(0.f, 0.f, 1.f), bool bDrawAxis = true);	static void enableWorldRendering(AActor* context, bool enable);
+	static void DrawCircle(const UWorld* InWorld, FVector Center, float Radius, int32 Segments, const FColor& Color, bool bPersistentLines = false, float LifeTime = -1.f, uint8 DepthPriority = 0, float Thickness = 0.f, FVector YAxis = FVector(0.f, 1.f, 0.f), FVector ZAxis = FVector(0.f, 0.f, 1.f), bool bDrawAxis = true);
     static void enableViewportRendering(AActor* context, bool enable);
     static void setSimulatePhysics(AActor* actor, bool simulate_physics);
     static void resetSimulatePhysics(AActor* actor);
@@ -225,21 +220,20 @@ private:
                 break;
             }
         }
-
-        SetObjectStencilID(mesh, hash % 256);
         if (!painted) {
             SetObjectStencilID(mesh, 0);
         }
     }
 
-    template <typename T>
+    template<typename T>
     static void SetObjectStencilIDIfMatch(T* mesh, int object_id,
-                                          const std::string& mesh_name, bool is_name_regex, const std::regex& name_regex, int& changes)
+        const std::string& mesh_name, bool is_name_regex, const std::regex& name_regex, int& changes)
     {
         std::string comp_mesh_name = GetMeshName(mesh);
         if (comp_mesh_name == "")
             return;
-        bool is_match = (!is_name_regex && (comp_mesh_name == mesh_name)) || (is_name_regex && std::regex_match(comp_mesh_name, name_regex));
+        bool is_match = (!is_name_regex && (comp_mesh_name == mesh_name))
+            || (is_name_regex && std::regex_match(comp_mesh_name, name_regex));
         if (is_match) {
             ++changes;
             SetObjectStencilID(mesh, object_id);
@@ -249,10 +243,12 @@ private:
     template<typename T>
     static void SetObjectStencilID(T* mesh, int object_id)
     {
-        if (object_id < 0) {
+        if (object_id < 0)
+        {
             mesh->SetRenderCustomDepth(false);
         }
-        else {
+        else
+        {
             mesh->SetCustomDepthStencilValue(object_id);
             mesh->SetRenderCustomDepth(true);
         }
@@ -262,10 +258,12 @@ private:
 
     static void SetObjectStencilID(ALandscapeProxy* mesh, int object_id)
     {
-        if (object_id < 0) {
+        if (object_id < 0)
+        {
             mesh->bRenderCustomDepth = false;
         }
-        else {
+        else
+        {
             mesh->CustomDepthStencilValue = object_id;
             mesh->bRenderCustomDepth = true;
         }
@@ -273,16 +271,20 @@ private:
         // Explicitly set the custom depth state on the components so the
         // render state is marked dirty and the update actually takes effect
         // immediately.
-        for (ULandscapeComponent* comp : mesh->LandscapeComponents) {
-            if (object_id < 0) {
+        for (ULandscapeComponent* comp : mesh->LandscapeComponents)
+        {
+            if (object_id < 0)
+            {
                 comp->SetRenderCustomDepth(false);
             }
-            else {
+            else
+            {
                 comp->SetCustomDepthStencilValue(object_id);
                 comp->SetRenderCustomDepth(true);
             }
         }
     }
+
 
     template <typename T>
     static void SetRenderCustomDepth(T* mesh, bool enable)
@@ -305,7 +307,6 @@ private:
     static bool log_messages_hidden_;
     //FViewPort doesn't expose this field so we are doing dirty work around by maintaining count by ourselves
     static uint32_t flush_on_draw_count_;
-    static msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType mesh_naming_method_;
 
     static IImageWrapperModule* image_wrapper_module_;
 };

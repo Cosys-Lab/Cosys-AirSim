@@ -9,9 +9,8 @@
 using namespace msr::airlib;
 
 SkidVehiclePawnSimApi::SkidVehiclePawnSimApi(const Params& params,
-	const SkidVehiclePawnApi::CarControls&  keyboard_controls, USkidVehicleMovementComponent* movement)
-	: PawnSimApi(params), params_(params),
-	keyboard_controls_(keyboard_controls)
+											 const msr::airlib::CarApiBase::CarControls& keyboard_controls)
+	: PawnSimApi(params), keyboard_controls_(keyboard_controls)
 {
 }
 
@@ -19,19 +18,18 @@ void SkidVehiclePawnSimApi::initialize()
 {
 	PawnSimApi::initialize();
 
-	createVehicleApi(static_cast<ASkidVehiclePawn*>(params_.pawn), params_.home_geopoint);
+	std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());
+
+	vehicle_api_ = CarApiFactory::createApi(getVehicleSetting(),
+		sensor_factory,
+		*getGroundTruthKinematics(),
+		*getGroundTruthEnvironment());
+
+	pawn_api_ = std::unique_ptr<SkidVehiclePawnApi>(new SkidVehiclePawnApi(static_cast<ASkidVehiclePawn*>(getPawn()), getGroundTruthKinematics(), vehicle_api_.get()));
+
 
 	//TODO: should do reset() here?
-	joystick_controls_ = SkidVehiclePawnApi::CarControls();
-}
-
-void SkidVehiclePawnSimApi::createVehicleApi(ASkidVehiclePawn* pawn, const msr::airlib::GeoPoint& home_geopoint)
-{
-	//create vehicle params
-	std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());
-	vehicle_api_ = std::unique_ptr<CarApiBase>(new SkidVehiclePawnApi(pawn, getGroundTruthKinematics(), home_geopoint,
-		getVehicleSetting(), sensor_factory,
-		(*getGroundTruthKinematics()), (*getGroundTruthEnvironment())));
+	joystick_controls_ = msr::airlib::CarApiBase::CarControls();
 }
 
 std::string SkidVehiclePawnSimApi::getRecordFileLine(bool is_header_line) const
@@ -39,22 +37,17 @@ std::string SkidVehiclePawnSimApi::getRecordFileLine(bool is_header_line) const
 	std::string common_line = PawnSimApi::getRecordFileLine(is_header_line);
 	if (is_header_line) {
 		return common_line +
-			"Throttle\tSteering\tBrake\tGear\tRPM\tSpeed\t";
+			"Throttle\tSteering\tBrake\tGear\tHandbrake\tRPM\tSpeed\t";
 	}
 
-	const msr::airlib::Kinematics::State* kinematics = getGroundTruthKinematics();
-	const auto state = vehicle_api_->getCarState();
+	const auto& state = pawn_api_->getCarState();
 
-	common_line
-		.append(std::to_string(current_controls_.throttle)).append("\t")
-		.append(std::to_string(current_controls_.steering)).append("\t")
-		.append(std::to_string(current_controls_.brake)).append("\t")
-		.append(std::to_string(state.gear)).append("\t")
-		.append(std::to_string(state.rpm)).append("\t")
-		.append(std::to_string(state.speed)).append("\t")
-		;
+	std::ostringstream ss;
+	ss << common_line;
+	ss << current_controls_.throttle << "\t" << current_controls_.steering << "\t" << current_controls_.brake << "\t";
+	ss << state.gear << "\t" << state.handbrake << "\t" << state.rpm << "\t" << state.speed << "\t";
 
-	return common_line;
+	return ss.str();
 }
 
 //these are called on render ticks
@@ -81,7 +74,7 @@ void SkidVehiclePawnSimApi::updateRendering(float dt)
 	try {
 		vehicle_api_->sendTelemetry(dt);
 	}
-	catch (std::exception &e) {
+	catch (std::exception& e) {
 		UAirBlueprintLib::LogMessage(FString(e.what()), TEXT(""), LogDebugLevel::Failure, 30);
 	}
 }
@@ -155,15 +148,16 @@ void SkidVehiclePawnSimApi::updateCarControls()
 	UAirBlueprintLib::LogMessageString("Accel: ", std::to_string(current_controls_.throttle), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessageString("Break: ", std::to_string(current_controls_.brake), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessageString("Steering: ", std::to_string(current_controls_.steering), LogDebugLevel::Informational);
+	UAirBlueprintLib::LogMessageString("Handbrake: ", std::to_string(current_controls_.handbrake), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessageString("Target Gear: ", std::to_string(current_controls_.manual_gear), LogDebugLevel::Informational);
 }
 
 //*** Start: UpdatableState implementation ***//
-void SkidVehiclePawnSimApi::reset()
+void SkidVehiclePawnSimApi::resetImplementation()
 {
-	PawnSimApi::reset();
+	PawnSimApi::resetImplementation();
 
-	vehicle_api_->reset();
+	pawn_api_->reset();
 }
 
 //physics tick
@@ -172,6 +166,13 @@ void SkidVehiclePawnSimApi::update(float delta)
 	vehicle_api_->update(delta);
 
 	PawnSimApi::update(delta);
+}
+
+void SkidVehiclePawnSimApi::reportState(StateReporter& reporter)
+{
+	PawnSimApi::reportState(reporter);
+
+	vehicle_api_->reportState(reporter);
 }
 
 //*** End: UpdatableState implementation ***//

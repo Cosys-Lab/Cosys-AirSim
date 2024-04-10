@@ -26,7 +26,7 @@ namespace msr {
 			}
 
 			//*** Start: UpdatableState implementation ***//
-			virtual void reset() override
+			virtual void resetImplementation() override
 			{
 				GPULidarBase::reset();
 				freq_limiter_.reset();

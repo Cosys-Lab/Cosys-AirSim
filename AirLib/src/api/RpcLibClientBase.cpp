@@ -238,19 +238,19 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simGetSegmentationObjectID", mesh_name).as<int>();
         }
 
-        void RpcLibClientBase::simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simAddDetectionFilterMeshName", camera_name, type, mesh_name, vehicle_name, external);
+            pimpl_->client.call("simAddDetectionFilterMeshName", camera_name, type, mesh_name, vehicle_name);
         }
-        void RpcLibClientBase::simSetDetectionFilterRadius(const std::string& camera_name, ImageCaptureBase::ImageType type, const float radius_cm, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetDetectionFilterRadius(const std::string& camera_name, ImageCaptureBase::ImageType type, const float radius_cm, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetDetectionFilterRadius", camera_name, type, radius_cm, vehicle_name, external);
+            pimpl_->client.call("simSetDetectionFilterRadius", camera_name, type, radius_cm, vehicle_name);
         }
-        void RpcLibClientBase::simClearDetectionMeshNames(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simClearDetectionMeshNames(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simClearDetectionMeshNames", camera_name, type, vehicle_name, external);
+            pimpl_->client.call("simClearDetectionMeshNames", camera_name, type, vehicle_name);
         }
-        vector<DetectionInfo> RpcLibClientBase::simGetDetections(const std::string& camera_name, ImageCaptureBase::ImageType image_type, const std::string& vehicle_name, bool external)
+        vector<DetectionInfo> RpcLibClientBase::simGetDetections(const std::string& camera_name, ImageCaptureBase::ImageType image_type, const std::string& vehicle_name)
         {
             const auto& result = pimpl_->client.call("simGetDetections", camera_name, image_type, vehicle_name, external).as<vector<RpcLibAdaptorsBase::DetectionInfo>>();
             return RpcLibAdaptorsBase::DetectionInfo::to(result);
@@ -281,7 +281,7 @@ __pragma(warning(disable : 4239))
             pimpl_->client.call("simSetTraceLine", color_rgba, thickness, vehicle_name);
         }
 
-        vector<ImageCaptureBase::ImageResponse> RpcLibClientBase::simGetImages(vector<ImageCaptureBase::ImageRequest> request, const std::string& vehicle_name, bool external)
+        vector<ImageCaptureBase::ImageResponse> RpcLibClientBase::simGetImages(vector<ImageCaptureBase::ImageRequest> request, const std::string& vehicle_name)
         {
             const auto& response_adaptor = pimpl_->client.call("simGetImages",
                                                                RpcLibAdaptorsBase::ImageRequest::from(request),
@@ -291,88 +291,88 @@ __pragma(warning(disable : 4239))
 
             return RpcLibAdaptorsBase::ImageResponse::to(response_adaptor);
         }
-        vector<uint8_t> RpcLibClientBase::simGetImage(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name, bool external)
+        vector<uint8_t> RpcLibClientBase::simGetImage(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name)
         {
             vector<uint8_t> result = pimpl_->client.call("simGetImage", camera_name, type, vehicle_name, external).as<vector<uint8_t>>();
             return result;
         }
 
         //CinemAirSim
-        std::vector<std::string> RpcLibClientBase::simGetPresetLensSettings(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        std::vector<std::string> RpcLibClientBase::simGetPresetLensSettings(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetPresetLensSettings", camera_name, vehicle_name, external).as<vector<std::string>>();
         }
 
-        std::string RpcLibClientBase::simGetLensSettings(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        std::string RpcLibClientBase::simGetLensSettings(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetLensSettings", camera_name, vehicle_name, external).as<std::string>();
         }
 
-        void RpcLibClientBase::simSetPresetLensSettings(const std::string& preset_lens_settings, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetPresetLensSettings(const std::string& preset_lens_settings, const std::string& camera_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetPresetLensSettings", preset_lens_settings, camera_name, vehicle_name, external);
+            pimpl_->client.call("simSetPresetLensSettings", preset_lens_settings, camera_name, vehicle_name);
         }
 
-        std::vector<std::string> RpcLibClientBase::simGetPresetFilmbackSettings(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        std::vector<std::string> RpcLibClientBase::simGetPresetFilmbackSettings(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetPresetFilmbackSettings", camera_name, vehicle_name, external).as<vector<std::string>>();
         }
 
-        void RpcLibClientBase::simSetPresetFilmbackSettings(const std::string& preset_filmback_settings, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetPresetFilmbackSettings(const std::string& preset_filmback_settings, const std::string& camera_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetPresetFilmbackSettings", preset_filmback_settings, camera_name, vehicle_name, external);
+            pimpl_->client.call("simSetPresetFilmbackSettings", preset_filmback_settings, camera_name, vehicle_name);
         }
 
-        std::string RpcLibClientBase::simGetFilmbackSettings(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        std::string RpcLibClientBase::simGetFilmbackSettings(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetFilmbackSettings", camera_name, vehicle_name, external).as<std::string>();
         }
 
-        float RpcLibClientBase::simSetFilmbackSettings(const float sensor_width, const float sensor_height, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        float RpcLibClientBase::simSetFilmbackSettings(const float sensor_width, const float sensor_height, const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simSetFilmbackSettings", sensor_width, sensor_height, camera_name, vehicle_name, external).as<float>();
         }
 
-        float RpcLibClientBase::simGetFocalLength(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        float RpcLibClientBase::simGetFocalLength(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetFocalLength", camera_name, vehicle_name, external).as<float>();
         }
 
-        void RpcLibClientBase::simSetFocalLength(const float focal_length, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetFocalLength(const float focal_length, const std::string& camera_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetFocalLength", focal_length, camera_name, vehicle_name, external);
+            pimpl_->client.call("simSetFocalLength", focal_length, camera_name, vehicle_name);
         }
 
-        void RpcLibClientBase::simEnableManualFocus(const bool enable, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simEnableManualFocus(const bool enable, const std::string& camera_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simEnableManualFocus", enable, camera_name, vehicle_name, external);
+            pimpl_->client.call("simEnableManualFocus", enable, camera_name, vehicle_name);
         }
 
-        float RpcLibClientBase::simGetFocusDistance(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        float RpcLibClientBase::simGetFocusDistance(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetFocusDistance", camera_name, vehicle_name, external).as<float>();
         }
-        void RpcLibClientBase::simSetFocusDistance(const float focus_distance, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetFocusDistance(const float focus_distance, const std::string& camera_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetFocusDistance", focus_distance, camera_name, vehicle_name, external);
+            pimpl_->client.call("simSetFocusDistance", focus_distance, camera_name, vehicle_name);
         }
 
-        float RpcLibClientBase::simGetFocusAperture(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        float RpcLibClientBase::simGetFocusAperture(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetFocusAperture", camera_name, vehicle_name, external).as<float>();
         }
 
-        void RpcLibClientBase::simSetFocusAperture(const float focus_aperture, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetFocusAperture(const float focus_aperture, const std::string& camera_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetFocusAperture", focus_aperture, camera_name, vehicle_name, external);
+            pimpl_->client.call("simSetFocusAperture", focus_aperture, camera_name, vehicle_name);
         }
 
-        void RpcLibClientBase::simEnableFocusPlane(const bool enable, const std::string& camera_name, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simEnableFocusPlane(const bool enable, const std::string& camera_name, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simEnableFocusPlane", enable, camera_name, vehicle_name, external);
+            pimpl_->client.call("simEnableFocusPlane", enable, camera_name, vehicle_name);
         }
 
-        std::string RpcLibClientBase::simGetCurrentFieldOfView(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        std::string RpcLibClientBase::simGetCurrentFieldOfView(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetCurrentFieldOfView", camera_name, vehicle_name, external).as<std::string>();
         }
@@ -575,27 +575,27 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simSetObjectScale", object_name, RpcLibAdaptorsBase::Vector3r(scale)).as<bool>();
         }
 
-        CameraInfo RpcLibClientBase::simGetCameraInfo(const std::string& camera_name, const std::string& vehicle_name, bool external) const
+        CameraInfo RpcLibClientBase::simGetCameraInfo(const std::string& camera_name, const std::string& vehicle_name) const
         {
             return pimpl_->client.call("simGetCameraInfo", camera_name, vehicle_name, external).as<RpcLibAdaptorsBase::CameraInfo>().to();
         }
 
-        void RpcLibClientBase::simSetCameraPose(const std::string& camera_name, const Pose& pose, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetCameraPose(const std::string& camera_name, const Pose& pose, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetCameraPose", camera_name, RpcLibAdaptorsBase::Pose(pose), vehicle_name, external);
+            pimpl_->client.call("simSetCameraPose", camera_name, RpcLibAdaptorsBase::Pose(pose), vehicle_name);
         }
 
-        void RpcLibClientBase::simSetCameraFov(const std::string& camera_name, float fov_degrees, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetCameraFov(const std::string& camera_name, float fov_degrees, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetCameraFov", camera_name, fov_degrees, vehicle_name, external);
+            pimpl_->client.call("simSetCameraFov", camera_name, fov_degrees, vehicle_name);
         }
 
-        void RpcLibClientBase::simSetDistortionParam(const std::string& camera_name, const std::string& param_name, float value, const std::string& vehicle_name, bool external)
+        void RpcLibClientBase::simSetDistortionParam(const std::string& camera_name, const std::string& param_name, float value, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetDistortionParam", camera_name, param_name, value, vehicle_name, external);
+            pimpl_->client.call("simSetDistortionParam", camera_name, param_name, value, vehicle_name);
         }
 
-        std::vector<float> RpcLibClientBase::simGetDistortionParams(const std::string& camera_name, const std::string& vehicle_name, bool external)
+        std::vector<float> RpcLibClientBase::simGetDistortionParams(const std::string& camera_name, const std::string& vehicle_name)
         {
             return pimpl_->client.call("simGetDistortionParams", camera_name, vehicle_name, external).as<std::vector<float>>();
         }

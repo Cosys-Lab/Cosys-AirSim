@@ -5,23 +5,13 @@
 
 #include "PhysXVehicleManager.h"
 
-SkidVehiclePawnApi::SkidVehiclePawnApi(ASkidVehiclePawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics, const msr::airlib::GeoPoint& home_geopoint,
-	const msr::airlib::AirSimSettings::VehicleSetting* vehicle_setting, std::shared_ptr<msr::airlib::SensorFactory> sensor_factory,
-	const msr::airlib::Kinematics::State& state, const msr::airlib::Environment& environment)
-	: msr::airlib::CarApiBase(vehicle_setting, sensor_factory, state, environment),
-	pawn_(pawn), pawn_kinematics_(pawn_kinematics), home_geopoint_(home_geopoint)
+SkidVehiclePawnApi::SkidVehiclePawnApi(ASkidVehiclePawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics, msr::airlib::CarApiBase* vehicle_api)
+	: pawn_(pawn), pawn_kinematics_(pawn_kinematics), vehicle_api_(vehicle_api)
 {
 	movement_ = pawn->GetSkidVehicleMovement();
 }
 
-bool SkidVehiclePawnApi::armDisarm(bool arm)
-{
-	//TODO: implement arming for car
-	unused(arm);
-	return true;
-}
-
-void SkidVehiclePawnApi::setCarControls(const CarApiBase::CarControls& controls)
+void SkidVehiclePawnApi::updateMovement(const msr::airlib::CarApiBase::CarControls& controls)
 {
 	last_controls_ = controls;
 
@@ -45,30 +35,25 @@ void SkidVehiclePawnApi::setCarControls(const CarApiBase::CarControls& controls)
 	movement_->SetUseAutoGears(!controls.is_manual_gear);
 }
 
-const msr::airlib::CarApiBase::CarControls& SkidVehiclePawnApi::getCarControls() const
-{
-	return last_controls_;
-}
-
 msr::airlib::CarApiBase::CarState SkidVehiclePawnApi::getCarState() const
 {
-	CarApiBase::CarState state(
+	msr::airlib::CarApiBase::CarState state(
 		movement_->GetForwardSpeed() / 100, //cm/s -> m/s
 		movement_->GetCurrentGear(),
 		movement_->GetEngineRotationSpeed(),
 		movement_->GetEngineMaxRotationSpeed(),
-		false,
+		last_controls_.handbrake,
 		*pawn_kinematics_,
-		msr::airlib::ClockFactory::get()->nowNanos()
+		vehicle_api_->clock()->nowNanos());
 	);
 	return state;
 }
 
 void SkidVehiclePawnApi::reset()
 {
-	msr::airlib::CarApiBase::reset();
+	vehicle_api_->reset();
 
-	last_controls_ = CarControls();
+	last_controls_ = msr::airlib::CarApiBase::CarControls();
 	auto phys_comps = UAirBlueprintLib::getPhysicsComponents(pawn_);
 	UAirBlueprintLib::RunCommandOnGameThread([this, &phys_comps]() {
 		for (auto* phys_comp : phys_comps) {
@@ -79,7 +64,7 @@ void SkidVehiclePawnApi::reset()
 		movement_->ResetMoveState();
 		movement_->SetActive(false);
 		movement_->SetActive(true, true);
-		setCarControls(CarControls());
+		updateMovement(msr::airlib::CarApiBase::CarControls());
 
 		auto pv = movement_->PVehicle;
 		if (pv) {
@@ -99,25 +84,8 @@ void SkidVehiclePawnApi::reset()
 
 void SkidVehiclePawnApi::update(float delta)
 {
-	msr::airlib::CarApiBase::update(delta);
-}
-
-msr::airlib::GeoPoint SkidVehiclePawnApi::getHomeGeoPoint() const
-{
-	return home_geopoint_;
-}
-
-void SkidVehiclePawnApi::enableApiControl(bool is_enabled)
-{
-	if (api_control_enabled_ != is_enabled) {
-		last_controls_ = CarControls();
-		api_control_enabled_ = is_enabled;
-	}
-}
-
-bool SkidVehiclePawnApi::isApiControlEnabled() const
-{
-	return api_control_enabled_;
+	vehicle_api_->updateCarState(getCarState());
+	vehicle_api_->update(delta);
 }
 
 SkidVehiclePawnApi::~SkidVehiclePawnApi() = default;

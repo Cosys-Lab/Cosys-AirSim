@@ -114,10 +114,7 @@ void AComputerVisionPawn::Tick(float Delta)
 
     //update ground level
     if (manual_pose_controller_->getActor() == this) {
-		auto test = !manual_pose_controller_->getHold();
-		if (!manual_pose_controller_->getHold()) {
-			manual_pose_controller_->updateActorPose(Delta);
-		}
+		manual_pose_controller_->updateActorPose(Delta);
     }
 }
 

@@ -25,7 +25,7 @@ msr::airlib::ComputerVisionApiBase::ComputerVisionState ComputerVisionPawnApi::g
     return state;
 }
 
-void ComputerVisionPawnApi::reset()
+void ComputerVisionPawnApi::resetImplementation()
 {
     msr::airlib::ComputerVisionApiBase::reset();
 }

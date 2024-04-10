@@ -31,9 +31,9 @@ namespace airlib
         }
 
     public:
-        virtual void update() override
+        virtual void update(float delta) override
         {
-            CarApiBase::update();
+            CarApiBase::update(delta);
         }
 
         virtual const SensorCollection& getSensors() const override

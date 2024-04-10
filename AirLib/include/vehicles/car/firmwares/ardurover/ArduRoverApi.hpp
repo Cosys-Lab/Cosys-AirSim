@@ -54,9 +54,9 @@ namespace airlib
 
     public:
         // Update sensor data & send to Ardupilot
-        virtual void update() override
+        virtual void update(float delta) override
         {
-            CarApiBase::update();
+            CarApiBase::update(delta);
 
             sendSensors();
             recvRoverControl();

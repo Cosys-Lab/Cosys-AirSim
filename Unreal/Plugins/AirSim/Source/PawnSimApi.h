@@ -79,7 +79,8 @@ public: //implementation of VehicleSimApiBase
     virtual const UnrealImageCapture* getImageCapture() const override;
     virtual Pose getPose() const override;
     virtual void setPose(const Pose& pose, bool ignore_collision) override;
-
+    virtual msr::airlib::CameraInfo getCameraInfo(const std::string& camera_name) const override;
+    virtual void setCameraOrientation(const std::string& camera_name, const Quaternionr& orientation) override;
     virtual CollisionInfo getCollisionInfo() const override;
     virtual CollisionInfo getCollisionInfoAndReset() override;
     virtual int getRemoteControlID() const override;

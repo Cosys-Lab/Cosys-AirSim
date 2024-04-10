@@ -31,9 +31,9 @@ namespace airlib
         {
         }
 
-        virtual void update() override
+        virtual void update(float delta = 0) override
         {
-            PhysicsEngineBase::update();
+            PhysicsEngineBase::update(delta);
 
             for (PhysicsBody* body_ptr : *this) {
                 body_ptr->updateKinematics();

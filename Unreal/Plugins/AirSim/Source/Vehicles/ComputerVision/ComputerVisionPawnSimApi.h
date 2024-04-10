@@ -27,7 +27,7 @@ public:
     //implements game interface to update pawn
     ComputerVisionPawnSimApi(const Params& params);
 
-    virtual void reset() override;
+    virtual void resetImplementation() override;
     virtual void update(float delta = 0) override;
 
     virtual void updateRenderedState(float dt) override;

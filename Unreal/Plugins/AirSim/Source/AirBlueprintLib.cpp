@@ -36,8 +36,6 @@ parameters -> camel_case
 
 bool UAirBlueprintLib::log_messages_hidden_ = false;
 uint32_t UAirBlueprintLib::flush_on_draw_count_ = 0;
-msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType UAirBlueprintLib::mesh_naming_method_ =
-    msr::airlib::AirSimSettings::SegmentationSetting::MeshNamingMethodType::OwnerName;
 IImageWrapperModule* UAirBlueprintLib::image_wrapper_module_ = nullptr;
 
 void UAirBlueprintLib::LogMessageString(const std::string& prefix, const std::string& suffix, LogDebugLevel level, float persist_sec)

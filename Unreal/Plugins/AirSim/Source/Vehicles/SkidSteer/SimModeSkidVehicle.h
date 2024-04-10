@@ -25,6 +25,7 @@ public:
 	virtual bool isPaused() const override;
 	virtual void pause(bool is_paused) override;
 	virtual void continueForTime(double seconds) override;
+	virtual void continueForFrames(uint32_t frames) override;
 
 private:
 	typedef msr::airlib::ClockFactory ClockFactory;
@@ -57,4 +58,6 @@ private:
 	std::atomic<float> current_clockspeed_;
 	std::atomic<TTimeDelta> pause_period_;
 	std::atomic<TTimePoint> pause_period_start_;
+	uint32_t targetFrameNumber_;
+	std::atomic_bool frame_countdown_enabled_;
 };

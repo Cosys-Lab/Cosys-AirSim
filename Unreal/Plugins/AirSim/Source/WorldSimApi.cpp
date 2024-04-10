@@ -366,30 +366,6 @@ WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name, boo
     return result;
 }
 
-WorldSimApi::Vector3r WorldSimApi::getObjectScale(const std::string& object_name) const
-{
-    Vector3r result;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, &result]() {
-        // AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
-        AActor* actor = simmode_->scene_object_map.FindRef(FString(object_name.c_str()));
-        result = actor ? Vector3r(actor->GetActorScale().X, actor->GetActorScale().Y, actor->GetActorScale().Z)
-                       : Vector3r::Zero();
-    },
-                                             true);
-    UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, ned, &result]() {
-        AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
-        if (ned) {
-            result = actor ? simmode_->getGlobalNedTransform().toGlobalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
-                : Pose::nanPose();
-        }
-        else {
-            result = actor ? simmode_->getGlobalNedTransform().toLocalNed(FTransform(actor->GetActorRotation(), actor->GetActorLocation()))
-                : Pose::nanPose();
-        }
-    }, true);
-    return result;
-}
-
 bool WorldSimApi::setObjectPose(const std::string& object_name, const WorldSimApi::Pose& pose, bool teleport)
 {
     bool result;
@@ -901,11 +877,11 @@ std::vector<float> WorldSimApi::getDistortionParams(const CameraDetails& camera_
 }
 
 std::vector<WorldSimApi::ImageCaptureBase::ImageResponse> WorldSimApi::getImages(
-    const std::vector<ImageCaptureBase::ImageRequest>& requests, const std::string& vehicle_name, bool external) const
+    const std::vector<ImageCaptureBase::ImageRequest>& requests, const std::string& vehicle_name) const
 {
     std::vector<ImageCaptureBase::ImageResponse> responses;
 
-    const UnrealImageCapture* camera = simmode_->getImageCapture(vehicle_name, external);
+    const UnrealImageCapture* camera = simmode_->getImageCapture(vehicle_name);
     camera->getImages(requests, responses);
 
     return responses;
@@ -917,7 +893,7 @@ std::vector<uint8_t> WorldSimApi::getImage(ImageCaptureBase::ImageType image_typ
         ImageCaptureBase::ImageRequest(camera_details.camera_name, image_type)
     };
 
-    const auto& response = getImages(request, camera_details.vehicle_name, camera_details.external);
+    const auto& response = getImages(request, camera_details.vehicle_name);
     if (response.size() > 0)
         return response.at(0).image_data_uint8;
     else
