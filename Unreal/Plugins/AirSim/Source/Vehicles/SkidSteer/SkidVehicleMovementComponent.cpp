@@ -5,7 +5,9 @@
 #include "SkidVehicleMovementComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Runtime/Engine/Private/PhysicsEngine/PhysXSupport.h"
+#include "WheeledVehicleMovementComponent4W.h"
 #include "PhysXPublic.h"
+#include "PhysXVehicleManager.h"
 #include "PhysXIncludes.h"
 USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

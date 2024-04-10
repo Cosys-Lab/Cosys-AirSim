@@ -332,6 +332,17 @@ void APIPCamera::setCameraTypeEnabled(ImageType type, bool enabled)
     enableCaptureComponent(type, enabled);
 }
 
+void APIPCamera::setCameraOrientation(const FRotator& rotator)
+{
+    if (gimbal_stabilization_ > 0) {
+        gimbald_rotator_.Pitch = rotator.Pitch;
+        gimbald_rotator_.Roll = rotator.Roll;
+        gimbald_rotator_.Yaw = rotator.Yaw;
+    }
+    this->SetActorRelativeRotation(rotator);
+}
+
+
 void APIPCamera::setCaptureUpdate(USceneCaptureComponent2D* capture, bool nodisplay)
 {
     capture->bCaptureEveryFrame = !nodisplay;

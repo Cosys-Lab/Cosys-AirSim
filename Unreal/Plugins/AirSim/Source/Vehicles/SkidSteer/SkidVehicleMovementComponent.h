@@ -6,6 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "WheeledVehicleMovementComponent.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Curves/CurveFloat.h"
 #include "UObject/ObjectMacros.h"

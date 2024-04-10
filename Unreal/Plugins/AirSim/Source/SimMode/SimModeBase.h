@@ -163,7 +163,6 @@ protected: //optional overrides
     void initializeCameraDirector(const FTransform& camera_transform, float follow_distance);
     void checkVehicleReady(); //checks if vehicle is available to use
     virtual void updateDebugReport(msr::airlib::StateReporterWrapper& debug_reporter);
-    virtual void initializeExternalCameras();
 
 protected: //Utility methods for derived classes
     virtual const AirSimSettings& getSettings() const;
