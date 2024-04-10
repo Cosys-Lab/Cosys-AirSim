@@ -148,7 +148,7 @@ namespace airlib
 
         CollisionInfo simGetCollisionInfo(const std::string& vehicle_name = "") const;
 
-        CameraInfo simGetCameraInfo(const std::string& camera_name, const std::string& vehicle_name = "", bool external = false) const;
+        CameraInfo simGetCameraInfo(const std::string& camera_name, const std::string& vehicle_name = "") const;
         void simSetDistortionParam(const std::string& camera_name, const std::string& param_name, float value, const std::string& vehicle_name = "");
         std::vector<float> simGetDistortionParams(const std::string& camera_name, const std::string& vehicle_name = "");
         void simSetCameraPose(const std::string& camera_name, const Pose& pose, const std::string& vehicle_name = "");

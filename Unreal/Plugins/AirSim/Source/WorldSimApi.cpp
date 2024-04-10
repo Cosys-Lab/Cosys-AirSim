@@ -1030,9 +1030,7 @@ std::vector<msr::airlib::DetectionInfo> WorldSimApi::getDetections(ImageCaptureB
     std::vector<msr::airlib::DetectionInfo> result;
 
     const APIPCamera* camera = simmode_->getCamera(camera_details);
-    const NedTransform& ned_transform = camera_details.external
-                                            ? simmode_->getGlobalNedTransform()
-                                            : simmode_->getVehicleSimApi(camera_details.vehicle_name)->getNedTransform();
+    const NedTransform& ned_transform = simmode_->getVehicleSimApi(camera_details.vehicle_name)->getNedTransform();
 
     UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, &result, &ned_transform]() {
         const TArray<FDetectionInfo>& detections = camera->getDetectionComponent(image_type, false)->getDetections();

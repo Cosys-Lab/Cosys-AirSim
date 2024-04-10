@@ -311,7 +311,7 @@ void ASimHUD::initializeSubWindows()
     }
 
     for (const auto& setting : getSubWindowSettings()) {
-        APIPCamera* camera = simmode_->getCamera(msr::airlib::CameraDetails(setting.camera_name, setting.vehicle_name, setting.external));
+        APIPCamera* camera = simmode_->getCamera(msr::airlib::CameraDetails(setting.camera_name, setting.vehicle_name));
         if (camera)
             subwindow_cameras_[setting.window_index] = camera;
         else

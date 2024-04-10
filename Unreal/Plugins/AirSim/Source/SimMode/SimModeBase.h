@@ -107,27 +107,11 @@ public:
 	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
 	int GetMeshVertexColorID(const std::string& mesh_name);
 
-    const APIPCamera* getExternalCamera(const std::string& camera_name) const
-    {
-        return external_cameras_.findOrDefault(camera_name, nullptr);
-    }
-
-    APIPCamera* getExternalCamera(const std::string& camera_name)
-    {
-        return const_cast<APIPCamera*>(
-            static_cast<const ASimModeBase*>(this)->getExternalCamera(camera_name));
-    }
-
     const APIPCamera* getCamera(const msr::airlib::CameraDetails& camera_details) const;
 
     APIPCamera* getCamera(const msr::airlib::CameraDetails& camera_details)
     {
         return const_cast<APIPCamera*>(static_cast<const ASimModeBase*>(this)->getCamera(camera_details));
-    }
-
-    const UnrealImageCapture* getExternalImageCapture() const
-    {
-        return external_image_capture_.get();
     }
 
     const UnrealImageCapture* getImageCapture(const std::string& vehicle_name = "") const;
@@ -222,8 +206,6 @@ private:
     msr::airlib::StateReporterWrapper debug_reporter_;
 
     std::vector<std::unique_ptr<msr::airlib::VehicleSimApiBase>> vehicle_sim_apis_;
-    common_utils::UniqueValueMap<std::string, APIPCamera*> external_cameras_;
-    std::unique_ptr<UnrealImageCapture> external_image_capture_;
 
     UPROPERTY()
     TArray<AActor*> spawned_actors_; //keep refs alive from Unreal GC

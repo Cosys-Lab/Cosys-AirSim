@@ -150,9 +150,9 @@ Below are complete list of settings available along with their default values. I
     "UpdateIntervalSecs": 60
   },
   "SubWindows": [
-    {"WindowID": 0, "CameraName": "0", "ImageType": 3, "VehicleName": "", "Visible": false, "External": false},
-    {"WindowID": 1, "CameraName": "0", "ImageType": 5, "VehicleName": "", "Visible": false, "External": false},
-    {"WindowID": 2, "CameraName": "0", "ImageType": 0, "VehicleName": "", "Visible": false, "External": false}
+    {"WindowID": 0, "CameraName": "0", "ImageType": 3, "VehicleName": "", "Visible": false},
+    {"WindowID": 1, "CameraName": "0", "ImageType": 5, "VehicleName": "", "Visible": false},
+    {"WindowID": 2, "CameraName": "0", "ImageType": 0, "VehicleName": "", "Visible": false}
   ],
   "PawnPaths": {
     "BareboneCar": {"PawnBP": "Class'/AirSim/VehicleAdv/Vehicle/VehicleAdvPawn.VehicleAdvPawn_C'"},
@@ -239,7 +239,6 @@ This setting determines what is shown in each of 3 subwindows which are visible 
 * `CameraName`: is any [available camera](image_apis.md#available-cameras) on the vehicle or external camera
 * `ImageType`: integer value determines what kind of image gets shown according to [ImageType enum](image_apis.md#available-imagetype-values).
 * `VehicleName`: string allows you to specify the vehicle to use the camera from, used when multiple vehicles are specified in the settings. First vehicle's camera will be used if there are any mistakes such as incorrect vehicle name, or only a single vehicle.
-* `External`: Set it to `true` if the camera is an external camera. If true, then the `VehicleName` parameter is ignored
 
 For example, for a single car vehicle, below shows driver view, front bumper view and rear view as scene, depth and surface normals respectively.
 ```json

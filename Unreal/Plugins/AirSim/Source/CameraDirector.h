@@ -68,7 +68,7 @@ public:
 private:
     void setupInputBindings();
     void attachSpringArm(bool attach);
-    void disableCameras(bool fpv, bool backup, bool external, bool front);
+    void disableCameras(bool fpv, bool backup, bool front);
     void notifyViewModeChanged();
 
 private:
