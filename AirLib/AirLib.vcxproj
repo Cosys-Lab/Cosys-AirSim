@@ -92,6 +92,8 @@
     <ClInclude Include="include\api\VehicleConnectorBase.hpp" />
     <ClInclude Include="include\sensors\SensorFactory.hpp" />
     <ClInclude Include="include\vehicles\car\api\CarApiBase.hpp" />
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionApiBase.hpp" />
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionApi.hpp" />
     <ClInclude Include="include\vehicles\multirotor\api\MultirotorCommon.hpp" />
     <ClInclude Include="include\vehicles\multirotor\api\MultirotorRpcLibAdaptors.hpp" />
     <ClInclude Include="include\vehicles\multirotor\api\MultirotorRpcLibClient.hpp" />
@@ -145,6 +147,9 @@
     <ClInclude Include="include\vehicles\car\api\CarRpcLibAdaptors.hpp" />
     <ClInclude Include="include\vehicles\car\api\CarRpcLibClient.hpp" />
     <ClInclude Include="include\vehicles\car\api\CarRpcLibServer.hpp" />
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionRpcLibAdapators.hpp" />
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionRpcLibClient.hpp" />
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionRpcLibServer.hpp" />
     <ClInclude Include="include\safety\SafetyEval.hpp" />
     <ClInclude Include="include\vehicles\multirotor\api\MultirotorApiBase.hpp" />
     <ClInclude Include="include\common\Settings.hpp" />
@@ -188,6 +193,8 @@
     <ClCompile Include="src\common\common_utils\FileSystem.cpp" />
     <ClCompile Include="src\vehicles\car\api\CarRpcLibClient.cpp" />
     <ClCompile Include="src\vehicles\car\api\CarRpcLibServer.cpp" />
+    <ClCompile Include="src\vehicles\computervision\api\ComputerVisionRpcLibClient.cpp" />
+    <ClCompile Include="src\vehicles\computervision\api\ComputerVisionRpcLibServer.cpp" />
     <ClCompile Include="src\vehicles\multirotor\api\MultirotorRpcLibClient.cpp" />
     <ClCompile Include="src\vehicles\multirotor\api\MultirotorRpcLibServer.cpp" />
   </ItemGroup>

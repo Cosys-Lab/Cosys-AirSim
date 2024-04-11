@@ -330,6 +330,15 @@
     <ClInclude Include="include\vehicles\car\api\CarRpcLibServer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionRpcLibAdapators.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionRpcLibClient.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionRpcLibServer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\vehicles\multirotor\api\MultirotorRpcLibAdaptors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -343,6 +352,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\vehicles\car\api\CarApiBase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionApiBase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vehicles\computervision\api\ComputerVisionApi.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\api\RpcLibServerBase.hpp">
@@ -474,6 +489,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vehicles\car\api\CarRpcLibServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vehicles\computervision\api\ComputerVisionRpcLibClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vehicles\computervision\api\ComputerVisionRpcLibServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vehicles\multirotor\api\MultirotorRpcLibClient.cpp">
