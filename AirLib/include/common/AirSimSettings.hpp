@@ -1251,6 +1251,10 @@ namespace airlib
                                 PawnPath("Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"));
             pawn_paths.emplace("DefaultQuadrotor",
                                PawnPath("Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"));
+            pawn_paths.emplace("Pioneer",
+                PawnPath("Class'/AirSim/VehicleAdv/Pioneer/PioneerPawn.PioneerPawn_C'"));
+            pawn_paths.emplace("BoxCar",
+                PawnPath("Class'/AirSim/VehicleAdv/BoxCar/BoxCarPawn.BoxCarPawn_C'"));
             pawn_paths.emplace("DefaultComputerVision",
                                PawnPath("Class'/AirSim/Blueprints/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"));
         }

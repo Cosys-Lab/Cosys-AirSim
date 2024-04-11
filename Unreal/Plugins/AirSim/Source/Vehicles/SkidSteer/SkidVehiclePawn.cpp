@@ -22,7 +22,7 @@ ASkidVehiclePawn::ASkidVehiclePawn()
 	static ConstructorHelpers::FClassFinder<APIPCamera> pip_camera_class(TEXT("Blueprint'/AirSim/Blueprints/BP_PIPCamera'"));
 	pip_camera_class_ = pip_camera_class.Succeeded() ? pip_camera_class.Class : nullptr;
 
-	const auto& car_mesh_paths = AirSimSettings::singleton().pawn_paths["CPHusky"];
+	const auto& car_mesh_paths = AirSimSettings::singleton().pawn_paths["DefaultSkidVehicle"];
 	auto slippery_mat = Cast<UPhysicalMaterial>(
 		UAirBlueprintLib::LoadObject(car_mesh_paths.slippery_mat));
 	auto non_slippery_mat = Cast<UPhysicalMaterial>(
