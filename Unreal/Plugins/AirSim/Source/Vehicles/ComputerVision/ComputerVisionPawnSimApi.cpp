@@ -2,6 +2,8 @@
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
 #include "ComputerVisionPawnApi.h"
+#include "vehicles/computervision/api/ComputerVisionApiBase.hpp"
+#include "vehicles/computervision/api/ComputerVisionApi.hpp"
 #include <exception>
 
 using namespace msr::airlib;
@@ -16,8 +18,8 @@ void ComputerVisionPawnSimApi::initialize()
     PawnSimApi::initialize();
 
     //create vehicle params
-    std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());
-    vehicle_api_ = std::unique_ptr<ComputerVisionApiBase>(new ComputerVisionApi(getVehicleSetting(), sensor_factory, (*getGroundTruthKinematics()), (*getGroundTruthEnvironment())));
+    std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());   
+    vehicle_api_ = std::unique_ptr<ComputerVisionApiBase>(new ComputerVisionApi(getVehicleSetting(), sensor_factory, *getGroundTruthKinematics(), *getGroundTruthEnvironment()));
     pawn_api_ = std::unique_ptr<ComputerVisionPawnApi>(new ComputerVisionPawnApi(static_cast<AComputerVisionPawn*>(getPawn()), getGroundTruthKinematics(), vehicle_api_.get()));
 
     //TODO: should do reset() here?

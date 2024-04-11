@@ -7,6 +7,7 @@
 #include "common/VectorMath.hpp"
 #include "common/CommonStructs.hpp"
 #include "api/VehicleApiBase.hpp"
+#include "physics/Kinematics.hpp"
 #include "sensors/SensorBase.hpp"
 #include "sensors/SensorCollection.hpp"
 #include "sensors/SensorFactory.hpp"

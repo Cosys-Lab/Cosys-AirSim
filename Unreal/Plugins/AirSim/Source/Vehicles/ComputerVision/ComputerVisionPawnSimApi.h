@@ -1,16 +1,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WheeledVehicleMovementComponent4W.h"
 
 #include "ComputerVisionPawn.h"
 #include "ComputerVisionPawnApi.h"
 #include "PawnEvents.h"
 #include "PawnSimApi.h"
 #include "vehicles/computervision/api/ComputerVisionApiBase.hpp"
-#include "vehicles/computervision/api/ComputerVisionApi.hpp"
 #include "physics//Kinematics.hpp"
 #include "common/Common.hpp"
 #include "common/CommonStructs.hpp"
+#include "vehicles/computervision/api/ComputerVisionApi.hpp"
 
 class ComputerVisionPawnSimApi : public PawnSimApi
 {

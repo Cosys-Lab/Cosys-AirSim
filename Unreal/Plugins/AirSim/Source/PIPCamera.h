@@ -14,8 +14,6 @@
 //CinemAirSim
 #include <CineCameraActor.h>
 #include <CineCameraComponent.h>
-#include "RunTime/CinematicCamera/Public/CineCameraComponent.h"
-#include "RunTime/CinematicCamera/Public/CineCameraActor.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Materials/MaterialInstanceDynamic.h"

@@ -44,7 +44,9 @@ namespace airlib
         // VehicleApiBase Implementation
         virtual void enableApiControl(bool is_enabled) override
         {
-            unused(is_enabled);
+            if (api_control_enabled_ != is_enabled) {
+                api_control_enabled_ = is_enabled;
+            }
         }
 
         virtual bool isApiControlEnabled() const override

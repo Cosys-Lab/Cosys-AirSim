@@ -5,6 +5,8 @@
 #include "GameFramework/WorldSettings.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkinnedMeshComponent.h"
+#include <CineCameraActor.h>
+#include <CineCameraComponent.h>
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "EngineUtils.h"
@@ -477,6 +479,7 @@ template UStaticMeshComponent* UAirBlueprintLib::GetActorComponent(AActor*, FStr
 template URotatingMovementComponent* UAirBlueprintLib::GetActorComponent(AActor*, FString);
 template UCameraComponent* UAirBlueprintLib::GetActorComponent(AActor*, FString);
 template UDetectionComponent* UAirBlueprintLib::GetActorComponent(AActor*, FString);
+template UCineCameraComponent* UAirBlueprintLib::GetActorComponent(AActor*, FString);
 
 bool UAirBlueprintLib::IsInGameThread()
 {

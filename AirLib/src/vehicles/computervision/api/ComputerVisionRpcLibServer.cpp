@@ -37,13 +37,13 @@ namespace msr
     namespace airlib
     {
 
-        typedef msr::airlib_rpclib::ComputerVisionRpcLibAdapators ComputerVisionRpcLibAdapators;
+        typedef msr::airlib_rpclib::ComputerVisionRpcLibAdapators ComputerVisionRpcLibAdaptors;
 
         ComputerVisionRpcLibServer::ComputerVisionRpcLibServer(ApiProvider* api_provider, string server_address, uint16_t port)
             : RpcLibServerBase(api_provider, server_address, port)
         {
-            (static_cast<rpc::server*>(getServer()))->bind("getComputerVisionState", [&](const std::string& vehicle_name) -> ComputerVisionRpcLibAdapators::ComputerVisionState {
-                return ComputerVisionRpcLibAdapators::ComputerVisionState(getVehicleApi(vehicle_name)->getComputerVisionState());
+            (static_cast<rpc::server*>(getServer()))->bind("getComputerVisionState", [&](const std::string& vehicle_name) -> ComputerVisionRpcLibAdaptors::ComputerVisionState {
+                return ComputerVisionRpcLibAdaptors::ComputerVisionState(getVehicleApi(vehicle_name)->getComputerVisionState());
                 });
         }
 

@@ -5,10 +5,55 @@
 #include "SkidVehicleMovementComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Runtime/Engine/Private/PhysicsEngine/PhysXSupport.h"
-#include "WheeledVehicleMovementComponent4W.h"
 #include "PhysXPublic.h"
 #include "PhysXVehicleManager.h"
 #include "PhysXIncludes.h"
+
+
+FVehicleTransmissionDataSkid::FVehicleTransmissionDataSkid()
+	: bUseGearAutoBox(true)
+	, GearSwitchTime(0.0f)
+	, GearAutoBoxLatency(0.0f)
+	, FinalRatio(1.0f)
+	, ReverseGearRatio(0.0f)
+	, NeutralGearUpRatio(0.0f)
+	, ClutchStrength(0.0f)
+{
+
+}
+
+FVehicleGearDataSkid::FVehicleGearDataSkid()
+	: Ratio(1.0f)
+	, DownRatio(0.0f)
+	, UpRatio(1.0f)
+{
+
+}
+
+FVehicleEngineDataSkid::FVehicleEngineDataSkid()
+	: MaxRPM(0.0f)
+	, MOI(0.0f)
+	, DampingRateFullThrottle(0.0f)
+	, DampingRateZeroThrottleClutchEngaged(0.0f)
+	, DampingRateZeroThrottleClutchDisengaged(0.0f)
+{
+
+}
+
+float FVehicleEngineDataSkid::FindPeakTorque() const
+{
+	// Find max torque
+	float PeakTorque = 0.f;
+	TArray<FRichCurveKey> TorqueKeys = TorqueCurve.GetRichCurveConst()->GetCopyOfKeys();
+	for (int32 KeyIdx = 0; KeyIdx < TorqueKeys.Num(); KeyIdx++)
+	{
+		FRichCurveKey& Key = TorqueKeys[KeyIdx];
+		PeakTorque = FMath::Max(PeakTorque, Key.Value);
+	}
+	return PeakTorque;
+}
+
+
 USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 #if WITH_PHYSX
@@ -23,41 +68,41 @@ USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitia
 	RightBrakeRate.FallRate = 10.f;
 
 	PxVehicleEngineData DefEngineData;
-	EngineSetup.MOI = DefEngineData.mMOI;
-	EngineSetup.MaxRPM = OmegaToRPM(DefEngineData.mMaxOmega);
-	EngineSetup.DampingRateFullThrottle = DefEngineData.mDampingRateFullThrottle;
-	EngineSetup.DampingRateZeroThrottleClutchEngaged = DefEngineData.mDampingRateZeroThrottleClutchEngaged;
-	EngineSetup.DampingRateZeroThrottleClutchDisengaged = DefEngineData.mDampingRateZeroThrottleClutchDisengaged;
+	EngineSetupLocal.MOI = DefEngineData.mMOI;
+	EngineSetupLocal.MaxRPM = OmegaToRPM(DefEngineData.mMaxOmega);
+	EngineSetupLocal.DampingRateFullThrottle = DefEngineData.mDampingRateFullThrottle;
+	EngineSetupLocal.DampingRateZeroThrottleClutchEngaged = DefEngineData.mDampingRateZeroThrottleClutchEngaged;
+	EngineSetupLocal.DampingRateZeroThrottleClutchDisengaged = DefEngineData.mDampingRateZeroThrottleClutchDisengaged;
 
 	// Convert from PhysX curve to ours
-	FRichCurve* TorqueCurveData = EngineSetup.TorqueCurve.GetRichCurve();
+	FRichCurve* TorqueCurveData = EngineSetupLocal.TorqueCurve.GetRichCurve();
 	for (PxU32 KeyIdx = 0; KeyIdx < DefEngineData.mTorqueCurve.getNbDataPairs(); KeyIdx++)
 	{
-		float Input = DefEngineData.mTorqueCurve.getX(KeyIdx) * EngineSetup.MaxRPM;
+		float Input = DefEngineData.mTorqueCurve.getX(KeyIdx) * EngineSetupLocal.MaxRPM;
 		float Output = DefEngineData.mTorqueCurve.getY(KeyIdx) * DefEngineData.mPeakTorque;
 		TorqueCurveData->AddKey(Input, Output);
 	}
 
 	PxVehicleClutchData DefClutchData;
-	TransmissionSetup.ClutchStrength = DefClutchData.mStrength;
+	TransmissionSetupLocal.ClutchStrength = DefClutchData.mStrength;
 
 	PxVehicleGearsData DefGearSetup;
-	TransmissionSetup.GearSwitchTime = DefGearSetup.mSwitchTime;
-	TransmissionSetup.ReverseGearRatio = DefGearSetup.mRatios[PxVehicleGearsData::eREVERSE];
-	TransmissionSetup.FinalRatio = DefGearSetup.mFinalRatio;
+	TransmissionSetupLocal.GearSwitchTime = DefGearSetup.mSwitchTime;
+	TransmissionSetupLocal.ReverseGearRatio = DefGearSetup.mRatios[PxVehicleGearsData::eREVERSE];
+	TransmissionSetupLocal.FinalRatio = DefGearSetup.mFinalRatio;
 
 	PxVehicleAutoBoxData DefAutoBoxSetup;
-	TransmissionSetup.NeutralGearUpRatio = DefAutoBoxSetup.mUpRatios[PxVehicleGearsData::eNEUTRAL];
-	TransmissionSetup.GearAutoBoxLatency = DefAutoBoxSetup.getLatency();
-	TransmissionSetup.bUseGearAutoBox = true;
+	TransmissionSetupLocal.NeutralGearUpRatio = DefAutoBoxSetup.mUpRatios[PxVehicleGearsData::eNEUTRAL];
+	TransmissionSetupLocal.GearAutoBoxLatency = DefAutoBoxSetup.getLatency();
+	TransmissionSetupLocal.bUseGearAutoBox = true;
 
 	for (uint32 i = PxVehicleGearsData::eFIRST; i < DefGearSetup.mNbRatios; i++)
 	{
-		FVehicleGearData GearData;
+		FVehicleGearDataSkid GearData;
 		GearData.DownRatio = DefAutoBoxSetup.mDownRatios[i];
 		GearData.UpRatio = DefAutoBoxSetup.mUpRatios[i];
 		GearData.Ratio = DefGearSetup.mRatios[i];
-		TransmissionSetup.ForwardGears.Add(GearData);
+		TransmissionSetupLocal.ForwardGears.Add(GearData);
 	}
 
 	// Init steering speed curve
@@ -72,7 +117,7 @@ USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitia
 #endif // WITH_PHYSX
 }
 
-float FindSkidPeakTorque(const FVehicleEngineData& Setup)
+float FindSkidPeakTorque(const FVehicleEngineDataSkid& Setup)
 {
 	// Find max torque
 	float PeakTorque = 0.f;
@@ -86,7 +131,7 @@ float FindSkidPeakTorque(const FVehicleEngineData& Setup)
 }
 
 #if WITH_PHYSX
-static void GetSkidVehicleEngineSetup(const FVehicleEngineData& Setup, PxVehicleEngineData& PxSetup)
+static void GetSkidVehicleEngineSetup(const FVehicleEngineDataSkid& Setup, PxVehicleEngineData& PxSetup)
 {
 	PxSetup.mMOI = M2ToCm2(Setup.MOI);
 	PxSetup.mMaxOmega = RPMToOmega(Setup.MaxRPM);
@@ -110,7 +155,7 @@ static void GetSkidVehicleEngineSetup(const FVehicleEngineData& Setup, PxVehicle
 	}
 }
 
-static void GetSkidVehicleGearSetup(const FVehicleTransmissionData& Setup, PxVehicleGearsData& PxSetup)
+static void GetSkidVehicleGearSetup(const FVehicleTransmissionDataSkid& Setup, PxVehicleGearsData& PxSetup)
 {
 	PxSetup.mSwitchTime = Setup.GearSwitchTime;
 	PxSetup.mRatios[PxVehicleGearsData::eREVERSE] = Setup.ReverseGearRatio;
@@ -122,11 +167,11 @@ static void GetSkidVehicleGearSetup(const FVehicleTransmissionData& Setup, PxVeh
 	PxSetup.mNbRatios = Setup.ForwardGears.Num() + PxVehicleGearsData::eFIRST;
 }
 
-static void GetSkidVehicleAutoBoxSetup(const FVehicleTransmissionData& Setup, PxVehicleAutoBoxData& PxSetup)
+static void GetSkidVehicleAutoBoxSetup(const FVehicleTransmissionDataSkid& Setup, PxVehicleAutoBoxData& PxSetup)
 {
 	for (int32 i = 0; i < Setup.ForwardGears.Num(); i++)
 	{
-		const FVehicleGearData& GearData = Setup.ForwardGears[i];
+		const FVehicleGearDataSkid& GearData = Setup.ForwardGears[i];
 		PxSetup.mUpRatios[i + PxVehicleGearsData::eFIRST] = GearData.UpRatio;
 		PxSetup.mDownRatios[i + PxVehicleGearsData::eFIRST] = GearData.DownRatio;
 	}
@@ -137,19 +182,19 @@ static void GetSkidVehicleAutoBoxSetup(const FVehicleTransmissionData& Setup, Px
 void SetupSkidDriveHelper(const USkidVehicleMovementComponent* VehicleData, const PxVehicleWheelsSimData* PWheelsSimData, PxVehicleDriveSimData4W& DriveData, uint32 NumOfWheels)
 {
 	PxVehicleEngineData EngineSetup;
-	GetSkidVehicleEngineSetup(VehicleData->EngineSetup, EngineSetup);
+	GetSkidVehicleEngineSetup(VehicleData->EngineSetupLocal, EngineSetup);
 	DriveData.setEngineData(EngineSetup);
 
 	PxVehicleClutchData ClutchSetup;
-	ClutchSetup.mStrength = M2ToCm2(VehicleData->TransmissionSetup.ClutchStrength);
+	ClutchSetup.mStrength = M2ToCm2(VehicleData->TransmissionSetupLocal.ClutchStrength);
 	DriveData.setClutchData(ClutchSetup);
 
 	PxVehicleGearsData GearSetup;
-	GetSkidVehicleGearSetup(VehicleData->TransmissionSetup, GearSetup);
+	GetSkidVehicleGearSetup(VehicleData->TransmissionSetupLocal, GearSetup);
 	DriveData.setGearsData(GearSetup);
 
 	PxVehicleAutoBoxData AutoBoxSetup;
-	GetSkidVehicleAutoBoxSetup(VehicleData->TransmissionSetup, AutoBoxSetup);
+	GetSkidVehicleAutoBoxSetup(VehicleData->TransmissionSetupLocal, AutoBoxSetup);
 	DriveData.setAutoBoxData(AutoBoxSetup);
 }
 #endif // WITH_PHYSX
@@ -223,7 +268,7 @@ void USkidVehicleMovementComponent::SetupVehicle()
 	PVehicle = PVehicleDriveTank;
 	PVehicleDrive = PVehicleDriveTank;
 
-	SetUseAutoGears(TransmissionSetup.bUseGearAutoBox);
+	SetUseAutoGears(TransmissionSetupLocal.bUseGearAutoBox);
 
 }
 
@@ -341,17 +386,17 @@ void USkidVehicleMovementComponent::PostEditChangeProperty(struct FPropertyChang
 
 	if (PropertyName == TEXT("DownRatio"))
 	{
-		for (int32 GearIdx = 0; GearIdx < TransmissionSetup.ForwardGears.Num(); ++GearIdx)
+		for (int32 GearIdx = 0; GearIdx < TransmissionSetupLocal.ForwardGears.Num(); ++GearIdx)
 		{
-			FVehicleGearData & GearData = TransmissionSetup.ForwardGears[GearIdx];
+			FVehicleGearDataSkid& GearData = TransmissionSetupLocal.ForwardGears[GearIdx];
 			GearData.DownRatio = FMath::Min(GearData.DownRatio, GearData.UpRatio);
 		}
 	}
 	else if (PropertyName == TEXT("UpRatio"))
 	{
-		for (int32 GearIdx = 0; GearIdx < TransmissionSetup.ForwardGears.Num(); ++GearIdx)
+		for (int32 GearIdx = 0; GearIdx < TransmissionSetupLocal.ForwardGears.Num(); ++GearIdx)
 		{
-			FVehicleGearData & GearData = TransmissionSetup.ForwardGears[GearIdx];
+			FVehicleGearDataSkid& GearData = TransmissionSetupLocal.ForwardGears[GearIdx];
 			GearData.UpRatio = FMath::Max(GearData.DownRatio, GearData.UpRatio);
 		}
 	}

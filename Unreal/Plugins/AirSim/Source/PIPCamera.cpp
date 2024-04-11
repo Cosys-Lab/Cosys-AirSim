@@ -5,9 +5,6 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/World.h"
 #include "ImageUtils.h"
-#include "EngineUtils.h"
-#include "Engine/Engine.h"
-#include "DrawDebugHelpers.h"
 #include "ObjectPainter.h"
 
 #include <string>

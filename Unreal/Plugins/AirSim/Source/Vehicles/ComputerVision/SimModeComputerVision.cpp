@@ -1,23 +1,15 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 #include "SimModeComputerVision.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Engine/World.h"
 
 #include "AirBlueprintLib.h"
 #include "common/AirSimSettings.hpp"
-#include "PawnSimApi.h"
+#include "ComputerVisionPawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "common/EarthUtils.hpp"
-#include "api/VehicleSimApiBase.hpp"
-#include "common/AirSimSettings.hpp"
-#include "physics/Kinematics.hpp"
-#include "api/RpcLibServerBase.hpp"
 #include "vehicles/computervision/api/ComputerVisionRpcLibServer.hpp"
-#include "ComputerVisionPawnSimApi.h"
 
+extern CORE_API uint32 GFrameNumber;
 
 void ASimModeComputerVision::BeginPlay()
 {
