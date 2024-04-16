@@ -33,15 +33,15 @@ namespace airlib
         static constexpr char const* kVehicleTypeSimpleFlight = "simpleflight";
         static constexpr char const* kVehicleTypeArduCopter = "arducopter";
         static constexpr char const* kVehicleTypePhysXCar = "physxcar";
-        static constexpr char const * kVehicleTypeBoxCar = "boxcar";
-        static constexpr char const * kVehicleTypeCPHusky = "cphusky";
-        static constexpr char const * kVehicleTypePioneer = "pioneer";
+        static constexpr char const* kVehicleTypeBoxCar = "boxcar";
+        static constexpr char const* kVehicleTypeCPHusky = "cphusky";
+        static constexpr char const* kVehicleTypePioneer = "pioneer";
         static constexpr char const* kVehicleTypeArduRover = "ardurover";
         static constexpr char const* kVehicleTypeComputerVision = "computervision";
 
         static constexpr char const* kVehicleInertialFrame = "VehicleInertialFrame";
         static constexpr char const* kSensorLocalFrame = "SensorLocalFrame";
-        static constexpr char const * kBeaconTypeTemplate = "templateBeacon";
+        static constexpr char const* kBeaconTypeTemplate = "templateBeacon";
         static constexpr char const* kSimModeTypeMultirotor = "Multirotor";
         static constexpr char const* kSimModeTypeCar = "Car";
         static constexpr char const* kSimModeTypeSkidVehicle = "SkidVehicle";
@@ -775,6 +775,7 @@ namespace airlib
             //get the simmode from user if not specified
             simmode_name = settings_json.getString("SimMode", "");
             if (simmode_name == "") {
+                msr::airlib::Settings vehicles_child;
                 if (simmode_getter)
                     simmode_name = simmode_getter();
                 else
@@ -1156,7 +1157,7 @@ namespace airlib
             }
             else if (simmode_name == kSimModeTypeSkidVehicle) {
                 // create CPHusky as default skidvehicle vehicle
-                auto cphusky_car_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting("CPHusky", kSimModeTypeSkidVehicle));
+                auto cphusky_car_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting("CPHusky", kVehicleTypeCPHusky));
                 cphusky_car_setting->sensors = sensor_defaults;
                 vehicles[cphusky_car_setting->vehicle_name] = std::move(cphusky_car_setting);
             }

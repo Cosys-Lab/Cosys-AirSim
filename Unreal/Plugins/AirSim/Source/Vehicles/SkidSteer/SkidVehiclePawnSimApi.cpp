@@ -140,10 +140,12 @@ void SkidVehiclePawnSimApi::updateCarControls()
 	if (!vehicle_api_->isApiControlEnabled()) {
 		//all car controls from anywhere must be routed through API component
 		vehicle_api_->setCarControls(current_controls_);
+		pawn_api_->updateMovement(current_controls_);
 	}
 	else {
 		UAirBlueprintLib::LogMessageString("Control Mode: ", "API", LogDebugLevel::Informational);
 		current_controls_ = vehicle_api_->getCarControls();
+		pawn_api_->updateMovement(current_controls_);
 	}
 	UAirBlueprintLib::LogMessageString("Accel: ", std::to_string(current_controls_.throttle), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessageString("Break: ", std::to_string(current_controls_.brake), LogDebugLevel::Informational);

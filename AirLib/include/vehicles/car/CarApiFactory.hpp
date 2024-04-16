@@ -23,7 +23,10 @@ namespace airlib
                 return std::unique_ptr<CarApiBase>(new ArduRoverApi(vehicle_setting, sensor_factory, state, environment));
             }
             else if (vehicle_setting->vehicle_type == "" || //default config
-                     vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypePhysXCar) {
+                     vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypePhysXCar ||
+                     vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypeBoxCar ||
+                     vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypePioneer ||
+                     vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypeCPHusky) {
                 return std::unique_ptr<CarApiBase>(new PhysXCarApi(vehicle_setting, sensor_factory, state, environment));
             }
             else

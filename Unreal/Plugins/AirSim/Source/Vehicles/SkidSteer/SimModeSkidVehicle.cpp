@@ -120,9 +120,14 @@ std::string ASimModeSkidVehicle::getVehiclePawnPathName(const AirSimSettings::Ve
 {
 	//decide which derived BP to use
 	std::string pawn_path = vehicle_setting.pawn_path;
-	if (pawn_path == "")
-		pawn_path = "DefaultSkidVehicle";
-
+	if (pawn_path == "") {
+		if (vehicle_setting.vehicle_type == "pioneer") {
+			pawn_path = "Pioneer";
+		}
+		else {
+			pawn_path = "DefaultSkidVehicle";
+		}
+	}
 	return pawn_path;
 }
 
