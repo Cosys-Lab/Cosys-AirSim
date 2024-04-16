@@ -118,8 +118,6 @@ private: //members
     const NedTransform* ned_transform_;
     TMap<int, EPixelFormat> image_type_to_pixel_format_map_;
 
-    FObjectFilter object_filter_;
-
     msr::airlib::AirSimSettings::CameraSetting sensor_params_;
 private: //methods
     typedef common_utils::Utils Utils;
