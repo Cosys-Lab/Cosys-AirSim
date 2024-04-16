@@ -36,7 +36,6 @@ public: //types
     typedef msr::airlib::Utils Utils;
     typedef msr::airlib::AirSimSettings::VehicleSetting VehicleSetting;
     typedef msr::airlib::ImageCaptureBase ImageCaptureBase;
-    typedef msr::airlib::DetectionInfo DetectionInfo;
     typedef msr::airlib::Kinematics Kinematics;
 
     struct Params

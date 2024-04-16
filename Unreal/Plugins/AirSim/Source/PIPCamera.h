@@ -9,7 +9,6 @@
 #include "common/common_utils/Utils.hpp"
 #include "common/AirSimSettings.hpp"
 #include "NedTransform.h"
-#include "DetectionComponent.h"
 
 //CinemAirSim
 #include <CineCameraActor.h>
@@ -79,7 +78,6 @@ public:
 
     USceneCaptureComponent2D* getCaptureComponent(const ImageType type, bool if_active);
     UTextureRenderTarget2D* getRenderTarget(const ImageType type, bool if_active);
-    UDetectionComponent* getDetectionComponent(const ImageType type, bool if_active) const;
 
     msr::airlib::Pose getPose() const;
 
@@ -93,8 +91,6 @@ private: //members
     TArray<USceneCaptureComponent2D*> captures_;
     UPROPERTY()
     TArray<UTextureRenderTarget2D*> render_targets_;
-    UPROPERTY()
-    TArray<UDetectionComponent*> detections_;
 
     //CinemAirSim
     UPROPERTY()

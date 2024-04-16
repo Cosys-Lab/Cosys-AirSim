@@ -329,62 +329,7 @@ namespace airlib_rpclib
             }
         };
 
-        struct DetectionInfo
-        {
-            std::string name;
-            GeoPoint geo_point;
-            Box2D box2D;
-            Box3D box3D;
-            Pose relative_pose;
-
-            MSGPACK_DEFINE_MAP(name, geo_point, box2D, box3D, relative_pose);
-
-            DetectionInfo()
-            {
-            }
-
-            DetectionInfo(const msr::airlib::DetectionInfo& d)
-            {
-                name = d.name;
-                geo_point = d.geo_point;
-                box2D = d.box2D;
-                box3D = d.box3D;
-                relative_pose = d.relative_pose;
-            }
-
-            msr::airlib::DetectionInfo to() const
-            {
-                msr::airlib::DetectionInfo d;
-                d.name = name;
-                d.geo_point = geo_point.to();
-                d.box2D = box2D.to();
-                d.box3D = box3D.to();
-                d.relative_pose = relative_pose.to();
-
-                return d;
-            }
-
-            static std::vector<DetectionInfo> from(
-                const std::vector<msr::airlib::DetectionInfo>& request)
-            {
-                std::vector<DetectionInfo> request_adaptor;
-                for (const auto& item : request)
-                    request_adaptor.push_back(DetectionInfo(item));
-
-                return request_adaptor;
-            }
-            static std::vector<msr::airlib::DetectionInfo> to(
-                const std::vector<DetectionInfo>& request_adapter)
-            {
-                std::vector<msr::airlib::DetectionInfo> request;
-                for (const auto& item : request_adapter)
-                    request.push_back(item.to());
-
-                return request;
-            }
-        };
-
-        struct CameraInfo
+       struct CameraInfo
         {
             Pose pose;
             float fov;
