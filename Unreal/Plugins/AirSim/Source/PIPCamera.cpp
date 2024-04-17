@@ -78,6 +78,7 @@ void APIPCamera::PostInitializeComponents()
     camera_ = UAirBlueprintLib::GetActorComponent<UCineCameraComponent>(this, TEXT("CameraComponent"));
     captures_.Init(nullptr, imageTypeCount());
     render_targets_.Init(nullptr, imageTypeCount());
+    detections_.Init(nullptr, imageTypeCount());
 
     captures_[Utils::toNumeric(ImageType::Scene)] =
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("SceneCaptureComponent"));
@@ -99,6 +100,15 @@ void APIPCamera::PostInitializeComponents()
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("OpticalFlowCaptureComponent"));
     captures_[Utils::toNumeric(ImageType::OpticalFlowVis)] =
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("OpticalFlowVisCaptureComponent"));
+
+    for (unsigned int i = 0; i < imageTypeCount(); ++i) {
+        detections_[i] = NewObject<UDetectionComponent>(this);
+        if (detections_[i]) {
+            detections_[i]->SetupAttachment(captures_[i]);
+            detections_[i]->RegisterComponent();
+            detections_[i]->Deactivate();
+        }
+    }
     //set initial focal length
     camera_->CurrentFocalLength = 11.9;
 
@@ -285,6 +295,7 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
         //use final color for all calculations
         captures_[image_type] = nullptr;
         render_targets_[image_type] = nullptr;
+        detections_[image_type] = nullptr;
     }
 }
 
@@ -637,17 +648,26 @@ void APIPCamera::enableCaptureComponent(const APIPCamera::ImageType type, bool i
 {
     USceneCaptureComponent2D* capture = getCaptureComponent(type, false);
     if (capture != nullptr) {
+        UDetectionComponent* detection = getDetectionComponent(type, false);
         if (is_enabled) {
             //do not make unnecessary calls to Activate() which otherwise causes crash in Unreal
             if (!capture->IsActive() || capture->TextureTarget == nullptr) {
                 capture->TextureTarget = getRenderTarget(type, false);
                 capture->Activate();
+                if (detection != nullptr) {
+                    detection->texture_target_ = capture->TextureTarget;
+                    detection->Activate();
+                }
             }
         }
         else {
             if (capture->IsActive() || capture->TextureTarget != nullptr) {
                 capture->Deactivate();
                 capture->TextureTarget = nullptr;
+                if (detection != nullptr) {
+                    detection->Deactivate();
+                    detection->texture_target_ = nullptr;
+                }
             }
         }
         camera_type_enabled_[Utils::toNumeric(type)] = is_enabled;
@@ -661,6 +681,15 @@ UTextureRenderTarget2D* APIPCamera::getRenderTarget(const APIPCamera::ImageType 
 
     if (!if_active || camera_type_enabled_[image_type])
         return render_targets_[image_type];
+    return nullptr;
+}
+
+UDetectionComponent* APIPCamera::getDetectionComponent(const ImageType type, bool if_active) const
+{
+    unsigned int image_type = Utils::toNumeric(type);
+
+    if (!if_active || camera_type_enabled_[image_type])
+        return detections_[image_type];
     return nullptr;
 }
 

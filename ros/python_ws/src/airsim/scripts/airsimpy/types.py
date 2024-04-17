@@ -560,6 +560,13 @@ class Box3D(MsgpackMixin):
     min = Vector3r()
     max = Vector3r()
 
+class DetectionInfo(MsgpackMixin):
+    name = ''
+    geo_point = GeoPoint()
+    box2D = Box2D()
+    box3D = Box3D()
+    relative_pose = Pose()
+
 class PIDGains():
     """
     Struct to store values of PID gains. Used to transmit controller gain values while instantiating
