@@ -14,17 +14,6 @@ namespace msr {
 				: SensorBase(sensor_name)
 			{}
 
-		public: //types
-			struct Output {
-
-				// header
-				TTimePoint time_stamp;
-				Pose relative_pose;
-
-				// data
-				vector<real_T> point_cloud;
-			};
-
 		public:
 			virtual void reportState(StateReporter& reporter) override
 			{

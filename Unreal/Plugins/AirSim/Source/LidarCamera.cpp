@@ -142,7 +142,7 @@ void ALidarCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 // Get all the settings from AirSim
-void ALidarCamera::InitializeSettingsFromAirSim(const AirSimSettings::GPULidarSetting& settings)
+void ALidarCamera::InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpleParams& settings)
 {
 	// Get all the settings from AirSim
 	resolution_ = (int32)settings.resolution;
@@ -189,8 +189,8 @@ void ALidarCamera::InitializeSettingsFromAirSim(const AirSimSettings::GPULidarSe
 	}
 
 	// Set the sensor in the Unreal world at the right position and rotation by transforming the coordinate system to that of Unreal from AirSim NED
-	this->SetActorRelativeLocation(FVector(settings.position.x() * 100, settings.position.y() * 100, -settings.position.z() * 100));
-	this->SetActorRelativeRotation(FRotator(settings.rotation.pitch, settings.rotation.yaw, settings.rotation.roll));
+	this->SetActorRelativeLocation(FVector(settings.relative_pose.position.x() * 100, settings.relative_pose.position.y() * 100, -settings.relative_pose.position.z() * 100));
+	this->SetActorRelativeRotation(FRotator(settings.pitch, settings.yaw, settings.roll));
 
 	// Initialize the sensor further
 	InitializeSensor();	

@@ -49,6 +49,9 @@ namespace msr {
 			real_T update_frequency = 10;                // Frequency to update the sensor at in Hz
 			real_T startup_delay = 1;                    // Delay until sensor is enabled in seconds
 
+            float pitch = 0;                            // Pitch of the sensor in degrees
+            float roll = 0;                             // Roll of the sensor in degrees
+            float yaw = 0;                              // Yaw of the sensor in degrees
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
 			{
 				std::string simmode_name = AirSimSettings::singleton().simmode_name;
@@ -118,7 +121,6 @@ namespace msr {
                     relative_pose.position.z() = 0;
                 }
 
-                float pitch, roll, yaw;
                 pitch = !std::isnan(rotation.pitch) ? rotation.pitch : 0;
                 roll = !std::isnan(rotation.roll) ? rotation.roll : 0;
                 yaw = !std::isnan(rotation.yaw) ? rotation.yaw : 0;

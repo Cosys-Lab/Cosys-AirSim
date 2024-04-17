@@ -21,6 +21,8 @@ namespace msr {
 				// initialize params
 				params_.initializeFromSettings(setting);
 
+				last_time_ = clock()->nowNanos();
+
 				//initialize frequency limiter
 				freq_limiter_.initialize(params_.update_frequency, params_.startup_delay, false);
 			}

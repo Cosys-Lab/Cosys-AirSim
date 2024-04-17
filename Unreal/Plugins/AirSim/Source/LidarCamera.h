@@ -11,6 +11,7 @@
 #include "Runtime/Core/Public/PixelFormat.h"
 #include "common/AirSimSettings.hpp"
 #include "AirBlueprintLib.h"
+#include "sensors/lidar/GPULidarSimple.hpp"
 #include "common/Common.hpp"
 #include <random>
 
@@ -24,8 +25,6 @@ class AIRSIM_API ALidarCamera : public AActor
 
 public:
 
-	typedef msr::airlib::AirSimSettings AirSimSettings;
-
 	ALidarCamera();
 
 	virtual void PostInitializeComponents() override;
@@ -33,7 +32,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	void InitializeSettingsFromAirSim(const AirSimSettings::GPULidarSetting& settings);
+	void InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpleParams& settings);
 	void InitializeSensor();
 	bool Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
 

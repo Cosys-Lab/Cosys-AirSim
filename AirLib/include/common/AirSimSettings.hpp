@@ -269,88 +269,13 @@ namespace airlib
         {
         };
 
-        struct GPULidarSetting : SensorSetting {
+        struct GPULidarSetting : SensorSetting
+        {
+        };
 
-        // shared defaults
-        uint number_of_channels = 64;				 // Amount of lasers of the sensor
-        real_T range = 50.0f;                        // maximum range a point is detected in meters
-        uint measurement_per_cycle = 2048;		     // The horizontal measurement count/frequency
-        real_T horizontal_rotation_frequency = 10;   // rotation frequency of the sensor in Hz
-        real_T horizontal_FOV_start = 0;			 // starting angle of rotation in degrees
-        real_T horizontal_FOV_end = 360;			 // ending angle of rotation in degrees, by default it works as a full horizontal FOV of 360 degrees
-        uint resolution = 512;					     // Resolution of the render texture, influences performance on the GPU
-        bool ground_truth = false;                   // Generate ground truth segmentation color values, if false will set to zero
-        bool ignore_marked = false;					 // If enabled, it will not detect objects marked to be ignored (with the 'MarkedIgnore' tag)
-        bool generate_noise = false;			     // Toggle range based noise
-        real_T min_noise_standard_deviation = 0;     // Minimum noise standard deviation
-        real_T noise_distance_scale = 1;		     // Factor to scale noise based on distance
-        bool generate_intensity = false;             // Toggle intensity calculation on or off
-        float range_max_lambertian_percentage = 80;  // Lambertian reflectivity percentage to max out on. Will act linear to 0% for below
-        float rain_max_intensity = 70;               // Rain intensity maximum to scale from in mm/hour
-        std::string material_list_file = "";         // String holding all material data
-        float rain_constant_a = 0.01f;                // Two constants to calculate the extinction coefficient in rain
-        float rain_constant_b = 0.6f;                 // Two constants to calculate the extinction coefficient in rain
-        bool external = false;                       // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                    // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
-        real_T update_frequency = 10;                // Frequency to update the sensor at in Hz
-
-        // debug settings
-        bool draw_debug_points = false;				 // Enable the drawing of debug cubes of the pointcloud. Disable this for real measurements as it is impacted(detected) by the virtual camera!
-        uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = impact angle, 4 = intensity
-        bool draw_sensor;						     // Draw the physical sensor in the world on the vehicle with a 3d colored axis
-
-        // defaults specific to a mode
-        float vertical_FOV_upper = Utils::nan<float>();
-        float vertical_FOV_lower = Utils::nan<float>();
-        Vector3r position = VectorMath::nanVector();
-        Rotation rotation = Rotation::nanRotation();
-	};
-
-	struct EchoSetting : SensorSetting {
-
-		// Signal propagation settings
-		uint number_of_traces = 1000;					// Amount of traces (rays) being cast
-		float reflection_opening_angle = 10.0f;			// Beam width of the scattered traces
-		float attenuation_per_distance = 0.0f;			// Attenuation of signal wrt distance traveled (dB/m)
-		float attenuation_per_reflection = 0.0f;        // Attenuation of signal wrt reflections (dB)
-		float attenuation_limit = -100.0f;              // Attenuation at which the signal is considered dissipated (dB)
-		float distance_limit = 10.0f;					// Maximum distance the signal can travel.
-		int reflection_limit = 3;						// Maximum times the signal can reflect.
-		float reflection_distance_limit = 0.4f;			// Maximum distance between reflection locations.
-
-		// Sensor settings
-		float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
-		float sensor_diameter = 0.5;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
-        float sensor_lower_azimuth_limit = -90;		    // The lower azimuth limit of the sensor opening angle in degrees.
-        float sensor_upper_azimuth_limit = 90;			// The upper azimuth limit of the sensor opening angle in degrees.
-        float sensor_lower_elevation_limit = -90;		// The lower elevation limit of the sensor opening angle in degrees.
-        float sensor_upper_elevation_limit = 90;		// The upper elevation limit of the sensor opening angle in degrees.
-        float sensor_passive_radius = 10;               // The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled.
-
-		// Engine & timing settings
-		bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
-														// If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-		// Debug settings
-		bool draw_initial_points = false;		     	// Draw the points of the initial half sphere where the traces (rays) are cast
-		bool draw_bounce_lines = false;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
-		bool draw_reflected_points = true;				// Draw debug points in world where reflected points are captured by the sensor
-		bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the sensor
-		bool draw_reflected_paths = false;				// Draw debug lines for the full path of reflected points to the sensor
-		bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
-		bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
-        bool draw_passive_sources = false;				// Draw debug points and reflection lines for all detected passive echo sources (original sources and their reflection echos against objects).
-        bool draw_passive_lines = false;				// Draw debug lines of the sensor to the passive echo sources that are detected with line of sight.
-
-        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
-        bool passive = false;                           // Sense and capture passive echo beacon data
-        bool active = true;                             // Sense and capture active echo beacon data (enable emission)
-
-		// Misc
-		Vector3r position = VectorMath::nanVector();
-		Rotation rotation = Rotation::nanRotation();
-		bool ignore_marked = false;
-	};
+	    struct EchoSetting : SensorSetting
+        {
+        };
 
     struct SensorTemplateSetting : SensorSetting {
         // Engine & timing settings
