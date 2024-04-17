@@ -12,7 +12,6 @@ namespace msr { namespace airlib {
 struct SensorTemplateSimpleParams {
 	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
-	std::string name = "SensorTemplate";
     bool external = false;                  // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
     bool external_ned = true;               // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
     bool draw_sensor;						// Draw the physical sensor in the world on the vehicle
@@ -26,45 +25,42 @@ struct SensorTemplateSimpleParams {
     std::string data_frame = AirSimSettings::kVehicleInertialFrame;
 
     real_T update_frequency;				// polling rate of update function, in Hz
-    real_T startup_delay;               // startup delay of sensor, in sec
+    real_T startup_delay;                   // startup delay of sensor, in sec
 
     void initializeFromSettings(const AirSimSettings::SensorTemplateSetting& settings)
     {
         std::string simmode_name = AirSimSettings::singleton().simmode_name;
 
-		pause_after_measurement = settings.pause_after_measurement;
-		measurement_frequency = settings.measurement_frequency;
-        external = settings.external;
-        external_ned = settings.external_ned;
-        draw_sensor = settings.draw_sensor;
+        const auto& settings_json = settings.settings;
+        measurement_frequency = settings_json.getFloat("MeasurementFrequency", measurement_frequency);
+        pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", pause_after_measurement);
+        external = settings_json.getBool("External", external);
+        external_ned = settings_json.getBool("ExternalLocal", external_ned);
+        draw_sensor = settings_json.getBool("DrawSensor", draw_sensor);
+        data_frame = settings_json.getString("DataFrame", data_frame);
 
-		name = settings.sensor_name;
 
-        relative_pose.position = settings.position;
+        relative_pose.position = AirSimSettings::createVectorSetting(settings_json, VectorMath::nanVector());
+        auto rotation = AirSimSettings::createRotationSetting(settings_json, AirSimSettings::Rotation::nanRotation());
+
         if (std::isnan(relative_pose.position.x()))
             relative_pose.position.x() = 0;
         if (std::isnan(relative_pose.position.y()))
             relative_pose.position.y() = 0;
         if (std::isnan(relative_pose.position.z())) {
-            if (simmode_name == "Multirotor")
-                relative_pose.position.z() = 0;
-            else
-                relative_pose.position.z() = -1;  // a little bit above for cars
+            relative_pose.position.z() = 0;
         }
 
         float pitch, roll, yaw;
-        pitch = !std::isnan(settings.rotation.pitch) ? settings.rotation.pitch : 0;
-        roll = !std::isnan(settings.rotation.roll) ? settings.rotation.roll : 0;
-        yaw = !std::isnan(settings.rotation.yaw) ? settings.rotation.yaw : 0;
+        pitch = !std::isnan(rotation.pitch) ? rotation.pitch : 0;
+        roll = !std::isnan(rotation.roll) ? rotation.roll : 0;
+        yaw = !std::isnan(rotation.yaw) ? rotation.yaw : 0;
         relative_pose.orientation = VectorMath::toQuaternion(
-            Utils::degreesToRadians(pitch),   //pitch - rotation around Y axis
-            Utils::degreesToRadians(roll),    //roll  - rotation around X axis
-            Utils::degreesToRadians(yaw)	  //yaw   - rotation around Z axis
-		);  
+            Utils::degreesToRadians(pitch), // pitch - rotation around Y axis
+            Utils::degreesToRadians(roll), // roll  - rotation around X axis
+            Utils::degreesToRadians(yaw)); // yaw   - rotation around Z axis
 
-        data_frame = settings.data_frame;
-		update_frequency = settings.measurement_frequency;
-
+		update_frequency = settings_json.getFloat("UpdateFrequency", update_frequency);
 		startup_delay = 0;
     }
 };

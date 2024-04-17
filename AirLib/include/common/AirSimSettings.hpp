@@ -277,56 +277,17 @@ namespace airlib
         {
         };
 
-    struct SensorTemplateSetting : SensorSetting {
-        // Engine & timing settings
-        float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
-        bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
-                                                        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
-        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
+        struct SensorTemplateSetting : SensorSetting
+        {
+        };
 
-        // Misc
-        std::string data_frame = AirSimSettings::kSensorLocalFrame;
-        Vector3r position = VectorMath::nanVector();
-        Rotation rotation = Rotation::nanRotation();
-    };
+        struct MarLocUwbSetting : SensorSetting
+        {
+        };
 
-    struct MarLocUwbSetting : SensorSetting {
-        // Engine & timing settings
-        uint number_of_traces = 5;	     				// Amount of traces (rays) being cast
-        float sensor_opening_angle = 180.0f;			// The opening angle in which rays will be cast from the sensor
-        float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
-        bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
-                                                        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
-        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
-
-        // Misc
-        std::string data_frame = AirSimSettings::kSensorLocalFrame;
-        Vector3r position = VectorMath::nanVector();
-        Rotation rotation = Rotation::nanRotation();
-
-    };
-
-    struct WifiSetting : SensorSetting {
-        // Engine & timing settings
-        uint number_of_traces = 5;	     				// Amount of traces (rays) being cast
-        float sensor_opening_angle = 180.0f;			// The opening angle in which rays will be cast from the sensor
-        float measurement_frequency = 10;				// The frequency of the sensor (measurements/s)
-        bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
-                                                        // If true, the time passed in-engine will be used (when performance doesn't allow real-time operation)
-        bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
-        bool external = false;                          // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
-        bool external_ned = true;                       // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
-
-        // Misc
-        std::string data_frame = AirSimSettings::kSensorLocalFrame;
-        Vector3r position = VectorMath::nanVector();
-        Rotation rotation = Rotation::nanRotation();
-
-    };
+        struct WifiSetting : SensorSetting
+        {
+        };
 
         struct VehicleSetting
         {
