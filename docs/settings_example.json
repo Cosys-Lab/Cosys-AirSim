@@ -20,13 +20,7 @@
         "Z": 0
     },
     "CameraDirector": {
-        "FollowDistance": -3,
-        "X": NaN,
-        "Y": NaN,
-        "Z": NaN,
-        "Pitch": NaN,
-        "Roll": NaN,
-        "Yaw": NaN
+        "FollowDistance": -3
     },
     "Recording": {
         "RecordOnMove": false,
@@ -133,7 +127,7 @@
             "RC": {
                 "RemoteControlID": 0
             },
-            "X": 8,
+            "X": 0,
             "Y": 0,
             "Z": 0,
             "Pitch": 0,
@@ -186,6 +180,33 @@
                     "Enabled": false,
                     "SensorType": 5
                 },
+                "gpulidar1": {
+					"SensorType": 8,
+					"Enabled" : false,
+					"External": false,
+					"NumberOfChannels": 32,
+					"Range": 50,
+				    "Resolution": 1024,
+					"RotationsPerSecond": 10,
+					"MeasurementsPerCycle": 512,
+					"X": 0, "Y": 0, "Z": -0.3,
+					"Roll": 0, "Pitch": 0, "Yaw" : 0,
+					"VerticalFOVUpper": 20,
+					"VerticalFOVLower": -20,
+					"HorizontalFOVStart": 0,
+					"HorizontalFOVEnd": 360,
+					"DrawDebugPoints": false,
+					"DrawMode": 1,
+					"Resolution": 1024,
+					"IgnoreMarked": true,
+					"GroundTruth": true,
+					"GenerateIntensity": false,
+					"rangeMaxLambertianPercentage": 80,
+					"rainMaxIntensity": 70,
+					"rainConstantA": 0.01,
+					"rainConstantB": 0.6,
+                    "DrawSensor": false
+				},
                 "lidar": {
                     "SensorType": 6,
                     "Enabled": true,
@@ -289,11 +310,11 @@
         "drone1": {
             "VehicleType": "SimpleFlight",
             "X": -5,
-            "Y": 7,
+            "Y": 0,
             "Z": 0,
             "Roll": 0,
             "Pitch": 0,
-            "Yaw": 180,
+            "Yaw": 0,
             "DefaultVehicleState": "Armed",
             "AutoCreate": true,
             "PawnPath": "",
@@ -357,9 +378,9 @@
     },
     "PassiveEchoBeacons": {
         "PassiveEchoBeaconTest": {
-            "X": 28.5079,
-            "Y": -104.33,
-            "Z": -0.0509,
+            "X": 10,
+            "Y": 10,
+            "Z": -2,
             "Roll": -40,
             "Pitch": 50,
             "Yaw": -50,
@@ -384,7 +405,7 @@
         "testBeacon_1": {
             "BeaconType": "fiducialmarker",
             "BeaconPawnName": "1",
-            "X": 0,
+            "X": 2,
             "Y": -0.5,
             "Z": -0.1,
             "Roll": -180,
@@ -395,7 +416,7 @@
         "testBeacon_2": {
             "BeaconType": "WifiBeacon",
             "BeaconPawnName": "1",
-            "X": 0,
+            "X": 2,
             "Y": 0,
             "Z": 0,
             "Roll": 0,
@@ -406,7 +427,7 @@
         "testBeacon_3": {
             "BeaconType": "UwbBeacon",
             "BeaconPawnName": "1",
-            "X": 0,
+            "X": 2,
             "Y": 0.5,
             "Z": 0,
             "Roll": 0,
