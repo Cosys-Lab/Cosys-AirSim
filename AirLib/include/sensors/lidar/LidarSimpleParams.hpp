@@ -76,7 +76,7 @@ namespace airlib
             draw_sensor = settings_json.getBool("DrawSensor", draw_sensor);
             external = settings_json.getBool("External", external);
             external_ned = settings_json.getBool("ExternalLocal", external_ned);
-            generate_noise = settings_json.getBool("GenerateNoise", limit_points);
+            generate_noise = settings_json.getBool("GenerateNoise", generate_noise);
             min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", min_noise_standard_deviation);
             noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", noise_distance_scale);
 

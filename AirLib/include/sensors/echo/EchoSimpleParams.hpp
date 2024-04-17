@@ -30,8 +30,6 @@ struct EchoSimpleParams {
 	bool ignore_marked = false;
 	int testParam = 1;
 
-	std::string name = "EchoSensor";
-
     Pose relative_pose {
         Vector3r(0,0,-1),                   // position - a little above vehicle (especially for cars) or Vector3r::Zero()
         Quaternionr::Identity()             // orientation - by default Quaternionr(1, 0, 0, 0) 
@@ -59,27 +57,30 @@ struct EchoSimpleParams {
     {
         std::string simmode_name = AirSimSettings::singleton().simmode_name;
 
-		number_of_traces = settings.number_of_traces;
-		reflection_opening_angle = settings.reflection_opening_angle;
-		sensor_lower_azimuth_limit = settings.sensor_lower_azimuth_limit;
-		sensor_upper_azimuth_limit = settings.sensor_upper_azimuth_limit;
-		sensor_lower_elevation_limit = settings.sensor_lower_elevation_limit;
-		sensor_upper_elevation_limit = settings.sensor_upper_elevation_limit;
-		sensor_passive_radius = settings.sensor_passive_radius;
-		attenuation_per_distance = settings.attenuation_per_distance;
-		attenuation_per_reflection = settings.attenuation_per_reflection;
-		attenuation_limit = settings.attenuation_limit;
-		distance_limit = settings.distance_limit;
-		reflection_limit = settings.reflection_limit;
-		reflection_distance_limit = settings.reflection_distance_limit;
-		measurement_frequency = settings.measurement_frequency;
-		sensor_diameter = settings.sensor_diameter;
-		pause_after_measurement = settings.pause_after_measurement;
-		ignore_marked = settings.ignore_marked;
+        const auto& settings_json = settings.settings;
 
-		name = settings.sensor_name;
+		number_of_traces = settings_json.getInt("NumberOfChannels", number_of_traces);
+		reflection_opening_angle = settings_json.getFloat("ReflectionOpeningAngle", reflection_opening_angle);
+		sensor_lower_azimuth_limit = settings_json.getFloat("SensorLowerAzimuthLimit", sensor_lower_azimuth_limit);
+		sensor_upper_azimuth_limit = settings_json.getFloat("SensorUpperAzimuthLimit", sensor_upper_azimuth_limit);
+		sensor_lower_elevation_limit = settings_json.getFloat("SensorLowerElevationLimit", sensor_lower_elevation_limit);
+		sensor_upper_elevation_limit = settings_json.getFloat("SensorUpperElevationLimit", sensor_upper_elevation_limit);
+		sensor_passive_radius = settings_json.getFloat("PassiveRadius", sensor_passive_radius);
+		attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", attenuation_per_distance);
+		attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", attenuation_per_reflection);
+		attenuation_limit = settings_json.getFloat("AttenuationLimit", attenuation_limit);
+		distance_limit = settings_json.getFloat("DistanceLimit", distance_limit);
+		reflection_limit = settings_json.getInt("ReflectionLimit", reflection_limit);
+		reflection_distance_limit = settings_json.getFloat("ReflectionDistanceLimit", reflection_distance_limit);
+		measurement_frequency = settings_json.getFloat("MeasurementFrequency", measurement_frequency);
+		sensor_diameter = settings_json.getFloat("SensorDiameter", sensor_diameter);
+		pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", pause_after_measurement);
+		ignore_marked = settings_json.getBool("IgnoreMarked", ignore_marked);
 
-        relative_pose.position = settings.position;
+        relative_pose.position = AirSimSettings::createVectorSetting(settings_json, VectorMath::nanVector());
+        auto rotation = AirSimSettings::createRotationSetting(settings_json, AirSimSettings::Rotation::nanRotation());
+
+
         if (std::isnan(relative_pose.position.x()))
             relative_pose.position.x() = 0;
         if (std::isnan(relative_pose.position.y()))
@@ -88,35 +89,35 @@ struct EchoSimpleParams {
             if (simmode_name == "Multirotor")
                 relative_pose.position.z() = 0;
             else
-                relative_pose.position.z() = -1;  // a little bit above for cars
+                relative_pose.position.z() = -1;
         }
 
         float pitch, roll, yaw;
-        pitch = !std::isnan(settings.rotation.pitch) ? settings.rotation.pitch : 0;
-        roll = !std::isnan(settings.rotation.roll) ? settings.rotation.roll : 0;
-        yaw = !std::isnan(settings.rotation.yaw) ? settings.rotation.yaw : 0;
+        pitch = !std::isnan(rotation.pitch) ? rotation.pitch : 0;
+        roll = !std::isnan(rotation.roll) ? rotation.roll : 0;
+        yaw = !std::isnan(rotation.yaw) ? rotation.yaw : 0;
         relative_pose.orientation = VectorMath::toQuaternion(
-            Utils::degreesToRadians(pitch),   //pitch - rotation around Y axis
-            Utils::degreesToRadians(roll),    //roll  - rotation around X axis
-            Utils::degreesToRadians(yaw)	  //yaw   - rotation around Z axis
-		);   
-           
-        draw_reflected_points = settings.draw_reflected_points;
-		draw_reflected_lines = settings.draw_reflected_lines;
-		draw_reflected_paths = settings.draw_reflected_paths;
-		draw_initial_points = settings.draw_initial_points;
-		draw_bounce_lines = settings.draw_bounce_lines;
-		draw_sensor = settings.draw_sensor;
-		draw_external_points = settings.draw_external_points;
-		draw_passive_sources = settings.draw_passive_sources;		        
-		draw_passive_lines = settings.draw_passive_lines;	        
+            Utils::degreesToRadians(pitch), // pitch - rotation around Y axis
+            Utils::degreesToRadians(roll), // roll  - rotation around X axis
+            Utils::degreesToRadians(yaw)); // yaw   - rotation around Z axis
 
-		update_frequency = settings.measurement_frequency;
 
-		external = settings.external;
-		external_ned = settings.external_ned;
-		passive = settings.passive;
-		active = settings.active; 
+        draw_reflected_points = settings_json.getBool("DrawReflectedPoints", draw_reflected_points);
+		draw_reflected_lines = settings_json.getBool("DrawReflectedLines", draw_reflected_lines);
+		draw_reflected_paths = settings_json.getBool("DrawReflectedPaths", draw_reflected_paths);
+		draw_initial_points = settings_json.getBool("DrawInitialPoints", draw_initial_points);
+		draw_bounce_lines = settings_json.getBool("DrawBounceLines", draw_bounce_lines);
+		draw_sensor = settings_json.getBool("DrawSensor", draw_sensor);
+		draw_external_points = settings_json.getBool("DrawExternalPoints", draw_external_points);
+		draw_passive_sources = settings_json.getBool("DrawPassiveSources", draw_passive_sources);
+		draw_passive_lines = settings_json.getBool("DrawPassiveLines", draw_passive_lines);
+
+		update_frequency = settings_json.getFloat("MeasurementFrequency", update_frequency);
+
+		external = settings_json.getBool("External", external);
+		external_ned = settings_json.getBool("ExternalLocal", external_ned);
+		passive = settings_json.getBool("SensePassive", passive);
+		active = settings_json.getBool("SenseActive", active);
 
 		startup_delay = 0;
     }
