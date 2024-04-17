@@ -8,7 +8,7 @@
     "drone_1": {
       "VehicleType": "PhysXCar",
       "DefaultVehicleState": "Armed",
-      "EnableCollisionPassthrogh": false,
+      "EnableCollisionPassthrough": false,
       "EnableCollisions": true,
       "AllowAPIAlways": true,
       "Sensors": {

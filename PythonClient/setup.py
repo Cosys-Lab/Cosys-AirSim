@@ -7,8 +7,10 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="airsim",
     version=__version__,
-    author="Shital Shah & Cosys-Lab",
-    author_email="wouter.jansen@uantwerpen.be",
+    author="Shital Shah",
+    author_email="shitals@microsoft.com",
+    maintainer="Wouter Jansen",
+    maintainer_email="wouter.jansen@uantwerpen.be",
     description="Open source simulator based on Unreal Engine for autonomous vehicles",
     long_description=long_description,
     long_description_content_type="text/markdown",

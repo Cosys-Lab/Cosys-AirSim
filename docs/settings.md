@@ -166,7 +166,7 @@ Below are complete list of settings available along with their default values. I
       "DefaultVehicleState": "Armed",
       "AutoCreate": true,
       "PawnPath": "",
-      "EnableCollisionPassthrogh": false,
+      "EnableCollisionPassthrough": false,
       "EnableCollisions": true,
       "AllowAPIAlways": true,
       "EnableTrace": false,
@@ -185,7 +185,7 @@ Below are complete list of settings available along with their default values. I
       "DefaultVehicleState": "",
       "AutoCreate": true,
       "PawnPath": "",
-      "EnableCollisionPassthrogh": false,
+      "EnableCollisionPassthrough": false,
       "EnableCollisions": true,
       "RC": {
         "RemoteControlID": -1

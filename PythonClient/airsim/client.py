@@ -503,6 +503,65 @@ class VehicleClient:
     def simGetSegmentationColorMap(self):
         return generate_colormap()
 
+
+    def simAddDetectionFilterMeshName(self, camera_name, image_type, mesh_name, vehicle_name = '', external = False):
+        """
+        Add mesh name to detect in wild card format
+
+        For example: simAddDetectionFilterMeshName("Car_*") will detect all instance named "Car_*"
+
+        Args:
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            image_type (ImageType): Type of image required
+            mesh_name (str): mesh name in wild card format
+            vehicle_name (str, optional): Vehicle which the camera is associated with
+            external (bool, optional): Whether the camera is an External Camera
+
+        """
+        self.client.call('simAddDetectionFilterMeshName', camera_name, image_type, mesh_name, vehicle_name, external)
+
+    def simSetDetectionFilterRadius(self, camera_name, image_type, radius_cm, vehicle_name = '', external = False):
+        """
+        Set detection radius for all cameras
+
+        Args:
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            image_type (ImageType): Type of image required
+            radius_cm (int): Radius in [cm]
+            vehicle_name (str, optional): Vehicle which the camera is associated with
+            external (bool, optional): Whether the camera is an External Camera
+        """
+        self.client.call('simSetDetectionFilterRadius', camera_name, image_type, radius_cm, vehicle_name, external)
+
+    def simClearDetectionMeshNames(self, camera_name, image_type, vehicle_name = '', external = False):
+        """
+        Clear all mesh names from detection filter
+
+        Args:
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            image_type (ImageType): Type of image required
+            vehicle_name (str, optional): Vehicle which the camera is associated with
+            external (bool, optional): Whether the camera is an External Camera
+
+        """
+        self.client.call('simClearDetectionMeshNames', camera_name, image_type, vehicle_name, external)
+
+    def simGetDetections(self, camera_name, image_type, vehicle_name = '', external = False):
+        """
+        Get current detections
+
+        Args:
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            image_type (ImageType): Type of image required
+            vehicle_name (str, optional): Vehicle which the camera is associated with
+            external (bool, optional): Whether the camera is an External Camera
+
+        Returns:
+            DetectionInfo array
+        """
+        responses_raw = self.client.call('simGetDetections', camera_name, image_type, vehicle_name, external)
+        return [DetectionInfo.from_msgpack(response_raw) for response_raw in responses_raw]
+
     def simLoadLevel(self, level_name):
         """
         Loads a level specified by its name

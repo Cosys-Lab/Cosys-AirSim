@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import setup_path
-import airsimpy
+import airsim
 import rospy
 import time
 import math

@@ -7,7 +7,7 @@
     "SimpleFlight": {
       "VehicleType": "SimpleFlight",
       "DefaultVehicleState": "Armed",
-      "EnableCollisionPassthrogh": false,
+      "EnableCollisionPassthrough": false,
       "EnableCollisions": true,
       "AllowAPIAlways": true,
       "RC": {

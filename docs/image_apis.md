@@ -300,3 +300,6 @@ Currently, this is just a map from object ID to grey scale 0-255. So any mesh wi
 
 ### OpticalFlow and OpticalFlowVis
 These image types return information about motion perceived by the point of view of the camera. OpticalFlow returns a 2-channel image where the channels correspond to vx and vy respectively. OpticalFlowVis is similar to OpticalFlow but converts flow data to RGB for a more 'visual' output.
+
+### Object Detection
+This feature lets you generate object detection using existing cameras in AirSim, find more info [here](object_detection.md).

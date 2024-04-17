@@ -1,488 +1,418 @@
 {
-  "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
-  "SettingsVersion": 1.2,
-  "ClockSpeed": 1,
-  "SimMode": "", 
-  "SubWindows": [
-    {
-      "WindowID": 0,
-      "CameraName": "front_center",
-      "ImageType": 5, 
-      "Visible": false
-    },
-    {
-      "WindowID": 1,
-      "CameraName": "front_center",
-      "ImageType": 0,
-      "Visible": false
-    },
-    {
-      "WindowID": 2,
-      "CameraName": "front_center",
-      "ImageType": 3,
-      "Visible": false
-    }
-  ],
-  "CameraDefaults": {
-    "CaptureSettings": [
-      {
-        "CaptureSettingsImageType": 0,
-        "CaptureSettingsWidth": 960,
-        "CaptureSettingsHeight": 540,
-        "CaptureSettingsFOV_Degrees": 90,
-        "CaptureSettingsAutoExposureSpeed": 100,
-        "CaptureSettingsAutoExposureBias": 0,
-        "CaptureSettingsAutoExposureMaxBrightness": 0.64,
-        "CaptureSettingsAutoExposureMinBrightness": 0.03,
-        "CaptureSettingsMotionBlurAmount": 0,
-        "CaptureSettingsTargetGamma": 1,
-        "CaptureSettingsProjectionMode": "",
-        "CaptureSettingsOrthoWidth": 5.12
-      }
-    ],
-    "NoiseSettings": [
-      {
-        "Enabled": true,
-        "ImageType": 0,
-        "RandContrib": 1,
-        "RandSpeed": 100000.0,
-        "RandSize": 500.0,
-        "RandDensity": 2,
-        "HorzWaveContrib": 0.03,
-        "HorzWaveStrength": 0.08,
-        "HorzWaveVertSize": 1.0,
-        "HorzWaveScreenSize": 1.0,
-        "HorzNoiseLinesContrib": 1.0,
-        "HorzNoiseLinesDensityY": 0.01,
-        "HorzNoiseLinesDensityXY": 0.5,
-        "HorzDistortionContrib": 1.0,
-        "HorzDistortionStrength": 0.002
-      }
-    ]
-  },
-  "Vehicles": {
-    "vehicle1": {
-      "VehicleType": "PhysXCar",
-      "X": -8,
-      "Y": 0,
-      "Z": 0,
-      "AutoCreate": true,
-      "Cameras": {
-        "frontcamera": {
-          "CameraName": "front_center",
-          "X": 2,
-          "Y": 0,
-          "Z": -1,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-          "DrawSensor": false,
-          "External": false,
-          "ExternalLocal": false,
-          "CaptureSettings": [
-            {
-              "ImageType": 0,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90
-            },
-            {
-              "ImageType": 1,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90
-            },
-            {
-              "ImageType": 5,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            }
-          ]
-        },
-        "backcamera": {
-          "CameraName": "back_center",
-          "X": -2,
-          "Y": 0,
-          "Z": -2.55,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 3.14,
-          "DrawSensor": false,
-          "External": false,
-          "ExternalLocal": false,
-          "CaptureSettings": [
-            {
-              "ImageType": 0,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90
-            },
-            {
-              "ImageType": 1,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90
-            },
-            {
-              "ImageType": 5,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            }
-          ]
-        }
-      },
-      "Sensors": {
-        "barometer": {
-          "Enabled": false,
-          "SensorType": 1
-        },
-        "imu": {
-          "Enabled": true,
-          "SensorType": 2
-        },
-        "gps": {
-          "Enabled": true,
-          "SensorType": 3
-        },
-        "magnetometer": {
-          "Enabled": false,
-          "SensorType": 4
-        },
-        "distance": {
-          "Enabled": false,
-          "SensorType": 5
-        },
-		"lidar": {
-          "SensorType": 6,
-          "Enabled": true,
-          "External": false,
-          "ExternalLocal": false,
-          "NumberOfChannels": 32,
-          "Range": 120,
-          "RotationsPerSecond": 10,
-          "MeasurementsPerCycle": 1024,
-          "X": 0,
-          "Y": 0,
-          "Z": -0.55,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-          "VerticalFOVUpper": 26.8,
-          "VerticalFOVLower": -24.8,
-          "HorizontalFOVStart": 0,
-          "HorizontalFOVEnd": 360,
-          "DrawDebugPoints": false,
-          "IgnoreMarked": true,
-          "GroundTruth": true,
-          "GenerateNoise": true,
-          "DrawSensor": false
-        },
-        "echo": {
-          "SensorType": 7,
-          "Enabled": true,
-          "External": false,
-          "ExternalLocal": false,
-          "X": 0,
-          "Y": 0,
-          "Z": -0.55,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-		  "MeasurementFrequency": 5,
-		  "NumberOfTraces": 1000,
-		  "SensorDiameter": 0.5,
-		  "SensorLowerAzimuthLimit": -90,
-		  "SensorUpperAzimuthLimit": 90,
-		  "SensorLowerElevationLimit": -90,
-		  "SensorUpperElevationLimit": 90,
-		  "AttenuationPerDistance": 0,
-		  "AttenuationPerReflection": 0,
-		  "AttenuationLimit": -100,
-		  "DistanceLimit": 10,
-		  "ReflectionLimit": 3,
-		  "ReflectionDistanceLimit": 0.4,
-		  "ReflectionOpeningAngle": 10,
-		  "DrawInitialPoints": false,
-		  "DrawBounceLines": false,
-		  "DrawReflectedPoints": false,
-		  "DrawReflectedLines": false,
-		  "DrawReflectedPaths": false,
-		  "DrawExternalPoints": false,
-		  "DrawPassiveSources": false,
-		  "DrawPassiveLines": false,
-		  "DrawSensor": false,
-		  "SenseActive": true,
-		  "SensePassive": true,
-		  "PassiveRadius" : 10
-        },
-		"gpulidar": {
-          "SensorType": 8,
-          "Enabled": true,
-          "External": false,
-          "ExternalLocal": false,
-		  "GenerateIntensity": true,
-          "NumberOfChannels": 64,
-          "Range": 120,
-          "RotationsPerSecond": 10,
-          "MeasurementsPerCycle": 1024,
-          "X": 0,
-          "Y": 0,
-          "Z": -0.55,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-          "VerticalFOVUpper": 26.8,
-          "VerticalFOVLower": -24.8,
-          "HorizontalFOVStart": 0,
-          "HorizontalFOVEnd": 360,
-          "DrawDebugPoints": false,
-          "Resolution": 512,
-		  "DrawMode": 1,
-		  "rainMaxIntensity": 1,
-          "IgnoreMarked": true,
-          "GroundTruth": true,
-          "GenerateNoise": true,
-          "DrawSensor": false
-        },
-        "MarLocUwb_1": {
-          "Enabled": true,
-          "Resolution": 512,
-          "Id": 1,
-          "SensorType": 10,
-          "X": 0.4275,
-          "Y": -0.24,
-          "Z": -0.707,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-          "NumberOfTraces": 5000,
-          "SensorOpeningAngle": 180,
-          "DataFrame": "SensorLocalFrame",
-          "MeasurementFrequency": 10,
-          "PauseAfterMeasurement": false,
-          "DrawSensor": false
-        },
-        "wifi": {
-          "Enabled": true,
-          "Id": 1,
-          "SensorType": 11,
-          "X": 0,
-          "Y": 0,
-          "Z": 0,
-          "Roll": 90,
-          "Pitch": 0,
-          "Yaw": 0,
-          "NumberOfTraces": 5000,
-          "SensorOpeningAngle": 180,
-          "DataFrame": "SensorLocalFrame",
-          "MeasurementFrequency": 10,
-          "PauseAfterMeasurement": false,
-          "DrawSensor": false
-        }
-      }
-    },
-    "drone": {
-      "VehicleType": "SimpleFlight",
-      "X": -5,
-      "Y": 7,
-      "Z": 0,
-      "Roll": 0,
-      "Pitch": 0,
-      "Yaw": 180,
-      "AutoCreate": true,
-      "Cameras": {
-        "leftcamera": {
-          "CameraName": "front_left",
-          "X": 0.491,
-          "Y": -0.112,
-          "Z": -0.678,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-          "DrawSensor": false,
-          "External": false,
-          "ExternalLocal": true,
-          "CaptureSettings": [
-            {
-              "ImageType": 0,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            },
-            {
-              "ImageType": 1,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            },
-            {
-              "ImageType": 5,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            }
-          ]
-        },
-        "rightcamera": {
-          "CameraName": "front_right",
-          "X": 0.491,
-          "Y": 0.058,
-          "Z": -0.678,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-          "DrawSensor": false,
-          "External": false,
-          "ExternalLocal": false,
-          "CaptureSettings": [
-            {
-              "ImageType": 0,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            },
-            {
-              "ImageType": 1,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            },
-            {
-              "ImageType": 5,
-              "Width": 960,
-              "Height": 540,
-              "FOV_Degrees": 90,
-              "TargetGamma": 1
-            }
-          ]
-        }
-      },
-      "Sensors": {
-        "barometer": {
-          "Enabled": false,
-          "SensorType": 1
-        },
-        "imu": {
-          "Enabled": false,
-          "SensorType": 2
-        },
-        "gps": {
-          "Enabled": true,
-          "SensorType": 3
-        },
-        "magnetometer": {
-          "Enabled": false,
-          "SensorType": 4
-        },
-        "distance": {
-          "Enabled": false,
-          "SensorType": 5
-        },
-        "MarLocUwb_1": {
-          "Enabled": false,
-          "Id": 1,
-          "SensorType": 10,
-          "X": 0.4275,
-          "Y": -0.24,
-          "Z": -0.707,
-          "Roll": 0,
-          "Pitch": 0,
-          "Yaw": 0,
-          "NumberOfTraces": 5000,
-          "SensorOpeningAngle": 180,
-          "Resolution": 512,
-          "DataFrame": "SensorLocalFrame",
-          "MeasurementFrequency": 10,
-          "PauseAfterMeasurement": false,
-          "DrawSensor": false
-        },
-        "wifi": {
-          "Enabled": false,
-          "Id": 1,
-          "SensorType": 11,
-          "X": 0,
-          "Y": 0,
-          "Z": 0,
-          "Roll": 90,
-          "Pitch": 0,
-          "Yaw": 0,
-          "NumberOfTraces": 5000,
-          "SensorOpeningAngle": 180,
-          "DataFrame": "SensorLocalFrame",
-          "MeasurementFrequency": 10,
-          "PauseAfterMeasurement": false,
-          "DrawSensor": false
-        }
-      }
-    }
-  },
-  "PassiveEchoBeacons": {
-	  "PassiveEchoBeaconTest": {
-		  "X": 28.5079,
-          "Y": -104.33,
-          "Z": -0.0509,
-          "Roll": -40,
-          "Pitch": 50,
-          "Yaw": -50,
-		  "Enable" : true,
-		  "InitialDirections": 1000,
-		  "SensorLowerAzimuthLimit": -90,
-		  "SensorUpperAzimuthLimit": 90,
-		  "SensorLowerElevationLimit": -90,
-		  "SensorUpperElevationLimit": 90,
-		  "AttenuationPerDistance": 0,
-		  "AttenuationPerReflection": 0,
-		  "AttenuationLimit": -100,
-		  "DistanceLimit": 3,
-		  "ReflectionLimit": 3,
-		  "ReflectionOnlyFinal": false,
-		  "DrawDebugAllPoints": false,
-		  "DrawDebugAllLines": false,
-		  "DrawDebugLocation": false
-        }
-  },
-    "Beacons": {
-      "testBeacon_1": {
-        "BeaconType": "fiducialmarker",
-        "BeaconPawnName": "1",
-        "X": 0,
-        "Y": -0.5,
-        "Z": -0.1,
-        "Roll": -180,
-        "Pitch": 0,
-        "Yaw": 0,
-        "Scale": 0.1
-      },
-      "testBeacon_2": {
-        "BeaconType": "WifiBeacon",
-        "BeaconPawnName": "1",
+    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SettingsVersion": 2,
+    "ClockSpeed": 1,
+    "LocalHostIp": "127.0.0.1",
+    "ApiServerPort": 41451,
+    "RecordUIVisible": true,
+    "LogMessagesVisible": true,
+    "ShowLosDebugLines": false,
+    "ViewMode": "",
+    "RpcEnabled": true,
+    "EngineSound": false,
+    "PhysicsEngineName": "",
+    "SpeedUnitFactor": 1,
+    "SpeedUnitLabel": "m/s",
+    "SimMode": "",
+    "Wind": {
         "X": 0,
         "Y": 0,
-        "Z": 0,
-        "Roll": 0,
-        "Pitch": 0,
-        "Yaw": 180,
-        "Scale": 1
-      },
-      "testBeacon_3": {
-        "BeaconType": "UwbBeacon",
-        "BeaconPawnName": "1",
-        "X": 0,
-        "Y": 0.5,
-        "Z": 0,
-        "Roll": 0,
-        "Pitch": 0,
-        "Yaw": 180,
-        "Scale": 0.15
-      }     
+        "Z": 0
+    },
+    "CameraDirector": {
+        "FollowDistance": -3,
+        "X": NaN,
+        "Y": NaN,
+        "Z": NaN,
+        "Pitch": NaN,
+        "Roll": NaN,
+        "Yaw": NaN
+    },
+    "Recording": {
+        "RecordOnMove": false,
+        "RecordInterval": 0.05,
+        "Folder": "",
+        "Enabled": false,
+        "Cameras": [
+            {
+                "CameraName": "0",
+                "ImageType": 0,
+                "PixelsAsFloat": false,
+                "VehicleName": "",
+                "Compress": true
+            }
+        ]
+    },
+    "OriginGeopoint": {
+        "Latitude": 47.641468,
+        "Longitude": -122.140165,
+        "Altitude": 122
+    },
+    "TimeOfDay": {
+        "Enabled": false,
+        "StartDateTime": "",
+        "CelestialClockSpeed": 1,
+        "StartDateTimeDst": false,
+        "UpdateIntervalSecs": 60
+    },
+    "SubWindows": [
+        {
+            "WindowID": 0,
+            "CameraName": "0",
+            "ImageType": 3,
+            "VehicleName": "",
+            "Visible": false
+        },
+        {
+            "WindowID": 1,
+            "CameraName": "0",
+            "ImageType": 5,
+            "VehicleName": "",
+            "Visible": false
+        },
+        {
+            "WindowID": 2,
+            "CameraName": "0",
+            "ImageType": 0,
+            "VehicleName": "",
+            "Visible": false
+        }
+    ],
+    "CameraDefaults": {
+        "CaptureSettings": [
+            {
+                "ImageType": 0,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "AutoExposureSpeed": 100,
+                "AutoExposureBias": 0,
+                "AutoExposureMaxBrightness": 0.64,
+                "AutoExposureMinBrightness": 0.03,
+                "MotionBlurAmount": 1,
+                "MotionBlurMax": 10,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "ChromaticAberrationScale": 2,
+                "IgnoreMarked": false
+            }
+        ],
+        "NoiseSettings": [
+            {
+                "Enabled": true,
+                "ImageType": 0,
+                "RandContrib": 0.2,
+                "RandSpeed": 100000,
+                "RandSize": 500,
+                "RandDensity": 2,
+                "HorzWaveContrib": 0.03,
+                "HorzWaveStrength": 0.08,
+                "HorzWaveVertSize": 1,
+                "HorzWaveScreenSize": 1,
+                "HorzNoiseLinesContrib": 1,
+                "HorzNoiseLinesDensityY": 0.01,
+                "HorzNoiseLinesDensityXY": 0.5,
+                "HorzDistortionContrib": 1,
+                "HorzDistortionStrength": 0.002,
+                "LensDistortionEnable": true,
+                "LensDistortionAreaFalloff": 2,
+                "LensDistortionAreaRadius": 1,
+                "LensDistortionInvert": false
+            }
+        ]
+    },
+    "Vehicles": {
+        "robot1": {
+            "VehicleType": "CPHusky",
+            "DefaultVehicleState": "",
+            "AutoCreate": true,
+            "PawnPath": "",
+            "EnableCollisionPassthrough": false,
+            "EnableCollisions": true,
+            "RC": {
+                "RemoteControlID": 0
+            },
+            "X": 8,
+            "Y": 0,
+            "Z": 0,
+            "Pitch": 0,
+            "Roll": 0,
+            "Yaw": 0,
+            "Cameras": {
+                "frontcamera": {
+                    "CameraName": "front_center",
+                    "X": 2,
+                    "Y": 0,
+                    "Z": -1,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "DrawSensor": false,
+                    "External": false,
+                    "ExternalLocal": false
+                },
+                "backcamera": {
+                    "CameraName": "back_center",
+                    "X": -2,
+                    "Y": 0,
+                    "Z": -2.55,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 3.14,
+                    "DrawSensor": false,
+                    "External": false,
+                    "ExternalLocal": false
+                }
+            },
+            "Sensors": {
+                "barometer": {
+                    "Enabled": false,
+                    "SensorType": 1
+                },
+                "imu": {
+                    "Enabled": true,
+                    "SensorType": 2
+                },
+                "gps": {
+                    "Enabled": true,
+                    "SensorType": 3
+                },
+                "magnetometer": {
+                    "Enabled": false,
+                    "SensorType": 4
+                },
+                "distance": {
+                    "Enabled": false,
+                    "SensorType": 5
+                },
+                "lidar": {
+                    "SensorType": 6,
+                    "Enabled": true,
+                    "External": false,
+                    "ExternalLocal": false,
+                    "NumberOfChannels": 32,
+                    "Range": 120,
+                    "RotationsPerSecond": 10,
+                    "MeasurementsPerCycle": 1024,
+                    "X": 0,
+                    "Y": 0,
+                    "Z": -0.55,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "VerticalFOVUpper": 26.8,
+                    "VerticalFOVLower": -24.8,
+                    "HorizontalFOVStart": 0,
+                    "HorizontalFOVEnd": 360,
+                    "DrawDebugPoints": false,
+                    "IgnoreMarked": true,
+                    "GroundTruth": true,
+                    "GenerateNoise": true,
+                    "DrawSensor": false
+                },
+                "echo": {
+                    "SensorType": 7,
+                    "Enabled": true,
+                    "External": false,
+                    "ExternalLocal": false,
+                    "X": 0,
+                    "Y": 0,
+                    "Z": -0.55,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "MeasurementFrequency": 5,
+                    "NumberOfTraces": 1000,
+                    "SensorDiameter": 0.5,
+                    "SensorLowerAzimuthLimit": -90,
+                    "SensorUpperAzimuthLimit": 90,
+                    "SensorLowerElevationLimit": -90,
+                    "SensorUpperElevationLimit": 90,
+                    "AttenuationPerDistance": 0,
+                    "AttenuationPerReflection": 0,
+                    "AttenuationLimit": -100,
+                    "DistanceLimit": 10,
+                    "ReflectionLimit": 3,
+                    "ReflectionDistanceLimit": 0.4,
+                    "ReflectionOpeningAngle": 10,
+                    "DrawInitialPoints": false,
+                    "DrawBounceLines": false,
+                    "DrawReflectedPoints": false,
+                    "DrawReflectedLines": false,
+                    "DrawReflectedPaths": false,
+                    "DrawExternalPoints": false,
+                    "DrawPassiveSources": false,
+                    "DrawPassiveLines": false,
+                    "DrawSensor": false,
+                    "SenseActive": true,
+                    "SensePassive": true,
+                    "PassiveRadius": 10
+                },
+                "MarLocUwb_1": {
+                    "Enabled": true,
+                    "Resolution": 512,
+                    "Id": 1,
+                    "SensorType": 10,
+                    "X": 0.4275,
+                    "Y": -0.24,
+                    "Z": -0.707,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "NumberOfTraces": 5000,
+                    "SensorOpeningAngle": 180,
+                    "DataFrame": "SensorLocalFrame",
+                    "MeasurementFrequency": 10,
+                    "PauseAfterMeasurement": false,
+                    "DrawSensor": false
+                },
+                "wifi": {
+                    "Enabled": true,
+                    "Id": 1,
+                    "SensorType": 11,
+                    "X": 0,
+                    "Y": 0,
+                    "Z": 0,
+                    "Roll": 90,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "NumberOfTraces": 5000,
+                    "SensorOpeningAngle": 180,
+                    "DataFrame": "SensorLocalFrame",
+                    "MeasurementFrequency": 10,
+                    "PauseAfterMeasurement": false,
+                    "DrawSensor": false
+                }
+            }
+        },
+        "drone1": {
+            "VehicleType": "SimpleFlight",
+            "X": -5,
+            "Y": 7,
+            "Z": 0,
+            "Roll": 0,
+            "Pitch": 0,
+            "Yaw": 180,
+            "DefaultVehicleState": "Armed",
+            "AutoCreate": true,
+            "PawnPath": "",
+            "EnableCollisionPassthrough": false,
+            "EnableCollisions": true,
+            "AllowAPIAlways": true,
+            "EnableTrace": false,
+            "RC": {
+                "RemoteControlID": -1,
+                "AllowAPIWhenDisconnected": false
+            },
+            "Cameras": {
+                "leftcamera": {
+                    "CameraName": "front_left",
+                    "X": 0.491,
+                    "Y": -0.112,
+                    "Z": -0.678,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "DrawSensor": false,
+                    "External": false,
+                    "ExternalLocal": true
+                },
+                "rightcamera": {
+                    "CameraName": "front_right",
+                    "X": 0.491,
+                    "Y": 0.058,
+                    "Z": -0.678,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "DrawSensor": false,
+                    "External": false,
+                    "ExternalLocal": false
+                }
+            },
+            "Sensors": {
+                "barometer": {
+                    "Enabled": false,
+                    "SensorType": 1
+                },
+                "imu": {
+                    "Enabled": false,
+                    "SensorType": 2
+                },
+                "gps": {
+                    "Enabled": true,
+                    "SensorType": 3
+                },
+                "magnetometer": {
+                    "Enabled": false,
+                    "SensorType": 4
+                },
+                "distance": {
+                    "Enabled": false,
+                    "SensorType": 5
+                }
+            }
+        }
+    },
+    "PassiveEchoBeacons": {
+        "PassiveEchoBeaconTest": {
+            "X": 28.5079,
+            "Y": -104.33,
+            "Z": -0.0509,
+            "Roll": -40,
+            "Pitch": 50,
+            "Yaw": -50,
+            "Enable": true,
+            "InitialDirections": 1000,
+            "SensorLowerAzimuthLimit": -90,
+            "SensorUpperAzimuthLimit": 90,
+            "SensorLowerElevationLimit": -90,
+            "SensorUpperElevationLimit": 90,
+            "AttenuationPerDistance": 0,
+            "AttenuationPerReflection": 0,
+            "AttenuationLimit": -100,
+            "DistanceLimit": 3,
+            "ReflectionLimit": 3,
+            "ReflectionOnlyFinal": false,
+            "DrawDebugAllPoints": false,
+            "DrawDebugAllLines": false,
+            "DrawDebugLocation": false
+        }
+    },
+    "Beacons": {
+        "testBeacon_1": {
+            "BeaconType": "fiducialmarker",
+            "BeaconPawnName": "1",
+            "X": 0,
+            "Y": -0.5,
+            "Z": -0.1,
+            "Roll": -180,
+            "Pitch": 0,
+            "Yaw": 0,
+            "Scale": 0.1
+        },
+        "testBeacon_2": {
+            "BeaconType": "WifiBeacon",
+            "BeaconPawnName": "1",
+            "X": 0,
+            "Y": 0,
+            "Z": 0,
+            "Roll": 0,
+            "Pitch": 0,
+            "Yaw": 180,
+            "Scale": 1
+        },
+        "testBeacon_3": {
+            "BeaconType": "UwbBeacon",
+            "BeaconPawnName": "1",
+            "X": 0,
+            "Y": 0.5,
+            "Z": 0,
+            "Roll": 0,
+            "Pitch": 0,
+            "Yaw": 180,
+            "Scale": 0.15
+        }
     }
 }
