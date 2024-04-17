@@ -1,9 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import re
 import sys
-import pdb
-
 
 def read_pfm(file):
     """ Read a pfm file """

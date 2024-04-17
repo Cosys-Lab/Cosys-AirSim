@@ -18,9 +18,10 @@ if __name__ == '__main__':
     client = airsim.CarClient()
     client.confirmConnection()
 
+
     # Get an image from the main segmentation camera, show and save it as png
     print("Getting segmentation image from main camera...")
-    responses = client.simGetImages([airsim.ImageRequest( "leftcamera", airsim.ImageType.Segmentation, False, False)])
+    responses = client.simGetImages([airsim.ImageRequest( "frontcamera", airsim.ImageType.Segmentation, False, False)])
     img_rgb_string = responses[0].image_data_uint8
     rgbarray = np.frombuffer(img_rgb_string, np.uint8)
     rgbarray_shaped = rgbarray.reshape((540,960,3))
@@ -31,7 +32,7 @@ if __name__ == '__main__':
 
     # Get an image from the main segmentation camera, show and save it as png
     print("Getting rgb image from main camera...")
-    responses = client.simGetImages([airsim.ImageRequest( "leftcamera", airsim.ImageType.Scene, False, False)])
+    responses = client.simGetImages([airsim.ImageRequest( "frontcamera", airsim.ImageType.Scene, False, False)])
     img_rgb_string = responses[0].image_data_uint8
     rgbarray = np.frombuffer(img_rgb_string, np.uint8)
     rgbarray_shaped = rgbarray.reshape((540,960,3))
@@ -42,7 +43,7 @@ if __name__ == '__main__':
 
     # Get an image from the main segmentation camera, show and save it as png
     print("Getting depth image from main camera...")
-    responses = client.simGetImages([airsim.ImageRequest( "leftcamera", airsim.ImageType.DepthPlanner, True, False)])
+    responses = client.simGetImages([airsim.ImageRequest( "frontcamera", airsim.ImageType.DepthPlanar, True, False)])
     img_depth_float = responses[0].image_data_float
     img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
     rgbarray_shaped = img_depth_float32.reshape((540,960)).astype(np.float32)
@@ -51,10 +52,8 @@ if __name__ == '__main__':
     img.save("depth_sample.tif")
     print("Shown and saved depth image from main camera\n")
 
-
-
     print("Getting GPU LiDAR data...")
-    lidar_data = client.getGPULidarData('lidar1', 'airsimvehicle')
+    lidar_data = client.getGPULidarData('gpulidar1', 'robot1')
     points = np.array(lidar_data.point_cloud, dtype=np.dtype('f4'))
     points = np.reshape(points, (int(points.shape[0] / 5), 5))
 

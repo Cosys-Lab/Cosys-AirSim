@@ -1,6 +1,6 @@
 from __future__ import print_function
-import msgpackrpc #install as admin: pip install msgpack-rpc-python
-import numpy as np #pip install numpy
+import numpy as np
+import math
 
 class MsgpackMixin:
     def __repr__(self):
@@ -52,8 +52,8 @@ class _ImageType(type):
         return 9
 
     def __getattr__(self, key):
-        if key == 'DepthPlanner':
-            print('\033[31m'+"DepthPlanner has been (correctly) renamed to DepthPlanar. Please use ImageType.DepthPlanar instead."+'\033[0m')
+        if key == 'DepthPlanar':
+            print('\033[31m'+"DepthPlanar has been (correctly) renamed to DepthPlanar. Please use ImageType.DepthPlanar instead."+'\033[0m')
             raise AttributeError
 
 class ImageType(metaclass=_ImageType):

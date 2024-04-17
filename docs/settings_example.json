@@ -13,7 +13,7 @@
     "PhysicsEngineName": "",
     "SpeedUnitFactor": 1,
     "SpeedUnitLabel": "m/s",
-    "SimMode": "",
+    "SimMode": "SkidVehicle",
     "Wind": {
         "X": 0,
         "Y": 0,
@@ -90,6 +90,96 @@
                 "OrthoWidth": 5.12,
                 "ChromaticAberrationScale": 2,
                 "IgnoreMarked": false
+            },
+            {
+                "ImageType": 1,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 2,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 3,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 4,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 5,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 6,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 7,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 8,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 9,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
             }
         ],
         "NoiseSettings": [
@@ -106,13 +196,7 @@
                 "HorzWaveScreenSize": 1,
                 "HorzNoiseLinesContrib": 1,
                 "HorzNoiseLinesDensityY": 0.01,
-                "HorzNoiseLinesDensityXY": 0.5,
-                "HorzDistortionContrib": 1,
-                "HorzDistortionStrength": 0.002,
-                "LensDistortionEnable": true,
-                "LensDistortionAreaFalloff": 2,
-                "LensDistortionAreaRadius": 1,
-                "LensDistortionInvert": false
+                "HorzNoiseLinesDensityXY": 0.5
             }
         ]
     },
@@ -182,7 +266,7 @@
                 },
                 "gpulidar1": {
 					"SensorType": 8,
-					"Enabled" : false,
+					"Enabled" : true,
 					"External": false,
 					"NumberOfChannels": 32,
 					"Range": 50,
@@ -209,7 +293,7 @@
 				},
                 "lidar": {
                     "SensorType": 6,
-                    "Enabled": true,
+                    "Enabled": false,
                     "External": false,
                     "ExternalLocal": false,
                     "NumberOfChannels": 32,
@@ -271,7 +355,7 @@
                     "PassiveRadius": 10
                 },
                 "MarLocUwb_1": {
-                    "Enabled": true,
+                    "Enabled": false,
                     "Resolution": 512,
                     "Id": 1,
                     "SensorType": 10,
@@ -289,7 +373,7 @@
                     "DrawSensor": false
                 },
                 "wifi": {
-                    "Enabled": true,
+                    "Enabled": false,
                     "Id": 1,
                     "SensorType": 11,
                     "X": 0,
@@ -304,74 +388,6 @@
                     "MeasurementFrequency": 10,
                     "PauseAfterMeasurement": false,
                     "DrawSensor": false
-                }
-            }
-        },
-        "drone1": {
-            "VehicleType": "SimpleFlight",
-            "X": -5,
-            "Y": 0,
-            "Z": 0,
-            "Roll": 0,
-            "Pitch": 0,
-            "Yaw": 0,
-            "DefaultVehicleState": "Armed",
-            "AutoCreate": true,
-            "PawnPath": "",
-            "EnableCollisionPassthrough": false,
-            "EnableCollisions": true,
-            "AllowAPIAlways": true,
-            "EnableTrace": false,
-            "RC": {
-                "RemoteControlID": -1,
-                "AllowAPIWhenDisconnected": false
-            },
-            "Cameras": {
-                "leftcamera": {
-                    "CameraName": "front_left",
-                    "X": 0.491,
-                    "Y": -0.112,
-                    "Z": -0.678,
-                    "Roll": 0,
-                    "Pitch": 0,
-                    "Yaw": 0,
-                    "DrawSensor": false,
-                    "External": false,
-                    "ExternalLocal": true
-                },
-                "rightcamera": {
-                    "CameraName": "front_right",
-                    "X": 0.491,
-                    "Y": 0.058,
-                    "Z": -0.678,
-                    "Roll": 0,
-                    "Pitch": 0,
-                    "Yaw": 0,
-                    "DrawSensor": false,
-                    "External": false,
-                    "ExternalLocal": false
-                }
-            },
-            "Sensors": {
-                "barometer": {
-                    "Enabled": false,
-                    "SensorType": 1
-                },
-                "imu": {
-                    "Enabled": false,
-                    "SensorType": 2
-                },
-                "gps": {
-                    "Enabled": true,
-                    "SensorType": 3
-                },
-                "magnetometer": {
-                    "Enabled": false,
-                    "SensorType": 4
-                },
-                "distance": {
-                    "Enabled": false,
-                    "SensorType": 5
                 }
             }
         }

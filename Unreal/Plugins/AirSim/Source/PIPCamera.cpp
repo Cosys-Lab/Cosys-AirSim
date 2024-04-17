@@ -439,6 +439,10 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
         this->SetActorTickEnabled(true);
     }
 
+    if (sensor_params_.external) {
+        this->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+    }
+
 	static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
 	TArray<AActor*> ignoreActors;
 	for (TActorIterator<AActor> ActorIterator(this->GetWorld()); ActorIterator; ++ActorIterator)

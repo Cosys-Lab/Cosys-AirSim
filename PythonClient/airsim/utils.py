@@ -1,10 +1,6 @@
-import numpy as np
-import math
-import time
 import sys
 import os
 import inspect
-import types
 import re
 import logging
 
@@ -244,8 +240,8 @@ def get_camera_type(cameraType):
         cameraTypeClass = ImageType.Segmentation
     elif cameraType == "DepthPerspective":
         cameraTypeClass = ImageType.DepthPerspective
-    elif cameraType == "DepthPlanner":
-        cameraTypeClass = ImageType.DepthPlanner
+    elif cameraType == "DepthPlanar":
+        cameraTypeClass = ImageType.DepthPlanar
     elif cameraType == "DepthVis":
         cameraTypeClass = ImageType.DepthVis
     elif cameraType == "Infrared":
@@ -254,6 +250,10 @@ def get_camera_type(cameraType):
         cameraTypeClass = ImageType.SurfaceNormals
     elif cameraType == "DisparityNormalized":
         cameraTypeClass = ImageType.DisparityNormalized
+    elif cameraType == "OpticalFlow":
+        cameraTypeClass = ImageType.OpticalFlow
+    elif cameraType == "OpticalFlowVis":
+        cameraTypeClass = ImageType.OpticalFlowVis
     else:
         cameraTypeClass = ImageType.Scene
     return cameraTypeClass
@@ -266,7 +266,7 @@ def is_pixels_as_float(cameraType):
         return False
     elif cameraType == "DepthPerspective":
         return True
-    elif cameraType == "DepthPlanner":
+    elif cameraType == "DepthPlanar":
         return True
     elif cameraType == "DepthVis":
         return True
@@ -276,6 +276,10 @@ def is_pixels_as_float(cameraType):
         return False
     elif cameraType == "DisparityNormalized":
         return True
+    elif cameraType == "OpticalFlow":
+        return False
+    elif cameraType == "OpticalFlowVis":
+        return False
     else:
         return False
 
@@ -289,7 +293,7 @@ def get_image_bytes(data, cameraType):
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
-    elif cameraType == "DepthPlanner":
+    elif cameraType == "DepthPlanar":
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
@@ -305,6 +309,11 @@ def get_image_bytes(data, cameraType):
         img_depth_float = data.image_data_float
         img_depth_float32 = np.asarray(img_depth_float, dtype=np.float32)
         img_rgb_string = img_depth_float32.tobytes()
+    elif cameraType == "OpticalFlow":
+        img_rgb_string = data.image_data_uint8
+    elif cameraType == "OpticalFlowVis":
+        img_rgb_string = data.image_data_uint8
+
     else:
         img_rgb_string = data.image_data_uint8
     return img_rgb_string

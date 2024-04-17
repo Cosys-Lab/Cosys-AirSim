@@ -166,7 +166,7 @@ cameraSensorName = "leftcamera";
 cameraSensorName = "leftcamera";
 [rgbImage, rgbCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.Scene);
 [segmentationImage, segmentationCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.Segmentation);
-[depthImage, depthCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.DepthPlanner);
+[depthImage, depthCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.DepthPlanar);
 figure;
 subplot(3, 1, 1);
 imshow(rgbImage)
@@ -184,7 +184,7 @@ drawnow
 % and taken in the same frame
 
 cameraSensorName = "leftcamera";
-[images, cameraIimestamp] = airSimClient.getCameraImages(cameraSensorName, [AirSimCameraTypes.Scene, AirSimCameraTypes.Segmentation, AirSimCameraTypes.DepthPlanner]);
+[images, cameraIimestamp] = airSimClient.getCameraImages(cameraSensorName, [AirSimCameraTypes.Scene, AirSimCameraTypes.Segmentation, AirSimCameraTypes.DepthPlanar]);
 figure;
 subplot(3, 1, 1);
 imshow(images{1})

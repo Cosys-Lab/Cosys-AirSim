@@ -170,7 +170,7 @@ def get_camera_info_ros_message(cur_fov, cur_frame, cur_timestamp, cur_width, cu
 
 
 def get_depth_camera_ros_message(cur_camera_msg, cur_response):
-    rgb_string = airsimpy.get_image_bytes(cur_response, "DepthPlanner")
+    rgb_string = airsimpy.get_image_bytes(cur_response, "DepthPlanar")
     cur_camera_msg.encoding = "32FC1"
     cur_camera_msg.step = cur_response.width * 4
     cur_camera_msg.data = rgb_string
@@ -777,8 +777,8 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
             response_locations[cur_sensor_name + '_segmentation'] = response_index
             response_index += 1
         if sensor_camera_toggle_depth[cur_sensor_index] == 1:
-            requests.append(airsimpy.ImageRequest(cur_sensor_name, airsimpy.get_camera_type("DepthPlanner"),
-                                                  airsimpy.is_pixels_as_float("DepthPlanner"), False))
+            requests.append(airsimpy.ImageRequest(cur_sensor_name, airsimpy.get_camera_type("DepthPlanar"),
+                                                  airsimpy.is_pixels_as_float("DepthPlanar"), False))
             response_locations[cur_sensor_name + '_depth'] = response_index
             response_index += 1
 

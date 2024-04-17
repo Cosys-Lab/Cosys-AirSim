@@ -137,9 +137,9 @@ void PawnSimApi::createCamerasFromSettings()
         //spawn and attach camera to pawn
 
         APIPCamera* camera = params_.pawn->GetWorld()->SpawnActor<APIPCamera>(params_.pip_camera_class, camera_transform, camera_spawn_params);
-        if (!setting.external){
-            camera->AttachToComponent(bodyMesh, FAttachmentTransformRules::KeepRelativeTransform);
-        }
+        //if (!setting.external){
+        //    camera->AttachToComponent(bodyMesh, FAttachmentTransformRules::KeepRelativeTransform);
+        //}
         //add on to our collection
         cameras_.insert_or_assign(camera_setting_pair.first, camera);
     }

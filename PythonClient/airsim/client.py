@@ -1,13 +1,7 @@
 from __future__ import print_function
-
 from .utils import *
 from .types import *
-
 import msgpackrpc  # install as admin: pip install msgpack-rpc-python
-import numpy as np  # pip install numpy
-import msgpack
-import time
-import math
 import logging
 
 class VehicleClient:
