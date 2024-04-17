@@ -68,7 +68,7 @@ namespace airlib
             horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", horizontal_rotation_frequency);
             data_frame = settings_json.getString("DataFrame", data_frame);
             external_controller = settings_json.getBool("ExternalController", external_controller);
-		    update_frequency = settings_json.getFloat("NoiseDistanceScale", update_frequency);
+		    update_frequency = settings_json.getFloat("UpdateFrequency", update_frequency);
             vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", Utils::nan<float>());
             limit_points = settings_json.getBool("LimitPoints", limit_points);
 		    pause_after_measurement = settings_json.getBool("settings.pause_after_measurement", pause_after_measurement);

@@ -53,67 +53,79 @@ namespace msr {
 			{
 				std::string simmode_name = AirSimSettings::singleton().simmode_name;
 
-				number_of_channels = settings.number_of_channels;
-				range = settings.range;
-				measurement_per_cycle = settings.measurement_per_cycle;
-				horizontal_rotation_frequency = settings.horizontal_rotation_frequency;
-				resolution = settings.resolution;
-				horizontal_FOV_start = settings.horizontal_FOV_start;
-				horizontal_FOV_end = settings.horizontal_FOV_end;
-				ground_truth = settings.ground_truth;
-				update_frequency = settings.update_frequency;
-				ignore_marked = settings.ignore_marked;
-				generate_noise = settings.generate_noise;
-				min_noise_standard_deviation = settings.min_noise_standard_deviation;
-				noise_distance_scale = settings.noise_distance_scale;
-				range_max_lambertian_percentage = settings.range_max_lambertian_percentage;
-				rain_max_intensity = settings.rain_max_intensity;
-				rain_constant_a = settings.rain_constant_a;
-				rain_constant_b = settings.rain_constant_b;
-				generate_intensity = settings.generate_intensity;
-				material_list_file = settings.material_list_file;
-				draw_debug_points = settings.draw_debug_points;
-				draw_mode = settings.draw_mode;
-				draw_sensor = settings.draw_sensor;
-				external = settings.external;
-				external_ned = settings.external_ned;
 
-				vertical_FOV_upper = settings.vertical_FOV_upper;
-				if (std::isnan(vertical_FOV_upper)) {
-					if (simmode_name == "Multirotor")
-						vertical_FOV_upper = -15;
-					else
-						vertical_FOV_upper = +10;
-				}
+                const auto& settings_json = settings.settings;
 
-				vertical_FOV_lower = settings.vertical_FOV_lower;
-				if (std::isnan(vertical_FOV_lower)) {
-					if (simmode_name == "Multirotor")
-						vertical_FOV_lower = -45;
-					else
-						vertical_FOV_lower = -10;
-				}
+                number_of_channels = settings_json.getInt("NumberOfChannels", number_of_channels);
+                range = settings_json.getFloat("Range", range);
+                measurement_per_cycle = settings_json.getInt("MeasurementsPerCycle", measurement_per_cycle);
+                horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", horizontal_rotation_frequency);
+                resolution = settings_json.getInt("Resolution", resolution);
+                update_frequency = settings_json.getFloat("UpdateFrequency", update_frequency);
+                vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", Utils::nan<float>());
+                draw_debug_points = settings_json.getBool("DrawDebugPoints", draw_debug_points);
+                draw_sensor = settings_json.getBool("DrawSensor", draw_sensor);
+                external = settings_json.getBool("External", external);
+                external_ned = settings_json.getBool("ExternalLocal", external_ned);
+                generate_noise = settings_json.getBool("GenerateNoise", generate_noise);
+                min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", min_noise_standard_deviation);
+                noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", noise_distance_scale);
+                ground_truth = settings_json.getBool("GroundTruth", ground_truth);
+                ignore_marked = settings_json.getBool("IgnoreMarked", ignore_marked);
+                range_max_lambertian_percentage = settings_json.getFloat("rangeMaxLambertianPercentage", range_max_lambertian_percentage);
+				rain_max_intensity = settings_json.getFloat("rainMaxIntensity", rain_max_intensity);
+				rain_constant_a = settings_json.getFloat("rainConstantA", rain_constant_a);
+				rain_constant_b = settings_json.getFloat("rainConstantB", rain_constant_b);
+				generate_intensity = settings_json.getBool("GenerateIntensity", generate_intensity);
+				draw_mode = settings_json.getInt("DrawMode", draw_mode);
 
-				relative_pose.position = settings.position;
-				if (std::isnan(relative_pose.position.x()))
-					relative_pose.position.x() = 0;
-				if (std::isnan(relative_pose.position.y()))
-					relative_pose.position.y() = 0;
-				if (std::isnan(relative_pose.position.z())) {
-					if (simmode_name == "Multirotor")
-						relative_pose.position.z() = 0;
-					else
-						relative_pose.position.z() = -1;
-				}
+                if (FILE* file = fopen(msr::airlib::Settings::getExecutableFullPath("materials.csv").c_str(), "r")) {
+                    fclose(file);
+                    material_list_file = msr::airlib::Settings::getExecutableFullPath("materials.csv");
+                }
+                else {
+                    material_list_file = msr::airlib::Settings::Settings::getUserDirectoryFullPath("materials.csv");
+                }
 
-				float pitch, roll, yaw;
-				pitch = !std::isnan(settings.rotation.pitch) ? settings.rotation.pitch : 0;
-				roll = !std::isnan(settings.rotation.roll) ? settings.rotation.roll : 0;
-				yaw = !std::isnan(settings.rotation.yaw) ? settings.rotation.yaw : 0;
-				relative_pose.orientation = VectorMath::toQuaternion(
-					Utils::degreesToRadians(pitch),   //pitch - rotation around Y axis
-					Utils::degreesToRadians(roll),    //roll  - rotation around X axis
-					Utils::degreesToRadians(yaw));    //yaw   - rotation around Z axis
+                // By default, for multirotors the lidars FOV point downwards;
+                // for cars, the lidars FOV is more forward facing.
+                if (std::isnan(vertical_FOV_upper)) {
+                    if (simmode_name == AirSimSettings::kSimModeTypeMultirotor)
+                        vertical_FOV_upper = -15;
+                    else
+                        vertical_FOV_upper = +10;
+                }
+
+                vertical_FOV_lower = settings_json.getFloat("VerticalFOVLower", Utils::nan<float>());
+                if (std::isnan(vertical_FOV_lower)) {
+                    if (simmode_name == AirSimSettings::kSimModeTypeMultirotor)
+                        vertical_FOV_lower = -45;
+                    else
+                        vertical_FOV_lower = -10;
+                }
+
+                horizontal_FOV_start = settings_json.getFloat("HorizontalFOVStart", horizontal_FOV_start);
+                horizontal_FOV_end = settings_json.getFloat("HorizontalFOVEnd", horizontal_FOV_end);
+
+                relative_pose.position = AirSimSettings::createVectorSetting(settings_json, VectorMath::nanVector());
+                auto rotation = AirSimSettings::createRotationSetting(settings_json, AirSimSettings::Rotation::nanRotation());
+
+                if (std::isnan(relative_pose.position.x()))
+                    relative_pose.position.x() = 0;
+                if (std::isnan(relative_pose.position.y()))
+                    relative_pose.position.y() = 0;
+                if (std::isnan(relative_pose.position.z())) {
+                    relative_pose.position.z() = 0;
+                }
+
+                float pitch, roll, yaw;
+                pitch = !std::isnan(rotation.pitch) ? rotation.pitch : 0;
+                roll = !std::isnan(rotation.roll) ? rotation.roll : 0;
+                yaw = !std::isnan(rotation.yaw) ? rotation.yaw : 0;
+                relative_pose.orientation = VectorMath::toQuaternion(
+                    Utils::degreesToRadians(pitch), // pitch - rotation around Y axis
+                    Utils::degreesToRadians(roll), // roll  - rotation around X axis
+                    Utils::degreesToRadians(yaw)); // yaw   - rotation around Z axis
 			}
 		};
 

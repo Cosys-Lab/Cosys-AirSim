@@ -44,6 +44,9 @@ rangeMaxLambertianPercentage | Lambertian reflectivity percentage to max out on.
 rainMaxIntensity             | Rain intensity maximum to scale from in mm/hour.
 rainConstantA                | Constant one to to calculate the extinction coefficient in rain
 rainConstantB                | Constant one to to calculate the extinction coefficient in rain
+GenerateNoise                | Generate and add range-noise based on normal distribution if set to true
+MinNoiseStandardDeviation    | The standard deviation to generate the noise normal distribution, in meters. This is the minimal noise (at 0 distance)
+NoiseDistanceScale           | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
 ```
 {
     "SeeDocsAt": "https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/settings.md",
@@ -75,12 +78,12 @@ rainConstantB                | Constant one to to calculate the extinction coeff
 					"DrawMode": 4,
 					"Resolution": 1024,
 					"IgnoreMarked": true,
-					"GroundTruth": false
+					"GroundTruth": false,
 					"GenerateIntensity": true,
 					"rangeMaxLambertianPercentage": 80,
 					"rainMaxIntensity": 70,
 					"rainConstantA": 0.01,
-					"rainConstantB": 0.6,
+					"rainConstantB": 0.6
 				}
 			}
 		}

@@ -86,7 +86,7 @@ e.g.,
                       "DistanceLimit": 10,
                       "ReflectionLimit": 3,
                       "ReflectionDistanceLimit": 0.4,
-                      "ReflectionOpeningAngle": 10,
+                      "ReflectionOpeningAngle": 10
 				}	
 			}
 		}
