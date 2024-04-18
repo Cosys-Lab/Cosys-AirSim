@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import setup_path
 import airsim
 import rospy
 import time
@@ -10,7 +9,7 @@ from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped, TransformStamped, Point, Twist
 import sensor_msgs.point_cloud2 as pc2
 import tf2_ros
-from airsim.msg import StringArray
+from airsimros.msg import StringArray
 from sensor_msgs.msg import PointCloud2, PointField, Imu, CameraInfo
 from nav_msgs.msg import Odometry
 from uwb_msgs.msg import Diagnostics, Range, RangeArray
@@ -170,7 +169,7 @@ def get_camera_info_ros_message(cur_fov, cur_frame, cur_timestamp, cur_width, cu
 
 
 def get_depth_camera_ros_message(cur_camera_msg, cur_response):
-    rgb_string = airsimpy.get_image_bytes(cur_response, "DepthPlanar")
+    rgb_string = airsim.get_image_bytes(cur_response, "DepthPlanar")
     cur_camera_msg.encoding = "32FC1"
     cur_camera_msg.step = cur_response.width * 4
     cur_camera_msg.data = rgb_string
@@ -178,7 +177,7 @@ def get_depth_camera_ros_message(cur_camera_msg, cur_response):
 
 
 def get_segmentation_camera_ros_message(cur_camera_msg, cur_response):
-    rgb_string = airsimpy.get_image_bytes(cur_response, "Segmentation")
+    rgb_string = airsim.get_image_bytes(cur_response, "Segmentation")
     cur_camera_msg.step = cur_response.width * 3
     cur_camera_msg.data = rgb_string
     return cur_camera_msg
@@ -186,7 +185,7 @@ def get_segmentation_camera_ros_message(cur_camera_msg, cur_response):
 
 def get_scene_camera_ros_message(cur_response, cur_timestamp, cur_frame, cur_cv_bridge,
                                  cur_sensor_camera_scene_quality, enable_mono):
-    rgb_matrix = np.frombuffer(airsimpy.get_image_bytes(cur_response, "Scene"),
+    rgb_matrix = np.frombuffer(airsim.get_image_bytes(cur_response, "Scene"),
                                dtype=np.uint8).reshape(cur_response.height, cur_response.width, 3)
     if cur_sensor_camera_scene_quality > 0:
         rgb_matrix = cv2.cvtColor(rgb_matrix, cv2.COLOR_RGB2BGR)
@@ -207,7 +206,7 @@ def get_scene_camera_ros_message(cur_response, cur_timestamp, cur_frame, cur_cv_
 def get_car_control_ros_message(c, cur_queue_input_command, cur_speed_pid, cur_odom, cur_vehicle_name,
                                 cur_desired_rotation):
     # set the controls for car
-    car_controls = airsimpy.CarControls()
+    car_controls = airsim.CarControls()
     car_controls.is_manual_gear = True
     car_controls.manual_gear = 1
 
@@ -769,16 +768,16 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         toggle_mono = True
         response_locations[cur_sensor_name + '_scene'] = response_index
         response_index += 1
-        requests.append(airsimpy.ImageRequest(cur_sensor_name, airsimpy.get_camera_type("Scene"),
-                                              airsimpy.is_pixels_as_float("Scene"), False))
+        requests.append(airsim.ImageRequest(cur_sensor_name, airsim.get_camera_type("Scene"),
+                                              airsim.is_pixels_as_float("Scene"), False))
         if sensor_camera_toggle_segmentation[cur_sensor_index] == 1:
-            requests.append(airsimpy.ImageRequest(cur_sensor_name, airsimpy.get_camera_type("Segmentation"),
-                                                  airsimpy.is_pixels_as_float("Segmentation"), False))
+            requests.append(airsim.ImageRequest(cur_sensor_name, airsim.get_camera_type("Segmentation"),
+                                                  airsim.is_pixels_as_float("Segmentation"), False))
             response_locations[cur_sensor_name + '_segmentation'] = response_index
             response_index += 1
         if sensor_camera_toggle_depth[cur_sensor_index] == 1:
-            requests.append(airsimpy.ImageRequest(cur_sensor_name, airsimpy.get_camera_type("DepthPlanar"),
-                                                  airsimpy.is_pixels_as_float("DepthPlanar"), False))
+            requests.append(airsim.ImageRequest(cur_sensor_name, airsim.get_camera_type("DepthPlanar"),
+                                                  airsim.is_pixels_as_float("DepthPlanar"), False))
             response_locations[cur_sensor_name + '_depth'] = response_index
             response_index += 1
 
@@ -835,13 +834,13 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                 if elapsedTime + tolerance >= period:
                     client.simContinueForTime(period)
                     last_time = t.to_sec()
-                    cur_position = airsimpy.Vector3r(msg.pose.position.x, -msg.pose.position.y, -msg.pose.position.z)
-                    cur_orientation = airsimpy.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y,
+                    cur_position = airsim.Vector3r(msg.pose.position.x, -msg.pose.position.y, -msg.pose.position.z)
+                    cur_orientation = airsim.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y,
                                                            msg.pose.orientation.z,
                                                            msg.pose.orientation.w).inverse()
-                    cur_orientation = airsimpy.Quaternionr(float(cur_orientation.x_val), float(cur_orientation.y_val),
+                    cur_orientation = airsim.Quaternionr(float(cur_orientation.x_val), float(cur_orientation.y_val),
                                                            float(cur_orientation.z_val), float(cur_orientation.w_val))
-                    client.simSetVehiclePose(airsimpy.Pose(cur_position, cur_orientation), True, vehicle_name)
+                    client.simSetVehiclePose(airsim.Pose(cur_position, cur_orientation), True, vehicle_name)
 
                     rospy.loginfo("Setting vehicle pose " + str(pose_index) + ' of ' + str(pose_count)
                                   + ' to record sensor data...')
@@ -1311,9 +1310,9 @@ if __name__ == '__main__':
 
         rospy.loginfo("Connecting to AirSim...")
         if toggle_drone:
-            client = airsimpy.MultirotorClient(ip=ip, port=port)
+            client = airsim.MultirotorClient(ip=ip, port=port)
         else:
-            client = airsimpy.CarClient(ip=ip, port=port)
+            client = airsim.CarClient(ip=ip, port=port)
         try:
             client.confirmConnection(rospy.get_name())
         except msgpackrpc.error.TimeoutError:

@@ -52,23 +52,23 @@
     "SubWindows": [
         {
             "WindowID": 0,
-            "CameraName": "0",
+            "CameraName": "frontcamera",
             "ImageType": 3,
-            "VehicleName": "",
+            "VehicleName": "airsimvehicle",
             "Visible": false
         },
         {
             "WindowID": 1,
-            "CameraName": "0",
+            "CameraName": "frontcamera",
             "ImageType": 5,
-            "VehicleName": "",
+            "VehicleName": "airsimvehicle",
             "Visible": false
         },
         {
             "WindowID": 2,
-            "CameraName": "0",
+            "CameraName": "frontcamera",
             "ImageType": 0,
-            "VehicleName": "",
+            "VehicleName": "airsimvehicle",
             "Visible": false
         }
     ],
@@ -201,7 +201,7 @@
         ]
     },
     "Vehicles": {
-        "robot1": {
+        "airsimvehicle": {
             "VehicleType": "CPHusky",
             "DefaultVehicleState": "",
             "AutoCreate": true,
@@ -264,7 +264,7 @@
                     "Enabled": false,
                     "SensorType": 5
                 },
-                "gpulidar1": {
+                "gpulidar": {
 					"SensorType": 8,
 					"Enabled" : true,
 					"External": false,
@@ -354,7 +354,7 @@
                     "SensePassive": true,
                     "PassiveRadius": 10
                 },
-                "MarLocUwb_1": {
+                "uwb": {
                     "Enabled": false,
                     "Resolution": 512,
                     "Id": 1,

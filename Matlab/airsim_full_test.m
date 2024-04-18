@@ -26,7 +26,7 @@ vehiclePoseWorld = airSimClient.getObjectPose(vehicle_name, false);
 
 % Get an random object pose or choose if you know the name of one
 useChosenObject = true;
-chosenObject = "palletjack_tofind";
+chosenObject = "Cylinder3";
 
 if useChosenObject
     finalName = chosenObject;
@@ -157,13 +157,13 @@ drawnow
 
 %% Get camera info data
 
-cameraSensorName = "leftcamera";
+cameraSensorName = "frontcamera";
 [intrinsics, cameraSensorPose] = airSimClient.getCameraInfo(cameraSensorName);
 
 %% Get single camera images
 % Get images sequentially 
 
-cameraSensorName = "leftcamera";
+cameraSensorName = "frontcamera";
 [rgbImage, rgbCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.Scene);
 [segmentationImage, segmentationCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.Segmentation);
 [depthImage, depthCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.DepthPlanar);
@@ -183,7 +183,7 @@ drawnow
 % By combining the image requests they will be synced 
 % and taken in the same frame
 
-cameraSensorName = "leftcamera";
+cameraSensorName = "backcamera";
 [images, cameraIimestamp] = airSimClient.getCameraImages(cameraSensorName, [AirSimCameraTypes.Scene, AirSimCameraTypes.Segmentation, AirSimCameraTypes.DepthPlanar]);
 figure;
 subplot(3, 1, 1);

@@ -27,7 +27,7 @@
       <arg name="sensor_imu_topic" default="airsim/imu"/>
       <arg name="sensor_imu_frame" default="base_imu"/>
 
-      <node name="airsim_record_route" pkg="airsim" type="airsim_publish.py" respawn="false" output="screen">
+      <node name="airsim_record_route" pkg="airsimros" type="airsim_publish.py" respawn="false" output="screen">
             <rosparam param="rate" subst_value="True">$(arg rate)</rosparam>
             <param name="ip" type="string" value="$(arg ip)"/>
             <param name="port" value="$(arg port)"/>

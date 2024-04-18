@@ -12,8 +12,10 @@ Each sensor is associated with a integer enum specifying its sensor type.
 * Lidar = 6
 * Echo = 7
 * GPULidar = 8
+* Uwb = 10
+* Wi-Fi = 11
 
-**Note** :  Cameras are configured differently than the other sensors and do not have an enum associated with them.    Look at [general settings](settings.md) and [image API](image_apis.md) for camera config and API.
+**Note** :  Cameras are configured differently than the other sensors and do not have an enum associated with them. Look at [general settings](settings.md) and [image API](image_apis.md) for camera config and API.
 
 ## Default sensors
 
@@ -94,23 +96,6 @@ The default sensor list can be configured in settings json:
         "X": 0, "Y": 0, "Z": -1,
         "Yaw": 0, "Pitch": 0, "Roll": 0,
         "DrawDebugPoints": false
-    },
-    "Lidar": { 
-         "SensorType": 6,
-         "Enabled" : true,
-         "NumberOfChannels": 4,
-         "PointsPerSecond": 10000
-    },
-    "Echo": { 
-         "SensorType": 7,
-         "Enabled" : true,
-         "NumberOfChannels": 4,
-         "PointsPerSecond": 10000
-    },
-    "GPULidar": { 
-         "SensorType": 8,
-         "Enabled" : true,
-         "NumberOfChannels": 4
     }
 },
 ```
@@ -208,3 +193,6 @@ distance_sensor_data = client.getDistanceSensorData(distance_sensor_name = "", v
 
 - GPU Lidar   
     See [GPU Lidar](gpulidar.md) for GPU Lidar API.
+
+- UWB/Wi-Fi
+    These sensors are still experimental and are currently not documented. Please refer to the source code for more information.

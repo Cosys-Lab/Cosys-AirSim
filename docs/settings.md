@@ -1,5 +1,8 @@
 # AirSim Settings
 
+A good basic settings file that works with many of the examples can be found here as [settings_example.json](settings_example.json).
+It shows many of the custom sensors and vehicles that were added by Cosys-Lab.
+
 ## Where are Settings Stored?
 AirSim is searching for the settings definition in the following order. The first match will be used:
 
@@ -25,7 +28,7 @@ For e.g. with the Blocks binary, the location searched is `<path-of-binary>/Linu
 
 The file is in usual [json format](https://en.wikipedia.org/wiki/JSON). On first startup AirSim would create `settings.json` file with no settings at the users home folder. To avoid problems, always use ASCII format to save json file.
 
-## How to Chose Between Car and Multirotor?
+## How to Chose Between Car/SkidVehicle/Multirotor?
 The default is to use multirotor. To use car simple set `"SimMode": "Car"` like this:
 
 ```
@@ -35,10 +38,11 @@ The default is to use multirotor. To use car simple set `"SimMode": "Car"` like 
 }
 ```
 
-To choose multirotor, set `"SimMode": "Multirotor"`. If you want to prompt user to select vehicle type then use `"SimMode": ""`.
+To choose multirotor or skid vehicle, set `"SimMode": "Multirotor"` or `"SimMode": "SkidVehicle"` respectively. If you want to prompt user to select vehicle type then use `"SimMode": ""`.
 
 ## Available Settings and Their Defaults
 Below are complete list of settings available along with their default values. If any of the settings is missing from json file, then default value is used. Some default values are simply specified as `""` which means actual value may be chosen based on the vehicle you are using. For example, `ViewMode` setting has default value `""` which translates to `"FlyWithMe"` for drones and `"SpringArmChase"` for cars.
+Note this does not include most sensor types. 
 
 **WARNING:** Do not copy paste all of below in your settings.json. We strongly recommend adding only those settings that you don't want default values. Only required element is `"SettingsVersion"`.
 
@@ -212,7 +216,6 @@ SimMode determines which simulation mode will be used. Below are currently suppo
 - `"Car"`: Use car simulation
 - `"ComputerVision"`: Use only camera, no vehicle or physics
 - `"SkidVehicle"`: use [skid-steering vehicle](skid_steer_vehicle.md) simulation
-- `"UrdfBot"`: use [URDF Bot](UrdfXml.md) simulation. 
 
 ## ViewMode
 The ViewMode determines which camera to use as default and how camera will follow the vehicle. For multirotors, the default ViewMode is `"FlyWithMe"` while for cars the default ViewMode is `"SpringArmChase"`.
@@ -367,7 +370,7 @@ This element contains settings specific to the Unreal Engine. These will be igno
 Each simulation mode will go through the list of vehicles specified in this setting and create the ones that has `"AutoCreate": true`. Each vehicle specified in this setting has key which becomes the name of the vehicle. If `"Vehicles"` element is missing then this list is populated with default car named "PhysXCar" and default multirotor named "SimpleFlight".
 
 ### Common Vehicle Setting
-- `VehicleType`: This could be either `PhysXCar` or `BoxCar` for the Car SimMode, `SimpleFlight` or `PX4Multirotor` for the MultiRotor SimMode, `ComputerVision` for the ComputerVision SimMode ,`CPHusky` or `Pioneer` for SkidVehicle SimMode and `UrdfBot` for the UrdfBot SimMode. you can use There is no default value therefore this element must be specified.
+- `VehicleType`: This could be either `PhysXCar`, `ArduRover` or `BoxCar` for the Car SimMode, `SimpleFlight`, `ArduCopter` or `PX4Multirotor` for the MultiRotor SimMode, `ComputerVision` for the ComputerVision SimMode and `CPHusky` or `Pioneer` for SkidVehicle SimMode. you can use There is no default value therefore this element must be specified.
 - `PawnPath`: This allows to override the pawn blueprint to use for the vehicle. For example, you may create new pawn blueprint derived from ACarPawn for a warehouse robot in your own project outside the AirSim code and then specify its path here. See also [PawnPaths](settings.md#PawnPaths). Note that you have to specify your custom pawn blueprint class path inside the global `PawnPaths` object using your proprietarily defined object name, and quote that name inside the `Vehicles` setting. For example,
 ```json
     {
@@ -388,6 +391,7 @@ Each simulation mode will go through the list of vehicles specified in this sett
 - `AutoCreate`: If true then this vehicle would be spawned (if supported by selected sim mode).
 - `RC`: This sub-element allows to specify which remote controller to use for vehicle using `RemoteControlID`. The value of -1 means use keyboard (not supported yet for multirotors). The value >= 0 specifies one of many remote controllers connected to the system. The list of available RCs can be seen in Game Controllers panel in Windows, for example.
 - `X, Y, Z, Yaw, Roll, Pitch`: These elements allows you to specify the initial position and orientation of the vehicle. Position is in NED coordinates in SI units with origin set to Player Start location in Unreal environment. The orientation is specified in degrees.
+- `Sensors`: This element specifies the sensors associated with the vehicle, see [Sensors](sensors.md) page for details.
 - `IsFpvVehicle`: This setting allows to specify which vehicle camera will follow and the view that will be shown when ViewMode is set to Fpv. By default, AirSim selects the first vehicle in settings as FPV vehicle.
 - `Cameras`: This element specifies camera settings for vehicle. The key in this element is name of the [available camera](image_apis.md#available_cameras) and the value is same as `CameraDefaults` as described above. For example, to change FOV for the front center camera to 120 degrees, you can use this for `Vehicles` setting:
 
