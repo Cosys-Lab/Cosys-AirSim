@@ -1,13 +1,13 @@
-# Welcome to AirSim
+# Cosys-AirSim
 
-AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/) (we now also have an experimental [Unity](https://unity3d.com/) release). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. Similarly, we have an experimental release for a Unity plugin. 
+AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. Similarly, we have an experimental release for a Unity plugin. 
 Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
 
 This fork is based on last public AirSim release from Microsoft's GitHub.
 
 ## Cosys-Lab Modifications
 
-Cosys-Lab made extensive modifications to the AirSim platform (based on November 2018 release) to support multiple projects and research goals. 
+Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
 Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to collaborate. 
 The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
 Please note that we use that same [MIT license](LICENSE) as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.

@@ -18,11 +18,12 @@ For Windows, you can just change the code in Visual Studio, press F5 and re-run.
 
 ## Linux
 1. Make sure you have [built the Unreal Engine and AirSim](build_linux.md).
-2. Navigate to your UnrealEngine repo folder and run `Engine/Binaries/Linux/UE4Editor` which will start Unreal Editor.
-3. On first start you might not see any projects in UE4 editor. Click on Projects tab, Browse button and then navigate to `AirSim/Unreal/Environments/Blocks/Blocks.uproject`. 
-4. If you get prompted for incompatible version and conversion, select In-place conversion which is usually under "More" options. If you get prompted for missing modules, make sure to select No so you don't exit. 
-5. Finally, when prompted with building AirSim, select Yes. Now it might take a while so go get some coffee :).
-6. Press the Play button in Unreal Editor and you will see something like in below video. Also see [how to use AirSim](https://github.com/microsoft/AirSim/#how-to-use-it).
+2. Navigate to folder `AirSim\Unreal\Environments\Blocks` and run `update_from_git.sh`.
+3. Navigate to your UnrealEngine repo folder and run `Engine/Binaries/Linux/UE4Editor` which will start Unreal Editor.
+4. On first start you might not see any projects in UE4 editor. Click on Projects tab, Browse button and then navigate to `AirSim/Unreal/Environments/Blocks/Blocks.uproject`. 
+5. If you get prompted for incompatible version and conversion, select In-place conversion which is usually under "More" options. If you get prompted for missing modules, make sure to select No so you don't exit. 
+6. Finally, when prompted with building AirSim, select Yes. Now it might take a while so go get some coffee :).
+7. Press the Play button in Unreal Editor and you will see something like in below video. Also see [how to use AirSim](https://github.com/microsoft/AirSim/#how-to-use-it).
 
 [![Blocks Demo Video](images/blocks_video.png)](https://www.youtube.com/watch?v=-r_QGaxMT4A)
 
