@@ -15,7 +15,7 @@ if "%VisualStudioVersion%" == "" (
 )
 if "%VisualStudioVersion%" lss "17.0" (
     echo(
-    echo Hello there! We just upgraded AirSim to Unreal Engine 4.27 and Visual Studio 2022.
+    echo Hello there! We just upgraded AirSim to Unreal Engine 5.2.1 and Visual Studio 2022.
     echo Here are few easy steps for upgrade so everything is new and shiny:
     echo https://github.com/Microsoft/AirSim/blob/main/docs/unreal_upgrade.md
     goto :buildfailed_nomsg

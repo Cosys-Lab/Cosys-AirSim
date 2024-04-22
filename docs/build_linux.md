@@ -1,23 +1,22 @@
 # Build AirSim on Linux
 
-The current recommended and tested environment is **Ubuntu 18.04 LTS**. Theoretically, you can build on other distros as well, but we haven't tested it.
+The current recommended and tested environment is **Ubuntu 20.04 LTS**. Theoretically, you can build on other distros as well, but we haven't tested it.
 
 ## Host machine
 
-### Build Unreal Engine and Airsim
-This branch uses a custom version of the Unreal Engine!
-- Make sure you are [registered with Epic Games and have linked your Epic Games account with your GitHub account](https://www.unrealengine.com/en-US/ue-on-github). This is required to get source code access for Unreal Engine.
+### Build Unreal Engine
+- Make sure you are [registered with Epic Games](https://docs.unrealengine.com/en-US/SharingAndReleasing/Linux/BeginnerLinuxDeveloper/SettingUpAnUnrealWorkflow/index.html). This is required to get source code access for Unreal Engine.
+- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 5.2.1 at present.
+```bash
+# go to the folder where you clone GitHub projects
+git clone -b 5.2 git@github.com:EpicGames/UnrealEngine.git
+cd UnrealEngine
+./Setup.sh
+./GenerateProjectFiles.sh
+make
+```
 
-- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.27.3 (Cosys-Lab) at present.
-   ```bash
-   # go to the folder where you clone GitHub projects
-   git clone https://github.com/WouterJansen/UnrealEngine.git
-   cd UnrealEngine
-   ./Setup.sh
-   ./GenerateProjectFiles.sh
-   make
-   ```
-
+### Build Airsim
 - Clone AirSim and build it:
    ```bash
    # go to the folder where you clone GitHub projects

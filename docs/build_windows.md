@@ -1,24 +1,11 @@
 # Build AirSim on Windows
 
 ## Install Unreal Engine
-This branch uses a custom version of the Unreal Engine!
-- Make sure you are [registered with Epic Games and have linked your Epic Games account with your GitHub account](https://www.unrealengine.com/en-US/ue-on-github). This is required to get source code access for Unreal Engine.
-
-- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 4.27.3 (Cosys-Lab fork) at present.
-   ```bash
-   # go to the folder where you clone GitHub projects
-   git clone https://github.com/WouterJansen/UnrealEngine.git
-   cd UnrealEngine
-   ```
- -Visual Studio 2012 is required for building. 
-- To install the correct components for UE4 development, check the "Game Development with C++" workload and the “.net 4.6.2”, "Unreal Engine Installer" and "Nuget Package Manager" optional individual components.
-- run `Setup.bat`
-- run `GenerateProjectFiles.bat ` as administrator 
-
-## Build UnrealEngine
-- Open the generated Visual Studio project `UE4.sln` in the root of the repository. Once it is open you need to set it to build the _Development Editor_ configuration for _Win64_. 
-- Once that is set, you can right click the UE4 target in the Solution Explorer on the right side of the window and press build. This will take a while. 
-- please run `Engine\Binaries\Win64\UnrealVersionSelector-Win64-Shipping.exe` once so it is detectable by your system. 
+1. [Download](https://www.unrealengine.com/download) the Epic Games Launcher. While the Unreal Engine is open source and free to download, registration is still required.
+2. Run the Epic Games Launcher, open the `Unreal Engine` tab on the left pane.
+Click on the `Install` button on the top right, which should show the option to download **Unreal Engine 5.2.1**. Chose the install location to suit your needs, as shown in the images below. If you have multiple versions of Unreal installed then **make sure the version you are using is set to `current`** by clicking down arrow next to the Launch button for the version.
+![Unreal Engine Tab UI Screenshot](images/ue_install.png)
+![Unreal Engine Install Location UI Screenshot](images/ue_install_location.png)
 
 ## Build AirSim
 * Start `x64 Native Tools Command Prompt for VS 2022`. 
