@@ -74,7 +74,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
 * Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
-* Updated Unreal to 4.27 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys))
+* Updated Unreal to 5.2.1 by merging changes of [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum).
 * Dropped support for Unity Environments.
 
 Some more details on our changes can be found in the [changelog](CHANGELOG.md).

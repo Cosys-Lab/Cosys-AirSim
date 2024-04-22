@@ -98,7 +98,6 @@ void ASimModeBase::toggleLoadingScreen(bool is_visible)
 
 void ASimModeBase::BeginPlay()
 {
-
     Super::BeginPlay();
 
     debug_reporter_.initialize(false);
@@ -345,10 +344,10 @@ void ASimModeBase::initializeTimeOfDay()
         static const FName sun_prop_name(TEXT("Directional light actor"));
         auto* p = sky_sphere_class_->FindPropertyByName(sun_prop_name);
 
-#if ENGINE_MINOR_VERSION > 24
+#if ((ENGINE_MAJOR_VERSION > 4) || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 27))
         FObjectProperty* sun_prop = CastFieldChecked<FObjectProperty>(p);
 #else
-        UObjectProperty* sun_prop = Cast<UObjectProperty>(p);
+        FObjectProperty* sun_prop = Cast<FObjectProperty>(p);
 #endif
 
         UObject* sun_obj = sun_prop->GetObjectPropertyValue_InContainer(sky_sphere_);
@@ -431,6 +430,13 @@ void ASimModeBase::setWind(const msr::airlib::Vector3r& wind) const
     throw std::domain_error("setWind not implemented by SimMode");
 }
 
+void ASimModeBase::setExtForce(const msr::airlib::Vector3r& ext_force) const
+{
+    // should be overridden by derived class
+    unused(ext_force);
+    throw std::domain_error("setExtForce not implemented by SimMode");
+}
+
 std::unique_ptr<msr::airlib::ApiServerBase> ASimModeBase::createApiServer() const
 {
     //this will be the case when compilation with RPCLIB is disabled or simmode doesn't support APIs
@@ -471,7 +477,7 @@ void ASimModeBase::Tick(float DeltaSeconds)
 
     updateDebugReport(debug_reporter_);
 
-    //drawLidarDebugPoints();
+    drawLidarDebugPoints();
 
     drawDistanceSensorDebugPoints();
 
@@ -580,6 +586,33 @@ void ASimModeBase::initializeCameraDirector(const FTransform& camera_transform, 
     }
 }
 
+void ASimModeBase::initializeExternalCameras()
+{
+    FActorSpawnParameters camera_spawn_params;
+    camera_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    const auto& transform = getGlobalNedTransform();
+
+    //for each camera in settings
+    for (const auto& camera_setting_pair : getSettings().external_cameras) {
+        const auto& setting = camera_setting_pair.second;
+
+        //get pose
+        FVector position = transform.fromLocalNed(setting.position) - transform.fromLocalNed(Vector3r::Zero());
+        FTransform camera_transform(FRotator(setting.rotation.pitch, setting.rotation.yaw, setting.rotation.roll),
+                                    position,
+                                    FVector(1., 1., 1.));
+
+        //spawn and attach camera to pawn
+        camera_spawn_params.Name = FName(("external_" + camera_setting_pair.first).c_str());
+        APIPCamera* camera = this->GetWorld()->SpawnActor<APIPCamera>(pip_camera_class, camera_transform, camera_spawn_params);
+
+        camera->setupCameraFromSettings(setting, transform);
+
+        //add on to our collection
+        external_cameras_.insert_or_assign(camera_setting_pair.first, camera);
+    }
+}
+
 bool ASimModeBase::toggleRecording()
 {
     if (isRecording())
@@ -615,12 +648,13 @@ void ASimModeBase::toggleTraceAll()
 
 const APIPCamera* ASimModeBase::getCamera(const msr::airlib::CameraDetails& camera_details) const
 {
-    return getVehicleSimApi(camera_details.vehicle_name)->getCamera(camera_details.camera_name);
+    return camera_details.external ? getExternalCamera(camera_details.camera_name)
+                                   : getVehicleSimApi(camera_details.vehicle_name)->getCamera(camera_details.camera_name);
 }
 
-const UnrealImageCapture* ASimModeBase::getImageCapture(const std::string& vehicle_name) const
+const UnrealImageCapture* ASimModeBase::getImageCapture(const std::string& vehicle_name, bool external) const
 {
-    return getVehicleSimApi(vehicle_name)->getImageCapture();
+    return external ? external_image_capture_.get() : getVehicleSimApi(vehicle_name)->getImageCapture();
 }
 
 //API server start/stop
@@ -807,111 +841,6 @@ void ASimModeBase::setupVehiclesAndCamera()
                 }
             }
         }
-
-        //add beacons from settings
-        for (auto const& beacon_setting_pair : getSettings().beacons)
-        {
-            //if vehicle is of type for derived SimMode and auto creatable
-            const auto& beacon_setting = *beacon_setting_pair.second;
-            //if (beacon_setting.auto_create &&
-                //isVehicleTypeSupported(beacon_setting.beacon_type)) {
-            if (beacon_setting.auto_create) {
-                //compute initial pose
-                FVector spawn_position = uu_origin.GetLocation();
-                msr::airlib::Vector3r settings_position = beacon_setting.position;
-                /*FVector globalOffset = getGlobalNedTransform().getGlobalOffset();
-
-                settings_position.x() += globalOffset.X;
-                settings_position.y() += globalOffset.Y;
-                settings_position.z() += globalOffset.Z;*/
-
-
-                if (!msr::airlib::VectorMath::hasNan(settings_position))
-                    spawn_position = getGlobalNedTransform().fromGlobalNed(settings_position);
-                FRotator spawn_rotation = toFRotator(beacon_setting.rotation, uu_origin.Rotator());
-
-                //spawn beacon pawn
-                FActorSpawnParameters pawn_spawn_params;
-                FString comboName = beacon_setting.beacon_name.c_str() + FString(":") + beacon_setting.beacon_pawn_name.c_str();
-                pawn_spawn_params.Name = FName(*comboName);
-                pawn_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-                //auto beacon_bp_class = UAirBlueprintLib::LoadClass(getSettings().pawn_paths.at(beacon_setting.beacon_pawn_name).pawn_bp);
-                //FActorSpawnParameters SpawnInfo;
-                // TODO: Make the child sim modes responsible for casting the types.
-                //ATemplateBeacon* spawned_beacon = static_cast<ATemplateBeacon*>(this->GetWorld()->SpawnActor(beacon_bp_class, &spawn_position, &spawn_rotation, pawn_spawn_params2));
-
-                if (beacon_setting.beacon_type.compare("fiducialmarker") == 0) {
-                    AFiducialBeacon* spawned_beacon = static_cast<AFiducialBeacon*>(GetWorld()->SpawnActor<AFiducialBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
-                    spawned_beacon->setScale(beacon_setting.scale);
-                }
-                else if (beacon_setting.beacon_type.compare("uwbbeacon") == 0) {
-                    AUWBBeacon* spawned_beacon = static_cast<AUWBBeacon*>(GetWorld()->SpawnActor<AUWBBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
-                }
-                else if (beacon_setting.beacon_type.compare("wifibeacon") == 0) {
-                    AWifiBeacon* spawned_beacon = static_cast<AWifiBeacon*>(GetWorld()->SpawnActor<AWifiBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
-                }
-                else if (beacon_setting.beacon_type.compare("dynamicblockbeacon") == 0) {
-                    ADynamicBlockBeacon* spawned_beacon = static_cast<ADynamicBlockBeacon*>(GetWorld()->SpawnActor<ADynamicBlockBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
-                }
-                else if (beacon_setting.beacon_type.compare("dynamicrackbeacon") == 0) {
-                    ADynamicRackBeacon* spawned_beacon = static_cast<ADynamicRackBeacon*>(GetWorld()->SpawnActor<ADynamicRackBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
-                }
-                else {
-                    ATemplateBeacon* spawned_beacon = static_cast<ATemplateBeacon*>(GetWorld()->SpawnActor<ATemplateBeacon>(spawn_position, spawn_rotation, pawn_spawn_params));
-                }
-
-                //this->GetWorld()->SpawnActor<AActor>(ATemplateBeacon)
-                /*AActor* spawned_actor = static_cast<AActor*>(this->GetWorld()->SpawnActor(
-                    beacon_bp_class, &spawn_position, &spawn_rotation, pawn_spawn_params2));
-
-                AirsimVehicle* spawned_pawn2 = dynamic_cast<AirsimVehicle*>(spawned_actor);
-
-                spawned_actors_.Add(spawned_pawn2->GetPawn());
-                pawns.Add(spawned_pawn2);
-
-                if (beacon_setting.is_fpv_vehicle)
-                    fpv_pawn = spawned_pawn2->GetPawn();*/
-            }
-        }
-
-        //add passive echo beacons from settings
-        for (auto const& passive_echo_beacon_setting_pair : getSettings().passive_echo_beacons)
-        {
-            const auto& passive_echo_beacon_setting = *passive_echo_beacon_setting_pair.second;
-            //compute initial pose
-            FVector spawn_position = FVector(0, 0, 0);
-            msr::airlib::Vector3r settings_position = passive_echo_beacon_setting.position;
-            if (!msr::airlib::VectorMath::hasNan(settings_position))
-                spawn_position = global_ned_transform_->toFVector(settings_position, 100, true);
-            FRotator spawn_rotation = toFRotator(passive_echo_beacon_setting.rotation, FRotator());
-
-            //spawn passive echo beacon actor
-            FActorSpawnParameters actor_spawn_params;
-            actor_spawn_params.Name = FName(passive_echo_beacon_setting.name.c_str());
-            actor_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-            actor_spawn_params.bDeferConstruction = true;
-            APassiveEchoBeacon* spawned_passive_echo_beacon = static_cast<APassiveEchoBeacon*>(GetWorld()->SpawnActor<APassiveEchoBeacon>(spawn_position, spawn_rotation, actor_spawn_params));
-            spawned_passive_echo_beacon->enable_ = passive_echo_beacon_setting.enable;
-            spawned_passive_echo_beacon->initial_directions_ = passive_echo_beacon_setting.initial_directions;
-            spawned_passive_echo_beacon->initial_lower_azimuth_limit_ = passive_echo_beacon_setting.initial_lower_azimuth_limit;
-            spawned_passive_echo_beacon->initial_upper_azimuth_limit_ = passive_echo_beacon_setting.initial_upper_azimuth_limit;
-            spawned_passive_echo_beacon->initial_lower_elevation_limit_ = passive_echo_beacon_setting.initial_lower_elevation_limit;
-            spawned_passive_echo_beacon->initial_upper_elevation_limit_ = passive_echo_beacon_setting.initial_upper_elevation_limit;
-            spawned_passive_echo_beacon->attenuation_limit_ = passive_echo_beacon_setting.attenuation_limit;
-            spawned_passive_echo_beacon->reflection_distance_limit_ = passive_echo_beacon_setting.reflection_distance_limit;
-            spawned_passive_echo_beacon->reflection_only_final_ = passive_echo_beacon_setting.reflection_only_final;
-            spawned_passive_echo_beacon->attenuation_per_distance_ = passive_echo_beacon_setting.attenuation_per_distance;
-            spawned_passive_echo_beacon->attenuation_per_reflection_ = passive_echo_beacon_setting.attenuation_per_reflection;
-            spawned_passive_echo_beacon->distance_limit_ = passive_echo_beacon_setting.distance_limit;
-            spawned_passive_echo_beacon->reflection_limit_ = passive_echo_beacon_setting.reflection_limit;
-            spawned_passive_echo_beacon->draw_debug_location_ = passive_echo_beacon_setting.draw_debug_location;
-            spawned_passive_echo_beacon->draw_debug_all_points_ = passive_echo_beacon_setting.draw_debug_all_points;
-            spawned_passive_echo_beacon->draw_debug_all_lines_ = passive_echo_beacon_setting.draw_debug_all_lines;
-            spawned_passive_echo_beacon->draw_debug_duration_ = passive_echo_beacon_setting.draw_debug_duration;
-            spawned_passive_echo_beacon->FinishSpawning(FTransform(spawn_rotation, spawn_position));
-        }
-
         //create API objects for each pawn we have
         for (AActor* pawn : pawns) {
             auto vehicle_pawn = static_cast<APawn*>(pawn);
@@ -925,6 +854,10 @@ void ASimModeBase::setupVehiclesAndCamera()
             vehicle_sim_apis_.push_back(std::move(vehicle_sim_api));
         }
     }
+
+    // Create External Cameras
+    initializeExternalCameras();
+    external_image_capture_ = std::make_unique<UnrealImageCapture>(&external_cameras_);
 
     if (getApiProvider()->hasDefaultVehicle()) {
         //TODO: better handle no FPV vehicles scenario
@@ -954,11 +887,6 @@ bool ASimModeBase::isVehicleTypeSupported(const std::string& vehicle_type) const
 }
 
 std::string ASimModeBase::getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const
-{
-    //derived class should override this method to retrieve types of pawns they support
-    return "";
-}
-std::string ASimModeBase::getBeaconPawnPathName(const AirSimSettings::BeaconSetting& beacon_setting) const
 {
     //derived class should override this method to retrieve types of pawns they support
     return "";

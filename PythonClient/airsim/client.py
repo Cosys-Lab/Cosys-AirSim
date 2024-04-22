@@ -40,14 +40,44 @@ class VehicleClient:
     def getMinRequiredClientVersion(self):
         return self.client.call('getMinRequiredClientVersion')
 
-    # basic flight control
+#basic flight control
     def enableApiControl(self, is_enabled, vehicle_name = ''):
-        return self.client.call('enableApiControl', is_enabled, vehicle_name)
+        """
+        Enables or disables API control for vehicle corresponding to vehicle_name
+
+        Args:
+            is_enabled (bool): True to enable, False to disable API control
+            vehicle_name (str, optional): Name of the vehicle to send this command to
+        """
+        self.client.call('enableApiControl', is_enabled, vehicle_name)
+
     def isApiControlEnabled(self, vehicle_name = ''):
+        """
+        Returns true if API control is established.
+
+        If false (which is default) then API calls would be ignored. After a successful call to `enableApiControl`, `isApiControlEnabled` should return true.
+
+        Args:
+            vehicle_name (str, optional): Name of the vehicle
+
+        Returns:
+            bool: If API control is enabled
+        """
         return self.client.call('isApiControlEnabled', vehicle_name)
+
     def armDisarm(self, arm, vehicle_name = ''):
+        """
+        Arms or disarms vehicle
+
+        Args:
+            arm (bool): True to arm, False to disarm the vehicle
+            vehicle_name (str, optional): Name of the vehicle to send this command to
+
+        Returns:
+            bool: Success
+        """
         return self.client.call('armDisarm', arm, vehicle_name)
- 
+
     def simPause(self, is_paused):
         """
         Pauses simulation
@@ -75,20 +105,35 @@ class VehicleClient:
         """
         self.client.call('simContinueForTime', seconds)
 
+    def simContinueForFrames(self, frames):
+        """
+        Continue (or resume if paused) the simulation for the specified number of frames, after which the simulation will be paused.
+
+        Args:
+            frames (int): Frames to run the simulation for
+        """
+        self.client.call('simContinueForFrames', frames)
+
     def getHomeGeoPoint(self, vehicle_name = ''):
+        """
+        Get the Home location of the vehicle
+
+        Args:
+            vehicle_name (str, optional): Name of vehicle to get home location of
+
+        Returns:
+            GeoPoint: Home location of the vehicle
+        """
         return GeoPoint.from_msgpack(self.client.call('getHomeGeoPoint', vehicle_name))
 
-    def confirmConnection(self, name=''):
+    def confirmConnection(self):
         """
         Checks state of connection every 1 sec and reports it in Console so user can see the progress for connection.
         """
         if self.ping():
-            if name == '':
-                print("Connected to AirSim API!")
-            else:
-                print(name + " connected to AirSim API!")
+            print("Connected!")
         else:
-            print("Ping returned false!")
+             print("Ping returned false!")
         server_ver = self.getServerVersion()
         client_ver = self.getClientVersion()
         server_min_ver = self.getMinRequiredServerVersion()
@@ -409,7 +454,7 @@ class VehicleClient:
     def simGetVehiclePose(self, vehicle_name = ''):
         """
         The position inside the returned Pose is in the frame of the vehicle's starting point
-
+        
         Args:
             vehicle_name (str, optional): Name of the vehicle to get the Pose of
 
@@ -419,8 +464,30 @@ class VehicleClient:
         pose = self.client.call('simGetVehiclePose', vehicle_name)
         return Pose.from_msgpack(pose)
 
+    def simSetTraceLine(self, color_rgba, thickness=1.0, vehicle_name = ''):
+        """
+        Modify the color and thickness of the line when Tracing is enabled
+
+        Tracing can be enabled by pressing T in the Editor or setting `EnableTrace` to `True` in the Vehicle Settings
+
+        Args:
+            color_rgba (list): desired RGBA values from 0.0 to 1.0
+            thickness (float, optional): Thickness of the line
+            vehicle_name (string, optional): Name of the vehicle to set Trace line values for
+        """
+        self.client.call('simSetTraceLine', color_rgba, thickness, vehicle_name)
+
     def simGetObjectPose(self, object_name, ned=True):
-        pose = self.client.call('simGetObjectPose', object_name, ned)
+        """
+        The position inside the returned Pose is in the world frame
+
+        Args:
+            object_name (str): Object to get the Pose of
+
+        Returns:
+            Pose:
+        """
+        pose = self.client.call('simGetObjectPose', object_name, ned=True)
         return Pose.from_msgpack(pose)
 
     def simSetObjectPose(self, object_name, pose, teleport = True):
@@ -481,6 +548,53 @@ class VehicleClient:
         """
         return self.client.call('simListSceneObjects', name_regex)
 
+    def simLoadLevel(self, level_name):
+        """
+        Loads a level specified by its name
+
+        Args:
+            level_name (str): Name of the level to load
+
+        Returns:
+            bool: True if the level was successfully loaded
+        """
+        return self.client.call('simLoadLevel', level_name)
+
+    def simListAssets(self):
+        """
+        Lists all the assets present in the Asset Registry
+
+        Returns:
+            list[str]: Names of all the assets
+        """
+        return self.client.call('simListAssets')
+
+    def simSpawnObject(self, object_name, asset_name, pose, scale, physics_enabled=False, is_blueprint=False):
+        """Spawned selected object in the world
+
+        Args:
+            object_name (str): Desired name of new object
+            asset_name (str): Name of asset(mesh) in the project database
+            pose (airsim.Pose): Desired pose of object
+            scale (airsim.Vector3r): Desired scale of object
+            physics_enabled (bool, optional): Whether to enable physics for the object
+            is_blueprint (bool, optional): Whether to spawn a blueprint or an actor
+
+        Returns:
+            str: Name of spawned object, in case it had to be modified
+        """
+        return self.client.call('simSpawnObject', object_name, asset_name, pose, scale, physics_enabled, is_blueprint)
+
+    def simDestroyObject(self, object_name):
+        """Removes selected object from the world
+
+        Args:
+            object_name (str): Name of object to be removed
+
+        Returns:
+            bool: True if object is queued up for removal
+        """
+        return self.client.call('simDestroyObject', object_name)
     def simListInstanceSegmentationObjects(self):
         return self.client.call('simListInstanceSegmentationObjects')
 
@@ -555,54 +669,6 @@ class VehicleClient:
         """
         responses_raw = self.client.call('simGetDetections', camera_name, image_type, vehicle_name, external)
         return [DetectionInfo.from_msgpack(response_raw) for response_raw in responses_raw]
-
-    def simLoadLevel(self, level_name):
-        """
-        Loads a level specified by its name
-
-        Args:
-            level_name (str): Name of the level to load
-
-        Returns:
-            bool: True if the level was successfully loaded
-        """
-        return self.client.call('simLoadLevel', level_name)
-
-    def simListAssets(self):
-        """
-        Lists all the assets present in the Asset Registry
-
-        Returns:
-            list[str]: Names of all the assets
-        """
-        return self.client.call('simListAssets')
-
-    def simSpawnObject(self, object_name, asset_name, pose, scale, physics_enabled=False, is_blueprint=False):
-        """Spawned selected object in the world
-
-        Args:
-            object_name (str): Desired name of new object
-            asset_name (str): Name of asset(mesh) in the project database
-            pose (airsim.Pose): Desired pose of object
-            scale (airsim.Vector3r): Desired scale of object
-            physics_enabled (bool, optional): Whether to enable physics for the object
-            is_blueprint (bool, optional): Whether to spawn a blueprint or an actor
-
-        Returns:
-            str: Name of spawned object, in case it had to be modified
-        """
-        return self.client.call('simSpawnObject', object_name, asset_name, pose, scale, physics_enabled, is_blueprint)
-
-    def simDestroyObject(self, object_name):
-        """Removes selected object from the world
-
-        Args:
-            object_name (str): Name of object to be removed
-
-        Returns:
-            bool: True if object is queued up for removal
-        """
-        return self.client.call('simDestroyObject', object_name)
 
     def simPrintLogMessage(self, message, message_param = "", severity = 0):
         """
@@ -890,7 +956,150 @@ class VehicleClient:
         """
         self.client.call('simPlotArrows', points_start, points_end, color_rgba, thickness, arrow_size, duration, is_persistent)
 
-#----------------------------------- Multirotor APIs ---------------------------------------------
+
+    def simPlotStrings(self, strings, positions, scale = 5, color_rgba=[1.0, 0.0, 0.0, 1.0], duration = -1.0):
+        """
+        Plots a list of strings at desired positions in World NED frame.
+
+        Args:
+            strings (list[String], optional): List of strings to plot
+            positions (list[Vector3r]): List of positions where the strings should be plotted. Should be in one-to-one correspondence with the strings' list
+            scale (float, optional): Font scale of transform name
+            color_rgba (list, optional): desired RGBA values from 0.0 to 1.0
+            duration (float, optional): Duration (seconds) to plot for
+        """
+        self.client.call('simPlotStrings', strings, positions, scale, color_rgba, duration)
+
+    def simPlotTransforms(self, poses, scale = 5.0, thickness = 5.0, duration = -1.0, is_persistent = False):
+        """
+        Plots a list of transforms in World NED frame.
+
+        Args:
+            poses (list[Pose]): List of Pose objects representing the transforms to plot
+            scale (float, optional): Length of transforms' axes
+            thickness (float, optional): Thickness of transforms' axes
+            duration (float, optional): Duration (seconds) to plot for
+            is_persistent (bool, optional): If set to True, the desired object will be plotted for infinite time.
+        """
+        self.client.call('simPlotTransforms', poses, scale, thickness, duration, is_persistent)
+
+    def simPlotTransformsWithNames(self, poses, names, tf_scale = 5.0, tf_thickness = 5.0, text_scale = 10.0, text_color_rgba = [1.0, 0.0, 0.0, 1.0], duration = -1.0):
+        """
+        Plots a list of transforms with their names in World NED frame.
+
+        Args:
+            poses (list[Pose]): List of Pose objects representing the transforms to plot
+            names (list[string]): List of strings with one-to-one correspondence to list of poses
+            tf_scale (float, optional): Length of transforms' axes
+            tf_thickness (float, optional): Thickness of transforms' axes
+            text_scale (float, optional): Font scale of transform name
+            text_color_rgba (list, optional): desired RGBA values from 0.0 to 1.0 for the transform name
+            duration (float, optional): Duration (seconds) to plot for
+        """
+        self.client.call('simPlotTransformsWithNames', poses, names, tf_scale, tf_thickness, text_scale, text_color_rgba, duration)
+
+    def cancelLastTask(self, vehicle_name = ''):
+        """
+        Cancel previous Async task
+
+        Args:
+            vehicle_name (str, optional): Name of the vehicle
+        """
+        self.client.call('cancelLastTask', vehicle_name)
+
+#Recording APIs
+    def startRecording(self):
+        """
+        Start Recording
+
+        Recording will be done according to the settings
+        """
+        self.client.call('startRecording')
+
+    def stopRecording(self):
+        """
+        Stop Recording
+        """
+        self.client.call('stopRecording')
+
+    def isRecording(self):
+        """
+        Whether Recording is running or not
+
+        Returns:
+            bool: True if Recording, else False
+        """
+        return self.client.call('isRecording')
+
+    def simSetWind(self, wind):
+        """
+        Set simulated wind, in World frame, NED direction, m/s
+
+        Args:
+            wind (Vector3r): Wind, in World frame, NED direction, in m/s
+        """
+        self.client.call('simSetWind', wind)
+
+    def simCreateVoxelGrid(self, position, x, y, z, res, of):
+        """
+        Construct and save a binvox-formatted voxel grid of environment
+
+        Args:
+            position (Vector3r): Position around which voxel grid is centered in m
+            x, y, z (int): Size of each voxel grid dimension in m
+            res (float): Resolution of voxel grid in m
+            of (str): Name of output file to save voxel grid as
+
+        Returns:
+            bool: True if output written to file successfully, else False
+        """
+        return self.client.call('simCreateVoxelGrid', position, x, y, z, res, of)
+
+#Add new vehicle via RPC
+    def simAddVehicle(self, vehicle_name, vehicle_type, pose, pawn_path = ""):
+        """
+        Create vehicle at runtime
+
+        Args:
+            vehicle_name (str): Name of the vehicle being created
+            vehicle_type (str): Type of vehicle, e.g. "simpleflight"
+            pose (Pose): Initial pose of the vehicle
+            pawn_path (str, optional): Vehicle blueprint path, default empty wbich uses the default blueprint for the vehicle type
+
+        Returns:
+            bool: Whether vehicle was created
+        """
+        return self.client.call('simAddVehicle', vehicle_name, vehicle_type, pose, pawn_path)
+
+    def listVehicles(self):
+        """
+        Lists the names of current vehicles
+
+        Returns:
+            list[str]: List containing names of all vehicles
+        """
+        return self.client.call('listVehicles')
+
+    def getSettingsString(self):
+        """
+        Fetch the settings text being used by AirSim
+
+        Returns:
+            str: Settings text in JSON format
+        """
+        return self.client.call('getSettingsString')
+
+    def simSetExtForce(self, ext_force):
+        """
+        Set arbitrary external forces, in World frame, NED direction. Can be used
+        for implementing simple payloads.
+
+        Args:
+            ext_force (Vector3r): Force, in World frame, NED direction, in N
+        """
+        self.client.call('simSetExtForce', ext_force)
+
+# -----------------------------------  Multirotor APIs ---------------------------------------------
 class MultirotorClient(VehicleClient, object):
     def __init__(self, ip = "", port = 41451, timeout_value = 3600):
         super(MultirotorClient, self).__init__(ip, port, timeout_value)

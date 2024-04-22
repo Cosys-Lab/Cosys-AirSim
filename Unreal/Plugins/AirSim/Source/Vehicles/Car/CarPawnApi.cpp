@@ -1,13 +1,13 @@
 #include "CarPawnApi.h"
 #include "AirBlueprintLib.h"
 
-#include "PhysXVehicleManager.h"
+#include "ChaosVehicleManager.h"
 
 CarPawnApi::CarPawnApi(ACarPawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics,
                        msr::airlib::CarApiBase* vehicle_api)
     : pawn_(pawn), pawn_kinematics_(pawn_kinematics), vehicle_api_(vehicle_api)
 {
-    movement_ = pawn->GetVehicleMovement();
+    movement_ = CastChecked<UChaosWheeledVehicleMovementComponent>(pawn->GetVehicleMovement());
 }
 
 void CarPawnApi::updateMovement(const msr::airlib::CarApiBase::CarControls& controls)
@@ -23,7 +23,7 @@ void CarPawnApi::updateMovement(const msr::airlib::CarApiBase::CarControls& cont
     movement_->SetSteeringInput(controls.steering);
     movement_->SetBrakeInput(controls.brake);
     movement_->SetHandbrakeInput(controls.handbrake);
-    movement_->SetUseAutoGears(!controls.is_manual_gear);
+    movement_->SetUseAutomaticGears(!controls.is_manual_gear);
 }
 
 msr::airlib::CarApiBase::CarState CarPawnApi::getCarState() const
@@ -56,16 +56,17 @@ void CarPawnApi::reset()
         movement_->SetActive(true, true);
         vehicle_api_->setCarControls(msr::airlib::CarApiBase::CarControls());
         updateMovement(msr::airlib::CarApiBase::CarControls());
+        movement_->ResetVehicleState();
 
-        auto pv = movement_->PVehicle;
-        if (pv) {
-            pv->mWheelsDynData.setToRestState();
-        }
-        auto pvd = movement_->PVehicleDrive;
-        if (pvd) {
-            pvd->mDriveDynData.setToRestState();
-        }
-    }, true);                                         
+//        auto pv = movement_->PVehicle;
+//        if (pv) {
+//            pv->mWheelsDynData.setToRestState();
+//        }
+//        auto pvd = movement_->PVehicleDrive;
+//        if (pvd) {
+//            pvd->mDriveDynData.setToRestState();
+//        }
+    }, true);
      //UAirBlueprintLib::RunCommandOnGameThread([this, &phys_comps]() {
     //    for (auto* phys_comp : phys_comps)
     //        phys_comp->SetSimulatePhysics(true);

@@ -278,7 +278,6 @@ namespace airlib
             const auto& response = getWorldSimApi()->getDetections(type, CameraDetails(camera_name, vehicle_name));
             return RpcLibAdaptorsBase::DetectionInfo::from(response);
         });
-
         pimpl_->server.bind("reset", [&]() -> void {
             //Exit if already resetting.
             static bool resetInProgress;
@@ -543,6 +542,10 @@ namespace airlib
 
         pimpl_->server.bind("simSetWind", [&](const RpcLibAdaptorsBase::Vector3r& wind) -> void {
             getWorldSimApi()->setWind(wind.to());
+        });
+
+        pimpl_->server.bind("simSetExtForce", [&](const RpcLibAdaptorsBase::Vector3r& ext_force) -> void {
+            getWorldSimApi()->setExtForce(ext_force.to());
         });
 
         pimpl_->server.bind("listVehicles", [&]() -> vector<string> {

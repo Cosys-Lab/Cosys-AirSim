@@ -482,12 +482,13 @@ namespace airlib
         CameraDirectorSetting camera_director;
         std::map<std::string, std::unique_ptr<BeaconSetting>> beacons;
         std::map<std::string, std::unique_ptr<PassiveEchoBeaconSetting>> passive_echo_beacons;
-            float speed_unit_factor = 1.0f;
+        float speed_unit_factor = 1.0f;
         std::string speed_unit_label = "m\\s";
         std::map<std::string, std::shared_ptr<SensorSetting>> sensor_defaults;
         Vector3r wind = Vector3r::Zero();
-        std::string settings_text_ = "";
+        Vector3r ext_force = Vector3r::Zero();
         std::string material_list_file = "";
+        std::string settings_text_ = "";
 
     public: //methods
         static AirSimSettings& singleton()
@@ -543,7 +544,7 @@ namespace airlib
             Settings& settings_json = Settings::singleton();
             //write some settings_json in new file otherwise the string "null" is written if all settings_json are empty
             settings_json.setString("SeeDocsAt", "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md");
-            settings_json.setDouble("SettingsVersion", 1.2);
+            settings_json.setDouble("SettingsVersion", 2.0);
 
             std::string settings_filename = Settings::getUserDirectoryFullPath("settings.json");
             //TODO: there is a crash in Linux due to settings_json.saveJSonString(). Remove this workaround after we only support Unreal 4.17
@@ -802,7 +803,6 @@ namespace airlib
                 capture_settings[i] = CaptureSetting();
             }
             capture_settings.at(Utils::toNumeric(ImageType::Scene)).target_gamma = CaptureSetting::kSceneTargetGamma;
-        	capture_settings.at(Utils::toNumeric(ImageType::Segmentation)).target_gamma = 1;
         }
 
         static void loadCaptureSettings(const Settings& settings_json, CaptureSettingsMap& capture_settings)
@@ -1407,6 +1407,13 @@ namespace airlib
                     wind = createVectorSetting(child_json, wind);
                 }
             }
+            {
+                // External Force Settings
+                Settings child_json;
+                if (settings_json.getChild("ExternalForce", child_json)) {
+                    ext_force = createVectorSetting(child_json, ext_force);
+                }
+            }
         }
 
         static void loadDefaultCameraSetting(const Settings& settings_json, CameraSetting& camera_defaults)
@@ -1416,7 +1423,6 @@ namespace airlib
                 camera_defaults = createCameraSetting(child_json, camera_defaults);
             }
         }
-
         static void loadCameraDirectorSetting(const Settings& settings_json,
                                               CameraDirectorSetting& camera_director, const std::string& simmode_name)
         {

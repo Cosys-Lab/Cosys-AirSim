@@ -168,6 +168,8 @@ namespace airlib
         bool isRecording();
 
         void simSetWind(const Vector3r& wind) const;
+        void simSetExtForce(const Vector3r& ext_force) const;
+
         vector<string> listVehicles();
 
         std::string getSettingsString() const;
