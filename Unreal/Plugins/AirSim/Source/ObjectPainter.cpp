@@ -275,52 +275,52 @@ bool UObjectPainter::PaintComponent(UMeshComponent* component, const FColor& col
 {
 	if (!component) return false;
 
-	FLinearColor LinearColor = FLinearColor(color);
-	const FColor NewColor = LinearColor.ToFColor(false);
-
-	if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component))
-	{
-		UStaticMesh* staticmesh;
-		staticmesh = staticmesh_component->GetStaticMesh(); 
-		if (staticmesh)
-		{
-			uint32 num_lod_level = staticmesh->RenderData->LODResources.Num();
-			for (uint32 painting_mesh_lod_index = 0; painting_mesh_lod_index < num_lod_level; painting_mesh_lod_index++)
-			{
-				FStaticMeshLODResources& lod_model = staticmesh->RenderData->LODResources[painting_mesh_lod_index];
-				FStaticMeshComponentLODInfo* instance_mesh_lod_info = NULL;
-
-				// painting_mesh_lod_index + 1 is the minimum requirement, enlarge if not satisfied
-				staticmesh_component->SetLODDataCount(painting_mesh_lod_index + 1, staticmesh_component->LODData.Num());
-				instance_mesh_lod_info = &staticmesh_component->LODData[painting_mesh_lod_index];
-
-				instance_mesh_lod_info->ReleaseOverrideVertexColorsAndBlock();
-				{
-					instance_mesh_lod_info->OverrideVertexColors = new FColorVertexBuffer;
-					instance_mesh_lod_info->OverrideVertexColors->InitFromSingleColor(FColor::White, lod_model.GetNumVertices());
-				}
-
-				uint32 num_vertices = lod_model.GetNumVertices();
-				check(instance_mesh_lod_info->OverrideVertexColors);
-				check(num_vertices <= instance_mesh_lod_info->OverrideVertexColors->GetNumVertices());
-
-				for (uint32 color_index = 0; color_index < num_vertices; ++color_index)
-				{
-					// Need to initialize the vertex buffer first
-					uint32 num_override_vertex_colors = instance_mesh_lod_info->OverrideVertexColors->GetNumVertices();
-					uint32 num_painted_vertices = instance_mesh_lod_info->PaintedVertices.Num();
-					instance_mesh_lod_info->OverrideVertexColors->VertexColor(color_index) = NewColor;
-				}
-				BeginInitResource(instance_mesh_lod_info->OverrideVertexColors);
-				staticmesh_component->MarkRenderStateDirty();
-					
-			}
-		}
-	}
-	if (USkinnedMeshComponent*  skinnedmesh_component = Cast<USkinnedMeshComponent>(component))
-	{
-		skinnedmesh_component->SetAllVertexColorOverride(NewColor);
-	}
+//	FLinearColor LinearColor = FLinearColor(color);
+//	const FColor NewColor = LinearColor.ToFColor(false);
+//
+//	if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component))
+//	{
+//		UStaticMesh* staticmesh;
+//		staticmesh = staticmesh_component->GetStaticMesh();
+//		if (staticmesh)
+//		{
+//			uint32 num_lod_level = staticmesh->RenderData->LODResources.Num();
+//			for (uint32 painting_mesh_lod_index = 0; painting_mesh_lod_index < num_lod_level; painting_mesh_lod_index++)
+//			{
+//				FStaticMeshLODResources& lod_model = staticmesh->RenderData->LODResources[painting_mesh_lod_index];
+//				FStaticMeshComponentLODInfo* instance_mesh_lod_info = NULL;
+//
+//				// painting_mesh_lod_index + 1 is the minimum requirement, enlarge if not satisfied
+//				staticmesh_component->SetLODDataCount(painting_mesh_lod_index + 1, staticmesh_component->LODData.Num());
+//				instance_mesh_lod_info = &staticmesh_component->LODData[painting_mesh_lod_index];
+//
+//				instance_mesh_lod_info->ReleaseOverrideVertexColorsAndBlock();
+//				{
+//					instance_mesh_lod_info->OverrideVertexColors = new FColorVertexBuffer;
+//					instance_mesh_lod_info->OverrideVertexColors->InitFromSingleColor(FColor::White, lod_model.GetNumVertices());
+//				}
+//
+//				uint32 num_vertices = lod_model.GetNumVertices();
+//				check(instance_mesh_lod_info->OverrideVertexColors);
+//				check(num_vertices <= instance_mesh_lod_info->OverrideVertexColors->GetNumVertices());
+//
+//				for (uint32 color_index = 0; color_index < num_vertices; ++color_index)
+//				{
+//					// Need to initialize the vertex buffer first
+//					uint32 num_override_vertex_colors = instance_mesh_lod_info->OverrideVertexColors->GetNumVertices();
+//					uint32 num_painted_vertices = instance_mesh_lod_info->PaintedVertices.Num();
+//					instance_mesh_lod_info->OverrideVertexColors->VertexColor(color_index) = NewColor;
+//				}
+//				BeginInitResource(instance_mesh_lod_info->OverrideVertexColors);
+//				staticmesh_component->MarkRenderStateDirty();
+//
+//			}
+//		}
+//	}
+//	if (USkinnedMeshComponent*  skinnedmesh_component = Cast<USkinnedMeshComponent>(component))
+//	{
+//		skinnedmesh_component->SetAllVertexColorOverride(NewColor);
+//	}
 	return true;
 }
 
