@@ -1,10 +1,10 @@
 ### May 2024
 * Merge of [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum).
-* Updated Unreal to 5.2.1
+* Updated Unreal to 5.2.1.
 
 ### April 2024
-* Merge of Cosys-Lab fork with last Public Microsoft AirSim branch version
-* Updated Unreal to 4.27 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys))
+* Merge of Cosys-Lab fork with last Public Microsoft AirSim branch version.
+* Updated Unreal to 4.27 (custom fork: [https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys](https://github.com/WouterJansen/UnrealEngine/tree/4.27-cosys)).
 
 ### December 2023
 * Added this changelog.
