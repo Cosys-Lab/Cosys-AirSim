@@ -39,6 +39,22 @@ See [Using APIs](apis.md) and [settings.json](settings.md) for various options a
 The other environments available often need additional asset packs to be downloaded first, read [here](environments.md) for more information.
 
 # FAQ
+
+
+#### I get an error `Il ‘P1’, version ‘X’, does not match ‘P2’, version ‘X’`
+This is caused by multiple versions of Visual Studio installed on the machine. The build script of AirSim will use the latest versions it can find so need to make Unreal does the same.
+Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppData\Roaming\Unreal Engine\UnrealBuildTool_ and add the following:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?> 
+<Configuration xmlns="https://www.unrealengine.com/BuildConfiguration">
+<WindowsPlatform>
+<CompilerVersion>Latest</CompilerVersion>
+</WindowsPlatform>
+</Configuration>
+```
+
+
 #### I get `error C100 : An internal error has occurred in the compiler` when running build.cmd
 We have noticed this happening with VS version `15.9.0` and have checked-in a workaround in AirSim code. If you have this VS version, please make sure to pull the latest AirSim code.
 
