@@ -10,7 +10,6 @@
 #include "EngineUtils.h"
 #include "CoreMinimal.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
-#include <PxScene.h>
 #include "Runtime/Core/Public/Async/ParallelFor.h"
 #include "Beacons/WifiBeacon.h"
 #include <typeinfo>
@@ -204,14 +203,14 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 				traceRayCurrentbounces += 1;
 
 				// If beacon was hit
-				if (trace_hit_result.Actor != nullptr) {
+				if (trace_hit_result.GetActor() != nullptr) {
 					//if ((trace_hit_result.Actor->GetName().Len() >= 10) && (trace_hit_result.Actor->GetName().Left(10) == "wifiBeacon")) {
-					if (trace_hit_result.Actor->IsA(AWifiBeacon::StaticClass())) {
+					if (trace_hit_result.GetActor()->IsA(AWifiBeacon::StaticClass())) {
 						mtxWifi.lock();
 						auto hitActor = trace_hit_result.GetActor();
 						
 						int tmpRssi = (int)traceRayCurrentSignalStrength;
-						FVector beaconPos = trace_hit_result.Actor->GetActorLocation() - startPos;
+						FVector beaconPos = trace_hit_result.GetActor()->GetActorLocation() - startPos;
 						
 						msr::airlib::WifiHit thisHit;
 						

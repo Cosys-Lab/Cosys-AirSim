@@ -66,7 +66,7 @@ FColor GetColorFromColorMap(int32 color_index)
 	int num_per_channel = 256;
 	int uneven_start = 79;
 	int full_start = 149;
-	int uneven_count = FMath::FloorToInt((full_start - uneven_start + 2) / 2);
+	int uneven_count = FMath::FloorToInt((full_start - uneven_start + 2) / 2.0f);
 	if (color_map_.Num() == 0)	{
 
 		for (int32 i = uneven_start; i <= full_start; i += 2) {

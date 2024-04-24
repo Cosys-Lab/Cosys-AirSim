@@ -9,7 +9,6 @@
 #include "EngineUtils.h"
 #include "CoreMinimal.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
-#include <PxScene.h>
 #include "Engine/Engine.h"
 #include "Runtime/Core/Public/Async/ParallelFor.h"
 

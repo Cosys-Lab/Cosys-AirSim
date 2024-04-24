@@ -586,33 +586,6 @@ void ASimModeBase::initializeCameraDirector(const FTransform& camera_transform, 
     }
 }
 
-void ASimModeBase::initializeExternalCameras()
-{
-    FActorSpawnParameters camera_spawn_params;
-    camera_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-    const auto& transform = getGlobalNedTransform();
-
-    //for each camera in settings
-    for (const auto& camera_setting_pair : getSettings().external_cameras) {
-        const auto& setting = camera_setting_pair.second;
-
-        //get pose
-        FVector position = transform.fromLocalNed(setting.position) - transform.fromLocalNed(Vector3r::Zero());
-        FTransform camera_transform(FRotator(setting.rotation.pitch, setting.rotation.yaw, setting.rotation.roll),
-                                    position,
-                                    FVector(1., 1., 1.));
-
-        //spawn and attach camera to pawn
-        camera_spawn_params.Name = FName(("external_" + camera_setting_pair.first).c_str());
-        APIPCamera* camera = this->GetWorld()->SpawnActor<APIPCamera>(pip_camera_class, camera_transform, camera_spawn_params);
-
-        camera->setupCameraFromSettings(setting, transform);
-
-        //add on to our collection
-        external_cameras_.insert_or_assign(camera_setting_pair.first, camera);
-    }
-}
-
 bool ASimModeBase::toggleRecording()
 {
     if (isRecording())
@@ -648,13 +621,12 @@ void ASimModeBase::toggleTraceAll()
 
 const APIPCamera* ASimModeBase::getCamera(const msr::airlib::CameraDetails& camera_details) const
 {
-    return camera_details.external ? getExternalCamera(camera_details.camera_name)
-                                   : getVehicleSimApi(camera_details.vehicle_name)->getCamera(camera_details.camera_name);
+    return getVehicleSimApi(camera_details.vehicle_name)->getCamera(camera_details.camera_name);
 }
 
-const UnrealImageCapture* ASimModeBase::getImageCapture(const std::string& vehicle_name, bool external) const
+const UnrealImageCapture* ASimModeBase::getImageCapture(const std::string& vehicle_name) const
 {
-    return external ? external_image_capture_.get() : getVehicleSimApi(vehicle_name)->getImageCapture();
+    return getVehicleSimApi(vehicle_name)->getImageCapture();
 }
 
 //API server start/stop
@@ -854,10 +826,6 @@ void ASimModeBase::setupVehiclesAndCamera()
             vehicle_sim_apis_.push_back(std::move(vehicle_sim_api));
         }
     }
-
-    // Create External Cameras
-    initializeExternalCameras();
-    external_image_capture_ = std::make_unique<UnrealImageCapture>(&external_cameras_);
 
     if (getApiProvider()->hasDefaultVehicle()) {
         //TODO: better handle no FPV vehicles scenario

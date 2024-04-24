@@ -10,7 +10,6 @@
 #include "EngineUtils.h"
 #include "CoreMinimal.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
-#include <PxScene.h>
 #include "Runtime/Core/Public/Async/ParallelFor.h"
 #include "Beacons/UWBBeacon.h"
 #include <typeinfo>
@@ -208,9 +207,9 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 				traceRayCurrentbounces += 1;
 
 				// If beacon was hit
-				if (trace_hit_result.Actor != nullptr) {
+				if (trace_hit_result.GetActor() != nullptr) {
 					//if ((trace_hit_result.Actor->GetName().Len() >= 9) && (trace_hit_result.Actor->GetName().Left(9) == "uwbBeacon")) {
-					if (trace_hit_result.Actor->IsA(AUWBBeacon::StaticClass())) {
+					if (trace_hit_result.GetActor()->IsA(AUWBBeacon::StaticClass())) {
 						mtx.lock();
 						auto hitActor = trace_hit_result.GetActor();
 						//FString tmpName, tmpId;
@@ -221,7 +220,7 @@ int UnrealMarLocUwbSensor::traceDirection(FVector trace_start_position, FVector 
 						//trace_hit_result.Actor->GetFName().ToString().Split(TEXT("_"), &tmpName, &tmpId);
 						//tmpName = trace_hit_result.Actor->GetFName().ToString();
 						int tmpRssi = (int)traceRayCurrentSignalStrength;
-						FVector beaconPos = trace_hit_result.Actor->GetActorLocation() - startPos;
+						FVector beaconPos = trace_hit_result.GetActor()->GetActorLocation() - startPos;
 
 						//FVector beaconPos = trace_hit_result.Actor->
 						//UWBHit thisHit = { FCString::Atoi(*tmpId),  tmpRssi, beaconPos[0], beaconPos[1] , beaconPos[2] };

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WheeledVehicleMovementComponent4W.h"
-
 #include "ComputerVisionPawn.h"
 #include "ComputerVisionPawnApi.h"
 #include "PawnEvents.h"
@@ -52,8 +50,6 @@ protected:
 
 
 private:
-
-
     std::unique_ptr<msr::airlib::ComputerVisionApiBase> vehicle_api_;
     std::unique_ptr<ComputerVisionPawnApi> pawn_api_;
     std::vector<std::string> vehicle_api_messages_;
