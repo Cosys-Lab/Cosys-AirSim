@@ -14,8 +14,9 @@ AUWBBeacon::AUWBBeacon()
 
 	// set the mesh
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Beacon mesh"));
+	this->SetRootComponent(Mesh);
 	// attach to root component
-	Mesh->SetupAttachment(GetRootComponent());
+	//Mesh->SetupAttachment(GetRootComponent());
 	// set path for static mesh
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/uwbBeacon.uwbBeacon'"));

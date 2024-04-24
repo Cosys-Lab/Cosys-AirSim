@@ -32,6 +32,13 @@ void SkidVehiclePawnApi::updateMovement(const msr::airlib::CarApiBase::CarContro
 		movement_->SetBreaksOff();
 	}
 	movement_->SetUseAutomaticGears(!controls.is_manual_gear);
+
+	//float accel = FMath::Min((float)sqrt(controls.steering * controls.steering + controls.throttle * controls.throttle), 1.0f);
+	//movement_->SetThrottleInput(accel);
+	//movement_->SetSteeringInput(controls.steering);
+	//movement_->SetBrakeInput(controls.brake);
+	//movement_->SetHandbrakeInput(controls.handbrake);
+	//movement_->SetUseAutomaticGears(!controls.is_manual_gear);
 }
 
 msr::airlib::CarApiBase::CarState SkidVehiclePawnApi::getCarState() const

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "ObjectFilter.h"
+#include <string>
 #include "DetectionComponent.generated.h"
 
 USTRUCT()

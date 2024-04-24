@@ -266,7 +266,7 @@ void ASkidVehiclePawn::updatePhysicsMaterial()
 //This method must be in pawn because Unreal doesn't allow key bindings to non UObject pointers
 void ASkidVehiclePawn::setupInputBindings()
 {
-	UAirBlueprintLib::EnableInput(this);
+	//UAirBlueprintLib::EnableInput(this);
 
 	UAirBlueprintLib::BindAxisToKey(FInputAxisKeyMapping("MoveY", EKeys::Up, 0.5), this,
 		this, &ASkidVehiclePawn::onMoveY);

@@ -168,29 +168,8 @@ public:
 public:
 
 
-	/** Engine */
-	UPROPERTY(EditAnywhere, Category = MechanicalSetup)
-		FVehicleEngineDataSkid EngineSetupLocal;
-
-	/** Transmission data */
-	UPROPERTY(EditAnywhere, Category = MechanicalSetup)
-		FVehicleTransmissionDataSkid TransmissionSetupLocal;
-
 	UPROPERTY(EditAnywhere, Category = "Skid Setup")
-		uint32 NumOfWheels;
-
-	/** Maximum steering versus forward speed (km/h) */
-	UPROPERTY(EditAnywhere, Category = SteeringSetup)
-		FRuntimeFloatCurve SteeringCurve;
-
-	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRateConfig LeftThrustRate;
-	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRateConfig RightThrustRate;
-	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRateConfig RightBrakeRate;
-	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRateConfig LeftBrakeRate;
+	uint32 NumOfWheels;
 
 public:
 
@@ -201,8 +180,6 @@ public:
 protected:
 
 	virtual void SetupVehicle(TUniquePtr<Chaos::FSimpleWheeledVehicle>& PVehicle) override;
-
-	void UpdateSimulation(float DeltaTime, const FChaosVehicleDefaultAsyncInput& InputData, Chaos::FRigidBodyHandle_Internal* Handle);
 
 protected:
 

@@ -67,6 +67,7 @@ ALidarCamera::ALidarCamera()
 
 	// Add components
 	arrow_ = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
+	this->SetRootComponent(arrow_);
 	capture_2D_depth_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DDepth"));
 	capture_2D_segmentation_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DSegmentation"));
 	capture_2D_intensity_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DIntensity"));
