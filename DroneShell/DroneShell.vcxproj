@@ -34,7 +34,7 @@
     <ProjectGuid>{9FE9234B-373A-4D5A-AD6B-FB0B593312DD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DroneShell</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

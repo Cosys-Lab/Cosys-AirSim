@@ -45,7 +45,7 @@
     <ProjectGuid>{4358ED90-CCA1-47A8-8D68-A260F212931E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>HelloCar</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

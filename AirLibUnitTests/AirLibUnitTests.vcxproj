@@ -34,7 +34,7 @@
     <ProjectGuid>{2A61ED54-2B66-4B9B-99FA-299DD0EF57CD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>AirLibUnitTests</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
