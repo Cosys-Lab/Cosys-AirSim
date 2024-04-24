@@ -5,7 +5,7 @@
 #include "SkidVehicle.h"
 #include "SkidVehicleMovementComponent.h"
 
-ASkidVehicle::ASkidVehicle(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<USkidVehicleMovementComponent>(AWheeledVehicle::VehicleMovementComponentName))
+ASkidVehicle::ASkidVehicle(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 
 

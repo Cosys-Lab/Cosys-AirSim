@@ -2,8 +2,7 @@
 
 #include "SkidVehiclePawnApi.h"
 #include "AirBlueprintLib.h"
-
-#include "PhysXVehicleManager.h"
+#include "ChaosVehicleManager.h"
 
 SkidVehiclePawnApi::SkidVehiclePawnApi(ASkidVehiclePawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics, msr::airlib::CarApiBase* vehicle_api)
 	: pawn_(pawn), pawn_kinematics_(pawn_kinematics), vehicle_api_(vehicle_api)
@@ -32,7 +31,7 @@ void SkidVehiclePawnApi::updateMovement(const msr::airlib::CarApiBase::CarContro
 	else {
 		movement_->SetBreaksOff();
 	}
-	movement_->SetUseAutoGears(!controls.is_manual_gear);
+	movement_->SetUseAutomaticGears(!controls.is_manual_gear);
 }
 
 msr::airlib::CarApiBase::CarState SkidVehiclePawnApi::getCarState() const
@@ -65,14 +64,14 @@ void SkidVehiclePawnApi::reset()
 		movement_->SetActive(true, true);
 		updateMovement(msr::airlib::CarApiBase::CarControls());
 
-		auto pv = movement_->PVehicle;
-		if (pv) {
-			pv->mWheelsDynData.setToRestState();
-		}
-		auto pvd = movement_->PVehicleDrive;
-		if (pvd) {
-			pvd->mDriveDynData.setToRestState();
-		}
+		//auto pv = movement_->PVehicle;
+		//if (pv) {
+		//	pv->mWheelsDynData.setToRestState();
+		//}
+		//auto pvd = movement_->PVehicleDrive;
+		//if (pvd) {
+		//	pvd->mDriveDynData.setToRestState();
+		//}
 	}, true);
 
 	//UAirBlueprintLib::RunCommandOnGameThread([this, &phys_comps]() {

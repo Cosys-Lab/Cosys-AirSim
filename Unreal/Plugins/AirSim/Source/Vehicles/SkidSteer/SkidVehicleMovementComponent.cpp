@@ -4,10 +4,6 @@
 
 #include "SkidVehicleMovementComponent.h"
 #include "Components/PrimitiveComponent.h"
-#include "Runtime/Engine/Private/PhysicsEngine/PhysXSupport.h"
-#include "PhysXPublic.h"
-#include "PhysXVehicleManager.h"
-#include "PhysXIncludes.h"
 
 
 FVehicleTransmissionDataSkid::FVehicleTransmissionDataSkid()
@@ -56,54 +52,18 @@ float FVehicleEngineDataSkid::FindPeakTorque() const
 
 USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-#if WITH_PHYSX
-
 	RightThrustRate.FallRate = 5.f;
+	RightThrustRate.InputCurveFunction = EInputFunctionType::LinearFunction;
 	RightThrustRate.RiseRate = 2.5f;
 	LeftThrustRate.FallRate = 5.f;
 	LeftThrustRate.RiseRate = 2.5f;
+	LeftThrustRate.InputCurveFunction = EInputFunctionType::LinearFunction;
 	LeftBrakeRate.RiseRate = 6.f;
 	LeftBrakeRate.FallRate = 10.f;
+	LeftBrakeRate.InputCurveFunction = EInputFunctionType::LinearFunction;
 	RightBrakeRate.RiseRate = 6.f;
 	RightBrakeRate.FallRate = 10.f;
-
-	PxVehicleEngineData DefEngineData;
-	EngineSetupLocal.MOI = DefEngineData.mMOI;
-	EngineSetupLocal.MaxRPM = OmegaToRPM(DefEngineData.mMaxOmega);
-	EngineSetupLocal.DampingRateFullThrottle = DefEngineData.mDampingRateFullThrottle;
-	EngineSetupLocal.DampingRateZeroThrottleClutchEngaged = DefEngineData.mDampingRateZeroThrottleClutchEngaged;
-	EngineSetupLocal.DampingRateZeroThrottleClutchDisengaged = DefEngineData.mDampingRateZeroThrottleClutchDisengaged;
-
-	// Convert from PhysX curve to ours
-	FRichCurve* TorqueCurveData = EngineSetupLocal.TorqueCurve.GetRichCurve();
-	for (PxU32 KeyIdx = 0; KeyIdx < DefEngineData.mTorqueCurve.getNbDataPairs(); KeyIdx++)
-	{
-		float Input = DefEngineData.mTorqueCurve.getX(KeyIdx) * EngineSetupLocal.MaxRPM;
-		float Output = DefEngineData.mTorqueCurve.getY(KeyIdx) * DefEngineData.mPeakTorque;
-		TorqueCurveData->AddKey(Input, Output);
-	}
-
-	PxVehicleClutchData DefClutchData;
-	TransmissionSetupLocal.ClutchStrength = DefClutchData.mStrength;
-
-	PxVehicleGearsData DefGearSetup;
-	TransmissionSetupLocal.GearSwitchTime = DefGearSetup.mSwitchTime;
-	TransmissionSetupLocal.ReverseGearRatio = DefGearSetup.mRatios[PxVehicleGearsData::eREVERSE];
-	TransmissionSetupLocal.FinalRatio = DefGearSetup.mFinalRatio;
-
-	PxVehicleAutoBoxData DefAutoBoxSetup;
-	TransmissionSetupLocal.NeutralGearUpRatio = DefAutoBoxSetup.mUpRatios[PxVehicleGearsData::eNEUTRAL];
-	TransmissionSetupLocal.GearAutoBoxLatency = DefAutoBoxSetup.getLatency();
-	TransmissionSetupLocal.bUseGearAutoBox = true;
-
-	for (uint32 i = PxVehicleGearsData::eFIRST; i < DefGearSetup.mNbRatios; i++)
-	{
-		FVehicleGearDataSkid GearData;
-		GearData.DownRatio = DefAutoBoxSetup.mDownRatios[i];
-		GearData.UpRatio = DefAutoBoxSetup.mUpRatios[i];
-		GearData.Ratio = DefGearSetup.mRatios[i];
-		TransmissionSetupLocal.ForwardGears.Add(GearData);
-	}
+	RightBrakeRate.InputCurveFunction = EInputFunctionType::LinearFunction;
 
 	// Init steering speed curve
 	FRichCurve* SteeringCurveData = SteeringCurve.GetRichCurve();
@@ -114,7 +74,6 @@ USkidVehicleMovementComponent::USkidVehicleMovementComponent(const FObjectInitia
 
 	// Initialize WheelSetups array with 4 wheels
 	WheelSetups.SetNum(4);
-#endif // WITH_PHYSX
 }
 
 float FindSkidPeakTorque(const FVehicleEngineDataSkid& Setup)
@@ -130,77 +89,7 @@ float FindSkidPeakTorque(const FVehicleEngineDataSkid& Setup)
 	return PeakTorque;
 }
 
-#if WITH_PHYSX
-static void GetSkidVehicleEngineSetup(const FVehicleEngineDataSkid& Setup, PxVehicleEngineData& PxSetup)
-{
-	PxSetup.mMOI = M2ToCm2(Setup.MOI);
-	PxSetup.mMaxOmega = RPMToOmega(Setup.MaxRPM);
-	PxSetup.mDampingRateFullThrottle = M2ToCm2(Setup.DampingRateFullThrottle);
-	PxSetup.mDampingRateZeroThrottleClutchEngaged = M2ToCm2(Setup.DampingRateZeroThrottleClutchEngaged);
-	PxSetup.mDampingRateZeroThrottleClutchDisengaged = M2ToCm2(Setup.DampingRateZeroThrottleClutchDisengaged);
-
-	float PeakTorque = FindSkidPeakTorque(Setup); // In Nm
-	PxSetup.mPeakTorque = M2ToCm2(PeakTorque);	// convert Nm to (kg cm^2/s^2)
-
-	// Convert from our curve to PhysX
-	PxSetup.mTorqueCurve.clear();
-	TArray<FRichCurveKey> TorqueKeys = Setup.TorqueCurve.GetRichCurveConst()->GetCopyOfKeys();
-	int32 NumTorqueCurveKeys = FMath::Min<int32>(TorqueKeys.Num(), PxVehicleEngineData::eMAX_NB_ENGINE_TORQUE_CURVE_ENTRIES);
-	for (int32 KeyIdx = 0; KeyIdx < NumTorqueCurveKeys; KeyIdx++)
-	{
-		FRichCurveKey& Key = TorqueKeys[KeyIdx];
-		const float KeyFloat = FMath::IsNearlyZero(Setup.MaxRPM) ? 0.f : Key.Time / Setup.MaxRPM;
-		const float ValueFloat = FMath::IsNearlyZero(PeakTorque) ? 0.f : Key.Value / PeakTorque;
-		PxSetup.mTorqueCurve.addPair(FMath::Clamp(KeyFloat, 0.f, 1.f), FMath::Clamp(ValueFloat, 0.f, 1.f)); // Normalize torque to 0-1 range
-	}
-}
-
-static void GetSkidVehicleGearSetup(const FVehicleTransmissionDataSkid& Setup, PxVehicleGearsData& PxSetup)
-{
-	PxSetup.mSwitchTime = Setup.GearSwitchTime;
-	PxSetup.mRatios[PxVehicleGearsData::eREVERSE] = Setup.ReverseGearRatio;
-	for (int32 i = 0; i < Setup.ForwardGears.Num(); i++)
-	{
-		PxSetup.mRatios[i + PxVehicleGearsData::eFIRST] = Setup.ForwardGears[i].Ratio;
-	}
-	PxSetup.mFinalRatio = Setup.FinalRatio;
-	PxSetup.mNbRatios = Setup.ForwardGears.Num() + PxVehicleGearsData::eFIRST;
-}
-
-static void GetSkidVehicleAutoBoxSetup(const FVehicleTransmissionDataSkid& Setup, PxVehicleAutoBoxData& PxSetup)
-{
-	for (int32 i = 0; i < Setup.ForwardGears.Num(); i++)
-	{
-		const FVehicleGearDataSkid& GearData = Setup.ForwardGears[i];
-		PxSetup.mUpRatios[i + PxVehicleGearsData::eFIRST] = GearData.UpRatio;
-		PxSetup.mDownRatios[i + PxVehicleGearsData::eFIRST] = GearData.DownRatio;
-	}
-	PxSetup.mUpRatios[PxVehicleGearsData::eNEUTRAL] = Setup.NeutralGearUpRatio;
-	PxSetup.setLatency(Setup.GearAutoBoxLatency);
-}
-
-void SetupSkidDriveHelper(const USkidVehicleMovementComponent* VehicleData, const PxVehicleWheelsSimData* PWheelsSimData, PxVehicleDriveSimData4W& DriveData, uint32 NumOfWheels)
-{
-	PxVehicleEngineData EngineSetup;
-	GetSkidVehicleEngineSetup(VehicleData->EngineSetupLocal, EngineSetup);
-	DriveData.setEngineData(EngineSetup);
-
-	PxVehicleClutchData ClutchSetup;
-	ClutchSetup.mStrength = M2ToCm2(VehicleData->TransmissionSetupLocal.ClutchStrength);
-	DriveData.setClutchData(ClutchSetup);
-
-	PxVehicleGearsData GearSetup;
-	GetSkidVehicleGearSetup(VehicleData->TransmissionSetupLocal, GearSetup);
-	DriveData.setGearsData(GearSetup);
-
-	PxVehicleAutoBoxData AutoBoxSetup;
-	GetSkidVehicleAutoBoxSetup(VehicleData->TransmissionSetupLocal, AutoBoxSetup);
-	DriveData.setAutoBoxData(AutoBoxSetup);
-}
-#endif // WITH_PHYSX
-
-#if WITH_PHYSX_VEHICLES
-void USkidVehicleMovementComponent::SetupVehicle()
+void USkidVehicleMovementComponent::SetupVehicle(TUniquePtr<Chaos::FSimpleWheeledVehicle>& PVehicle)
 {
 
 	if (!UpdatedPrimitive)
@@ -211,81 +100,26 @@ void USkidVehicleMovementComponent::SetupVehicle()
 	if (WheelSetups.Num() % 2 != 0 && WheelSetups.Num() > 20)
 	{
 		PVehicle = NULL;
-		PVehicleDrive = NULL;
 		return;
 	}
 
+
+
 	for (int32 WheelIdx = 0; WheelIdx < WheelSetups.Num(); ++WheelIdx)
 	{
-		const FWheelSetup& WheelSetup = WheelSetups[WheelIdx];
+		const FChaosWheelSetup& WheelSetup = WheelSetups[WheelIdx];
 		if (WheelSetup.BoneName == NAME_None)
 		{
 			return;
 		}
 	}
 
-	// Setup the chassis and wheel shapes
-	SetupVehicleShapes();
-
-	// Setup mass properties
-	SetupVehicleMass();
-
-	// Setup the wheels
-	PxVehicleWheelsSimData* PWheelsSimData = PxVehicleWheelsSimData::allocate(WheelSetups.Num());
-
-	SetupWheels(PWheelsSimData);
-
-	// Setup drive data
-	PxVehicleDriveSimData4W DriveData;
-	SetupSkidDriveHelper(this, PWheelsSimData, DriveData, WheelSetups.Num());
-
-	// Create the vehicle
-	PxVehicleDriveTank* PVehicleDriveTank = PxVehicleDriveTank::allocate(WheelSetups.Num());
-	check(PVehicleDriveTank);
-
-	FPhysicsCommand::ExecuteWrite(UpdatedPrimitive->GetBodyInstance()->ActorHandle, [&](const FPhysicsActorHandle& Actor)
-	{
-#if WITH_CHAOS || WITH_IMMEDIATE_PHYSX
-		PxRigidActor* PRigidActor = nullptr;
-#else
-		PxRigidActor* PRigidActor = Actor.SyncActor;
-#endif
-
-		if (PRigidActor)
-		{
-			if (PxRigidDynamic* PRigidDynamic = PRigidActor->is<PxRigidDynamic>())
-			{
-				PVehicleDriveTank->setup(GPhysXSDK, PRigidDynamic, *PWheelsSimData, DriveData, WheelSetups.Num());
-				PVehicleDriveTank->setToRestState();
-
-				// cleanup
-				PWheelsSimData->free();
-			}
-		}
-	});
-	PWheelsSimData = NULL;
-	// cache values
-	PVehicle = PVehicleDriveTank;
-	PVehicleDrive = PVehicleDriveTank;
-
-	SetUseAutoGears(TransmissionSetupLocal.bUseGearAutoBox);
-
+	Super::SetupVehicle(PVehicle);
 }
 
-void USkidVehicleMovementComponent::SetupWheels(physx::PxVehicleWheelsSimData* PWheelsSimData)
+
+void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime, const FChaosVehicleDefaultAsyncInput& InputData, Chaos::FRigidBodyHandle_Internal* Handle)
 {
-	Super::SetupWheels(PWheelsSimData);
-}
-#endif // WITH_PHYSX
-
-#if WITH_PHYSX_VEHICLES
-
-void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
-{
-	if (PVehicleDrive == NULL)
-		return;
-
-	PxVehicleDriveTankRawInputData VehicleInputData(PxVehicleDriveTankControlModel::eSPECIAL);
 
 	float accel = FMath::Min((float)sqrt(nJoyX*nJoyX + nJoyY*nJoyY) , 1.0f);
 
@@ -348,35 +182,26 @@ void USkidVehicleMovementComponent::UpdateSimulation(float DeltaTime)
 	nMotMixL = (1.0 - fPivScale)*nMotPremixL + fPivScale * (nPivSpeed);
 	nMotMixR = (1.0 - fPivScale)*nMotPremixR + fPivScale * (-nPivSpeed);
    
-	VehicleInputData.setAnalogLeftThrust(nMotMixL);
-	VehicleInputData.setAnalogRightThrust(nMotMixR);
-	VehicleInputData.setAnalogAccel(accel);
 
-	if (!PVehicleDrive->mDriveDynData.getUseAutoGears())
+	FChaosVehicleDefaultAsyncInput VehicleInputData;	
+	VehicleInputData.ControlInputs.YawInput = nJoyX;
+	VehicleInputData.ControlInputs.ThrottleInput = accel;
+
+	if (!Super::GetUseAutoGears())
 	{
-		VehicleInputData.setGearUp(bRawGearUpInput);
-		VehicleInputData.setGearDown(bRawGearDownInput);
+		VehicleInputData.ControlInputs.GearUpInput = bRawGearUpInput;
+		VehicleInputData.ControlInputs.GearDownInput = bRawGearDownInput;
 	}
 
 	// Toggle on/off digital (hand) break
 	if (toggleBreak) {
-		VehicleInputData.setAnalogLeftBrake(LeftBreak);
-		VehicleInputData.setAnalogRightBrake(RightBreak);
-		VehicleInputData.setAnalogAccel(0);
+		VehicleInputData.ControlInputs.BrakeInput = LeftBreak;
+		VehicleInputData.ControlInputs.ThrottleInput = 0;
+		VehicleInputData.ControlInputs.HandbrakeInput = LeftBreak;
 		//UE_LOG(LogTemp, Warning, TEXT("Braking %f %f "), VehicleInputData.getAnalogLeftBrake(), VehicleInputData.getAnalogRightBrake());
 	}
-	// Convert from our curve to PxFixedSizeLookupTable
-
-	PxVehiclePadSmoothingData SmoothData = {
-		{ ThrottleInputRate.RiseRate, LeftBrakeRate.RiseRate, RightBrakeRate.RiseRate, LeftThrustRate.RiseRate, RightThrustRate.RiseRate },
-		{ ThrottleInputRate.FallRate, LeftBrakeRate.FallRate, RightBrakeRate.FallRate, LeftThrustRate.FallRate, RightThrustRate.FallRate }
-	};
-
-	PxVehicleDriveTank* PVehicleDriveTank = (PxVehicleDriveTank*)PVehicleDrive;
-	PxVehicleDriveTankSmoothAnalogRawInputsAndSetAnalogInputs(SmoothData, VehicleInputData, DeltaTime, *PVehicleDriveTank);
-
+	VehicleSimulationPT->UpdateSimulation(DeltaTime, VehicleInputData, Handle);
 }
-#endif // WITH_PHYSX_VEHICLES
 
 #if WITH_EDITOR
 void USkidVehicleMovementComponent::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
@@ -415,94 +240,60 @@ void USkidVehicleMovementComponent::PostEditChangeProperty(struct FPropertyChang
 
 void USkidVehicleMovementComponent::SetAcceleration(float OtherAcceleration)
 {
-#if WITH_PHYSX_VEHICLES
 	this->Acceleration = OtherAcceleration;
-#endif
 }
 
 void USkidVehicleMovementComponent::SetLeftBreak(float OtherLeftBreak)
 {
-#if WITH_PHYSX_VEHICLES
 	this->LeftBreak = OtherLeftBreak;
-#endif
 }
 
 void USkidVehicleMovementComponent::SetRightBreak(float OtherRightBreak)
 {
-#if WITH_PHYSX_VEHICLES
 	this->RightBreak = OtherRightBreak;
-#endif
 }
 
 void USkidVehicleMovementComponent::SetYJoy(float OtherNJoyY)
 {
-#if WITH_PHYSX_VEHICLES
 	this->nJoyY = OtherNJoyY;
-#endif
 }
 
 void USkidVehicleMovementComponent::SetXJoy(float OtherNJoyX)
 {
-#if WITH_PHYSX_VEHICLES
 	this->nJoyX = OtherNJoyX;
-#endif
 }
 
 float USkidVehicleMovementComponent::GetAcceleration() const
 {
-#if WITH_PHYSX_VEHICLES
 	return Acceleration;
-#else
-	return 0.0f;
-#endif
 }
 
 float USkidVehicleMovementComponent::GetLeftBreak() const
 {
-#if WITH_PHYSX_VEHICLES
 	return LeftBreak;
-#else
-	return 0.0f;
-#endif
 }
 
 float USkidVehicleMovementComponent::GetRightBreak() const
 {
-#if WITH_PHYSX_VEHICLES
 	return RightBreak;
-#else
-	return 0.0f;
-#endif
 }
 
 float USkidVehicleMovementComponent::GetYJoy() const
 {
-#if WITH_PHYSX_VEHICLES
 	return nJoyY;
-#else
-	return 0.0f;
-#endif
 }
 
 float USkidVehicleMovementComponent::GetXJoy() const
 {
-#if WITH_PHYSX_VEHICLES
 	return nJoyX;
-#else
-	return 0.0f;
-#endif
 }
 
 void USkidVehicleMovementComponent::SetBreaksOn()
 {
-#if WITH_PHYSX_VEHICLES
 	this->toggleBreak = true;
-#endif
 }
 
 void USkidVehicleMovementComponent::SetBreaksOff()
 {
-#if WITH_PHYSX_VEHICLES
 	this->toggleBreak = false;
-#endif
 }

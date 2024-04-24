@@ -181,8 +181,9 @@ void ASkidVehiclePawn::Tick(float Delta)
 	updateInCarHUD();
 
 	// Pass the engine RPM to the sound component
-	float RPMToAudioScale = 2500.0f / GetVehicleMovement()->GetEngineMaxRotationSpeed();
-	engine_sound_audio_->SetFloatParameter(FName("RPM"), GetVehicleMovement()->GetEngineRotationSpeed()*RPMToAudioScale);
+	UChaosWheeledVehicleMovementComponent* movement = CastChecked<UChaosWheeledVehicleMovementComponent>(getVehicleMovementComponent());
+	float RPMToAudioScale = 2500.0f / movement->GetEngineMaxRotationSpeed();
+	engine_sound_audio_->SetFloatParameter(FName("RPM"), movement->GetEngineRotationSpeed() * RPMToAudioScale);
 
 	pawn_events_.getPawnTickSignal().emit(Delta);
 }
@@ -216,10 +217,10 @@ void ASkidVehiclePawn::updateHUDStrings()
 		last_gear_ = (Gear == 0) ? LOCTEXT("N", "N") : FText::AsNumber(Gear);
 	}
 
-
+	UChaosWheeledVehicleMovementComponent* movement = CastChecked<UChaosWheeledVehicleMovementComponent>(getVehicleMovementComponent());
 	UAirBlueprintLib::LogMessage(TEXT("Speed: "), last_speed_.ToString(), LogDebugLevel::Informational);
 	UAirBlueprintLib::LogMessage(TEXT("Gear: "), last_gear_.ToString(), LogDebugLevel::Informational);
-	UAirBlueprintLib::LogMessage(TEXT("RPM: "), FText::AsNumber(GetVehicleMovement()->GetEngineRotationSpeed()).ToString(), LogDebugLevel::Informational);
+	UAirBlueprintLib::LogMessage(TEXT("RPM: "), FText::AsNumber(movement->GetEngineRotationSpeed()).ToString(), LogDebugLevel::Informational);
 }
 
 void ASkidVehiclePawn::updateInCarHUD()

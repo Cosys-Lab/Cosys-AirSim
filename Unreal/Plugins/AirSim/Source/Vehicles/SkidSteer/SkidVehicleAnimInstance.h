@@ -5,14 +5,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VehicleAnimInstance.h"
+#include "Vehicles/SkidSteer/SkidVehicle.h"
+#include "VehicleAnimationInstance.h"
 #include "SkidVehicleAnimInstance.generated.h"
 
 /**
  * 
  */
 UCLASS(transient)
-class AIRSIM_API USkidVehicleAnimInstance : public UVehicleAnimInstance
+class AIRSIM_API USkidVehicleAnimInstance : public UVehicleAnimationInstance
 {
 	GENERATED_UCLASS_BODY()
 

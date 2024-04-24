@@ -5,8 +5,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WheeledVehicleMovementComponent.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 #include "Curves/CurveFloat.h"
 #include "UObject/ObjectMacros.h"
 #include "SkidVehicleMovementComponent.generated.h"
@@ -66,6 +65,7 @@ USTRUCT()
 struct FVehicleGearDataSkid
 {
 	GENERATED_BODY()
+
 	FVehicleGearDataSkid();
 
 	/** Determines the amount of torque multiplication*/
@@ -122,7 +122,7 @@ struct FVehicleTransmissionDataSkid
 };
 
 UCLASS(ClassGroup = (Physics), meta = (BlueprintSpawnableComponent), hidecategories = (PlanarMovement, "Components|Movement|Planar", Activation, "Components|Activation"))
-class AIRSIM_API USkidVehicleMovementComponent : public UWheeledVehicleMovementComponent
+class AIRSIM_API USkidVehicleMovementComponent : public UChaosWheeledVehicleMovementComponent
 {
 	GENERATED_UCLASS_BODY()
 	
@@ -184,13 +184,13 @@ public:
 		FRuntimeFloatCurve SteeringCurve;
 
 	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRate LeftThrustRate;
+		FVehicleInputRateConfig LeftThrustRate;
 	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRate RightThrustRate;
+		FVehicleInputRateConfig RightThrustRate;
 	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRate RightBrakeRate;
+		FVehicleInputRateConfig RightBrakeRate;
 	UPROPERTY(EditAnywhere, Category = SkidInput, AdvancedDisplay)
-		FVehicleInputRate LeftBrakeRate;
+		FVehicleInputRateConfig LeftBrakeRate;
 
 public:
 
@@ -200,15 +200,9 @@ public:
 
 protected:
 
-#if WITH_PHYSX && PHYSICS_INTERFACE_PHYSX
+	virtual void SetupVehicle(TUniquePtr<Chaos::FSimpleWheeledVehicle>& PVehicle) override;
 
-	virtual void SetupVehicle() override;
-
-	virtual void SetupWheels(physx::PxVehicleWheelsSimData* PWheelsSimData) override;
-
-	virtual void UpdateSimulation(float DeltaTime) override;
-
-#endif // WITH_PHYSX
+	void UpdateSimulation(float DeltaTime, const FChaosVehicleDefaultAsyncInput& InputData, Chaos::FRigidBodyHandle_Internal* Handle);
 
 protected:
 

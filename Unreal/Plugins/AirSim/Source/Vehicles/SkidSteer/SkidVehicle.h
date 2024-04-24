@@ -5,14 +5,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WheeledVehicle.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
+#include "WheeledVehiclePawn.h"
 #include "SkidVehicle.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AIRSIM_API ASkidVehicle : public AWheeledVehicle
+class AIRSIM_API ASkidVehicle : public AWheeledVehiclePawn
 {
 	GENERATED_UCLASS_BODY()
 	
