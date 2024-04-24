@@ -8,7 +8,8 @@ Click on the `Install` button on the top right, which should show the option to 
 ![Unreal Engine Install Location UI Screenshot](images/ue_install_location.png)
 
 ## Build AirSim
-* Start `x64 Native Tools Command Prompt for VS 2022`. 
+* Install Visual Studio 2022. Make sure to select Desktop Development with C++ and Windows 10 SDK **10.0.18362** and select the latest .NET Framework SDK under the 'Individual Components' tab while installing VS 2022. More info [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/setting-up-visual-studio-development-environment-for-cplusplus-projects-in-unreal-engine?application_version=5.2).
+* Start `Developer Command Prompt for VS 2022`. 
 * Clone the repo: `git clone https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git`, and go the AirSim directory by `cd AirSim`. 
 * Run `build.cmd` from the command line. This will create ready to use plugin bits in the `Unreal\Plugins` folder that can be dropped into any Unreal project.
 

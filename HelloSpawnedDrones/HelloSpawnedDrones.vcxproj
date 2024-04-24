@@ -39,7 +39,7 @@
     <ProjectGuid>{99CBF376-5EBA-4164-A657-E7D708C9D685}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>HelloSpawnedDrones</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
