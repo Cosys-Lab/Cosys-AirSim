@@ -19,6 +19,7 @@ APassiveEchoBeacon::APassiveEchoBeacon()
 	this->SetRootComponent(arrow_);
 
 	Super::SetActorHiddenInGame(true);
+	name_ = this->GetName();
 }
 
 // initializes information based on echo configuration
@@ -32,7 +33,7 @@ void APassiveEchoBeacon::getPointCloud()
 	FVector trace_start_position;
 	trace_start_position = ned_transform_->fromLocalNed(beacon_reference_frame_.position);
 
-	std::string source_label = TCHAR_TO_UTF8(*this->GetName());
+
 
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetLocation().X);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetLocation().Y);
@@ -43,8 +44,8 @@ void APassiveEchoBeacon::getPointCloud()
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetRotation().Rotator().Vector().X);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetRotation().Rotator().Vector().Y);
 	point_cloud_.emplace_back(ned_transform_->getGlobalTransform().GetRotation().Rotator().Vector().Z);
-	groundtruth_.emplace_back(source_label);
-	groundtruth_.emplace_back(source_label);
+	groundtruth_.emplace_back(std::string(TCHAR_TO_UTF8(*name_)));
+	groundtruth_.emplace_back(std::string(TCHAR_TO_UTF8(*name_)));
 	for (auto sample_direction_point_count = 0u; sample_direction_point_count < sample_direction_points_.size(); ++sample_direction_point_count)
 	{
 		Vector3r sample_direction_point = sample_direction_points_[sample_direction_point_count];
@@ -57,7 +58,7 @@ void APassiveEchoBeacon::getPointCloud()
 		// Shoot trace and get the impact point and remaining attenuation, if any returns
 		UnrealEchoSensor::traceDirection(trace_start_position, trace_end_position, point_cloud_, groundtruth_, ned_transform_, beacon_reference_frame_,
 			distance_limit_, reflection_limit_, attenuation_limit_, reflection_distance_limit_cm_, 0, attenuation_per_distance_, attenuation_per_reflection_, ignore_actors_, this, false, true,
-			draw_debug_duration_, line_thickness_ / 2, false, draw_debug_all_lines_, false, false, false, false, true, true, reflection_only_final_, source_label);
+			draw_debug_duration_, line_thickness_ / 2, false, draw_debug_all_lines_, false, false, false, false, true, true, reflection_only_final_, std::string(TCHAR_TO_UTF8(*name_)));
 	}
 }
 

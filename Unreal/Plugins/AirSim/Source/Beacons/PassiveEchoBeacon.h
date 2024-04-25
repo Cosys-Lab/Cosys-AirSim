@@ -21,6 +21,9 @@ public:
 	// Sets default values for this actor's properties
 	APassiveEchoBeacon();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
+	FString	name_ = "MyPassiveEchoBeacon";
+
 	/** Toggle the beacon on or off. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
 		bool enable_ = true;

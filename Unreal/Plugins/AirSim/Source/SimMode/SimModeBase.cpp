@@ -887,36 +887,39 @@ void ASimModeBase::setupVehiclesAndCamera()
         {
             const auto& passive_echo_beacon_setting = *passive_echo_beacon_setting_pair.second;
             //compute initial pose
-            FVector spawn_position = FVector(0, 0, 0);
-            msr::airlib::Vector3r settings_position = passive_echo_beacon_setting.position;
-            if (!msr::airlib::VectorMath::hasNan(settings_position))
-                spawn_position = global_ned_transform_->toFVector(settings_position, 100, true);
-            FRotator spawn_rotation = toFRotator(passive_echo_beacon_setting.rotation, FRotator());
+            if (passive_echo_beacon_setting.enable) {
+                FVector spawn_position = FVector(0, 0, 0);
+                msr::airlib::Vector3r settings_position = passive_echo_beacon_setting.position;
+                if (!msr::airlib::VectorMath::hasNan(settings_position))
+                    spawn_position = global_ned_transform_->toFVector(settings_position, 100, true);
+                FRotator spawn_rotation = toFRotator(passive_echo_beacon_setting.rotation, FRotator());
 
-            //spawn passive echo beacon actor
-            FActorSpawnParameters actor_spawn_params;
-            actor_spawn_params.Name = FName(passive_echo_beacon_setting.name.c_str());
-            actor_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-            actor_spawn_params.bDeferConstruction = true;
-            APassiveEchoBeacon* spawned_passive_echo_beacon = static_cast<APassiveEchoBeacon*>(GetWorld()->SpawnActor<APassiveEchoBeacon>(spawn_position, spawn_rotation, actor_spawn_params));
-            spawned_passive_echo_beacon->enable_ = passive_echo_beacon_setting.enable;
-            spawned_passive_echo_beacon->initial_directions_ = passive_echo_beacon_setting.initial_directions;
-            spawned_passive_echo_beacon->initial_lower_azimuth_limit_ = passive_echo_beacon_setting.initial_lower_azimuth_limit;
-            spawned_passive_echo_beacon->initial_upper_azimuth_limit_ = passive_echo_beacon_setting.initial_upper_azimuth_limit;
-            spawned_passive_echo_beacon->initial_lower_elevation_limit_ = passive_echo_beacon_setting.initial_lower_elevation_limit;
-            spawned_passive_echo_beacon->initial_upper_elevation_limit_ = passive_echo_beacon_setting.initial_upper_elevation_limit;
-            spawned_passive_echo_beacon->attenuation_limit_ = passive_echo_beacon_setting.attenuation_limit;
-            spawned_passive_echo_beacon->reflection_distance_limit_ = passive_echo_beacon_setting.reflection_distance_limit;
-            spawned_passive_echo_beacon->reflection_only_final_ = passive_echo_beacon_setting.reflection_only_final;
-            spawned_passive_echo_beacon->attenuation_per_distance_ = passive_echo_beacon_setting.attenuation_per_distance;
-            spawned_passive_echo_beacon->attenuation_per_reflection_ = passive_echo_beacon_setting.attenuation_per_reflection;
-            spawned_passive_echo_beacon->distance_limit_ = passive_echo_beacon_setting.distance_limit;
-            spawned_passive_echo_beacon->reflection_limit_ = passive_echo_beacon_setting.reflection_limit;
-            spawned_passive_echo_beacon->draw_debug_location_ = passive_echo_beacon_setting.draw_debug_location;
-            spawned_passive_echo_beacon->draw_debug_all_points_ = passive_echo_beacon_setting.draw_debug_all_points;
-            spawned_passive_echo_beacon->draw_debug_all_lines_ = passive_echo_beacon_setting.draw_debug_all_lines;
-            spawned_passive_echo_beacon->draw_debug_duration_ = passive_echo_beacon_setting.draw_debug_duration;
-            spawned_passive_echo_beacon->FinishSpawning(FTransform(spawn_rotation, spawn_position));
+                //spawn passive echo beacon actor
+                FActorSpawnParameters actor_spawn_params;
+                actor_spawn_params.Name = FName(passive_echo_beacon_setting.name.c_str());
+                actor_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+                actor_spawn_params.bDeferConstruction = true;
+                APassiveEchoBeacon* spawned_passive_echo_beacon = static_cast<APassiveEchoBeacon*>(GetWorld()->SpawnActor<APassiveEchoBeacon>(spawn_position, spawn_rotation, actor_spawn_params));
+                spawned_passive_echo_beacon->enable_ = passive_echo_beacon_setting.enable;
+                spawned_passive_echo_beacon->name_ = FString(passive_echo_beacon_setting.name.c_str());
+                spawned_passive_echo_beacon->initial_directions_ = passive_echo_beacon_setting.initial_directions;
+                spawned_passive_echo_beacon->initial_lower_azimuth_limit_ = passive_echo_beacon_setting.initial_lower_azimuth_limit;
+                spawned_passive_echo_beacon->initial_upper_azimuth_limit_ = passive_echo_beacon_setting.initial_upper_azimuth_limit;
+                spawned_passive_echo_beacon->initial_lower_elevation_limit_ = passive_echo_beacon_setting.initial_lower_elevation_limit;
+                spawned_passive_echo_beacon->initial_upper_elevation_limit_ = passive_echo_beacon_setting.initial_upper_elevation_limit;
+                spawned_passive_echo_beacon->attenuation_limit_ = passive_echo_beacon_setting.attenuation_limit;
+                spawned_passive_echo_beacon->reflection_distance_limit_ = passive_echo_beacon_setting.reflection_distance_limit;
+                spawned_passive_echo_beacon->reflection_only_final_ = passive_echo_beacon_setting.reflection_only_final;
+                spawned_passive_echo_beacon->attenuation_per_distance_ = passive_echo_beacon_setting.attenuation_per_distance;
+                spawned_passive_echo_beacon->attenuation_per_reflection_ = passive_echo_beacon_setting.attenuation_per_reflection;
+                spawned_passive_echo_beacon->distance_limit_ = passive_echo_beacon_setting.distance_limit;
+                spawned_passive_echo_beacon->reflection_limit_ = passive_echo_beacon_setting.reflection_limit;
+                spawned_passive_echo_beacon->draw_debug_location_ = passive_echo_beacon_setting.draw_debug_location;
+                spawned_passive_echo_beacon->draw_debug_all_points_ = passive_echo_beacon_setting.draw_debug_all_points;
+                spawned_passive_echo_beacon->draw_debug_all_lines_ = passive_echo_beacon_setting.draw_debug_all_lines;
+                spawned_passive_echo_beacon->draw_debug_duration_ = passive_echo_beacon_setting.draw_debug_duration;
+                spawned_passive_echo_beacon->FinishSpawning(FTransform(spawn_rotation, spawn_position));
+            }
         }
 
         //create API objects for each pawn we have
