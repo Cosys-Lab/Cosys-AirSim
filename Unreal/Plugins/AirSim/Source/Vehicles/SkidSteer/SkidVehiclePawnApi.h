@@ -3,7 +3,7 @@
 #pragma once
 
 #include "vehicles/car/api/CarApiBase.hpp"
-#include "SkidVehicleMovementComponent.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 #include "physics/Kinematics.hpp"
 #include "SkidVehiclePawn.h"
 
@@ -24,8 +24,12 @@ public:
 	virtual ~SkidVehiclePawnApi();
 
 private:
-	USkidVehicleMovementComponent* movement_;
+	UChaosWheeledVehicleMovementComponent* movement_;
 	msr::airlib::CarApiBase::CarControls last_controls_;
+	bool turn_started_ = false;
+	bool move_started_ = false;
+	bool turn_completed_ = false;
+	bool move_completed_ = false;
 	ASkidVehiclePawn* pawn_;
 	const msr::airlib::Kinematics::State* pawn_kinematics_;
 	msr::airlib::CarApiBase* vehicle_api_;

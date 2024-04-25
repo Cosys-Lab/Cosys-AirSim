@@ -158,7 +158,7 @@ if $downloadHighPolySuv; then
             fi
             mkdir -p "suv_download_tmp"
             cd suv_download_tmp
-            wget  https://github.com/CodexLabsLLC/Colosseum/releases/download/v2.0.0-beta.0/car_assets.zip
+            wget  https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip
             if [ -d "../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV" ]; then
                 rm -rf "../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV"
             fi

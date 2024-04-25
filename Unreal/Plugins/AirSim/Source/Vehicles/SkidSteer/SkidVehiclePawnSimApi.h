@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SkidVehicleMovementComponent.h"
-
+#include "ChaosWheeledVehicleMovementComponent.h"
 #include "SkidVehiclePawn.h"
 #include "SkidVehiclePawnApi.h"
 #include "PawnEvents.h"

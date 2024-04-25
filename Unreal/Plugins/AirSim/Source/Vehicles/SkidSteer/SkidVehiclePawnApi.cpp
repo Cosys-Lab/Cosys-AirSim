@@ -7,38 +7,94 @@
 SkidVehiclePawnApi::SkidVehiclePawnApi(ASkidVehiclePawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics, msr::airlib::CarApiBase* vehicle_api)
 	: pawn_(pawn), pawn_kinematics_(pawn_kinematics), vehicle_api_(vehicle_api)
 {
-	movement_ = pawn->GetSkidVehicleMovement();
+	movement_ = CastChecked<UChaosWheeledVehicleMovementComponent>(pawn->GetVehicleMovement());
 }
 
 void SkidVehiclePawnApi::updateMovement(const msr::airlib::CarApiBase::CarControls& controls)
-{
+{		
+	if (last_controls_.steering == 0 && controls.steering != 0)
+		turn_started_ = true;
+	if (last_controls_.throttle == 0 && controls.throttle != 0)
+		move_started_ = true;
+	if (last_controls_.steering != 0 && controls.steering == 0)
+		turn_completed_ = true;
+	if (last_controls_.throttle != 0 && controls.throttle == 0)
+		move_completed_ = true;
+
 	last_controls_ = controls;
 
-	if (!controls.is_manual_gear && movement_->GetTargetGear() < 0)
-		movement_->SetTargetGear(0, true); //in auto gear we must have gear >= 0
-	if (controls.is_manual_gear && movement_->GetTargetGear() != controls.manual_gear)
-		movement_->SetTargetGear(controls.manual_gear, controls.gear_immediate);
-
-	movement_->SetYJoy(controls.throttle);
-	movement_->SetXJoy(controls.steering);
-	movement_->SetLeftBreak(controls.brake);
-	movement_->SetRightBreak(controls.brake);
-	if (controls.brake || controls.handbrake) {
-		movement_->SetBreaksOn();
-		movement_->SetYJoy(0);
-		movement_->SetXJoy(0);
+	msr::airlib::CarApiBase::CarControls to_set_controls_ = controls;
+	to_set_controls_.brake = 0;
+	bool set_throttle = false;
+	bool set_steering = false;
+	if (controls.handbrake) {
+		to_set_controls_.throttle = 0;
+		to_set_controls_.steering = 0;
+		to_set_controls_.brake = 0;
+		to_set_controls_.handbrake = controls.handbrake;
+		set_throttle = true;
+		set_steering = true;
 	}
-	else {
-		movement_->SetBreaksOff();
+	else
+	{
+		if (move_completed_ || controls.throttle != 0){
+			if (move_completed_)
+				set_throttle = true;
+				move_completed_ = false;
+			if (controls.throttle >= 0) {
+				to_set_controls_.brake = 0;
+			}
+			else {
+				to_set_controls_.brake = controls.throttle * -1.0f;
+			}
+		}
+		if (move_started_) {
+			move_started_ = false;
+			to_set_controls_.steering = 0;
+			to_set_controls_.throttle = 0;
+			set_throttle = true;
+			set_steering = true;
+		}
+		if (turn_started_) {
+			if (controls.throttle == 0) {
+				// For some reason ChaosVehicles when setting Yaw input with negative value requires a velocity on the vehicle
+				if((FMath::Abs(movement_->GetForwardSpeed() / 100)) < 0.02 && controls.steering > 0) {					
+					to_set_controls_.throttle = pawn_->fixed_turn_rate_;	
+					set_throttle = true;
+				}
+			}
+		}			
+		if (controls.steering != 0 && pawn_->stop_turn_) {
+			to_set_controls_.steering = FMath::Lerp(controls.steering, 0, pawn_->fixed_turn_rate_);
+			UE_LOG(LogTemp, Warning, TEXT("STOP TURN"));
+			set_steering = true;
+		}
+		if (turn_completed_) {
+			to_set_controls_.steering = 0;
+			to_set_controls_.throttle = 0;
+			turn_completed_ = false;
+			set_throttle = true;
+			set_steering = true;
+			turn_started_ = false;
+		}
+		if (!set_steering)
+		{
+			to_set_controls_.steering = controls.steering;
+			set_steering = true;
+		}
+		if (!set_throttle)
+		{
+			to_set_controls_.throttle = controls.throttle;
+			set_throttle = true;
+		}
 	}
-	movement_->SetUseAutomaticGears(!controls.is_manual_gear);
-
-	//float accel = FMath::Min((float)sqrt(controls.steering * controls.steering + controls.throttle * controls.throttle), 1.0f);
-	//movement_->SetThrottleInput(accel);
-	//movement_->SetSteeringInput(controls.steering);
-	//movement_->SetBrakeInput(controls.brake);
-	//movement_->SetHandbrakeInput(controls.handbrake);
-	//movement_->SetUseAutomaticGears(!controls.is_manual_gear);
+	if(set_throttle)
+		movement_->SetThrottleInput(to_set_controls_.throttle);
+	if(set_steering)
+		movement_->SetYawInput(to_set_controls_.steering);
+	movement_->SetBrakeInput(to_set_controls_.brake);
+	movement_->SetHandbrakeInput(to_set_controls_.handbrake);
+	//UE_LOG(LogTemp, Warning, TEXT("throttle: %f | steering:  %f | brake: %f | handbrake: %s"), to_set_controls_.throttle, to_set_controls_.steering, to_set_controls_.brake, to_set_controls_.handbrake ? TEXT("true") : TEXT("false"));
 }
 
 msr::airlib::CarApiBase::CarState SkidVehiclePawnApi::getCarState() const
