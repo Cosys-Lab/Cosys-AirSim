@@ -66,7 +66,6 @@ void SkidVehiclePawnApi::updateMovement(const msr::airlib::CarApiBase::CarContro
 		}			
 		if (controls.steering != 0 && pawn_->stop_turn_) {
 			to_set_controls_.steering = FMath::Lerp(controls.steering, 0, pawn_->fixed_turn_rate_);
-			UE_LOG(LogTemp, Warning, TEXT("STOP TURN"));
 			set_steering = true;
 		}
 		if (turn_completed_) {
@@ -94,7 +93,7 @@ void SkidVehiclePawnApi::updateMovement(const msr::airlib::CarApiBase::CarContro
 		movement_->SetYawInput(to_set_controls_.steering);
 	movement_->SetBrakeInput(to_set_controls_.brake);
 	movement_->SetHandbrakeInput(to_set_controls_.handbrake);
-	//UE_LOG(LogTemp, Warning, TEXT("throttle: %f | steering:  %f | brake: %f | handbrake: %s"), to_set_controls_.throttle, to_set_controls_.steering, to_set_controls_.brake, to_set_controls_.handbrake ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogTemp, Warning, TEXT("throttle: %f | steering:  %f | brake: %f | handbrake: %s"), to_set_controls_.throttle, to_set_controls_.steering, to_set_controls_.brake, to_set_controls_.handbrake ? TEXT("true") : TEXT("false"));
 }
 
 msr::airlib::CarApiBase::CarState SkidVehiclePawnApi::getCarState() const

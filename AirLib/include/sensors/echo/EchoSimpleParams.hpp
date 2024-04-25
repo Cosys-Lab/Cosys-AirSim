@@ -10,23 +10,23 @@ namespace msr { namespace airlib {
 
 struct EchoSimpleParams {
 
-    int number_of_traces;					// Amount of traces (rays) being cast 
-	float reflection_opening_angle;			// Beam width of the scattered traces
-	real_T attenuation_per_distance;		// Attenuation of signal wrt distance traveled (dB/m)
-	real_T attenuation_per_reflection;		// Attenuation of signal wrt reflections (dB)
-	real_T attenuation_limit;				// Attenuation at which the signal is considered dissipated (dB)
-	real_T distance_limit;					// Maximum distance the signal can travel.
-	int reflection_limit;					// Maximum times the signal can reflect.
-	real_T reflection_distance_limit;		// Maximum distance between reflection locations.
-	real_T measurement_frequency;			// The frequency of the sensor (measurements/s)
-	real_T sensor_diameter;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
-	float sensor_lower_azimuth_limit;		// The lower azimuth limit of the sensor opening angle in degrees.
-	float sensor_upper_azimuth_limit;		// The upper azimuth limit of the sensor opening angle in degrees.
-	float sensor_lower_elevation_limit;		// The lower elevation limit of the sensor opening angle in degrees.
-	float sensor_upper_elevation_limit;		// The upper elevation limit of the sensor opening angle in degrees.
-	float sensor_passive_radius;            // The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled. 
+    int number_of_traces = 1000;					// Amount of traces (rays) being cast 
+	float reflection_opening_angle = 10;			// Beam width of the scattered traces
+	real_T attenuation_per_distance = 0;		// Attenuation of signal wrt distance traveled (dB/m)
+	real_T attenuation_per_reflection = 0;		// Attenuation of signal wrt reflections (dB)
+	real_T attenuation_limit = -100;				// Attenuation at which the signal is considered dissipated (dB)
+	real_T distance_limit = 10;					// Maximum distance the signal can travel.
+	int reflection_limit = 3;					// Maximum times the signal can reflect.
+	real_T reflection_distance_limit = 0.4;		// Maximum distance between reflection locations.
+	real_T measurement_frequency = 10;			// The frequency of the sensor (measurements/s)
+	real_T sensor_diameter = 0.5;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
+	float sensor_lower_azimuth_limit = -90;		// The lower azimuth limit of the sensor opening angle in degrees.
+	float sensor_upper_azimuth_limit = 90;		// The upper azimuth limit of the sensor opening angle in degrees.
+	float sensor_lower_elevation_limit = -90;		// The lower elevation limit of the sensor opening angle in degrees.
+	float sensor_upper_elevation_limit = 90;		// The upper elevation limit of the sensor opening angle in degrees.
+	float sensor_passive_radius = 10;            // The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled. 
 
-	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
+	bool pause_after_measurement = false;			// Pause the simulation after each measurement. Useful for API interaction to be synced
 	bool ignore_marked = false;
 	int testParam = 1;
 
@@ -40,18 +40,18 @@ struct EchoSimpleParams {
 	bool passive = false;                   // Sense and capture passive echo beacon data
 	bool active = true;                     // Sense and capture active echo beacon data (enable emission)
 
-	bool draw_reflected_points;				// Draw debug points in world where reflected points are captured by the echo sensor
-	bool draw_reflected_lines;				// Draw debug lines in world from reflected points to the echo sensor
-	bool draw_reflected_paths;				// Draw debug lines for the full path of reflected points to the sensor
-	bool draw_initial_points;				// Draw the points of the initial half sphere where the traces (rays) are cast
-	bool draw_bounce_lines;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
-	bool draw_sensor;						// Draw the physical sensor in the world on the vehicle
-	bool draw_external_points;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
-	bool draw_passive_sources;		        // Draw debug points and reflection lines for all detected passive echo sources (original sources and their reflection echos against objects).
-	bool draw_passive_lines;	        	// Draw debug lines of the sensor to the passive echo sources that are detected with line of sight. 
+	bool draw_reflected_points = false;				// Draw debug points in world where reflected points are captured by the echo sensor
+	bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the echo sensor
+	bool draw_reflected_paths = false;				// Draw debug lines for the full path of reflected points to the sensor
+	bool draw_initial_points = false;				// Draw the points of the initial half sphere where the traces (rays) are cast
+	bool draw_bounce_lines = false;					// Draw lines of all bouncing reflections of the traces with their color depending on attenuation
+	bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
+	bool draw_external_points = false;				// Draw points from an external source (e.g. MATLAB clustered pointcloud)
+	bool draw_passive_sources = false;		        // Draw debug points and reflection lines for all detected passive echo sources (original sources and their reflection echos against objects).
+	bool draw_passive_lines = false;	        	// Draw debug lines of the sensor to the passive echo sources that are detected with line of sight. 
 
-    real_T update_frequency;				// polling rate of update function, in Hz
-    real_T startup_delay;                   // startup delay of sensor, in sec
+    real_T update_frequency = 10;				// polling rate of update function, in Hz
+    real_T startup_delay = 1;                   // startup delay of sensor, in sec
 
     void initializeFromSettings(const AirSimSettings::EchoSetting& settings)
     {
@@ -59,7 +59,7 @@ struct EchoSimpleParams {
 
         const auto& settings_json = settings.settings;
 
-		number_of_traces = settings_json.getInt("NumberOfChannels", number_of_traces);
+		number_of_traces = settings_json.getInt("NumberOfTraces", number_of_traces);
 		reflection_opening_angle = settings_json.getFloat("ReflectionOpeningAngle", reflection_opening_angle);
 		sensor_lower_azimuth_limit = settings_json.getFloat("SensorLowerAzimuthLimit", sensor_lower_azimuth_limit);
 		sensor_upper_azimuth_limit = settings_json.getFloat("SensorUpperAzimuthLimit", sensor_upper_azimuth_limit);
