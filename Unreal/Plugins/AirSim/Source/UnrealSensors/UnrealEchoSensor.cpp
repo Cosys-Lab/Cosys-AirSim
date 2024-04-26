@@ -264,7 +264,7 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 					FVector point_direction = Vector3rToFVector(VectorMath::rotateVectorReverse(FVectorToVector3r(passive_point_allowed.direction), sensor_reference_frame_.orientation, 1));
 					passive_beacons_point_cloud.emplace_back(point_direction.X);
 					passive_beacons_point_cloud.emplace_back(point_direction.Y);
-					passive_beacons_point_cloud.emplace_back(point_direction.Z);
+					passive_beacons_point_cloud.emplace_back(-point_direction.Z);
 
 					passive_beacons_groundtruth.emplace_back(passive_point_allowed.reflection_object);
 					passive_beacons_groundtruth.emplace_back(passive_point_allowed.source_object);

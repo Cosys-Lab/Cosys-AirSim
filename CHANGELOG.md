@@ -4,6 +4,8 @@
 * Now using ChaosVehicles instead of PhysXVehicles. Some issues may arise.
 * Added `MoveWorldOrigin` for the settings to move the world origin to the player start location when starting the simulator. Disabled by default. This affects things like setting the sensors to external!
 * Fixes for passive echo beacons and the data retrieved.
+* Fixed GPU Lidar not providing pointcloud in NED format.
+* Fixed Echo passive data Z-direction not being in NED format. 
 
 ### April 2024
 * Merge of Cosys-Lab fork with last Public Microsoft AirSim branch version.

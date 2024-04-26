@@ -276,7 +276,7 @@ classdef AirSimClient < handle
                 passiveData.distance = reflectorPointcloudPassiveRaw(:, 5); 
                 passiveData.reflections = reflectorPointcloudPassiveRaw(:, 6);
                 normalData = reflectorPointcloudPassiveRaw(:, 7:9);
-                normalData(:,2) = -normalData(:, 2);
+                normalData(:,2:3) = -normalData(:, 2:3);
                 passivePointCloud = pointCloud(reflectorPointcloudPassiveRaw(:, 1:3), Normal=normalData);
             end               
         end   
@@ -327,6 +327,7 @@ classdef AirSimClient < handle
             
             if mod(numel(lidarPointcloudRaw), 5) == 0 % Discard malformed point clouds
                 lidarPointcloudRaw = reshape(lidarPointcloudRaw, 5, []).';
+                lidarPointcloudRaw = obj.nedToRightHandCoordinates(lidarPointcloudRaw);
                 colorValues = uint32(lidarPointcloudRaw(:, 4));
                 lidarLabelColors = zeros(size(lidarPointcloudRaw, 1), 3, 'uint8');
                 lidarLabelColors(:, 1) = bitshift(bitand(colorValues, hex2dec('FF0000')), -16);

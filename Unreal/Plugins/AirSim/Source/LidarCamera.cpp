@@ -530,7 +530,7 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 					if (threshold_enable && used_by_airsim_) {
 						point_cloud.emplace_back(point.X / 100);
 						point_cloud.emplace_back(-point.Y / 100);
-						point_cloud.emplace_back(point.Z / 100);
+						point_cloud.emplace_back(-point.Z / 100);
 						std::uint32_t rgb = ((std::uint32_t)value_segmentation.R << 16 | (std::uint32_t)value_segmentation.G << 8 | (std::uint32_t)value_segmentation.B);
 						point_cloud.emplace_back(rgb);
 						point_cloud.emplace_back(final_intensity);
