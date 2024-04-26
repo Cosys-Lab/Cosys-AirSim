@@ -986,9 +986,9 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         output.close()
         rospy.loginfo("Merged rosbag with route and sensor data created!")
         if generate_gt_map:
-            rospy.loginfo("Generating segmentation colormap, this takes a while...")
+            rospy.loginfo("Loading segmentation colormap...")
             colorMap = client.simGetSegmentationColorMap()
-            rospy.loginfo("Generated segmentation colormap.")
+            rospy.loginfo("Loaded segmentation colormap.")
 
             currentObjectList = client.simListInstanceSegmentationObjects()
             rospy.loginfo("Generating list of all current objects...")

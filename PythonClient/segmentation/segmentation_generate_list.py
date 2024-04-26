@@ -16,9 +16,9 @@ if __name__ == '__main__':
     client.confirmConnection()
 
     # Generate list of all colors available for segmentation
-    print("Generating segmentation colormap, this takes a while...")
+    print("Loading segmentation colormap...")
     colorMap = client.simGetSegmentationColorMap()
-    print("Generated segmentation colormap.")
+    print("Loaded segmentation colormap.")
 
     # Get names of all objects in simulation world and store in list together with the associated RGB value
     # In a dynamic world, this is never the same!!

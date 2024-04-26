@@ -609,7 +609,7 @@ class VehicleClient:
         return self.client.call('simGetSegmentationObjectID', mesh_name)
 
     def simGetSegmentationColorMap(self):
-        return generate_colormap()
+        return load_colormap()
 
 
     def simAddDetectionFilterMeshName(self, camera_name, image_type, mesh_name, vehicle_name = '', external = False):

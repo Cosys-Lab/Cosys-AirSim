@@ -3,7 +3,7 @@ import os
 import inspect
 import re
 import logging
-
+import csv
 from .types import *
 
 
@@ -152,6 +152,24 @@ def generate_colormap():
         get_colormap_colors(maxChannelIndex, True, True, False, colorMap, channelValues, okValues)
         get_colormap_colors(maxChannelIndex, True, True, True, colorMap, channelValues, okValues)
     colorMap = np.asarray(colorMap)
+    return colorMap
+
+def load_read_csv(path: str):
+    with open(path, 'r') as csv_file:
+        reader = csv.reader(csv_file)
+        matrix = None
+        first_row = True
+        for row_index, row in enumerate(reader):
+            if first_row:
+                size = len(row)
+                matrix = np.zeros((size, size), dtype=np.int32)
+                first_row = False
+            matrix[row_index] = row
+
+    return matrix
+
+def load_colormap():
+    colorMap = np.load(os.path.dirname(os.path.abspath(__file__)) + "/colormap.npy")
     return colorMap
 
 

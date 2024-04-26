@@ -6,6 +6,7 @@
 * Fixes for passive echo beacons and the data retrieved.
 * Fixed GPU Lidar not providing pointcloud in NED format.
 * Fixed Echo passive data Z-direction not being in NED format. 
+* Python API now loads colormap from disk instead of regenerating each time and being very slow.
 
 ### April 2024
 * Merge of Cosys-Lab fork with last Public Microsoft AirSim branch version.
