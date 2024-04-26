@@ -42,6 +42,9 @@ UnrealEchoSensor::UnrealEchoSensor(const AirSimSettings::EchoSetting& setting, A
 	UGameplayStatics::GetAllActorsOfClass(actor_->GetWorld(), passive_beacon_class, found_beacons);
 	for (AActor* beacon_actor : found_beacons) {
 		APassiveEchoBeacon* beacon = Cast<APassiveEchoBeacon>(beacon_actor);
+		if (!beacon->IsStarted()) {
+			beacon->StartSampling();
+		}
 		passive_points_.Append(beacon->getPoints());
 	}
 	passive_points_.Sort([](const EchoPoint& ip1, const EchoPoint& ip2) {

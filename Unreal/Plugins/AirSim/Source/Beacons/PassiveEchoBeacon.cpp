@@ -106,25 +106,35 @@ TArray<UnrealEchoSensor::EchoPoint> APassiveEchoBeacon::getPoints() {
 void APassiveEchoBeacon::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	ned_transform_ = new NedTransform(this, NedTransform(Super::GetActorTransform(), UAirBlueprintLib::GetWorldToMetersScale(this)));
+void APassiveEchoBeacon::StartSampling() {
 
-	beacon_reference_frame_ = msr::airlib::Pose();
+	if (!started_) {
+		ned_transform_ = new NedTransform(this, NedTransform(Super::GetActorTransform(), UAirBlueprintLib::GetWorldToMetersScale(this)));
 
-	reflection_distance_limit_cm_ = ned_transform_->fromNed(reflection_distance_limit_);
+		beacon_reference_frame_ = msr::airlib::Pose();
 
-	if (draw_debug_location_) {
-		bool persistent_lines = false;
-		if (draw_debug_duration_ == -1)persistent_lines = true;
-		UAirBlueprintLib::DrawCoordinateSystem(this->GetWorld(), Super::GetActorLocation(), Super::GetActorRotation(), 25, persistent_lines, draw_debug_duration_, 10);
+		reflection_distance_limit_cm_ = ned_transform_->fromNed(reflection_distance_limit_);
+
+		if (draw_debug_location_) {
+			bool persistent_lines = false;
+			if (draw_debug_duration_ == -1)persistent_lines = true;
+			UAirBlueprintLib::DrawCoordinateSystem(this->GetWorld(), Super::GetActorLocation(), Super::GetActorRotation(), 25, persistent_lines, draw_debug_duration_, 10);
+		}
+		if (enable_) {
+			generateSampleDirectionPoints();
+			point_cloud_.clear();
+			groundtruth_.clear();
+			getPointCloud();
+			parsePointCloud();
+		}
+		started_ = true;
 	}
-	if (enable_) {
-		generateSampleDirectionPoints();
-		point_cloud_.clear();
-		groundtruth_.clear();
-		getPointCloud();
-		parsePointCloud();
-	}
+}
+
+bool APassiveEchoBeacon::IsStarted() {
+	return started_;
 }
 
 // Called every frame

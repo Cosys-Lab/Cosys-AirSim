@@ -7,6 +7,7 @@
 #include "Components/ArrowComponent.h"
 #include "NedTransform.h"
 #include "AirBlueprintLib.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "AirLib/include/common/AirSimSettings.hpp"
 #include "UnrealSensors/UnrealEchoSensor.h"
 
@@ -92,6 +93,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|Debug")
 		float draw_debug_duration_ = -1.f;
 
+	/** Generate the sampling for this passive echo beacon. */
+	UFUNCTION(BlueprintCallable, Category = "PassiveEchoBeacon")
+	void StartSampling();
+
+	/** If the startup sampling has already been called. */
+	UFUNCTION(BlueprintCallable, Category = "PassiveEchoBeacon")
+	bool IsStarted();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -122,4 +131,5 @@ private:
 	msr::airlib::Pose beacon_reference_frame_;
 	TArray<AActor*> ignore_actors_;
 	float reflection_distance_limit_cm_;
+	bool started_ = false;
 };
