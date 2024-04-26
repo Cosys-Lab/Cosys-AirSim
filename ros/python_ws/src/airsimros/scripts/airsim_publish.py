@@ -520,8 +520,8 @@ def get_gpulidar_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_time
             points = np.array(cur_lidar_data.point_cloud, dtype=np.dtype('f4'))
             points = np.reshape(points, (int(points.shape[0] / 5), 5))
             points_x = points[:, 0]
-            points_y = points[:, 1]
-            points_z = points[:, 2]
+            points_y = -points[:, 1]
+            points_z = -points[:, 2]
             points_rgb = points[:, 3].astype('uint32')
             points_intensity = points[:, 4]
             points_list = [points_x, points_y, points_z, points_rgb, points_intensity]
@@ -602,7 +602,7 @@ def get_echo_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestam
                 if len(cur_echo_data.passive_beacons_point_cloud) > 8:
                     pointsp = np.array(cur_echo_data.passive_beacons_point_cloud, dtype=np.dtype('f4'))
                     pointsp = np.reshape(pointsp, (int(pointsp.shape[0] / 9), 9))
-                    pointsp = pointsp * np.array([1, -1, -1, 1, 1, 1, 1, -1, 1])
+                    pointsp = pointsp * np.array([1, -1, -1, 1, 1, 1, 1, -1, -1])
                     pointsp_list = pointsp.tolist()
                     pcloud_passive = pc2.create_cloud(header, cur_fields_echo_passive, pointsp_list)
                     pcloud_passive.header.stamp = cur_timestamp
