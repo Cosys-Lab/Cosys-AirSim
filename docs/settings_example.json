@@ -5,6 +5,7 @@
     "LocalHostIp": "127.0.0.1",
     "ApiServerPort": 41451,
     "RecordUIVisible": true,
+    "MoveWorldOrigin": false,
     "LogMessagesVisible": true,
     "ShowLosDebugLines": false,
     "ViewMode": "",

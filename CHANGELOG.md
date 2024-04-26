@@ -1,6 +1,9 @@
 ### May 2024
 * Merge of [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum).
 * Updated Unreal to 5.2.1.
+* Now using ChaosVehicles instead of PhysXVehicles. Some issues may arise.
+* Added `MoveWorldOrigin` for the settings to move the world origin to the player start location when starting the simulator. Disabled by default. This affects things like setting the sensors to external!
+* Fixes for passive echo beacons and the data retrieved.
 
 ### April 2024
 * Merge of Cosys-Lab fork with last Public Microsoft AirSim branch version.

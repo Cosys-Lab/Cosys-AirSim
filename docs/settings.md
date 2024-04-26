@@ -54,6 +54,7 @@ Note this does not include most sensor types.
   "LocalHostIp": "127.0.0.1",
   "ApiServerPort": 41451,
   "RecordUIVisible": true,
+  "MoveWorldOrigin": false,
   "LogMessagesVisible": true,
   "ShowLosDebugLines": false,
   "ViewMode": "",
@@ -239,7 +240,7 @@ This setting specifies the latitude, longitude and altitude of the Player Start 
 This setting determines what is shown in each of 3 subwindows which are visible when you press 1,2,3 keys. 
 
 * `WindowID`: Can be 0 to 2
-* `CameraName`: is any [available camera](image_apis.md#available-cameras) on the vehicle or external camera
+* `CameraName`: is any [available camera](image_apis.md#available-cameras) on the vehicle
 * `ImageType`: integer value determines what kind of image gets shown according to [ImageType enum](image_apis.md#available-imagetype-values).
 * `VehicleName`: string allows you to specify the vehicle to use the camera from, used when multiple vehicles are specified in the settings. First vehicle's camera will be used if there are any mistakes such as incorrect vehicle name, or only a single vehicle.
 
@@ -306,11 +307,11 @@ The `CameraDefaults` element at root level specifies defaults used for all camer
 Like other sensors the pose of the sensor in the vehicle frame can be defined by X, Y, Z, Roll, Pitch, Yaw parameters. 
 Furthermore there are some other settings available:
 * `DrawSensor`: Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is.
-* `External`: Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates.
-* `ExternalLocal`: When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default.
+* `External`: Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates. Note that if `MoveWorldOrigin` in the settings.json is set to `true` the Unreal coordinates will be moved to be the same origin as the player start location and as such this may effect where the sensor will spawn. 
+* `ExternalLocal`: When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default. Note that if `MoveWorldOrigin` in the settings.json is set to `true` the Unreal coordinates will be moved to be the same origin as the player start location and as such this may effect what coordinates are returned if set to `false`. 
 
 ### Note on ImageType element
-The `ImageType` element in JSON array determines which image type that settings applies to. The valid values are described in [ImageType section](image_apis.md#available-imagetype). In addition, we also support special value `ImageType: -1` to apply the settings to external camera (i.e. what you are looking at on the screen).
+The `ImageType` element in JSON array determines which image type that settings applies to. The valid values are described in [ImageType section](image_apis.md#available-imagetype).
 
 For example, `CaptureSettings` element is json array so you can add settings for multiple image types easily.
 

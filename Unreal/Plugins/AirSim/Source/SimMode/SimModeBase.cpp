@@ -119,13 +119,16 @@ void ASimModeBase::BeginPlay()
         APlayerController* player_controller = this->GetWorld()->GetFirstPlayerController();
         fpv_pawn = player_controller->GetViewTarget();
     }
+
     player_start_transform = fpv_pawn->GetActorTransform();
-    player_loc = player_start_transform.GetLocation();
-    // Move the world origin to the player's location (this moves the coordinate system and adds
-    // a corresponding offset to all positions to compensate for the shift)
-    this->GetWorld()->SetNewWorldOrigin(FIntVector(player_loc) + this->GetWorld()->OriginLocation);
-    // Regrab the player's position after the offset has been added (which should be 0,0,0 now)
-    player_start_transform = fpv_pawn->GetActorTransform();
+    if (getSettings().move_world_origin) {
+        player_loc = player_start_transform.GetLocation();
+        // Move the world origin to the player's location (this moves the coordinate system and adds
+        // a corresponding offset to all positions to compensate for the shift)
+        this->GetWorld()->SetNewWorldOrigin(FIntVector(player_loc) + this->GetWorld()->OriginLocation);
+        // Regrab the player's position after the offset has been added (which should be 0,0,0 now)
+        player_start_transform = fpv_pawn->GetActorTransform();
+    }
     global_ned_transform_.reset(new NedTransform(player_start_transform,
                                                  UAirBlueprintLib::GetWorldToMetersScale(this)));
 

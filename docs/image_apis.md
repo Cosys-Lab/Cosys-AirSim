@@ -132,7 +132,7 @@ See also [other example code](https://github.com/Microsoft/AirSim/tree/master/Ex
 
 ## Available Cameras
 
-These are the default cameras already available in each vehicle. Apart from these, you can add more cameras to the vehicles and external cameras which are not attached to any vehicle through the [settings](settings.md).
+These are the default cameras already available in each vehicle. Apart from these, you can add more cameras to the vehicles or make them are not attached to any vehicle by setting them as `external`.
 
 ### Car
 The cameras on car can be accessed by following names in API calls: `front_center`, `front_right`, `front_left`, `fpv` and `back_center`. Here FPV camera is driver's head position in the car.
@@ -170,6 +170,7 @@ The `simGetCameraInfo` returns the FOV(in degrees), projection matrix of a camer
 * Default: The pose of the camera in the vehicle frame. 
 * External: If set to `External` the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 
+Note that if `MoveWorldOrigin` in the settings.json is set to `true` the Unreal coordinates will be moved to be the same origin as the player start location and as such this may effect where the sensor will spawn and which coordinates are returned when `ExternalLocal` is `false`.
 The `simSetCameraPose` sets the pose for the specified camera while taking an input pose as a combination of relative position and a quaternion in NED frame. The handy `airsim.to_quaternion()` function allows to convert pitch, roll, yaw to quaternion. For example, to set camera-0 to 15-degree pitch while maintaining the same position, you can use:
 ```
 camera_pose = airsim.Pose(airsim.Vector3r(0, 0, 0), airsim.to_quaternion(0.261799, 0, 0))  #PRY in radians
@@ -179,7 +180,7 @@ client.simSetCameraPose(0, camera_pose);
 - `simSetCameraFov` allows changing the Field-of-View of the camera at runtime.
 - `simSetDistortionParams`, `simGetDistortionParams` allow setting and fetching the distortion parameters K1, K2, K3, P1, P2
 
-All Camera APIs take in 3 common parameters apart from the API-specific ones, `camera_name`(str), `vehicle_name`(str) and `external`(bool, to indicate [External Camera](settings.md#external-cameras)). Camera and vehicle name is used to get the specific camera, if `external` is set to `true`, then the vehicle name is ignored. Also see [external_camera.py](https://github.com/microsoft/AirSim/blob/main/PythonClient/computer_vision/external_camera.py) for example usage of these APIs.
+All Camera APIs take in 3 common parameters apart from the API-specific ones, `camera_name`(str), `vehicle_name`(str). Camera and vehicle name is used to get the specific camera on the specific vehicle.
 
 ### Gimbal
 You can set stabilization for pitch, roll or yaw for any camera [using settings](settings.md#gimbal).
