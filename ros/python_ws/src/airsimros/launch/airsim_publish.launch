@@ -86,7 +86,7 @@
       <arg name="object_poses_individual_topics" default="[airsim/object/cylinder3/pose]"/>
 
 
-      <node name="airsim_publish" pkg="airsim" type="airsim_publish.py" respawn="false" output="screen">
+      <node name="airsim_publish" pkg="airsimros" type="airsim_publish.py" respawn="false" output="screen">
 
             <rosparam param="rate" subst_value="True">$(arg rate)</rosparam>
             <param name="ip" type="string" value="$(arg ip)"/>
