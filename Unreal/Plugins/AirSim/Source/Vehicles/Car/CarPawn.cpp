@@ -355,12 +355,15 @@ void ACarPawn::setupInputBindings()
 
 void ACarPawn::onMoveForward(float Val)
 {
-    if (Val < 0)
+    if (Val < 0) {
         onReversePressed();
+        keyboard_controls_.throttle = -Val;
+    }
     else
+    {
         onReverseReleased();
-
-    keyboard_controls_.throttle = Val;
+        keyboard_controls_.throttle = Val;
+    }
 }
 
 void ACarPawn::onMoveRight(float Val)
