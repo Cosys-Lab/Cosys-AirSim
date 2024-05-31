@@ -50,7 +50,7 @@ namespace airlib
         };
 
         bool draw_debug_points = false;
-        std::string data_frame = AirSimSettings::kVehicleInertialFrame;
+        std::string data_frame = AirSimSettings::kSensorLocalFrame;
 
         bool external_controller = true;
 
