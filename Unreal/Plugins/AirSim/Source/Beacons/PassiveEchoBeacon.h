@@ -132,4 +132,5 @@ private:
 	TArray<AActor*> ignore_actors_;
 	float reflection_distance_limit_cm_;
 	bool started_ = false;
+	msr::airlib::vector<FVector> point_cloud_draw_reflected_points_;
 };

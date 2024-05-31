@@ -39,6 +39,7 @@ struct EchoSimpleParams {
 	bool external_ned = true;               // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
 	bool passive = false;                   // Sense and capture passive echo beacon data
 	bool active = true;                     // Sense and capture active echo beacon data (enable emission)
+	bool parallel = true;                   // Use ParallelFor for speeding up sampling. This disables all debug drawing except for the final reflected points if enabled.
 
 	bool draw_reflected_points = false;				// Draw debug points in world where reflected points are captured by the echo sensor
 	bool draw_reflected_lines = false;				// Draw debug lines in world from reflected points to the echo sensor
@@ -76,6 +77,7 @@ struct EchoSimpleParams {
 		sensor_diameter = settings_json.getFloat("SensorDiameter", sensor_diameter);
 		pause_after_measurement = settings_json.getBool("PauseAfterMeasurement", pause_after_measurement);
 		ignore_marked = settings_json.getBool("IgnoreMarked", ignore_marked);
+		parallel = settings_json.getBool("RunParallel", parallel);
 
         relative_pose.position = AirSimSettings::createVectorSetting(settings_json, VectorMath::nanVector());
         auto rotation = AirSimSettings::createRotationSetting(settings_json, AirSimSettings::Rotation::nanRotation());

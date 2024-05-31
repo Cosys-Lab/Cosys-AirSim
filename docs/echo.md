@@ -23,6 +23,7 @@ X Y Z                      | Position of the echo sensor relative to the vehicle
 Roll Pitch Yaw             | Orientation of the echo sensor relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 External                   | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates
 ExternalLocal              | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
+runParallel               | Uses CPU parallelisation for speeding up the ray casting for active sensing. This disables all debug drawing except for the final reflected points if enabled (DrawReflectedPoints)
 SenseActive                | Enable active sensing where the sensor will emit a signal and receive signals from the reflections
 SensePassive               | Enable passive sensing where the sensor will receive signals from other active sources in the world (Passive Echo Beacons, see details below)
 PassiveRadius              | The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled

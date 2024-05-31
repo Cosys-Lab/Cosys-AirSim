@@ -37,12 +37,12 @@ public:
 	static void sampleSphereCap(int num_points, float lower_azimuth_limit, float upper_azimuth_limit, float lower_elevation_limit, float upper_elevation_limit, msr::airlib::vector<msr::airlib::Vector3r>& point_cloud);
 	static void applyFreeSpaceLoss(float& signal_attenuation, float previous_distance, float added_distance);
 	static float remainingDistance(float signal_attenuation, float total_distance, float attenuation_limit, float distance_limit);
-	static void traceDirection(FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& points, msr::airlib::vector<std::string>& groundtruth, const NedTransform* ned_transform, const msr::airlib::Pose& pose,
+	static void traceDirection(uint32 current_sample_index, bool use_indexing, FVector trace_start_position, FVector trace_end_position, msr::airlib::vector<msr::airlib::real_T>& points, msr::airlib::vector<std::string>& groundtruth, msr::airlib::vector<FVector>& draw_points, const NedTransform* ned_transform, const msr::airlib::Pose& pose,
 		                       float distance_limit, int reflection_limit, float attenuation_limit, float reflection_distance_limit, float reflection_opening_angle,
 		                       float attenuation_per_distance, float attenuation_per_reflection, TArray<AActor*> ignore_actors, AActor* cur_actor, bool external, bool result_uu,
 		                       float draw_time, float line_thickness, bool debug_draw_reflected_paths = false, bool debug_draw_bounce_lines = false, bool debug_draw_initial_points = false,
 		                       bool debug_draw_reflected_points = false, bool debug_draw_reflected_lines = false, bool check_return = true, bool save_normal = false, bool save_source = false, bool only_final_reflection = false, std::string source_label = "");
-	static void SavePoint(FHitResult trace_hit_result, FVector direction, float signal_attenuation, float total_distance, float reflection_count, std::string label,
+	static void SavePoint(uint32 current_sample_index, bool use_indexing, FHitResult trace_hit_result, FVector direction, float signal_attenuation, float total_distance, float reflection_count, std::string label,
 		const NedTransform* ned_transform, const msr::airlib::Pose& pose, msr::airlib::vector<msr::airlib::real_T>& points, msr::airlib::vector<std::string>& groundtruth,
 		bool external, bool result_uu, bool save_normal, bool save_source, std::string source_label = "");
 	static void bounceTrace(FVector& trace_start_position, FVector& trace_direction, float& trace_length, const FHitResult& trace_hit_result, float& total_distance,
@@ -89,4 +89,6 @@ private:
 	const float line_thickness_;
 	const bool external_;
 	TArray<UnrealEchoSensor::EchoPoint> passive_points_;
+
+	msr::airlib::vector<FVector> point_cloud_draw_reflected_points_;
 };

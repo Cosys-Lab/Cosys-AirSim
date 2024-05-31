@@ -322,6 +322,7 @@
                     "Enabled": true,
                     "External": false,
                     "ExternalLocal": false,
+                    "RunParallel": true,
                     "X": 0,
                     "Y": 0,
                     "Z": -0.55,

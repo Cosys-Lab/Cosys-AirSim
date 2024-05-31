@@ -56,7 +56,7 @@ void APassiveEchoBeacon::getPointCloud()
 		FVector trace_end_position = trace_start_position + trace_direction * trace_length;
 
 		// Shoot trace and get the impact point and remaining attenuation, if any returns
-		UnrealEchoSensor::traceDirection(trace_start_position, trace_end_position, point_cloud_, groundtruth_, ned_transform_, beacon_reference_frame_,
+		UnrealEchoSensor::traceDirection(0, false, trace_start_position, trace_end_position, point_cloud_, groundtruth_, point_cloud_draw_reflected_points_, ned_transform_, beacon_reference_frame_,
 			distance_limit_, reflection_limit_, attenuation_limit_, reflection_distance_limit_cm_, 0, attenuation_per_distance_, attenuation_per_reflection_, ignore_actors_, this, false, true,
 			draw_debug_duration_, line_thickness_ / 2, false, draw_debug_all_lines_, false, false, false, false, true, true, reflection_only_final_, std::string(TCHAR_TO_UTF8(*name_)));
 	}

@@ -8,6 +8,7 @@
 * Fixed Echo passive data Z-direction not being in NED format. 
 * Python API now loads colormap from disk instead of regenerating each time and being very slow.
 * Added parallelization to LiDAR sensor to speed up pointcloud generation.
+* Added optional parallelization to echo sensor to speed up pointcloud generation. See echo documentation for more info.
 
 ### April 2024
 * Merge of Cosys-Lab fork with last Public Microsoft AirSim branch version.

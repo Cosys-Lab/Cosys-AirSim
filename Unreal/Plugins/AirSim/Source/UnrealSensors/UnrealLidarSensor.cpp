@@ -186,21 +186,16 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 		}
 
 		ParallelFor(number_of_lasers, [&](uint32 laser) {
-			//for (auto laser = 0u; laser < number_of_lasers; ++laser)
-			//{
 			float vertical_angle = laser_angles_[laser];
 			uint32 current_point_index = number_of_lasers * current_horizontal_angle_index_ + laser;
 			uint32 draw_index = number_of_lasers * i + laser;
 			Vector3r point;
 			FVector draw_point;
 			std::string label;
+
 			// shoot laser and get the impact point, if any
 			if (shootLaser(lidar_pose, vehicle_pose, laser, horizontal_angle, vertical_angle, params, point, label, draw_point))
 			{
-				/*point_cloud.emplace_back(point.x());
-				point_cloud.emplace_back(point.y());
-				point_cloud.emplace_back(point.z());
-				groundtruth.emplace_back(label);*/
 				point_cloud[current_point_index * 3] = point.x();
 				point_cloud[current_point_index * 3 + 1] = point.y();
 				point_cloud[current_point_index * 3 + 2] = point.z();
@@ -208,13 +203,6 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 				if (sensor_params_.draw_debug_points)
 					point_cloud_draw_[draw_index] = draw_point;
 			}
-			//else {
-				/*point_cloud.emplace_back(0);
-				point_cloud.emplace_back(0);
-				point_cloud.emplace_back(0);
-				groundtruth.emplace_back("out_of_range");*/
-				//}
-				//}
 			});
 
 
@@ -225,8 +213,6 @@ bool UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 	if (sensor_params_.draw_debug_points) {
 		for (uint32 j = 0; j < point_cloud_draw_.size(); j++)
 		{
-			// Debug code for very specific cases.
-			// Mostly shouldn't be needed. Use SimModeBase::drawLidarDebugPoints()
 			UAirBlueprintLib::DrawPoint(
 				actor_->GetWorld(),
 				point_cloud_draw_[j],
