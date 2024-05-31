@@ -37,7 +37,7 @@ private:
     void createLasers();
     bool shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
         const uint32 channel, const float horizontal_angle, const float vertical_angle, 
-        const msr::airlib::LidarSimpleParams params, Vector3r &point, std::string &label);
+        const msr::airlib::LidarSimpleParams params, Vector3r &point, std::string &label, FVector& raw_point);
     FVector Vector3rToFVector(const Vector3r& input_vector);
 
 private:
@@ -45,6 +45,7 @@ private:
     const NedTransform* ned_transform_;
 	float saved_clockspeed_ = 1;
     msr::airlib::vector<msr::airlib::real_T> laser_angles_;
+    msr::airlib::vector<FVector> point_cloud_draw_;
 	uint32 current_horizontal_angle_index_ = 0;
 	TArray<float> horizontal_angles_;
 	std::mt19937 gen_;
