@@ -150,9 +150,9 @@ title('GPU-Accelerated LiDAR Pointcloud')
 xlabel("X (m)")
 ylabel("Y (m)")
 zlabel("Z (m)")
-xlim([0 10])
-ylim([-10 10])
-zlim([-10 10])
+xlim([-50 50])
+ylim([-50 50])
+zlim([-50 50])
 drawnow
 
 %% Get camera info data
