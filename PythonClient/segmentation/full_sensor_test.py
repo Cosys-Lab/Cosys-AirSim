@@ -53,7 +53,7 @@ if __name__ == '__main__':
     print("Shown and saved depth image from main camera\n")
 
     print("Getting GPU LiDAR data...")
-    lidar_data = client.getGPULidarData('gpulidar1', 'robot1')
+    lidar_data = client.getGPULidarData('gpulidar', 'airsimvehicle')
     points = np.array(lidar_data.point_cloud, dtype=np.dtype('f4'))
     points = np.reshape(points, (int(points.shape[0] / 5), 5))
 
