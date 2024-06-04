@@ -1026,6 +1026,7 @@ void UAirBlueprintLib::CompressImageArray(int32 width, int32 height, const TArra
         uint8 TempRed = MutableSrcData[Index].R;
         MutableSrcData[Index].R = MutableSrcData[Index].B;
         MutableSrcData[Index].B = TempRed;
+        MutableSrcData[Index].A = 255;
     }
 
     FObjectThumbnail TempThumbnail;
