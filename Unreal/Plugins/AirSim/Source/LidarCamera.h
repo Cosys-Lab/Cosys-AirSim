@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Containers/Queue.h"
+#include "RHIGPUReadback.h"
+#include "common/WorkerThread.hpp"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/ArrowComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -18,6 +21,18 @@
 #include "LidarCamera.generated.h"
 
 
+//struct FLidarCameraRenderRequest {
+//	FIntPoint ImageSize;
+//	FRHIGPUTextureReadback Readback;
+//	FRenderCommandFence RenderFence;
+//
+//	FLidarCameraRenderRequest(
+//		const FIntPoint& ImageSize,
+//		const FRHIGPUTextureReadback& Readback) :
+//		ImageSize(ImageSize),
+//		Readback(Readback) {}
+//};
+
 UCLASS()
 class AIRSIM_API ALidarCamera : public AActor
 {
@@ -32,6 +47,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
 	void InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpleParams& settings);
 	void InitializeSensor();
 	bool Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
@@ -101,6 +117,9 @@ private:
 	void GenerateLidarCoordinates();
 	void RotateCamera(float sensor_rotation_angle);
 	bool SampleRenders(float sensor_rotation_angle, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
+	//void ExecuteScanTask();
+	std::shared_ptr<msr::airlib::WorkerThreadSignal> wait_signal_;
+
 
 	UPROPERTY()
 		USceneCaptureComponent2D* capture_2D_depth_;
@@ -140,5 +159,13 @@ private:
 	static int32 unique_colors_[765];
 	bool used_by_airsim_ = false;
 	bool initialized = false;
+
+	//bool saved_DisableWorldRendering_ = false;
+	//UGameViewportClient* game_viewport_;
+	//FDelegateHandle end_draw_handle_;
+	//TArray<FColor> buffer_2D_depth_;
+	//TArray<FColor> buffer_2D_segmentation_;
+	//TArray<FColor> buffer_2D_intensity_;
+	//bool first_frame_ = true;
 };
 

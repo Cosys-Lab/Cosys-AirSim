@@ -68,6 +68,7 @@ public:
     void setCaptureUpdate(USceneCaptureComponent2D* capture, bool nodisplay);
     void setCameraTypeUpdate(ImageType type, bool nodisplay);
     void setCameraOrientation(const FRotator& rotator);
+    void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
     void setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform);
     void setCameraPose(const msr::airlib::Pose& relative_pose);
     void setCameraFoV(float fov_degrees);

@@ -148,6 +148,7 @@ protected: //optional overrides
     void initializeCameraDirector(const FTransform& camera_transform, float follow_distance);
     void checkVehicleReady(); //checks if vehicle is available to use
     virtual void updateDebugReport(msr::airlib::StateReporterWrapper& debug_reporter);
+    virtual void updateAnnotation();
 
 protected: //Utility methods for derived classes
     virtual const AirSimSettings& getSettings() const;
@@ -199,6 +200,7 @@ private:
 	TMap<FString, FString> ColorToNameMap_;
 	/** A list of paintable objects */
 	TMap<FString, UMeshComponent*> nameToComponentMap_;
+	TArray<TWeakObjectPtr<UPrimitiveComponent> > SegmentationComponentList_;
 
     std::unique_ptr<NedTransform> global_ned_transform_;
     std::unique_ptr<msr::airlib::WorldSimApiBase> world_sim_api_;

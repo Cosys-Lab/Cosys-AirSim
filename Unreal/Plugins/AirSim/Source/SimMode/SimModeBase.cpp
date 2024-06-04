@@ -12,7 +12,9 @@
 #include <memory>
 #include "AirBlueprintLib.h"
 #include "ObjectPainter.h"
+#include "LidarCamera.h"
 
+#include "api/VehicleApiBase.hpp"
 #include "common/AirSimSettings.hpp"
 #include "common/ScalableClock.hpp"
 #include "common/SteppableClock.hpp"
@@ -197,6 +199,7 @@ void ASimModeBase::checkVehicleReady()
 void ASimModeBase::InitializeMeshVertexColorIDs()
 {
 	UObjectPainter::Reset(this->GetLevel(), &nameToColorIndexMap_, &nameToComponentMap_, &ColorToNameMap_);
+    updateAnnotation();
 }
 
 
@@ -283,7 +286,8 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 				changes++;
 			}
 		}
-		return changes > 0;
+        updateAnnotation();
+        return changes > 0;
 	}
 	else if (nameToComponentMap_.Contains(mesh_name.c_str())) {
 		bool success;
@@ -294,7 +298,8 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 		UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap, &success]() {
 			success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap);
 		}, true);
-		return success;
+        updateAnnotation();
+        return success;
 	}
 	else {
 		return false;
@@ -308,6 +313,7 @@ int ASimModeBase::GetMeshVertexColorID(const std::string& mesh_name) {
 bool ASimModeBase::AddNewActorToSegmentation(AActor* Actor)
 {
 	return UObjectPainter::PaintNewActor(Actor, &nameToColorIndexMap_, &nameToComponentMap_, &ColorToNameMap_);
+    updateAnnotation();
 }
 
 void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -948,6 +954,26 @@ void ASimModeBase::setupVehiclesAndCamera()
         CameraDirector->initializeForBeginPlay(getInitialViewMode(), nullptr, nullptr, nullptr, nullptr);
 
     checkVehicleReady();
+}
+
+void ASimModeBase::updateAnnotation() {
+    UObjectPainter::GetAnnotationComponents(this->GetWorld(), SegmentationComponentList_);    
+    TArray<AActor*> cameras_found;
+    UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
+    if (cameras_found.Num() >= 0) {
+        for (auto camera_actor : cameras_found) {
+            APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
+            cur_camera->updateAnnotation(SegmentationComponentList_);
+        }
+    }
+    TArray<AActor*> lidar_cameras_found;
+    UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
+    if (cameras_found.Num() >= 0) {
+        for (auto lidar_camera_actor : lidar_cameras_found) {
+            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
+            cur_lidar_camera->updateAnnotation(SegmentationComponentList_);
+        }
+    }
 }
 
 void ASimModeBase::registerPhysicsBody(msr::airlib::VehicleSimApiBase* physicsBody)

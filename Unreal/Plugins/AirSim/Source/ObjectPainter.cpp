@@ -3,6 +3,7 @@
 
 #include "ObjectPainter.h"
 #include "StaticMeshResources.h"
+#include "Annotation/AnnotationComponent.h"
 #include "Components/SkinnedMeshComponent.h"
 #include "Slate/SceneViewport.h"
 #include "AirBlueprintLib.h"
@@ -321,15 +322,27 @@ bool UObjectPainter::PaintComponent(UMeshComponent* component, const FColor& col
 //	{
 //		skinnedmesh_component->SetAllVertexColorOverride(NewColor);
 //	}
+
+	FLinearColor LinearColor = FLinearColor(color);
+	const FColor NewColor = LinearColor.ToFColor(false);
+	UAnnotationComponent* AnnotationComponent = NewObject<UAnnotationComponent>(component);
+	AnnotationComponent->SetupAttachment(component);
+	AnnotationComponent->RegisterComponent();
+	AnnotationComponent->SetAnnotationColor(NewColor);
+	AnnotationComponent->MarkRenderStateDirty();
 	return true;
 }
 
 void UObjectPainter::SetViewForVertexColor(FEngineShowFlags& show_flags)
 {
+	//show_flags.SetMaterials(false); // Check AnnotationComponent.cpp::GetViewRelevance
+	//show_flags.SetLighting(false);
+	//show_flags.SetPostProcessing(false);
+	//show_flags.SetColorGrading(true);
+	//show_flags.SetTonemapper(false); // Important to disable this
 	show_flags.SetMaterials(false);
 	show_flags.SetLighting(false);
 	show_flags.SetBSPTriangles(true);
-	show_flags.SetVertexColors(true);
 	show_flags.SetPostProcessing(false);
 	show_flags.SetHMDDistortion(false);
 	show_flags.SetTonemapper(false);
@@ -345,6 +358,38 @@ void UObjectPainter::SetViewForVertexColor(FEngineShowFlags& show_flags)
 	show_flags.SetTextRender(false);
 	show_flags.SetTemporalAA(false);
 	show_flags.SetDecals(false);
+}
+
+void UObjectPainter::GetAnnotationComponents(UWorld* World, TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList)
+{
+	if (!IsValid(World))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Can not get AnnotationComponents, World is invalid"));
+		return;
+	}
+
+	// Check how much time is spent here!
+	TArray<UObject*> UObjectList;
+	bool bIncludeDerivedClasses = false;
+	EObjectFlags ExclusionFlags = EObjectFlags::RF_ClassDefaultObject;
+	EInternalObjectFlags ExclusionInternalFlags = EInternalObjectFlags::AllFlags;
+	GetObjectsOfClass(UAnnotationComponent::StaticClass(), UObjectList, bIncludeDerivedClasses, ExclusionFlags, ExclusionInternalFlags);
+
+	for (UObject* Object : UObjectList)
+	{
+		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Object);
+
+		if (Component->GetWorld() == World
+			&& !ComponentList.Contains(Component))
+		{
+			ComponentList.Add(Component);
+		}
+	}
+
+	if (ComponentList.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No annotation in the scene to show, fall back to lit mode"));
+	}
 }
 
 int32 UObjectPainter::GammaCorrectionTable[256] =

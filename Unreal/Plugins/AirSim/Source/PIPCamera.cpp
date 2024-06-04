@@ -6,7 +6,7 @@
 #include "Engine/World.h"
 #include "ImageUtils.h"
 #include "ObjectPainter.h"
-
+#include <Annotation/ObjectAnnotator.h>
 #include <string>
 #include <exception>
 #include "AirBlueprintLib.h"
@@ -113,6 +113,7 @@ void APIPCamera::PostInitializeComponents()
     camera_->CurrentFocalLength = 11.9;
 
 	UObjectPainter::SetViewForVertexColor(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
+    captures_[Utils::toNumeric(ImageType::Segmentation)]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 }
 
 void APIPCamera::BeginPlay()
@@ -415,6 +416,10 @@ void APIPCamera::setDistortionParam(const std::string& param_name, float value)
     distortion_param_instance_->SetScalarParameterValue(FName(param_name.c_str()), value);
 }
 
+void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
+    captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowOnlyComponents = ComponentList;
+}
+
 void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform)
 {
     //TODO: should we be ignoring position and orientation settings here?
@@ -445,12 +450,11 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
 
 	static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
 	TArray<AActor*> ignoreActors;
-	for (TActorIterator<AActor> ActorIterator(this->GetWorld()); ActorIterator; ++ActorIterator)
-	{
-		AActor* Actor = *ActorIterator;
-		if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))ignoreActors.Add(Actor);
-	}
-
+    for (TActorIterator<AActor> ActorIterator(this->GetWorld()); ActorIterator; ++ActorIterator)
+    {
+        AActor* Actor = *ActorIterator;
+        if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))ignoreActors.Add(Actor);
+    }
     int image_count = static_cast<int>(Utils::toNumeric(ImageType::Count));
     for (int image_type = -1; image_type < image_count; ++image_type) {
         const auto& capture_setting = camera_setting.capture_settings.at(image_type);

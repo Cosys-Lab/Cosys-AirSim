@@ -58,6 +58,7 @@ int32 getIndexLowerClosest(TArray<float> range, float value) {
 }
 
 // Constructor
+//ALidarCamera::ALidarCamera() : wait_signal_(new msr::airlib::WorkerThreadSignal)
 ALidarCamera::ALidarCamera()
 {
 	// Seed and initiate noise
@@ -91,6 +92,7 @@ ALidarCamera::ALidarCamera()
 		UAirBlueprintLib::LogMessageString("Cannot create intensity material for the LidarCamera", "", LogDebugLevel::Failure);
 
 	PrimaryActorTick.bCanEverTick = true;
+
 }
 
 void ALidarCamera::PostInitializeComponents()
@@ -216,6 +218,8 @@ void ALidarCamera::InitializeSensor()
 
 	// Setup the capture component for the virtual instance segmentation camera
 	UObjectPainter::SetViewForVertexColor(capture_2D_segmentation_->ShowFlags);
+	capture_2D_segmentation_->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+
 	render_target_2D_segmentation_->TargetGamma = 1;
 	capture_2D_segmentation_->TextureTarget = render_target_2D_segmentation_;
 	capture_2D_segmentation_->bAlwaysPersistRenderingState = true;
@@ -300,7 +304,6 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 		RotateCamera(FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_ + (cur_fov / 2), 360));
 		sensor_cur_angle_ = FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_, 360);
 
-		// Make the cameras take an image of the Unreal world
 		capture_2D_depth_->CaptureScene();
 		capture_2D_segmentation_->CaptureScene();
 		capture_2D_intensity_->CaptureScene();
@@ -309,6 +312,11 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 		if (sensor_sum_rotation_angle_ > cur_fov)sensor_sum_rotation_angle_ = cur_fov;
 
 		// Perform the camera to LiDAR pointcloud conversion
+		//if(!first_frame_){
+		//	refresh_pointcloud = SampleRenders(sensor_sum_rotation_angle_, cur_fov, point_cloud, point_cloud_final);
+		//}
+		//first_frame_ = false;
+
 		refresh_pointcloud = SampleRenders(sensor_sum_rotation_angle_, cur_fov, point_cloud, point_cloud_final);
 
 		// Set up the values for the next frame
@@ -317,6 +325,11 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	}
 	return refresh_pointcloud;
 }
+
+void ALidarCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
+	capture_2D_segmentation_->ShowOnlyComponents = ComponentList;
+}
+
 
 // Generate the XYZ-coordinates LUT based on the LiDAR sensor laser configuration
 void ALidarCamera::GenerateLidarCoordinates() {
@@ -337,36 +350,90 @@ void ALidarCamera::GenerateLidarCoordinates() {
 // Rotate the physical cameras in the Unreal world
 void ALidarCamera::RotateCamera(float sensor_rotation_angle)
 {
+	//UAirBlueprintLib::RunCommandOnGameThread([this, sensor_rotation_angle]() {
+	//	capture_2D_depth_->SetRelativeRotation(FRotator(0, sensor_rotation_angle, 0));
+	//	capture_2D_segmentation_->SetRelativeRotation(FRotator(0, sensor_rotation_angle, 0));
+	//	capture_2D_intensity_->SetRelativeRotation(FRotator(0, sensor_rotation_angle, 0));
+	//	}, false);
+
 	capture_2D_depth_->SetRelativeRotation(FRotator(0, sensor_rotation_angle, 0));
 	capture_2D_segmentation_->SetRelativeRotation(FRotator(0, sensor_rotation_angle, 0));
 	capture_2D_intensity_->SetRelativeRotation(FRotator(0, sensor_rotation_angle, 0));
+
 }
 
 // Perform the camera to LiDAR pointcloud conversion
 bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final) {
 
+	//CheckNotBlockedOnRenderThread();
+
+	//game_viewport_ = this->GetWorld()->GetGameViewport();
+
+
+	//AsyncTask(ENamedThreads::GameThread, [this]() {
+	//	bool test = IsInGameThread();
+	//	check(IsInGameThread());	
+
+	//	saved_DisableWorldRendering_ = game_viewport_->bDisableWorldRendering;
+	//	game_viewport_->bDisableWorldRendering = 0;
+	//	end_draw_handle_ = game_viewport_->OnEndDraw().AddLambda([this] {
+	//		bool test2 = IsInGameThread();
+	//		check(IsInGameThread());
+
+	//		// The completion is called immeidately after GameThread sends the
+	//		// rendering commands to RenderThread. Hence, our ExecuteTask will
+	//		// execute *immediately* after RenderThread renders the scene!
+	//		ALidarCamera* This = this;
+	//		ENQUEUE_RENDER_COMMAND(SceneDrawCompletion)
+	//			(
+	//				[This](FRHICommandListImmediate& RHICmdList) {
+	//					This->ExecuteScanTask();
+	//				});
+
+	//		game_viewport_->bDisableWorldRendering = saved_DisableWorldRendering_;
+
+	//		assert(end_draw_handle_.IsValid());
+	//		game_viewport_->OnEndDraw().Remove(end_draw_handle_);
+	//	});
+
+	//	// while we're still on GameThread, enqueue request for capture the scene!
+	//	capture_2D_depth_->CaptureScene();
+	//	capture_2D_intensity_->CaptureScene();
+	//	capture_2D_segmentation_->CaptureScene();
+	//	
+	//});
+
+	//// wait for this task to complete
+	//while (!wait_signal_->waitFor(5)) {
+	//	// log a message and continue wait
+	//	// lamda function still references a few objects for which there is no refcount.
+	//	// Walking away will cause memory corruption, which is much more difficult to debug.
+	//	UE_LOG(LogTemp, Warning, TEXT("Failed: timeout waiting for lidar data"));
+	//}
+
+
 	// Toggle to indicate to AirSim that the sensor has done a full measurement and that the point_cloud_final holds a new full measurement that can be given to the API
 	bool refresh_pointcloud = false;
 
 	// Declare the buffers for holding the RGB data from the cameras
-	TArray<FColor> buffer_2D_depth;
-	TArray<FColor> buffer_2D_segmentation;
-	TArray<FColor> buffer_2D_intensity;
+	TArray<FColor> buffer_2D_depth_;
+	TArray<FColor> buffer_2D_segmentation_;
+	TArray<FColor> buffer_2D_intensity_;
 
 	// Read the RGB data from the cameras and transfer them to the buffers
 	FTextureRenderTarget2DResource* render_target_2D_depth = (FTextureRenderTarget2DResource*)capture_2D_depth_->TextureTarget->Resource;
-	render_target_2D_depth->ReadPixels(buffer_2D_depth);
+	render_target_2D_depth->ReadPixels(buffer_2D_depth_);
 	if (generate_groundtruth_) {
 		FTextureRenderTarget2DResource* render_target_2D_segmentation;
 		render_target_2D_segmentation = (FTextureRenderTarget2DResource*)capture_2D_segmentation_->TextureTarget->Resource;
 		FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
 		flags.SetLinearToGamma(false);
-		render_target_2D_segmentation->ReadPixels(buffer_2D_segmentation);
+		render_target_2D_segmentation->ReadPixels(buffer_2D_segmentation_);
 	}
 	if (generate_intensity_) {
 		FTextureRenderTarget2DResource* render_target_2D_intensity;
 		render_target_2D_intensity = (FTextureRenderTarget2DResource*)capture_2D_intensity_->TextureTarget->Resource;
-		render_target_2D_intensity->ReadPixels(buffer_2D_intensity);
+		render_target_2D_intensity->ReadPixels(buffer_2D_intensity_);
 	}
 
 	// Calculate the camera intrensic parameters
@@ -449,7 +516,7 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 			if (h_pixel >= 0 && h_pixel < resolution_ && v_pixel >= 0 && v_pixel < resolution_) {
 
 				// Get the depth value in centimeters, the depth value is spread of the full 3 bytes to achieve three bytes unsigned precision
-				FColor value_depth = buffer_2D_depth[h_pixel + (v_pixel * resolution_)];
+				FColor value_depth = buffer_2D_depth_[h_pixel + (v_pixel * resolution_)];
 				float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
 
 			    // Added random distance based noise
@@ -482,7 +549,7 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 					if (generate_intensity_) {
 
 						// Get the impact angle in radians, it is spread of the full 3 bytes to achieve three bytes unsigned precision
-						FColor value_intensity = buffer_2D_intensity[h_pixel + (v_pixel * resolution_)];
+						FColor value_intensity = buffer_2D_intensity_[h_pixel + (v_pixel * resolution_)];
 						float impact_angle = ((value_intensity.R + value_intensity.G * 256 + value_intensity.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
 
 						// Get the stencil color (saved in the alpha channel of the intensity render target) that defines the surface material 
@@ -517,7 +584,7 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 
 					if (generate_groundtruth_) {
 						// Get the RGB value associated with the instance segmentation index of the object detected in this point
-						value_segmentation = buffer_2D_segmentation[h_pixel + (v_pixel * resolution_)];
+						value_segmentation = buffer_2D_segmentation_[h_pixel + (v_pixel * resolution_)];
 
 						// If in the right debug drawing mode, draw the instance segmentation color to screen in the final pointcloud formation
 						if (draw_debug_ && debug_draw_mode_ == 1 && threshold_enable) {
@@ -576,6 +643,60 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 	}
 	return refresh_pointcloud;
 }
+//
+//void ALidarCamera::ExecuteScanTask()
+//{
+//	FRHICommandListImmediate& RHICmdList = GetImmediateCommandList_ForRenderCommand();
+//	auto render_target_2D_depth = capture_2D_depth_->TextureTarget->GetRenderTargetResource();
+//	if (render_target_2D_depth != nullptr) {
+//		const FTexture2DRHIRef& rhi_texture = render_target_2D_depth->GetRenderTargetTexture();
+//		FIntPoint size = rhi_texture->GetSizeXY();
+//		FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
+//		flags.SetLinearToGamma(false);
+//
+//		RHICmdList.ReadSurfaceData(
+//			rhi_texture,
+//			FIntRect(0, 0, size.X, size.Y),
+//			buffer_2D_depth_,
+//			flags);
+//	}
+//
+//	if (generate_groundtruth_) {
+//		auto render_target_2D_segmentation = capture_2D_segmentation_->TextureTarget->GetRenderTargetResource();			
+//		/*FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
+//		flags.SetLinearToGamma(false);*/
+//		if (render_target_2D_segmentation != nullptr) {
+//			const FTexture2DRHIRef& rhi_texture = render_target_2D_segmentation->GetRenderTargetTexture();
+//			FIntPoint size = rhi_texture->GetSizeXY();
+//			FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
+//			flags.SetLinearToGamma(false);
+//
+//			RHICmdList.ReadSurfaceData(
+//				rhi_texture,
+//				FIntRect(0, 0, size.X, size.Y),
+//				buffer_2D_segmentation_,
+//				flags);
+//		}
+//	}
+//	if (generate_intensity_) {
+//		auto render_target_2D_intensity = capture_2D_intensity_->TextureTarget->GetRenderTargetResource();
+//		if (render_target_2D_intensity != nullptr) {
+//			const FTexture2DRHIRef& rhi_texture = render_target_2D_intensity->GetRenderTargetTexture();
+//			FIntPoint size = rhi_texture->GetSizeXY();
+//			FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
+//			flags.SetLinearToGamma(false);
+//
+//			RHICmdList.ReadSurfaceData(
+//				rhi_texture,
+//				FIntRect(0, 0, size.X, size.Y),
+//				buffer_2D_intensity_,
+//				flags);
+//		}
+//	}
+//
+//	wait_signal_->signal();
+//	
+//}
 
 // Pre-calculated array of unique colors that are easy to distinguish from one another 
 int32 ALidarCamera::unique_colors_[765] = {
