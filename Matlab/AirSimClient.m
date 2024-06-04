@@ -361,7 +361,7 @@ classdef AirSimClient < handle
             else
                 image_bytes = uint8(camera_image.image_data_uint8);
                 image_reshaped = reshape(image_bytes, 3, camera_image.width.int32, camera_image.height.int32);
-                image = rescale(permute(image_reshaped,[3 2 1]));
+                image = permute(image_reshaped,[3 2 1]);
             end
             timestamp = floor(double(double(camera_image.time_stamp))/1e9);
         end
