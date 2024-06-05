@@ -7,7 +7,7 @@
 #include "RandomPropSpawner.generated.h"
 
 UCLASS()
-class HS_BM_2_API ARandomPropSpawner : public AActor
+class HYSLAM_API ARandomPropSpawner : public AActor
 {
 	GENERATED_BODY()
 	

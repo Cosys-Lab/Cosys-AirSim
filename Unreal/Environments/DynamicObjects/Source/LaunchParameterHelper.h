@@ -13,65 +13,24 @@
  * 
  */
 UCLASS()
-class HS_BM_2_API ULaunchParameterHelper : public UBlueprintFunctionLibrary
+class HYSLAM_API ULaunchParameterHelper : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-
-
-private:
-
-	static void ShuffleArrayWithStream_impl(void* TargetArray, const UArrayProperty* ArrayProperty, const FRandomStream& Stream); // Real implementation
-
 public:
-
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Shuffle actor array by name", CompactNodeTitle = "SORTACTORARRAY", ArrayParm = "TargetArray"), Category = "Utility")
-		static void SortActorArray(UPARAM(ref) TArray<AActor*>& TargetArray, const bool Reversed);
-	UFUNCTION(BlueprintCallable, CustomThunk, meta = (DisplayName = "Shuffle by Stream", CompactNodeTitle = "SHUFFLESTREAM", ArrayParm = "TargetArray"), Category = "Utility")
-		static void ShuffleArrayWithStream(const TArray<int32>& TargetArray, int32 Seed); // Stub function
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static bool GetLaunchFile(FString& launchFileName);
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static int32 ParseLaunchFile(const FString& launchFileName);
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static void GetLaunchConfig(const FString& launchFileName, const int32 index, int32 &startSeed, int32 &removePercentage, int32 &movePercentage, int32 &moveOffsetValue, int32 &moveRotationValue);
+	// Get seed from launch parameters if available, otherwise set random
 	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
 		static int32 GetStartSeed();
+	// Get random seed
 	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
 		static int32 GetRandomStartSeed();
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static int32 GetStartPoint();
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static bool SpawnAI();
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static int32 GetRemovePercentage();
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static int32 GetMovePercentage();
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static int32 GetMoveOffsetValue();
-	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
-		static int32 GetMoveRotationValue();
+	// Allow the blueprint to determine whether we are running with the editor or not
 	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
 		static bool IsWithEditor(const AActor* actor);
+	// Get boolean from launch parameters if available, otherwise false
 	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
 		static bool IsStatic();
-
-
-	DECLARE_FUNCTION(execShuffleArrayWithStream)
-	{
-		Stack.MostRecentProperty = nullptr;
-		Stack.StepCompiledIn<UArrayProperty>(NULL);
-		void* ArrayAddr = Stack.MostRecentPropertyAddress;
-		UArrayProperty* ArrayProperty = Cast<UArrayProperty>(Stack.MostRecentProperty);
-		if (!ArrayProperty)
-		{
-			Stack.bArrayContextFailed = true;
-			return;
-		}
-		P_GET_STRUCT_REF(FRandomStream, Stream);
-		P_FINISH;
-		P_NATIVE_BEGIN;
-		ShuffleArrayWithStream_impl(ArrayAddr, ArrayProperty, Stream);
-		P_NATIVE_END;
-	}
+	// Get boolean from launch parameters if available, otherwise true
+	UFUNCTION(BlueprintCallable, Category = "LaunchParameters")
+		static bool SpawnAI();
 };
