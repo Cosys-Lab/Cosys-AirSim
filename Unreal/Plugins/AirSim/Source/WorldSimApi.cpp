@@ -304,12 +304,12 @@ bool WorldSimApi::addVehicle(const std::string& vehicle_name, const std::string&
 
 bool WorldSimApi::setSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex)
 {
-	return simmode_->SetMeshVertexColorID(mesh_name, object_id, is_name_regex);
+	return simmode_->SetMeshInstanceSegmentationID(mesh_name, object_id, is_name_regex);
 }
 
 int WorldSimApi::getSegmentationObjectID(const std::string& mesh_name) const
 {
-	return simmode_->GetMeshVertexColorID(mesh_name);
+	return simmode_->GetMeshInstanceSegmentationID(mesh_name);
 }
 
 void WorldSimApi::printLogMessage(const std::string& message,
@@ -340,12 +340,12 @@ bool WorldSimApi::runConsoleCommand(const std::string& command)
 }
 std::vector<std::string> WorldSimApi::listInstanceSegmentationObjects() const
 {
-    return simmode_->GetAllSegmentationMeshIDs();
+    return simmode_->GetAllInstanceSegmentationMeshIDs();
 }
 
 std::vector <msr::airlib::Pose> WorldSimApi::listInstanceSegmentationPoses(bool ned, bool only_visible) const
 {
-    return simmode_->GetAllSegmentationMeshPoses(ned, only_visible);
+    return simmode_->GetAllInstanceSegmentationMeshPoses(ned, only_visible);
 }
 
 

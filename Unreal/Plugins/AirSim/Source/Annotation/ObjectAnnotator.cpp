@@ -14,314 +14,448 @@ FObjectAnnotator::FObjectAnnotator()
 {
 }
 
-/** Annotate all static mesh in the world */
-void FObjectAnnotator::AnnotateWorld(UWorld* World)
+
+bool FObjectAnnotator::IsPaintable(AActor* actor)
 {
-	if (!IsValid(World))
+	if (!IsValid(actor))
 	{
-		UAirBlueprintLib::LogMessageString("Can not annotate world, the world is not valid", "Annotation", LogDebugLevel::Failure);
-		return;
+		return false;
 	}
-
-	TArray<AActor*> ActorArray;
-	GetAnnotableActors(World, ActorArray);
-
-	for (AActor* Actor : ActorArray)
+	TArray<UMeshComponent*> paintable_components;
+	actor->GetComponents<UMeshComponent>(paintable_components);
+	if (paintable_components.Num() == 0)
 	{
-		FColor AnnotationColor = GetDefaultColor(Actor);
-
-		if (!IsValid(Actor))
-		{
-			UAirBlueprintLib::LogMessageString("Found invalid actor in AnnotateWorld", "Annotation", LogDebugLevel::Failure);
-			continue;
-		}
-		// Use VertexColor as annotation
-		this->SetAnnotationColor(Actor, AnnotationColor);
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Annotate mesh of the scene (%d)"), AnnotationColors.Num());
-}
-
-
-void FObjectAnnotator::SetAnnotationColor(AActor* Actor, const FColor& AnnotationColor)
-{
-	if (!IsValid(Actor))
-	{
-		return;
-	}
-	// CHECK: Add the annotation color regardless successful or not
-	TArray<UActorComponent*> AnnotationComponents = Actor->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
-	if (AnnotationComponents.Num() == 0)
-	{
-		CreateAnnotationComponent(Actor, AnnotationColor);
+		return false;
 	}
 	else
 	{
-		UpdateAnnotationComponent(Actor, AnnotationColor);
-	}
-	this->AnnotationColors.Emplace(Actor->GetName(), AnnotationColor);
-	// TODO: Remote AnnotationColor Map!
-}
-
-void FObjectAnnotator::GetAnnotationColor(AActor* Actor, FColor& AnnotationColor)
-{
-	if (!IsValid(Actor))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InActor is invalid in GetAnnotationColor"));
-		return;
-	}
-
-	// FString ActorName = Actor->GetName();
-	// if (!this->AnnotationColors.Contains(ActorName))
-	// {
-	// 	UE_LOG(LogUnrealCV, Warning, TEXT("Can not find actor %s in GetAnnotationColor"), *ActorName);
-	// 	return;
-	// }
-	// AnnotationColor = this->AnnotationColors[ActorName];
-
-	// Another way to get annotation color is directly read color from AnnotationComponent
-	// TODO: Remove the first only leave the second method
-
-	// Check its direct children, do not recursive, otherwise it is very easy to trigger the warning.
-	TArray<UActorComponent*> AnnotationComponents = Actor->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
-	TArray<UActorComponent*> MeshComponents = Actor->K2_GetComponentsByClass(UMeshComponent::StaticClass());
-	// Note: Strange that the MeshComponents.Num() is twice the number of AnnotationComponents.Num()
-	if (AnnotationComponents.Num() == 0) return;
-	if (AnnotationComponents.Num() != MeshComponents.Num())
-	{
-		// UE_LOG(LogTemp, Warning, TEXT("More than one AnnotationComponent for MeshComponent."));
-		UE_LOG(LogTemp, Warning, TEXT("In actor %s, the number of MeshComponent (%d) and AnnotationComponent (%d) is different."), *Actor->GetName(), MeshComponents.Num(), AnnotationComponents.Num());
-		// for (UActorComponent* Component : MeshComponents)
-		// {
-		// 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Component->GetName()); 
-		// }
-	}
-	UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(AnnotationComponents[0]);
-	// check(AnnotationColor == AnnotationComponent->AnnotationColor);
-	AnnotationColor = AnnotationComponent->GetAnnotationColor();
-}
-
-void FObjectAnnotator::GetAnnotableActors(UWorld* World, TArray<AActor*>& ActorArray)
-{
-	if (!IsValid(World))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("The world is invalid in GetAnnotableActors"));
-		return;
-	}
-
-	for (TActorIterator<AActor> ActorItr(World); ActorItr; ++ActorItr)
-	{
-		AActor *Actor = *ActorItr;
-		ActorArray.Add(Actor);
+		return true;
 	}
 }
 
-/**
- * Debug tips:
- * AnnotationComponent->AnnotationColor = FColor::MakeRandomColor();
- */
-void FObjectAnnotator::CreateAnnotationComponent(AActor* Actor, const FColor& AnnotationColor)
+void FObjectAnnotator::getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes)
 {
-	// Two special type of actors
-	// https://api.unrealengine.com/INT/API/Runtime/Landscape/ALandscape/index.html
-	// https://api.unrealengine.com/INT/API/Runtime/Foliage/AInstancedFoliageActor/index.html
-	if (!IsValid(Actor))
+	TArray<UMeshComponent*> paintable_components;
+	actor->GetComponents<UMeshComponent>(paintable_components);
+	int index = 0;
+	for (auto component : paintable_components)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid actor in CreateAnnotationComponent"));
-		return;
-	}
-	TArray<UActorComponent*> AnnotationComponents = Actor->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
-	if (AnnotationComponents.Num() != 0)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Skip annotated actor %d"), *Actor->GetName());
-		return;
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("Annotate actor %s with color %s"), *Actor->GetName(), *AnnotationColor.ToString());
-	// UE_LOG(LogTemp, Log, TEXT("Annotate actor %s with color %s"), *Actor->GetName(), *AnnotationColor.ToString());
-	TArray<UActorComponent*> MeshComponents = Actor->K2_GetComponentsByClass(UMeshComponent::StaticClass());
-	for (UActorComponent* Component : MeshComponents)
-	{
-		UMeshComponent* MeshComponent = Cast<UMeshComponent>(Component);
-
-		UAnnotationComponent* AnnotationComponent = NewObject<UAnnotationComponent>(MeshComponent);
-		// UE_LOG(LogTemp, Log, TEXT("Annotate %s with color %s"), *MeshComponent->GetName(), *AnnotationColor.ToString());
-		AnnotationComponent->SetupAttachment(MeshComponent);
-		AnnotationComponent->RegisterComponent();
-		// Set annotation color after the component is registered
-		AnnotationComponent->SetAnnotationColor(AnnotationColor); 
-		AnnotationComponent->MarkRenderStateDirty();
+		if (paintable_components.Num() == 1) {
+			if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
+				if (actor->GetParentActor()) {
+					if (staticmesh_component->GetStaticMesh() != nullptr) {
+						FString component_name = staticmesh_component->GetStaticMesh()->GetName();
+						component_name.Append("_");
+						component_name.Append(FString::FromInt(0));
+						component_name.Append("_");
+						if (actor->GetRootComponent()->GetAttachParent()) {
+							component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							component_name.Append("_");
+						}
+						component_name.Append(actor->GetParentActor()->GetName());
+						paintable_components_meshes->Emplace(component_name, component);
+					}
+				}
+				else {
+					paintable_components_meshes->Emplace(actor->GetName(), component);
+				}
+			}
+			if (USkinnedMeshComponent* SkinnedMeshComponent = Cast<USkinnedMeshComponent>(component)) {
+				paintable_components_meshes->Emplace(actor->GetName(), component);
+			}
+		}
+		else {
+			FString component_name;
+			if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
+				if (staticmesh_component->GetStaticMesh() != nullptr) {
+					component_name = staticmesh_component->GetStaticMesh()->GetName();
+					component_name.Append("_");
+					component_name.Append(FString::FromInt(index));
+					component_name.Append("_");
+					if (actor->GetParentActor()) {
+						if (actor->GetRootComponent()->GetAttachParent()) {
+							component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							component_name.Append("_");
+						}
+						component_name.Append(actor->GetParentActor()->GetName());
+					}
+					else {
+						component_name.Append(actor->GetName());
+					}
+				}
+			}
+			if (USkinnedMeshComponent* skinnedmesh_component = Cast<USkinnedMeshComponent>(component)) {
+				component_name = actor->GetName();
+			}
+			paintable_components_meshes->Emplace(component_name, component);
+			index++;
+		}
 	}
 }
 
-void FObjectAnnotator::UpdateAnnotationComponent(AActor* Actor, const FColor& AnnotationColor)
+bool FObjectAnnotator::SetComponentRGBColorByIndex(FString component_id, uint32 color_index)
 {
-	if (!IsValid(Actor))
+	if (name_to_component_map_.Contains(component_id))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid actor in CreateAnnotationComponent"));
-		return;
+		FColor color = ColorGenerator_.GetColorFromColorMap(color_index);
+		UMeshComponent* actor = name_to_component_map_[component_id];
+		if (UpdatePaintRGBComponent(actor, color))
+		{
+			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
+			FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.B));
+			color_to_name_map_.Emplace(color_string, component_id);
+			name_to_color_index_map_.Emplace(component_id, color_index);
+			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Adjusted object %s to new ID # %s (RGB: %s)"), *component_id, *FString::FromInt(color_index), *color_string_gammacorrected);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
-	TArray<UActorComponent*> AnnotationComponents = Actor->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
+	else
+	{
+		return false;
+	}
+}
+
+bool FObjectAnnotator::AnnotateNewActor(AActor* actor)
+{
+	if (actor && IsPaintable(actor)) {
+		TMap<FString, UMeshComponent*> paintable_components_meshes;
+		getPaintableComponentMeshes(actor, &paintable_components_meshes);
+		for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
+		{
+			if (name_to_component_map_.Contains(it.Key())) {
+				FColor Color = ColorGenerator_.GetColorFromColorMap(name_to_color_index_map_.FindRef(it.Key()));
+				check(UpdatePaintRGBComponent(it.Value(), Color));
+			}
+			else {
+				uint32 ObjectIndex = name_to_component_map_.Num();
+				name_to_component_map_.Emplace(it.Key(), it.Value());
+				FColor new_color = ColorGenerator_.GetColorFromColorMap(ObjectIndex);
+				name_to_color_index_map_.Emplace(it.Key(), ObjectIndex);
+				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
+				FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
+				color_to_name_map_.Emplace(color_string, it.Key());
+				check(PaintRGBComponent(it.Value(), new_color));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Added new object %s with ID # %s (RGB: %s)"), *it.Key(), *FString::FromInt(ObjectIndex), *color_string_gammacorrected);
+			}
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool FObjectAnnotator::DeleteActor(AActor* actor)
+{
+	if (actor && IsPaintable(actor)) {
+		TMap<FString, UMeshComponent*> paintable_components_meshes;
+		getPaintableComponentMeshes(actor, &paintable_components_meshes);
+		for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
+		{
+			if (name_to_component_map_.Contains(it.Key())) {
+				check(DeleteComponent(it.Value()));
+				name_to_component_map_.Remove(it.Key());
+				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Deleted object %s."), *it.Key());
+
+			}
+			else {
+				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: could not delete object %s."), *it.Key());
+				return false;
+			}
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+uint32 FObjectAnnotator::GetComponentIndex(FString component_id)
+{
+	if (name_to_color_index_map_.Num() == 0)
+	{
+		return -1;
+	}
+	if (name_to_color_index_map_.Contains(component_id))
+	{
+		return name_to_color_index_map_[component_id];
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+void FObjectAnnotator::GenerateEntireLevel(ULevel* InLevel)
+{
+	uint32 color_index = 0;
+	UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Starting full level index-based RGB annotation."));
+	for (AActor* actor : InLevel->Actors)
+	{
+		if (actor && IsPaintable(actor))
+		{
+			TMap<FString, UMeshComponent*> paintable_components_meshes;
+			getPaintableComponentMeshes(actor, &paintable_components_meshes);
+			for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
+			{
+				name_to_component_map_.Emplace(it.Key(), it.Value());
+				FColor new_color = ColorGenerator_.GetColorFromColorMap(color_index);
+				name_to_color_index_map_.Emplace(it.Key(), color_index);
+				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
+				FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
+				color_to_name_map_.Emplace(color_string, it.Key());
+				check(PaintRGBComponent(it.Value(), new_color));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Added new object %s with ID # %s (RGB: %s)"), *it.Key(), *FString::FromInt(color_index), *color_string_gammacorrected);
+
+				color_index++;
+			}
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Completed full level index-based RGB annotation."));
+
+}
+
+bool FObjectAnnotator::PaintRGBComponent(UMeshComponent* component, const FColor& color)
+{
+	if (!component) return false;
+
+	FLinearColor LinearColor = FLinearColor(color);
+	const FColor NewColor = LinearColor.ToFColor(false);
+	UAnnotationComponent* AnnotationComponent = NewObject<UAnnotationComponent>(component);
+	AnnotationComponent->SetupAttachment(component);
+	AnnotationComponent->RegisterComponent();
+	AnnotationComponent->SetAnnotationColor(NewColor);
+	AnnotationComponent->MarkRenderStateDirty();
+	return true;
+}
+
+bool FObjectAnnotator::UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color)
+{
+	if (!component) return false;
+
+	FLinearColor LinearColor = FLinearColor(color);
+	const FColor NewColor = LinearColor.ToFColor(false);
+	TArray<UActorComponent*> AnnotationComponents = component->GetAttachmentRootActor()->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
+
+	if (AnnotationComponents.Num() == 0)return PaintRGBComponent(component, color);
+
 	for (UActorComponent* Component : AnnotationComponents)
 	{
 		UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(Component);
-		AnnotationComponent->SetAnnotationColor(AnnotationColor);
+		AnnotationComponent->SetAnnotationColor(NewColor);
 		AnnotationComponent->MarkRenderStateDirty();
 	}
+	return true;
 }
 
-FColor FObjectAnnotator::GetDefaultColor(AActor* Actor)
+bool FObjectAnnotator::DeleteComponent(UMeshComponent* component)
 {
-	FString ActorName = Actor->GetName();
-	if (AnnotationColors.Contains(ActorName))
+	if (!component) return false;
+
+	TArray<UActorComponent*> AnnotationComponents = component->GetAttachmentRootActor()->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
+	for (UActorComponent* Component : AnnotationComponents)
 	{
-		// Already initialized
-		return AnnotationColors[ActorName];
+		Component->DestroyComponent();
 	}
-
-	int ColorIndex = AnnotationColors.Num();
-	FColor AnnotationColor = ColorGenerator.GetColorFromColorMap(ColorIndex);
-
-	return AnnotationColor;
+	return true;
 }
 
+void FObjectAnnotator::SetViewForRGBAnnotationRender(FEngineShowFlags& show_flags)
+{
+	show_flags.SetMaterials(false);
+	show_flags.SetLighting(false);
+	show_flags.SetBSPTriangles(true);
+	show_flags.SetPostProcessing(false);
+	show_flags.SetHMDDistortion(false);
+	show_flags.SetTonemapper(false);
+	show_flags.SetEyeAdaptation(false);
+	show_flags.SetFog(false);
+	show_flags.SetPaper2DSprites(false);
+	show_flags.SetBloom(false);
+	show_flags.SetMotionBlur(false);
+	show_flags.SetSkyLighting(false);
+	show_flags.SetAmbientOcclusion(false);
+	show_flags.SetInstancedFoliage(false);
+	show_flags.SetInstancedGrass(false);
+	show_flags.SetTextRender(false);
+	show_flags.SetTemporalAA(false);
+	show_flags.SetDecals(false);
+}
 
-/**
-void FObjectAnnotator::AnnotateMeshComponents(UWorld* World)
+void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 {
 	if (!IsValid(World))
 	{
-		UE_LOG(LogUnrealCV, Warning, TEXT("Can not annotate world, the world is not valid"));
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Can not get AnnotationComponents, World is invalid."));
 		return;
 	}
 
-	// List all MeshComponents in the scene
-	TArray<UMeshComponent*> ComponentList;
+	// Check how much time is spent here!
 	TArray<UObject*> UObjectList;
-	bool bIncludeDerivedClasses = true;
+	bool bIncludeDerivedClasses = false;
 	EObjectFlags ExclusionFlags = EObjectFlags::RF_ClassDefaultObject;
 	EInternalObjectFlags ExclusionInternalFlags = EInternalObjectFlags::AllFlags;
-	GetObjectsOfClass(UMeshComponent::StaticClass(), UObjectList, bIncludeDerivedClasses, ExclusionFlags, ExclusionInternalFlags);
+	GetObjectsOfClass(UAnnotationComponent::StaticClass(), UObjectList, bIncludeDerivedClasses, ExclusionFlags, ExclusionInternalFlags);
+
 	for (UObject* Object : UObjectList)
 	{
-		UMeshComponent* Component = Cast<UMeshComponent>(Object);
+		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Object);
 
 		if (Component->GetWorld() == World
-		&& !ComponentList.Contains(Component))
+			&& !annotation_component_list_.Contains(Component))
 		{
-			ComponentList.Add(Component);
+			annotation_component_list_.Add(Component);
 		}
 	}
 
-	for (int i = 0; i < ComponentList.Num(); i++)	
-	// for (UMeshComponent* MeshComponent : ComponentList)
+	if (annotation_component_list_.Num() == 0)
 	{
-		UMeshComponent* MeshComponent = ComponentList[i];
-		if (!IsValid(MeshComponent))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MeshComponent is invalid."));
-			continue;
-		}
-
-		UAnnotationComponent* AnnotationComponent = nullptr;
-		TArray<USceneComponent*> AttachChildren = MeshComponent->GetAttachChildren();
-		for (USceneComponent* Child : AttachChildren)
-		{
-			AnnotationComponent = Cast<UAnnotationComponent>(Child);
-			if (IsValid(AnnotationComponent))
-			{
-				break;
-			}
-		}
-		if (!IsValid(AnnotationComponent))
-		{
-			// Create a new one
-			AnnotationComponent = NewObject<UAnnotationComponent>(MeshComponent);
-			AnnotationComponent->SetupAttachment(MeshComponent);
-			AnnotationComponent->RegisterComponent();
-			AnnotationComponent->MarkRenderStateDirty();
-		}
-		// UE_LOG(LogTemp, Log, TEXT("Annotate %s with color %s"), *MeshComponent->GetName(), *AnnotationColor.ToString());
-		// FColor AnnotationColor = FColor::MakeRandomColor();
-		FColor AnnotationColor = ColorGenerator.GetColorFromColorMap(i);
-		AnnotationComponent->SetAnnotationColor(AnnotationColor);
-		// AnnotationComponent->AnnotationColor = FColor::MakeRandomColor(); // Debug
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: No annotation in the scene to show."));
 	}
 }
-*/
 
-/** Utility function to generate color map */
-int32 FColorGenerator::GetChannelValue(uint32 Index)
-{
-	static int32 Values[256] = { 0 };
-	static bool Init = false;
-	if (!Init)
-	{
-		float Step = 256;
-		uint32 Iter = 0;
-		Values[0] = 0;
-		while (Step >= 1)
-		{
-			for (uint32 Value = Step - 1; Value <= 256; Value += Step * 2)
-			{
-				Iter++;
-				Values[Iter] = Value;
-			}
-			Step /= 2;
-		}
-		Init = true;
+TArray<TWeakObjectPtr<UPrimitiveComponent>>  FObjectAnnotator::GetAnnotationComponents(){
+	return annotation_component_list_;
+}
+
+std::vector<std::string> FObjectAnnotator::GetAllMeshIDs() {
+	std::vector<std::string> retval;
+	TMap<FString, uint32> nameToColorIndexMapTemp = name_to_color_index_map_;
+	for (auto const& element : nameToColorIndexMapTemp) {
+		retval.emplace_back(std::string(TCHAR_TO_UTF8(*element.Key)));
 	}
-	if (Index >= 0 && Index <= 255)
+	return retval;
+}
+
+
+TMap<FString, UMeshComponent*> FObjectAnnotator::GetNameToComponentMap() {
+	return name_to_component_map_;
+}
+
+int32 FColorGenerator::GetChannelValue(uint32 index)
+{
+	static int32 values[256] = { 0 };
+	static bool init = false;
+	if (!init)
 	{
-		return Values[Index];
+		float step = 256;
+		uint32 iter = 0;
+		values[0] = 0;
+		while (step >= 1)
+		{
+			for (uint32 value = step - 1; value <= 256; value += step * 2)
+			{
+				iter++;
+				values[iter] = value;
+			}
+			step /= 2;
+		}
+		init = true;
+	}
+	if (index >= 0 && index <= 255)
+	{
+		return values[index];
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid channel index"));
 		check(false);
 		return -1;
 	}
 }
 
-void FColorGenerator::GetColors(int32 MaxVal, bool Fix1, bool Fix2, bool Fix3, TArray<FColor>& ColorMap)
+void FColorGenerator::GetColors(int32 max_val, bool enable_1, bool enable_2, bool enable_3, TArray<FColor>& color_map, TArray<int32>& ok_values)
 {
-	for (int32 I = 0; I <= (Fix1 ? 0 : MaxVal - 1); I++)
+
+	for (int32 I = 0; I <= (enable_1 ? 0 : max_val - 1); I++)
 	{
-		for (int32 J = 0; J <= (Fix2 ? 0 : MaxVal - 1); J++)
+		for (int32 J = 0; J <= (enable_2 ? 0 : max_val - 1); J++)
 		{
-			for (int32 K = 0; K <= (Fix3 ? 0 : MaxVal - 1); K++)
+			for (int32 K = 0; K <= (enable_3 ? 0 : max_val - 1); K++)
 			{
-				uint8 R = (uint8)GetChannelValue(Fix1 ? MaxVal : I);
-				uint8 G = (uint8)GetChannelValue(Fix2 ? MaxVal : J);
-				uint8 B = (uint8)GetChannelValue(Fix3 ? MaxVal : K);
-				FColor Color(R, G, B, 255);
-				ColorMap.Add(Color);
+				uint8 R = GetChannelValue(enable_1 ? max_val : I);
+				uint8 G = GetChannelValue(enable_2 ? max_val : J);
+				uint8 B = GetChannelValue(enable_3 ? max_val : K);
+				if (ok_values.Contains(R) && ok_values.Contains(G) && ok_values.Contains(B) && R != 149 && B != 149 && G != 149) {
+					FColor color(R, G, B, 255);
+					color_map.Add(color);
+				}
 			}
 		}
 	}
 }
 
-FColor FColorGenerator::GetColorFromColorMap(int32 ObjectIndex)
+FColor FColorGenerator::GetColorFromColorMap(int32 color_index)
 {
-	static TArray<FColor> ColorMap;
-	int NumPerChannel = 32;
-	if (ColorMap.Num() == 0)
-	{
-		// 32 ^ 3
-		for (int32 MaxChannelIndex = 0; MaxChannelIndex < NumPerChannel; MaxChannelIndex++) // Get color map for 1000 objects
+	static TArray<FColor> color_map_;
+	static TArray<int32> ok_values_;
+	int num_per_channel = 256;
+	int uneven_start = 79;
+	int full_start = 149;
+	int uneven_count = FMath::FloorToInt((full_start - uneven_start + 2) / 2.0f);
+	if (color_map_.Num() == 0) {
+
+		for (int32 i = uneven_start; i <= full_start; i += 2) {
+			ok_values_.Emplace(i);
+		}
+		for (int32 i = full_start + 1; i < num_per_channel; i++) {
+			ok_values_.Emplace(i);
+		}
+		for (int32 max_channel_index = 0; max_channel_index < num_per_channel; max_channel_index++)
 		{
-			// GetColors(MaxChannelIndex, false, false, false, ColorMap);
-			GetColors(MaxChannelIndex, false, false, true, ColorMap);
-			GetColors(MaxChannelIndex, false, true, false, ColorMap);
-			GetColors(MaxChannelIndex, false, true, true, ColorMap);
-			GetColors(MaxChannelIndex, true, false, false, ColorMap);
-			GetColors(MaxChannelIndex, true, false, true, ColorMap);
-			GetColors(MaxChannelIndex, true, true, false, ColorMap);
-			GetColors(MaxChannelIndex, true, true, true, ColorMap);
+			GetColors(max_channel_index, false, false, true, color_map_, ok_values_);
+			GetColors(max_channel_index, false, true, false, color_map_, ok_values_);
+			GetColors(max_channel_index, false, true, true, color_map_, ok_values_);
+			GetColors(max_channel_index, true, false, false, color_map_, ok_values_);
+			GetColors(max_channel_index, true, false, true, color_map_, ok_values_);
+			GetColors(max_channel_index, true, true, false, color_map_, ok_values_);
+			GetColors(max_channel_index, true, true, true, color_map_, ok_values_);
 		}
 	}
-	if (ObjectIndex < 0 || ObjectIndex >= pow(NumPerChannel, 3))
+	if (color_index < 0 || color_index >= pow((num_per_channel - full_start) + uneven_count - 3, 3))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Object index %d is out of the color map boundary [%d, %d]"), ObjectIndex, 0, (int) pow(NumPerChannel, 3));
+		UE_LOG(LogTemp, Error, TEXT("AirSim Segmentation: Object index %d is out of the available color map boundary [%d, %d]"), color_index, 0, pow((num_per_channel - full_start) + uneven_count - 3, 3));
+		return FColor(0, 0, 0);
 	}
-	return ColorMap[ObjectIndex];
+	else {
+		return color_map_[color_index];
+	}
 }
+
+int FColorGenerator::GetGammaCorrectedColor(int color_index) {
+	return GammaCorrectionTable_[color_index];
+}
+
+int32 FColorGenerator::GammaCorrectionTable_[256] =
+{
+	0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 79, 0,
+	81, 0, 83, 0, 85, 0, 86, 0, 88, 0,
+	90, 0, 93, 0, 95, 0, 96, 0, 98, 0,
+	101, 0, 102, 0, 105, 0, 106, 0, 109, 0,
+	110, 0, 113, 0, 114, 0, 117, 0, 119, 0,
+	120, 0, 122, 0, 125, 0, 127, 0, 129, 0,
+	131, 0, 133, 0, 135, 0, 137, 0, 139, 0,
+	141, 0, 143, 0, 145, 0, 147, 147, 148, 150,
+	151, 152, 153, 154, 155, 156, 157, 158, 159, 160,
+	161, 162, 163, 164, 165, 166, 167, 168, 169, 170,
+	171, 172, 173, 174, 175, 176, 177, 178, 179, 180,
+	181, 182, 183, 184, 185, 186, 187, 188, 189, 190,
+	191, 192, 193, 194, 195, 196, 197, 198, 199, 200,
+	201, 202, 203, 204, 205, 206, 207, 208, 209, 210,
+	211, 212, 213, 214, 215, 216, 217, 218, 219, 220,
+	221, 222, 223, 224, 225, 226, 227, 228, 229, 230,
+	231, 232, 233, 234, 235, 236, 237, 238, 239, 240,
+	241, 242, 243, 244, 245, 246, 247, 248, 249, 250,
+	251, 252, 253, 254, 255
+};

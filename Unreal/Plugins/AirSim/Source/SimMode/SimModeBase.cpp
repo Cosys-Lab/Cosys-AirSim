@@ -11,7 +11,7 @@
 #include "Misc/FileHelper.h"
 #include <memory>
 #include "AirBlueprintLib.h"
-#include "ObjectPainter.h"
+#include "Annotation/ObjectAnnotator.h"
 #include "LidarCamera.h"
 
 #include "api/VehicleApiBase.hpp"
@@ -145,7 +145,7 @@ void ASimModeBase::BeginPlay()
 
     setupClockSpeed();
 
-    setStencilIDs();
+    InitializeMaterialStencils();
 
     record_tick_count = 0;
     setupInputBindings();
@@ -172,7 +172,7 @@ void ASimModeBase::BeginPlay()
     loading_screen_widget_->AddToViewport();
     loading_screen_widget_->SetVisibility(ESlateVisibility::Hidden);
 
-    InitializeMeshVertexColorIDs();
+    InitializeInstanceSegmentation();
 }
 
 const NedTransform& ASimModeBase::getGlobalNedTransform()
@@ -196,14 +196,24 @@ void ASimModeBase::checkVehicleReady()
     }
 }
 
-void ASimModeBase::InitializeMeshVertexColorIDs()
+void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wait, const TStatId InStatId)
 {
-	UObjectPainter::Reset(this->GetLevel(), &nameToColorIndexMap_, &nameToComponentMap_, &ColorToNameMap_);
-    updateAnnotation();
+    if (::IsInGameThread())
+        InFunction();
+    else {
+        FGraphEventRef task = FFunctionGraphTask::CreateAndDispatchWhenReady(MoveTemp(InFunction), InStatId, nullptr, ENamedThreads::GameThread);
+        if (wait)
+            FTaskGraphInterface::Get().WaitUntilTaskCompletes(task);
+    }
 }
 
+void ASimModeBase::InitializeInstanceSegmentation()
+{
+    instance_segmentation_annotator_.GenerateEntireLevel(this->GetLevel());
+    updateInstanceSegmentationAnnotation();
+}
 
-void ASimModeBase::setStencilIDs()
+void ASimModeBase::InitializeMaterialStencils()
 {
 	FString materialListContent;
 	if (FFileHelper::LoadFileToString(materialListContent, UTF8_TO_TCHAR(getSettings().material_list_file.c_str()))) {
@@ -215,30 +225,16 @@ void ASimModeBase::setStencilIDs()
 	}
 }
 
-void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wait, const TStatId InStatId)
-{
-	if (::IsInGameThread())
-		InFunction();
-	else {
-		FGraphEventRef task = FFunctionGraphTask::CreateAndDispatchWhenReady(MoveTemp(InFunction), InStatId, nullptr, ENamedThreads::GameThread);
-		if (wait)
-			FTaskGraphInterface::Get().WaitUntilTaskCompletes(task);
-	}
+
+
+
+std::vector<std::string> ASimModeBase::GetAllInstanceSegmentationMeshIDs() {
+    return instance_segmentation_annotator_.GetAllMeshIDs();
 }
 
-
-std::vector<std::string> ASimModeBase::GetAllSegmentationMeshIDs() {
-	std::vector<std::string> retval;
-    TMap<FString, uint32> nameToColorIndexMapTemp = nameToColorIndexMap_;
-	for (auto const& element : nameToColorIndexMapTemp) {
-		retval.emplace_back(std::string(TCHAR_TO_UTF8(*element.Key)));
-	}
-	return retval;
-}
-
-std::vector<msr::airlib::Pose> ASimModeBase::GetAllSegmentationMeshPoses(bool ned, bool only_visible) {
+std::vector<msr::airlib::Pose> ASimModeBase::GetAllInstanceSegmentationMeshPoses(bool ned, bool only_visible) {
     std::vector<msr::airlib::Pose> retval;
-    TMap<FString, UMeshComponent*> nameToComponentMapTemp = nameToComponentMap_;
+    TMap<FString, UMeshComponent*> nameToComponentMapTemp = instance_segmentation_annotator_.GetNameToComponentMap();
     for (auto const& element : nameToComponentMapTemp) {
         UAirBlueprintLib::RunCommandOnGameThread([ned, only_visible, &retval, element, this]() {
             if (element.Value->HasBegunPlay() && element.Value->IsRenderStateCreated()) {
@@ -267,38 +263,32 @@ std::vector<msr::airlib::Pose> ASimModeBase::GetAllSegmentationMeshPoses(bool ne
     return retval;
 }
 
-bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex) {
+bool ASimModeBase::SetMeshInstanceSegmentationID(const std::string& mesh_name, int object_id, bool is_name_regex, bool update_annotation) {
 	if (is_name_regex) {
 		std::regex name_regex;
 		name_regex.assign(mesh_name, std::regex_constants::icase);
 		int changes = 0;
-		for (auto It = nameToComponentMap_.CreateConstIterator(); It; ++It)
+		for (auto It = instance_segmentation_annotator_.GetNameToComponentMap().CreateConstIterator(); It; ++It)
 		{
 			if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
 				bool success;
 				FString key = It.Key();
-				TMap<FString, uint32>* nameToColorIndexMap = &nameToColorIndexMap_;
-				TMap<FString, UMeshComponent*> nameToComponentMap = nameToComponentMap_;
-				TMap<FString, FString>* colorToNameMap = &ColorToNameMap_;
-				UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap, &success]() {
-					success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap);
+				UAirBlueprintLib::RunCommandOnGameThread([this, key, object_id, &success]() {
+					success = instance_segmentation_annotator_.SetComponentRGBColorByIndex(key, object_id);
 				}, true);
 				changes++;
 			}
 		}
-        updateAnnotation();
+        if(update_annotation)updateInstanceSegmentationAnnotation();
         return changes > 0;
 	}
-	else if (nameToComponentMap_.Contains(mesh_name.c_str())) {
+	else if (instance_segmentation_annotator_.GetNameToComponentMap().Contains(mesh_name.c_str())) {
 		bool success;
 		FString key = mesh_name.c_str();
-		TMap<FString, uint32>* nameToColorIndexMap = &nameToColorIndexMap_;
-		TMap<FString, UMeshComponent*> nameToComponentMap = nameToComponentMap_;
-		TMap<FString, FString>* colorToNameMap = &ColorToNameMap_;
-		UAirBlueprintLib::RunCommandOnGameThread([key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap, &success]() {
-			success = UObjectPainter::SetComponentColor(key, object_id, nameToColorIndexMap, nameToComponentMap, colorToNameMap);
+		UAirBlueprintLib::RunCommandOnGameThread([this, key, object_id, &success]() {
+			success = instance_segmentation_annotator_.SetComponentRGBColorByIndex(key, object_id);
 		}, true);
-        updateAnnotation();
+        if(update_annotation)updateInstanceSegmentationAnnotation();
         return success;
 	}
 	else {
@@ -306,14 +296,47 @@ bool ASimModeBase::SetMeshVertexColorID(const std::string& mesh_name, int object
 	}
 }
 
-int ASimModeBase::GetMeshVertexColorID(const std::string& mesh_name) {
-	return UObjectPainter::GetComponentColor(mesh_name.c_str(), nameToColorIndexMap_);
+int ASimModeBase::GetMeshInstanceSegmentationID(const std::string& mesh_name) {
+	return instance_segmentation_annotator_.GetComponentIndex(mesh_name.c_str());
 }
 
-bool ASimModeBase::AddNewActorToSegmentation(AActor* Actor)
-{
-	return UObjectPainter::PaintNewActor(Actor, &nameToColorIndexMap_, &nameToComponentMap_, &ColorToNameMap_);
-    updateAnnotation();
+bool ASimModeBase::AddNewActorToInstanceSegmentation(AActor* Actor, bool update_annotation){
+   
+	bool success = instance_segmentation_annotator_.AnnotateNewActor(Actor);
+    if(success && update_annotation)updateInstanceSegmentationAnnotation();        
+    return success;
+}
+
+bool ASimModeBase::DeleteActorFromInstanceSegmentation(AActor* Actor, bool update_annotation) {
+
+    bool success = instance_segmentation_annotator_.DeleteActor(Actor);
+    if (success && update_annotation)updateInstanceSegmentationAnnotation();
+    return success;
+}
+
+void ASimModeBase::ForceUpdateInstanceSegmentation() {
+	instance_segmentation_annotator_.UpdateAnnotationComponents(this->GetWorld());
+    updateInstanceSegmentationAnnotation();
+}
+
+void ASimModeBase::updateInstanceSegmentationAnnotation() {
+    TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = instance_segmentation_annotator_.GetAnnotationComponents();
+    TArray<AActor*> cameras_found;
+    UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
+    if (cameras_found.Num() >= 0) {
+        for (auto camera_actor : cameras_found) {
+            APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
+            cur_camera->updateAnnotation(current_segmentation_components);
+        }
+    }
+    TArray<AActor*> lidar_cameras_found;
+    UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
+    if (cameras_found.Num() >= 0) {
+        for (auto lidar_camera_actor : lidar_cameras_found) {
+            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
+            cur_lidar_camera->updateAnnotation(current_segmentation_components);
+        }
+    }
 }
 
 void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -954,26 +977,6 @@ void ASimModeBase::setupVehiclesAndCamera()
         CameraDirector->initializeForBeginPlay(getInitialViewMode(), nullptr, nullptr, nullptr, nullptr);
 
     checkVehicleReady();
-}
-
-void ASimModeBase::updateAnnotation() {
-    UObjectPainter::GetAnnotationComponents(this->GetWorld(), SegmentationComponentList_);    
-    TArray<AActor*> cameras_found;
-    UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
-    if (cameras_found.Num() >= 0) {
-        for (auto camera_actor : cameras_found) {
-            APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
-            cur_camera->updateAnnotation(SegmentationComponentList_);
-        }
-    }
-    TArray<AActor*> lidar_cameras_found;
-    UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
-    if (cameras_found.Num() >= 0) {
-        for (auto lidar_camera_actor : lidar_cameras_found) {
-            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
-            cur_lidar_camera->updateAnnotation(SegmentationComponentList_);
-        }
-    }
 }
 
 void ASimModeBase::registerPhysicsBody(msr::airlib::VehicleSimApiBase* physicsBody)

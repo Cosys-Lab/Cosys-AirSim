@@ -178,7 +178,7 @@ UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectIniti
 	static ConstructorHelpers::FObjectFinder<UMaterial> AnnotationMaterialObject(*MaterialPath);
 	if (AnnotationMaterialObject.Object == nullptr)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Annotation material is not valid."));
+        UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Annotation material is not valid."));
     }
     else
     {
@@ -286,7 +286,7 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(USkeletalMeshCompon
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("The data of SkeletalMeshComponent %s is invalid."), *SkeletalMeshComponent->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: The data of SkeletalMeshComponent %s is invalid."), *SkeletalMeshComponent->GetName());
 		return nullptr;
 	}
 }
@@ -304,7 +304,7 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy()
 
 	if (!IsValid(ParentComponent))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Parent component is invalid."));
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Parent component is invalid."));
 		return nullptr;
 	}
 
@@ -327,7 +327,7 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy()
 	// }
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("The type of ParentMeshComponent : %s can not be supported."), *ParentComponent->GetClass()->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: The type of ParentMeshComponent : %s can not be supported."), *ParentComponent->GetClass()->GetName());
 		return nullptr;
 	}
 	// return nullptr;
@@ -389,6 +389,5 @@ void UAnnotationComponent::TickComponent(
 
 void UAnnotationComponent::ForceUpdate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Force update the annotation component."));
 	this->MarkRenderStateDirty();
 }

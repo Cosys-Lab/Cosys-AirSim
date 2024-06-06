@@ -5,8 +5,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/World.h"
 #include "ImageUtils.h"
-#include "ObjectPainter.h"
-#include <Annotation/ObjectAnnotator.h>
+#include "Annotation/ObjectAnnotator.h"
 #include <string>
 #include <exception>
 #include "AirBlueprintLib.h"
@@ -112,7 +111,7 @@ void APIPCamera::PostInitializeComponents()
     //set initial focal length
     camera_->CurrentFocalLength = 11.9;
 
-	UObjectPainter::SetViewForVertexColor(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
+    FObjectAnnotator::SetViewForRGBAnnotationRender(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
     captures_[Utils::toNumeric(ImageType::Segmentation)]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 }
 

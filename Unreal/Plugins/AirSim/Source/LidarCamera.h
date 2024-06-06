@@ -159,6 +159,9 @@ private:
 	static int32 unique_colors_[765];
 	bool used_by_airsim_ = false;
 	bool initialized = false;
+	int32 wait_frames_ = 100;
+	int32 waited_frames_ = 0;
+
 
 	//bool saved_DisableWorldRendering_ = false;
 	//UGameViewportClient* game_viewport_;

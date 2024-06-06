@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/MeshComponent.h"
 #include "ParticleDefinitions.h"
-
+#include "Annotation/ObjectAnnotator.h"
 #include <string>
 #include "CameraDirector.h"
 #include "common/AirSimSettings.hpp"
@@ -41,8 +41,14 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Recording")
     bool toggleRecording();
 
-	UFUNCTION(BlueprintCallable, Category = "Segmentation")
-	bool AddNewActorToSegmentation(AActor* Actor);
+	UFUNCTION(BlueprintCallable, Category = "Instance Segmentation")
+	bool AddNewActorToInstanceSegmentation(AActor* Actor, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Instance Segmentation")
+    bool DeleteActorFromInstanceSegmentation(AActor* Actor, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Instance Segmentation")
+    void ForceUpdateInstanceSegmentation();
 
 public:
     UFUNCTION(BlueprintPure, Category = "Airsim | get stuff")
@@ -102,11 +108,12 @@ public:
     {
         return static_cast<PawnSimApi*>(api_provider_->getVehicleSimApi(vehicle_name));
     }
-	std::vector<std::string> GetAllSegmentationMeshIDs();
-    std::vector<msr::airlib::Pose> GetAllSegmentationMeshPoses(bool ned = true, bool only_visible = false);
-	bool SetMeshVertexColorID(const std::string& mesh_name, int object_id, bool is_name_regex);
+	std::vector<std::string> GetAllInstanceSegmentationMeshIDs();
+    std::vector<msr::airlib::Pose> GetAllInstanceSegmentationMeshPoses(bool ned = true, bool only_visible = false);
+	bool SetMeshInstanceSegmentationID(const std::string& mesh_name, int object_id, bool is_name_regex, bool update_annotation = true);
+    int GetMeshInstanceSegmentationID(const std::string& mesh_name);
+
 	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
-	int GetMeshVertexColorID(const std::string& mesh_name);
 
     const APIPCamera* getCamera(const msr::airlib::CameraDetails& camera_details) const;
 
@@ -148,7 +155,7 @@ protected: //optional overrides
     void initializeCameraDirector(const FTransform& camera_transform, float follow_distance);
     void checkVehicleReady(); //checks if vehicle is available to use
     virtual void updateDebugReport(msr::airlib::StateReporterWrapper& debug_reporter);
-    virtual void updateAnnotation();
+    virtual void updateInstanceSegmentationAnnotation();
 
 protected: //Utility methods for derived classes
     virtual const AirSimSettings& getSettings() const;
@@ -195,13 +202,6 @@ private:
     float tod_update_interval_secs_;
     bool tod_move_sun_;
 
-	/** The assigned color for each object */
-	TMap<FString, uint32> nameToColorIndexMap_;
-	TMap<FString, FString> ColorToNameMap_;
-	/** A list of paintable objects */
-	TMap<FString, UMeshComponent*> nameToComponentMap_;
-	TArray<TWeakObjectPtr<UPrimitiveComponent> > SegmentationComponentList_;
-
     std::unique_ptr<NedTransform> global_ned_transform_;
     std::unique_ptr<msr::airlib::WorldSimApiBase> world_sim_api_;
     std::unique_ptr<msr::airlib::ApiProvider> api_provider_;
@@ -217,9 +217,11 @@ private:
     bool lidar_draw_debug_points_ = false;
     static ASimModeBase* SIMMODE;
 
+    FObjectAnnotator instance_segmentation_annotator_;
+
 private:
-    void InitializeMeshVertexColorIDs();
-	void setStencilIDs();
+    void InitializeInstanceSegmentation();
+	void InitializeMaterialStencils();
     void initializeTimeOfDay();
     void advanceTimeOfDay();
     void setSunRotation(FRotator rotation);

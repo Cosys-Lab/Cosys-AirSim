@@ -13,7 +13,7 @@
 #include "common/AirSimSettings.hpp"
 #include "api/WorldSimApiBase.hpp"
 #include "EngineUtils.h"
-#include "ObjectPainter.h"
+#include "Annotation/ObjectAnnotator.h"
 #include "DrawDebugHelpers.h"
 #include "Weather/WeatherLib.h"
 #include <random>
@@ -217,7 +217,7 @@ void ALidarCamera::InitializeSensor()
 	capture_2D_depth_->bUseCustomProjectionMatrix = false;
 
 	// Setup the capture component for the virtual instance segmentation camera
-	UObjectPainter::SetViewForVertexColor(capture_2D_segmentation_->ShowFlags);
+	FObjectAnnotator::SetViewForRGBAnnotationRender(capture_2D_segmentation_->ShowFlags);
 	capture_2D_segmentation_->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
 	render_target_2D_segmentation_->TargetGamma = 1;
@@ -304,10 +304,6 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 		RotateCamera(FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_ + (cur_fov / 2), 360));
 		sensor_cur_angle_ = FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_, 360);
 
-		capture_2D_depth_->CaptureScene();
-		capture_2D_segmentation_->CaptureScene();
-		capture_2D_intensity_->CaptureScene();
-
 		// If the rotation is bigger than the allowed FOV, cap the rotation (it will be further completed in the next frame)
 		if (sensor_sum_rotation_angle_ > cur_fov)sensor_sum_rotation_angle_ = cur_fov;
 
@@ -317,7 +313,17 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 		//}
 		//first_frame_ = false;
 
-		refresh_pointcloud = SampleRenders(sensor_sum_rotation_angle_, cur_fov, point_cloud, point_cloud_final);
+		if (waited_frames_ < wait_frames_) {
+			waited_frames_++;
+		}
+		else {
+
+			capture_2D_depth_->CaptureScene();
+			capture_2D_segmentation_->CaptureScene();
+			capture_2D_intensity_->CaptureScene();
+			refresh_pointcloud = SampleRenders(sensor_sum_rotation_angle_, cur_fov, point_cloud, point_cloud_final);
+		}
+		
 
 		// Set up the values for the next frame
 		sensor_prev_rotation_angle_ = sensor_sum_rotation_angle_;
