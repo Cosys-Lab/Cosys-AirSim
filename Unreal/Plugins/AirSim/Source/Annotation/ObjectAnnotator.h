@@ -20,12 +20,31 @@ private:
 class AIRSIM_API FObjectAnnotator
 {
 public:
+
+	enum class AnnotatorType : uint32
+	{
+		RGB = 0,
+		Greyscale = 1,
+		Texture = 2,
+		InstanceSegmentation = 3
+	};
+
+	enum class AnnotatorDefault : uint32
+	{
+		NoRender = 0,
+		DefaultColor = 1
+	};
+
 	FObjectAnnotator();
+
+	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, AnnotatorDefault default_type = AnnotatorDefault::NoRender, bool direct = false);
+
+	void Initialize(ULevel* level);
 
 	bool DeleteActor(AActor* actor);
 	bool AnnotateNewActor(AActor* actor);
 	
-	void GenerateEntireLevel(ULevel* InLevel);
+	void GenerateEntireLevel(ULevel* level);
 
 	uint32 GetComponentIndex(FString component_id);
 	bool SetComponentRGBColorByIndex(FString component_id, uint32 color_index);
@@ -39,6 +58,12 @@ public:
 
 private:
 	FColorGenerator ColorGenerator_;
+
+	AnnotatorType type_;
+	FString name_;
+	AnnotatorDefault default_type_;
+	bool direct_;
+	
 
 	bool PaintRGBComponent(UMeshComponent* component, const FColor& color);
 	bool UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color);

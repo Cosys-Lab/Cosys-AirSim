@@ -66,6 +66,25 @@ namespace airlib
             }
         };
 
+        struct AnnotatorSetting
+        {
+            int annotator_index;
+            int type;
+            int default_value;
+            std::string name;
+            bool direct;
+
+            AnnotatorSetting(int annotator_index = 0, int type = 0, int default_value = 0,
+                const std::string& name = "", bool direct = false)
+                : annotator_index(annotator_index)
+                , type(type)
+                , default_value(default_value)
+                , name(name)
+                , direct(direct)
+            {
+            }
+        };
+
         struct RecordingSetting
         {
             bool record_on_move = false;
@@ -459,6 +478,7 @@ namespace airlib
         std::vector<SubwindowSetting> subwindow_settings;
         RecordingSetting recording_setting;
         TimeOfDaySetting tod_setting;
+        std::vector<AnnotatorSetting> annotator_settings;
 
         std::vector<std::string> warning_messages;
         std::vector<std::string> error_messages;
@@ -517,6 +537,7 @@ namespace airlib
             loadDefaultCameraSetting(settings_json, camera_defaults);
             loadCameraDirectorSetting(settings_json, camera_director, simmode_name);
             loadSubWindowsSettings(settings_json, subwindow_settings);
+            loadAnnotatorSettings(settings_json, annotator_settings);
             loadViewModeSettings(settings_json);
             loadPawnPaths(settings_json, pawn_paths);
             loadOtherSettings(settings_json);
@@ -1350,6 +1371,26 @@ namespace airlib
                         subwindow_setting.visible = json_settings_child.getBool("Visible", false);
                         subwindow_setting.camera_name = getCameraName(json_settings_child);
                         subwindow_setting.vehicle_name = json_settings_child.getString("VehicleName", "");
+                    }
+                }
+            }
+        }
+
+        static void loadAnnotatorSettings(const Settings& settings_json, std::vector<AnnotatorSetting>& annotator_settings)
+        {
+
+            Settings json_parent;
+            if (settings_json.getChild("Annotation", json_parent)) {
+                for (size_t child_index = 0; child_index < json_parent.size(); ++child_index) {
+                    Settings json_settings_child;
+                    if (json_parent.getChild(child_index, json_settings_child)) {
+                        AnnotatorSetting annotator_setting;
+                        annotator_setting.annotator_index = child_index;
+                        annotator_setting.type = json_settings_child.getInt("Type", 0);
+                        annotator_setting.default_value = json_settings_child.getInt("Default", 0);
+                        annotator_setting.name = json_settings_child.getString("Name", "");
+                        annotator_setting.direct = json_settings_child.getBool("Direct", false);
+                        annotator_settings.push_back(annotator_setting);
                     }
                 }
             }

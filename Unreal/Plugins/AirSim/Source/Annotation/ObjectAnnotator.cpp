@@ -10,10 +10,40 @@
 // For UE4 < 17
 // check https://github.com/unrealcv/unrealcv/blob/1369a72be8428547318d8a52ae2d63e1eb57a001/Source/UnrealCV/Private/Controller/ObjectAnnotator.cpp#L1
 
+
 FObjectAnnotator::FObjectAnnotator()
 {
+	name_ = FString("InstanceSegmentation");
+	type_ = AnnotatorType::InstanceSegmentation;
+	default_type_ = AnnotatorDefault::NoRender;
+	direct_ = false;
 }
 
+FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, AnnotatorDefault default_type, bool direct)
+{
+	name_ = name;
+	type_ = type;
+	default_type_ = default_type;
+	direct_ = direct;
+}
+
+void FObjectAnnotator::Initialize(ULevel* level) {
+	switch (type_)
+	{
+	case AnnotatorType::RGB:
+		UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: RGB not implemented yet."));
+		break;
+	case AnnotatorType::Greyscale:
+		UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Greyscale not implemented yet"));
+		break;
+	case AnnotatorType::Texture:
+		UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Texture not implemented yet."));
+		break;
+	case AnnotatorType::InstanceSegmentation:
+		GenerateEntireLevel(level);
+		break;
+	}
+}
 
 bool FObjectAnnotator::IsPaintable(AActor* actor)
 {

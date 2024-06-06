@@ -218,9 +218,11 @@ private:
     static ASimModeBase* SIMMODE;
 
     FObjectAnnotator instance_segmentation_annotator_;
+    TMap<FString, FObjectAnnotator> annotators_;
 
 private:
     void InitializeInstanceSegmentation();
+    void InitializeAnnotation();
 	void InitializeMaterialStencils();
     void initializeTimeOfDay();
     void advanceTimeOfDay();

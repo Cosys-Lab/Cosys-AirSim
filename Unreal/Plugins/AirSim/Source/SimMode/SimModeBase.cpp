@@ -173,6 +173,8 @@ void ASimModeBase::BeginPlay()
     loading_screen_widget_->SetVisibility(ESlateVisibility::Hidden);
 
     InitializeInstanceSegmentation();
+
+    InitializeAnnotation();
 }
 
 const NedTransform& ASimModeBase::getGlobalNedTransform()
@@ -207,9 +209,18 @@ void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wai
     }
 }
 
+void ASimModeBase::InitializeAnnotation() {
+    std::vector<AirSimSettings::AnnotatorSetting> annotator_settings = getSettings().annotator_settings;
+	for (auto& annotator_setting : annotator_settings) {
+        FString name = FString(annotator_setting.name.c_str());
+        annotators_.Emplace(name, FObjectAnnotator(name, FObjectAnnotator::AnnotatorType(annotator_setting.type)));
+		annotators_[name].Initialize(this->GetLevel());
+	}
+}
+
 void ASimModeBase::InitializeInstanceSegmentation()
 {
-    instance_segmentation_annotator_.GenerateEntireLevel(this->GetLevel());
+    instance_segmentation_annotator_.Initialize(this->GetLevel());
     updateInstanceSegmentationAnnotation();
 }
 
