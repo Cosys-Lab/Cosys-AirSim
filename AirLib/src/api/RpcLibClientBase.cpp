@@ -290,7 +290,7 @@ __pragma(warning(disable : 4239))
 
             return RpcLibAdaptorsBase::ImageResponse::to(response_adaptor);
         }
-        vector<uint8_t> RpcLibClientBase::simGetImage(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name, std::string& annotation_name)
+        vector<uint8_t> RpcLibClientBase::simGetImage(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name, const std::string& annotation_name)
         {
             vector<uint8_t> result = pimpl_->client.call("simGetImage", camera_name, type, vehicle_name, annotation_name).as<vector<uint8_t>>();
             return result;

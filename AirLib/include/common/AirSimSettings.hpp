@@ -1390,7 +1390,7 @@ namespace airlib
                     Settings json_settings_child;
                     if (json_parent.getChild(child_index, json_settings_child)) {
                         AnnotatorSetting annotator_setting;
-                        annotator_setting.annotator_index = child_index;
+                        annotator_setting.annotator_index = (int)child_index;
                         annotator_setting.type = json_settings_child.getInt("Type", 0);
                         annotator_setting.default_value = json_settings_child.getInt("Default", 0);
                         annotator_setting.name = json_settings_child.getString("Name", "");

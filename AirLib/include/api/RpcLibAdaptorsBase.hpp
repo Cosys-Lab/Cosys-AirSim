@@ -558,7 +558,7 @@ namespace airlib_rpclib
             bool compress;
             int width, height;
             msr::airlib::ImageCaptureBase::ImageType image_type;
-            std::string annotation_name
+            std::string annotation_name;
 
             MSGPACK_DEFINE_MAP(image_data_uint8, image_data_float, camera_position, camera_name,
                                camera_orientation, time_stamp, message, pixels_as_float, compress, width, height, image_type, annotation_name);
