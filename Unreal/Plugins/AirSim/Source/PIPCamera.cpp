@@ -65,6 +65,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Infrared), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlow), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlowVis), EPixelFormat::PF_B8G8R8A8);
+    image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Annotation), EPixelFormat::PF_B8G8R8A8);
 
     object_filter_ = FObjectFilter();
 }
@@ -151,9 +152,12 @@ msr::airlib::AirSimSettings::CameraSetting APIPCamera::getParams() const
     return sensor_params_;
 }
 
-msr::airlib::ProjectionMatrix APIPCamera::getProjectionMatrix(const APIPCamera::ImageType image_type) const
+msr::airlib::ProjectionMatrix APIPCamera::getProjectionMatrix() const
 {
     msr::airlib::ProjectionMatrix mat;
+
+    // TODO: This is always the case in current request, might need to change to include annotation if needed
+	ImageType image_type = ImageType::Scene;
 
     //TODO: avoid the need to override const cast here
     const_cast<APIPCamera*>(this)->setCameraTypeEnabled(image_type, true);
@@ -255,8 +259,9 @@ void APIPCamera::Tick(float DeltaTime)
 
 void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    int image_count_to_delete = static_cast<int>(Utils::toNumeric(ImageType::Count));
     if (noise_materials_.Num()) {
-        for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
+        for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
             if (noise_materials_[image_type + 1])
                 captures_[image_type]->PostProcessSettings.RemoveBlendable(noise_materials_[image_type + 1]);
         }
@@ -265,7 +270,7 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
     }
 
 	if (lens_distortion_materials_.Num()) {
-		for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
+		for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
 			if (lens_distortion_materials_[image_type + 1])
 				captures_[image_type]->PostProcessSettings.RemoveBlendable(lens_distortion_materials_[image_type + 1]);
 		}
@@ -280,7 +285,7 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	lens_distortion_materials_.Empty();
 
     if (distortion_materials_.Num()) {
-        for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
+        for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
             if (distortion_materials_[image_type + 1])
                 captures_[image_type]->PostProcessSettings.RemoveBlendable(distortion_materials_[image_type + 1]);
         }
@@ -291,17 +296,32 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
     distortion_material_static_ = nullptr;
     distortion_materials_.Empty();
 
-    for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
+	annotator_name_to_index_map_.Empty();
+
+
+    int camera_full_count = static_cast<int>(cameraCaptureCount());
+    for (int current_camera = 0; current_camera < camera_full_count; ++current_camera) {
         //use final color for all calculations
-        captures_[image_type] = nullptr;
-        render_targets_[image_type] = nullptr;
-        detections_[image_type] = nullptr;
+        if (current_camera == Utils::toNumeric(ImageType::Segmentation) || current_camera >= image_count_to_delete - 2) {
+            captures_[current_camera]->ShowOnlyComponents.Empty();
+        }        
+        captures_[current_camera] = nullptr;
+        render_targets_[current_camera] = nullptr;
+        detections_[current_camera] = nullptr;
     }
+    captures_.Empty();
+	render_targets_.Empty();
+	detections_.Empty();
 }
 
 unsigned int APIPCamera::imageTypeCount()
 {
-    return Utils::toNumeric(ImageType::Count);
+    return Utils::toNumeric(ImageType::Count) - 1;
+}
+
+unsigned int APIPCamera::cameraCaptureCount()
+{
+    return static_cast<unsigned int>(captures_.Num());
 }
 
 void APIPCamera::showToScreen()
@@ -319,14 +339,19 @@ void APIPCamera::disableAll()
     disableAllPIP();
 }
 
-bool APIPCamera::getCameraTypeEnabled(ImageType type) const
+bool APIPCamera::getCameraTypeEnabled(ImageType type, std::string annotation_name) const
 {
-    return camera_type_enabled_[Utils::toNumeric(type)];
+    if (type == ImageType::Annotation) {
+        return camera_type_enabled_[annotator_name_to_index_map_[FString(annotation_name.c_str())]];
+    }
+    else {
+        return camera_type_enabled_[Utils::toNumeric(type)];
+    }    
 }
 
-void APIPCamera::setCameraTypeEnabled(ImageType type, bool enabled)
+void APIPCamera::setCameraTypeEnabled(ImageType type, bool enabled, std::string annotation_name)
 {
-    enableCaptureComponent(type, enabled);
+    enableCaptureComponent(type, enabled, annotation_name);
 }
 
 void APIPCamera::setCameraOrientation(const FRotator& rotator)
@@ -347,9 +372,9 @@ void APIPCamera::setCaptureUpdate(USceneCaptureComponent2D* capture, bool nodisp
     capture->bAlwaysPersistRenderingState = true;
 }
 
-void APIPCamera::setCameraTypeUpdate(ImageType type, bool nodisplay)
+void APIPCamera::setCameraTypeUpdate(ImageType type, bool nodisplay, std::string annotation_name)
 {
-    USceneCaptureComponent2D* capture = getCaptureComponent(type, false);
+    USceneCaptureComponent2D* capture = getCaptureComponent(type, false, annotation_name);
     if (capture != nullptr)
         setCaptureUpdate(capture, nodisplay);
 }
@@ -374,11 +399,9 @@ void APIPCamera::setCameraPose(const msr::airlib::Pose& relative_pose)
 
 void APIPCamera::setCameraFoV(float fov_degrees)
 {
-    int image_count = static_cast<int>(Utils::toNumeric(ImageType::Count));
-    for (int image_type = 0; image_type < image_count; ++image_type) {
+    for (unsigned int image_type = 0; image_type < cameraCaptureCount(); ++image_type) {
         captures_[image_type]->FOVAngle = fov_degrees;
     }
-
     camera_->SetFieldOfView(fov_degrees);
 }
 
@@ -389,7 +412,7 @@ msr::airlib::CameraInfo APIPCamera::getCameraInfo() const
     camera_info.pose.position = ned_transform_->toLocalNed(this->GetActorLocation());
     camera_info.pose.orientation = ned_transform_->toNed(this->GetActorRotation().Quaternion());
     camera_info.fov = camera_->FieldOfView;
-    camera_info.proj_mat = getProjectionMatrix(ImageType::Scene);
+    camera_info.proj_mat = getProjectionMatrix();
     return camera_info;
 }
 
@@ -415,8 +438,50 @@ void APIPCamera::setDistortionParam(const std::string& param_name, float value)
     distortion_param_instance_->SetScalarParameterValue(FName(param_name.c_str()), value);
 }
 
-void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
+void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
     captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowOnlyComponents = ComponentList;
+}
+
+void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name) {
+    captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents = ComponentList;
+}
+
+void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type)
+{
+    USceneCaptureComponent2D* new_capture = NewObject<USceneCaptureComponent2D>(this, USceneCaptureComponent2D ::StaticClass(), *name);
+    new_capture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+    if (type == FObjectAnnotator::AnnotatorType::RGB || type == FObjectAnnotator::AnnotatorType::InstanceSegmentation)
+        FObjectAnnotator::SetViewForRGBAnnotationRender(new_capture->ShowFlags);
+    new_capture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+
+    new_capture->SetRelativeRotation(FRotator(0, 0, 0));
+    new_capture->SetRelativeLocation(FVector(0, 0, 0));
+    new_capture->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+    render_targets_.Add(NewObject<UTextureRenderTarget2D>());
+    int render_index = render_targets_.Num() - 1;
+
+    updateCaptureComponentSetting(new_capture, render_targets_[render_index],
+        false, image_type_to_pixel_format_map_[Utils::toNumeric(ImageType::Annotation)],
+        sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)), 
+        *ned_transform_, false);
+
+    render_targets_[render_index]->TargetGamma = 1;
+
+	annotator_name_to_index_map_.Add(TCHAR_TO_UTF8(*name), render_index);
+
+    if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)new_capture->HiddenActors = ignore_actors_;
+    copyCameraSettingsToSceneCapture(camera_, new_capture);
+
+	captures_.Add(new_capture);
+	camera_type_enabled_.push_back(false);
+	
+    detections_.Add(NewObject<UDetectionComponent>(this));
+    if (detections_[render_index]) {
+        detections_[render_index]->SetupAttachment(new_capture);
+        detections_[render_index]->RegisterComponent();
+        detections_[render_index]->Deactivate();
+    }
 }
 
 void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform)
@@ -448,14 +513,15 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
     }
 
 	static const FName lidar_ignore_tag = TEXT("MarkedIgnore");
-	TArray<AActor*> ignoreActors;
     for (TActorIterator<AActor> ActorIterator(this->GetWorld()); ActorIterator; ++ActorIterator)
     {
         AActor* Actor = *ActorIterator;
-        if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))ignoreActors.Add(Actor);
+        if (Actor && Actor != this && Actor->Tags.Contains(lidar_ignore_tag))ignore_actors_.Add(Actor);
     }
+
+
     int image_count = static_cast<int>(Utils::toNumeric(ImageType::Count));
-    for (int image_type = -1; image_type < image_count; ++image_type) {
+    for (int image_type = -1; image_type < image_count - 1; ++image_type) {
         const auto& capture_setting = camera_setting.capture_settings.at(image_type);
         const auto& noise_setting = camera_setting.noise_settings.at(image_type);
 
@@ -479,12 +545,13 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
             case ImageType::SurfaceNormals:
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], true, pixel_format, capture_setting, ned_transform, true);
                 break;
-
+            case ImageType::Annotation:
+                break;
             default:
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], true, pixel_format, capture_setting, ned_transform, false);
                 break;
             }
-            if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors = ignoreActors;
+            if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors = ignore_actors_;
             setDistortionMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings);
             setNoiseMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings, noise_setting);
             copyCameraSettingsToSceneCapture(camera_, captures_[image_type]); //CinemAirSim
@@ -651,15 +718,15 @@ void APIPCamera::setNoiseMaterial(int image_type, UObject* outer, FPostProcessSe
 	}
 }
 
-void APIPCamera::enableCaptureComponent(const APIPCamera::ImageType type, bool is_enabled)
+void APIPCamera::enableCaptureComponent(const APIPCamera::ImageType type, bool is_enabled, std::string annotation_name)
 {
-    USceneCaptureComponent2D* capture = getCaptureComponent(type, false);
+    USceneCaptureComponent2D* capture = getCaptureComponent(type, false, annotation_name);
     if (capture != nullptr) {
-        UDetectionComponent* detection = getDetectionComponent(type, false);
+        UDetectionComponent* detection = getDetectionComponent(type, false, annotation_name);
         if (is_enabled) {
             //do not make unnecessary calls to Activate() which otherwise causes crash in Unreal
             if (!capture->IsActive() || capture->TextureTarget == nullptr) {
-                capture->TextureTarget = getRenderTarget(type, false);
+                capture->TextureTarget = getRenderTarget(type, false, annotation_name);
                 capture->Activate();
                 if (detection != nullptr) {
                     detection->texture_target_ = capture->TextureTarget;
@@ -677,42 +744,70 @@ void APIPCamera::enableCaptureComponent(const APIPCamera::ImageType type, bool i
                 }
             }
         }
-        camera_type_enabled_[Utils::toNumeric(type)] = is_enabled;
+        if (type == ImageType::Annotation)
+			camera_type_enabled_[annotator_name_to_index_map_[FString(annotation_name.c_str())]] = is_enabled;
+        else
+            camera_type_enabled_[Utils::toNumeric(type)] = is_enabled;
     }
     //else nothing to enable
 }
 
-UTextureRenderTarget2D* APIPCamera::getRenderTarget(const APIPCamera::ImageType type, bool if_active)
+UTextureRenderTarget2D* APIPCamera::getRenderTarget(const APIPCamera::ImageType type, bool if_active, std::string annotation_name)
 {
     unsigned int image_type = Utils::toNumeric(type);
-
-    if (!if_active || camera_type_enabled_[image_type])
-        return render_targets_[image_type];
+	if (type == ImageType::Annotation)
+    {        
+        if (!if_active || camera_type_enabled_[annotator_name_to_index_map_[FString(annotation_name.c_str())]])
+            return render_targets_[annotator_name_to_index_map_[FString(annotation_name.c_str())]];
+    }
+    else {
+        if (!if_active || camera_type_enabled_[image_type])
+            return render_targets_[image_type];
+    }    
     return nullptr;
 }
 
-UDetectionComponent* APIPCamera::getDetectionComponent(const ImageType type, bool if_active) const
+UDetectionComponent* APIPCamera::getDetectionComponent(const ImageType type, bool if_active, std::string annotation_name) const
 {
-    unsigned int image_type = Utils::toNumeric(type);
-
-    if (!if_active || camera_type_enabled_[image_type])
-        return detections_[image_type];
+    if (type == ImageType::Annotation) {
+        if (!if_active || camera_type_enabled_[annotator_name_to_index_map_[FString(annotation_name.c_str())]])
+            return detections_[annotator_name_to_index_map_[FString(annotation_name.c_str())]];
+    }
+    else {
+        unsigned int image_type = Utils::toNumeric(type);
+        if (!if_active || camera_type_enabled_[image_type])
+            return detections_[image_type];
+    }
     return nullptr;
 }
 
-USceneCaptureComponent2D* APIPCamera::getCaptureComponent(const APIPCamera::ImageType type, bool if_active)
+USceneCaptureComponent2D* APIPCamera::getCaptureComponent(const APIPCamera::ImageType type, bool if_active, std::string annotation_name)
 {
-    unsigned int image_type = Utils::toNumeric(type);
-
-    if (!if_active || camera_type_enabled_[image_type])
-        return captures_[image_type];
+    if (type == ImageType::Annotation) {
+        if (!if_active || camera_type_enabled_[annotator_name_to_index_map_[FString(annotation_name.c_str())]])
+            return captures_[annotator_name_to_index_map_[FString(annotation_name.c_str())]];
+    }
+    else {
+        unsigned int image_type = Utils::toNumeric(type);
+        if (!if_active || camera_type_enabled_[image_type])
+            return captures_[image_type];
+    }
     return nullptr;
 }
 
 void APIPCamera::disableAllPIP()
 {
     for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
-        enableCaptureComponent(Utils::toEnum<ImageType>(image_type), false);
+		if (Utils::toEnum<ImageType>(image_type) == ImageType::Annotation)
+		{
+			for (auto& annotator : annotator_name_to_index_map_)
+			{
+				enableCaptureComponent(ImageType::Annotation, false, TCHAR_TO_UTF8(*annotator.Key));
+			}
+		}
+        else {
+            enableCaptureComponent(Utils::toEnum<ImageType>(image_type), false);
+        }
     }
 }
 
@@ -728,10 +823,22 @@ void APIPCamera::disableMain()
 void APIPCamera::onViewModeChanged(bool nodisplay)
 {
     for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
-        USceneCaptureComponent2D* capture = getCaptureComponent(static_cast<ImageType>(image_type), false);
-        if (capture) {
-            setCaptureUpdate(capture, nodisplay);
+        if (Utils::toEnum<ImageType>(image_type) == ImageType::Annotation)
+        {
+            for (auto& annotator : annotator_name_to_index_map_)
+            {
+                USceneCaptureComponent2D* capture = getCaptureComponent(ImageType::Annotation, false, TCHAR_TO_UTF8(*annotator.Key));
+                if (capture) {
+                    setCaptureUpdate(capture, nodisplay);
+                }
+            }
         }
+        else {
+            USceneCaptureComponent2D* capture = getCaptureComponent(static_cast<ImageType>(image_type), false);
+            if (capture) {
+                setCaptureUpdate(capture, nodisplay);
+            }
+        }        
     }
 }
 
@@ -883,7 +990,7 @@ std::string APIPCamera::getCurrentFieldOfView() const
 
 void APIPCamera::copyCameraSettingsToAllSceneCapture(UCameraComponent* camera)
 {
-    int image_count = static_cast<int>(Utils::toNumeric(ImageType::Count));
+    int image_count = static_cast<int>(cameraCaptureCount());
     for (int image_type = image_count - 1; image_type >= 0; image_type--) {
         copyCameraSettingsToSceneCapture(camera_, captures_[image_type]);
     }

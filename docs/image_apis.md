@@ -224,6 +224,7 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
   Infrared = 7,
   OpticalFlow = 8,
   OpticalFlowVis = 9
+  Annotation = 10
 ```                
 
 ### DepthPlanar and DepthPerspective
@@ -304,3 +305,8 @@ These image types return information about motion perceived by the point of view
 
 ### Object Detection
 This feature lets you generate object detection using existing cameras in AirSim, find more info [here](object_detection.md).
+
+### Annotation
+The annotation system allows you to choose different groundtruth labeling techniques to create more data from your simulation. Find more info [here](annotation.md).
+How to define them in the settings you can find here [settings](settings.md#annotation-settings) as well. 
+When enabling annotation layers, one can choose to render images as well from these layers. The image type if set to annotation does usually require to also supply the name of the annotation layer as defined in the settings.

@@ -28,6 +28,7 @@ namespace airlib
             Infrared,
             OpticalFlow,
             OpticalFlowVis,
+            Annotation,
             Count //must be last
         };
 
@@ -37,6 +38,7 @@ namespace airlib
             ImageCaptureBase::ImageType image_type = ImageCaptureBase::ImageType::Scene;
             bool pixels_as_float = false;
             bool compress = true;
+            std::string annotation_name;
 
             ImageRequest()
             {
@@ -45,11 +47,13 @@ namespace airlib
             ImageRequest(const std::string& camera_name_val,
                          ImageCaptureBase::ImageType image_type_val,
                          bool pixels_as_float_val = false,
-                         bool compress_val = true)
+                         bool compress_val = true,
+                         const std::string& annotation_name_val = "")
                 : camera_name(camera_name_val)
                 , image_type(image_type_val)
                 , pixels_as_float(pixels_as_float_val)
                 , compress(compress_val)
+				, annotation_name(annotation_name_val)
             {
             }
         };
@@ -68,6 +72,7 @@ namespace airlib
             bool compress = true;
             int width = 0, height = 0;
             ImageType image_type;
+			std::string annotation_name;
         };
 
     public: //methods

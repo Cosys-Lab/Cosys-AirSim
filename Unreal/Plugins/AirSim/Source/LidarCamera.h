@@ -47,7 +47,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
+	void updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
 	void InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpleParams& settings);
 	void InitializeSensor();
 	bool Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);

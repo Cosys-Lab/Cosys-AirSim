@@ -100,18 +100,19 @@ void ASimHUD::updateWidgetSubwindowVisibility()
     for (int window_index = 0; window_index < AirSimSettings::kSubwindowCount; ++window_index) {
         APIPCamera* camera = subwindow_cameras_[window_index];
         ImageType camera_type = getSubWindowSettings().at(window_index).image_type;
+		std::string annotation_name = getSubWindowSettings().at(window_index).annotation_name;
 
         bool is_visible = getSubWindowSettings().at(window_index).visible && camera != nullptr;
 
         if (camera != nullptr) {
-            camera->setCameraTypeEnabled(camera_type, is_visible);
+            camera->setCameraTypeEnabled(camera_type, is_visible, annotation_name);
             //sub-window captures don't count as a request, set bCaptureEveryFrame and bCaptureOnMovement to display so we can show correctly the subwindow
-            camera->setCameraTypeUpdate(camera_type, false);
+            camera->setCameraTypeUpdate(camera_type, false, annotation_name);
         }
 
         widget_->setSubwindowVisibility(window_index,
                                         is_visible,
-                                        is_visible ? camera->getRenderTarget(camera_type, false) : nullptr);
+                                        is_visible ? camera->getRenderTarget(camera_type, false, annotation_name) : nullptr);
     }
 }
 

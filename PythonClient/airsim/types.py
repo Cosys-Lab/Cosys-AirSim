@@ -67,6 +67,7 @@ class ImageType(metaclass=_ImageType):
     Infrared = 7
     OpticalFlow = 8
     OpticalFlowVis = 9
+    Annotation = 10
 
 class DrivetrainType:
     MaxDegreeOfFreedom = 0
@@ -334,14 +335,15 @@ class ImageRequest(MsgpackMixin):
     image_type = ImageType.Scene
     pixels_as_float = False
     compress = False
+    annotation_name = ""
 
-    def __init__(self, camera_name, image_type, pixels_as_float = False, compress = True):
+    def __init__(self, camera_name, image_type, pixels_as_float = False, compress = True, annotation_name = ""):
         # todo: in future remove str(), it's only for compatibility to pre v1.2
         self.camera_name = str(camera_name)
         self.image_type = image_type
         self.pixels_as_float = pixels_as_float
         self.compress = compress
-
+        self.annotation_name = annotation_name
 
 class ImageResponse(MsgpackMixin):
     image_data_uint8 = np.uint8(0)
@@ -355,6 +357,7 @@ class ImageResponse(MsgpackMixin):
     width = 0
     height = 0
     image_type = ImageType.Scene
+    annotation_name = ""
 
 class CarControls(MsgpackMixin):
     throttle = 0.0

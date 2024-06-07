@@ -54,14 +54,16 @@ namespace airlib
             bool visible;
             std::string camera_name;
             std::string vehicle_name;
+            std::string annotation_name;
 
             SubwindowSetting(int window_index_val = 0, ImageType image_type_val = ImageType::Scene, bool visible_val = false,
-                             const std::string& camera_name_val = "", const std::string& vehicle_name_val = "")
+                             const std::string& camera_name_val = "", const std::string& vehicle_name_val = "", const std::string& annotation_name_val = "")
                 : window_index(window_index_val)
                 , image_type(image_type_val)
                 , visible(visible_val)
                 , camera_name(camera_name_val)
                 , vehicle_name(vehicle_name_val)
+				, annotation_name(annotation_name_val)
             {
             }
         };
@@ -72,15 +74,13 @@ namespace airlib
             int type;
             int default_value;
             std::string name;
-            bool direct;
 
-            AnnotatorSetting(int annotator_index = 0, int type = 0, int default_value = 0,
-                const std::string& name = "", bool direct = false)
-                : annotator_index(annotator_index)
-                , type(type)
-                , default_value(default_value)
-                , name(name)
-                , direct(direct)
+            AnnotatorSetting(int annotator_index_val = 0, int type_val = 0, int default_value_val = 0,
+                const std::string& name_val = "")
+                : annotator_index(annotator_index_val)
+                , type(type_val)
+                , default_value(default_value_val)
+                , name(name_val)
             {
             }
         };
@@ -520,6 +520,7 @@ namespace airlib
 
         AirSimSettings()
         {
+            initializeAnnotatorSettings(annotator_settings);
             initializeSubwindowSettings(subwindow_settings);
             initializePawnPaths(pawn_paths);
         }
@@ -809,9 +810,9 @@ namespace airlib
                             bool compress = req_camera_settings.getBool("Compress", true);
                             bool pixels_as_float = req_camera_settings.getBool("PixelsAsFloat", false);
                             std::string vehicle_name = req_camera_settings.getString("VehicleName", default_vehicle_name);
-
+                            std::string annotation_name = req_camera_settings.getString("Annotation", "");
                             recording_setting.requests[vehicle_name].push_back(ImageCaptureBase::ImageRequest(
-                                camera_name, image_type, pixels_as_float, compress));
+                                camera_name, image_type, pixels_as_float, compress, annotation_name));
                         }
                     }
                 }
@@ -1204,7 +1205,7 @@ namespace airlib
         {
             const int image_count = Utils::toNumeric(ImageType::Count);
             noise_settings.clear();
-            for (int i = -1; i < image_count; ++i)
+            for (int i = -1; i < image_count - 1; ++i)
                 noise_settings[i] = NoiseSetting();
         }
 
@@ -1368,6 +1369,7 @@ namespace airlib
                         subwindow_setting.window_index = window_index;
                         subwindow_setting.image_type = Utils::toEnum<ImageType>(
                             json_settings_child.getInt("ImageType", 0));
+                        subwindow_setting.annotation_name = json_settings_child.getString("Annotation", "");
                         subwindow_setting.visible = json_settings_child.getBool("Visible", false);
                         subwindow_setting.camera_name = getCameraName(json_settings_child);
                         subwindow_setting.vehicle_name = json_settings_child.getString("VehicleName", "");
@@ -1379,6 +1381,9 @@ namespace airlib
         static void loadAnnotatorSettings(const Settings& settings_json, std::vector<AnnotatorSetting>& annotator_settings)
         {
 
+            //load default annotator layers
+            initializeAnnotatorSettings(annotator_settings);
+
             Settings json_parent;
             if (settings_json.getChild("Annotation", json_parent)) {
                 for (size_t child_index = 0; child_index < json_parent.size(); ++child_index) {
@@ -1389,19 +1394,24 @@ namespace airlib
                         annotator_setting.type = json_settings_child.getInt("Type", 0);
                         annotator_setting.default_value = json_settings_child.getInt("Default", 0);
                         annotator_setting.name = json_settings_child.getString("Name", "");
-                        annotator_setting.direct = json_settings_child.getBool("Direct", false);
                         annotator_settings.push_back(annotator_setting);
                     }
                 }
             }
         }
 
+        static void initializeAnnotatorSettings(std::vector<AnnotatorSetting>& annotator_settings)
+        {
+            annotator_settings.clear();
+        }
+
+
         static void initializeSubwindowSettings(std::vector<SubwindowSetting>& subwindow_settings)
         {
             subwindow_settings.clear();
-            subwindow_settings.push_back(SubwindowSetting(0, ImageType::DepthVis, false, "", "")); //depth
-            subwindow_settings.push_back(SubwindowSetting(1, ImageType::Segmentation, false, "", "")); //seg
-            subwindow_settings.push_back(SubwindowSetting(2, ImageType::Scene, false, "", "")); //vis
+            subwindow_settings.push_back(SubwindowSetting(0, ImageType::DepthVis, false, "", "", "")); //depth
+            subwindow_settings.push_back(SubwindowSetting(1, ImageType::Segmentation, false, "", "", "")); //seg
+            subwindow_settings.push_back(SubwindowSetting(2, ImageType::Scene, false, "", "", "")); //vis
         }
 
         void loadOtherSettings(const Settings& settings_json)

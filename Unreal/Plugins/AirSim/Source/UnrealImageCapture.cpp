@@ -59,7 +59,7 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
         ImageResponse& response = responses.at(i);
 
         UTextureRenderTarget2D* textureTarget = nullptr;
-        USceneCaptureComponent2D* capture = camera->getCaptureComponent(requests[i].image_type, false);
+        USceneCaptureComponent2D* capture = camera->getCaptureComponent(requests[i].image_type, false, requests[i].annotation_name);
         if (capture == nullptr) {
             response.message = "Can't take screenshot because none camera type is not active";
         }
@@ -69,7 +69,7 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
         else
             textureTarget = capture->TextureTarget;
         bool disable_gamma = false;
-        if (requests[i].image_type == ImageCaptureBase::ImageType::Segmentation)disable_gamma = true;
+        if (requests[i].image_type == ImageCaptureBase::ImageType::Segmentation || requests[i].image_type == ImageCaptureBase::ImageType::Annotation)disable_gamma = true;
         render_params.push_back(std::make_shared<RenderRequest::RenderParams>(capture, textureTarget, requests[i].pixels_as_float, requests[i].compress, disable_gamma));
     }
 
@@ -113,14 +113,15 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
         response.width = render_results[i]->width;
         response.height = render_results[i]->height;
         response.image_type = request.image_type;
+		response.annotation_name = request.annotation_name;
     }
 }
 
 bool UnrealImageCapture::updateCameraVisibility(APIPCamera* camera, const msr::airlib::ImageCaptureBase::ImageRequest& request)
 {
     bool visibilityChanged = false;
-    if (!camera->getCameraTypeEnabled(request.image_type)) {
-        camera->setCameraTypeEnabled(request.image_type, true);
+    if (!camera->getCameraTypeEnabled(request.image_type, request.annotation_name)) {
+        camera->setCameraTypeEnabled(request.image_type, true, request.annotation_name);
         visibilityChanged = true;
     }
 

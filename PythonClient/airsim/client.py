@@ -257,7 +257,7 @@ class VehicleClient:
 #camera control
 #simGetImage returns compressed png in array of bytes
 #image_type uses one of the ImageType members
-    def simGetImage(self, camera_name, image_type, vehicle_name = ''):
+    def simGetImage(self, camera_name, image_type, vehicle_name = '', annotation_name = ""):
         """
         Get a single image
 
@@ -269,6 +269,7 @@ class VehicleClient:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
             image_type (ImageType): Type of image required
             vehicle_name (str, optional): Name of the vehicle with the camera
+            annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
 
         Returns:
             Binary string literal of compressed png image
@@ -277,7 +278,7 @@ class VehicleClient:
         camera_name = str(camera_name)
 
 #because this method returns std::vector < uint8>, msgpack decides to encode it as a string unfortunately.
-        result = self.client.call('simGetImage', camera_name, image_type, vehicle_name)
+        result = self.client.call('simGetImage', camera_name, image_type, vehicle_name, annotation_name)
         if (result == "" or result == "\0"):
             return None
         return result
@@ -612,7 +613,7 @@ class VehicleClient:
         return load_colormap()
 
 
-    def simAddDetectionFilterMeshName(self, camera_name, image_type, mesh_name, vehicle_name = '', external = False):
+    def simAddDetectionFilterMeshName(self, camera_name, image_type, mesh_name, vehicle_name = '', annotation_name = ""):
         """
         Add mesh name to detect in wild card format
 
@@ -623,12 +624,13 @@ class VehicleClient:
             image_type (ImageType): Type of image required
             mesh_name (str): mesh name in wild card format
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
+            annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
 
         """
-        self.client.call('simAddDetectionFilterMeshName', camera_name, image_type, mesh_name, vehicle_name, external)
+        self.client.call('simAddDetectionFilterMeshName', camera_name, image_type, mesh_name,
+                         vehicle_name, annotion_name)
 
-    def simSetDetectionFilterRadius(self, camera_name, image_type, radius_cm, vehicle_name = '', external = False):
+    def simSetDetectionFilterRadius(self, camera_name, image_type, radius_cm, vehicle_name = '', annotation_name = ""):
         """
         Set detection radius for all cameras
 
@@ -637,11 +639,12 @@ class VehicleClient:
             image_type (ImageType): Type of image required
             radius_cm (int): Radius in [cm]
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
+            annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
         """
-        self.client.call('simSetDetectionFilterRadius', camera_name, image_type, radius_cm, vehicle_name, external)
+        self.client.call('simSetDetectionFilterRadius', camera_name, image_type, radius_cm, vehicle_name,
+                         annotation_name)
 
-    def simClearDetectionMeshNames(self, camera_name, image_type, vehicle_name = '', external = False):
+    def simClearDetectionMeshNames(self, camera_name, image_type, vehicle_name = '', annotation_name = ""):
         """
         Clear all mesh names from detection filter
 
@@ -649,12 +652,13 @@ class VehicleClient:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
             image_type (ImageType): Type of image required
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
+            annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
 
         """
-        self.client.call('simClearDetectionMeshNames', camera_name, image_type, vehicle_name, external)
+        self.client.call('simClearDetectionMeshNames', camera_name, image_type, vehicle_name,
+                         annotation_name)
 
-    def simGetDetections(self, camera_name, image_type, vehicle_name = '', external = False):
+    def simGetDetections(self, camera_name, image_type, vehicle_name = '', annotation_name = ""):
         """
         Get current detections
 
@@ -662,12 +666,13 @@ class VehicleClient:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
             image_type (ImageType): Type of image required
             vehicle_name (str, optional): Vehicle which the camera is associated with
-            external (bool, optional): Whether the camera is an External Camera
+            annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
 
         Returns:
             DetectionInfo array
         """
-        responses_raw = self.client.call('simGetDetections', camera_name, image_type, vehicle_name, external)
+        responses_raw = self.client.call('simGetDetections', camera_name, image_type, vehicle_name,
+                                         annotation_name)
         return [DetectionInfo.from_msgpack(response_raw) for response_raw in responses_raw]
 
     def simPrintLogMessage(self, message, message_param = "", severity = 0):

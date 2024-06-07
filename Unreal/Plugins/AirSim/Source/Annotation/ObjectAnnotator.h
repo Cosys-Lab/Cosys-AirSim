@@ -37,14 +37,15 @@ public:
 
 	FObjectAnnotator();
 
-	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, AnnotatorDefault default_type = AnnotatorDefault::NoRender, bool direct = false);
+	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, AnnotatorDefault default_type = AnnotatorDefault::NoRender);
 
 	void Initialize(ULevel* level);
 
 	bool DeleteActor(AActor* actor);
 	bool AnnotateNewActor(AActor* actor);
 	
-	void GenerateEntireLevel(ULevel* level);
+	void InitializeInstanceSegmentation(ULevel* level);
+	void InitializeRGB(ULevel* level);
 
 	uint32 GetComponentIndex(FString component_id);
 	bool SetComponentRGBColorByIndex(FString component_id, uint32 color_index);
@@ -53,23 +54,24 @@ public:
 
     static void SetViewForRGBAnnotationRender(FEngineShowFlags& show_flags);
 
+	void EndPlay();
+
 	std::vector<std::string> GetAllMeshIDs();
 	TMap<FString, UMeshComponent*> GetNameToComponentMap();
-
 private:
 	FColorGenerator ColorGenerator_;
 
 	AnnotatorType type_;
 	FString name_;
-	AnnotatorDefault default_type_;
-	bool direct_;
-	
+	AnnotatorDefault default_type_;	
 
 	bool PaintRGBComponent(UMeshComponent* component, const FColor& color);
 	bool UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color);
 	bool DeleteComponent(UMeshComponent* component);	
 
 	void getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes);
+	void getPaintableComponentMeshesAndTags(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes, TMap<FString, TArray<FName>>* paintable_components_tags);
+
 	bool IsPaintable(AActor* actor);
 
 private:

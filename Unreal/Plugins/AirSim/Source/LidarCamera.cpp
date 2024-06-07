@@ -332,7 +332,7 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	return refresh_pointcloud;
 }
 
-void ALidarCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
+void ALidarCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
 	capture_2D_segmentation_->ShowOnlyComponents = ComponentList;
 }
 

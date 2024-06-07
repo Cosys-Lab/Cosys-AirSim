@@ -210,17 +210,21 @@ void ASimModeBase::RunCommandOnGameThread(TFunction<void()> InFunction, bool wai
 }
 
 void ASimModeBase::InitializeAnnotation() {
-    std::vector<AirSimSettings::AnnotatorSetting> annotator_settings = getSettings().annotator_settings;
-	for (auto& annotator_setting : annotator_settings) {
+	for (auto& annotator_setting : getSettings().annotator_settings) {
         FString name = FString(annotator_setting.name.c_str());
-        annotators_.Emplace(name, FObjectAnnotator(name, FObjectAnnotator::AnnotatorType(annotator_setting.type)));
+        FObjectAnnotator::AnnotatorType type = FObjectAnnotator::AnnotatorType(annotator_setting.type);
+        annotators_.Emplace(name, FObjectAnnotator(name, type, FObjectAnnotator::AnnotatorDefault(annotator_setting.default_value)));
 		annotators_[name].Initialize(this->GetLevel());
+        AddAnnotatorCamera(name, type);
+        ForceUpdateAnnotation(name);
+        updateAnnotation(name);
 	}
 }
 
 void ASimModeBase::InitializeInstanceSegmentation()
 {
     instance_segmentation_annotator_.Initialize(this->GetLevel());
+    ForceUpdateInstanceSegmentation();
     updateInstanceSegmentationAnnotation();
 }
 
@@ -290,7 +294,7 @@ bool ASimModeBase::SetMeshInstanceSegmentationID(const std::string& mesh_name, i
 				changes++;
 			}
 		}
-        if(update_annotation)updateInstanceSegmentationAnnotation();
+        if(update_annotation && changes > 0)updateInstanceSegmentationAnnotation();
         return changes > 0;
 	}
 	else if (instance_segmentation_annotator_.GetNameToComponentMap().Contains(mesh_name.c_str())) {
@@ -330,22 +334,83 @@ void ASimModeBase::ForceUpdateInstanceSegmentation() {
     updateInstanceSegmentationAnnotation();
 }
 
+bool ASimModeBase::AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation) {
+
+    bool success = annotators_[annotation_name].AnnotateNewActor(Actor);
+    if (success && update_annotation)updateAnnotation(annotation_name);
+    return success;
+}
+
+bool ASimModeBase::DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation) {
+
+    bool success = annotators_[annotation_name].DeleteActor(Actor);
+    if (success && update_annotation)updateAnnotation(annotation_name);
+    return success;
+}
+
+void ASimModeBase::ForceUpdateAnnotation(FString annotation_name) {
+    annotators_[annotation_name].UpdateAnnotationComponents(this->GetWorld());
+    updateAnnotation(annotation_name);
+}
+
 void ASimModeBase::updateInstanceSegmentationAnnotation() {
     TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = instance_segmentation_annotator_.GetAnnotationComponents();
+
+    TArray<AActor*> cameras_found;
+    UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
+        UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
+        }, true);
+    if (cameras_found.Num() >= 0) {
+        for (auto camera_actor : cameras_found) {
+            APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
+            cur_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
+        }
+    }
+    TArray<AActor*> lidar_cameras_found;
+    UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
+        UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
+        }, true);
+    if (cameras_found.Num() >= 0) {
+        for (auto lidar_camera_actor : lidar_cameras_found) {
+            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
+            cur_lidar_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
+        }
+    }
+}
+
+void ASimModeBase::updateAnnotation(FString annotation_name) {
+    TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = annotators_[annotation_name].GetAnnotationComponents();
+    TArray<AActor*> cameras_found;
+    UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
+        UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
+        }, true);
+    UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
+    if (cameras_found.Num() >= 0) {
+        for (auto camera_actor : cameras_found) {
+            APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
+            cur_camera->updateAnnotation(current_segmentation_components, annotation_name);
+        }
+    }
+    TArray<AActor*> lidar_cameras_found;
+    UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
+        UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
+        }, true);
+    UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
+    if (cameras_found.Num() >= 0) {
+        for (auto lidar_camera_actor : lidar_cameras_found) {
+            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
+            //cur_lidar_camera->updateAnnotation(current_segmentation_components, annotation_name);
+        }
+    }
+}
+
+void ASimModeBase::AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type) {
     TArray<AActor*> cameras_found;
     UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
     if (cameras_found.Num() >= 0) {
         for (auto camera_actor : cameras_found) {
             APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
-            cur_camera->updateAnnotation(current_segmentation_components);
-        }
-    }
-    TArray<AActor*> lidar_cameras_found;
-    UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
-    if (cameras_found.Num() >= 0) {
-        for (auto lidar_camera_actor : lidar_cameras_found) {
-            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
-            cur_lidar_camera->updateAnnotation(current_segmentation_components);
+            cur_camera->addAnnotationCamera(name, type);
         }
     }
 }
@@ -365,6 +430,8 @@ void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
     spawned_actors_.Empty();
     vehicle_sim_apis_.clear();
+
+    annotators_.Empty();
 
     Super::EndPlay(EndPlayReason);
 }

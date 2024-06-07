@@ -17,10 +17,14 @@ void RecordingFile::appendRecord(const std::vector<msr::airlib::ImageCaptureBase
 
         //build image file name
         std::ostringstream image_file_name;
-        image_file_name << "img_"
-                        << vehicle_sim_api->getVehicleName() << "_"
-                        << response.camera_name << "_" << common_utils::Utils::toNumeric(response.image_type) << "_" << common_utils::Utils::getTimeSinceEpochNanos();
 
+        image_file_name << "img_"
+            << vehicle_sim_api->getVehicleName() << "_"
+            << response.camera_name << "_" << common_utils::Utils::toNumeric(response.image_type);
+        if (response.annotation_name != "")
+            image_file_name << "_" << response.annotation_name;
+        image_file_name << "_" << common_utils::Utils::getTimeSinceEpochNanos();
+        
         std::string extension;
         if (response.pixels_as_float)
             extension = ".pfm";

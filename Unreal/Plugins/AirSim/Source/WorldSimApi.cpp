@@ -905,10 +905,10 @@ std::vector<WorldSimApi::ImageCaptureBase::ImageResponse> WorldSimApi::getImages
     return responses;
 }
 
-std::vector<uint8_t> WorldSimApi::getImage(ImageCaptureBase::ImageType image_type, const CameraDetails& camera_details) const
+std::vector<uint8_t> WorldSimApi::getImage(ImageCaptureBase::ImageType image_type, const CameraDetails& camera_details, const std::string& annotation_name) const
 {
     std::vector<ImageCaptureBase::ImageRequest> request{
-        ImageCaptureBase::ImageRequest(camera_details.camera_name, image_type)
+        ImageCaptureBase::ImageRequest(camera_details.camera_name, image_type, false, true, annotation_name)
     };
 
     const auto& response = getImages(request, camera_details.vehicle_name);
@@ -1000,45 +1000,45 @@ std::string WorldSimApi::getCurrentFieldOfView(const CameraDetails& camera_detai
 }
 //End CinemAirSim
 
-void WorldSimApi::addDetectionFilterMeshName(ImageCaptureBase::ImageType image_type, const std::string& mesh_name, const CameraDetails& camera_details)
+void WorldSimApi::addDetectionFilterMeshName(ImageCaptureBase::ImageType image_type, const std::string& mesh_name, const CameraDetails& camera_details, const std::string& annotation_name)
 {
     const APIPCamera* camera = simmode_->getCamera(camera_details);
 
-    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, &mesh_name]() {
-        camera->getDetectionComponent(image_type, false)->addMeshName(mesh_name);
+    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, &mesh_name, annotation_name]() {
+        camera->getDetectionComponent(image_type, false, annotation_name)->addMeshName(mesh_name);
     },
                                              true);
 }
 
-void WorldSimApi::setDetectionFilterRadius(ImageCaptureBase::ImageType image_type, float radius_cm, const CameraDetails& camera_details)
+void WorldSimApi::setDetectionFilterRadius(ImageCaptureBase::ImageType image_type, float radius_cm, const CameraDetails& camera_details, const std::string& annotation_name)
 {
     const APIPCamera* camera = simmode_->getCamera(camera_details);
 
-    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, radius_cm]() {
-        camera->getDetectionComponent(image_type, false)->setFilterRadius(radius_cm);
+    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, radius_cm, annotation_name]() {
+        camera->getDetectionComponent(image_type, false, annotation_name)->setFilterRadius(radius_cm);
     },
                                              true);
 }
 
-void WorldSimApi::clearDetectionMeshNames(ImageCaptureBase::ImageType image_type, const CameraDetails& camera_details)
+void WorldSimApi::clearDetectionMeshNames(ImageCaptureBase::ImageType image_type, const CameraDetails& camera_details, const std::string& annotation_name)
 {
     const APIPCamera* camera = simmode_->getCamera(camera_details);
 
-    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type]() {
-        camera->getDetectionComponent(image_type, false)->clearMeshNames();
+    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, annotation_name]() {
+        camera->getDetectionComponent(image_type, false, annotation_name)->clearMeshNames();
     },
                                              true);
 }
 
-std::vector<msr::airlib::DetectionInfo> WorldSimApi::getDetections(ImageCaptureBase::ImageType image_type, const CameraDetails& camera_details)
+std::vector<msr::airlib::DetectionInfo> WorldSimApi::getDetections(ImageCaptureBase::ImageType image_type, const CameraDetails& camera_details, const std::string& annotation_name)
 {
     std::vector<msr::airlib::DetectionInfo> result;
 
     const APIPCamera* camera = simmode_->getCamera(camera_details);
     const NedTransform& ned_transform = simmode_->getVehicleSimApi(camera_details.vehicle_name)->getNedTransform();
 
-    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, &result, &ned_transform]() {
-        const TArray<FDetectionInfo>& detections = camera->getDetectionComponent(image_type, false)->getDetections();
+    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, &result, &ned_transform, annotation_name]() {
+        const TArray<FDetectionInfo>& detections = camera->getDetectionComponent(image_type, false, annotation_name)->getDetections();
         result.resize(detections.Num());
 
         for (int i = 0; i < detections.Num(); i++) {

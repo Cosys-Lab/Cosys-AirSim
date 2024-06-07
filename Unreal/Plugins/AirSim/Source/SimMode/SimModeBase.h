@@ -50,6 +50,15 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Instance Segmentation")
     void ForceUpdateInstanceSegmentation();
 
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    void ForceUpdateAnnotation(FString annotation_name);
+
 public:
     UFUNCTION(BlueprintPure, Category = "Airsim | get stuff")
     static ASimModeBase* getSimMode();
@@ -156,6 +165,7 @@ protected: //optional overrides
     void checkVehicleReady(); //checks if vehicle is available to use
     virtual void updateDebugReport(msr::airlib::StateReporterWrapper& debug_reporter);
     virtual void updateInstanceSegmentationAnnotation();
+    virtual void updateAnnotation(FString annotation_name);
 
 protected: //Utility methods for derived classes
     virtual const AirSimSettings& getSettings() const;
@@ -223,6 +233,7 @@ private:
 private:
     void InitializeInstanceSegmentation();
     void InitializeAnnotation();
+    void AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type);
 	void InitializeMaterialStencils();
     void initializeTimeOfDay();
     void advanceTimeOfDay();

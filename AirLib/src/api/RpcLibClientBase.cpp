@@ -238,21 +238,21 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simGetSegmentationObjectID", mesh_name).as<int>();
         }
 
-        void RpcLibClientBase::simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name)
+        void RpcLibClientBase::simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name, const std::string& annotation_name)
         {
-            pimpl_->client.call("simAddDetectionFilterMeshName", camera_name, type, mesh_name, vehicle_name);
+            pimpl_->client.call("simAddDetectionFilterMeshName", camera_name, type, mesh_name, vehicle_name, annotation_name);
         }
-        void RpcLibClientBase::simSetDetectionFilterRadius(const std::string& camera_name, ImageCaptureBase::ImageType type, const float radius_cm, const std::string& vehicle_name)
+        void RpcLibClientBase::simSetDetectionFilterRadius(const std::string& camera_name, ImageCaptureBase::ImageType type, const float radius_cm, const std::string& vehicle_name, const std::string& annotation_name)
         {
-            pimpl_->client.call("simSetDetectionFilterRadius", camera_name, type, radius_cm, vehicle_name);
+            pimpl_->client.call("simSetDetectionFilterRadius", camera_name, type, radius_cm, vehicle_name, annotation_name);
         }
-        void RpcLibClientBase::simClearDetectionMeshNames(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name)
+        void RpcLibClientBase::simClearDetectionMeshNames(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name, const std::string& annotation_name)
         {
-            pimpl_->client.call("simClearDetectionMeshNames", camera_name, type, vehicle_name);
+            pimpl_->client.call("simClearDetectionMeshNames", camera_name, type, vehicle_name, annotation_name);
         }
-        vector<DetectionInfo> RpcLibClientBase::simGetDetections(const std::string& camera_name, ImageCaptureBase::ImageType image_type, const std::string& vehicle_name)
+        vector<DetectionInfo> RpcLibClientBase::simGetDetections(const std::string& camera_name, ImageCaptureBase::ImageType image_type, const std::string& vehicle_name, const std::string& annotation_name)
         {
-            const auto& result = pimpl_->client.call("simGetDetections", camera_name, image_type, vehicle_name).as<vector<RpcLibAdaptorsBase::DetectionInfo>>();
+            const auto& result = pimpl_->client.call("simGetDetections", camera_name, image_type, vehicle_name, annotation_name).as<vector<RpcLibAdaptorsBase::DetectionInfo>>();
             return RpcLibAdaptorsBase::DetectionInfo::to(result);
         }
 
@@ -290,9 +290,9 @@ __pragma(warning(disable : 4239))
 
             return RpcLibAdaptorsBase::ImageResponse::to(response_adaptor);
         }
-        vector<uint8_t> RpcLibClientBase::simGetImage(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name)
+        vector<uint8_t> RpcLibClientBase::simGetImage(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name, std::string& annotation_name)
         {
-            vector<uint8_t> result = pimpl_->client.call("simGetImage", camera_name, type, vehicle_name).as<vector<uint8_t>>();
+            vector<uint8_t> result = pimpl_->client.call("simGetImage", camera_name, type, vehicle_name, annotation_name).as<vector<uint8_t>>();
             return result;
         }
 

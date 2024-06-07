@@ -5,6 +5,7 @@
 #include "Camera/CameraActor.h"
 #include "Materials/Material.h"
 #include "Runtime/Core/Public/PixelFormat.h"
+#include "Annotation/ObjectAnnotator.h"
 #include "common/ImageCaptureBase.hpp"
 #include "common/common_utils/Utils.hpp"
 #include "common/AirSimSettings.hpp"
@@ -22,8 +23,7 @@
 UCLASS()
 class AIRSIM_API APIPCamera : public ACineCameraActor //CinemAirSim
 {
-    GENERATED_BODY()
-    
+    GENERATED_BODY()    
 
 public:
     typedef msr::airlib::ImageCaptureBase::ImageType ImageType;
@@ -62,13 +62,15 @@ public:
     std::string getCurrentFieldOfView() const;
     //end CinemAirSim methods
 
-    void setCameraTypeEnabled(ImageType type, bool enabled);
-    bool getCameraTypeEnabled(ImageType type) const;
+    void setCameraTypeEnabled(ImageType type, bool enabled, std::string annotation_name = "");
+    bool getCameraTypeEnabled(ImageType type, std::string annotation_name = "") const;
     AirSimSettings::CameraSetting getParams() const;
     void setCaptureUpdate(USceneCaptureComponent2D* capture, bool nodisplay);
-    void setCameraTypeUpdate(ImageType type, bool nodisplay);
+    void setCameraTypeUpdate(ImageType type, bool nodisplay, std::string annotation_name = "");
     void setCameraOrientation(const FRotator& rotator);
-    void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
+    void updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
+    void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name);
+    void addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type);
     void setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform);
     void setCameraPose(const msr::airlib::Pose& relative_pose);
     void setCameraFoV(float fov_degrees);
@@ -76,11 +78,11 @@ public:
     std::vector<float> getDistortionParams() const;
     void setDistortionParam(const std::string& param_name, float value);
 
-    msr::airlib::ProjectionMatrix getProjectionMatrix(const ImageType image_type) const;
+    msr::airlib::ProjectionMatrix getProjectionMatrix() const;
 
-    USceneCaptureComponent2D* getCaptureComponent(const ImageType type, bool if_active);
-    UTextureRenderTarget2D* getRenderTarget(const ImageType type, bool if_active);
-    UDetectionComponent* getDetectionComponent(const ImageType type, bool if_active) const;
+    USceneCaptureComponent2D* getCaptureComponent(const ImageType type, bool if_active, std::string annotation_name = "");
+    UTextureRenderTarget2D* getRenderTarget(const ImageType type, bool if_active, std::string annotation_name = "");
+    UDetectionComponent* getDetectionComponent(const ImageType type, bool if_active, std::string annotation_name = "") const;
 
     msr::airlib::Pose getPose() const;
 
@@ -116,7 +118,7 @@ private: //members
 	UPROPERTY() UMaterial* lens_distortion_invert_material_static_;
 	UPROPERTY() TArray<UMaterialInstanceDynamic*> lens_distortion_materials_;
 
-
+    TMap<FString, int> annotator_name_to_index_map_;
     std::vector<bool> camera_type_enabled_;
     FRotator gimbald_rotator_;
     float gimbal_stabilization_;
@@ -126,13 +128,16 @@ private: //members
     FObjectFilter object_filter_;
 
     msr::airlib::AirSimSettings::CameraSetting sensor_params_;
+
+    TArray<AActor*> ignore_actors_;
 private: //methods
     typedef common_utils::Utils Utils;
     typedef AirSimSettings::CaptureSetting CaptureSetting;
     typedef AirSimSettings::NoiseSetting NoiseSetting;
 
     static unsigned int imageTypeCount();
-    void enableCaptureComponent(const ImageType type, bool is_enabled);
+    unsigned int cameraCaptureCount();
+    void enableCaptureComponent(const ImageType type, bool is_enabled, std::string annotation_name = "");
     static void updateCaptureComponentSetting(USceneCaptureComponent2D* capture, UTextureRenderTarget2D* render_target,
                                               bool auto_format, const EPixelFormat& pixel_format, const CaptureSetting& setting, const NedTransform& ned_transform,
                                               bool force_linear_gamma);

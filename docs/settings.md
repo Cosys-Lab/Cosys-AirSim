@@ -243,6 +243,7 @@ This setting determines what is shown in each of 3 subwindows which are visible 
 * `CameraName`: is any [available camera](image_apis.md#available-cameras) on the vehicle
 * `ImageType`: integer value determines what kind of image gets shown according to [ImageType enum](image_apis.md#available-imagetype-values).
 * `VehicleName`: string allows you to specify the vehicle to use the camera from, used when multiple vehicles are specified in the settings. First vehicle's camera will be used if there are any mistakes such as incorrect vehicle name, or only a single vehicle.
+* `Annotation`: string allows you to specify the annotation layer to use for the camera. This is only if using the Annotation camera type for `ImageType`.
 
 For example, for a single car vehicle, below shows driver view, front bumper view and rear view as scene, depth and surface normals respectively.
 ```json
@@ -274,7 +275,7 @@ The recording feature allows you to record data such as position, orientation, v
     * When `PixelsAsFloat` is true, image is saved as [pfm](pfm.md) file instead of png file.
     * `VehicleName` option allows you to specify separate cameras for individual vehicles. If the `Cameras` element isn't present, `Scene` image from the default camera of each vehicle will be recorded.
     * If you don't want to record any images and just the vehicle's physics data, then specify the `Cameras` element but leave it empty, like this: `"Cameras": []`
-
+    * add the field `Annotation`, a string allowing you to specify the annotation layer to use for the camera. This is only if using the Annotation camera type for `ImageType`.
 For example, the `Cameras` element below records scene & segmentation images for `Car1` & scene for `Car2`-
 
 ```json

@@ -502,8 +502,9 @@ namespace airlib_rpclib
             msr::airlib::ImageCaptureBase::ImageType image_type;
             bool pixels_as_float;
             bool compress;
+            std::string annotation_name;
 
-            MSGPACK_DEFINE_MAP(camera_name, image_type, pixels_as_float, compress);
+            MSGPACK_DEFINE_MAP(camera_name, image_type, pixels_as_float, compress, annotation_name);
 
             ImageRequest()
             {
@@ -514,12 +515,13 @@ namespace airlib_rpclib
                 , image_type(s.image_type)
                 , pixels_as_float(s.pixels_as_float)
                 , compress(s.compress)
+				, annotation_name(s.annotation_name)
             {
             }
 
             msr::airlib::ImageCaptureBase::ImageRequest to() const
             {
-                return { camera_name, image_type, pixels_as_float, compress };
+                return { camera_name, image_type, pixels_as_float, compress, annotation_name };
             }
 
             static std::vector<ImageRequest> from(
@@ -556,9 +558,10 @@ namespace airlib_rpclib
             bool compress;
             int width, height;
             msr::airlib::ImageCaptureBase::ImageType image_type;
+            std::string annotation_name
 
             MSGPACK_DEFINE_MAP(image_data_uint8, image_data_float, camera_position, camera_name,
-                               camera_orientation, time_stamp, message, pixels_as_float, compress, width, height, image_type);
+                               camera_orientation, time_stamp, message, pixels_as_float, compress, width, height, image_type, annotation_name);
 
             ImageResponse()
             {
@@ -580,6 +583,7 @@ namespace airlib_rpclib
                 width = s.width;
                 height = s.height;
                 image_type = s.image_type;
+				annotation_name = s.annotation_name;
             }
 
             msr::airlib::ImageCaptureBase::ImageResponse to() const
@@ -602,6 +606,7 @@ namespace airlib_rpclib
                 d.width = width;
                 d.height = height;
                 d.image_type = image_type;
+                d.annotation_name = annotation_name;
 
                 return d;
             }

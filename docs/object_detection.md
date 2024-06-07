@@ -18,6 +18,8 @@ One can control these settings for each camera, image type and vehicle combinati
 - Get detections   
 ```simGetDetections(camera_name, image_type, vehicle_name = '')```
 
+Note that if using Annotation camera one has to also give the `annotation_name` argument to choose the right annotation camera.
+For example: ```simGetDetections(camera_name, image_type, vehicle_name = '', annotation_name="mygreyscaleannotation")```
 
 The return value of `simGetDetections` is a `DetectionInfo` array:
 ```python

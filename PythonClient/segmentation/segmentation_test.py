@@ -17,9 +17,9 @@ if __name__ == '__main__':
     client.confirmConnection()
 
     # Generate list of all colors available for segmentation
-    print("Generating segmentation colormap, this takes a while...")
+    print("Getting segmentation colormap...")
     colorMap = client.simGetSegmentationColorMap()
-    print("Generated segmentation colormap\n")
+    print("Getting segmentation colormap\n")
 
     # Get names of all objects in simulation world in the instance segmentation format
     # and store in list together with the associated RGB value
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     print("Sorted objects based on segmentation.csv into classes\n")
 
     # Set the colors for all AI humans to a chosen color with color index 15
-    className = 'wall'
+    className = 'ground'
     classColorIndex = 1000000
     # a) this version we set it based on the gathered objects in the list
     print("Setting all objects in world matching class-name '"
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     # Get an image from the main segmentation camera, show and save it as png
     print("Getting segmentation image from main camera...")
-    responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
+    responses = client.simGetImages([airsim.ImageRequest( "frontcamera", airsim.ImageType.Segmentation, False, False)])
     img_rgb_string = responses[0].image_data_uint8
     rgbarray = np.frombuffer(img_rgb_string, np.uint8)
     rgbarray_shaped = rgbarray.reshape((540,960,3))
