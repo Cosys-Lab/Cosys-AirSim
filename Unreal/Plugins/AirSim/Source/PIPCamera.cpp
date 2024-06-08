@@ -460,8 +460,8 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
     new_capture->SetRelativeRotation(FRotator(0, 0, 0));
     new_capture->SetRelativeLocation(FVector(0, 0, 0));
     new_capture->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	new_capture->RegisterComponent();
-    new_capture->Deactivate();
+	//new_capture->RegisterComponent();
+ //   new_capture->Deactivate();
     
     render_targets_.Add(NewObject<UTextureRenderTarget2D>());
     int render_index = render_targets_.Num() - 1;

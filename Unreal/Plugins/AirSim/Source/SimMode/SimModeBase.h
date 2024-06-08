@@ -57,10 +57,37 @@ public:
     bool AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddRGBDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FColor color, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateRGBDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FColor color, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
     bool DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
     void ForceUpdateAnnotation(FString annotation_name);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool IsAnnotationRGBValid(FString annotation_name, FColor color);
 
 public:
     UFUNCTION(BlueprintPure, Category = "Airsim | get stuff")
@@ -122,8 +149,17 @@ public:
     }
 	std::vector<std::string> GetAllInstanceSegmentationMeshIDs();
     std::vector<msr::airlib::Pose> GetAllInstanceSegmentationMeshPoses(bool ned = true, bool only_visible = false);
+
 	bool SetMeshInstanceSegmentationID(const std::string& mesh_name, int object_id, bool is_name_regex, bool update_annotation = true);
     int GetMeshInstanceSegmentationID(const std::string& mesh_name);
+
+    std::vector<std::string> GetAllAnnotationMeshIDs(const std::string& annotation_name);
+    std::vector<msr::airlib::Pose> GetAllAnnotationMeshPoses(const std::string& annotation_name, bool ned = true, bool only_visible = false);
+
+    bool SetMeshRGBAnnotationID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex, bool update_annotation = true);
+    bool SetMeshRGBAnnotationColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex, bool update_annotation = true);
+    int GetMeshRGBAnnotationID(const std::string& annotation_name, const std::string& mesh_name);
+    std::string GetMeshRGBAnnotationColor(const std::string& annotation_name, const std::string& mesh_name);
 
 	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
 

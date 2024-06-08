@@ -312,6 +312,26 @@ int WorldSimApi::getSegmentationObjectID(const std::string& mesh_name) const
 	return simmode_->GetMeshInstanceSegmentationID(mesh_name);
 }
 
+bool WorldSimApi::setAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex)
+{
+    return simmode_->SetMeshRGBAnnotationID(annotation_name, mesh_name, object_id, is_name_regex);
+}
+
+int WorldSimApi::getAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name) const
+{
+    return simmode_->GetMeshRGBAnnotationID(annotation_name, mesh_name);
+}
+
+bool WorldSimApi::setAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex)
+{
+    return simmode_->SetMeshRGBAnnotationColor(annotation_name, mesh_name, r, g, b, is_name_regex);
+}
+
+std::string WorldSimApi::getAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const
+{
+    return simmode_->GetMeshRGBAnnotationColor(annotation_name, mesh_name);
+}
+
 void WorldSimApi::printLogMessage(const std::string& message,
                                   const std::string& message_param, unsigned char severity)
 {
@@ -348,6 +368,15 @@ std::vector <msr::airlib::Pose> WorldSimApi::listInstanceSegmentationPoses(bool 
     return simmode_->GetAllInstanceSegmentationMeshPoses(ned, only_visible);
 }
 
+std::vector<std::string> WorldSimApi::listAnnotationObjects(const std::string& annotation_name) const
+{
+    return simmode_->GetAllAnnotationMeshIDs(annotation_name);
+}
+
+std::vector <msr::airlib::Pose> WorldSimApi::listAnnotationPoses(const std::string& annotation_name, bool ned, bool only_visible) const
+{
+    return simmode_->GetAllAnnotationMeshPoses(annotation_name, ned, only_visible);
+}
 
 WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name, bool ned) const
 {

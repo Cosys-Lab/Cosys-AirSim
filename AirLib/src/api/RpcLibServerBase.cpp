@@ -261,8 +261,33 @@ namespace airlib
         pimpl_->server.bind("simSetSegmentationObjectID", [&](const std::string& mesh_name, int object_id, bool is_name_regex) -> bool {
             return getWorldSimApi()->setSegmentationObjectID(mesh_name, object_id, is_name_regex);
         });
+
         pimpl_->server.bind("simGetSegmentationObjectID", [&](const std::string& mesh_name) -> int {
             return getWorldSimApi()->getSegmentationObjectID(mesh_name);
+        });
+
+        pimpl_->server.bind("simListAnnotationObjects", [&](const std::string& annotation_name) -> std::vector<string> {
+            return getWorldSimApi()->listAnnotationObjects(annotation_name);
+        });
+
+        pimpl_->server.bind("simListAnnotationPoses", [&](const std::string& annotation_name, bool ned, bool only_visible) -> std::vector<RpcLibAdaptorsBase::Pose> {
+            return RpcLibAdaptorsBase::Pose::from(getWorldSimApi()->listAnnotationPoses(annotation_name, ned, only_visible));
+        });
+
+        pimpl_->server.bind("simSetAnnotationObjectID", [&](const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex) -> bool {
+            return getWorldSimApi()->setAnnotationObjectID(annotation_name, mesh_name, object_id, is_name_regex);
+        });
+
+        pimpl_->server.bind("simGetAnnotationObjectID", [&](const std::string& annotation_name, const std::string& mesh_name) -> int {
+            return getWorldSimApi()->getAnnotationObjectID(annotation_name, mesh_name);
+        });
+
+        pimpl_->server.bind("simSetAnnotationObjectColor", [&](const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex) -> bool {
+            return getWorldSimApi()->setAnnotationObjectColor(annotation_name, mesh_name, r, g, b, is_name_regex);
+        });
+
+        pimpl_->server.bind("simGetAnnotationObjectColor", [&](const std::string& annotation_name, const std::string& mesh_name) -> std::string {
+            return getWorldSimApi()->getAnnotationObjectColor(annotation_name, mesh_name);
         });
 
         pimpl_->server.bind("simAddDetectionFilterMeshName", [&](const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name, const std::string& annotation_name) -> void {

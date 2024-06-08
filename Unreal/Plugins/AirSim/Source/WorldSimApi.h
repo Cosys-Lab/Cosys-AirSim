@@ -39,8 +39,19 @@ public:
     virtual void enableWeather(bool enable);
     virtual void setWeatherParameter(WeatherParameter param, float val);
 
+    virtual std::vector<std::string> listInstanceSegmentationObjects() const override;
+    virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const override;
+
     virtual bool setSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex = false) override;
     virtual int getSegmentationObjectID(const std::string& mesh_name) const override;
+
+    virtual std::vector<std::string> listAnnotationObjects(const std::string& annotation_name) const override;
+    virtual std::vector<Pose> listAnnotationPoses(const std::string& annotation_name, bool ned = true, bool only_visible = false) const override;
+
+    virtual bool setAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex = false) override;
+    virtual int getAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name) const override;
+    virtual bool setAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex = false) override;
+    virtual std::string getAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const override;
 
     virtual bool addVehicle(const std::string& vehicle_name, const std::string& vehicle_type, const Pose& pose, const std::string& pawn_path = "") override;
 
@@ -52,8 +63,6 @@ public:
     virtual bool setObjectMaterial(const std::string& object_name, const std::string& material_name, const int component_id = 0) override;
     virtual bool setObjectMaterialFromTexture(const std::string& object_name, const std::string& texture_path, const int component_id = 0) override;
     virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const override;
-    virtual std::vector<std::string> listInstanceSegmentationObjects() const override;
-    virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const override;
     virtual Pose getObjectPose(const std::string& object_name, bool ned = true) const override;
     virtual bool setObjectPose(const std::string& object_name, const Pose& pose, bool teleport) override;
     virtual bool runConsoleCommand(const std::string& command) override;

@@ -609,9 +609,30 @@ class VehicleClient:
     def simGetSegmentationObjectID(self, mesh_name):
         return self.client.call('simGetSegmentationObjectID', mesh_name)
 
+    def simListAnnotationObjects(selfannotation_name, ):
+        return self.client.call('simListAnnotationObjects', annotation_name)
+
+    def simListAnnotationPoses(self, annotation_name, ned=True, only_visible=False):
+        poses_raw = self.client.call('simListAnnotationPoses', annotation_name, ned, only_visible)
+        return [Pose.from_msgpack(pose_raw) for pose_raw in poses_raw]
+
+    def simSetAnnotationObjectID(self, annotation_name, mesh_name, object_id, is_name_regex=False):
+        return self.client.call('simSetAnnotationObjectID', annotation_name, mesh_name, object_id, is_name_regex)
+
+    def simGetAnnotationObjectID(self, annotation_name, mesh_name):
+        return self.client.call('simGetAnnotationObjectID', annotation_name, mesh_name)
+
+    def simSetAnnotationObjectColor(self, annotation_name, mesh_name, r, g, b, is_name_regex=False):
+        return self.client.call('simSetAnnotationObjectColor', annotation_name, mesh_name, r, g, b, is_name_regex)
+
+    def simGetAnnotationObjectColor(self, annotation_name, mesh_name):
+        return self.client.call('simGetAnnotationObjectColor', annotation_name, mesh_name)
+
     def simGetSegmentationColorMap(self):
         return load_colormap()
 
+    def simIsValidColor(r, g, b):
+        return np.array([r, g, b]) in load_colormap()
 
     def simAddDetectionFilterMeshName(self, camera_name, image_type, mesh_name, vehicle_name = '', annotation_name = ""):
         """

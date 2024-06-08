@@ -74,13 +74,15 @@ namespace airlib
             int type;
             int default_value;
             std::string name;
+            bool set_direct;
 
             AnnotatorSetting(int annotator_index_val = 0, int type_val = 0, int default_value_val = 0,
-                const std::string& name_val = "")
+                const std::string& name_val = "", bool set_direct_val = false)
                 : annotator_index(annotator_index_val)
                 , type(type_val)
                 , default_value(default_value_val)
                 , name(name_val)
+				, set_direct(set_direct_val)
             {
             }
         };
@@ -1394,6 +1396,7 @@ namespace airlib
                         annotator_setting.type = json_settings_child.getInt("Type", 0);
                         annotator_setting.default_value = json_settings_child.getInt("Default", 0);
                         annotator_setting.name = json_settings_child.getString("Name", "");
+                        annotator_setting.set_direct = json_settings_child.getBool("SetDirect", false);
                         annotator_settings.push_back(annotator_setting);
                     }
                 }

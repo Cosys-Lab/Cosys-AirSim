@@ -79,6 +79,14 @@ namespace airlib
         int simGetSegmentationObjectID(const std::string& mesh_name) const;
         void simPrintLogMessage(const std::string& message, std::string message_param = "", unsigned char severity = 0);
 
+        vector<string> simListAnnotationObjects(const std::string& annotation_name) const override;
+        vector<Pose> simListAnnotationPoses(const std::string& annotation_name, bool ned = true, bool only_visible = false) const override;
+
+        bool simGetAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex = false) override;
+        int simGetAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name) const override;
+        bool simSetAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex = false) override;
+        string simGetAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const override;
+
         void simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name = "", const std::string& annotation_name = "");
         void simSetDetectionFilterRadius(const std::string& camera_name, ImageCaptureBase::ImageType type, const float radius_cm, const std::string& vehicle_name = "", const std::string& annotation_name = "");
         void simClearDetectionMeshNames(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name = "", const std::string& annotation_name = "");

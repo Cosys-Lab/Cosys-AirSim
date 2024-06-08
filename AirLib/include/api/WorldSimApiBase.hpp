@@ -51,6 +51,14 @@ namespace airlib
         virtual bool setSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex = false) = 0;
         virtual int getSegmentationObjectID(const std::string& mesh_name) const = 0;
 
+        virtual std::vector<std::string> listAnnotationObjects(const std::string& annotation_name) const = 0;
+        virtual std::vector<Pose> listAnnotationPoses(const std::string& annotation_name, bool ned = true, bool only_visible = false) const = 0;
+
+        virtual bool setAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex = false) = 0;
+        virtual int getAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name) const = 0;
+        virtual bool setAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex = false) = 0;
+        virtual std::string getAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const = 0;
+
         virtual bool addVehicle(const std::string& vehicle_name, const std::string& vehicle_type, const Pose& pose, const std::string& pawn_path = "") = 0;
 
         virtual void printLogMessage(const std::string& message,
@@ -68,7 +76,8 @@ namespace airlib
 
         virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const = 0;
         virtual std::vector<std::string> listInstanceSegmentationObjects() const = 0;
-        virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const = 0;        virtual Pose getObjectPose(const std::string& object_name, bool ned = true) const = 0;
+        virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const = 0;
+        virtual Pose getObjectPose(const std::string& object_name, bool ned = true) const = 0;
         virtual Vector3r getObjectScale(const std::string& object_name) const = 0;
         virtual bool setObjectPose(const std::string& object_name, const Pose& pose, bool teleport) = 0;
         virtual bool runConsoleCommand(const std::string& command) = 0;

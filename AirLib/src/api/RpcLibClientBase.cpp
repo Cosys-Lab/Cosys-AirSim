@@ -238,6 +238,37 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simGetSegmentationObjectID", mesh_name).as<int>();
         }
 
+        vector<string> RpcLibClientBase::simListAnnotationObjects(const std::string& annotation_name) const
+        {
+            return pimpl_->client.call("simListAnnotationObjects", annotation_name).as<vector<string>>();
+        }
+
+        vector<msr::airlib::Pose> RpcLibClientBase::simListAnnotationPoses(const std::string& annotation_name, bool ned, bool only_visible) const
+        {
+            const auto& response_adaptor = pimpl_->client.call("simListAnnotationPoses", annotation_name, ned, only_visible).as<vector<RpcLibAdaptorsBase::Pose>>();
+            return RpcLibAdaptorsBase::Pose::to(response_adaptor);
+        }
+
+        bool RpcLibClientBase::simSetAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex)
+        {
+            return pimpl_->client.call("simSetAnnotationObjectID", annotation_name, mesh_name, object_id, is_name_regex).as<bool>();
+        }
+
+        int RpcLibClientBase::simGetAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name) const
+        {
+            return pimpl_->client.call("simGetAnnotationObjectID", annotation_name, mesh_name).as<int>();
+        }
+
+        bool RpcLibClientBase::simSetAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex)
+        {
+            return pimpl_->client.call("simSetAnnotationObjectColor", annotation_name, mesh_name, r, g, b, is_name_regex).as<bool>();
+        }
+
+        std::string RpcLibClientBase::simGetAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const
+        {
+            return pimpl_->client.call("simGetAnnotationObjectColor", annotation_name, mesh_name).as<std::string>();
+        }
+
         void RpcLibClientBase::simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name, const std::string& annotation_name)
         {
             pimpl_->client.call("simAddDetectionFilterMeshName", camera_name, type, mesh_name, vehicle_name, annotation_name);
