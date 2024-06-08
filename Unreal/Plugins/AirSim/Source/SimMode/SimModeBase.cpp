@@ -334,8 +334,19 @@ void ASimModeBase::ForceUpdateInstanceSegmentation() {
     updateInstanceSegmentationAnnotation();
 }
 
-bool ASimModeBase::AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation) {
+bool ASimModeBase::DoesAnnotationLayerExist(FString annotation_name) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        return false;
+    }
+    return true;
+}
 
+bool ASimModeBase::AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        return false;
+    }
     bool success = annotators_[annotation_name].AnnotateNewActor(Actor);
     if (success && update_annotation)updateAnnotation(annotation_name);
     return success;
@@ -343,14 +354,22 @@ bool ASimModeBase::AddNewActorToAnnotation(FString annotation_name, AActor* Acto
 
 bool ASimModeBase::DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation) {
 
+    if (annotators_.Contains(annotation_name) == false) {
+        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        return false;
+    }
     bool success = annotators_[annotation_name].DeleteActor(Actor);
     if (success && update_annotation)updateAnnotation(annotation_name);
     return success;
 }
 
 void ASimModeBase::ForceUpdateAnnotation(FString annotation_name) {
-    annotators_[annotation_name].UpdateAnnotationComponents(this->GetWorld());
-    updateAnnotation(annotation_name);
+    if (annotators_.Contains(annotation_name) == false) {
+        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+    }else{
+        annotators_[annotation_name].UpdateAnnotationComponents(this->GetWorld());
+        updateAnnotation(annotation_name);
+    }
 }
 
 void ASimModeBase::updateInstanceSegmentationAnnotation() {
@@ -380,30 +399,35 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
 }
 
 void ASimModeBase::updateAnnotation(FString annotation_name) {
-    TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = annotators_[annotation_name].GetAnnotationComponents();
-    TArray<AActor*> cameras_found;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
-        UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
-        }, true);
-    UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
-    if (cameras_found.Num() >= 0) {
-        for (auto camera_actor : cameras_found) {
-            APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
-            cur_camera->updateAnnotation(current_segmentation_components, annotation_name);
-        }
+    if (annotators_.Contains(annotation_name) == false) {
+        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
     }
-    TArray<AActor*> lidar_cameras_found;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
-        UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
-        }, true);
-    UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
-    if (cameras_found.Num() >= 0) {
-        for (auto lidar_camera_actor : lidar_cameras_found) {
-            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
-            if (!cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_ && cur_lidar_camera->annotation_name_ == annotation_name)
-                cur_lidar_camera->updateAnnotation(current_segmentation_components);
+    else {
+        TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = annotators_[annotation_name].GetAnnotationComponents();
+        TArray<AActor*> cameras_found;
+        UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
+            UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
+            }, true);
+        UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
+        if (cameras_found.Num() >= 0) {
+            for (auto camera_actor : cameras_found) {
+                APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
+                cur_camera->updateAnnotation(current_segmentation_components, annotation_name);
+            }
         }
-    }
+        TArray<AActor*> lidar_cameras_found;
+        UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
+            UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
+            }, true);
+        UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
+        if (cameras_found.Num() >= 0) {
+            for (auto lidar_camera_actor : lidar_cameras_found) {
+                ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
+                if (!cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_ && cur_lidar_camera->annotation_name_ == annotation_name)
+                    cur_lidar_camera->updateAnnotation(current_segmentation_components);
+            }
+        }
+    }  
 }
 
 void ASimModeBase::AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type) {

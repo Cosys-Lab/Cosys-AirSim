@@ -51,6 +51,9 @@ public:
     void ForceUpdateInstanceSegmentation();
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool DoesAnnotationLayerExist(FString annotation_name);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
     bool AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")

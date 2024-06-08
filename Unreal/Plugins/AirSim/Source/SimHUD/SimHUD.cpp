@@ -102,17 +102,34 @@ void ASimHUD::updateWidgetSubwindowVisibility()
         ImageType camera_type = getSubWindowSettings().at(window_index).image_type;
 		std::string annotation_name = getSubWindowSettings().at(window_index).annotation_name;
 
-        bool is_visible = getSubWindowSettings().at(window_index).visible && camera != nullptr;
+        if (camera_type == ImageType::Annotation) {
+            if (simmode_->DoesAnnotationLayerExist(FString(annotation_name.c_str()))) {
+                bool is_visible = getSubWindowSettings().at(window_index).visible && camera != nullptr;
 
-        if (camera != nullptr) {
-            camera->setCameraTypeEnabled(camera_type, is_visible, annotation_name);
-            //sub-window captures don't count as a request, set bCaptureEveryFrame and bCaptureOnMovement to display so we can show correctly the subwindow
-            camera->setCameraTypeUpdate(camera_type, false, annotation_name);
+                if (camera != nullptr) {
+                    camera->setCameraTypeEnabled(camera_type, is_visible, annotation_name);
+                    //sub-window captures don't count as a request, set bCaptureEveryFrame and bCaptureOnMovement to display so we can show correctly the subwindow
+                    camera->setCameraTypeUpdate(camera_type, false, annotation_name);
+                }
+
+                widget_->setSubwindowVisibility(window_index,
+                    is_visible,
+                    is_visible ? camera->getRenderTarget(camera_type, false, annotation_name) : nullptr);
+            }
         }
+        else {
+            bool is_visible = getSubWindowSettings().at(window_index).visible && camera != nullptr;
 
-        widget_->setSubwindowVisibility(window_index,
-                                        is_visible,
-                                        is_visible ? camera->getRenderTarget(camera_type, false, annotation_name) : nullptr);
+            if (camera != nullptr) {
+                camera->setCameraTypeEnabled(camera_type, is_visible, annotation_name);
+                //sub-window captures don't count as a request, set bCaptureEveryFrame and bCaptureOnMovement to display so we can show correctly the subwindow
+                camera->setCameraTypeUpdate(camera_type, false, annotation_name);
+            }
+
+            widget_->setSubwindowVisibility(window_index,
+                is_visible,
+                is_visible ? camera->getRenderTarget(camera_type, false, annotation_name) : nullptr);
+        }
     }
 }
 

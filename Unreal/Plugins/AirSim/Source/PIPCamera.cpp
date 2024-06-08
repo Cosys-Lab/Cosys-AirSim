@@ -454,12 +454,19 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
         FObjectAnnotator::SetViewForRGBAnnotationRender(new_capture->ShowFlags);
     new_capture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
+    new_capture->bAutoActivate = false;
+    new_capture->bCaptureEveryFrame = true;
+    new_capture->bCaptureOnMovement = true;
     new_capture->SetRelativeRotation(FRotator(0, 0, 0));
     new_capture->SetRelativeLocation(FVector(0, 0, 0));
     new_capture->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
+	new_capture->RegisterComponent();
+    new_capture->Deactivate();
+    
     render_targets_.Add(NewObject<UTextureRenderTarget2D>());
     int render_index = render_targets_.Num() - 1;
+    
+    setCaptureUpdate(new_capture, true);
 
     updateCaptureComponentSetting(new_capture, render_targets_[render_index],
         false, image_type_to_pixel_format_map_[Utils::toNumeric(ImageType::Annotation)],
