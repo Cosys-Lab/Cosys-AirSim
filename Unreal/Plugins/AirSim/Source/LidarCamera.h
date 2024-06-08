@@ -48,6 +48,8 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
+	void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
+
 	void InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpleParams& settings);
 	void InitializeSensor();
 	bool Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
@@ -81,6 +83,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LidarCamera|Sensor")
 		bool generate_groundtruth_ = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LidarCamera|Sensor")
+		bool instance_segmentation_ = true;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LidarCamera|Sensor")
+		FString annotation_name_ = "";
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LidarCamera|Sensor")
 		bool generate_intensity_ = false;

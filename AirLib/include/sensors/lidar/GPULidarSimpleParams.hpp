@@ -21,6 +21,8 @@ namespace msr {
 			real_T vertical_FOV_lower = -45;             // lower angle of vertical FOV in degrees
 			uint resolution = 512;					     // Resolution of the render texture, influences performance on the GPU
 			bool ground_truth = false;                   // Generate ground truth segmentation color values, if false will set to zero
+            bool instance_segmentation = true;           // Force the groundtruth labels to be instance segmentation. Set to false to use different annotation layer.
+            std::string annotation_name = "";            // If disabling instance_segmentation, this field chooses with annotation layer gets used by the lidar for groundtruth. 
 			bool ignore_marked = false;					 // If enabled, it will not detect objects marked to be ignored  (with the 'LidarIgnore' tag)
 			bool generate_noise = false;			     // Toggle range based noise
 			real_T min_noise_standard_deviation = 0;     // Minimum noise standard deviation
@@ -74,6 +76,8 @@ namespace msr {
                 min_noise_standard_deviation = settings_json.getFloat("MinNoiseStandardDeviation", min_noise_standard_deviation);
                 noise_distance_scale = settings_json.getFloat("NoiseDistanceScale", noise_distance_scale);
                 ground_truth = settings_json.getBool("GroundTruth", ground_truth);
+                instance_segmentation = settings_json.getBool("InstanceSegmentation", instance_segmentation);
+                annotation_name = settings_json.getString("Annotation", annotation_name);
                 ignore_marked = settings_json.getBool("IgnoreMarked", ignore_marked);
                 range_max_lambertian_percentage = settings_json.getFloat("rangeMaxLambertianPercentage", range_max_lambertian_percentage);
 				rain_max_intensity = settings_json.getFloat("rainMaxIntensity", rain_max_intensity);

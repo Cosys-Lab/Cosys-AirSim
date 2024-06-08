@@ -35,6 +35,9 @@ VerticalFOVLower             | Vertical FOV lower limit for the lidar, in degree
 X Y Z                        | Position of the lidar relative to the vehicle (in NED, in meters)                     
 Roll Pitch Yaw               | Orientation of the lidar relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)
 IgnoreMarked                 | Remove objects with the Unreal Tag _MarkedIgnore_ from the sensor data
+GroundTruth                  | Generate ground truth labeling color values
+InstanceSegmentation         | Enable to set the generated ground truth to the instance segmentation labeling. Set to false to choose a different annotation label
+Annotation                   | If GroundTruth is enabled and InstanceSegmentation is disabled, you can set this value to the name of the annotation you want to use. This will be used for the ground truth color labels.
 GroundTruth                  | Generate ground truth segmentation color values
 DrawSensor                   | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
 External                     | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.
@@ -79,6 +82,8 @@ NoiseDistanceScale           | To scale the noise with distance, set this parame
 					"Resolution": 1024,
 					"IgnoreMarked": true,
 					"GroundTruth": true,
+                    "InstanceSegmentation": true,
+                    "Annotation": "",
 					"GenerateIntensity": false,
 					"rangeMaxLambertianPercentage": 80,
 					"rainMaxIntensity": 70,
@@ -114,7 +119,7 @@ e.g.:
 ```
 You can also tweak the variation of debugging with the 'DrawMode' parameter:
  - 0 = no coloring
- - 1 = instance segmentation
+ - 1 = groundtruth color labels (instance segmentation or other annotation labels depending on settings)
  - 2 = material
  - 3 = impact angle
  - 4 = intensity
@@ -134,7 +139,7 @@ Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar d
 * **Point-Cloud:** The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan in NED format.
 * **Lidar Pose:** Default: sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 
-Rgb represents a float32 representation of the RGB8 value that is linked to the instance segmentation system. See the [Image API documentation](image_apis.md#segmentation) and the [instance segmentation documentation](instance_segmentation.md).
+Rgb represents a float32 representation of the RGB8 value that is linked either the instance segmentation system or a different annotation label. See the [Image API documentation](image_apis.md#segmentation), [Annotation documentation](annotation.md) and the [instance segmentation documentation](instance_segmentation.md).
 The float32 comes from binary concatenation of the RGB8 values :`rgb = value_segmentation.R << 16 | value_segmentation.G << 8 | value_segmentation.B`\\
 It can be retrieved from the API and converted back to RGB8 with for example the following Python code:
 ```python 

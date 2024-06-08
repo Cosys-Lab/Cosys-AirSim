@@ -162,6 +162,8 @@ void ALidarCamera::InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpl
 	distance_noise_scale_ = settings.noise_distance_scale;
 	ignore_marked_ = settings.ignore_marked;
 	generate_groundtruth_ = settings.ground_truth;
+	instance_segmentation_ = settings.instance_segmentation;
+	annotation_name_ = FString(settings.annotation_name.c_str());
 	generate_intensity_ = settings.generate_intensity;
 	material_list_file_ = settings.material_list_file;
 	max_range_lambertian_percentage_ = settings.range_max_lambertian_percentage;
@@ -333,6 +335,10 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 }
 
 void ALidarCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
+	capture_2D_segmentation_->ShowOnlyComponents = ComponentList;
+}
+
+void ALidarCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
 	capture_2D_segmentation_->ShowOnlyComponents = ComponentList;
 }
 

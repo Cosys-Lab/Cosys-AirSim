@@ -373,7 +373,8 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
     if (cameras_found.Num() >= 0) {
         for (auto lidar_camera_actor : lidar_cameras_found) {
             ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
-            cur_lidar_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
+            if(cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_)
+                cur_lidar_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
         }
     }
 }
@@ -399,7 +400,8 @@ void ASimModeBase::updateAnnotation(FString annotation_name) {
     if (cameras_found.Num() >= 0) {
         for (auto lidar_camera_actor : lidar_cameras_found) {
             ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
-            //cur_lidar_camera->updateAnnotation(current_segmentation_components, annotation_name);
+            if (!cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_ && cur_lidar_camera->annotation_name_ == annotation_name)
+                cur_lidar_camera->updateAnnotation(current_segmentation_components);
         }
     }
 }
