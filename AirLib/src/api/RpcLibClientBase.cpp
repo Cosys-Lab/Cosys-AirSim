@@ -269,6 +269,16 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simGetAnnotationObjectColor", annotation_name, mesh_name).as<std::string>();
         }
 
+        bool RpcLibClientBase::simSetAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex)
+        {
+            return pimpl_->client.call("simSetAnnotationObjectValue", annotation_name, mesh_name, greyscale_value, is_name_regex).as<bool>();
+        }
+
+        float RpcLibClientBase::simGetAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name) const
+        {
+            return pimpl_->client.call("simGetAnnotationObjectValue", annotation_name, mesh_name).as<float>();
+        }
+
         void RpcLibClientBase::simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name, const std::string& annotation_name)
         {
             pimpl_->client.call("simAddDetectionFilterMeshName", camera_name, type, mesh_name, vehicle_name, annotation_name);

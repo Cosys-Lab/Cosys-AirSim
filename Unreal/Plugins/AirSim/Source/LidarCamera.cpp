@@ -219,7 +219,7 @@ void ALidarCamera::InitializeSensor()
 	capture_2D_depth_->bUseCustomProjectionMatrix = false;
 
 	// Setup the capture component for the virtual instance segmentation camera
-	FObjectAnnotator::SetViewForRGBAnnotationRender(capture_2D_segmentation_->ShowFlags);
+	FObjectAnnotator::SetViewForAnnotationRender(capture_2D_segmentation_->ShowFlags);
 	capture_2D_segmentation_->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
 	render_target_2D_segmentation_->TargetGamma = 1;

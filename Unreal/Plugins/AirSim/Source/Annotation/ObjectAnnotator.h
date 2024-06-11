@@ -44,29 +44,39 @@ public:
 	void Initialize(ULevel* level);
 	void InitializeInstanceSegmentation(ULevel* level);
 	void InitializeRGB(ULevel* level);
+	void InitializeGreyscale(ULevel* level);
 
 	bool DeleteActor(AActor* actor);
+
 	bool AnnotateNewActor(AActor* actor);
 	bool AnnotateNewActorInstanceSegmentation(AActor* actor);
 	bool AnnotateNewActorRGB(AActor* actor);
+	bool AnnotateNewActorGreyscale(AActor* actor);
+
+	uint32 GetComponentIndex(FString component_id);
 
 	bool IsRGBColorValid(FColor color);
-	uint32 GetComponentIndex(FString component_id);
 	FString GetComponentRGBColor(FString component_id);
 	bool SetComponentRGBColorByIndex(FString component_id, uint32 color_index);
 	bool SetComponentRGBColorByColor(FString component_id, FColor color);
+
+	bool SetComponentGreyScaleColorByValue(FString component_id, float greyscale_value);
+	float GetComponentGreyscaleValue(FString component_id);
+
 	void UpdateAnnotationComponents(UWorld* World);
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> GetAnnotationComponents();
 
-	static void SetViewForRGBAnnotationRender(FEngineShowFlags& show_flags);
+	static void SetViewForAnnotationRender(FEngineShowFlags& show_flags);
 
 	bool IsDirect();
+	FObjectAnnotator::AnnotatorType GetType();
 
 	void EndPlay();
 
 	std::vector<std::string> GetAllComponentNames();
 	TMap<FString, UMeshComponent*> GetNameToComponentMap();
 	TMap<FString, FString> GetColorToComponentNameMap();
+	TMap<FString, float> GetComponentToValueMap();
 
 private:
 	FColorGenerator ColorGenerator_;
@@ -82,12 +92,12 @@ private:
 
 	void getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes);
 	void getPaintableComponentMeshesAndTags(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes, TMap<FString, TArray<FName>>* paintable_components_tags);
-
 	bool IsPaintable(AActor* actor);
 
 private:
 	TMap<FString, uint32> name_to_color_index_map_;
 	TMap<FString, FString> name_to_gammacorrected_color_map_;
+	TMap<FString, float> name_to_value_map_;
 	TMap<FString, FString> color_to_name_map_;
 	TMap<FString, FString> gammacorrected_color_to_name_map_;
 	TMap<FString, UMeshComponent*> name_to_component_map_;

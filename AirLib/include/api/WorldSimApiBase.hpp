@@ -58,6 +58,8 @@ namespace airlib
         virtual int getAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name) const = 0;
         virtual bool setAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex = false) = 0;
         virtual std::string getAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const = 0;
+        virtual bool setAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex = false) = 0;
+        virtual float getAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name) const = 0;
 
         virtual bool addVehicle(const std::string& vehicle_name, const std::string& vehicle_type, const Pose& pose, const std::string& pawn_path = "") = 0;
 

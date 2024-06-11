@@ -65,7 +65,6 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Infrared), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlow), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlowVis), EPixelFormat::PF_B8G8R8A8);
-    image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Annotation), EPixelFormat::PF_B8G8R8A8);
 
     object_filter_ = FObjectFilter();
 }
@@ -112,7 +111,7 @@ void APIPCamera::PostInitializeComponents()
     //set initial focal length
     camera_->CurrentFocalLength = 11.9;
 
-    FObjectAnnotator::SetViewForRGBAnnotationRender(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
+    FObjectAnnotator::SetViewForAnnotationRender(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
     captures_[Utils::toNumeric(ImageType::Segmentation)]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 }
 
@@ -463,9 +462,11 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
 
     render_targets_.Add(NewObject<UTextureRenderTarget2D>());
     int render_index = render_targets_.Num() - 1;
-    render_targets_[render_index]->TargetGamma = 1;
+    if (type == FObjectAnnotator::AnnotatorType::RGB || type == FObjectAnnotator::AnnotatorType::InstanceSegmentation) {
+        render_targets_[render_index]->TargetGamma = 1;
+    }
 
-    FObjectAnnotator::SetViewForRGBAnnotationRender(captures_[render_index]->ShowFlags);
+    FObjectAnnotator::SetViewForAnnotationRender(captures_[render_index]->ShowFlags);
     captures_[render_index]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
     camera_type_enabled_.push_back(false);   
@@ -484,14 +485,23 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
     setCaptureUpdate(captures_[render_index], true);    
 
     if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)captures_[render_index]->HiddenActors = ignore_actors_;
+    
+    captures_[render_index]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
-    updateCaptureComponentSetting(captures_[render_index], render_targets_[render_index],
-        false, image_type_to_pixel_format_map_[Utils::toNumeric(ImageType::Annotation)],
-        sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)), 
-        *ned_transform_, false);   
+    if (type == FObjectAnnotator::AnnotatorType::RGB || type == FObjectAnnotator::AnnotatorType::InstanceSegmentation) {
+        updateCaptureComponentSetting(captures_[render_index], render_targets_[render_index],
+            false, EPixelFormat::PF_B8G8R8A8,
+            sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)),
+            *ned_transform_, false);
+    }
+    else if (type == FObjectAnnotator::AnnotatorType::Greyscale) {
+        updateCaptureComponentSetting(captures_[render_index], render_targets_[render_index],
+            true, EPixelFormat::PF_DepthStencil,
+            sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)),
+            *ned_transform_, false);
+    }
 
     copyCameraSettingsToSceneCapture(camera_, captures_[render_index]);	
-
 }
 
 void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform)

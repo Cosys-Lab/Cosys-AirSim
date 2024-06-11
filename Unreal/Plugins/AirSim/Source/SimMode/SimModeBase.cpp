@@ -224,7 +224,7 @@ void ASimModeBase::InitializeAnnotation() {
 
 bool ASimModeBase::IsAnnotationRGBValid(FString annotation_name, FColor color) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
         return false;
     }
 	return annotators_[annotation_name].IsRGBColorValid(color);
@@ -239,11 +239,15 @@ void ASimModeBase::InitializeInstanceSegmentation()
 
 bool ASimModeBase::AddRGBDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FColor color, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (!annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to direct mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
         return false;
     }
 	FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
@@ -253,11 +257,15 @@ bool ASimModeBase::AddRGBDirectAnnotationTagToActor(FString annotation_name, AAc
 
 bool ASimModeBase::UpdateRGBDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FColor color, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (!annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to direct mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
         return false;
     }
     int32 found_tag = actor->Tags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
@@ -265,7 +273,7 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToActor(FString annotation_name, 
         return tag.Contains(annotation_name);
         });
     if (found_tag == INDEX_NONE)
-        UAirBlueprintLib::LogMessage("Could not find an tag for this actor for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for actor %s."), *annotation_name, *actor->GetName());
         return false;
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
 	actor->Tags[found_tag] = FName(*tag);
@@ -274,11 +282,15 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToActor(FString annotation_name, 
 
 bool ASimModeBase::AddRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to index mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to index mode."), *annotation_name);
         return false;
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
@@ -288,11 +300,15 @@ bool ASimModeBase::AddRGBIndexAnnotationTagToActor(FString annotation_name, AAct
 
 bool ASimModeBase::UpdateRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to index mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to index mode."), *annotation_name);
         return false;
     }
     int32 found_tag = actor->Tags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
@@ -300,21 +316,24 @@ bool ASimModeBase::UpdateRGBIndexAnnotationTagToActor(FString annotation_name, A
         return tag.Contains(annotation_name);
         });
     if (found_tag == INDEX_NONE)
-        UAirBlueprintLib::LogMessage("Could not find an tag for this actor for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for actor %s."), *annotation_name, *actor->GetName());
     return false;
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
     actor->Tags[found_tag] = FName(*tag);
     return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
 }
 
-
 bool ASimModeBase::AddRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (!annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to direct mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
         return false;
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
@@ -324,11 +343,15 @@ bool ASimModeBase::AddRGBDirectAnnotationTagToComponent(FString annotation_name,
 
 bool ASimModeBase::UpdateRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (!annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to direct mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
         return false;
     }
     int32 found_tag = component->ComponentTags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
@@ -336,7 +359,7 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToComponent(FString annotation_na
         return tag.Contains(annotation_name);
         });
     if (found_tag == INDEX_NONE)
-        UAirBlueprintLib::LogMessage("Could not find an tag for this actor for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
     return false;
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
     component->ComponentTags[found_tag] = FName(*tag);
@@ -345,11 +368,15 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToComponent(FString annotation_na
 
 bool ASimModeBase::AddRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to index mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to index mode."), *annotation_name);
         return false;
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
@@ -359,11 +386,15 @@ bool ASimModeBase::AddRGBIndexAnnotationTagToComponent(FString annotation_name, 
 
 bool ASimModeBase::UpdateRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *annotation_name);
         return false;
     }
     if (annotators_[annotation_name].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to index mode for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to index mode."), *annotation_name);
         return false;
     }
     int32 found_tag = component->ComponentTags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
@@ -371,9 +402,79 @@ bool ASimModeBase::UpdateRGBIndexAnnotationTagToComponent(FString annotation_nam
         return tag.Contains(annotation_name);
         });
     if (found_tag == INDEX_NONE)
-        UAirBlueprintLib::LogMessage("Could not find an tag for this actor for annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for component."), *annotation_name);
     return false;
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
+    component->ComponentTags[found_tag] = FName(*tag);
+    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+}
+
+bool ASimModeBase::AddGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Greyscale) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the greyscale type."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
+    actor->Tags.Emplace(FName(*tag));
+    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+}
+
+bool ASimModeBase::UpdateGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Greyscale) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the greyscale type."), *annotation_name);
+        return false;
+    }
+    int32 found_tag = actor->Tags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
+        FString tag = tagFName.ToString();
+        return tag.Contains(annotation_name);
+        });
+    if (found_tag == INDEX_NONE)
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for actor %s."), *annotation_name, *actor->GetName());
+    return false;
+    FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
+    actor->Tags[found_tag] = FName(*tag);
+    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+}
+
+bool ASimModeBase::AddGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Greyscale) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the greyscale type."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
+    component->ComponentTags.Emplace(FName(*tag));
+    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+}
+
+bool ASimModeBase::UpdateGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Greyscale) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the greyscale type."), *annotation_name);
+        return false;
+    }
+    int32 found_tag = component->ComponentTags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
+        FString tag = tagFName.ToString();
+        return tag.Contains(annotation_name);
+        });
+    if (found_tag == INDEX_NONE)
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+    return false;
+    FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
     component->ComponentTags[found_tag] = FName(*tag);
     return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
 }
@@ -463,9 +564,10 @@ int ASimModeBase::GetMeshInstanceSegmentationID(const std::string& mesh_name) {
 }
 
 std::vector<std::string> ASimModeBase::GetAllAnnotationMeshIDs(const std::string& annotation_name) {
+    std::vector<msr::airlib::string> retval;
     if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
-        return {};
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return retval;
     }
     return annotators_[FString(annotation_name.c_str())].GetAllComponentNames();
 }
@@ -473,7 +575,7 @@ std::vector<std::string> ASimModeBase::GetAllAnnotationMeshIDs(const std::string
 std::vector<msr::airlib::Pose> ASimModeBase::GetAllAnnotationMeshPoses(const std::string& annotation_name, bool ned, bool only_visible) {
     std::vector<msr::airlib::Pose> retval;
     if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
         return retval;
     }
     TMap<FString, UMeshComponent*> nameToComponentMapTemp = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
@@ -507,11 +609,15 @@ std::vector<msr::airlib::Pose> ASimModeBase::GetAllAnnotationMeshPoses(const std
 
 bool ASimModeBase::SetMeshRGBAnnotationID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex, bool update_annotation) {
     if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return false;
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *FString(annotation_name.c_str()));
         return false;
     }
     if (annotators_[FString(annotation_name.c_str())].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to index mode for annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to index mode."), *FString(annotation_name.c_str()));
         return false;
     }
 
@@ -549,13 +655,18 @@ bool ASimModeBase::SetMeshRGBAnnotationID(const std::string& annotation_name, co
 
 bool ASimModeBase::SetMeshRGBAnnotationColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex, bool update_annotation) {
     if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return false;
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *FString(annotation_name.c_str()));
         return false;
     }
     if (!annotators_[FString(annotation_name.c_str())].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to direct mode for annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *FString(annotation_name.c_str()));
         return false;
     }
+
     FColor color = FColor(r, g, b);
 
     if (is_name_regex) {
@@ -591,13 +702,73 @@ bool ASimModeBase::SetMeshRGBAnnotationColor(const std::string& annotation_name,
 
 }
 
+bool ASimModeBase::SetMeshGreyscaleAnnotationValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex, bool update_annotation) {
+    if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return false;
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::Greyscale) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the greyscale type."), *FString(annotation_name.c_str()));
+        return false;
+    }
+    
+    if (is_name_regex) {
+        std::regex name_regex;
+        name_regex.assign(mesh_name, std::regex_constants::icase);
+        int changes = 0;
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        {
+            if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
+                bool success;
+                FString key = It.Key();
+                UAirBlueprintLib::RunCommandOnGameThread([this, key, greyscale_value, &success, annotation_name]() {
+                    success = annotators_[FString(annotation_name.c_str())].SetComponentGreyScaleColorByValue(key, greyscale_value);
+                    }, true);
+                changes++;
+            }
+        }
+        if (update_annotation && changes > 0)updateAnnotation(FString(annotation_name.c_str()));
+        return changes > 0;
+    }
+    else if (annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().Contains(mesh_name.c_str())) {
+        bool success;
+        FString key = mesh_name.c_str();
+        UAirBlueprintLib::RunCommandOnGameThread([this, key, greyscale_value, &success, annotation_name]() {
+            success = annotators_[FString(annotation_name.c_str())].SetComponentGreyScaleColorByValue(key, greyscale_value);
+            }, true);
+        if (update_annotation)updateAnnotation(FString(annotation_name.c_str()));
+        return success;
+    }
+    else {
+        return false;
+    }
+
+}
+
+float ASimModeBase::GetMeshGreyscaleAnnotationValue(const std::string& annotation_name, const std::string& mesh_name) {
+    if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return 0;
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::Greyscale) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the greyscale type."), *FString(annotation_name.c_str()));
+        return 0;
+    }
+    float greyscale_value = annotators_[FString(annotation_name.c_str())].GetComponentGreyscaleValue(mesh_name.c_str());
+    return greyscale_value;
+}
+
 int ASimModeBase::GetMeshRGBAnnotationID(const std::string& annotation_name, const std::string& mesh_name) {
     if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return -1;
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *FString(annotation_name.c_str()));
         return -1;
     }
     if (annotators_[FString(annotation_name.c_str())].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to index mode for annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to index mode."), *FString(annotation_name.c_str()));
         return -1;
     }
     return annotators_[FString(annotation_name.c_str())].GetComponentIndex(mesh_name.c_str());
@@ -605,11 +776,15 @@ int ASimModeBase::GetMeshRGBAnnotationID(const std::string& annotation_name, con
 
 std::string ASimModeBase::GetMeshRGBAnnotationColor(const std::string& annotation_name, const std::string& mesh_name) {
     if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return "";
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::RGB) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the RGB type."), *FString(annotation_name.c_str()));
         return "";
     }
     if (!annotators_[FString(annotation_name.c_str())].IsDirect()) {
-        UAirBlueprintLib::LogMessage("Not set to direct mode for annotation layer ", FString(annotation_name.c_str()), LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *FString(annotation_name.c_str()));
         return "";
     }
     FString color = annotators_[FString(annotation_name.c_str())].GetComponentRGBColor(mesh_name.c_str());
@@ -637,7 +812,7 @@ void ASimModeBase::ForceUpdateInstanceSegmentation() {
 
 bool ASimModeBase::DoesAnnotationLayerExist(FString annotation_name) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
         return false;
     }
     return true;
@@ -645,7 +820,7 @@ bool ASimModeBase::DoesAnnotationLayerExist(FString annotation_name) {
 
 bool ASimModeBase::AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
         return false;
     }
     bool success = annotators_[annotation_name].AnnotateNewActor(Actor);
@@ -656,7 +831,7 @@ bool ASimModeBase::AddNewActorToAnnotation(FString annotation_name, AActor* Acto
 bool ASimModeBase::DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation) {
 
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
         return false;
     }
     bool success = annotators_[annotation_name].DeleteActor(Actor);
@@ -666,7 +841,7 @@ bool ASimModeBase::DeleteActorFromAnnotation(FString annotation_name, AActor* Ac
 
 void ASimModeBase::ForceUpdateAnnotation(FString annotation_name) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
     }else{
         annotators_[annotation_name].UpdateAnnotationComponents(this->GetWorld());
         updateAnnotation(annotation_name);
@@ -701,7 +876,7 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
 
 void ASimModeBase::updateAnnotation(FString annotation_name) {
     if (annotators_.Contains(annotation_name) == false) {
-        UAirBlueprintLib::LogMessage("Could not find annotation layer ", annotation_name, LogDebugLevel::Failure);
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
     }
     else {
         TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = annotators_[annotation_name].GetAnnotationComponents();

@@ -81,6 +81,18 @@ public:
     bool UpdateRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation = true);
+  
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
     bool DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
@@ -161,6 +173,9 @@ public:
     int GetMeshRGBAnnotationID(const std::string& annotation_name, const std::string& mesh_name);
     std::string GetMeshRGBAnnotationColor(const std::string& annotation_name, const std::string& mesh_name);
 
+    bool SetMeshGreyscaleAnnotationValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex, bool update_annotation = true);
+    float GetMeshGreyscaleAnnotationValue(const std::string& annotation_name, const std::string& mesh_name);
+
 	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
 
     const APIPCamera* getCamera(const msr::airlib::CameraDetails& camera_details) const;
@@ -203,6 +218,7 @@ protected: //optional overrides
     void initializeCameraDirector(const FTransform& camera_transform, float follow_distance);
     void checkVehicleReady(); //checks if vehicle is available to use
     virtual void updateDebugReport(msr::airlib::StateReporterWrapper& debug_reporter);
+
     virtual void updateInstanceSegmentationAnnotation();
     virtual void updateAnnotation(FString annotation_name);
 

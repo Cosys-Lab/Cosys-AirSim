@@ -332,6 +332,16 @@ std::string WorldSimApi::getAnnotationObjectColor(const std::string& annotation_
     return simmode_->GetMeshRGBAnnotationColor(annotation_name, mesh_name);
 }
 
+bool WorldSimApi::setAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex)
+{
+    return simmode_->SetMeshGreyscaleAnnotationValue(annotation_name, mesh_name, greyscale_value, is_name_regex);
+}
+
+float WorldSimApi::getAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name) const
+{
+    return simmode_->GetMeshGreyscaleAnnotationValue(annotation_name, mesh_name);
+}
+
 void WorldSimApi::printLogMessage(const std::string& message,
                                   const std::string& message_param, unsigned char severity)
 {
