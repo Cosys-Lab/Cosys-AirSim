@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     # Get an image from the main segmentation camera, show and save it as png
     print("Getting segmentation image from main camera...")
-    responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Annotation, False, False, "RGBTest")])
+    responses = client.simGetImages([airsim.ImageRequest( "frontcamera", airsim.ImageType.Segmentation, False, False)])
     img_rgb_string = responses[0].image_data_uint8
     rgbarray = np.frombuffer(img_rgb_string, np.uint8)
     rgbarray_shaped = rgbarray.reshape((540,960,3))
