@@ -488,18 +488,10 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
     
     captures_[render_index]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
-    if (type == FObjectAnnotator::AnnotatorType::RGB || type == FObjectAnnotator::AnnotatorType::InstanceSegmentation) {
-        updateCaptureComponentSetting(captures_[render_index], render_targets_[render_index],
-            false, EPixelFormat::PF_B8G8R8A8,
-            sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)),
-            *ned_transform_, false);
-    }
-    else if (type == FObjectAnnotator::AnnotatorType::Greyscale) {
-        updateCaptureComponentSetting(captures_[render_index], render_targets_[render_index],
-            true, EPixelFormat::PF_DepthStencil,
-            sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)),
-            *ned_transform_, false);
-    }
+    updateCaptureComponentSetting(captures_[render_index], render_targets_[render_index],
+        false, EPixelFormat::PF_B8G8R8A8,
+        sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)),
+        *ned_transform_, false);
 
     copyCameraSettingsToSceneCapture(camera_, captures_[render_index]);	
 }
