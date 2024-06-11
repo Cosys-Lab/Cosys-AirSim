@@ -228,6 +228,9 @@ The ViewMode determines which camera to use as default and how camera will follo
 * `SpringArmChase`: Chase the vehicle with camera mounted on (invisible) arm that is attached to the vehicle via spring (so it has some latency in movement).
 * `NoDisplay`: This will freeze rendering for main screen however rendering for subwindows, recording and APIs remain active. This mode is useful to save resources in "headless" mode where you are only interested in getting images and don't care about what gets rendered on main screen. This may also improve FPS for recording images.
 
+## Annotation
+The annotation system allows you to choose different groundtruth labeling techniques to create more data from your simulation. Find more info [here](annotation.md) for defining the settings.
+
 ## TimeOfDay
 This setting controls the position of Sun in the environment. By default `Enabled` is false which means Sun's position is left at whatever was the default in the environment and it doesn't change over the time. If `Enabled` is true then Sun position is computed using longitude, latitude and altitude specified in `OriginGeopoint` section for the date specified in `StartDateTime` in the string format as [%Y-%m-%d %H:%M:%S](https://en.cppreference.com/w/cpp/io/manip/get_time), for example, `2018-02-12 15:20:00`. If this string is empty then current date and time is used. If `StartDateTimeDst` is true then we adjust for day light savings time. The Sun's position is then continuously updated at the interval specified in `UpdateIntervalSecs`. In some cases, it might be desirable to have celestial clock run faster or slower than simulation clock. This can be specified using `CelestialClockSpeed`, for example, value 100 means for every 1 second of simulation clock, Sun's position is advanced by 100 seconds so Sun will move in sky much faster.
 
@@ -243,7 +246,7 @@ This setting determines what is shown in each of 3 subwindows which are visible 
 * `CameraName`: is any [available camera](image_apis.md#available-cameras) on the vehicle
 * `ImageType`: integer value determines what kind of image gets shown according to [ImageType enum](image_apis.md#available-imagetype-values).
 * `VehicleName`: string allows you to specify the vehicle to use the camera from, used when multiple vehicles are specified in the settings. First vehicle's camera will be used if there are any mistakes such as incorrect vehicle name, or only a single vehicle.
-* `Annotation`: string allows you to specify the annotation layer to use for the camera. This is only if using the Annotation camera type for `ImageType`.
+* `Annotation`: string allows you to specify the annotation layer to use for the camera. This is only if using the Annotation camera type for `ImageType` (value is 10).
 
 For example, for a single car vehicle, below shows driver view, front bumper view and rear view as scene, depth and surface normals respectively.
 ```json

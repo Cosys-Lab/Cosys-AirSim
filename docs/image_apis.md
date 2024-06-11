@@ -308,5 +308,22 @@ This feature lets you generate object detection using existing cameras in AirSim
 
 ### Annotation
 The annotation system allows you to choose different groundtruth labeling techniques to create more data from your simulation. Find more info [here](annotation.md).
-How to define them in the settings you can find here [settings](settings.md#annotation-settings) as well. 
 When enabling annotation layers, one can choose to render images as well from these layers. The image type if set to annotation does usually require to also supply the name of the annotation layer as defined in the settings.
+
+For example with Python, you can use the following examples for RGB and greyscale annotation layers.
+```python
+    responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Annotation, False, False, "RGBTest")])
+    img_rgb_string = responses[0].image_data_uint8
+    rgbarray = np.frombuffer(img_rgb_string, np.uint8)
+    rgbarray_shaped = rgbarray.reshape((540,960,3))
+    img = Image.fromarray(rgbarray_shaped, 'RGB')
+    img.show()
+
+    responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Annotation, False, False, "GreyscaleTest")])
+    img_rgb_string = responses[0].image_data_uint8
+    rgbarray = np.frombuffer(img_rgb_string, np.uint8)
+    rgbarray_shaped = rgbarray.reshape((540,960,3))
+    greyscale_values = np.divide(rgbarray_shaped[:,:,0], 255)
+    img = Image.fromarray(rgbarray_shaped[:,:,0])
+    img.show()
+```
