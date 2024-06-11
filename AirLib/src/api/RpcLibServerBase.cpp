@@ -93,11 +93,11 @@ namespace airlib
         pimpl_->server.bind("ping", [&]() -> bool { return true; });
 
         pimpl_->server.bind("getServerVersion", []() -> int {
-            return 1;
+            return 3;
         });
 
         pimpl_->server.bind("getMinRequiredClientVersion", []() -> int {
-            return 1;
+            return 3;
         });
 
         pimpl_->server.bind("simPause", [&](bool is_paused) -> void {

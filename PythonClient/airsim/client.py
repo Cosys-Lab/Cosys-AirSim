@@ -29,13 +29,13 @@ class VehicleClient:
         return self.client.call('ping')
 
     def getClientVersion(self):
-        return 1 # sync with C++ client
+        return 3 # sync with C++ client
 
     def getServerVersion(self):
         return self.client.call('getServerVersion')
 
     def getMinRequiredServerVersion(self):
-        return 1 # sync with C++ client
+        return 3 # sync with C++ client
 
     def getMinRequiredClientVersion(self):
         return self.client.call('getMinRequiredClientVersion')
@@ -144,10 +144,10 @@ class VehicleClient:
 
         if server_ver < server_min_ver:
             print(ver_info, file=sys.stderr)
-            print("AirSim server is of older version and not supported by this client. Please upgrade!")
+            print("Cosys-AirSim server is of older version and not supported by this client. Please upgrade!")
         elif client_ver < client_min_ver:
             print(ver_info, file=sys.stderr)
-            print("AirSim client is of older version and not supported by this server. Please upgrade!")
+            print("Cosys-AirSim client is of older version and not supported by this server. Please upgrade!")
         else:
             print(ver_info)
         print('')
@@ -169,8 +169,6 @@ class VehicleClient:
         """
         Runtime Swap Texture API
 
-        See https://microsoft.github.io/AirSim/retexturing/ for details
-
         Args:
             tags (str): string of "," or ", " delimited tags to identify on which actors to perform the swap
             tex_id (int, optional): indexes the array of textures assigned to each actor undergoing a swap
@@ -187,7 +185,6 @@ class VehicleClient:
     def simSetObjectMaterial(self, object_name, material_name, component_id = 0):
         """
         Runtime Swap Texture API
-        See https://microsoft.github.io/AirSim/retexturing/ for details
         Args:
             object_name (str): name of object to set material for
             material_name (str): name of material to set for object
@@ -201,7 +198,6 @@ class VehicleClient:
     def simSetObjectMaterialFromTexture(self, object_name, texture_path, component_id = 0):
         """
         Runtime Swap Texture API
-        See https://microsoft.github.io/AirSim/retexturing/ for details
         Args:
             object_name (str): name of object to set material for
             texture_path (str): path to texture to set for object
@@ -263,7 +259,6 @@ class VehicleClient:
 
         Returns bytes of png format image which can be dumped into abinary file to create .png image
         `string_to_uint8_array()` can be used to convert into Numpy unit8 array
-        See https://microsoft.github.io/AirSim/image_apis/ for details
 
         Args:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
@@ -289,8 +284,6 @@ class VehicleClient:
     def simGetImages(self, requests, vehicle_name = ''):
         """
         Get multiple images
-
-        See https://microsoft.github.io/AirSim/image_apis/ for details and examples
 
         Args:
             requests (list[ImageRequest]): Images required
@@ -406,7 +399,7 @@ class VehicleClient:
         """
         Allows the client to execute a command in Unreal's native console, via an API.
         Affords access to the countless built-in commands such as "stat unit", "stat fps", "open [map]", adjust any config settings, etc. etc.
-        Allows the user to create bespoke APIs very easily, by adding a custom event to the level blueprint, and then calling the console command "ce MyEventName [args]". No recompilation of AirSim needed!
+        Allows the user to create bespoke APIs very easily, by adding a custom event to the level blueprint, and then calling the console command "ce MyEventName [args]". No recompilation of Cosys-AirSim needed!
 
         Args:
             command ([string]): Desired Unreal Engine Console command to run
@@ -421,7 +414,6 @@ class VehicleClient:
         """
         Returns the static meshes that make up the scene
 
-        See https://microsoft.github.io/AirSim/meshes/ for details and how to use this
 
         Returns:
             list[MeshPositionVertexBuffersResponse]:
@@ -1114,7 +1106,7 @@ class VehicleClient:
 
     def getSettingsString(self):
         """
-        Fetch the settings text being used by AirSim
+        Fetch the settings text being used by Cosys-AirSim
 
         Returns:
             str: Settings text in JSON format
@@ -1530,9 +1522,9 @@ class MultirotorClient(VehicleClient, object):
         """
         - Sets angle level controller gains (used by any API setting angle references - for ex: moveByRollPitchYawZAsync(), moveByRollPitchYawThrottleAsync(), etc)
         - Modifying these gains will also affect the behaviour of moveByVelocityAsync() API.
-            This is because the AirSim flight controller will track velocity setpoints by converting them to angle set points.
+            This is because the Cosys-AirSim flight controller will track velocity setpoints by converting them to angle set points.
         - This function should only be called if the default angle level control PID gains need to be modified.
-        - Passing AngleLevelControllerGains() sets gains to default airsim values.
+        - Passing AngleLevelControllerGains() sets gains to default Cosys-AirSim values.
 
         Args:
             angle_level_gains (AngleLevelControllerGains):
@@ -1546,7 +1538,7 @@ class MultirotorClient(VehicleClient, object):
         """
         - Sets velocity controller gains for moveByVelocityAsync().
         - This function should only be called if the default velocity control PID gains need to be modified.
-        - Passing VelocityControllerGains() sets gains to default airsim values.
+        - Passing VelocityControllerGains() sets gains to default Cosys-AirSim values.
 
         Args:
             velocity_gains (VelocityControllerGains):
