@@ -449,10 +449,6 @@ void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& 
 void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type)
 {
     USceneCaptureComponent2D* new_capture = NewObject<USceneCaptureComponent2D>(this, USceneCaptureComponent2D ::StaticClass(), *name);
-    new_capture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
-    if (type == FObjectAnnotator::AnnotatorType::RGB || type == FObjectAnnotator::AnnotatorType::InstanceSegmentation)
-        FObjectAnnotator::SetViewForRGBAnnotationRender(new_capture->ShowFlags);
-    new_capture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
     new_capture->bAutoActivate = false;
     new_capture->bCaptureEveryFrame = true;
@@ -460,35 +456,42 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
     new_capture->SetRelativeRotation(FRotator(0, 0, 0));
     new_capture->SetRelativeLocation(FVector(0, 0, 0));
     new_capture->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	//new_capture->RegisterComponent();
- //   new_capture->Deactivate();
-    
+	new_capture->RegisterComponent();
+    new_capture->Deactivate();
+
+    captures_.Add(new_capture);
+
     render_targets_.Add(NewObject<UTextureRenderTarget2D>());
     int render_index = render_targets_.Num() - 1;
-    
-    setCaptureUpdate(new_capture, true);
-
-    updateCaptureComponentSetting(new_capture, render_targets_[render_index],
-        false, image_type_to_pixel_format_map_[Utils::toNumeric(ImageType::Annotation)],
-        sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)), 
-        *ned_transform_, false);
-
     render_targets_[render_index]->TargetGamma = 1;
 
-	annotator_name_to_index_map_.Add(TCHAR_TO_UTF8(*name), render_index);
+    FObjectAnnotator::SetViewForRGBAnnotationRender(captures_[render_index]->ShowFlags);
+    captures_[render_index]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
-    if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)new_capture->HiddenActors = ignore_actors_;
-    copyCameraSettingsToSceneCapture(camera_, new_capture);
+    camera_type_enabled_.push_back(false);   
 
-	captures_.Add(new_capture);
-	camera_type_enabled_.push_back(false);
-	
+    annotator_name_to_index_map_.Add(TCHAR_TO_UTF8(*name), render_index);
+
     detections_.Add(NewObject<UDetectionComponent>(this));
     if (detections_[render_index]) {
-        detections_[render_index]->SetupAttachment(new_capture);
+        detections_[render_index]->SetupAttachment(captures_[render_index]);
         detections_[render_index]->RegisterComponent();
         detections_[render_index]->Deactivate();
     }
+
+    captures_[render_index]->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+
+    setCaptureUpdate(captures_[render_index], true);    
+
+    if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)captures_[render_index]->HiddenActors = ignore_actors_;
+
+    updateCaptureComponentSetting(captures_[render_index], render_targets_[render_index],
+        false, image_type_to_pixel_format_map_[Utils::toNumeric(ImageType::Annotation)],
+        sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)), 
+        *ned_transform_, false);   
+
+    copyCameraSettingsToSceneCapture(camera_, captures_[render_index]);	
+
 }
 
 void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform)
