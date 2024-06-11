@@ -32,3 +32,4 @@ Do note the test script requires next to the toolboxes listed above in the Prere
 * Robotics System Toolbox
 * ROS Toolbox
 * UAV Toolbox
+* Aerospace Toolbox
