@@ -214,7 +214,9 @@ void ASimModeBase::InitializeAnnotation() {
         FString name = FString(annotator_setting.name.c_str());
         FObjectAnnotator::AnnotatorType type = FObjectAnnotator::AnnotatorType(annotator_setting.type);
 		bool set_direct = annotator_setting.set_direct;
-        annotators_.Emplace(name, FObjectAnnotator(name, type, FObjectAnnotator::AnnotatorDefault(annotator_setting.default_value), set_direct));
+        FString texture_path = FString(annotator_setting.texture_path.c_str());
+        FString texture_prefix = FString(annotator_setting.texture_prefix.c_str());
+        annotators_.Emplace(name, FObjectAnnotator(name, type, FObjectAnnotator::AnnotatorDefault(annotator_setting.default_value), set_direct, texture_path, texture_prefix));
 		annotators_[name].Initialize(this->GetLevel());
         AddAnnotatorCamera(name, type);
         ForceUpdateAnnotation(name);
@@ -756,6 +758,113 @@ float ASimModeBase::GetMeshGreyscaleAnnotationValue(const std::string& annotatio
     }
     float greyscale_value = annotators_[FString(annotation_name.c_str())].GetComponentGreyscaleValue(mesh_name.c_str());
     return greyscale_value;
+}
+
+bool ASimModeBase::SetMeshTextureAnnotationPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex, bool update_annotation) {
+    if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return false;
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *FString(annotation_name.c_str()));
+        return false;
+    }
+    if (!annotators_[FString(annotation_name.c_str())].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *FString(annotation_name.c_str()));
+        return false;
+    }
+    FString texture_path_fstring = FString(texture_path.c_str());
+
+    if (is_name_regex) {
+        std::regex name_regex;
+        name_regex.assign(mesh_name, std::regex_constants::icase);
+        int changes = 0;
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        {
+            if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
+                bool success;
+                FString key = It.Key();
+                UAirBlueprintLib::RunCommandOnGameThread([this, key, texture_path_fstring, &success, annotation_name]() {
+                    success = annotators_[FString(annotation_name.c_str())].SetComponentTextureByDirectPath(key, texture_path_fstring);
+                    }, true);
+                changes++;
+            }
+        }
+        if (update_annotation && changes > 0)updateAnnotation(FString(annotation_name.c_str()));
+        return changes > 0;
+    }
+    else if (annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().Contains(mesh_name.c_str())) {
+        bool success;
+        FString key = mesh_name.c_str();
+        UAirBlueprintLib::RunCommandOnGameThread([this, key, texture_path_fstring, &success, annotation_name]() {
+            success = annotators_[FString(annotation_name.c_str())].SetComponentTextureByDirectPath(key, texture_path_fstring);
+            }, true);
+        if (update_annotation)updateAnnotation(FString(annotation_name.c_str()));
+        return success;
+    }
+    else {
+        return false;
+    }
+
+}
+
+bool ASimModeBase::EnableMeshTextureAnnotationByPath(const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex, bool update_annotation) {
+    if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return false;
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *FString(annotation_name.c_str()));
+        return false;
+    }
+    if (annotators_[FString(annotation_name.c_str())].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to relative path mode."), *FString(annotation_name.c_str()));
+        return false;
+    }
+
+    if (is_name_regex) {
+        std::regex name_regex;
+        name_regex.assign(mesh_name, std::regex_constants::icase);
+        int changes = 0;
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        {
+            if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
+                bool success;
+                FString key = It.Key();
+                UAirBlueprintLib::RunCommandOnGameThread([this, key, &success, annotation_name]() {
+                    success = annotators_[FString(annotation_name.c_str())].SetComponentTextureByRelativePath(key);
+                    }, true);
+                changes++;
+            }
+        }
+        if (update_annotation && changes > 0)updateAnnotation(FString(annotation_name.c_str()));
+        return changes > 0;
+    }
+    else if (annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().Contains(mesh_name.c_str())) {
+        bool success;
+        FString key = mesh_name.c_str();
+        UAirBlueprintLib::RunCommandOnGameThread([this, key, &success, annotation_name]() {
+            success = annotators_[FString(annotation_name.c_str())].SetComponentTextureByRelativePath(key);
+            }, true);
+        if (update_annotation)updateAnnotation(FString(annotation_name.c_str()));
+        return success;
+    }
+    else {
+        return false;
+    }
+}
+
+std::string ASimModeBase::GetMeshTextureAnnotationPath(const std::string& annotation_name, const std::string& mesh_name) {
+    if (annotators_.Contains(FString(annotation_name.c_str())) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *FString(annotation_name.c_str()), *FString(annotation_name.c_str()));
+        return "";
+    }
+    if (annotators_[FString(annotation_name.c_str())].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *FString(annotation_name.c_str()));
+        return "";
+    }
+    FString texture_path = annotators_[FString(annotation_name.c_str())].GetComponentTexturePath(mesh_name.c_str());
+    return TCHAR_TO_UTF8(*texture_path);
 }
 
 int ASimModeBase::GetMeshRGBAnnotationID(const std::string& annotation_name, const std::string& mesh_name) {

@@ -92,23 +92,23 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Annotation")
     bool UpdateGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
-    bool AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
+    //UFUNCTION(BlueprintCallable, Category = "Annotation")
+    //bool AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
-    bool UpdateTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
+    //UFUNCTION(BlueprintCallable, Category = "Annotation")
+    //bool UpdateTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
-    bool AddTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
+    //UFUNCTION(BlueprintCallable, Category = "Annotation")
+    //bool AddTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
-    bool UpdateTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
+    //UFUNCTION(BlueprintCallable, Category = "Annotation")
+    //bool UpdateTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
-    bool EnableTextureByPathAnnotationTagToActor(FString annotation_name, AActor* actor, bool update_annotation = true);
+    //UFUNCTION(BlueprintCallable, Category = "Annotation")
+    //bool EnableTextureByPathAnnotationTagToActor(FString annotation_name, AActor* actor, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
-    bool EnableTextureByPathAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, bool update_annotation = true);
+    //UFUNCTION(BlueprintCallable, Category = "Annotation")
+    //bool EnableTextureByPathAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
     bool DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);

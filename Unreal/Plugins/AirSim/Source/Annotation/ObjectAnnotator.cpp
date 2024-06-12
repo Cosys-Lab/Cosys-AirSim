@@ -317,7 +317,7 @@ bool FObjectAnnotator::SetComponentGreyScaleColorByValue(FString component_id, f
 	}
 }
 
-bool FObjectAnnotator::SetComponentTextureByPath(FString component_id, FString path)
+bool FObjectAnnotator::SetComponentTextureByDirectPath(FString component_id, FString path)
 {
 	if (name_to_component_map_.Contains(component_id))
 	{
@@ -326,7 +326,33 @@ bool FObjectAnnotator::SetComponentTextureByPath(FString component_id, FString p
 		if (UpdatePaintTextureComponent(actor, path))
 		{
 			// TODO
-			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted texture annotation of object %s to new texture %s"), *name_, *component_id, *path);
+			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted texture annotation of object %s to new direct texture %s"), *name_, *component_id, *path);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool FObjectAnnotator::SetComponentTextureByRelativePath(FString component_id)
+{
+	if (name_to_component_map_.Contains(component_id))
+	{
+		FString path = FString(TEXT(""));
+
+		// TODO
+
+		UMeshComponent* actor = name_to_component_map_[component_id];
+		if (UpdatePaintTextureComponent(actor, path))
+		{
+			// TODO
+			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted texture annotation of object %s to new relative texture %s"), *name_, *component_id, *path);
 			return true;
 		}
 		else

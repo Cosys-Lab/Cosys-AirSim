@@ -65,7 +65,9 @@ public:
 	bool SetComponentGreyScaleColorByValue(FString component_id, float greyscale_value);
 	float GetComponentGreyscaleValue(FString component_id);
 
-	bool SetComponentTextureByPath(FString component_id, FString path);
+	bool SetComponentTextureByDirectPath(FString component_id, FString path);
+	bool SetComponentTextureByRelativePath(FString component_id);
+
 	FString GetComponentTexturePath(FString component_id);
 
 	void UpdateAnnotationComponents(UWorld* World);

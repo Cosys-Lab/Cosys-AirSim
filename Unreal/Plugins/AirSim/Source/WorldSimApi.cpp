@@ -349,7 +349,7 @@ bool WorldSimApi::setAnnotationObjectTextureByPath(const std::string& annotation
 
 bool WorldSimApi::enableAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex)
 {
-    return simmode_->enableMeshTextureAnnotationByPath(annotation_name, mesh_name, is_name_regex);
+    return simmode_->EnableMeshTextureAnnotationByPath(annotation_name, mesh_name, is_name_regex);
 }
 
 std::string  WorldSimApi::getAnnotationObjectTexturePath(const std::string& annotation_name, const std::string& mesh_name) const
