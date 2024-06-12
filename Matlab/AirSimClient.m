@@ -345,7 +345,7 @@ classdef AirSimClient < handle
         function [image, timestamp] = getCameraImage(obj, sensorName, cameraType)
             % GET_CAMERA_IMAGE Get camera data from a camera sensor
 
-            if cameraType == 1 || cameraType == 2 || cameraType == 3
+            if cameraType == 1 || cameraType == 2 || cameraType == 3 || cameraType == 4
                 image_request = py.airsim.ImageRequest(sensorName, int32(cameraType), true, false);
             else
                 image_request = py.airsim.ImageRequest(sensorName, int32(cameraType), false, false);
@@ -354,7 +354,7 @@ classdef AirSimClient < handle
             camera_image_response_request = obj.rpc_client.call("simGetImages", image_request_list, obj.vehicle_name);
             image_response = py.airsim.ImageResponse();
             camera_image = image_response.from_msgpack(camera_image_response_request{1});
-            if cameraType == 1 || cameraType == 2 || cameraType == 3
+            if cameraType == 1 || cameraType == 2 || cameraType == 3 || cameraType == 4
                 image_bytes = single(camera_image.image_data_float);
                 image_reshaped = reshape(image_bytes, camera_image.width.int32, camera_image.height.int32);
                 image = permute(image_reshaped,[2 1]);
@@ -371,7 +371,7 @@ classdef AirSimClient < handle
             images = {};
             image_requests = [];
             for i = 1: numel(cameraTypes)
-                if cameraTypes(i) == 1 || cameraTypes(i) == 2
+                if cameraTypes(i) == 1 || cameraTypes(i) == 2 || cameraTypes(i) == 3 || cameraTypes(i) == 4
                     image_requests{i} = py.airsim.ImageRequest(sensorName, int32(cameraTypes(i)), true, false);
                 else
                     image_requests{i} = py.airsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false);
@@ -383,7 +383,7 @@ classdef AirSimClient < handle
             for i = 1: numel(cameraTypes)
                 image_response = py.airsim.ImageResponse();
                 camera_image = image_response.from_msgpack(camera_image_response_request{i});
-                if cameraTypes(i) == 1 || cameraTypes(i) == 2
+                if cameraTypes(i) == 1 || cameraTypes(i) == 2 || cameraTypes(i) == 3 || cameraTypes(i) == 4
                     image_bytes = single(camera_image.image_data_float);
                     image_reshaped = reshape(image_bytes, camera_image.width.int32, camera_image.height.int32);
                     images{i} = permute(image_reshaped,[2 1]);

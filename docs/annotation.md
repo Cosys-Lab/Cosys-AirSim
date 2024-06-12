@@ -30,18 +30,18 @@ For example:
         {
             "Name": "RGBTest",
             "Type": 0,
-            "Default": 1,
+            "Default": true,
             "SetDirect": true
         },
         {
             "Name": "GreyscaleTest",
             "Type": 1,
-            "Default": 1
+            "Default": true
         },
         {
             "Name": "TextureTest",
             "Type": 2,
-            "Default": 0
+            "Default": true
         }
     ],    
   ...
@@ -55,8 +55,8 @@ The types are:
 ```       
 
 The `Default` setting applies to all types and is what happens when no tag is set for a actor/component. 
-When set to 0, the mesh will not be rendered in the annotation layer.
-When set to 1, the mesh will be rendered in the annotation layer with the default value of the layer.
+When set to false, the mesh will not be rendered in the annotation layer.
+When set to true, the mesh will be rendered in the annotation layer with the default value of the layer.
 
 ### Type 1: RGB
 Similar to [instance segmentation](instance_segmentation.md), you can use the RGB annotation layer to tag objects in the environment with a unique color. 

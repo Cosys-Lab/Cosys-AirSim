@@ -50,6 +50,8 @@ class _ImageType(type):
         return 8
     def OpticalFlowVis(cls):
         return 9
+    def Annotation(cls):
+        return 10
 
     def __getattr__(self, key):
         if key == 'DepthPlanar':

@@ -72,17 +72,17 @@ namespace airlib
         {
             int annotator_index;
             int type;
-            int default_value;
+            bool show_by_default;
             std::string name;
             bool set_direct;
             std::string texture_path;
             std::string texture_prefix;
 
-            AnnotatorSetting(int annotator_index_val = 0, int type_val = 0, int default_value_val = 0,
+            AnnotatorSetting(int annotator_index_val = 0, int type_val = 0, bool show_by_default_val = true,
                 const std::string& name_val = "", bool set_direct_val = false, std::string texture_path_val = "", std::string texture_prefix_val = "")
                 : annotator_index(annotator_index_val)
                 , type(type_val)
-                , default_value(default_value_val)
+                , show_by_default(show_by_default_val)
                 , name(name_val)
                 , set_direct(set_direct_val)
                 , texture_path(texture_path_val)
@@ -1398,7 +1398,7 @@ namespace airlib
                         AnnotatorSetting annotator_setting;
                         annotator_setting.annotator_index = (int)child_index;
                         annotator_setting.type = json_settings_child.getInt("Type", 0);
-                        annotator_setting.default_value = json_settings_child.getInt("Default", 0);
+                        annotator_setting.show_by_default = json_settings_child.getBool("Default", true);
                         annotator_setting.name = json_settings_child.getString("Name", "");
                         annotator_setting.set_direct = json_settings_child.getBool("SetDirect", false);
                         annotator_setting.texture_path = json_settings_child.getString("TexturePath", "");

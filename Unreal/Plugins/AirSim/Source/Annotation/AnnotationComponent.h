@@ -35,8 +35,11 @@ public:
 	void SetAnnotationColor(FColor AnnotationColor);
 
 	void SetAnnotationTexture(FString NewAnnotationTexturePath);
+	void SetAnnotationTexture(UTexture* NewAnnotationTexture);
 
 	FColor GetAnnotationColor();
+
+	FString GetAnnotationTexturePath();
 
 	virtual void OnRegister() override;
 
@@ -57,6 +60,7 @@ private:
 	FString AnnotationTexturePath;
 
 	bool bSkeletalMesh; // indicate whether this is for a SkeletalMesh
+	bool bTexture; // indicate if this is a texture annotation component
 
 	FPrimitiveSceneProxy* CreateSceneProxy(UStaticMeshComponent* StaticMeshComponent);
 	FPrimitiveSceneProxy* CreateSceneProxy(USkeletalMeshComponent* SkeletalMeshComponent);

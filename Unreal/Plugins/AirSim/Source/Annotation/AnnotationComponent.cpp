@@ -90,7 +90,11 @@ void FStaticAnnotationSceneProxy::GetDynamicMeshElements(
 	uint32 VisibilityMap,
 	FMeshElementCollector & Collector) const
 {
+	//if (MaterialRenderProxy->GetMaterialName().Contains("AnnotationMaterialMID")) {
+	//	FStaticMeshSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
+	//}	
 	FStaticMeshSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
+
 }
 
 bool FStaticAnnotationSceneProxy::GetMeshElement(
@@ -129,7 +133,7 @@ public:
 				}
 				else
 				{
-					UAirBlueprintLib::LogMessageString("AnnotationMaterial is Invalid in FSkeletalSceneProxy", "Annotation", LogDebugLevel::Failure);
+					UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: AnnotationMaterial is Invalid in FSkeletalSceneProxy"));
 				}
 			}
 		}
@@ -150,7 +154,15 @@ void FSkeletalAnnotationSceneProxy::GetDynamicMeshElements(
 	uint32 VisibilityMap,
 	FMeshElementCollector& Collector) const
 {
+	//if (LODSections.Num() > 0){
+	//	if (LODSections[0].SectionElements.Num() > 0) {
+	//		if (LODSections[0].SectionElements[0].Material->GetName().Contains("AnnotationMaterialMID")) {
+	//			FSkeletalMeshSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
+	//		}
+	//	}
+	//}
 	FSkeletalMeshSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
+
 }
 
 FPrimitiveViewRelevance FSkeletalAnnotationSceneProxy::GetViewRelevance(const FSceneView * View) const
@@ -174,7 +186,9 @@ UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectIniti
 	  // , ParentMeshInfo(nullptr)
 {
 	bSkeletalMesh = false;
-	FString MaterialPath = TEXT("Material'/AirSim/HUDAssets/LinearColorAnnotationMaterial.LinearColorAnnotationMaterial'");
+	bTexture = false;
+	FString MaterialPath = TEXT("Material'/AirSim/HUDAssets/AnnotationMaterial.AnnotationMaterial'");
+
 	static ConstructorHelpers::FObjectFinder<UMaterial> AnnotationMaterialObject(*MaterialPath);
 	if (AnnotationMaterialObject.Object == nullptr)
     {
@@ -197,7 +211,7 @@ void UAnnotationComponent::OnRegister()
 	AnnotationMID = UMaterialInstanceDynamic::Create(AnnotationMaterial, this, TEXT("AnnotationMaterialMID"));
 	if (!IsValid(AnnotationMID))
 	{
-		UAirBlueprintLib::LogMessageString("AnnotationMaterial is not correctly initialized", "Annotation", LogDebugLevel::Failure);
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: ColorAnnotationMaterial is not correctly initialized"));
 		return;
 	}
 	const float OneOver255 = 1.0f / 255.0f;
@@ -208,9 +222,6 @@ void UAnnotationComponent::OnRegister()
 		1.0
 	);
 	AnnotationMID->SetVectorParameterValue("AnnotationColor", LinearAnnotationColor);
-
-	// SetAnnotationColor(this->AnnotationColor);
-	// ParentMeshInfo = MakeShareable(new FParentMeshInfo(this->GetAttachParent()));
 }
 
 /** 
@@ -236,7 +247,42 @@ void UAnnotationComponent::SetAnnotationColor(FColor NewAnnotationColor)
 
 void UAnnotationComponent::SetAnnotationTexture(FString NewAnnotationTexturePath)
 {
-	// TODO
+    bTexture = true;
+	AnnotationMID->SetScalarParameterValue("TextureEnabled", 1);
+    this->AnnotationTexturePath = NewAnnotationTexturePath;
+    TArray<FString> splitPath;
+    NewAnnotationTexturePath.ParseIntoArray(splitPath, TEXT("/"), true);
+    FString TextureFileName = splitPath.Last();
+	FString FullPath = FString::Printf(TEXT("%s.%s"), *NewAnnotationTexturePath, *TextureFileName);
+	UTexture* AnnotationTexture = LoadObject<UTexture>(NULL, *FullPath);
+
+    if (AnnotationTexture != nullptr)
+    {       
+        if (IsValid(AnnotationMID))
+        {
+			AnnotationMID->SetTextureParameterValue("AnnotationTexture", AnnotationTexture);
+		}else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Could not set annotation texture to %s cause something wrong with MID."), *FullPath);
+		}
+    }
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Could not set annotation texture to %s."), *FullPath);
+	}
+}
+
+void UAnnotationComponent::SetAnnotationTexture(UTexture* NewAnnotationTexture)
+{
+	bTexture = true;
+	TArray<FString> splitPath;
+	NewAnnotationTexture->GetPathName().ParseIntoArray(splitPath, TEXT("."), true);
+	FString TextureFilePath = splitPath[0];
+	this->AnnotationTexturePath = TextureFilePath;
+	if (IsValid(AnnotationMID))
+	{
+		AnnotationMID->SetTextureParameterValue("AnnotationTexture", NewAnnotationTexture);
+	}
 }
 
 FColor UAnnotationComponent::GetAnnotationColor()
@@ -244,11 +290,15 @@ FColor UAnnotationComponent::GetAnnotationColor()
 	return AnnotationColor;
 }
 
+FString UAnnotationComponent::GetAnnotationTexturePath()
+{
+	return AnnotationTexturePath;
+}
+
 FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(UStaticMeshComponent* StaticMeshComponent)
 {
 	// FPrimitiveSceneProxy* PrimitiveSceneProxy = StaticMeshComponent->CreateSceneProxy();
 	// FStaticMeshSceneProxy* StaticMeshSceneProxy = (FStaticMeshSceneProxy*)PrimitiveSceneProxy;
-
 	UMaterialInterface* ProxyMaterial = AnnotationMID; // Material Instance Dynamic
 	UStaticMesh* ParentStaticMesh = StaticMeshComponent->GetStaticMesh();
 	if(ParentStaticMesh == NULL
@@ -270,6 +320,7 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(UStaticMeshComponen
 FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	UMaterialInterface* ProxyMaterial = AnnotationMID; // Material Instance Dynamic
+
 	ERHIFeatureLevel::Type SceneFeatureLevel = GetWorld()->FeatureLevel;
 
 	// Ref: https://github.com/EpicGames/UnrealEngine/blob/4.19/Engine/Source/Runtime/Engine/Private/Components/SkinnedMeshComponent.cpp#L415

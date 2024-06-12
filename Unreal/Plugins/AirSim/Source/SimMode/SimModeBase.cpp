@@ -216,7 +216,7 @@ void ASimModeBase::InitializeAnnotation() {
 		bool set_direct = annotator_setting.set_direct;
         FString texture_path = FString(annotator_setting.texture_path.c_str());
         FString texture_prefix = FString(annotator_setting.texture_prefix.c_str());
-        annotators_.Emplace(name, FObjectAnnotator(name, type, FObjectAnnotator::AnnotatorDefault(annotator_setting.default_value), set_direct, texture_path, texture_prefix));
+        annotators_.Emplace(name, FObjectAnnotator(name, type, annotator_setting.show_by_default, set_direct, texture_path, texture_prefix));
 		annotators_[name].Initialize(this->GetLevel());
         AddAnnotatorCamera(name, type);
         ForceUpdateAnnotation(name);
@@ -274,9 +274,10 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToActor(FString annotation_name, 
         FString tag = tagFName.ToString();
         return tag.Contains(annotation_name);
         });
-    if (found_tag == INDEX_NONE)
-        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for actor %s."), *annotation_name, *actor->GetName());
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
         return false;
+    }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
 	actor->Tags[found_tag] = FName(*tag);
     return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
@@ -317,9 +318,10 @@ bool ASimModeBase::UpdateRGBIndexAnnotationTagToActor(FString annotation_name, A
         FString tag = tagFName.ToString();
         return tag.Contains(annotation_name);
         });
-    if (found_tag == INDEX_NONE)
-        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for actor %s."), *annotation_name, *actor->GetName());
-    return false;
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+        return false;
+    }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
     actor->Tags[found_tag] = FName(*tag);
     return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
@@ -360,9 +362,10 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToComponent(FString annotation_na
         FString tag = tagFName.ToString();
         return tag.Contains(annotation_name);
         });
-    if (found_tag == INDEX_NONE)
+    if (found_tag == INDEX_NONE) {
         UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
-    return false;
+        return false;
+    }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
     component->ComponentTags[found_tag] = FName(*tag);
     return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
@@ -403,9 +406,10 @@ bool ASimModeBase::UpdateRGBIndexAnnotationTagToComponent(FString annotation_nam
         FString tag = tagFName.ToString();
         return tag.Contains(annotation_name);
         });
-    if (found_tag == INDEX_NONE)
-        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for component."), *annotation_name);
-    return false;
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+        return false;
+    }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
     component->ComponentTags[found_tag] = FName(*tag);
     return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
@@ -438,9 +442,10 @@ bool ASimModeBase::UpdateGreyscaleAnnotationTagToActor(FString annotation_name, 
         FString tag = tagFName.ToString();
         return tag.Contains(annotation_name);
         });
-    if (found_tag == INDEX_NONE)
-        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for actor %s."), *annotation_name, *actor->GetName());
-    return false;
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+        return false;
+    }
     FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
     actor->Tags[found_tag] = FName(*tag);
     return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
@@ -473,11 +478,236 @@ bool ASimModeBase::UpdateGreyscaleAnnotationTagToComponent(FString annotation_na
         FString tag = tagFName.ToString();
         return tag.Contains(annotation_name);
         });
-    if (found_tag == INDEX_NONE)
+    if (found_tag == INDEX_NONE) {
         UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
-    return false;
+        return false;
+    }
     FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
     component->ComponentTags[found_tag] = FName(*tag);
+    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+}
+
+bool ASimModeBase::AddTextureDirectAnnotationTagToActorByPath(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_")) + texture_path;
+    actor->Tags.Emplace(FName(*tag));
+    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+}
+
+bool ASimModeBase::UpdateTextureDirectAnnotationTagToActorByPath(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    int32 found_tag = actor->Tags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
+        FString tag = tagFName.ToString();
+        return tag.Contains(annotation_name);
+        });
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_")) + texture_path;
+    actor->Tags[found_tag] = FName(*tag);
+    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+}
+
+bool ASimModeBase::AddTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_")) + texture_path;
+    component->ComponentTags.Emplace(FName(*tag));
+    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+}
+
+bool ASimModeBase::UpdateTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    int32 found_tag = component->ComponentTags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
+        FString tag = tagFName.ToString();
+        return tag.Contains(annotation_name);
+        });
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_")) + texture_path;
+    component->ComponentTags[found_tag] = FName(*tag);
+    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+}
+
+bool ASimModeBase::AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    TArray<FString> splitPath;
+    texture->GetPathName().ParseIntoArray(splitPath, TEXT("."), true);
+    FString TextureFilePath = splitPath[0];
+    FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
+    actor->Tags.Emplace(FName(*tag));
+    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+}
+
+bool ASimModeBase::UpdateTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    int32 found_tag = actor->Tags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
+        FString tag = tagFName.ToString();
+        return tag.Contains(annotation_name);
+        });
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+        return false;
+    }
+    TArray<FString> splitPath;
+    texture->GetPathName().ParseIntoArray(splitPath, TEXT("."), true);
+    FString TextureFilePath = splitPath[0];
+    FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
+    actor->Tags[found_tag] = FName(*tag);
+    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+}
+
+bool ASimModeBase::AddTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, UTexture* texture, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    TArray<FString> splitPath;
+    texture->GetPathName().ParseIntoArray(splitPath, TEXT("."), true);
+    FString TextureFilePath = splitPath[0];
+    FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
+    component->ComponentTags.Emplace(FName(*tag));
+    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+}
+
+bool ASimModeBase::UpdateTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, UTexture* texture, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (!annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to direct mode."), *annotation_name);
+        return false;
+    }
+    int32 found_tag = component->ComponentTags.IndexOfByPredicate([annotation_name](const FName& tagFName) {
+        FString tag = tagFName.ToString();
+        return tag.Contains(annotation_name);
+        });
+    if (found_tag == INDEX_NONE) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find a tag for this component."), *annotation_name);
+        return false;
+    }
+    TArray<FString> splitPath;
+    texture->GetPathName().ParseIntoArray(splitPath, TEXT("."), true);
+    FString TextureFilePath = splitPath[0];
+    FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
+    component->ComponentTags[found_tag] = FName(*tag);
+    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+}
+
+bool ASimModeBase::EnableTextureByPathAnnotationTagToActor(FString annotation_name, AActor* actor, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to relative path mode."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_enable"));
+    actor->Tags.Emplace(FName(*tag));
+    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+}
+
+bool ASimModeBase::EnableTextureByPathAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, bool update_annotation) {
+    if (annotators_.Contains(annotation_name) == false) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].GetType() != FObjectAnnotator::AnnotatorType::Texture) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not of the texture type."), *annotation_name);
+        return false;
+    }
+    if (annotators_[annotation_name].IsDirect()) {
+        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: This annotation layer is not set to relative path mode."), *annotation_name);
+        return false;
+    }
+    FString tag = annotation_name + FString(TEXT("_enable"));
+    component->ComponentTags.Emplace(FName(*tag));
     return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
 }
 

@@ -15,14 +15,14 @@ FObjectAnnotator::FObjectAnnotator()
 {
 	name_ = FString("InstanceSegmentation");
 	type_ = AnnotatorType::InstanceSegmentation;
-	default_type_ = AnnotatorDefault::NoRender;
+	show_by_default_ = false;
 }
 
-FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, AnnotatorDefault default_type, bool set_direct, FString texture_path, FString texture_prefix)
+FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, bool show_by_default, bool set_direct, FString texture_path, FString texture_prefix)
 {
 	name_ = name;
 	type_ = type;
-	default_type_ = default_type;
+	show_by_default_ = show_by_default;
 	set_direct_ = set_direct;
 	texture_path_ = texture_path;
 	texture_prefix_ = texture_prefix;
@@ -200,8 +200,8 @@ bool FObjectAnnotator::SetComponentRGBColorByIndex(FString component_id, uint32 
 	if (name_to_component_map_.Contains(component_id))
 	{
 		FColor color = ColorGenerator_.GetColorFromColorMap(color_index);
-		UMeshComponent* actor = name_to_component_map_[component_id];
-		if (UpdatePaintRGBComponent(actor, color))
+		UMeshComponent* component = name_to_component_map_[component_id];
+		if (UpdatePaintRGBComponent(component, color))
 		{
 			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
 			FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.B));
@@ -239,8 +239,8 @@ bool FObjectAnnotator::SetComponentRGBColorByColor(FString component_id, FColor 
 	{
 		int32 color_index = ColorGenerator_.GetIndexForColor(color);
 
-		UMeshComponent* actor = name_to_component_map_[component_id];
-		if (UpdatePaintRGBComponent(actor, color))
+		UMeshComponent* component = name_to_component_map_[component_id];
+		if (UpdatePaintRGBComponent(component, color))
 		{
 			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
 			FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.B));
@@ -284,8 +284,8 @@ bool FObjectAnnotator::SetComponentGreyScaleColorByValue(FString component_id, f
 		}
 		FLinearColor new_color_linear = FLinearColor(greyscale_value, greyscale_value, greyscale_value);
 		FColor color = new_color_linear.ToFColor(true);
-		UMeshComponent* actor = name_to_component_map_[component_id];
-		if (UpdatePaintRGBComponent(actor, color))
+		UMeshComponent* component = name_to_component_map_[component_id];
+		if (UpdatePaintRGBComponent(component, color))
 		{
 			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
 			FString color_string_gammacorrected = color_string;
@@ -322,10 +322,18 @@ bool FObjectAnnotator::SetComponentTextureByDirectPath(FString component_id, FSt
 	if (name_to_component_map_.Contains(component_id))
 	{
 
-		UMeshComponent* actor = name_to_component_map_[component_id];
-		if (UpdatePaintTextureComponent(actor, path))
+		FString new_texture;
+
+		if (set_direct_) {
+			new_texture = path;
+		}
+		else {
+			return false;
+		}
+		UMeshComponent* component = name_to_component_map_[component_id];
+		if (UpdatePaintTextureComponent(component, path))
 		{
-			// TODO
+			name_to_texture_path_map_[component_id] = new_texture;
 			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted texture annotation of object %s to new direct texture %s"), *name_, *component_id, *path);
 			return true;
 		}
@@ -344,15 +352,31 @@ bool FObjectAnnotator::SetComponentTextureByRelativePath(FString component_id)
 {
 	if (name_to_component_map_.Contains(component_id))
 	{
-		FString path = FString(TEXT(""));
+		FString new_texture;
 
-		// TODO
+		if (set_direct_) {
+			return false;
+		}
+		else {
+			FString component_name;
+			if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(name_to_component_map_[component_id])) {
+				if (staticmesh_component->GetStaticMesh() != nullptr) {
+					component_name = staticmesh_component->GetStaticMesh()->GetName();
+				}
+			}
+			else if (USkinnedMeshComponent* skinnedmesh_component = Cast<USkinnedMeshComponent>(name_to_component_map_[component_id])) {
+				if (skinnedmesh_component->GetSkinnedAsset() != nullptr) {
+					component_name = skinnedmesh_component->GetSkinnedAsset()->GetName();
+				}
+			}
+			new_texture = texture_path_ + "/" + texture_prefix_ + "-" + component_name;
+		}
 
-		UMeshComponent* actor = name_to_component_map_[component_id];
-		if (UpdatePaintTextureComponent(actor, path))
+		UMeshComponent* component = name_to_component_map_[component_id];
+		if (UpdatePaintTextureComponent(component, new_texture))
 		{
-			// TODO
-			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted texture annotation of object %s to new relative texture %s"), *name_, *component_id, *path);
+			name_to_texture_path_map_[component_id] = new_texture;
+			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted texture annotation of object %s to new relative texture %s"), *name_, *component_id, *new_texture);
 			return true;
 		}
 		else
@@ -576,14 +600,28 @@ bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
 				FString tag = found_tag->ToString();
 				TArray<FString> splitTag;
 				tag.ParseIntoArray(splitTag, TEXT("_"), true);
+				
+				FString new_texture;
 
-				FString new_texture = FString(TEXT(""));
-
-				// TODO
+				if (set_direct_) {
+					new_texture = splitTag[1];
+				} else {
+					FString component_name;
+					if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(it.Value())) {
+						if (staticmesh_component->GetStaticMesh() != nullptr) {
+							component_name = staticmesh_component->GetStaticMesh()->GetName();
+						}
+					} else if (USkinnedMeshComponent* skinnedmesh_component = Cast<USkinnedMeshComponent>(it.Value())) {
+						if (skinnedmesh_component->GetSkinnedAsset() != nullptr) {
+							component_name = skinnedmesh_component->GetSkinnedAsset()->GetName();
+						}
+					}
+					new_texture = texture_path_ + "/" + texture_prefix_ + "-" + component_name;
+				}
 
 				if (name_to_component_map_.Contains(it.Key())) {
-					// TODO
-					
+					check(UpdatePaintTextureComponent(it.Value(), new_texture));
+					name_to_texture_path_map_[it.Key()] = new_texture;
 					if (set_direct_) {
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Updated texture annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
 
@@ -593,7 +631,9 @@ bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
 					}
 				}
 				else {
-					// TODO
+					check(UpdatePaintTextureComponent(it.Value(), new_texture));
+					name_to_component_map_.Emplace(it.Key(), it.Value());
+					name_to_texture_path_map_.Emplace(it.Key(), new_texture);
 					if (set_direct_) {
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
 
@@ -780,7 +820,7 @@ void FObjectAnnotator::InitializeRGB(ULevel* InLevel)
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with ID # %s (RGB: %s)"), *name_, *it.Key(), *FString::FromInt(color_index), *color_string_gammacorrected);
 					}
 				}
-				else if (default_type_ == AnnotatorDefault::DefaultColor) {
+				else if (show_by_default_) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 					FColor new_color = FColor(0, 0, 0);
 					name_to_color_index_map_.Emplace(it.Key(), 2744000 - 1);
@@ -842,7 +882,7 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 					check(PaintRGBComponent(it.Value(), new_color));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new greyscale annotated object %s with direct greyscale value %f (RGB: %s)"), *name_, *it.Key(), greyscale_value , *color_string_gammacorrected);
 				}
-				else if (default_type_ == AnnotatorDefault::DefaultColor) {
+				else if (show_by_default_) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 					FColor new_color = FColor(0, 0, 0);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
@@ -885,18 +925,38 @@ void FObjectAnnotator::InitializeTexture(ULevel* InLevel)
 					tag.ParseIntoArray(splitTag, TEXT("_"), true);
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 
-					FString new_texture = FString("test/one/two/three/");
-					// TODO
+					FString new_texture;
+
+					if (set_direct_) {
+						new_texture = splitTag[1];
+					}
+					else {
+						FString component_name;
+						if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(it.Value())) {
+							if (staticmesh_component->GetStaticMesh() != nullptr) {
+								component_name = staticmesh_component->GetStaticMesh()->GetName();
+							}
+						}
+						else if (USkinnedMeshComponent* skinnedmesh_component = Cast<USkinnedMeshComponent>(it.Value())) {
+							if (skinnedmesh_component->GetSkinnedAsset() != nullptr) {
+								component_name = skinnedmesh_component->GetSkinnedAsset()->GetName();
+							}
+						}
+						new_texture = texture_path_ + "/" + texture_prefix_ + "-" + component_name;
+					}
+					name_to_texture_path_map_.Emplace(it.Key(), new_texture);
+					check(PaintTextureComponent(it.Value(), new_texture));
 					if (set_direct_) {
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new texture annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
-
 					}
 					else {
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new texture annotated object %s with texture: # %s"), *name_, *it.Key(), *new_texture);
 					}
 				}
-				else if (default_type_ == AnnotatorDefault::DefaultColor) {
-					// TODO
+				else if (show_by_default_) {
+					FString new_texture = "/AirSim/HUDAssets/k";
+					name_to_texture_path_map_.Emplace(it.Key(), new_texture);
+					check(PaintTextureComponent(it.Value(), new_texture));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged texture annotated object %s with default texture"), *name_, *it.Key());
 				}
 
@@ -1005,7 +1065,7 @@ bool FObjectAnnotator::DeleteComponent(UMeshComponent* component)
 	return true;
 }
 
-void FObjectAnnotator::SetViewForAnnotationRender(FEngineShowFlags& show_flags, bool show_textures)
+void FObjectAnnotator::SetViewForAnnotationRender(FEngineShowFlags& show_flags)
 {
 	show_flags.SetMaterials(false);
 	show_flags.SetLighting(false);
@@ -1019,7 +1079,9 @@ void FObjectAnnotator::SetViewForAnnotationRender(FEngineShowFlags& show_flags, 
 	show_flags.SetBloom(false);
 	show_flags.SetMotionBlur(false);
 	show_flags.SetSkyLighting(false);
+	show_flags.SetVisualizeSkyAtmosphere(false);
 	show_flags.SetAmbientOcclusion(false);
+	show_flags.SetAtmosphere(false);
 	show_flags.SetInstancedFoliage(false);
 	show_flags.SetInstancedGrass(false);
 	show_flags.SetTextRender(false);

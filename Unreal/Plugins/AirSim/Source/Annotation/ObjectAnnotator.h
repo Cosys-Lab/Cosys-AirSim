@@ -31,15 +31,9 @@ public:
 		InstanceSegmentation = 3
 	};
 
-	enum class AnnotatorDefault : uint32
-	{
-		NoRender = 0,
-		DefaultColor = 1
-	};
-
 	FObjectAnnotator();
 
-	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, AnnotatorDefault default_type = AnnotatorDefault::NoRender, bool set_direct = false, FString texture_path = FString(""), FString texture_prefix = FString(""));
+	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, bool show_by_default = true, bool set_direct = false, FString texture_path = FString(""), FString texture_prefix = FString(""));
 
 	void Initialize(ULevel* level);
 	void InitializeInstanceSegmentation(ULevel* level);
@@ -73,7 +67,7 @@ public:
 	void UpdateAnnotationComponents(UWorld* World);
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> GetAnnotationComponents();
 
-	static void SetViewForAnnotationRender(FEngineShowFlags& show_flags, bool show_textures = false);
+	static void SetViewForAnnotationRender(FEngineShowFlags& show_flags);
 
 	bool IsDirect();
 	FObjectAnnotator::AnnotatorType GetType();
@@ -90,7 +84,7 @@ private:
 
 	AnnotatorType type_;
 	FString name_;
-	AnnotatorDefault default_type_;
+	bool show_by_default_;
 	bool set_direct_;
 	FString texture_path_;
 	FString texture_prefix_;
