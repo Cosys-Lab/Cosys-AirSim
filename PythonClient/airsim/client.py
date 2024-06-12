@@ -621,10 +621,19 @@ class VehicleClient:
         return self.client.call('simGetAnnotationObjectColor', annotation_name, mesh_name)
 
     def simSetAnnotationObjectValue(self, annotation_name, mesh_name, greyscale_value, is_name_regex=False):
-        return self.client.call('simSetAnnotationObjectValue', annotation_name, mesh_name, Value, is_name_regex)
+        return self.client.call('simSetAnnotationObjectValue', annotation_name, mesh_name, greyscale_value, is_name_regex)
 
     def simGetAnnotationObjectValue(self, annotation_name, mesh_name):
         return self.client.call('simGetAnnotationObjectValue', annotation_name, mesh_name)
+
+    def simSetAnnotationObjectTextureByPath(self, annotation_name, mesh_name, texture_path, is_name_regex=False):
+        return self.client.call('simSetAnnotationObjectTextureByPath', annotation_name, mesh_name, texture_path, is_name_regex)
+
+    def simEnableAnnotationObjectTextureByPath(self, annotation_name, mesh_name, is_name_regex=False):
+        return self.client.call('simEnableAnnotationObjectTextureByPath', annotation_name, mesh_name, is_name_regex)
+
+    def simGetAnnotationObjectTexturePath(self, annotation_name, mesh_name):
+        return self.client.call('simGetAnnotationObjectTexturePath', annotation_name, mesh_name)
 
     def simGetSegmentationColorMap(self):
         return load_colormap()
