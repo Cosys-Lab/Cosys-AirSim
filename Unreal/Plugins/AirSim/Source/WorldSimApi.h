@@ -54,6 +54,9 @@ public:
     virtual std::string getAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const override;
     virtual bool setAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex = false) override;
     virtual float getAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name) const override;
+    virtual bool setAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex = false) override;
+    virtual bool enableAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_namee, bool is_name_regex = false) override;
+    virtual std::string getAnnotationObjectTexturePath(const std::string& annotation_name, const std::string& mesh_name) const override;
 
     virtual bool addVehicle(const std::string& vehicle_name, const std::string& vehicle_type, const Pose& pose, const std::string& pawn_path = "") override;
 

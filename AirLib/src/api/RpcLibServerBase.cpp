@@ -292,11 +292,23 @@ namespace airlib
 
         pimpl_->server.bind("simSetAnnotationObjectValue", [&](const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex) -> bool {
             return getWorldSimApi()->setAnnotationObjectValue(annotation_name, mesh_name, greyscale_value, is_name_regex);
-            });
+        });
 
         pimpl_->server.bind("simGetAnnotationObjectValue", [&](const std::string& annotation_name, const std::string& mesh_name) -> float {
             return getWorldSimApi()->getAnnotationObjectValue(annotation_name, mesh_name);
-            });
+        });
+
+        pimpl_->server.bind("simSetAnnotationObjectTextureByPath", [&](const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex) -> bool {
+            return getWorldSimApi()->setAnnotationObjectTextureByPath(annotation_name, mesh_name, texture_path, is_name_regex);
+        });
+
+        pimpl_->server.bind("simEnableAnnotationObjectTextureByPath", [&](const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex) -> bool {
+            return getWorldSimApi()->enableAnnotationObjectTextureByPath(annotation_name, mesh_name, is_name_regex);
+        });
+
+        pimpl_->server.bind("simGetAnnotationObjectTexturePath", [&](const std::string& annotation_name, const std::string& mesh_name) -> std::string {
+            return getWorldSimApi()->getAnnotationObjectTexturePath(annotation_name, mesh_name);
+        });
 
         pimpl_->server.bind("simAddDetectionFilterMeshName", [&](const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name, const std::string& annotation_name) -> void {
             getWorldSimApi()->addDetectionFilterMeshName(type, mesh_name, CameraDetails(camera_name, vehicle_name), annotation_name);

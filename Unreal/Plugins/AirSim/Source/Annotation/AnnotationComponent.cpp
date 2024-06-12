@@ -234,6 +234,11 @@ void UAnnotationComponent::SetAnnotationColor(FColor NewAnnotationColor)
 	}
 }
 
+void UAnnotationComponent::SetAnnotationTexture(FString NewAnnotationTexturePath)
+{
+	// TODO
+}
+
 FColor UAnnotationComponent::GetAnnotationColor()
 {
 	return AnnotationColor;

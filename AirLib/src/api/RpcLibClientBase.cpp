@@ -279,6 +279,21 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simGetAnnotationObjectValue", annotation_name, mesh_name).as<float>();
         }
 
+        bool RpcLibClientBase::simSetAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex)
+        {
+            return pimpl_->client.call("simSetAnnotationObjectTextureByPath", annotation_name, mesh_name, texture_path, is_name_regex).as<bool>();
+        }
+
+        bool RpcLibClientBase::simEnableAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex)
+        {
+            return pimpl_->client.call("simEnableAnnotationObjectTextureByPath", annotation_name, mesh_name, is_name_regex).as<bool>();
+        }
+
+        std::string RpcLibClientBase::simGetAnnotationObjectTexturePath(const std::string& annotation_name, const std::string& mesh_name) const
+        {
+            return pimpl_->client.call("simGetAnnotationObjectTexturePath", annotation_name, mesh_name).as<std::string>();
+        }
+
         void RpcLibClientBase::simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name, const std::string& annotation_name)
         {
             pimpl_->client.call("simAddDetectionFilterMeshName", camera_name, type, mesh_name, vehicle_name, annotation_name);

@@ -88,6 +88,9 @@ namespace airlib
         string simGetAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const;
         bool simSetAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex = false);
         float simGetAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name) const;
+        bool simSetAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex = false);
+        bool simEnableAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex = false);
+        string simGetAnnotationObjectTexturePath(const std::string& annotation_name, const std::string& mesh_name) const;
 
         void simAddDetectionFilterMeshName(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& mesh_name, const std::string& vehicle_name = "", const std::string& annotation_name = "");
         void simSetDetectionFilterRadius(const std::string& camera_name, ImageCaptureBase::ImageType type, const float radius_cm, const std::string& vehicle_name = "", const std::string& annotation_name = "");

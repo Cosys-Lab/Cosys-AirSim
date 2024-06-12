@@ -93,6 +93,24 @@ public:
     bool UpdateGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool AddTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool UpdateTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool EnableTextureByPathAnnotationTagToActor(FString annotation_name, AActor* actor, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    bool EnableTextureByPathAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, bool update_annotation = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Annotation")
     bool DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "Annotation")
@@ -175,6 +193,10 @@ public:
 
     bool SetMeshGreyscaleAnnotationValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex, bool update_annotation = true);
     float GetMeshGreyscaleAnnotationValue(const std::string& annotation_name, const std::string& mesh_name);
+
+    bool EnableMeshTextureAnnotationByPath(const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex, bool update_annotation = true);
+    bool SetMeshTextureAnnotationPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex, bool update_annotation = true);
+    std::string GetMeshTextureAnnotationPath(const std::string& annotation_name, const std::string& mesh_name);
 
 	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
 

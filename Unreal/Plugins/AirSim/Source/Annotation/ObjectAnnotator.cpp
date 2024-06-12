@@ -18,12 +18,14 @@ FObjectAnnotator::FObjectAnnotator()
 	default_type_ = AnnotatorDefault::NoRender;
 }
 
-FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, AnnotatorDefault default_type, bool set_direct)
+FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, AnnotatorDefault default_type, bool set_direct, FString texture_path, FString texture_prefix)
 {
 	name_ = name;
 	type_ = type;
 	default_type_ = default_type;
 	set_direct_ = set_direct;
+	texture_path_ = texture_path;
+	texture_prefix_ = texture_prefix;
 }
 
 void FObjectAnnotator::Initialize(ULevel* level) {
@@ -36,7 +38,7 @@ void FObjectAnnotator::Initialize(ULevel* level) {
 		InitializeGreyscale(level);
 		break;
 	case AnnotatorType::Texture:
-		UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Texture not implemented yet."), *name_);
+		InitializeTexture(level);
 		break;
 	case AnnotatorType::InstanceSegmentation:
 		InitializeInstanceSegmentation(level);
@@ -315,6 +317,29 @@ bool FObjectAnnotator::SetComponentGreyScaleColorByValue(FString component_id, f
 	}
 }
 
+bool FObjectAnnotator::SetComponentTextureByPath(FString component_id, FString path)
+{
+	if (name_to_component_map_.Contains(component_id))
+	{
+
+		UMeshComponent* actor = name_to_component_map_[component_id];
+		if (UpdatePaintTextureComponent(actor, path))
+		{
+			// TODO
+			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted texture annotation of object %s to new texture %s"), *name_, *component_id, *path);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
 bool FObjectAnnotator::AnnotateNewActor(AActor* actor)
 {
 	switch (type_)
@@ -326,7 +351,7 @@ bool FObjectAnnotator::AnnotateNewActor(AActor* actor)
 		return AnnotateNewActorGreyscale(actor);
 		return false;
 	case AnnotatorType::Texture:
-		UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Texture not implemented yet."), *name_);
+		return AnnotateNewActorTexture(actor);
 		return false;
 	case AnnotatorType::InstanceSegmentation:
 		return AnnotateNewActorInstanceSegmentation(actor);
@@ -509,6 +534,57 @@ bool FObjectAnnotator::AnnotateNewActorGreyscale(AActor* actor) {
 	}
 }
 
+bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
+	if (actor && IsPaintable(actor)) {
+		TMap<FString, UMeshComponent*> paintable_components_meshes;
+		TMap<FString, TArray<FName>> paintable_components_tags;
+		getPaintableComponentMeshesAndTags(actor, &paintable_components_meshes, &paintable_components_tags);
+		for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
+		{
+			FName* found_tag = paintable_components_tags[it.Key()].FindByPredicate([this](const FName& tagFName) {
+				FString tag = tagFName.ToString();
+				return tag.Contains(name_);
+				});
+
+			if (found_tag != nullptr) {
+				FString tag = found_tag->ToString();
+				TArray<FString> splitTag;
+				tag.ParseIntoArray(splitTag, TEXT("_"), true);
+
+				FString new_texture = FString(TEXT(""));
+
+				// TODO
+
+				if (name_to_component_map_.Contains(it.Key())) {
+					// TODO
+					
+					if (set_direct_) {
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Updated texture annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
+
+					}
+					else {
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Updated texture annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
+					}
+				}
+				else {
+					// TODO
+					if (set_direct_) {
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
+
+					}
+					else {
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
+					}
+				}
+			}
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 bool FObjectAnnotator::DeleteActor(AActor* actor)
 {
 	if (actor && IsPaintable(actor)) {
@@ -579,6 +655,22 @@ float FObjectAnnotator::GetComponentGreyscaleValue(FString component_id)
 	else
 	{
 		return 0.;
+	}
+}
+
+FString FObjectAnnotator::GetComponentTexturePath(FString component_id)
+{
+	if (name_to_texture_path_map_.Num() == 0)
+	{
+		return FString(TEXT(""));
+	}
+	if (name_to_texture_path_map_.Contains(component_id))
+	{
+		return name_to_texture_path_map_[component_id];
+	}
+	else
+	{
+		return FString(TEXT(""));
 	}
 }
 
@@ -743,6 +835,58 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 	UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Completed full level greyscale annotation."), *name_);
 }
 
+void FObjectAnnotator::InitializeTexture(ULevel* InLevel)
+{
+	UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Starting full level texture annotation by searching for tags."), *name_);
+	for (AActor* actor : InLevel->Actors)
+	{
+		if (actor && IsPaintable(actor))
+		{
+
+			TMap<FString, UMeshComponent*> paintable_components_meshes;
+			TMap<FString, TArray<FName>> paintable_components_tags;
+			getPaintableComponentMeshesAndTags(actor, &paintable_components_meshes, &paintable_components_tags);
+			for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
+			{
+				FName* found_tag = paintable_components_tags[it.Key()].FindByPredicate([this](const FName& tagFName) {
+					FString tag = tagFName.ToString();
+					return tag.Contains(name_);
+					});
+
+				if (found_tag != nullptr) {
+					FString tag = found_tag->ToString();
+					TArray<FString> splitTag;
+					tag.ParseIntoArray(splitTag, TEXT("_"), true);
+					name_to_component_map_.Emplace(it.Key(), it.Value());
+
+					FString new_texture = FString("test/one/two/three/");
+					// TODO
+					if (set_direct_) {
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new texture annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
+
+					}
+					else {
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new texture annotated object %s with texture: # %s"), *name_, *it.Key(), *new_texture);
+					}
+				}
+				else if (default_type_ == AnnotatorDefault::DefaultColor) {
+					// TODO
+					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged texture annotated object %s with default texture"), *name_, *it.Key());
+				}
+
+			}
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Completed full level RGB annotation."), *name_);
+}
+
+bool FObjectAnnotator::IsRGBColorValid(FColor color) {
+	if (ColorGenerator_.GetIndexForColor(color) != INDEX_NONE)
+		return true;
+	return false;
+}
+
+
 bool FObjectAnnotator::PaintRGBComponent(UMeshComponent* component, const FColor& color)
 {
 	if (!component) return false;
@@ -758,13 +902,6 @@ bool FObjectAnnotator::PaintRGBComponent(UMeshComponent* component, const FColor
 	AnnotationComponent->SetAnnotationColor(NewColor);
 	AnnotationComponent->MarkRenderStateDirty();
 	return true;
-}
-
-
-bool FObjectAnnotator::IsRGBColorValid(FColor color) {
-	if (ColorGenerator_.GetIndexForColor(color) != INDEX_NONE)
-		return true;
-	return false;
 }
 
 bool FObjectAnnotator::UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color)
@@ -790,6 +927,42 @@ bool FObjectAnnotator::UpdatePaintRGBComponent(UMeshComponent* component, const 
 	return true;
 }
 
+bool FObjectAnnotator::PaintTextureComponent(UMeshComponent* component, const FString& texture_path)
+{
+	if (!component) return false;
+
+
+	FName componentName = *component->GetName();
+	FString newName = name_ + "_" + componentName.ToString();
+	UAnnotationComponent* AnnotationComponent = NewObject<UAnnotationComponent>(component, FName(*newName));
+	AnnotationComponent->SetupAttachment(component);
+	AnnotationComponent->RegisterComponent();
+	AnnotationComponent->SetAnnotationTexture(texture_path);
+	AnnotationComponent->MarkRenderStateDirty();
+	return true;
+}
+
+bool FObjectAnnotator::UpdatePaintTextureComponent(UMeshComponent* component, const FString& texture_path)
+{
+	if (!component) return false;
+
+	TArray<UActorComponent*> AnnotationComponents = component->GetAttachmentRootActor()->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
+
+	if (AnnotationComponents.Num() == 0)return PaintTextureComponent(component, texture_path);
+
+	for (UActorComponent* Component : AnnotationComponents)
+	{
+		UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(Component);
+		FName componentFName = *AnnotationComponent->GetName();
+		FString componentName = componentFName.ToString();
+		if (componentName.Contains(name_)) {
+			AnnotationComponent->SetAnnotationTexture(texture_path);
+			AnnotationComponent->MarkRenderStateDirty();
+		}
+	}
+	return true;
+}
+
 bool FObjectAnnotator::DeleteComponent(UMeshComponent* component)
 {
 	if (!component) return false;
@@ -806,7 +979,7 @@ bool FObjectAnnotator::DeleteComponent(UMeshComponent* component)
 	return true;
 }
 
-void FObjectAnnotator::SetViewForAnnotationRender(FEngineShowFlags& show_flags)
+void FObjectAnnotator::SetViewForAnnotationRender(FEngineShowFlags& show_flags, bool show_textures)
 {
 	show_flags.SetMaterials(false);
 	show_flags.SetLighting(false);
@@ -907,6 +1080,7 @@ void FObjectAnnotator::EndPlay() {
 	annotation_component_list_.Empty();
 	name_to_gammacorrected_color_map_.Empty();
 	name_to_value_map_.Empty();
+	name_to_texture_path_map_.Empty();
 }
 
 int32 FColorGenerator::GetChannelValue(uint32 index)

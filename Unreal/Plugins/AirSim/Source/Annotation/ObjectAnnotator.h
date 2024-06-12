@@ -39,12 +39,13 @@ public:
 
 	FObjectAnnotator();
 
-	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, AnnotatorDefault default_type = AnnotatorDefault::NoRender, bool set_direct = false);
+	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, AnnotatorDefault default_type = AnnotatorDefault::NoRender, bool set_direct = false, FString texture_path = FString(""), FString texture_prefix = FString(""));
 
 	void Initialize(ULevel* level);
 	void InitializeInstanceSegmentation(ULevel* level);
 	void InitializeRGB(ULevel* level);
 	void InitializeGreyscale(ULevel* level);
+	void InitializeTexture(ULevel* level);
 
 	bool DeleteActor(AActor* actor);
 
@@ -52,6 +53,7 @@ public:
 	bool AnnotateNewActorInstanceSegmentation(AActor* actor);
 	bool AnnotateNewActorRGB(AActor* actor);
 	bool AnnotateNewActorGreyscale(AActor* actor);
+	bool AnnotateNewActorTexture(AActor* actor);
 
 	uint32 GetComponentIndex(FString component_id);
 
@@ -63,10 +65,13 @@ public:
 	bool SetComponentGreyScaleColorByValue(FString component_id, float greyscale_value);
 	float GetComponentGreyscaleValue(FString component_id);
 
+	bool SetComponentTextureByPath(FString component_id, FString path);
+	FString GetComponentTexturePath(FString component_id);
+
 	void UpdateAnnotationComponents(UWorld* World);
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> GetAnnotationComponents();
 
-	static void SetViewForAnnotationRender(FEngineShowFlags& show_flags);
+	static void SetViewForAnnotationRender(FEngineShowFlags& show_flags, bool show_textures = false);
 
 	bool IsDirect();
 	FObjectAnnotator::AnnotatorType GetType();
@@ -85,9 +90,15 @@ private:
 	FString name_;
 	AnnotatorDefault default_type_;
 	bool set_direct_;
+	FString texture_path_;
+	FString texture_prefix_;
 
 	bool PaintRGBComponent(UMeshComponent* component, const FColor& color);
 	bool UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color);
+
+	bool PaintTextureComponent(UMeshComponent* component, const FString& texture_path);
+	bool UpdatePaintTextureComponent(UMeshComponent* component, const FString& texture_path);
+
 	bool DeleteComponent(UMeshComponent* component);
 
 	void getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes);
@@ -98,6 +109,7 @@ private:
 	TMap<FString, uint32> name_to_color_index_map_;
 	TMap<FString, FString> name_to_gammacorrected_color_map_;
 	TMap<FString, float> name_to_value_map_;
+	TMap<FString, FString> name_to_texture_path_map_;
 	TMap<FString, FString> color_to_name_map_;
 	TMap<FString, FString> gammacorrected_color_to_name_map_;
 	TMap<FString, UMeshComponent*> name_to_component_map_;

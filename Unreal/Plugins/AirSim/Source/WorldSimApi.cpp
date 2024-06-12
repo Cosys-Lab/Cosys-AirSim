@@ -342,6 +342,21 @@ float WorldSimApi::getAnnotationObjectValue(const std::string& annotation_name, 
     return simmode_->GetMeshGreyscaleAnnotationValue(annotation_name, mesh_name);
 }
 
+bool WorldSimApi::setAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex)
+{
+    return simmode_->SetMeshTextureAnnotationPath(annotation_name, mesh_name, texture_path, is_name_regex);
+}
+
+bool WorldSimApi::enableAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex)
+{
+    return simmode_->enableMeshTextureAnnotationByPath(annotation_name, mesh_name, is_name_regex);
+}
+
+std::string  WorldSimApi::getAnnotationObjectTexturePath(const std::string& annotation_name, const std::string& mesh_name) const
+{
+    return simmode_->GetMeshTextureAnnotationPath(annotation_name, mesh_name);
+}
+
 void WorldSimApi::printLogMessage(const std::string& message,
                                   const std::string& message_param, unsigned char severity)
 {

@@ -34,6 +34,8 @@ public:
 
 	void SetAnnotationColor(FColor AnnotationColor);
 
+	void SetAnnotationTexture(FString NewAnnotationTexturePath);
+
 	FColor GetAnnotationColor();
 
 	virtual void OnRegister() override;
@@ -52,6 +54,7 @@ private:
 	UMaterialInstanceDynamic* AnnotationMID;
 
 	FColor AnnotationColor;
+	FString AnnotationTexturePath;
 
 	bool bSkeletalMesh; // indicate whether this is for a SkeletalMesh
 
