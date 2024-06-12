@@ -41,7 +41,10 @@ For example:
         {
             "Name": "TextureTest",
             "Type": 2,
-            "Default": true
+            "Default": false,
+            "SetDirect": false,
+            "TexturePath": "/Game/AnnotationTest",
+            "TexturePrefix": "Test1"
         }
     ],    
   ...
@@ -63,7 +66,7 @@ Similar to [instance segmentation](instance_segmentation.md), you can use the RG
 You can do this by directly setting the color yourself (direct mode), or by assigning the object an index (0-2744000 unique colors) that will be linked to the colormap.
 To use direct mode, set the settings of this layer with `SetDirect` to `true`. For index mode, set to `false`.
 Actor/component tags have the following format: `annotationName_R_G_B` for direct mode or `annotationName_ID` for direct mode.
-So if for example your RGB annotation layer is called `RGBTest`, you can tag an actor with the tag `RGBTest_255_0_0` to give it a red color. 
+So if for example your RGB annotation layer is called `GreyscaleTest`, you can tag an actor with the tag `RGBTest_255_0_0` to give it a red color. 
 Or for index mode, `RGBTest_5` to give it the fifth color in the colormap. 
 
 When `Default` is set to 1, all objects without a tag for this layer will be rendered in black.
@@ -79,7 +82,7 @@ Several RPC API functions are available to influence or retrieve the RGB annotat
  * `simGetAnnotationObjectID(annotation_name, mesh_name)` to get the ID of an object in index mode
  * `simGetAnnotationObjectColor(annotation_name, mesh_name)` to get the color of an object in direct mode
  * `simIsValidColor(r,g,b)` You can check if a color is valid using this function
- * 
+
 The same is available in Unreal Blueprint and Unreal c++. You can find  the functions in the `Annotation` category.
  * `Add RGBDirect Annotation Tag to Component/Actor(annotation_name, component/actor, color, update_annotation=true/false)` to set the color of an object in direct mode
  * `Update RGBDirect Annotation Tag to Component/Actor(annotation_name, component/actor, color, update_annotation=true/false)` to update the color of an object in direct mode already in the system
@@ -90,7 +93,7 @@ The same is available in Unreal Blueprint and Unreal c++. You can find  the func
 ### Type 2: Greyscale
 You can use the greyscale annotation layer to tag objects in the environment with a float value between 0 and 1. Note that this has the precision of uint8.
 Actor/component tags have the following format: `annotationName_value`.
-So if for example your RGB annotation layer is called `GreyscaleTest`, you can tag an actor with the tag `RGBTest_0.76` to give it a value of 0.76 which would result in a color of (194, 194, 194).
+So if for example your RGB annotation layer is called `GreyscaleTest`, you can tag an actor with the tag `GreyscaleTest_0.76` to give it a value of 0.76 which would result in a color of (194, 194, 194).
 
 When `Default` is set to 1, all objects without a tag for this layer will be rendered in black.
 
@@ -103,6 +106,35 @@ The same is available in Unreal Blueprint and Unreal c++. You can find  the func
  * `Update Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)` to update the value of an object
 
 ### Type 3: Texture
+You can use the texture annotation layer to tag objects in the environment with a specific texture. This can be a color or greyscale texture or you can mix them. Choice is up to you.
+You can do this by directly setting the texture yourself (direct mode), or by assigning a texture that is loaded based on a set path and the name of the mesh.
+To use direct mode, set the settings of this layer with `SetDirect` to `true`. For path reference mode, set to `false`.
+
+Actor/component tags have the following format: `annotationName_texturepath` for direct mode.
+The Unreal texture path name has to be rather specific:
+ - If your texture is in the environment content folder, you must add `/Game/` in front of the path. 
+ - If it is in the Cosys-AirSim plugin content folder, you must add `/AirSim/` in front of the path. 
+ - For Engine textures, you must add `/Engine/` in front of the path.
+So if for example your texture annotation layer is called `TextureTest`, and your texture *TestTexture1* is in the game content folder under a subfolder *MyTextures* you can tag an actor with the tag `TextureTest_/Game/MyTextures/TestTexture1` to give it this texture. 
+
+For path reference mod, the content of the tag is not really important as long as it contains the name of the annotation layer and an underscore, for example `annotationName_enable`.
+What is important is in reference mode is that you have a texture in the content folder with the name of the mesh if you do enable this object by setting a tag.
+You must place your textures in the folder defined by the `TexturePath` setting in the settings.json file for this layer. And the texture must have the same name as the mesh and start with the prefix set by the `TexturePrefix` setting in the settings.json file for this layer followed by a hyphen.
+So for example if you have a static mesh called *TestCubeMesh1* and your texture layer is called `TextureTest` with the settings `TexturePath` set to `/Game/AnnotationTest` and `TexturePrefix` set to `Test1`, you must have a texture called `Test1-TestCubeMesh1` in the folder `/Game/AnnotationTest`.
+
+When `Default` is set to 1, all objects without a tag for this layer will be rendered in black.
+
+Several RPC API functions are available to influence or retrieve the RGB annotation layer. For example in Python:
+ * `simSetAnnotationObjectTextureByPath(annotation_name, mesh_name, texture_path, is_name_regex=False/True)` to set the texture of an object in direct mode, the texture path should be same format as described above, for example `/Game/MyTextures/TestTexture1` (regex allows to set multiple with wildcards for example)
+ * `simEnableAnnotationObjectTextureByPath(annotation_name, mesh_name, r, g, b, is_name_regex=False/True)` to enable the texture of an object in relative path mode, this does require a texture in the relative path as described above!  (regex allows to set multiple with wildcards for example)
+ * `simGetAnnotationObjectTexturePath(annotation_name, mesh_name)` to get the texture path of an object
+
+The same is available in Unreal Blueprint and Unreal c++. You can find  the functions in the `Annotation` category.
+ * `Add Texture Direct Annotation Tag to Component/Actor By Path(annotation_name, component/actor, texture_path, update_annotation=true/false)` to set the texture of an object in direct mode, the texture path should be same format as described above, for example `/Game/MyTextures/TestTexture1`
+ * `Update Texture Direct Annotation Tag to Component/Actor By Path(annotation_name, component/actor, texture_path, update_annotation=true/false)` to update texture of an object in direct mode that is already in the system, the texture path should be same format as described above, for example `/Game/MyTextures/TestTexture1`
+ * `Add Texture Direct Annotation Tag to Component/Actor(annotation_name, component/actor, texture, update_annotation=true/false)` to set the texture of an object in direct mode, the texture can be directly referenced as UTexture* Object
+ * `Update Texture Direct Annotation Tag to Component/Actor(annotation_name, component/actor, texture, update_annotation=true/false)` to update texture of an object in direct mode that is already in the system, the texture can be directly referenced as UTexture* Object
+ * `Enable Texture By Path Annotation Tag to Component/Actor(annotation_name, component/actor, update_annotation=true/false)` to enable the texture of an object in relative path mode, this does require a texture in the relative path as described above! 
 
 ### Common functionality
 By default, when the world loads, all meshes are checked for tags and the annotation layers are updated accordingly. 
