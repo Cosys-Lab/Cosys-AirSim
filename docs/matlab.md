@@ -23,7 +23,7 @@ The files are in the _Matlab_ folder. A test script _airsim_full_test.m_ is also
 * Get/set vehicle pose
 * Get instance segmentation groundtruth table
 * Get object pose(s)
-* Get sensor data (imu, echo (active/passive), (gpu)LiDAR, camera (info, rgb, depth, segmentation))
+* Get sensor data (imu, echo (active/passive), (gpu)LiDAR, camera (info, rgb, depth, segmentation, annotation))
 
 Do note the test script requires next to the toolboxes listed above in the Prerequisites the following Matlab toolboxes:
 

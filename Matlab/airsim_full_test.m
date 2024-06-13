@@ -4,7 +4,7 @@ close all
 %% Setup connection
 
 %Define client
-vehicle_name = "airsimvehicle";
+vehicle_name = "robot1";
 airSimClient = AirSimClient(IsDrone=false, ApiControl=false, IP="127.0.0.1", port=41451, vehicleName=vehicle_name);
 
 %% Groundtruth labels
@@ -163,36 +163,45 @@ cameraSensorName = "frontcamera";
 %% Get single camera images
 % Get images sequentially 
 
-cameraSensorName = "frontcamera";
+cameraSensorName = "front_center";
 [rgbImage, rgbCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.Scene);
 [segmentationImage, segmentationCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.Segmentation);
 [depthImage, depthCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.DepthPlanar);
+[annotationImage, annotationCameraIimestamp] = airSimClient.getCameraImage(cameraSensorName, AirSimCameraTypes.Annotation, "TextureTest");
 figure;
-subplot(3, 1, 1);
+subplot(4, 1, 1);
 imshow(rgbImage)
 title("RGB Camera Image")
-subplot(3, 1, 2);
+subplot(4, 1, 2);
 imshow(segmentationImage)
 title("Segmentation Camera Image")
-subplot(3, 1, 3);
+subplot(4, 1, 3);
 imshow(depthImage ./ max(max(depthImage)).* 255, gray)
 title("Depth Camera Image")
+subplot(4, 1, 4);
+imshow(annotationImage)
+title("Annotation Camera Image")
 drawnow
 
 %% Get synced camera images
 % By combining the image requests they will be synced 
 % and taken in the same frame
 
-cameraSensorName = "backcamera";
-[images, cameraIimestamp] = airSimClient.getCameraImages(cameraSensorName, [AirSimCameraTypes.Scene, AirSimCameraTypes.Segmentation, AirSimCameraTypes.DepthPlanar]);
+cameraSensorName = "front_center";
+[images, cameraIimestamp] = airSimClient.getCameraImages(cameraSensorName, ...
+                                                         [AirSimCameraTypes.Scene, AirSimCameraTypes.Segmentation, AirSimCameraTypes.DepthPlanar, AirSimCameraTypes.Annotation], ...
+                                                         ["", "", "", "TextureTest"]);
 figure;
-subplot(3, 1, 1);
+subplot(4, 1, 1);
 imshow(images{1})
 title("Synced RGB Camera Image")
-subplot(3, 1, 2);
+subplot(4, 1, 2);
 imshow(images{2})
 title("Synced Segmentation Camera Image")
-subplot(3, 1, 3);
+subplot(4, 1, 3);
 imshow(images{3} ./ max(max(images{3})).* 255, gray)
 title("Synced Depth Camera Image")
+subplot(4, 1, 4);
+imshow(images{4})
+title("Synced Annotation Camera Image")
 drawnow

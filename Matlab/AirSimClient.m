@@ -342,11 +342,19 @@ classdef AirSimClient < handle
             end    
         end    
 
-        function [image, timestamp] = getCameraImage(obj, sensorName, cameraType)
+        function [image, timestamp] = getCameraImage(obj, sensorName, cameraType, annotationLayer)
+            arguments
+                obj AirSimClient
+                sensorName string 
+                cameraType uint32
+                annotationLayer string = ""
+            end
             % GET_CAMERA_IMAGE Get camera data from a camera sensor
 
             if cameraType == 1 || cameraType == 2 || cameraType == 3 || cameraType == 4
                 image_request = py.airsim.ImageRequest(sensorName, int32(cameraType), true, false);
+            elseif cameraType == 10
+                image_request = py.airsim.ImageRequest(sensorName, int32(cameraType), false, false, annotationLayer);
             else
                 image_request = py.airsim.ImageRequest(sensorName, int32(cameraType), false, false);
             end
@@ -366,13 +374,21 @@ classdef AirSimClient < handle
             timestamp = floor(double(double(camera_image.time_stamp))/1e9);
         end
 
-        function [images, timestamp] = getCameraImages(obj, sensorName, cameraTypes)
+        function [images, timestamp] = getCameraImages(obj, sensorName, cameraTypes, annotationLayers)
+            arguments
+                obj AirSimClient
+                sensorName string 
+                cameraTypes uint32
+                annotationLayers string = ""
+            end
             % GET_CAMERA_IMAGES Get syncedcamera data from a camera sensor
             images = {};
             image_requests = [];
             for i = 1: numel(cameraTypes)
                 if cameraTypes(i) == 1 || cameraTypes(i) == 2 || cameraTypes(i) == 3 || cameraTypes(i) == 4
                     image_requests{i} = py.airsim.ImageRequest(sensorName, int32(cameraTypes(i)), true, false);
+                elseif cameraTypes(i) == 10
+                    image_requests{i} = py.airsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false, annotationLayers(i));
                 else
                     image_requests{i} = py.airsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false);
                 end
