@@ -65,6 +65,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Added [Matlab API](docs/matlab.md) implementation.
 * Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
+* Added [multi-layer annotation](docs/annotation.md) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
 * Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.

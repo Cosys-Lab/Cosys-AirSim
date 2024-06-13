@@ -1,7 +1,7 @@
 ### May 2024
 * Updated Unreal to 5.2.1 and merge of [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum).
 * Updated instance segmentation to use proxy meshing, no longer requiring custom Unreal Engine fork. 
-* Added modular object annotation system for generating groundtruth data using proxy meshing.
+* Added [multi-layer annotation](docs/annotation.md) with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Updated ground vehicles to use ChaosVehicles instead of PhysXVehicles. Some issues may arise.
 * Added parallelization to LiDAR sensor to speed up pointcloud generation.
 * Added optional parallelization to echo sensor to speed up pointcloud generation. See echo documentation for more info.
