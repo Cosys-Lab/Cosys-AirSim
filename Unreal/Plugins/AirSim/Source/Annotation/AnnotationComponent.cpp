@@ -275,6 +275,7 @@ void UAnnotationComponent::SetAnnotationTexture(FString NewAnnotationTexturePath
 void UAnnotationComponent::SetAnnotationTexture(UTexture* NewAnnotationTexture)
 {
 	bTexture = true;
+	AnnotationMID->SetScalarParameterValue("TextureEnabled", 1);
 	TArray<FString> splitPath;
 	NewAnnotationTexture->GetPathName().ParseIntoArray(splitPath, TEXT("."), true);
 	FString TextureFilePath = splitPath[0];

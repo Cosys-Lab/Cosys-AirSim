@@ -89,11 +89,11 @@ private:
 	FString texture_path_;
 	FString texture_prefix_;
 
-	bool PaintRGBComponent(UMeshComponent* component, const FColor& color);
-	bool UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color);
+	bool PaintRGBComponent(UMeshComponent* component, const FColor& color, const FString& component_name);
+	bool UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color, const FString& component_name);
 
-	bool PaintTextureComponent(UMeshComponent* component, const FString& texture_path);
-	bool UpdatePaintTextureComponent(UMeshComponent* component, const FString& texture_path);
+	bool PaintTextureComponent(UMeshComponent* component, const FString& texture_path, const FString& component_name);
+	bool UpdatePaintTextureComponent(UMeshComponent* component, const FString& texture_path, const FString& component_name);
 
 	bool DeleteComponent(UMeshComponent* component);
 
