@@ -30,7 +30,8 @@ class VehicleClient:
         """
         return self.client.call('ping')
 
-    def getClientVersion(self):
+    @staticmethod
+    def getClientVersion():
         """
         Get the version of the client
 
@@ -48,7 +49,8 @@ class VehicleClient:
         """
         return self.client.call('getServerVersion')
 
-    def getMinRequiredServerVersion(self):
+    @staticmethod
+    def getMinRequiredServerVersion():
         """
         Get the minimum required server version for compatibility
 
@@ -80,7 +82,8 @@ class VehicleClient:
         """
         Returns true if API control is established.
 
-        If false (which is default) then API calls would be ignored. After a successful call to `enableApiControl`, `isApiControlEnabled` should return true.
+        If false (which is default) then API calls would be ignored. After a successful call to `enableApiControl`,
+         `isApiControlEnabled` should return true.
 
         Args:
             vehicle_name (str, optional): Name of the vehicle
@@ -132,7 +135,8 @@ class VehicleClient:
 
     def simContinueForFrames(self, frames):
         """
-        Continue (or resume if paused) the simulation for the specified number of frames, after which the simulation will be paused.
+        Continue (or resume if paused) the simulation for the specified number of frames, after which the simulation
+        will be paused.
 
         Args:
             frames (int): Frames to run the simulation for
@@ -198,7 +202,8 @@ class VehicleClient:
             tags (str): string of "," or ", " delimited tags to identify on which actors to perform the swap
             tex_id (int, optional): indexes the array of textures assigned to each actor undergoing a swap
 
-                                    If out-of-bounds for some object's texture set, it will be taken modulo the number of textures that were available
+                                    If out-of-bounds for some object's texture set, it will be taken modulo the number
+                                    of textures that were available
             component_id (int, optional): Index of the component to apply the texture to
             material_id (int, optional): Index of the material to apply the texture to
 
@@ -233,14 +238,16 @@ class VehicleClient:
         Returns:
             bool: True if material was set
         """
-        return self.client.call("simSetObjectMaterialFromTexture", object_name, texture_path, component_id)
+        return self.client.call("simSetObjectMaterialFromTexture", object_name, texture_path,
+                                component_id)
 
     def simSetTimeOfDay(self, is_enabled, start_datetime="", is_start_datetime_dst=False, celestial_clock_speed=1,
                         update_interval_secs=60, move_sun=True):
         """
         Control the position of Sun in the environment
 
-        Sun's position is computed using the coordinates specified in `OriginGeopoint` in settings for the date-time specified in the argument,
+        Sun's position is computed using the coordinates specified in `OriginGeopoint` in settings for the date-time
+        specified in the argument,
         else if the string is empty, current date & time is used
 
         Args:
@@ -248,12 +255,14 @@ class VehicleClient:
             start_datetime (str, optional): Date & Time in %Y-%m-%d %H:%M:%S format, e.g. `2018-02-12 15:20:00`
             is_start_datetime_dst (bool, optional): True to adjust for Daylight Savings Time
             celestial_clock_speed (float, optional): Run celestial clock faster or slower than simulation clock
-                                                     E.g. Value 100 means for every 1 second of simulation clock, Sun's position is advanced by 100 seconds
+                                                     E.g. Value 100 means for every 1 second of simulation clock, Sun's
+                                                     position is advanced by 100 seconds
                                                      so Sun will move in sky much faster
             update_interval_secs (float, optional): Interval to update the Sun's position
             move_sun (bool, optional): To move the Sun or not
         """
-        self.client.call('simSetTimeOfDay', is_enabled, start_datetime, is_start_datetime_dst, celestial_clock_speed,
+        self.client.call('simSetTimeOfDay', is_enabled, start_datetime, is_start_datetime_dst,
+                         celestial_clock_speed,
                          update_interval_secs, move_sun)
 
     def simEnableWeather(self, enable):
@@ -283,7 +292,8 @@ class VehicleClient:
         `string_to_uint8_array()` can be used to convert into Numpy uint8 array
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+            can also be used
             image_type (ImageType): Type of image required
             vehicle_name (str, optional): Name of the vehicle with the camera
             annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
@@ -561,8 +571,10 @@ class VehicleClient:
     def simRunConsoleCommand(self, command):
         """
         Allows the client to execute a command in Unreal's native console, via an API.
-        Affords access to the countless built-in commands such as "stat unit", "stat fps", "open [map]", adjust any config settings, etc. etc.
-        Allows the user to create bespoke APIs very easily, by adding a custom event to the level blueprint, and then calling the console command "ce MyEventName [args]". No recompilation of Cosys-AirSim needed!
+        Affords access to the countless built-in commands such as "stat unit", "stat fps", "open [map]", adjust any
+        config settings, etc. etc.
+        Allows the user to create bespoke APIs very easily, by adding a custom event to the level blueprint, and then
+         calling the console command "ce MyEventName [args]". No recompilation of Cosys-AirSim needed!
 
         Args:
             command (str): Desired Unreal Engine Console command to run.
@@ -598,7 +610,8 @@ class VehicleClient:
         """
         Set the pose of the vehicle.
 
-        If you don't want to change position (or orientation), then just set the components of position (or orientation) to floating point NaN values.
+        If you don't want to change position (or orientation), then just set the components of position
+         (or orientation) to floating point NaN values.
 
         Args:
             pose (Pose): Desired pose of the vehicle.
@@ -609,7 +622,8 @@ class VehicleClient:
 
     def simGetVehiclePose(self, vehicle_name=''):
         """
-        Gets the pose of the specified vehicle. The position inside the returned Pose is in the frame of the vehicle's starting point.
+        Gets the pose of the specified vehicle. The position inside the returned Pose is in the frame of
+         the vehicle's starting point.
 
         Args:
             vehicle_name (str, optional): Name of the vehicle to get the pose of.
@@ -652,7 +666,8 @@ class VehicleClient:
         Set the pose of the object (actor) in the environment.
 
         The specified actor must have Mobility set to movable, otherwise there will be undefined behavior.
-        See https://www.unrealengine.com/en-US/blog/moving-physical-objects for details on how to set Mobility and the effect of the Teleport parameter.
+        See https://www.unrealengine.com/en-US/blog/moving-physical-objects for details on how to set Mobility and
+        the effect of the Teleport parameter.
 
         Args:
             object_name (str): Name of the object (actor) to move.
@@ -694,7 +709,8 @@ class VehicleClient:
         """
         Lists the objects present in the environment.
 
-        The default behavior is to list all objects. A regex can be used to return a smaller list of matching objects or actors.
+        The default behavior is to list all objects. A regex can be used to return a smaller list
+        of matching objects or actors.
 
         Args:
             name_regex (str, optional): String to match actor names against, e.g., "Cylinder.*".
@@ -971,7 +987,8 @@ class VehicleClient:
         """
         return self.client.call('simGetAnnotationObjectTexturePath', annotation_name, mesh_name)
 
-    def simGetSegmentationColorMap(self):
+    @staticmethod
+    def simGetSegmentationColorMap():
         """
         Gets the segmentation color map.
 
@@ -980,7 +997,8 @@ class VehicleClient:
         """
         return load_colormap()
 
-    def simIsValidColor(self, r, g, b):
+    @staticmethod
+    def simIsValidColor(r, g, b):
         """
         Checks if the specified color is valid.
 
@@ -1001,7 +1019,8 @@ class VehicleClient:
         For example: simAddDetectionFilterMeshName("Car_*") will detect all instance named "Car_*"
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             image_type (ImageType): Type of image required
             mesh_name (str): mesh name in wild card format
             vehicle_name (str, optional): Vehicle which the camera is associated with
@@ -1016,7 +1035,8 @@ class VehicleClient:
         Set detection radius for all cameras
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             image_type (ImageType): Type of image required
             radius_cm (int): Radius in [cm]
             vehicle_name (str, optional): Vehicle which the camera is associated with
@@ -1030,7 +1050,8 @@ class VehicleClient:
         Clear all mesh names from detection filter
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             image_type (ImageType): Type of image required
             vehicle_name (str, optional): Vehicle which the camera is associated with
             annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
@@ -1044,7 +1065,8 @@ class VehicleClient:
         Get current detections
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             image_type (ImageType): Type of image required
             vehicle_name (str, optional): Vehicle which the camera is associated with
             annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
@@ -1060,10 +1082,13 @@ class VehicleClient:
         """
         Prints the specified message in the simulator's window.
 
-        If message_param is supplied, then it's printed next to the message and in that case if this API is called with same message value
-        but different message_param again then previous line is overwritten with new line (instead of API creating new line on display).
+        If message_param is supplied, then it's printed next to the message and in that case if this API is
+        called with same message value
+        but different message_param again then previous line is overwritten with new line (instead of API creating
+        new line on display).
 
-        For example, `simPrintLogMessage("Iteration: ", to_string(i))` keeps updating same line on display when API is called with different values of i.
+        For example, `simPrintLogMessage("Iteration: ", to_string(i))` keeps updating same line on display when API
+        is called with different values of i.
         The valid values of severity parameter is 0 to 3 inclusive that corresponds to different colors.
 
         Args:
@@ -1078,7 +1103,8 @@ class VehicleClient:
         Get details about the camera
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             vehicle_name (str, optional): Vehicle which the camera is associated with
 
         Returns:
@@ -1092,7 +1118,8 @@ class VehicleClient:
         Get camera distortion parameters
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             vehicle_name (str, optional): Vehicle which the camera is associated with
 
         Returns:
@@ -1106,7 +1133,8 @@ class VehicleClient:
         Set camera distortion parameters
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             distortion_params (dict): Dictionary of distortion param names and corresponding values
                                         {"K1": 0.0, "K2": 0.0, "K3": 0.0, "P1": 0.0, "P2": 0.0}
             vehicle_name (str, optional): Vehicle which the camera is associated with
@@ -1120,7 +1148,8 @@ class VehicleClient:
         Set single camera distortion parameter
 
         Args:
-            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
+            camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc.
+                can also be used
             param_name (str): Name of distortion parameter
             value (float): Value of distortion parameter
             vehicle_name (str, optional): Vehicle which the camera is associated with
@@ -1172,7 +1201,8 @@ class VehicleClient:
         """
         Set the kinematics state of the vehicle
 
-        If you don't want to change position (or orientation) then just set components of position (or orientation) to floating point nan values
+        If you don't want to change position (or orientation) then just set components of position (or orientation)
+        to floating point nan values
 
         Args:
             state (KinematicsState): Desired Pose pf the vehicle
@@ -1218,7 +1248,8 @@ class VehicleClient:
         Returns:
             BarometerData:
         """
-        return BarometerData.from_msgpack(self.client.call('getBarometerData', barometer_name, vehicle_name))
+        return BarometerData.from_msgpack(self.client.call('getBarometerData', barometer_name,
+                                                           vehicle_name))
 
     def getMagnetometerData(self, magnetometer_name='', vehicle_name=''):
         """
@@ -1229,7 +1260,8 @@ class VehicleClient:
         Returns:
             MagnetometerData:
         """
-        return MagnetometerData.from_msgpack(self.client.call('getMagnetometerData', magnetometer_name, vehicle_name))
+        return MagnetometerData.from_msgpack(self.client.call('getMagnetometerData', magnetometer_name,
+                                                              vehicle_name))
 
     def getGpsData(self, gps_name='', vehicle_name=''):
         """
@@ -1319,29 +1351,30 @@ class VehicleClient:
 
     def getWifiData(self, wifi_name='', vehicle_name=''):
         """
-        Retrieves data from the specified WiFi sensor.
+        Retrieves data from the specified Wi-Fi sensor.
 
         Args:
-            wifi_name (str, optional): Name of the WiFi sensor to get data from, specified in settings.json.
+            wifi_name (str, optional): Name of the Wi-Fi sensor to get data from, specified in settings.json.
             vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
 
         Returns:
-            WifiData: Data from the specified WiFi sensor.
+            WifiData: Data from the specified Wi-Fi sensor.
         """
         return WifiData.from_msgpack(self.client.call('getWifiData', wifi_name, vehicle_name))
 
     def getWifiSensorData(self, wifi_name='', vehicle_name=''):
         """
-        Retrieves sensor-specific data from the specified WiFi sensor.
+        Retrieves sensor-specific data from the specified Wi-Fi sensor.
 
         Args:
-            wifi_name (str, optional): Name of the WiFi sensor to get data from, specified in settings.json.
+            wifi_name (str, optional): Name of the Wi-Fi sensor to get data from, specified in settings.json.
             vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
 
         Returns:
-            WifiSensorData: Sensor-specific data from the specified WiFi sensor.
+            WifiSensorData: Sensor-specific data from the specified Wi-Fi sensor.
         """
-        return WifiSensorData.from_msgpack(self.client.call('getWifiSensorData', wifi_name, vehicle_name))
+        return WifiSensorData.from_msgpack(self.client.call('getWifiSensorData', wifi_name,
+                                                            vehicle_name))
 
     def simFlushPersistentMarkers(self):
         """
@@ -1349,7 +1382,7 @@ class VehicleClient:
         """
         self.client.call('simFlushPersistentMarkers')
 
-    def simPlotPoints(self, points, color_rgba=[1.0, 0.0, 0.0, 1.0], size=10.0, duration=-1.0, is_persistent=False):
+    def simPlotPoints(self, points, color_rgba=None, size=10.0, duration=-1.0, is_persistent=False):
         """
         Plot a list of 3D points in World NED frame
 
@@ -1360,12 +1393,15 @@ class VehicleClient:
             duration (float, optional): Duration (seconds) to plot for
             is_persistent (bool, optional): If set to True, the desired object will be plotted for infinite time.
         """
+        if color_rgba is None:
+            color_rgba = [1.0, 0.0, 0.0, 1.0]
         self.client.call('simPlotPoints', points, color_rgba, size, duration, is_persistent)
 
-    def simPlotLineStrip(self, points, color_rgba=[1.0, 0.0, 0.0, 1.0], thickness=5.0, duration=-1.0,
+    def simPlotLineStrip(self, points, color_rgba=None, thickness=5.0, duration=-1.0,
                          is_persistent=False):
         """
-        Plots a line strip in World NED frame, defined from points[0] to points[1], points[1] to points[2], ... , points[n-2] to points[n-1]
+        Plots a line strip in World NED frame, defined from points[0] to points[1], points[1] to points[2],
+        ... , points[n-2] to points[n-1]
 
         Args:
             points (list[Vector3r]): List of 3D locations of line start and end points, specified as Vector3r objects
@@ -1374,49 +1410,63 @@ class VehicleClient:
             duration (float, optional): Duration (seconds) to plot for
             is_persistent (bool, optional): If set to True, the desired object will be plotted for infinite time.
         """
+        if color_rgba is None:
+            color_rgba = [1.0, 0.0, 0.0, 1.0]
         self.client.call('simPlotLineStrip', points, color_rgba, thickness, duration, is_persistent)
 
-    def simPlotLineList(self, points, color_rgba=[1.0, 0.0, 0.0, 1.0], thickness=5.0, duration=-1.0,
+    def simPlotLineList(self, points, color_rgba=None, thickness=5.0, duration=-1.0,
                         is_persistent=False):
         """
-        Plots a line strip in World NED frame, defined from points[0] to points[1], points[2] to points[3], ... , points[n-2] to points[n-1]
+        Plots a line strip in World NED frame, defined from points[0] to points[1], points[2] to points[3], ... ,
+         points[n-2] to points[n-1]
 
         Args:
-            points (list[Vector3r]): List of 3D locations of line start and end points, specified as Vector3r objects. Must be even
+            points (list[Vector3r]): List of 3D locations of line start and end points, specified as Vector3r objects.
+                Must be even
             color_rgba (list, optional): desired RGBA values from 0.0 to 1.0
             thickness (float, optional): Thickness of line
             duration (float, optional): Duration (seconds) to plot for
             is_persistent (bool, optional): If set to True, the desired object will be plotted for infinite time.
         """
+        if color_rgba is None:
+            color_rgba = [1.0, 0.0, 0.0, 1.0]
         self.client.call('simPlotLineList', points, color_rgba, thickness, duration, is_persistent)
 
-    def simPlotArrows(self, points_start, points_end, color_rgba=[1.0, 0.0, 0.0, 1.0], thickness=5.0, arrow_size=2.0,
+    def simPlotArrows(self, points_start, points_end, color_rgba=None, thickness=5.0, arrow_size=2.0,
                       duration=-1.0, is_persistent=False):
         """
-        Plots a list of arrows in World NED frame, defined from points_start[0] to points_end[0], points_start[1] to points_end[1], ... , points_start[n-1] to points_end[n-1]
+        Plots a list of arrows in World NED frame, defined from points_start[0] to points_end[0], points_start[1] to
+         points_end[1], ... , points_start[n-1] to points_end[n-1]
         Args:
-            points_start (list[Vector3r]): List of 3D start positions of arrow start positions, specified as Vector3r objects
-            points_end (list[Vector3r]): List of 3D end positions of arrow start positions, specified as Vector3r objects
+            points_start (list[Vector3r]): List of 3D start positions of arrow start positions,
+                specified as Vector3r objects
+            points_end (list[Vector3r]): List of 3D end positions of arrow start positions,
+                specified as Vector3r objects
             color_rgba (list, optional): desired RGBA values from 0.0 to 1.0
             thickness (float, optional): Thickness of line
             arrow_size (float, optional): Size of arrow head
             duration (float, optional): Duration (seconds) to plot for
             is_persistent (bool, optional): If set to True, the desired object will be plotted for infinite time.
         """
-        self.client.call('simPlotArrows', points_start, points_end, color_rgba, thickness, arrow_size, duration,
-                         is_persistent)
+        if color_rgba is None:
+            color_rgba = [1.0, 0.0, 0.0, 1.0]
+        self.client.call('simPlotArrows', points_start, points_end, color_rgba, thickness,
+                         arrow_size, duration,  is_persistent)
 
-    def simPlotStrings(self, strings, positions, scale=5, color_rgba=[1.0, 0.0, 0.0, 1.0], duration=-1.0):
+    def simPlotStrings(self, strings, positions, scale=5, color_rgba=None, duration=-1.0):
         """
         Plots a list of strings at desired positions in World NED frame.
 
         Args:
             strings (list[String], optional): List of strings to plot
-            positions (list[Vector3r]): List of positions where the strings should be plotted. Should be in one-to-one correspondence with the strings' list
+            positions (list[Vector3r]): List of positions where the strings should be plotted.
+                Should be in one-to-one correspondence with the strings' list
             scale (float, optional): Font scale of transform name
             color_rgba (list, optional): desired RGBA values from 0.0 to 1.0
             duration (float, optional): Duration (seconds) to plot for
         """
+        if color_rgba is None:
+            color_rgba = [1.0, 0.0, 0.0, 1.0]
         self.client.call('simPlotStrings', strings, positions, scale, color_rgba, duration)
 
     def simPlotTransforms(self, poses, scale=5.0, thickness=5.0, duration=-1.0, is_persistent=False):
@@ -1433,7 +1483,7 @@ class VehicleClient:
         self.client.call('simPlotTransforms', poses, scale, thickness, duration, is_persistent)
 
     def simPlotTransformsWithNames(self, poses, names, tf_scale=5.0, tf_thickness=5.0, text_scale=10.0,
-                                   text_color_rgba=[1.0, 0.0, 0.0, 1.0], duration=-1.0):
+                                   text_color_rgba=None, duration=-1.0):
         """
         Plots a list of transforms with their names in World NED frame.
 
@@ -1446,6 +1496,8 @@ class VehicleClient:
             text_color_rgba (list, optional): desired RGBA values from 0.0 to 1.0 for the transform name
             duration (float, optional): Duration (seconds) to plot for
         """
+        if text_color_rgba is None:
+            text_color_rgba = [1.0, 0.0, 0.0, 1.0]
         self.client.call('simPlotTransformsWithNames', poses, names, tf_scale, tf_thickness, text_scale,
                          text_color_rgba, duration)
 
@@ -1513,7 +1565,8 @@ class VehicleClient:
             vehicle_name (str): Name of the vehicle being created
             vehicle_type (str): Type of vehicle, e.g. "simpleflight"
             pose (Pose): Initial pose of the vehicle
-            pawn_path (str, optional): Vehicle blueprint path, default empty which uses the default blueprint for the vehicle type
+            pawn_path (str, optional): Vehicle blueprint path, default empty which uses the default blueprint for the
+             vehicle type
 
         Returns:
             bool: Whether vehicle was created
@@ -1610,13 +1663,14 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveByVelocityBodyFrame', vx, vy, vz, duration, drivetrain, yaw_mode,
-                                      vehicle_name)
+        return self.client.call_async('moveByVelocityBodyFrame', vx, vy, vz, duration, drivetrain,
+                                      yaw_mode, vehicle_name)
 
     def moveByVelocityZBodyFrameAsync(self, vx, vy, z, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                                       yaw_mode=YawMode(), vehicle_name=''):
         """
-        Initiates a velocity command relative to the vehicle's body frame with a specified Z axis position asynchronously.
+        Initiates a velocity command relative to the vehicle's body frame with a specified Z
+        axis position asynchronously.
 
         Args:
             vx (float): Desired velocity in the X axis of the vehicle's local NED frame.
@@ -1630,8 +1684,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveByVelocityZBodyFrame', vx, vy, z, duration, drivetrain, yaw_mode,
-                                      vehicle_name)
+        return self.client.call_async('moveByVelocityZBodyFrame', vx, vy, z, duration, drivetrain,
+                                      yaw_mode,  vehicle_name)
 
     def moveByAngleZAsync(self, pitch, roll, z, yaw, duration, vehicle_name=''):
         """
@@ -1651,7 +1705,8 @@ class MultirotorClient(VehicleClient, object):
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
         logging.warning("moveByAngleZAsync API is deprecated, use moveByRollPitchYawZAsync() API instead")
-        return self.client.call_async('moveByRollPitchYawZ', roll, -pitch, -yaw, z, duration, vehicle_name)
+        return self.client.call_async('moveByRollPitchYawZ', roll, -pitch, -yaw, z, duration,
+                                      vehicle_name)
 
     def moveByAngleThrottleAsync(self, pitch, roll, throttle, yaw_rate, duration, vehicle_name=''):
         """
@@ -1672,8 +1727,8 @@ class MultirotorClient(VehicleClient, object):
         """
         logging.warning(
             "moveByAngleThrottleAsync API is deprecated, use moveByRollPitchYawrateThrottleAsync() API instead")
-        return self.client.call_async('moveByRollPitchYawrateThrottle', roll, -pitch, -yaw_rate, throttle, duration,
-                                      vehicle_name)
+        return self.client.call_async('moveByRollPitchYawrateThrottle', roll, -pitch, -yaw_rate,
+                                      throttle, duration, vehicle_name)
 
     def moveByVelocityAsync(self, vx, vy, vz, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                             yaw_mode=YawMode(), vehicle_name=''):
@@ -1692,7 +1747,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveByVelocity', vx, vy, vz, duration, drivetrain, yaw_mode, vehicle_name)
+        return self.client.call_async('moveByVelocity', vx, vy, vz, duration, drivetrain, yaw_mode,
+                                      vehicle_name)
 
     def moveByVelocityZAsync(self, vx, vy, z, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                              yaw_mode=YawMode(), vehicle_name=''):
@@ -1711,7 +1767,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, drivetrain, yaw_mode, vehicle_name)
+        return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, drivetrain, yaw_mode,
+                                      vehicle_name)
 
     def moveOnPathAsync(self, path, velocity, timeout_sec=3e+38, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                         yaw_mode=YawMode(), lookahead=-1, adaptive_lookahead=1, vehicle_name=''):
@@ -1731,8 +1788,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveOnPath', path, velocity, timeout_sec, drivetrain, yaw_mode, lookahead,
-                                      adaptive_lookahead, vehicle_name)
+        return self.client.call_async('moveOnPath', path, velocity, timeout_sec, drivetrain, yaw_mode,
+                                      lookahead, adaptive_lookahead, vehicle_name)
 
     def moveToPositionAsync(self, x, y, z, velocity, timeout_sec=3e+38, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                             yaw_mode=YawMode(), lookahead=-1, adaptive_lookahead=1, vehicle_name=''):
@@ -1754,7 +1811,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveToPosition', x, y, z, velocity, timeout_sec, drivetrain, yaw_mode, lookahead,
+        return self.client.call_async('moveToPosition', x, y, z, velocity, timeout_sec, drivetrain,
+                                      yaw_mode, lookahead,
                                       adaptive_lookahead, vehicle_name)
 
     def moveToGPSAsync(self, latitude, longitude, altitude, velocity, timeout_sec=3e+38,
@@ -1778,7 +1836,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveToGPS', latitude, longitude, altitude, velocity, timeout_sec, drivetrain,
+        return self.client.call_async('moveToGPS', latitude, longitude, altitude, velocity,
+                                      timeout_sec, drivetrain,
                                       yaw_mode, lookahead, adaptive_lookahead, vehicle_name)
 
     def moveToZAsync(self, z, velocity, timeout_sec=3e+38, yaw_mode=YawMode(), lookahead=-1, adaptive_lookahead=1,
@@ -1798,7 +1857,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        return self.client.call_async('moveToZ', z, velocity, timeout_sec, yaw_mode, lookahead, adaptive_lookahead,
+        return self.client.call_async('moveToZ', z, velocity, timeout_sec, yaw_mode, lookahead,
+                                      adaptive_lookahead,
                                       vehicle_name)
 
     def moveByManualAsync(self, vx_max, vy_max, z_min, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
@@ -1806,7 +1866,8 @@ class MultirotorClient(VehicleClient, object):
         """
         Initiates a manual movement command asynchronously using RC state.
 
-        This method sets constraints on velocity and minimum altitude while flying. If the RC state is detected to violate these constraints,
+        This method sets constraints on velocity and minimum altitude while flying. If the RC state is detected to
+         violate these constraints,
         that RC state would be ignored.
 
         Args:
@@ -1894,7 +1955,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
         """
-        return self.client.call_async('moveByMotorPWMs', front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm,
+        return self.client.call_async('moveByMotorPWMs', front_right_pwm, rear_left_pwm,
+                                      front_left_pwm, rear_right_pwm,
                                       duration, vehicle_name)
 
     def moveByRollPitchYawZAsync(self, roll, pitch, yaw, z, duration, vehicle_name=''):
@@ -1907,17 +1969,20 @@ class MultirotorClient(VehicleClient, object):
             - X axis is along the **Front** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **roll** angle.
-            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction,
+             w.r.t. our FLU body frame.
 
             - Y axis is along the **Left** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **pitch** angle.
-            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction,
+             w.r.t. our FLU body frame.
 
             - Z axis is along the **Up** direction.
 
             | Clockwise rotation about this axis defines a positive **yaw** angle.
-            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction
+             wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
 
         Args:
             roll (float): Desired roll angle, in radians.
@@ -1930,29 +1995,34 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
         """
-        return self.client.call_async('moveByRollPitchYawZ', roll, -pitch, -yaw, z, duration, vehicle_name)
+        return self.client.call_async('moveByRollPitchYawZ', roll, -pitch, -yaw, z, duration,
+                                      vehicle_name)
 
     def moveByRollPitchYawThrottleAsync(self, roll, pitch, yaw, throttle, duration, vehicle_name=''):
         """
         - Desired throttle is between 0.0 to 1.0
-        - Roll angle, pitch angle, and yaw angle are given in **degrees** when using PX4 and in **radians** when using SimpleFlight, in the body frame.
+        - Roll angle, pitch angle, and yaw angle are given in **degrees** when using PX4 and in **radians** when
+        using SimpleFlight, in the body frame.
         - The body frame follows the Front Left Up (FLU) convention, and right-handedness.
 
         - Frame Convention:
             - X axis is along the **Front** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **roll** angle.
-            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t.
+             our FLU body frame.
 
             - Y axis is along the **Left** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **pitch** angle.
-            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t.
+             our FLU body frame.
 
             - Z axis is along the **Up** direction.
 
             | Clockwise rotation about this axis defines a positive **yaw** angle.
-            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our
+            FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
 
         Args:
             roll (float): Desired roll angle.
@@ -1965,8 +2035,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
         """
-        return self.client.call_async('moveByRollPitchYawThrottle', roll, -pitch, -yaw, throttle, duration,
-                                      vehicle_name)
+        return self.client.call_async('moveByRollPitchYawThrottle', roll, -pitch, -yaw, throttle,
+                                      duration, vehicle_name)
 
     def moveByRollPitchYawrateThrottleAsync(self, roll, pitch, yaw_rate, throttle, duration, vehicle_name=''):
         """
@@ -1978,17 +2048,20 @@ class MultirotorClient(VehicleClient, object):
             - X axis is along the **Front** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **roll** angle.
-            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction,
+            w.r.t. our FLU body frame.
 
             - Y axis is along the **Left** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **pitch** angle.
-            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction,
+             w.r.t. our FLU body frame.
 
             - Z axis is along the **Up** direction.
 
             | Clockwise rotation about this axis defines a positive **yaw** angle.
-            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt
+            our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
 
         Args:
             roll (float): Desired roll angle, in radians.
@@ -2001,7 +2074,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
         """
-        return self.client.call_async('moveByRollPitchYawrateThrottle', roll, -pitch, -yaw_rate, throttle, duration,
+        return self.client.call_async('moveByRollPitchYawrateThrottle', roll, -pitch, -yaw_rate,
+                                      throttle, duration,
                                       vehicle_name)
 
     def moveByRollPitchYawrateZAsync(self, roll, pitch, yaw_rate, z, duration, vehicle_name=''):
@@ -2014,17 +2088,20 @@ class MultirotorClient(VehicleClient, object):
             - X axis is along the **Front** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **roll** angle.
-            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction,
+             w.r.t. our FLU body frame.
 
             - Y axis is along the **Left** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **pitch** angle.
-            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction,
+             w.r.t. our FLU body frame.
 
             - Z axis is along the **Up** direction.
 
             | Clockwise rotation about this axis defines a positive **yaw** angle.
-            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt
+             our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
 
         Args:
             roll (float): Desired roll angle, in radians.
@@ -2037,7 +2114,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
         """
-        return self.client.call_async('moveByRollPitchYawrateZ', roll, -pitch, -yaw_rate, z, duration, vehicle_name)
+        return self.client.call_async('moveByRollPitchYawrateZ', roll, -pitch, -yaw_rate, z, duration,
+                                      vehicle_name)
 
     def moveByAngleRatesZAsync(self, roll_rate, pitch_rate, yaw_rate, z, duration, vehicle_name=''):
         """
@@ -2049,17 +2127,20 @@ class MultirotorClient(VehicleClient, object):
             - X axis is along the **Front** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **roll** angle.
-            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t.
+             our FLU body frame.
 
             - Y axis is along the **Left** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **pitch** angle.
-            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t.
+            our FLU body frame.
 
             - Z axis is along the **Up** direction.
 
             | Clockwise rotation about this axis defines a positive **yaw** angle.
-            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU
+             body frame. Or in an anticlockwise fashion in the body XY / FL plane.
 
         Args:
             roll_rate (float): Desired roll rate, in radians / second
@@ -2072,7 +2153,8 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
         """
-        return self.client.call_async('moveByAngleRatesZ', roll_rate, -pitch_rate, -yaw_rate, z, duration, vehicle_name)
+        return self.client.call_async('moveByAngleRatesZ', roll_rate, -pitch_rate, -yaw_rate,
+                                      z, duration, vehicle_name)
 
     def moveByAngleRatesThrottleAsync(self, roll_rate, pitch_rate, yaw_rate, throttle, duration, vehicle_name=''):
         """
@@ -2084,17 +2166,20 @@ class MultirotorClient(VehicleClient, object):
             - X axis is along the **Front** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **roll** angle.
-            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction,
+             w.r.t. our FLU body frame.
 
             - Y axis is along the **Left** direction of the quadrotor.
 
             | Clockwise rotation about this axis defines a positive **pitch** angle.
-            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction,
+             w.r.t. our FLU body frame.
 
             - Z axis is along the **Up** direction.
 
             | Clockwise rotation about this axis defines a positive **yaw** angle.
-            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU
+            body frame. Or in an anticlockwise fashion in the body XY / FL plane.
 
         Args:
             roll_rate (float): Desired roll rate, in radians / second
@@ -2107,13 +2192,15 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
         """
-        return self.client.call_async('moveByAngleRatesThrottle', roll_rate, -pitch_rate, -yaw_rate, throttle, duration,
+        return self.client.call_async('moveByAngleRatesThrottle', roll_rate, -pitch_rate, -yaw_rate,
+                                      throttle, duration,
                                       vehicle_name)
 
     def setAngleRateControllerGains(self, angle_rate_gains=AngleRateControllerGains(), vehicle_name=''):
         """
         - Modifying these gains will have an effect on *ALL* move*() APIs.
-            This is because any velocity setpoint is converted to an angle level setpoint which is tracked with an angle level controllers.
+            This is because any velocity setpoint is converted to an angle level setpoint which is tracked
+            with an angle level controllers.
             That angle level setpoint is itself tracked with and angle rate controller.
         - This function should only be called if the default angle rate control PID gains need to be modified.
 
@@ -2127,9 +2214,11 @@ class MultirotorClient(VehicleClient, object):
 
     def setAngleLevelControllerGains(self, angle_level_gains=AngleLevelControllerGains(), vehicle_name=''):
         """
-        - Sets angle level controller gains (used by any API setting angle references - for ex: moveByRollPitchYawZAsync(), moveByRollPitchYawThrottleAsync(), etc.)
+        - Sets angle level controller gains (used by any API setting angle references -
+        for ex: moveByRollPitchYawZAsync(), moveByRollPitchYawThrottleAsync(), etc.)
         - Modifying these gains will also affect the behaviour of moveByVelocityAsync() API.
-            This is because the Cosys-AirSim flight controller will track velocity setpoints by converting them to angle set points.
+            This is because the Cosys-AirSim flight controller will track velocity setpoints
+             by converting them to angle set points.
         - This function should only be called if the default angle level control PID gains need to be modified.
         - Passing AngleLevelControllerGains() sets gains to default Cosys-AirSim values.
 
@@ -2139,7 +2228,8 @@ class MultirotorClient(VehicleClient, object):
                 - Pass AngleLevelControllerGains() to reset gains to default recommended values.
             vehicle_name (str, optional): Name of the multirotor to send this command to
         """
-        self.client.call('setAngleLevelControllerGains', *(angle_level_gains.to_lists() + (vehicle_name,)))
+        self.client.call('setAngleLevelControllerGains', *(angle_level_gains.to_lists() +
+                                                           (vehicle_name,)))
 
     def setVelocityControllerGains(self, velocity_gains=VelocityControllerGains(), vehicle_name=''):
         """
@@ -2151,7 +2241,8 @@ class MultirotorClient(VehicleClient, object):
             velocity_gains (VelocityControllerGains):
                 - Correspond to the world X, Y, Z axes.
                 - Pass VelocityControllerGains() to reset gains to default recommended values.
-                - Modifying velocity controller gains will have an effect on the behaviour of moveOnSplineAsync() and moveOnSplineVelConstraintsAsync(), as they both use velocity control to track the trajectory.
+                - Modifying velocity controller gains will have an effect on the behaviour of moveOnSplineAsync()
+                 and moveOnSplineVelConstraintsAsync(), as they both use velocity control to track the trajectory.
             vehicle_name (str, optional): Name of the multirotor to send this command to
         """
         self.client.call('setVelocityControllerGains', *(velocity_gains.to_lists() + (vehicle_name,)))
