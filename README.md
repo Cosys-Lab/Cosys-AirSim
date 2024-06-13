@@ -59,23 +59,21 @@ A manually maintained fork of this repository is available to the public: https:
 ```
 
 ## Cosys-Lab Modifications
-* Updated the camera, Echo and (GPU)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
-* Added more camera sensor distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
-* Added [Matlab API](docs/matlab.md) implementation.
-* Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
-* Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
 * Added [multi-layer annotation](docs/annotation.md) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
+* Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
 * Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
+* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md). ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Added [Matlab API](docs/matlab.md) implementation.
+* Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
+* Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
+* Updated Unreal to 5.2.1.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
-* Added option to hot-reload plugin through Unreal Editor (faster development).
-* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md). ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
-* Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
-* Updated standard camera render resolution target to 960x540. Updated standard uncompressed image format to RGB instead of BGR (this breaks OpenCV support but fixes ROS images). 
-* Added option to Cameras, EchoSensor and GPULidar to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
-* Updated Unreal to 5.2.1 by merging changes of [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum).
+* Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
+* Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
+* Updated cameras sensor with more distortion features such as chromatic aberration, motion blur and lens distortion. 
+* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
 * Dropped support for Unity Environments.
 
 Some more details on our changes can be found in the [changelog](CHANGELOG.md).
