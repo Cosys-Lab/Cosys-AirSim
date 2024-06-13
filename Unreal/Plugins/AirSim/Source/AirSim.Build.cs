@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using UnrealBuildTool;
+using System;
 using System.IO;
 
 public class AirSim : ModuleRules
