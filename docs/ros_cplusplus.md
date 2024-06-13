@@ -2,6 +2,8 @@
 
 A ROS wrapper over the AirSim C++ client library.
 
+**NOTE THAT THIS NOT UPDATED FOR COSYS-AIRSIM CHANGES AND MAY NOT WORK AS INTENDED**
+
 ## Setup
 
 The below steps are meant for Linux. If you're running AirSim on Windows, you can use Windows Subsystem for Linux (WSL) to run the ROS wrapper, see the instructions [below](#setting-up-the-build-environment-on-windows10-using-wsl1-or-wsl2). If you're unable or don't prefer to install ROS and related tools on your host Linux due to some issues, you can also try it using Docker, see the steps in [Using Docker for ROS wrapper](#using-docker-for-ros)
@@ -76,7 +78,7 @@ Let's look at the ROS API for both nodes:
 
 #### Publishers:
 
-- `/airsim_node/origin_geo_point` [airsim_ros_pkgs/GPSYaw](https://github.com/microsoft/AirSim/tree/main/ros/src/airsim_ros_pkgs/msg/GPSYaw.msg)
+- `/airsim_node/origin_geo_point` [airsim_ros_pkgs/GPSYaw](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/GPSYaw.msg)
 GPS coordinates corresponding to global NED frame. This is set in the airsim's [settings.json](https://microsoft.github.io/AirSim/settings/) file under the `OriginGeopoint` key.
 
 - `/airsim_node/VEHICLE_NAME/global_gps` [sensor_msgs/NavSatFix](https://docs.ros.org/api/sensor_msgs/html/msg/NavSatFix.html)
@@ -92,7 +94,7 @@ Odometry in NED frame (default name: odom_local_ned, launch name and frame type 
 
 - `/tf` [tf2_msgs/TFMessage](https://docs.ros.org/api/tf2_msgs/html/msg/TFMessage.html)
 
-- `/airsim_node/VEHICLE_NAME/altimeter/SENSOR_NAME` [airsim_ros_pkgs/Altimeter](https://github.com/microsoft/AirSim/blob/main/ros/src/airsim_ros_pkgs/msg/Altimeter.msg)
+- `/airsim_node/VEHICLE_NAME/altimeter/SENSOR_NAME` [airsim_ros_pkgs/Altimeter](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/Altimeter.msg)
 This the current altimeter reading for altitude, pressure, and [QNH](https://en.wikipedia.org/wiki/QNH)
 
 - `/airsim_node/VEHICLE_NAME/imu/SENSOR_NAME` [sensor_msgs::Imu](http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html)
@@ -109,20 +111,20 @@ IMU sensor data
 
 #### Subscribers:
 
-- `/airsim_node/vel_cmd_body_frame` [airsim_ros_pkgs/VelCmd](https://github.com/microsoft/AirSim/tree/main/ros/src/airsim_ros_pkgs/msg/VelCmd.msg)
+- `/airsim_node/vel_cmd_body_frame` [airsim_ros_pkgs/VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/VelCmd.msg)
   Ignore `vehicle_name` field, leave it to blank. We will use `vehicle_name` in future for multiple drones.
 
-- `/airsim_node/vel_cmd_world_frame` [airsim_ros_pkgs/VelCmd](https://github.com/microsoft/AirSim/tree/main/ros/src/airsim_ros_pkgs/msg/VelCmd.msg)
+- `/airsim_node/vel_cmd_world_frame` [airsim_ros_pkgs/VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/VelCmd.msg)
   Ignore `vehicle_name` field, leave it to blank. We will use `vehicle_name` in future for multiple drones.
 
-- `/gimbal_angle_euler_cmd` [airsim_ros_pkgs/GimbalAngleEulerCmd](https://github.com/microsoft/AirSim/tree/main/ros/src/airsim_ros_pkgs/msg/GimbalAngleEulerCmd.msg)
+- `/gimbal_angle_euler_cmd` [airsim_ros_pkgs/GimbalAngleEulerCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/GimbalAngleEulerCmd.msg)
   Gimbal set point in euler angles.
 
-- `/gimbal_angle_quat_cmd` [airsim_ros_pkgs/GimbalAngleQuatCmd](https://github.com/microsoft/AirSim/tree/main/ros/src/airsim_ros_pkgs/msg/GimbalAngleQuatCmd.msg)
+- `/gimbal_angle_quat_cmd` [airsim_ros_pkgs/GimbalAngleQuatCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/GimbalAngleQuatCmd.msg)
   Gimbal set point in quaternion.
 
-- `/airsim_node/VEHICLE_NAME/car_cmd` [airsim_ros_pkgs/CarControls](https://github.com/microsoft/AirSim/blob/main/ros/src/airsim_ros_pkgs/msg/CarControls.msg)
-Throttle, brake, steering and gear selections for control. Both automatic and manual transmission control possible, see the [`car_joy.py`](https://github.com/microsoft/AirSim/blob/main/ros/src/airsim_ros_pkgs/scripts/car_joy) script for use.
+- `/airsim_node/VEHICLE_NAME/car_cmd` [airsim_ros_pkgs/CarControls](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/CarControls.msg)
+Throttle, brake, steering and gear selections for control. Both automatic and manual transmission control possible, see the [`car_joy.py`](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/scripts/car_joy) script for use.
 
 #### Services:
 
@@ -197,16 +199,16 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Services:
 
-- `/airsim_node/VEHICLE_NAME/gps_goal` [Request: [srv/SetGPSPosition](https://github.com/microsoft/AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetGPSPosition.srv)]
+- `/airsim_node/VEHICLE_NAME/gps_goal` [Request: [srv/SetGPSPosition](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/srv/SetGPSPosition.srv)]
   Target gps position + yaw.
   In **absolute** altitude.
 
-- `/airsim_node/VEHICLE_NAME/local_position_goal` [Request: [srv/SetLocalPosition](https://github.com/microsoft/AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetLocalPosition.srv)]
+- `/airsim_node/VEHICLE_NAME/local_position_goal` [Request: [srv/SetLocalPosition](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/srv/SetLocalPosition.srv)]
   Target local position + yaw in global NED frame.
 
 #### Subscribers:
 
-- `/airsim_node/origin_geo_point` [airsim_ros_pkgs/GPSYaw](https://github.com/microsoft/AirSim/tree/main/ros/src/airsim_ros_pkgs/msg/GPSYaw.msg)
+- `/airsim_node/origin_geo_point` [airsim_ros_pkgs/GPSYaw](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/GPSYaw.msg)
   Listens to home geo coordinates published by `airsim_node`.
 
 - `/airsim_node/VEHICLE_NAME/odom_local_ned` [nav_msgs/Odometry](https://docs.ros.org/api/nav_msgs/html/msg/Odometry.html)
@@ -214,7 +216,7 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Publishers:
 
-- `/vel_cmd_world_frame` [airsim_ros_pkgs/VelCmd](https://github.com/microsoft/AirSim/tree/main/ros/src/airsim_ros_pkgs/msg/VelCmd.msg)
+- `/vel_cmd_world_frame` [airsim_ros_pkgs/VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/VelCmd.msg)
   Sends velocity command to `airsim_node`
 
 #### Global params
@@ -298,7 +300,7 @@ roslaunch airsim_ros_pkgs rviz.launch
 
 ### Using Docker for ROS
 
-A Dockerfile is present in the [`tools`](https://github.com/microsoft/AirSim/tree/main/tools/Dockerfile-ROS) directory. To build the `airsim-ros` image -
+A Dockerfile is present in the [`tools`](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/tools/Dockerfile-ROS) directory. To build the `airsim-ros` image -
 
 ```shell
 cd tools

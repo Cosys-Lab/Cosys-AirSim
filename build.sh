@@ -144,7 +144,7 @@ echo "=================================================================="
 echo "All environments under Unreal/Environments have been updated."
 echo ""
 echo "For further info see:"
-echo "https://github.com/Microsoft/AirSim/blob/master/docs/build_linux.md"
+echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/docs/build_linux.md"
 echo "=================================================================="
 
 popd >/dev/null

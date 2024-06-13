@@ -70,7 +70,7 @@ API does not require RC, see [`No Remote Control`](px4_sitl.md#No-Remote-Control
 
 ## Starting SITL instances with PX4 console
 
-If you want to start your SITL instances while being able to view the PX4 console, you will need to run the shell scripts found [here](https://github.com/microsoft/AirSim/tree/main/PX4Scripts) rather than `sitl_multiple_run.sh`.
+If you want to start your SITL instances while being able to view the PX4 console, you will need to run the shell scripts found [here](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PX4Scripts) rather than `sitl_multiple_run.sh`.
 Here is how you would do so:
 
 **Note** This script also assumes PX4 is built with `make px4_sitl_default none_iris` as shown [here](px4_sitl.md#setting-up-px4-software-in-loop) before trying to run multiple PX4 instances.

@@ -1,5 +1,5 @@
 {
-    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/docs/settings_json.md",
     "SettingsVersion": 2,
     "ClockSpeed": 1,
     "LocalHostIp": "127.0.0.1",

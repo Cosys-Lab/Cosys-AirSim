@@ -16,7 +16,7 @@ Here's how to use AirSim APIs using Python to control simulated car (see also [P
 
 ```cpp
 
-// ready to run example: https://github.com/Microsoft/AirSim/blob/master/HelloCar/main.cpp
+// ready to run example: https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/HelloCar/main.cpp
 
 #include <iostream>
 #include "vehicles/car/api/CarRpcLibClient.hpp"
@@ -54,7 +54,7 @@ Here's how to use AirSim APIs using Python to control simulated car (see also [P
 
 ```cpp
 
-// ready to run example: https://github.com/Microsoft/AirSim/blob/master/HelloDrone/main.cpp
+// ready to run example: https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/HelloDrone/main.cpp
 
 #include <iostream>
 #include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"

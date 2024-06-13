@@ -17,7 +17,7 @@ if "%VisualStudioVersion%" lss "17.0" (
     echo(
     echo Hello there! We just upgraded AirSim to Unreal Engine 5.2.1 and Visual Studio 2022.
     echo Here are few easy steps for upgrade so everything is new and shiny:
-    echo https://github.com/Microsoft/AirSim/blob/main/docs/unreal_upgrade.md
+    echo https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/docs/unreal_upgrade.md
     goto :buildfailed_nomsg
 )
 
@@ -141,8 +141,8 @@ IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV\v1.2.0 (
         IF EXIST suv_download_tmp rmdir suv_download_tmp /q /s
         mkdir suv_download_tmp
         @echo on
-        REM %powershell% -command "& { Start-BitsTransfer -Source https://github.com/Microsoft/AirSim/releases/download/v1.2.0/car_assets.zip -Destination suv_download_tmp\car_assets.zip }"
-        REM %powershell% -command "& { (New-Object System.Net.WebClient).DownloadFile('https://github.com/Microsoft/AirSim/releases/download/v1.2.0/car_assets.zip', 'suv_download_tmp\car_assets.zip') }"
+        REM %powershell% -command "& { Start-BitsTransfer -Source https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip -Destination suv_download_tmp\car_assets.zip }"
+        REM %powershell% -command "& { (New-Object System.Net.WebClient).DownloadFile('https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip', 'suv_download_tmp\car_assets.zip') }"
         if "%PWSHV7%" == "" (
             %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip -OutFile suv_download_tmp\car_assets.zip }"
         ) else (

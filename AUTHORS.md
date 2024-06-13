@@ -6,6 +6,8 @@ AirSim was originally created by [Shital Shah](https://github.com/sytelus) durin
 
 List of all contributors since our first release in February 2017 can be [found here](https://github.com/Microsoft/AirSim/graphs/contributors).
 
+Afterwards, Cosys-Lab researchers have started to add new features and improvements to AirSim. The following publications are the result of this work:
+
 # Cosys-Lab publications
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)

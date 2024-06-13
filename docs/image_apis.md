@@ -286,7 +286,7 @@ An extension to `simListInstanceSegmentationObjects()` is `simListInstanceSegmen
 Once you decide on the meshes you are interested, note down their names and use above API to set their object IDs. There are [few settings](settings.md#segmentation-settings) available to change object ID generation behavior.
 
 #### Changing Colors for Object IDs
-At present the color for each object ID is fixed as in [this pallet](https://github.com/microsoft/AirSim/blob/main/Unreal/Plugins/AirSim/Content/HUDAssets/seg_color_palette.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
+At present the color for each object ID is fixed as in [this pallet](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/Unreal/Plugins/AirSim/Content/HUDAssets/seg_color_palette.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
 
 #### Startup Object IDs
 At the start, AirSim assigns color indexes to each object found in environment of type `UStaticMeshComponent` or `USkinnedMeshComponent`. It then makes an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).
