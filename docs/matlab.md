@@ -25,6 +25,8 @@ The files are in the _Matlab_ folder. A test script _airsim_full_test.m_ is also
 * Get object pose(s)
 * Get sensor data (imu, echo (active/passive), (gpu)LiDAR, camera (info, rgb, depth, segmentation, annotation))
 
+
+Do note that the AirSim matlab client has almost all API functions available but not all are listed in this test script. For a full list see the source code fo the AirSimClient class.
 Do note the test script requires next to the toolboxes listed above in the Prerequisites the following Matlab toolboxes:
 
 * Lidar Toolbox
