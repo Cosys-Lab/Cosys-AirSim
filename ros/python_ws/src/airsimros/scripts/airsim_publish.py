@@ -183,6 +183,13 @@ def get_segmentation_camera_ros_message(cur_camera_msg, cur_response):
     return cur_camera_msg
 
 
+def get_annotation_camera_ros_message(cur_camera_msg, cur_response):
+    rgb_string = airsim.get_image_bytes(cur_response, "Annotation")
+    cur_camera_msg.step = cur_response.width * 3
+    cur_camera_msg.data = rgb_string
+    return cur_camera_msg
+
+
 def get_scene_camera_ros_message(cur_response, cur_timestamp, cur_frame, cur_cv_bridge,
                                  cur_sensor_camera_scene_quality, enable_mono):
     rgb_matrix = np.frombuffer(airsim.get_image_bytes(cur_response, "Scene"),
@@ -633,9 +640,9 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                    sensor_gpulidar_names, sensor_gpulidar_topics,
                    sensor_gpulidar_frames, sensor_camera_names, sensor_camera_toggle_scene_mono,
                    sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
-                   sensor_camera_toggle_depth, sensor_camera_scene_topics,
-                   sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                   sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
+                   sensor_camera_toggle_depth, sensor_camera_toggle_annotation, sensor_camera_annotation_layers,
+                   sensor_camera_scene_topics, sensor_camera_segmentation_topics, sensor_camera_depth_topics,
+                   sensor_camera_annotation_topics, sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
                    sensor_camera_info_topics, sensor_stereo_enable, baseline,
                    object_poses_all, object_poses_all_coordinates_local, object_poses_all_once, object_poses_all_topic,
                    object_poses_individual_names, object_poses_individual_coordinates_local,
@@ -693,14 +700,17 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
             wifi_range_array_publisher = rospy.Publisher(sensor_wifi_topic, RangeArray, queue_size=10)
 
         for cur_sensor_index, cur_sensor_name in enumerate(sensor_camera_names):
-            image_publishers[cur_sensor_name + '_scene'] = rospy.Publisher(sensor_camera_scene_topics[cur_sensor_index],
-                                                                           Image, queue_size=2)
+            image_publishers[cur_sensor_name + '_scene'] = \
+                rospy.Publisher(sensor_camera_scene_topics[cur_sensor_index], Image, queue_size=2)
             if sensor_camera_toggle_segmentation[cur_sensor_index] == 1:
                 image_publishers[cur_sensor_name + '_segmentation'] = \
                     rospy.Publisher(sensor_camera_segmentation_topics[cur_sensor_index], Image, queue_size=2)
             if sensor_camera_toggle_depth[cur_sensor_index] == 1:
                 image_publishers[cur_sensor_name + '_depth'] = \
                     rospy.Publisher(sensor_camera_depth_topics[cur_sensor_index], Image, queue_size=2)
+            if sensor_camera_toggle_annotation[cur_sensor_index] == 1:
+                image_publishers[cur_sensor_name + '_annotation'] = \
+                    rospy.Publisher(sensor_camera_annotation_topics[cur_sensor_index], Image, queue_size=2)
             if sensor_camera_toggle_camera_info[cur_sensor_index] == 1:
                 image_publishers[cur_sensor_name + '_cameraInfo'] = \
                     rospy.Publisher(sensor_camera_info_topics[cur_sensor_index], CameraInfo, queue_size=2)
@@ -769,16 +779,22 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         response_locations[cur_sensor_name + '_scene'] = response_index
         response_index += 1
         requests.append(airsim.ImageRequest(cur_sensor_name, airsim.get_camera_type("Scene"),
-                                              airsim.is_pixels_as_float("Scene"), False))
+                                            airsim.is_pixels_as_float("Scene"), False))
         if sensor_camera_toggle_segmentation[cur_sensor_index] == 1:
             requests.append(airsim.ImageRequest(cur_sensor_name, airsim.get_camera_type("Segmentation"),
-                                                  airsim.is_pixels_as_float("Segmentation"), False))
+                                                airsim.is_pixels_as_float("Segmentation"), False))
             response_locations[cur_sensor_name + '_segmentation'] = response_index
             response_index += 1
         if sensor_camera_toggle_depth[cur_sensor_index] == 1:
             requests.append(airsim.ImageRequest(cur_sensor_name, airsim.get_camera_type("DepthPlanar"),
-                                                  airsim.is_pixels_as_float("DepthPlanar"), False))
+                                                airsim.is_pixels_as_float("DepthPlanar"), False))
             response_locations[cur_sensor_name + '_depth'] = response_index
+            response_index += 1
+        if sensor_camera_toggle_annotation[cur_sensor_index] == 1:
+            requests.append(airsim.ImageRequest(cur_sensor_name, airsim.get_camera_type("Annotation"),
+                                                airsim.is_pixels_as_float("Annotation"), False,
+                                                sensor_camera_annotation_layers[cur_sensor_index]))
+            response_locations[cur_sensor_name + '_annotation'] = response_index
             response_index += 1
 
     cv_bridge = None
@@ -836,10 +852,9 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                     last_time = t.to_sec()
                     cur_position = airsim.Vector3r(msg.pose.position.x, -msg.pose.position.y, -msg.pose.position.z)
                     cur_orientation = airsim.Quaternionr(msg.pose.orientation.x, msg.pose.orientation.y,
-                                                           msg.pose.orientation.z,
-                                                           msg.pose.orientation.w).inverse()
+                                                         msg.pose.orientation.z, msg.pose.orientation.w).inverse()
                     cur_orientation = airsim.Quaternionr(float(cur_orientation.x_val), float(cur_orientation.y_val),
-                                                           float(cur_orientation.z_val), float(cur_orientation.w_val))
+                                                         float(cur_orientation.z_val), float(cur_orientation.w_val))
                     client.simSetVehiclePose(airsim.Pose(cur_position, cur_orientation), True, vehicle_name)
 
                     rospy.loginfo("Setting vehicle pose " + str(pose_index) + ' of ' + str(pose_count)
@@ -851,11 +866,12 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                         if response.width == 0 and response.height == 0:
                             rospy.logwarn("Camera '" + cur_sensor_name + "' could not retrieve scene image.")
                         else:
-                            camera_msg = get_scene_camera_ros_message(response, timestamp,
-                                                                      sensor_camera_optical_frames[cur_sensor_index],
-                                                                      cv_bridge,
-                                                                      sensor_camera_scene_quality[cur_sensor_index],
-                                                                      sensor_camera_toggle_scene_mono[cur_sensor_index])
+                            camera_msg = (
+                                get_scene_camera_ros_message(response, timestamp,
+                                                             sensor_camera_optical_frames[cur_sensor_index],
+                                                             cv_bridge,
+                                                             sensor_camera_scene_quality[cur_sensor_index],
+                                                             sensor_camera_toggle_scene_mono[cur_sensor_index]))
                             output.write(sensor_camera_scene_topics[cur_sensor_index], camera_msg, t=ros_timestamp)
                         if sensor_camera_toggle_segmentation[cur_sensor_index] == 1:
                             response = camera_responses[response_locations[cur_sensor_name + '_segmentation']]
@@ -872,6 +888,14 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                             else:
                                 camera_msg = get_depth_camera_ros_message(camera_msg, response)
                                 output.write(sensor_camera_depth_topics[cur_sensor_index], camera_msg,
+                                             t=ros_timestamp)
+                        if sensor_camera_toggle_annotation[cur_sensor_index] == 1:
+                            response = camera_responses[response_locations[cur_sensor_name + '_annotation']]
+                            if response.width == 0 and response.height == 0:
+                                rospy.logwarn("Camera '" + cur_sensor_name + "' could not retrieve annotation image.")
+                            else:
+                                camera_msg = get_annotation_camera_ros_message(camera_msg, response)
+                                output.write(sensor_camera_annotation_topics[cur_sensor_index], camera_msg,
                                              t=ros_timestamp)
                         if sensor_camera_toggle_camera_info[cur_sensor_index] == 1:
                             if cur_sensor_index == 1:
@@ -1098,6 +1122,13 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
                     else:
                         camera_msg = get_depth_camera_ros_message(camera_msg, response)
                         image_publishers[cur_sensor_name + '_depth'].publish(camera_msg)
+                if sensor_camera_toggle_annotation[cur_sensor_index] == 1:
+                    response = camera_responses[response_locations[cur_sensor_name + '_annotation']]
+                    if response.width == 0 and response.height == 0:
+                        rospy.logwarn("Camera '" + cur_sensor_name + "' could not retrieve annotation image.")
+                    else:
+                        camera_msg = get_annotation_camera_ros_message(camera_msg, response)
+                        image_publishers[cur_sensor_name + '_annotation'].publish(camera_msg)
                 if sensor_camera_toggle_camera_info[cur_sensor_index] == 1:
                     if cur_sensor_index == 1:
                         first_sensor = True
@@ -1280,6 +1311,9 @@ if __name__ == '__main__':
         sensor_camera_scene_quality = rospy.get_param('~sensor_camera_scene_quality', 0)
         sensor_camera_toggle_segmentation = rospy.get_param('~sensor_camera_toggle_segmentation', 1)
         sensor_camera_toggle_depth = rospy.get_param('~sensor_camera_toggle_depth', 1)
+        sensor_camera_toggle_annotation = rospy.get_param('~sensor_camera_toggle_annotation', 0)
+        sensor_camera_annotation_layers = rospy.get_param('~sensor_camera_annotation_layers',
+                                                          ["TextureTest", "GreyscaleTest"])
         sensor_camera_scene_topics = rospy.get_param('~sensor_camera_scene_topics',
                                                      ["airsim/leftcamera/rgb/image", "airsim/rightcamera/rgb/image"])
         sensor_camera_segmentation_topics = rospy.get_param('~sensor_camera_segmentation_topics',
@@ -1288,6 +1322,9 @@ if __name__ == '__main__':
         sensor_camera_depth_topics = rospy.get_param('~sensor_camera_depth_topics',
                                                      ["airsim/leftcamera/depth/image",
                                                       "airsim/rightcamera/depth/image"])
+        sensor_camera_annotation_topics = rospy.get_param('~sensor_camera_annotation_topics',
+                                                          ["airsim/frontcamera/annotation/TextureTest/image",
+                                                           "airsim/backcamera/annotation/GreyscaleTest/image"])
         sensor_camera_frames = rospy.get_param('~sensor_camera_frames', ["base_leftcamera", "base_rightcamera"])
         sensor_camera_optical_frames = rospy.get_param('~sensor_camera_optical_frames',
                                                        ["leftcamera_optical_link", "rightcamera_optical_link"])
@@ -1544,9 +1581,9 @@ if __name__ == '__main__':
                        sensor_gpulidar_names, sensor_gpulidar_topics,
                        sensor_gpulidar_frames, sensor_camera_names, sensor_camera_toggle_scene_mono,
                        sensor_camera_scene_quality, sensor_camera_toggle_segmentation,
-                       sensor_camera_toggle_depth, sensor_camera_scene_topics,
-                       sensor_camera_segmentation_topics, sensor_camera_depth_topics,
-                       sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
+                       sensor_camera_toggle_depth, sensor_camera_toggle_annotation, sensor_camera_annotation_layers,
+                       sensor_camera_scene_topics, sensor_camera_segmentation_topics, sensor_camera_depth_topics,
+                       sensor_camera_annotation_topics, sensor_camera_optical_frames, sensor_camera_toggle_camera_info,
                        sensor_camera_info_topics, sensor_stereo_enable, baseline,
                        object_poses_all, object_poses_all_coordinates_local, object_poses_all_once,
                        object_poses_all_topic, object_poses_individual_names, object_poses_individual_coordinates_local,
