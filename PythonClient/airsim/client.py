@@ -26,23 +26,46 @@ class VehicleClient:
         If connection is established then this call will return true otherwise it will be blocked until timeout
 
         Returns:
-            bool:
+            bool: True if connection is established, otherwise False
         """
         return self.client.call('ping')
 
     def getClientVersion(self):
+        """
+        Get the version of the client
+
+        Returns:
+            int: Client version number
+        """
         return 3  # sync with C++ client
 
     def getServerVersion(self):
+        """
+        Get the version of the server
+
+        Returns:
+            int: Server version number
+        """
         return self.client.call('getServerVersion')
 
     def getMinRequiredServerVersion(self):
+        """
+        Get the minimum required server version for compatibility
+
+        Returns:
+            int: Minimum required server version number
+        """
         return 3  # sync with C++ client
 
     def getMinRequiredClientVersion(self):
+        """
+        Get the minimum required client version for compatibility
+
+        Returns:
+            int: Minimum required client version number
+        """
         return self.client.call('getMinRequiredClientVersion')
 
-    #basic flight control
     def enableApiControl(self, is_enabled, vehicle_name=''):
         """
         Enables or disables API control for vehicle corresponding to vehicle_name
@@ -176,21 +199,22 @@ class VehicleClient:
             tex_id (int, optional): indexes the array of textures assigned to each actor undergoing a swap
 
                                     If out-of-bounds for some object's texture set, it will be taken modulo the number of textures that were available
-            component_id (int, optional):
-            material_id (int, optional):
+            component_id (int, optional): Index of the component to apply the texture to
+            material_id (int, optional): Index of the material to apply the texture to
 
         Returns:
-            list[str]: List of objects which matched the provided tags and had the texture swap perfomed
+            list[str]: List of objects which matched the provided tags and had the texture swap performed
         """
         return self.client.call("simSwapTextures", tags, tex_id, component_id, material_id)
 
     def simSetObjectMaterial(self, object_name, material_name, component_id=0):
         """
         Runtime Swap Texture API
+
         Args:
-            object_name (str): name of object to set material for
-            material_name (str): name of material to set for object
-            component_id (int, optional) : index of material elements
+            object_name (str): Name of object to set material for
+            material_name (str): Name of material to set for object
+            component_id (int, optional): Index of material elements
 
         Returns:
             bool: True if material was set
@@ -200,18 +224,17 @@ class VehicleClient:
     def simSetObjectMaterialFromTexture(self, object_name, texture_path, component_id=0):
         """
         Runtime Swap Texture API
+
         Args:
-            object_name (str): name of object to set material for
-            texture_path (str): path to texture to set for object
-            component_id (int, optional) : index of material elements
+            object_name (str): Name of object to set material for
+            texture_path (str): Path to texture to set for object
+            component_id (int, optional): Index of material elements
 
         Returns:
             bool: True if material was set
         """
         return self.client.call("simSetObjectMaterialFromTexture", object_name, texture_path, component_id)
 
-    # time-of-day control
-    #time - of - day control
     def simSetTimeOfDay(self, is_enabled, start_datetime="", is_start_datetime_dst=False, celestial_clock_speed=1,
                         update_interval_secs=60, move_sun=True):
         """
@@ -233,7 +256,6 @@ class VehicleClient:
         self.client.call('simSetTimeOfDay', is_enabled, start_datetime, is_start_datetime_dst, celestial_clock_speed,
                          update_interval_secs, move_sun)
 
-    #weather
     def simEnableWeather(self, enable):
         """
         Enable Weather effects. Needs to be called before using `simSetWeatherParameter` API
@@ -253,15 +275,12 @@ class VehicleClient:
         """
         self.client.call('simSetWeatherParameter', param, val)
 
-    #camera control
-    #simGetImage returns compressed png in array of bytes
-    #image_type uses one of the ImageType members
     def simGetImage(self, camera_name, image_type, vehicle_name='', annotation_name=""):
         """
         Get a single image
 
-        Returns bytes of png format image which can be dumped into abinary file to create .png image
-        `string_to_uint8_array()` can be used to convert into Numpy unit8 array
+        Returns bytes of png format image which can be dumped into a binary file to create .png image
+        `string_to_uint8_array()` can be used to convert into Numpy uint8 array
 
         Args:
             camera_name (str): Name of the camera, for backwards compatibility, ID numbers such as 0,1,etc. can also be used
@@ -270,20 +289,17 @@ class VehicleClient:
             annotation_name (str, optional): Name of the annotation to be applied if using image type Annotation.
 
         Returns:
-            Binary string literal of compressed png image
+            bytes: Binary string literal of compressed png image
         """
-        #todo : in future remove below, it's only for compatibility to pre v1.2
+        # todo: in future remove below, it's only for compatibility to pre v1.2
         camera_name = str(camera_name)
 
-        #because this method returns std::vector < uint8>, msgpack decides to encode it as a string, unfortunately.
+        # because this method returns std::vector < uint8>, msgpack decides to encode it as a string, unfortunately.
         result = self.client.call('simGetImage', camera_name, image_type, vehicle_name, annotation_name)
         if result == "" or result == "\0":
             return None
         return result
 
-    #camera control
-    #simGetImage returns compressed png in array of bytes
-    #image_type uses one of the ImageType members
     def simGetImages(self, requests, vehicle_name=''):
         """
         Get multiple images
@@ -293,105 +309,251 @@ class VehicleClient:
             vehicle_name (str, optional): Name of vehicle associated with the camera
 
         Returns:
-            list[ImageResponse]:
+            list[ImageResponse]: List of image responses
         """
         responses_raw = self.client.call('simGetImages', requests, vehicle_name)
         return [ImageResponse.from_msgpack(response_raw) for response_raw in responses_raw]
 
-    #CinemAirSim
     def simGetPresetLensSettings(self, camera_name, vehicle_name=''):
+        """
+        Get the preset lens settings for a given camera
+
+        Args:
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            list[str]: Preset lens settings
+        """
         result = self.client.call('simGetPresetLensSettings', camera_name, vehicle_name)
         if result == "" or result == "\0":
             return None
         return result
 
     def simGetLensSettings(self, camera_name, vehicle_name=''):
+        """
+        Get the current lens settings for a given camera
+
+        Args:
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            str: Current lens settings
+        """
         result = self.client.call('simGetLensSettings', camera_name, vehicle_name)
         if result == "" or result == "\0":
             return None
         return result
 
     def simSetPresetLensSettings(self, preset_lens_settings, camera_name, vehicle_name=''):
+        """
+        Set the preset lens settings for a given camera
+
+        Args:
+            preset_lens_settings (str): Preset lens settings
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+        """
         self.client.call("simSetPresetLensSettings", preset_lens_settings, camera_name, vehicle_name)
 
     def simGetPresetFilmbackSettings(self, camera_name, vehicle_name=''):
+        """
+        Get the preset filmback settings for a given camera
+
+        Args:
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            list[str]: Preset filmback settings
+        """
         result = self.client.call('simGetPresetFilmbackSettings', camera_name, vehicle_name)
         if result == "" or result == "\0":
             return None
         return result
 
     def simSetPresetFilmbackSettings(self, preset_filmback_settings, camera_name, vehicle_name=''):
+        """
+        Set the preset filmback settings for a given camera
+
+        Args:
+            preset_filmback_settings (list[str]): Preset filmback settings
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+        """
         self.client.call("simSetPresetFilmbackSettings", preset_filmback_settings, camera_name, vehicle_name)
 
     def simGetFilmbackSettings(self, camera_name, vehicle_name=''):
+        """
+        Get the current filmback settings for a given camera
+
+        Args:
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            str: Current filmback settings
+        """
         result = self.client.call('simGetFilmbackSettings', camera_name, vehicle_name)
         if result == "" or result == "\0":
             return None
         return result
 
     def simSetFilmbackSettings(self, sensor_width, sensor_height, camera_name, vehicle_name=''):
+        """
+        Set the filmback settings for a given camera
+
+        Args:
+            sensor_width (float): Width of the sensor
+            sensor_height (float): Height of the sensor
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            bool: True if the settings were successfully applied, otherwise False
+        """
         return self.client.call("simSetFilmbackSettings", sensor_width, sensor_height, camera_name, vehicle_name)
 
     def simGetFocalLength(self, camera_name, vehicle_name=''):
+        """
+        Get the focal length for a given camera
+
+        Args:
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            float: Focal length of the camera
+        """
         return self.client.call("simGetFocalLength", camera_name, vehicle_name)
 
     def simSetFocalLength(self, focal_length, camera_name, vehicle_name=''):
+        """
+        Set the focal length for a given camera
+
+        Args:
+            focal_length (float): Focal length to set
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+        """
         self.client.call("simSetFocalLength", focal_length, camera_name, vehicle_name)
 
     def simEnableManualFocus(self, enable, camera_name, vehicle_name=''):
+        """
+        Enable or disable manual focus for a given camera
+
+        Args:
+            enable (bool): True to enable manual focus, False to disable
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+        """
         self.client.call("simEnableManualFocus", enable, camera_name, vehicle_name)
 
     def simGetFocusDistance(self, camera_name, vehicle_name=''):
+        """
+        Get the focus distance for a given camera
+
+        Args:
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            float: Focus distance of the camera
+        """
         return self.client.call("simGetFocusDistance", camera_name, vehicle_name)
 
     def simSetFocusDistance(self, focus_distance, camera_name, vehicle_name=''):
+        """
+        Set the focus distance for a given camera
+
+        Args:
+            focus_distance (float): Focus distance to set
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+        """
         self.client.call("simSetFocusDistance", focus_distance, camera_name, vehicle_name)
 
     def simGetFocusAperture(self, camera_name, vehicle_name=''):
+        """
+        Get the focus aperture for a given camera
+
+        Args:
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+
+        Returns:
+            float: Focus aperture of the camera
+        """
         return self.client.call("simGetFocusAperture", camera_name, vehicle_name)
 
     def simSetFocusAperture(self, focus_aperture, camera_name, vehicle_name=''):
+        """
+        Set the focus aperture for a given camera
+
+        Args:
+            focus_aperture (float): Focus aperture to set
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+        """
         self.client.call("simSetFocusAperture", focus_aperture, camera_name, vehicle_name)
 
     def simEnableFocusPlane(self, enable, camera_name, vehicle_name=''):
+        """
+        Enable or disable the focus plane for a given camera
+
+        Args:
+            enable (bool): True to enable focus plane, False to disable
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
+        """
         self.client.call("simEnableFocusPlane", enable, camera_name, vehicle_name)
 
     def simGetCurrentFieldOfView(self, camera_name, vehicle_name=''):
-        return self.client.call("simGetCurrentFieldOfView", camera_name, vehicle_name)
-
-    #End CinemAirSim
-    def simTestLineOfSightToPoint(self, point, vehicle_name=''):
         """
-        Returns whether the target point is visible from the perspective of the inputted vehicle
+        Get the current field of view for a given camera
 
         Args:
-            point (GeoPoint): target point
-            vehicle_name (str, optional): Name of vehicle
+            camera_name (str): Name of the camera
+            vehicle_name (str, optional): Name of the vehicle with the camera
 
         Returns:
-            [bool]: Success
+            float: Current field of view of the camera
+        """
+        return self.client.call("simGetCurrentFieldOfView", camera_name, vehicle_name)
+
+    def simTestLineOfSightToPoint(self, point, vehicle_name=''):
+        """
+        Returns whether the target point is visible from the perspective of the inputted vehicle.
+
+        Args:
+            point (GeoPoint): Target point.
+            vehicle_name (str, optional): Name of the vehicle.
+
+        Returns:
+            bool: True if the target point is visible, otherwise False.
         """
         return self.client.call('simTestLineOfSightToPoint', point, vehicle_name)
 
     def simTestLineOfSightBetweenPoints(self, point1, point2):
         """
-        Returns whether the target point is visible from the perspective of the source point
+        Returns whether the target point is visible from the perspective of the source point.
 
         Args:
-            point1 (GeoPoint): source point
-            point2 (GeoPoint): target point
+            point1 (GeoPoint): Source point.
+            point2 (GeoPoint): Target point.
 
         Returns:
-            [bool]: Success
+            bool: True if the target point is visible from the source point, otherwise False.
         """
         return self.client.call('simTestLineOfSightBetweenPoints', point1, point2)
 
     def simGetWorldExtents(self):
         """
-        Returns a list of GeoPoints representing the minimum and maximum extents of the world
+        Returns a list of GeoPoints representing the minimum and maximum extents of the world.
 
         Returns:
-            list[GeoPoint]
+            list[GeoPoint]: List containing the minimum and maximum extents of the world.
         """
         responses_raw = self.client.call('simGetWorldExtents')
         return [GeoPoint.from_msgpack(response_raw) for response_raw in responses_raw]
@@ -403,245 +565,433 @@ class VehicleClient:
         Allows the user to create bespoke APIs very easily, by adding a custom event to the level blueprint, and then calling the console command "ce MyEventName [args]". No recompilation of Cosys-AirSim needed!
 
         Args:
-            command ([string]): Desired Unreal Engine Console command to run
+            command (str): Desired Unreal Engine Console command to run.
 
         Returns:
-            [bool]: Success
+            bool: True if the command was successfully executed, otherwise False.
         """
         return self.client.call('simRunConsoleCommand', command)
 
-    #gets the static meshes in the unreal scene
     def simGetMeshPositionVertexBuffers(self):
         """
-        Returns the static meshes that make up the scene
-
+        Returns the static meshes that make up the scene.
 
         Returns:
-            list[MeshPositionVertexBuffersResponse]:
+            list[MeshPositionVertexBuffersResponse]: List of responses containing mesh position vertex buffers.
         """
         responses_raw = self.client.call('simGetMeshPositionVertexBuffers')
         return [MeshPositionVertexBuffersResponse.from_msgpack(response_raw) for response_raw in responses_raw]
 
     def simGetCollisionInfo(self, vehicle_name=''):
         """
+        Gets the collision information for the specified vehicle.
+
         Args:
-            vehicle_name (str, optional): Name of the Vehicle to get the info of
+            vehicle_name (str, optional): Name of the vehicle to get the collision information of.
 
         Returns:
-            CollisionInfo:
+            CollisionInfo: Collision information of the specified vehicle.
         """
         return CollisionInfo.from_msgpack(self.client.call('simGetCollisionInfo', vehicle_name))
 
     def simSetVehiclePose(self, pose, ignore_collision, vehicle_name=''):
         """
-        Set the pose of the vehicle
+        Set the pose of the vehicle.
 
-        If you don't want to change position (or orientation) then just set components of position (or orientation) to floating point nan values
+        If you don't want to change position (or orientation), then just set the components of position (or orientation) to floating point NaN values.
 
         Args:
-            pose (Pose): Desired Pose pf the vehicle
-            ignore_collision (bool): Whether to ignore any collision or not
-            vehicle_name (str, optional): Name of the vehicle to move
+            pose (Pose): Desired pose of the vehicle.
+            ignore_collision (bool): Whether to ignore any collision or not.
+            vehicle_name (str, optional): Name of the vehicle to move.
         """
         self.client.call('simSetVehiclePose', pose, ignore_collision, vehicle_name)
 
     def simGetVehiclePose(self, vehicle_name=''):
         """
-        The position inside the returned Pose is in the frame of the vehicle's starting point
-        
+        Gets the pose of the specified vehicle. The position inside the returned Pose is in the frame of the vehicle's starting point.
+
         Args:
-            vehicle_name (str, optional): Name of the vehicle to get the Pose of
+            vehicle_name (str, optional): Name of the vehicle to get the pose of.
 
         Returns:
-            Pose:
+            Pose: Pose of the specified vehicle.
         """
         pose = self.client.call('simGetVehiclePose', vehicle_name)
         return Pose.from_msgpack(pose)
 
     def simSetTraceLine(self, color_rgba, thickness=1.0, vehicle_name=''):
         """
-        Modify the color and thickness of the line when Tracing is enabled
+        Modify the color and thickness of the line when tracing is enabled.
 
-        Tracing can be enabled by pressing T in the Editor or setting `EnableTrace` to `True` in the Vehicle Settings
+        Tracing can be enabled by pressing 'T' in the Editor or setting `EnableTrace` to `True` in the Vehicle Settings.
 
         Args:
-            color_rgba (list): desired RGBA values from 0.0 to 1.0
-            thickness (float, optional): Thickness of the line
-            vehicle_name (string, optional): Name of the vehicle to set Trace line values for
+            color_rgba (list): Desired RGBA values from 0.0 to 1.0.
+            thickness (float, optional): Thickness of the line.
+            vehicle_name (str, optional): Name of the vehicle to set trace line values for.
         """
         self.client.call('simSetTraceLine', color_rgba, thickness, vehicle_name)
 
     def simGetObjectPose(self, object_name, ned=True):
         """
-        The position inside the returned Pose is in the world frame
+        Gets the pose of the specified object. The position inside the returned Pose is in the world frame.
 
         Args:
-            object_name (str): Object to get the Pose of
+            object_name (str): Name of the object to get the pose of.
+            ned (bool, optional): Whether the pose is in NED coordinates.
 
         Returns:
-            Pose:
+            Pose: Pose of the specified object.
         """
         pose = self.client.call('simGetObjectPose', object_name, ned)
         return Pose.from_msgpack(pose)
 
     def simSetObjectPose(self, object_name, pose, teleport=True):
         """
-        Set the pose of the object(actor) in the environment
+        Set the pose of the object (actor) in the environment.
 
-        The specified actor must have Mobility set to movable, otherwise there will be undefined behaviour.
-        See https://www.unrealengine.com/en-US/blog/moving-physical-objects for details on how to set Mobility and the effect of Teleport parameter
+        The specified actor must have Mobility set to movable, otherwise there will be undefined behavior.
+        See https://www.unrealengine.com/en-US/blog/moving-physical-objects for details on how to set Mobility and the effect of the Teleport parameter.
 
         Args:
-            object_name (str): Name of the object(actor) to move
-            pose (Pose): Desired Pose of the object
-            teleport (bool, optional): Whether to move the object immediately without affecting their velocity
+            object_name (str): Name of the object (actor) to move.
+            pose (Pose): Desired pose of the object.
+            teleport (bool, optional): Whether to move the object immediately without affecting its velocity.
 
         Returns:
-            bool: If the move was successful
+            bool: True if the move was successful, otherwise False.
         """
         return self.client.call('simSetObjectPose', object_name, pose, teleport)
 
     def simGetObjectScale(self, object_name):
         """
-        Gets scale of an object in the world
+        Gets the scale of the specified object in the world.
 
         Args:
-            object_name (str): Object to get the scale of
+            object_name (str): Name of the object to get the scale of.
 
         Returns:
-            airsim.Vector3r: Scale
+            Vector3r: Scale of the specified object.
         """
         scale = self.client.call('simGetObjectScale', object_name)
         return Vector3r.from_msgpack(scale)
 
     def simSetObjectScale(self, object_name, scale_vector):
         """
-        Sets scale of an object in the world
+        Sets the scale of the specified object in the world.
 
         Args:
-            object_name (str): Object to set the scale of
-            scale_vector (airsim.Vector3r): Desired scale of object
+            object_name (str): Name of the object to set the scale of.
+            scale_vector (Vector3r): Desired scale of the object.
 
         Returns:
-            bool: True if scale change was successful
+            bool: True if the scale change was successful, otherwise False.
         """
         return self.client.call('simSetObjectScale', object_name, scale_vector)
 
     def simListSceneObjects(self, name_regex='.*'):
         """
-        Lists the objects present in the environment
+        Lists the objects present in the environment.
 
-        Default behaviour is to list all objects, regex can be used to return smaller list of matching objects or actors
+        The default behavior is to list all objects. A regex can be used to return a smaller list of matching objects or actors.
 
         Args:
-            name_regex (str, optional): String to match actor names against, e.g. "Cylinder.*"
+            name_regex (str, optional): String to match actor names against, e.g., "Cylinder.*".
 
         Returns:
-            list[str]: List containing all the names
+            list[str]: List containing the names of the objects.
         """
         return self.client.call('simListSceneObjects', name_regex)
 
     def simLoadLevel(self, level_name):
         """
-        Loads a level specified by its name
+        Loads a level specified by its name.
 
         Args:
-            level_name (str): Name of the level to load
+            level_name (str): Name of the level to load.
 
         Returns:
-            bool: True if the level was successfully loaded
+            bool: True if the level was successfully loaded, otherwise False.
         """
         return self.client.call('simLoadLevel', level_name)
 
     def simListAssets(self):
         """
-        Lists all the assets present in the Asset Registry
+        Lists all the assets present in the Asset Registry.
 
         Returns:
-            list[str]: Names of all the assets
+            list[str]: Names of all the assets.
         """
         return self.client.call('simListAssets')
 
     def simSpawnObject(self, object_name, asset_name, pose, scale, physics_enabled=False, is_blueprint=False):
-        """Spawned selected object in the world
+        """
+        Spawns the selected object in the world.
 
         Args:
-            object_name (str): Desired name of new object
-            asset_name (str): Name of asset(mesh) in the project database
-            pose (airsim.Pose): Desired pose of object
-            scale (airsim.Vector3r): Desired scale of object
-            physics_enabled (bool, optional): Whether to enable physics for the object
-            is_blueprint (bool, optional): Whether to spawn a blueprint or an actor
+            object_name (str): Desired name of the new object.
+            asset_name (str): Name of the asset (mesh) in the project database.
+            pose (Pose): Desired pose of the object.
+            scale (Vector3r): Desired scale of the object.
+            physics_enabled (bool, optional): Whether to enable physics for the object.
+            is_blueprint (bool, optional): Whether to spawn a blueprint or an actor.
 
         Returns:
-            str: Name of spawned object, in case it had to be modified
+            str: Name of the spawned object, in case it had to be modified.
         """
         return self.client.call('simSpawnObject', object_name, asset_name, pose, scale, physics_enabled, is_blueprint)
 
     def simDestroyObject(self, object_name):
-        """Removes selected object from the world
+        """
+        Removes the selected object from the world.
 
         Args:
-            object_name (str): Name of object to be removed
+            object_name (str): Name of the object to be removed.
 
         Returns:
-            bool: True if object is queued up for removal
+            bool: True if the object is queued up for removal, otherwise False.
         """
         return self.client.call('simDestroyObject', object_name)
 
     def simListInstanceSegmentationObjects(self):
+        """
+        Lists all the instance segmentation objects in the environment.
+
+        Returns:
+            list[str]: Names of all the instance segmentation objects.
+        """
         return self.client.call('simListInstanceSegmentationObjects')
 
     def simListInstanceSegmentationPoses(self, ned=True, only_visible=False):
+        """
+        Lists the poses of all instance segmentation objects in the environment.
+
+        Args:
+            ned (bool, optional): Whether the poses are in NED coordinates.
+            only_visible (bool, optional): Whether to include only visible objects.
+
+        Returns:
+            list[Pose]: List of poses of instance segmentation objects.
+        """
         poses_raw = self.client.call('simListInstanceSegmentationPoses', ned, only_visible)
         return [Pose.from_msgpack(pose_raw) for pose_raw in poses_raw]
 
     def simSetSegmentationObjectID(self, mesh_name, object_id, is_name_regex=False):
+        """
+        Sets the ID for the specified segmentation object.
+
+        Args:
+            mesh_name (str): Name of the mesh.
+            object_id (int): Desired ID for the object.
+            is_name_regex (bool, optional): Whether the mesh name is a regex.
+
+        Returns:
+            bool: True if the ID was successfully set, otherwise False.
+        """
         return self.client.call('simSetSegmentationObjectID', mesh_name, object_id, is_name_regex)
 
     def simGetSegmentationObjectID(self, mesh_name):
+        """
+        Gets the ID for the specified segmentation object.
+
+        Args:
+            mesh_name (str): Name of the mesh.
+
+        Returns:
+            int: ID of the specified object.
+        """
         return self.client.call('simGetSegmentationObjectID', mesh_name)
 
-    def simListAnnotationObjects(self, annotation_name, ):
+    def simListAnnotationObjects(self, annotation_name):
+        """
+        Lists all annotation objects with the specified name of the layer.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+
+        Returns:
+            list[str]: List of annotation objects with the specified name.
+        """
         return self.client.call('simListAnnotationObjects', annotation_name)
 
     def simListAnnotationPoses(self, annotation_name, ned=True, only_visible=False):
+        """
+        Lists the poses of all annotation objects with the specified name of the layer.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            ned (bool, optional): Whether the poses are in NED coordinates.
+            only_visible (bool, optional): Whether to include only visible objects.
+
+        Returns:
+            list[Pose]: List of poses of annotation objects with the specified name.
+        """
         poses_raw = self.client.call('simListAnnotationPoses', annotation_name, ned, only_visible)
         return [Pose.from_msgpack(pose_raw) for pose_raw in poses_raw]
 
     def simSetAnnotationObjectID(self, annotation_name, mesh_name, object_id, is_name_regex=False):
+        """
+        Sets the ID for the specified annotation object on this annotation layer.
+        This works only for RGB layers.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+            object_id (int): Desired ID for the object.
+            is_name_regex (bool, optional): Whether the mesh name is a regex.
+
+        Returns:
+            bool: True if the ID was successfully set, otherwise False.
+        """
         return self.client.call('simSetAnnotationObjectID', annotation_name, mesh_name, object_id, is_name_regex)
 
     def simGetAnnotationObjectID(self, annotation_name, mesh_name):
+        """
+        Gets the ID for the specified annotation object on this annotation layer.
+        This works only for RGB layers.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+
+        Returns:
+            int: ID of the specified object.
+        """
         return self.client.call('simGetAnnotationObjectID', annotation_name, mesh_name)
 
     def simSetAnnotationObjectColor(self, annotation_name, mesh_name, r, g, b, is_name_regex=False):
+        """
+        Sets the color for the specified annotation object on this annotation layer.
+        This works only for RGB layers. Use simIsValidColor(r, g, b) to test if your color can work!
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+            r (float): Red component of the color [0 255]
+            g (float): Green component of the color [0 255]
+            b (float): Blue component of the color [0 255]
+            is_name_regex (bool, optional): Whether the mesh name is a regex.
+
+        Returns:
+            bool: True if the color was successfully set, otherwise False.
+        """
         return self.client.call('simSetAnnotationObjectColor', annotation_name, mesh_name, r, g, b, is_name_regex)
 
     def simGetAnnotationObjectColor(self, annotation_name, mesh_name):
+        """
+        Gets the color for the specified annotation object on this annotation layer.
+        This works only for RGB layers.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+
+        Returns:
+            tuple: (r, g, b) color values of the specified object.
+        """
         return self.client.call('simGetAnnotationObjectColor', annotation_name, mesh_name)
 
     def simSetAnnotationObjectValue(self, annotation_name, mesh_name, greyscale_value, is_name_regex=False):
+        """
+        Sets the greyscale value for the specified annotation object on this annotation layer.
+        This works only for greyscale layers.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+            greyscale_value (float): Desired greyscale value for the object.
+            is_name_regex (bool, optional): Whether the mesh name is a regex.
+
+        Returns:
+            bool: True if the greyscale value was successfully set, otherwise False.
+        """
         return self.client.call('simSetAnnotationObjectValue', annotation_name, mesh_name, greyscale_value,
                                 is_name_regex)
 
     def simGetAnnotationObjectValue(self, annotation_name, mesh_name):
+        """
+        Gets the greyscale value for the specified annotation object on this annotation layer.
+        This works only for greyscale layers.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+
+        Returns:
+            float: Greyscale value of the specified object.
+        """
         return self.client.call('simGetAnnotationObjectValue', annotation_name, mesh_name)
 
     def simSetAnnotationObjectTextureByPath(self, annotation_name, mesh_name, texture_path, is_name_regex=False):
+        """
+        Sets the texture for the specified annotation object by path on this annotation layer.
+        See documentation on annotation for texture path syntax.
+        This works only for texture layers that are set to direct mode.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+            texture_path (str): Path to the desired texture.
+            is_name_regex (bool, optional): Whether the mesh name is a regex.
+
+        Returns:
+            bool: True if the texture was successfully set, otherwise False.
+        """
         return self.client.call('simSetAnnotationObjectTextureByPath', annotation_name, mesh_name, texture_path,
                                 is_name_regex)
 
     def simEnableAnnotationObjectTextureByPath(self, annotation_name, mesh_name, is_name_regex=False):
+        """
+        Enables the texture for the specified annotation object by relative path on this annotation layer.
+        This works only for texture layers set to relative path mode.
+        This requires the texture to be present in the expected location. See annotation documentation for more info.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+            is_name_regex (bool, optional): Whether the mesh name is a regex.
+
+        Returns:
+            bool: True if the texture was successfully enabled, otherwise False.
+        """
         return self.client.call('simEnableAnnotationObjectTextureByPath', annotation_name, mesh_name, is_name_regex)
 
     def simGetAnnotationObjectTexturePath(self, annotation_name, mesh_name):
+        """
+        Gets the texture path for the specified annotation object on this annotation layer.
+        This works only for texture layers.
+
+        Args:
+            annotation_name (str): Name of the annotation layer.
+            mesh_name (str): Name of the mesh.
+
+        Returns:
+            str: Path to the texture of the specified object.
+        """
         return self.client.call('simGetAnnotationObjectTexturePath', annotation_name, mesh_name)
 
     def simGetSegmentationColorMap(self):
+        """
+        Gets the segmentation color map.
+
+        Returns:
+            dict: Dictionary mapping object IDs to colors.
+        """
         return load_colormap()
 
     def simIsValidColor(self, r, g, b):
+        """
+        Checks if the specified color is valid.
+
+        Args:
+            r (int): Red component of the color [0 255]
+            g (int): Green component of the color [0 255]
+            b (int): Blue component of the color [0 255]
+
+        Returns:
+            bool: True if the color is valid, otherwise False.
+        """
         return np.array([r, g, b]) in load_colormap()
 
     def simAddDetectionFilterMeshName(self, camera_name, image_type, mesh_name, vehicle_name='', annotation_name=""):
@@ -848,7 +1198,6 @@ class VehicleClient:
 
     simGetGroundTruthEnvironment.__annotations__ = {'return': EnvironmentState}
 
-    #sensor APIs
     def getImuData(self, imu_name='', vehicle_name=''):
         """
         Args:
@@ -917,24 +1266,83 @@ class VehicleClient:
         return LidarData.from_msgpack(self.client.call('getLidarData', lidar_name, vehicle_name))
 
     def getGPULidarData(self, lidar_name='', vehicle_name=''):
+        """
+        Retrieves data from the specified GPU LiDAR sensor.
+
+        Args:
+            lidar_name (str, optional): Name of the GPU LiDAR to get data from, specified in settings.json.
+            vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
+
+        Returns:
+            GPULidarData: Data from the specified GPU LiDAR sensor.
+        """
         return GPULidarData.from_msgpack(self.client.call('getGPULidarData', lidar_name, vehicle_name))
 
     def getEchoData(self, echo_name='', vehicle_name=''):
+        """
+        Retrieves data from the specified Echo sensor.
+
+        Args:
+            echo_name (str, optional): Name of the Echo sensor to get data from, specified in settings.json.
+            vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
+
+        Returns:
+            EchoData: Data from the specified Echo sensor.
+        """
         return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))
 
     def getUWBData(self, uwb_name='', vehicle_name=''):
+        """
+        Retrieves data from the specified UWB (Ultra-Wideband) sensor.
+
+        Args:
+            uwb_name (str, optional): Name of the UWB sensor to get data from, specified in settings.json.
+            vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
+
+        Returns:
+            UwbData: Data from the specified UWB sensor.
+        """
         return UwbData.from_msgpack(self.client.call('getUWBData', uwb_name, vehicle_name))
 
     def getUWBSensorData(self, uwb_name='', vehicle_name=''):
+        """
+        Retrieves sensor-specific data from the specified UWB sensor.
+
+        Args:
+            uwb_name (str, optional): Name of the UWB sensor to get data from, specified in settings.json.
+            vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
+
+        Returns:
+            UwbSensorData: Sensor-specific data from the specified UWB sensor.
+        """
         return UwbSensorData.from_msgpack(self.client.call('getUWBSensorData', uwb_name, vehicle_name))
 
     def getWifiData(self, wifi_name='', vehicle_name=''):
+        """
+        Retrieves data from the specified WiFi sensor.
+
+        Args:
+            wifi_name (str, optional): Name of the WiFi sensor to get data from, specified in settings.json.
+            vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
+
+        Returns:
+            WifiData: Data from the specified WiFi sensor.
+        """
         return WifiData.from_msgpack(self.client.call('getWifiData', wifi_name, vehicle_name))
 
     def getWifiSensorData(self, wifi_name='', vehicle_name=''):
+        """
+        Retrieves sensor-specific data from the specified WiFi sensor.
+
+        Args:
+            wifi_name (str, optional): Name of the WiFi sensor to get data from, specified in settings.json.
+            vehicle_name (str, optional): Name of the vehicle to which the sensor corresponds.
+
+        Returns:
+            WifiSensorData: Sensor-specific data from the specified WiFi sensor.
+        """
         return WifiSensorData.from_msgpack(self.client.call('getWifiSensorData', wifi_name, vehicle_name))
 
-    #Plotting APIs
     def simFlushPersistentMarkers(self):
         """
         Clear any persistent markers - those plotted with setting `is_persistent=True` in the APIs below
@@ -1050,7 +1458,6 @@ class VehicleClient:
         """
         self.client.call('cancelLastTask', vehicle_name)
 
-    #Recording APIs
     def startRecording(self):
         """
         Start Recording
@@ -1098,7 +1505,6 @@ class VehicleClient:
         """
         return self.client.call('simCreateVoxelGrid', position, x, y, z, res, of)
 
-    #Add new vehicle via RPC
     def simAddVehicle(self, vehicle_name, vehicle_type, pose, pawn_path=""):
         """
         Create vehicle at runtime
@@ -1187,21 +1593,22 @@ class MultirotorClient(VehicleClient, object):
         """
         return self.client.call_async('goHome', timeout_sec, vehicle_name)
 
-    #APIs for control
     def moveByVelocityBodyFrameAsync(self, vx, vy, vz, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                                      yaw_mode=YawMode(), vehicle_name=''):
         """
+        Initiates a velocity command relative to the vehicle's body frame asynchronously.
+
         Args:
-            vx (float): desired velocity in the X axis of the vehicle's local NED frame.
-            vy (float): desired velocity in the Y axis of the vehicle's local NED frame.
-            vz (float): desired velocity in the Z axis of the vehicle's local NED frame.
-            duration (float): Desired amount of time (seconds), to send this command for
-            drivetrain (DrivetrainType, optional):
-            yaw_mode (YawMode, optional):
-            vehicle_name (str, optional): Name of the multirotor to send this command to
+            vx (float): Desired velocity in the X axis of the vehicle's local NED frame.
+            vy (float): Desired velocity in the Y axis of the vehicle's local NED frame.
+            vz (float): Desired velocity in the Z axis of the vehicle's local NED frame.
+            duration (float): Desired amount of time (seconds) to send this command for.
+            drivetrain (DrivetrainType, optional): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
 
         Returns:
-            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
         return self.client.call_async('moveByVelocityBodyFrame', vx, vy, vz, duration, drivetrain, yaw_mode,
                                       vehicle_name)
@@ -1209,27 +1616,60 @@ class MultirotorClient(VehicleClient, object):
     def moveByVelocityZBodyFrameAsync(self, vx, vy, z, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                                       yaw_mode=YawMode(), vehicle_name=''):
         """
+        Initiates a velocity command relative to the vehicle's body frame with a specified Z axis position asynchronously.
+
         Args:
-            vx (float): desired velocity in the X axis of the vehicle's local NED frame
-            vy (float): desired velocity in the Y axis of the vehicle's local NED frame
-            z (float): desired Z value (in local NED frame of the vehicle)
-            duration (float): Desired amount of time (seconds), to send this command for
-            drivetrain (DrivetrainType, optional):
-            yaw_mode (YawMode, optional):
-            vehicle_name (str, optional): Name of the multirotor to send this command to
+            vx (float): Desired velocity in the X axis of the vehicle's local NED frame.
+            vy (float): Desired velocity in the Y axis of the vehicle's local NED frame.
+            z (float): Desired Z value (in the local NED frame of the vehicle).
+            duration (float): Desired amount of time (seconds) to send this command for.
+            drivetrain (DrivetrainType, optional): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
 
         Returns:
-            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-
         return self.client.call_async('moveByVelocityZBodyFrame', vx, vy, z, duration, drivetrain, yaw_mode,
                                       vehicle_name)
 
     def moveByAngleZAsync(self, pitch, roll, z, yaw, duration, vehicle_name=''):
+        """
+        Initiates a movement command based on angles and Z axis position asynchronously.
+
+        **Note:** This API is deprecated. Use `moveByRollPitchYawZAsync()` instead.
+
+        Args:
+            pitch (float): Desired pitch angle (in degrees).
+            roll (float): Desired roll angle (in degrees).
+            z (float): Desired Z value (in the local NED frame of the vehicle).
+            yaw (float): Desired yaw angle (in degrees).
+            duration (float): Desired amount of time (seconds) to send this command for.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         logging.warning("moveByAngleZAsync API is deprecated, use moveByRollPitchYawZAsync() API instead")
         return self.client.call_async('moveByRollPitchYawZ', roll, -pitch, -yaw, z, duration, vehicle_name)
 
     def moveByAngleThrottleAsync(self, pitch, roll, throttle, yaw_rate, duration, vehicle_name=''):
+        """
+        Initiates a movement command based on angles, throttle, and yaw rate asynchronously.
+
+        **Note:** This API is deprecated. Use `moveByRollPitchYawrateThrottleAsync()` instead.
+
+        Args:
+            pitch (float): Desired pitch angle (in degrees).
+            roll (float): Desired roll angle (in degrees).
+            throttle (float): Desired throttle value (normalized).
+            yaw_rate (float): Desired yaw rate (in degrees per second).
+            duration (float): Desired amount of time (seconds) to send this command for.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         logging.warning(
             "moveByAngleThrottleAsync API is deprecated, use moveByRollPitchYawrateThrottleAsync() API instead")
         return self.client.call_async('moveByRollPitchYawrateThrottle', roll, -pitch, -yaw_rate, throttle, duration,
@@ -1238,83 +1678,207 @@ class MultirotorClient(VehicleClient, object):
     def moveByVelocityAsync(self, vx, vy, vz, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                             yaw_mode=YawMode(), vehicle_name=''):
         """
+        Initiates a velocity command in world (NED) frame asynchronously.
+
         Args:
-            vx (float): desired velocity in world (NED) X axis
-            vy (float): desired velocity in world (NED) Y axis
-            vz (float): desired velocity in world (NED) Z axis
-            duration (float): Desired amount of time (seconds), to send this command for
-            drivetrain (DrivetrainType, optional):
-            yaw_mode (YawMode, optional):
-            vehicle_name (str, optional): Name of the multirotor to send this command to
+            vx (float): Desired velocity in the world (NED) X axis.
+            vy (float): Desired velocity in the world (NED) Y axis.
+            vz (float): Desired velocity in the world (NED) Z axis.
+            duration (float): Desired amount of time (seconds) to send this command for.
+            drivetrain (DrivetrainType, optional): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
 
         Returns:
-            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
         return self.client.call_async('moveByVelocity', vx, vy, vz, duration, drivetrain, yaw_mode, vehicle_name)
 
     def moveByVelocityZAsync(self, vx, vy, z, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                              yaw_mode=YawMode(), vehicle_name=''):
+        """
+        Initiates a velocity command with a specified Z axis position asynchronously.
+
+        Args:
+            vx (float): Desired velocity in the world (NED) X axis.
+            vy (float): Desired velocity in the world (NED) Y axis.
+            z (float): Desired Z value (in the world (NED) frame).
+            duration (float): Desired amount of time (seconds) to send this command for.
+            drivetrain (DrivetrainType, optional): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, drivetrain, yaw_mode, vehicle_name)
 
     def moveOnPathAsync(self, path, velocity, timeout_sec=3e+38, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
-                        yaw_mode=YawMode(),
-                        lookahead=-1, adaptive_lookahead=1, vehicle_name=''):
+                        yaw_mode=YawMode(), lookahead=-1, adaptive_lookahead=1, vehicle_name=''):
+        """
+        Initiates a movement along a specified path asynchronously.
+
+        Args:
+            path (list[airsim.Vector3r]): List of waypoints defining the path.
+            velocity (float): Desired velocity along the path (meters per second).
+            timeout_sec (float, optional): Timeout duration in seconds.
+            drivetrain (DrivetrainType, optional): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            lookahead (float, optional): Lookahead distance for path following.
+            adaptive_lookahead (float, optional): Adaptive lookahead factor for path following.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('moveOnPath', path, velocity, timeout_sec, drivetrain, yaw_mode, lookahead,
                                       adaptive_lookahead, vehicle_name)
 
     def moveToPositionAsync(self, x, y, z, velocity, timeout_sec=3e+38, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
-                            yaw_mode=YawMode(),
-                            lookahead=-1, adaptive_lookahead=1, vehicle_name=''):
+                            yaw_mode=YawMode(), lookahead=-1, adaptive_lookahead=1, vehicle_name=''):
+        """
+        Initiates a movement to a specified position asynchronously.
+
+        Args:
+            x (float): Desired X coordinate of the target position (in world (NED) frame).
+            y (float): Desired Y coordinate of the target position (in world (NED) frame).
+            z (float): Desired Z coordinate of the target position (in world (NED) frame).
+            velocity (float): Desired velocity towards the target position (meters per second).
+            timeout_sec (float, optional): Timeout duration in seconds.
+            drivetrain (DrivetrainType, optional): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            lookahead (float, optional): Lookahead distance for path following.
+            adaptive_lookahead (float, optional): Adaptive lookahead factor for path following.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('moveToPosition', x, y, z, velocity, timeout_sec, drivetrain, yaw_mode, lookahead,
                                       adaptive_lookahead, vehicle_name)
 
     def moveToGPSAsync(self, latitude, longitude, altitude, velocity, timeout_sec=3e+38,
                        drivetrain=DrivetrainType.MaxDegreeOfFreedom, yaw_mode=YawMode(),
                        lookahead=-1, adaptive_lookahead=1, vehicle_name=''):
+        """
+        Initiates a movement to a specified GPS position asynchronously.
+
+        Args:
+            latitude (float): Desired latitude of the target position.
+            longitude (float): Desired longitude of the target position.
+            altitude (float): Desired altitude of the target position (in meters).
+            velocity (float): Desired velocity towards the target position (meters per second).
+            timeout_sec (float, optional): Timeout duration in seconds.
+            drivetrain (DrivetrainType, optional): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            lookahead (float, optional): Lookahead distance for path following.
+            adaptive_lookahead (float, optional): Adaptive lookahead factor for path following.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('moveToGPS', latitude, longitude, altitude, velocity, timeout_sec, drivetrain,
                                       yaw_mode, lookahead, adaptive_lookahead, vehicle_name)
 
     def moveToZAsync(self, z, velocity, timeout_sec=3e+38, yaw_mode=YawMode(), lookahead=-1, adaptive_lookahead=1,
                      vehicle_name=''):
+        """
+        Initiates a movement to a specified Z axis position asynchronously.
+
+        Args:
+            z (float): Desired Z coordinate of the target position (in meters).
+            velocity (float): Desired velocity towards the target position (meters per second).
+            timeout_sec (float, optional): Timeout duration in seconds.
+            yaw_mode (YawMode, optional): Specifies the yaw mode for the command.
+            lookahead (float, optional): Lookahead distance for path following.
+            adaptive_lookahead (float, optional): Adaptive lookahead factor for path following.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('moveToZ', z, velocity, timeout_sec, yaw_mode, lookahead, adaptive_lookahead,
                                       vehicle_name)
 
     def moveByManualAsync(self, vx_max, vy_max, z_min, duration, drivetrain=DrivetrainType.MaxDegreeOfFreedom,
                           yaw_mode=YawMode(), vehicle_name=''):
         """
-        - Read current RC state and use it to control the vehicles.
+        Initiates a manual movement command asynchronously using RC state.
 
-        Parameters sets up the constraints on velocity and minimum altitude while flying. If RC state is detected to violate these constraints
-        then that RC state would be ignored.
+        This method sets constraints on velocity and minimum altitude while flying. If the RC state is detected to violate these constraints,
+        that RC state would be ignored.
 
         Args:
-            vx_max (float): max velocity allowed in x direction
-            vy_max (float): max velocity allowed in y direction
-            vz_max (float): max velocity allowed in z direction
-            z_min (float): min z allowed for vehicle position
-            duration (float): after this duration vehicle would switch back to non-manual mode
-            drivetrain (DrivetrainType): when ForwardOnly, vehicle rotates itself so that its front is always facing the direction of travel. If MaxDegreeOfFreedom then it doesn't do that (crab-like movement)
-            yaw_mode (YawMode): Specifies if vehicle should face at given angle (is_rate=False) or should be rotating around its axis at given rate (is_rate=True)
-            vehicle_name (str, optional): Name of the multirotor to send this command to
+            vx_max (float): Maximum allowed velocity in the X direction (in meters per second).
+            vy_max (float): Maximum allowed velocity in the Y direction (in meters per second).
+            z_min (float): Minimum allowed Z coordinate for vehicle position (in meters).
+            duration (float): Duration after which the vehicle switches back to non-manual mode (in seconds).
+            drivetrain (DrivetrainType): Specifies the type of drivetrain used by the vehicle.
+            yaw_mode (YawMode): Specifies if the vehicle should face at a given angle (is_rate=False)
+                               or should be rotating around its axis at a given rate (is_rate=True).
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
         Returns:
-            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
         return self.client.call_async('moveByManual', vx_max, vy_max, z_min, duration, drivetrain, yaw_mode,
                                       vehicle_name)
 
     def rotateToYawAsync(self, yaw, timeout_sec=3e+38, margin=5, vehicle_name=''):
+        """
+        Initiates a rotation command to a specific yaw angle asynchronously.
+
+        Args:
+            yaw (float): Desired yaw angle (in degrees).
+            timeout_sec (float, optional): Timeout duration in seconds.
+            margin (float, optional): Margin allowed for reaching the desired yaw angle (in degrees).
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('rotateToYaw', yaw, timeout_sec, margin, vehicle_name)
 
     def rotateByYawRateAsync(self, yaw_rate, duration, vehicle_name=''):
+        """
+        Initiates a rotation command at a specific yaw rate asynchronously.
+
+        Args:
+            yaw_rate (float): Desired yaw rate (in degrees per second).
+            duration (float): Duration for which the vehicle should rotate (in seconds).
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('rotateByYawRate', yaw_rate, duration, vehicle_name)
 
     def hoverAsync(self, vehicle_name=''):
+        """
+        Initiates a hover command asynchronously.
+
+        Args:
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call_async('hover', vehicle_name)
 
     def moveByRC(self, rcdata=RCData(), vehicle_name=''):
+        """
+        Initiates a movement command using RC data.
+
+        Args:
+            rcdata (RCData, optional): RC data object specifying control input.
+            vehicle_name (str, optional): Name of the multirotor to send this command to.
+
+        Returns:
+            msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
+        """
         return self.client.call('moveByRC', rcdata, vehicle_name)
 
-    #low - level control API
     def moveByMotorPWMsAsync(self, front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration,
                              vehicle_name=''):
         """
@@ -1605,7 +2169,6 @@ class MultirotorClient(VehicleClient, object):
         """
         self.client.call('setPositionControllerGains', *(position_gains.to_lists() + (vehicle_name,)))
 
-    #query vehicle state
     def getMultirotorState(self, vehicle_name=''):
         """
         The position inside the returned MultirotorState is in the frame of the vehicle's starting point
@@ -1620,7 +2183,6 @@ class MultirotorClient(VehicleClient, object):
 
     getMultirotorState.__annotations__ = {'return': MultirotorState}
 
-    #query rotor states
     def getRotorStates(self, vehicle_name=''):
         """
         Used to obtain the current state of all a multirotor's rotors. The state includes the speeds,
