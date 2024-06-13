@@ -1,12 +1,13 @@
-### May 2024
+### May/June 2024
+* Added [multi-layer annotation](docs/annotation.md) with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Updated Unreal to 5.2.1 and merge of [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum).
 * Updated instance segmentation to use proxy meshing, no longer requiring custom Unreal Engine fork. 
-* Added [multi-layer annotation](docs/annotation.md) with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Updated ground vehicles to use ChaosVehicles instead of PhysXVehicles. Some issues may arise.
 * Added parallelization to LiDAR sensor to speed up pointcloud generation.
 * Added optional parallelization to echo sensor to speed up pointcloud generation. See echo documentation for more info.
 * Added `MoveWorldOrigin` for the settings to move the world origin to the player start location when starting the simulator. Disabled by default. This affects things like setting the sensors to external!
 * Updated Python API to now loads colormap from disk instead of regenerating each time and being very slow.
+* Updated Matlab Client extensively with almost all available RPC API functions.
 * Fixed passive echo beacons data structure.
 * Fixed GPU Lidar not providing pointcloud in NED format.
 * Fixed Echo passive data Z-direction not being in NED format. 
