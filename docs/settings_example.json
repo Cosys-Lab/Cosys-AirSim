@@ -15,6 +15,39 @@
     "SpeedUnitFactor": 1,
     "SpeedUnitLabel": "m/s",
     "SimMode": "SkidVehicle",
+    "Annotation": [
+    {
+        "Name": "RGBTestDirect",
+        "Type": 0,
+        "Default": true,
+        "SetDirect": true
+    },
+    {
+        "Name": "RGBTestIndex",
+        "Type": 0,
+        "Default": true,
+        "SetDirect": false
+    },
+    {
+        "Name": "GreyscaleTest",
+        "Type": 1,
+        "Default": true
+    },
+    {
+        "Name": "TextureTestDirect",
+        "Type": 2,
+        "Default": true,
+        "SetDirect": true
+    },
+    {
+        "Name": "TextureTestRelativePath",
+        "Type": 2,
+        "Default": false,
+        "SetDirect": false,
+        "TexturePath": "/Game/AnnotationTest",
+        "TexturePrefix": "Test1"
+    }
+    ],
     "Wind": {
         "X": 0,
         "Y": 0,
@@ -304,7 +337,7 @@
 				},
                 "lidar": {
                     "SensorType": 6,
-                    "Enabled": false,
+                    "Enabled": true,
                     "External": false,
                     "ExternalLocal": false,
                     "NumberOfChannels": 32,
