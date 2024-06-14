@@ -68,7 +68,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Added [Matlab API Client](docs/matlab.md) implementation as an easy to install Matlab toolbox.
 * Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
-* Updated Unreal to 5.2.1.
+* Updated Unreal to 5.3.2.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
