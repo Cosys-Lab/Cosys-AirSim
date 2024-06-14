@@ -2,7 +2,7 @@
 # https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/docs/image_apis.md#computer-vision-mode
 
 import setup_path 
-import cosysairsim
+import cosysairsim as airsim
 
 import pprint
 

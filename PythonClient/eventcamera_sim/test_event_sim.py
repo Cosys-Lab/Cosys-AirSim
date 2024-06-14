@@ -1,5 +1,5 @@
 import numpy as np
-import cosysairsim
+import cosysairsim as airsim
 import time
 import cv2
 import matplotlib.pyplot as plt

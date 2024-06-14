@@ -1,4 +1,4 @@
-import cosysairsim
+import cosysairsim as airsim
 import cv2
 import numpy as np
 import os

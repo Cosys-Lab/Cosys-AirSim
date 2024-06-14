@@ -12,7 +12,7 @@
 # }
 
 import setup_path
-import cosysairsim
+import cosysairsim as airsim
 import time
 
 # connect to the AirSim simulator
