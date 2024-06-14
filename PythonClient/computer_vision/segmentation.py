@@ -1,7 +1,7 @@
 # In settings.json first activate computer vision mode: 
 # https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/docs/image_apis.md#computer-vision-mode
 
-import cosysairsim
+import cosysairsim as airsim
 import cv2
 import numpy as np
 import setup_path 

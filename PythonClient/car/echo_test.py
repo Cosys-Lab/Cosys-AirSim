@@ -2,7 +2,7 @@
 #
 
 import setup_path
-import cosysairsim
+import cosysairsim as airsim
 import numpy as np
 import matplotlib.pyplot as plt
 

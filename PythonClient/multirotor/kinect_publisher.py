@@ -3,7 +3,7 @@ from sensor_msgs.msg import Image,CameraInfo
 from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import TransformStamped
 from cv_bridge import CvBridge
-import cosysairsim
+import cosysairsim as airsim
 import cv2
 import numpy as np
 

@@ -32,7 +32,7 @@ Note that you will have to use a 3rdparty library or your own custom code to act
 Python bindings of [libigl](https://github.com/libigl/libigl) to visualize the received meshes.
 
 ```python
-import cosysairsim
+import cosysairsim as airsim
 
 AIRSIM_HOST_IP='127.0.0.1'
 

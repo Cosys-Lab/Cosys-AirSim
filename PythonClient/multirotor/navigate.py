@@ -1,7 +1,7 @@
 # use open cv to show new images from AirSim 
 
 import setup_path 
-import cosysairsim
+import cosysairsim as airsim
 
 # requires Python 3.5.3 :: Anaconda 4.4.0
 # pip install opencv-python

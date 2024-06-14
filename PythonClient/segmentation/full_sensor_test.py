@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import setup_path
-import cosysairsim
+import cosysairsim as airsim
 import csv
 import random
 import numpy as np
