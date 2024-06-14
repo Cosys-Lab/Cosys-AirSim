@@ -27,26 +27,38 @@ For example:
 {
   ...
     "Annotation": [
-        {
-            "Name": "RGBTest",
-            "Type": 0,
-            "Default": true,
-            "SetDirect": true
-        },
-        {
-            "Name": "GreyscaleTest",
-            "Type": 1,
-            "Default": true
-        },
-        {
-            "Name": "TextureTest",
-            "Type": 2,
-            "Default": false,
-            "SetDirect": false,
-            "TexturePath": "/Game/AnnotationTest",
-            "TexturePrefix": "Test1"
-        }
-    ],    
+    {
+        "Name": "RGBTestDirect",
+        "Type": 0,
+        "Default": true,
+        "SetDirect": true
+    },
+    {
+        "Name": "RGBTestIndex",
+        "Type": 0,
+        "Default": true,
+        "SetDirect": false
+    },
+    {
+        "Name": "GreyscaleTest",
+        "Type": 1,
+        "Default": true
+    },
+    {
+        "Name": "TextureTestDirect",
+        "Type": 2,
+        "Default": true,
+        "SetDirect": true
+    },
+    {
+        "Name": "TextureTestRelativePath",
+        "Type": 2,
+        "Default": false,
+        "SetDirect": false,
+        "TexturePath": "/Game/AnnotationTest",
+        "TexturePrefix": "Test1"
+    }
+    ], 
   ...
 }
 ```
@@ -66,7 +78,7 @@ Similar to [instance segmentation](instance_segmentation.md), you can use the RG
 You can do this by directly setting the color yourself (direct mode), or by assigning the object an index (0-2744000 unique colors) that will be linked to the colormap.
 To use direct mode, set the settings of this layer with `SetDirect` to `true`. For index mode, set to `false`.
 Actor/component tags have the following format: `annotationName_R_G_B` for direct mode or `annotationName_ID` for direct mode.
-So if for example your RGB annotation layer is called `GreyscaleTest`, you can tag an actor with the tag `RGBTest_255_0_0` to give it a red color. 
+So if for example your RGB annotation layer is called `RGBTestDirect`, you can tag an actor with the tag `RGBTestDirect_255_0_0` to give it a red color. 
 Or for index mode, `RGBTest_5` to give it the fifth color in the colormap. 
 
 When `Default` is set to 1, all objects without a tag for this layer will be rendered in black.
@@ -115,12 +127,12 @@ The Unreal texture path name has to be rather specific:
  - If your texture is in the environment content folder, you must add `/Game/` in front of the path. 
  - If it is in the Cosys-AirSim plugin content folder, you must add `/AirSim/` in front of the path. 
  - For Engine textures, you must add `/Engine/` in front of the path.
-So if for example your texture annotation layer is called `TextureTest`, and your texture *TestTexture1* is in the game content folder under a subfolder *MyTextures* you can tag an actor with the tag `TextureTest_/Game/MyTextures/TestTexture1` to give it this texture. 
+So if for example your texture annotation layer is called `TextureTestDirect`, and your texture *TestTexture* is in the game content folder under a subfolder *AnnotationTest* you can tag an actor with the tag `TextureTest_/Game/AnnotationTest/TestTexture` to give it this texture. 
 
 For path reference mod, the content of the tag is not really important as long as it contains the name of the annotation layer and an underscore, for example `annotationName_enable`.
 What is important is in reference mode is that you have a texture in the content folder with the name of the mesh if you do enable this object by setting a tag.
 You must place your textures in the folder defined by the `TexturePath` setting in the settings.json file for this layer. And the texture must have the same name as the mesh and start with the prefix set by the `TexturePrefix` setting in the settings.json file for this layer followed by a hyphen.
-So for example if you have a static mesh called *TestCubeMesh1* and your texture layer is called `TextureTest` with the settings `TexturePath` set to `/Game/AnnotationTest` and `TexturePrefix` set to `Test1`, you must have a texture called `Test1-TestCubeMesh1` in the folder `/Game/AnnotationTest`.
+So for example if you have a static mesh called *Cylinder* and your texture layer is called `TextureTestDirect` with the settings `TexturePath` set to `/Game/AnnotationTest` and `TexturePrefix` set to `Test1`, you must have a texture called `Test1-Cylinder` in the folder `/Game/AnnotationTest`.
 
 When `Default` is set to 1, all objects without a tag for this layer will be rendered in black.
 
