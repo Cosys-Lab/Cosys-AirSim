@@ -1,5 +1,8 @@
 classdef AirSimCameraTypes < uint32
-    %AIRSIMCAMERATYPES
+    % AIRSIMCAMERATYPES Types of camera outputs.
+    %
+    % Description:
+    %   Enumerator for types of camera outputs.
     
     enumeration
         Scene               (0)

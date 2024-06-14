@@ -64,7 +64,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
 * Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
 * Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md). ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
-* Added [Matlab API](docs/matlab.md) implementation.
+* Added [Matlab API Client](docs/matlab.md) implementation as an easy to install Matlab toolbox.
 * Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated Unreal to 5.2.1.

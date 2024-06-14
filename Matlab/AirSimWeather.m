@@ -1,5 +1,8 @@
 classdef AirSimWeather < uint32
-    %AIRSIMWEATHER
+    % AIRSIMWEATHER Types of weather.
+    %
+    % Description:
+    %   Enumerator for types of weather.
     
     enumeration
         Rain        (0)

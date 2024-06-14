@@ -7,7 +7,7 @@
 * Added optional parallelization to echo sensor to speed up pointcloud generation. See echo documentation for more info.
 * Added `MoveWorldOrigin` for the settings to move the world origin to the player start location when starting the simulator. Disabled by default. This affects things like setting the sensors to external!
 * Updated Python API to now loads colormap from disk instead of regenerating each time and being very slow.
-* Updated Matlab Client extensively with almost all available RPC API functions.
+* Updated [Matlab API Client](docs/matlab.md) implementation as an easy to install Matlab toolbox and completed all possible API functions (many untested!)
 * Fixed passive echo beacons data structure.
 * Fixed GPU Lidar not providing pointcloud in NED format.
 * Fixed Echo passive data Z-direction not being in NED format. 
