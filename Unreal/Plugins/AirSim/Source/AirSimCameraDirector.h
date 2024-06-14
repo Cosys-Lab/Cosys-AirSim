@@ -7,7 +7,7 @@
 #include "ManualPoseController.h"
 #include "common/common_utils/Utils.hpp"
 #include "GameFramework/SpringArmComponent.h"
-#include "CameraDirector.generated.h"
+#include "AirSimCameraDirector.generated.h"
 
 UENUM(BlueprintType)
 enum class ECameraDirectorMode : uint8
@@ -30,10 +30,10 @@ class AIRSIM_API ACameraDirector : public AActor
 public:
     /** Spring arm that will offset the camera */
     UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    USpringArmComponent* SpringArm;
+    USpringArmComponent *SpringArm;
 
     UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    APIPCamera* ExternalCamera;
+    APIPCamera *ExternalCamera;
 
 public:
     void inputEventFpvView();
@@ -57,11 +57,11 @@ public:
     void setMode(ECameraDirectorMode mode);
 
     void initializeForBeginPlay(ECameraDirectorMode view_mode,
-                                AActor* follow_actor, APIPCamera* fpv_camera, APIPCamera* front_camera, APIPCamera* back_camera);
+                                AActor *follow_actor, APIPCamera *fpv_camera, APIPCamera *front_camera, APIPCamera *back_camera);
 
-    APIPCamera* getFpvCamera() const;
-    APIPCamera* getExternalCamera() const;
-    APIPCamera* getBackupCamera() const;
+    APIPCamera *getFpvCamera() const;
+    APIPCamera *getExternalCamera() const;
+    APIPCamera *getBackupCamera() const;
     void setFollowDistance(const int follow_distance) { this->follow_distance_ = follow_distance; }
     void setCameraRotationLagEnabled(const bool lag_enabled) { this->camera_rotation_lag_enabled_ = lag_enabled; }
 
@@ -74,16 +74,16 @@ private:
 private:
     typedef common_utils::Utils Utils;
 
-    APIPCamera* fpv_camera_;
-    APIPCamera* backup_camera_;
-    APIPCamera* front_camera_;
-    AActor* follow_actor_;
+    APIPCamera *fpv_camera_;
+    APIPCamera *backup_camera_;
+    APIPCamera *front_camera_;
+    AActor *follow_actor_;
 
-    USceneComponent* last_parent_ = nullptr;
+    USceneComponent *last_parent_ = nullptr;
 
     ECameraDirectorMode mode_;
     UPROPERTY()
-    UManualPoseController* manual_pose_controller_;
+    UManualPoseController *manual_pose_controller_;
 
     FVector camera_start_location_;
     FVector initial_ground_obs_offset_;

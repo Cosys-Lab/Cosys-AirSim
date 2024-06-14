@@ -1,4 +1,4 @@
-#include "CameraDirector.h"
+#include "AirSimCameraDirector.h"
 #include "GameFramework/PlayerController.h"
 #include "AirBlueprintLib.h"
 
@@ -321,7 +321,7 @@ void ACameraDirector::inputEventFpvView()
     if (fpv_camera_) {
         setMode(ECameraDirectorMode::CAMERA_DIRECTOR_MODE_FPV);
         fpv_camera_->showToScreen();
-        disableCameras(false, true, true);
+        disableCameras(false, true, true, true);
     }
     else
         UAirBlueprintLib::LogMessageString("Camera is not available: ", "fpv_camera", LogDebugLevel::Failure);

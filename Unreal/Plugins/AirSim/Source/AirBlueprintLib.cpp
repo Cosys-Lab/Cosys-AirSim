@@ -53,7 +53,7 @@ EAppReturnType::Type UAirBlueprintLib::ShowMessage(EAppMsgType::Type message_typ
 
     return FMessageDialog::Open(message_type,
                                 FText::FromString(message.c_str()),
-                                &title_text);
+                                title_text);
 }
 
 ULineBatchComponent* GetLineBatcher(const UWorld* InWorld, bool bPersistentLines, float LifeTime, bool bDepthIsForeground)
@@ -732,9 +732,9 @@ std::vector<msr::airlib::MeshPositionVertexBuffersResponse> UAirBlueprintLib::Ge
             ENQUEUE_RENDER_COMMAND(GetVertexBuffer)
             (
                 [vertex_buffer, data](FRHICommandListImmediate& RHICmdList) {
-                    FVector* indices = (FVector*)RHILockBuffer(vertex_buffer->VertexBufferRHI, 0, vertex_buffer->VertexBufferRHI->GetSize(), RLM_ReadOnly);
+                    FVector* indices = (FVector*)RHICmdList.LockBuffer(vertex_buffer->VertexBufferRHI, 0, vertex_buffer->VertexBufferRHI->GetSize(), RLM_ReadOnly);
                     memcpy(data, indices, vertex_buffer->VertexBufferRHI->GetSize());
-                    RHIUnlockBuffer(vertex_buffer->VertexBufferRHI);
+                    RHICmdList.UnlockBuffer(vertex_buffer->VertexBufferRHI);
                 });
 
 #if ((ENGINE_MAJOR_VERSION > 4) || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 27))
@@ -754,9 +754,9 @@ std::vector<msr::airlib::MeshPositionVertexBuffersResponse> UAirBlueprintLib::Ge
                 ENQUEUE_RENDER_COMMAND(GetIndexBuffer)
                 (
                     [IndexBuffer, data_ptr](FRHICommandListImmediate& RHICmdList) {
-                        uint16_t* indices = (uint16_t*)RHILockBuffer(IndexBuffer->IndexBufferRHI, 0, IndexBuffer->IndexBufferRHI->GetSize(), RLM_ReadOnly);
+                        uint16_t* indices = (uint16_t*)RHICmdList.LockBuffer(IndexBuffer->IndexBufferRHI, 0, IndexBuffer->IndexBufferRHI->GetSize(), RLM_ReadOnly);
                         memcpy(data_ptr, indices, IndexBuffer->IndexBufferRHI->GetSize());
-                        RHIUnlockBuffer(IndexBuffer->IndexBufferRHI);
+                        RHICmdList.UnlockBuffer(IndexBuffer->IndexBufferRHI);
                     });
 
                 //Need to force the render command to go through cause on the next iteration the buffer no longer exists
@@ -777,9 +777,9 @@ std::vector<msr::airlib::MeshPositionVertexBuffersResponse> UAirBlueprintLib::Ge
                 ENQUEUE_RENDER_COMMAND(GetIndexBuffer)
                 (
                     [IndexBuffer, data_ptr](FRHICommandListImmediate& RHICmdList) {
-                        uint32_t* indices = (uint32_t*)RHILockBuffer(IndexBuffer->IndexBufferRHI, 0, IndexBuffer->IndexBufferRHI->GetSize(), RLM_ReadOnly);
+                        uint32_t* indices = (uint32_t*)RHICmdList.LockBuffer(IndexBuffer->IndexBufferRHI, 0, IndexBuffer->IndexBufferRHI->GetSize(), RLM_ReadOnly);
                         memcpy(data_ptr, indices, IndexBuffer->IndexBufferRHI->GetSize());
-                        RHIUnlockBuffer(IndexBuffer->IndexBufferRHI);
+                        RHICmdList.UnlockBuffer(IndexBuffer->IndexBufferRHI);
                     });
 
                 FlushRenderingCommands();
@@ -814,7 +814,8 @@ std::vector<msr::airlib::MeshPositionVertexBuffersResponse> UAirBlueprintLib::Ge
 TArray<FName> UAirBlueprintLib::ListWorldsInRegistry()
 {
     FARFilter Filter;
-    Filter.ClassNames.Add(UWorld::StaticClass()->GetFName());
+    FTopLevelAssetPath UPath(UWorld::StaticClass()->GetPathName());
+    Filter.ClassPaths.Add(UPath);
     Filter.bRecursivePaths = true;
 
     TArray<FAssetData> AssetData;
@@ -830,7 +831,8 @@ TArray<FName> UAirBlueprintLib::ListWorldsInRegistry()
 UObject* UAirBlueprintLib::GetMeshFromRegistry(const std::string& load_object)
 {
     FARFilter Filter;
-    Filter.ClassNames.Add(UStaticMesh::StaticClass()->GetFName());
+    FTopLevelAssetPath MPath(UStaticMesh::StaticClass()->GetPathName());
+    Filter.ClassPaths.Add(MPath);
     Filter.bRecursivePaths = true;
 
     TArray<FAssetData> AssetData;

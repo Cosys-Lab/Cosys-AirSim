@@ -94,12 +94,6 @@ if [[ ! -d $build_dir ]]; then
     mkdir -p $build_dir
 fi
 
-# Fix for Unreal/Unity using x86_64 (Rosetta) on Apple Silicon hardware.
-CMAKE_VARS=
-if [ "$(uname)" == "Darwin" ]; then
-    CMAKE_VARS="-DCMAKE_APPLE_SILICON_PROCESSOR=x86_64"
-fi
-
 pushd $build_dir  >/dev/null
 if $debug; then
     folder_name="Debug"

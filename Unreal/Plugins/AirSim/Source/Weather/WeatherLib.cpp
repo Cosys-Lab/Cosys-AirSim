@@ -200,7 +200,6 @@ void UWeatherLib::hideWeatherMenu(UWorld* World)
                 // hacky test to make sure we are getting the right class. for some reason cast above doesn't work, so we use this instead to test for class
                 if (FoundWidgets[i] && FoundWidgets[i]->GetClass()->GetFName().ToString() == getWeatherMenuClassName()) {
                     FoundWidgets[i]->RemoveFromParent();
-                    FoundWidgets[i]->RemoveFromViewport();
                 }
             }
             APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);

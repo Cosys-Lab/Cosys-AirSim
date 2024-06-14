@@ -26,25 +26,34 @@ UDetectionComponent::UDetectionComponent()
 void UDetectionComponent::BeginPlay()
 {
     Super::BeginPlay();
-    scene_capture_component_2D_ = CastChecked<USceneCaptureComponent2D>(GetAttachParent());
+    scene_capture_component_2D_ = Cast<USceneCaptureComponent2D>(GetAttachParent());
+    if (!scene_capture_component_2D_)
+    {
+        // we get re-parented to USceneComponent when saving Take Recorder videos
+        this->Deactivate();
+    }
     object_filter_ = FObjectFilter();
 }
 
-void UDetectionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UDetectionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-const TArray<FDetectionInfo>& UDetectionComponent::getDetections()
+const TArray<FDetectionInfo> &UDetectionComponent::getDetections()
 {
     cached_detections_.Empty();
 
-    for (TActorIterator<AActor> actor_itr(GetWorld()); actor_itr; ++actor_itr) {
-        AActor* actor = *actor_itr;
-        if (object_filter_.matchesActor(actor)) {
-            if (FVector::Distance(actor->GetActorLocation(), GetComponentLocation()) <= max_distance_to_camera_) {
+    for (TActorIterator<AActor> actor_itr(GetWorld()); actor_itr; ++actor_itr)
+    {
+        AActor *actor = *actor_itr;
+        if (object_filter_.matchesActor(actor))
+        {
+            if (FVector::Distance(actor->GetActorLocation(), GetComponentLocation()) <= max_distance_to_camera_)
+            {
                 FBox2D box_2D_out;
-                if (texture_target_ && calcBoundingFromViewInfo(actor, box_2D_out)) {
+                if (texture_target_ && calcBoundingFromViewInfo(actor, box_2D_out))
+                {
                     FDetectionInfo detection;
                     detection.Actor = actor;
                     detection.Box2D = box_2D_out;
@@ -63,7 +72,7 @@ const TArray<FDetectionInfo>& UDetectionComponent::getDetections()
     return cached_detections_;
 }
 
-bool UDetectionComponent::calcBoundingFromViewInfo(AActor* actor, FBox2D& box_out)
+bool UDetectionComponent::calcBoundingFromViewInfo(AActor *actor, FBox2D &box_out)
 {
     FVector origin;
     FVector extend;
@@ -74,7 +83,7 @@ bool UDetectionComponent::calcBoundingFromViewInfo(AActor* actor, FBox2D& box_ou
     bool is_in_camera_view = false;
 
     // get render target for texture size
-    FRenderTarget* render_target = texture_target_->GameThread_GetRenderTargetResource();
+    FRenderTarget *render_target = texture_target_->GameThread_GetRenderTargetResource();
 
     // initialize viewinfo for projection matrix
     FMinimalViewInfo info;
@@ -113,16 +122,19 @@ bool UDetectionComponent::calcBoundingFromViewInfo(AActor* actor, FBox2D& box_ou
                                                                                      FPlane(0, 1, 0, 0),
                                                                                      FPlane(0, 0, 0, 1));
 
-    if (scene_capture_component_2D_->bUseCustomProjectionMatrix) {
+    if (scene_capture_component_2D_->bUseCustomProjectionMatrix)
+    {
         projection_data.ProjectionMatrix = scene_capture_component_2D_->CustomProjectionMatrix;
     }
-    else {
+    else
+    {
         projection_data.ProjectionMatrix = info.CalculateProjectionMatrix();
     }
     projection_data.SetConstrainedViewRectangle(screen_rect);
 
     // Project Points to pixels and get the corner pixels
-    for (FVector& point : points) {
+    for (FVector &point : points)
+    {
         FVector2D Pixel(0, 0);
         FSceneView::ProjectWorldToScreen((point), screen_rect, projection_data.ComputeViewProjectionMatrix(), Pixel);
         is_in_camera_view |= (Pixel != screen_rect.Min) && (Pixel != screen_rect.Max) && screen_rect.Contains(FIntPoint(Pixel.X, Pixel.Y));
@@ -136,13 +148,17 @@ bool UDetectionComponent::calcBoundingFromViewInfo(AActor* actor, FBox2D& box_ou
     // If actor in camera view - check if it's actually visible or hidden
     // Check against 8 extend points
     bool is_visible = false;
-    if (is_in_camera_view) {
+    if (is_in_camera_view)
+    {
         FHitResult result;
         bool is_world_hit;
-        for (FVector& point : points) {
+        for (FVector &point : points)
+        {
             is_world_hit = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_WorldStatic);
-            if (is_world_hit) {
-                if (result.GetActor() == actor) {
+            if (is_world_hit)
+            {
+                if (result.GetActor() == actor)
+                {
                     is_visible = true;
                     break;
                 }
@@ -151,12 +167,16 @@ bool UDetectionComponent::calcBoundingFromViewInfo(AActor* actor, FBox2D& box_ou
 
         // If actor in camera view but didn't hit any point out of 8 extend points,
         // check against 10 random points
-        if (!is_visible) {
-            for (int i = 0; i < 10; i++) {
+        if (!is_visible)
+        {
+            for (int i = 0; i < 10; i++)
+            {
                 FVector point = UKismetMathLibrary::RandomPointInBoundingBox(origin, extend);
                 is_world_hit = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_WorldStatic);
-                if (is_world_hit) {
-                    if (result.GetActor() == actor) {
+                if (is_world_hit)
+                {
+                    if (result.GetActor() == actor)
+                    {
                         is_visible = true;
                         break;
                     }
@@ -187,11 +207,12 @@ FRotator UDetectionComponent::getRelativeRotation(FVector in_location, FRotator 
     return relative_object_transform.Rotator();
 }
 
-void UDetectionComponent::addMeshName(const std::string& mesh_name)
+void UDetectionComponent::addMeshName(const std::string &mesh_name)
 {
     FString name(mesh_name.c_str());
 
-    if (!object_filter_.wildcard_mesh_names_.Contains(name)) {
+    if (!object_filter_.wildcard_mesh_names_.Contains(name))
+    {
         object_filter_.wildcard_mesh_names_.Add(name);
     }
 }

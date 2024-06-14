@@ -8,7 +8,7 @@
 #include "ParticleDefinitions.h"
 #include "Annotation/ObjectAnnotator.h"
 #include <string>
-#include "CameraDirector.h"
+#include "AirSimCameraDirector.h"
 #include "common/AirSimSettings.hpp"
 #include "common/ClockFactory.hpp"
 #include "api/ApiServerBase.hpp"

@@ -24,7 +24,7 @@
     <ClCompile Include="unreal\plugins\airsim\source\AirSimGameMode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="unreal\plugins\airsim\source\CameraDirector.cpp">
+    <ClCompile Include="unreal\plugins\airsim\source\AirSimCameraDirector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="unreal\plugins\airsim\source\ManualPoseController.cpp">
