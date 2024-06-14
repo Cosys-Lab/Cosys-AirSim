@@ -1,6 +1,6 @@
-# How to Use GPU Lidar in AirSim
+# How to Use GPU Lidar in Cosys-AirSim
 
-AirSim supports a GPU accelerated Lidar for multirotors and cars. It uses a depth camera that rotates around to simulate a Lidar while exploiting the GPU to do most of the work. Should allow for a large increase in amount of points that can be simulated.
+Cosys-AirSim supports a GPU accelerated Lidar for multirotors and cars. It uses a depth camera that rotates around to simulate a Lidar while exploiting the GPU to do most of the work. Should allow for a large increase in amount of points that can be simulated.
 
 The enablement of a GPU lidar and the other lidar settings can be configured via AirSimSettings json.
 Please see [general sensors](sensors.md) for information on configuration of general/shared sensor settings.

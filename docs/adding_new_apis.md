@@ -44,7 +44,7 @@ Testing is required to ensure that the API is working as expected. For this, as 
 
 1. Use [setup_path.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient/multirotor/setup_path.py). It will setup the path such that the local airsim module is used instead of the pip installed package. This is the method used in many of the scripts since the user doesn't need to do anything other than run the script.
     Place your example script in one of the folders inside `PythonClient` like `multirotor`, `car`, etc. You can also create one to keep things separate, and copy the `setup_path.py` file from another folder.
-    Add `import setup_path` before `import airsim` in your files. Now the latest main API (or any branch currently checked out) will be used.
+    Add `import setup_path` before `import cosysairsim` in your files. Now the latest main API (or any branch currently checked out) will be used.
 
 2. Use a [local project pip install](https://pip.pypa.io/en/stable/cli/pip_install/#local-project-installs). Regular install would create a copy of the current source and use it, whereas Editable install (`pip install -e .` from inside the `PythonClient` folder) would change the package whenever the Python API files are changed. Editable install has the benefit when working on several branches or API is not finalized.
 

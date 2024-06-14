@@ -1,12 +1,12 @@
 # airsim_ros_pkgs
 
-A ROS wrapper over the AirSim C++ client library.
+A ROS wrapper over the Cosys-AirSim C++ client library.
 
 **NOTE THAT THIS NOT UPDATED FOR COSYS-AIRSIM CHANGES AND MAY NOT WORK AS INTENDED**
 
 ## Setup
 
-The below steps are meant for Linux. If you're running AirSim on Windows, you can use Windows Subsystem for Linux (WSL) to run the ROS wrapper, see the instructions [below](#setting-up-the-build-environment-on-windows10-using-wsl1-or-wsl2). If you're unable or don't prefer to install ROS and related tools on your host Linux due to some issues, you can also try it using Docker, see the steps in [Using Docker for ROS wrapper](#using-docker-for-ros)
+The below steps are meant for Linux. If you're running Cosys-AirSim on Windows, you can use Windows Subsystem for Linux (WSL) to run the ROS wrapper, see the instructions [below](#setting-up-the-build-environment-on-windows10-using-wsl1-or-wsl2). If you're unable or don't prefer to install ROS and related tools on your host Linux due to some issues, you can also try it using Docker, see the steps in [Using Docker for ROS wrapper](#using-docker-for-ros)
 
 - If your default GCC version is not 8 or above (check using `gcc --version`)
 
@@ -30,10 +30,10 @@ The below steps are meant for Linux. If you're running AirSim on Windows, you ca
 
 ## Build
 
-- Build AirSim
+- Build Cosys-AirSim
 
 ```shell
-git clone https://github.com/Microsoft/AirSim.git;
+git clone https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git;
 cd AirSim;
 ./setup.sh;
 ./build.sh;
@@ -69,17 +69,17 @@ roslaunch airsim_ros_pkgs rviz.launch;
 
    **Note**: If you get an error running `roslaunch airsim_ros_pkgs airsim_node.launch`, run `catkin clean` and try again
 
-## Using AirSim ROS wrapper
+## Using Cosys-Airsim ROS wrapper
 
-The ROS wrapper is composed of two ROS nodes - the first is a wrapper over AirSim's multirotor C++ client library, and the second is a simple PD position controller.
+The ROS wrapper is composed of two ROS nodes - the first is a wrapper over Cosys-Airsim's multirotor C++ client library, and the second is a simple PD position controller.
 Let's look at the ROS API for both nodes:
 
-### AirSim ROS Wrapper Node
+### Cosys-Airsim ROS Wrapper Node
 
 #### Publishers:
 
 - `/airsim_node/origin_geo_point` [airsim_ros_pkgs/GPSYaw](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/msg/GPSYaw.msg)
-GPS coordinates corresponding to global NED frame. This is set in the airsim's [settings.json](https://microsoft.github.io/AirSim/settings/) file under the `OriginGeopoint` key.
+GPS coordinates corresponding to global NED frame. This is set in the airsim's [settings.json](https://cosys-lab.github.io/settings/) file under the `OriginGeopoint` key.
 
 - `/airsim_node/VEHICLE_NAME/global_gps` [sensor_msgs/NavSatFix](https://docs.ros.org/api/sensor_msgs/html/msg/NavSatFix.html)
 This the current GPS coordinates of the drone in airsim.
@@ -313,4 +313,4 @@ To run, replace the path of the AirSim folder below -
 docker run --rm -it --net=host -v <your-AirSim-folder-path>:/home/testuser/AirSim airsim-ros:latest bash
 ```
 
-The above command mounts the AirSim directory to the home directory inside the container. Any changes you make in the source files from your host will be visible inside the container, which is useful for development and testing. Now follow the steps from [Build](#build) to compile and run the ROS wrapper.
+The above command mounts the Cosys-AirSim directory to the home directory inside the container. Any changes you make in the source files from your host will be visible inside the container, which is useful for development and testing. Now follow the steps from [Build](#build) to compile and run the ROS wrapper.

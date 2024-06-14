@@ -1,6 +1,6 @@
-# Sensors in AirSim
+# Sensors in Cosys-AirSim
 
-AirSim currently supports the following sensors.    
+Cosys-AirSim currently supports the following sensors.    
 Each sensor is associated with a integer enum specifying its sensor type.
 
 * Camera

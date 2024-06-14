@@ -1,7 +1,7 @@
 # Cosys-AirSim
 
-AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. Similarly, we have an experimental release for a Unity plugin. 
-Our goal is to develop AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
+Cosys-AirSim is a simulator for drones, cars and more, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. Similarly, we have an experimental release for a Unity plugin. 
+Our goal is to develop Cosys-AirSim as a platform for AI research to experiment with deep learning, computer vision and reinforcement learning algorithms for autonomous vehicles. For this purpose, Cosys-AirSim also exposes APIs to retrieve data and control vehicles in a platform independent way.
 
 This fork is based on last public AirSim release from Microsoft's GitHub.
 
@@ -16,6 +16,7 @@ Please contact a Cosys-Lab researcher to get more in depth information on which 
 The biggest difference is that this requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
 
 A manually maintained fork of this repository is available to the public: https://github.com/Cosys-Lab/Cosys-AirSim
+
 ### Associated publications
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
@@ -91,7 +92,7 @@ This branch uses a custom Unreal Engine version! Please read the documentation c
 
 ### Documentation
 
-View our [detailed documentation](docs) on all aspects of AirSim.
+View our [detailed documentation](docs) on all aspects of Cosys-AirSim.
 
 ## Participate
 

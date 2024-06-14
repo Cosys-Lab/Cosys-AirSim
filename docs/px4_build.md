@@ -115,7 +115,7 @@ hardware with these brand new bits, so you don't need to use QGroundControl for 
 
 ## Some Useful Parameters
 
-PX4 has many customizable parameters (over 700 of them, in fact) and to get best results with AirSim we have
+PX4 has many customizable parameters (over 700 of them, in fact) and to get best results with Cosys-AirSim we have
 found the following parameters are handy:
 
 ```

@@ -1,6 +1,6 @@
 # Setting up multi-vehicle PX4 simulation
 
-The [PX4 SITL stack](px4_sitl.md) comes with a `sitl_multiple_run.sh` shell script that runs multiple instances of the PX4 binary. This would allow the SITL stack to listen to connections from multiple AirSim vehicles on multiple TCP ports starting from 4560.
+The [PX4 SITL stack](px4_sitl.md) comes with a `sitl_multiple_run.sh` shell script that runs multiple instances of the PX4 binary. This would allow the SITL stack to listen to connections from multiple Cosys-AirSim vehicles on multiple TCP ports starting from 4560.
 However, the provided script does not let us view the PX4 console. If you want to run the instances manually while being able to view each instance's console (**Recommended**) see [this section](px4_multi_vehicle.md#starting-sitl-instances-with-px4-console) 
 
 ## Setting up multiple instances of PX4 Software-in-Loop
@@ -51,9 +51,9 @@ However, the provided script does not let us view the PX4 console. If you want t
     ```
     You can add more than two vehicles but you will need to make sure you adjust the TCP port for each (ie: vehicle 3's port would be `4562` and so on..) and adjust the spawn point.
 
-4. Now run your Unreal AirSim environment and it should connect to SITL PX4 via TCP.
+4. Now run your Unreal Cosys-AirSim environment and it should connect to SITL PX4 via TCP.
 If you are running the instances with the [PX4 console visible](px4_multi_vehicle.md#Starting-sitl-instances-with-px4-console), you should see a bunch of messages from each SITL PX4 window.
-Specifically, the following messages tell you that AirSim is connected properly and GPS fusion is stable:
+Specifically, the following messages tell you that Cosys-AirSim is connected properly and GPS fusion is stable:
     ```
     INFO  [simulator] Simulator connected on UDP port 14560
     INFO  [mavlink] partner IP: 127.0.0.1
@@ -65,7 +65,7 @@ Specifically, the following messages tell you that AirSim is connected properly 
 
 5. You should also be able to use QGroundControl with SITL mode.  Make sure
 there is no Pixhawk hardware plugged in, otherwise QGroundControl will choose
-to use that instead.  Note that as we don't have a physical board, an RC cannot be connected directly to it. So the alternatives are either use XBox 360 Controller or connect your RC using USB (for example, in case of FrSky Taranis X9D Plus) or using trainer USB cable to your PC. This makes your RC look like a joystick. You will need to do extra set up in QGroundControl to use virtual joystick for RC control.  You do not need to do this unless you plan to fly a drone manually in AirSim.  Autonomous flight using the Python
+to use that instead.  Note that as we don't have a physical board, an RC cannot be connected directly to it. So the alternatives are either use XBox 360 Controller or connect your RC using USB (for example, in case of FrSky Taranis X9D Plus) or using trainer USB cable to your PC. This makes your RC look like a joystick. You will need to do extra set up in QGroundControl to use virtual joystick for RC control.  You do not need to do this unless you plan to fly a drone manually in Cosys-AirSim.  Autonomous flight using the Python
 API does not require RC, see [`No Remote Control`](px4_sitl.md#No-Remote-Control).
 
 ## Starting SITL instances with PX4 console
@@ -94,7 +94,7 @@ Here is how you would do so:
     ./run_airsim_sitl.sh 0 # first instance = 0
     ```
     
-    You should see the PX4 instance starting and waiting for AirSim's connection as it would with a single instance.
+    You should see the PX4 instance starting and waiting for Cosys-AirSim's connection as it would with a single instance.
     ```
     ______  __   __    ___
     | ___ \ \ \ / /   /   |
@@ -117,4 +117,4 @@ Here is how you would do so:
 
 5. Repeat step 4 for as many instances as you would like to start
  
-6. Run your Unreal AirSim environment and it should connect to SITL PX4 via TCP (assuming your settings.json file has the right ports).
+6. Run your Unreal Cosys-AirSim environment and it should connect to SITL PX4 via TCP (assuming your settings.json file has the right ports).

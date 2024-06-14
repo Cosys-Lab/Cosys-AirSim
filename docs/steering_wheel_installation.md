@@ -1,17 +1,17 @@
 # Logitech G920 Steering Wheel Installation
 
-To use Logitech G920 steering wheel with AirSim follow these steps:
+To use Logitech G920 steering wheel with Cosys-AirSim follow these steps:
 
 1. Connect the steering wheel to the computer and wait until drivers installation complete.
 
 2. Install Logitech Gaming Software from [here](http://support.logitech.com/en_us/software/lgs)
 
-3. Before debug, you’ll have to normalize the values in AirSim code. Perform this changes in CarPawn.cpp (according to the current update in the git):  
+3. Before debug, you’ll have to normalize the values in Cosys-AirSim code. Perform this changes in CarPawn.cpp (according to the current update in the git):  
   In line 382, change “Val” to “1 – Val”. (the complementary value in the range [0.0,1.0]).  
   In line 388, change “Val” to “5Val - 2.5” (Change the range of the given input from [0.0,1.0] to [-1.0,1.0]).  
   In line 404, change “Val” to “4(1 – Val)”. (the complementary value in the range [0.0,1.0]).
  
-4. Debug AirSim project (while the steering wheel is connected – it’s important).
+4. Debug Cosys-AirSim project (while the steering wheel is connected – it’s important).
 
 5. On Unreal Editor, go to Edit->plugins->input devices and enable “Windows RawInput”.
 

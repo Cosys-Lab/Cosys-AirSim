@@ -45,7 +45,7 @@ The voxel grids are stored in the binvox format which can then be converted by t
 As an example, a voxel grid can be constructed as follows, once the Blocks environment is up and running:
 
 ```
-import airsim
+import cosysairsim
 c = airsim.VehicleClient()
 center = airsim.Vector3r(0, 0, 0)
 output_path = os.path.join(os.getcwd(), "map.binvox")

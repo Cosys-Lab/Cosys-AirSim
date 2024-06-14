@@ -1,6 +1,6 @@
-# How to Use Echo sensor modalities in AirSim
+# How to Use Echo sensor modalities in Cosys-AirSim
 
-AirSim supports Echo sensors for multirotors and cars.  Echo sensors can be configured to behave like sonar, radar or other echo-based sensor types.
+Cosys-AirSim supports Echo sensors for multirotors and cars.  Echo sensors can be configured to behave like sonar, radar or other echo-based sensor types.
 
 The enablement of an echo sensor and the other settings can be configured via AirSimSettings json.
 Please see [general sensors](sensors.md) for information on configuration of general/shared sensor settings.

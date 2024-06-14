@@ -1,10 +1,10 @@
-# AirSim Settings
+# Cosys-AirSim Settings
 
 A good basic settings file that works with many of the examples can be found here as [settings_example.json](settings_example.json).
 It shows many of the custom sensors and vehicles that were added by Cosys-Lab.
 
 ## Where are Settings Stored?
-AirSim is searching for the settings definition in the following order. The first match will be used:
+Cosys-AirSim is searching for the settings definition in the following order. The first match will be used:
 
 1. Looking at the (absolute) path specified by the `-settings` command line argument.
 For example, in Windows: `AirSim.exe -settings="C:\path\to\settings.json"`
@@ -26,7 +26,7 @@ For e.g. with the Blocks binary, the location searched is `<path-of-binary>/Linu
 
 5. Looking in the AirSim subfolder for a file called `settings.json`. The AirSim subfolder is located at `Documents\AirSim` on Windows and `~/Documents/AirSim` on Linux systems.
 
-The file is in usual [json format](https://en.wikipedia.org/wiki/JSON). On first startup AirSim would create `settings.json` file with no settings at the users home folder. To avoid problems, always use ASCII format to save json file.
+The file is in usual [json format](https://en.wikipedia.org/wiki/JSON). On first startup Cosys-AirSim would create `settings.json` file with no settings at the users home folder. To avoid problems, always use ASCII format to save json file.
 
 ## How to Chose Between Car/SkidVehicle/Multirotor?
 The default is to use multirotor. To use car simple set `"SimMode": "Car"` like this:
@@ -376,7 +376,7 @@ Each simulation mode will go through the list of vehicles specified in this sett
 
 ### Common Vehicle Setting
 - `VehicleType`: This could be either `PhysXCar`, `ArduRover` or `BoxCar` for the Car SimMode, `SimpleFlight`, `ArduCopter` or `PX4Multirotor` for the MultiRotor SimMode, `ComputerVision` for the ComputerVision SimMode and `CPHusky` or `Pioneer` for SkidVehicle SimMode. you can use There is no default value therefore this element must be specified.
-- `PawnPath`: This allows to override the pawn blueprint to use for the vehicle. For example, you may create new pawn blueprint derived from ACarPawn for a warehouse robot in your own project outside the AirSim code and then specify its path here. See also [PawnPaths](settings.md#PawnPaths). Note that you have to specify your custom pawn blueprint class path inside the global `PawnPaths` object using your proprietarily defined object name, and quote that name inside the `Vehicles` setting. For example,
+- `PawnPath`: This allows to override the pawn blueprint to use for the vehicle. For example, you may create new pawn blueprint derived from ACarPawn for a warehouse robot in your own project outside the Cosys-AirSim code and then specify its path here. See also [PawnPaths](settings.md#PawnPaths). Note that you have to specify your custom pawn blueprint class path inside the global `PawnPaths` object using your proprietarily defined object name, and quote that name inside the `Vehicles` setting. For example,
 ```json
     {
       ...
@@ -397,7 +397,7 @@ Each simulation mode will go through the list of vehicles specified in this sett
 - `RC`: This sub-element allows to specify which remote controller to use for vehicle using `RemoteControlID`. The value of -1 means use keyboard (not supported yet for multirotors). The value >= 0 specifies one of many remote controllers connected to the system. The list of available RCs can be seen in Game Controllers panel in Windows, for example.
 - `X, Y, Z, Yaw, Roll, Pitch`: These elements allows you to specify the initial position and orientation of the vehicle. Position is in NED coordinates in SI units with origin set to Player Start location in Unreal environment. The orientation is specified in degrees.
 - `Sensors`: This element specifies the sensors associated with the vehicle, see [Sensors](sensors.md) page for details.
-- `IsFpvVehicle`: This setting allows to specify which vehicle camera will follow and the view that will be shown when ViewMode is set to Fpv. By default, AirSim selects the first vehicle in settings as FPV vehicle.
+- `IsFpvVehicle`: This setting allows to specify which vehicle camera will follow and the view that will be shown when ViewMode is set to Fpv. By default, Cosys-AirSim selects the first vehicle in settings as FPV vehicle.
 - `Cameras`: This element specifies camera settings for vehicle. The key in this element is name of the [available camera](image_apis.md#available_cameras) and the value is same as `CameraDefaults` as described above. For example, to change FOV for the front center camera to 120 degrees, you can use this for `Vehicles` setting:
 
 ```json
@@ -419,7 +419,7 @@ Each simulation mode will go through the list of vehicles specified in this sett
 ```
 
 ### Using PX4
-By default we use [simple_flight](simple_flight.md) so you don't have to do separate HITL or SITL setups. We also support ["PX4"](px4_setup.md) for advanced users. To use PX4 with AirSim, you can use the following for `Vehicles` setting:
+By default we use [simple_flight](simple_flight.md) so you don't have to do separate HITL or SITL setups. We also support ["PX4"](px4_setup.md) for advanced users. To use PX4 with Cosys-AirSim, you can use the following for `Vehicles` setting:
 
 ```
 "Vehicles": {
@@ -496,7 +496,7 @@ messages share the same serial port. When communicating over UDP or TCP PX4 requ
 channels.  If UseTcp is false, then UdpIp, UdpPort are used to send HIL_* messages, otherwise the
 TcpPort is used.  TCP support in PX4 was added in 1.9.2 with the `lockstep` feature because the
 guarantee of message delivery that TCP provides is required for the proper functioning of lockstep.
-AirSim becomes a TCP server in that case, and waits for a connection from the PX4 app.  The second
+Cosys-AirSim becomes a TCP server in that case, and waits for a connection from the PX4 app.  The second
 channel for controlling the vehicle is defined by (ControlIp, ControlPort) and is always a UDP
 channel.
 
@@ -506,7 +506,7 @@ PX4 connection. See [Setting up PX4 Software-in-Loop](px4_sitl.md) for an exampl
 
 ### Using ArduPilot
 
-[ArduPilot](https://ardupilot.org/) Copter & Rover vehicles are supported in latest AirSim main branch & releases `v1.3.0` and later. For settings and how to use, please see [ArduPilot SITL with AirSim](https://ardupilot.org/dev/docs/sitl-with-airsim.html)
+[ArduPilot](https://ardupilot.org/) Copter & Rover vehicles are supported in latest Cosys-AirSim main branch & releases `v1.3.0` and later. For settings and how to use, please see [ArduPilot SITL with Cosys-AirSim](https://ardupilot.org/dev/docs/sitl-with-airsim.html)
 
 ## Other Settings
 

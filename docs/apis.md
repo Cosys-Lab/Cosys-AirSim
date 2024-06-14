@@ -37,7 +37,7 @@ Here's how to use AirSim APIs using Python to control simulated car (see also [C
 
 ```python
 # ready to run example: PythonClient/car/hello_car.py
-import airsim
+import cosysairsim
 import time
 
 # connect to the AirSim simulator 
@@ -81,7 +81,7 @@ Here's how to use AirSim APIs using Python to control simulated quadrotor (see a
 
 ```python
 # ready to run example: PythonClient/multirotor/hello_drone.py
-import airsim
+import cosysairsim
 import os
 
 # connect to the AirSim simulator

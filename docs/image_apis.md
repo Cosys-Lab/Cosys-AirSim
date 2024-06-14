@@ -9,7 +9,7 @@ Here's a sample code to get a single image from camera named "0". The returned v
 ### Python
 
 ```python
-import airsim 
+import cosysairsim 
 
 # for car use CarClient() 
 client = airsim.MultirotorClient()
@@ -42,7 +42,7 @@ The `simGetImages` API which is slightly more complex to use than `simGetImage` 
 ### Python
 
 ```python
-import airsim 
+import cosysairsim 
 
 # for car use CarClient() 
 client = airsim.MultirotorClient()

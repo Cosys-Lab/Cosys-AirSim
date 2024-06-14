@@ -1,7 +1,7 @@
 # Object Detection
 
 ## About
-This feature lets you generate object detection using existing cameras in AirSim, similar to detection DNN.   
+This feature lets you generate object detection using existing cameras in Cosys-AirSim, similar to detection DNN.   
 Using the API you can control which object to detect by name and radius from camera.   
 One can control these settings for each camera, image type and vehicle combination separately.
 

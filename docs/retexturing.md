@@ -43,7 +43,7 @@ If tex_id is out-of-bounds for some object's texture set, it will be taken modul
 Demo (Python):
 
 ```Python
-import airsim
+import cosysairsim
 import time
 
 c = airsim.client.MultirotorClient()
