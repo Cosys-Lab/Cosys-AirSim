@@ -3,6 +3,8 @@
 // Licensed under the MIT License.
 #pragma once
 
+#include <vector>
+#include <string>
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
 
 class FColorGenerator
