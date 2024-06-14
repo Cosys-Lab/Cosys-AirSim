@@ -1,5 +1,5 @@
 import setup_path 
-import airsim
+import cosysairsim
 
 #from keras.models import load_model
 import sys

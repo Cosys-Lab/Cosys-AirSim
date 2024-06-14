@@ -1,6 +1,6 @@
 import os
 import setup_path 
-import airsim
+import cosysairsim
 import time
 import numpy as np
 import sys

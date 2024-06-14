@@ -2,7 +2,7 @@
 # https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/docs/image_apis.md#computer-vision-mode
 
 import setup_path
-import airsim
+import cosysairsim
 
 # requires Python 3.5.3 :: Anaconda 4.4.0
 # pip install opencv-python

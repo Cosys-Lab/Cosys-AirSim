@@ -6,7 +6,7 @@ import sys
 import time
 import numpy as np
 
-import airsim
+import cosysairsim
 
 import keras.backend as K
 from keras.preprocessing import image

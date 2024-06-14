@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import airsim
+import cosysairsim
 import time
 import numpy as np
 

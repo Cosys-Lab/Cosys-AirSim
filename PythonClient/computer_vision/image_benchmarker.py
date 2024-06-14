@@ -1,5 +1,5 @@
 import setup_path
-import airsim
+import cosysairsim
 from argparse import ArgumentParser
 import time
 import threading

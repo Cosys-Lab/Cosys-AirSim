@@ -1,5 +1,5 @@
 import setup_path 
-import airsim
+import cosysairsim
 from airsim import Vector3r, Quaternionr, Pose
 from airsim.utils import to_quaternion
 import numpy as np

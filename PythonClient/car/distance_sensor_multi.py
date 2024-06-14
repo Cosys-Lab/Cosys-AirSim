@@ -1,4 +1,4 @@
-import airsim
+import cosysairsim
 import time
 
 '''

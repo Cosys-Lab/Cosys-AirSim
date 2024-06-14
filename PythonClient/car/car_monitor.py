@@ -1,5 +1,5 @@
 import setup_path 
-import airsim
+import cosysairsim
 
 import cv2 #conda install opencv
 import time

@@ -2,7 +2,7 @@
 # 
 
 import setup_path 
-import airsim
+import cosysairsim
 
 import sys
 import math

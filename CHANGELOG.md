@@ -1,11 +1,12 @@
 ### May/June 2024
 * Added [multi-layer annotation](docs/annotation.md) with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
-* Updated Unreal to 5.2.1 and merge of [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum).
+* Updated Unreal to 5.2.1 (Thanks in part to [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum)!).
 * Updated instance segmentation to use proxy meshing, no longer requiring custom Unreal Engine fork. 
 * Updated ground vehicles to use ChaosVehicles instead of PhysXVehicles. Some issues may arise.
-* Added parallelization to LiDAR sensor to speed up pointcloud generation.
-* Added optional parallelization to echo sensor to speed up pointcloud generation. See echo documentation for more info.
-* Added `MoveWorldOrigin` for the settings to move the world origin to the player start location when starting the simulator. Disabled by default. This affects things like setting the sensors to external!
+* Updated settings with new parameter `MoveWorldOrigin` to move the world origin to the player start location when starting the simulator. Disabled by default. This affects things like setting the sensors to external!
+* Updated LiDAR sensor with parallelization to speed up pointcloud generation.
+* Updated Echo sensor with optional parallelization to speed up pointcloud generation. See echo documentation for more info.
+* Updated Python API module to be named cosysairsim and be installable from pip (`pip install cosysairsim`)
 * Updated Python API to now loads colormap from disk instead of regenerating each time and being very slow.
 * Updated [Matlab API Client](docs/matlab.md) implementation as an easy to install Matlab toolbox and completed all possible API functions (many untested!)
 * Fixed passive echo beacons data structure.
