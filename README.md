@@ -5,6 +5,8 @@ Our goal is to develop Cosys-AirSim as a platform for AI research to experiment 
 
 This fork is based on last public AirSim release from Microsoft's GitHub.
 
+**Note that Unreal 5.3 breaks debug rendering when editor aspect ratio is not perfect! Disable it to avoid issues in editor. This means things like _DrawSensor_ and  _DrawDebugPoints_ should be disabled. [This does not happen in 5.2 and is fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454).**
+
 ## Cosys-Lab Modifications
 
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
