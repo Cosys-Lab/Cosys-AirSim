@@ -203,7 +203,12 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
           "AutoExposureMinBrightness": 0.03,
           "MotionBlurAmount": 1,
           "MotionBlurMax": 10,
-          "ChromaticAberrationScale": 2
+          "ChromaticAberrationScale": 2,
+          "LumenGIEnable": true,
+          "LumenReflectionEnable": true,
+          "LumenFinalQuality": 1,
+          "LumenSceneDetail": 1,
+          "LumenSceneLightningDetail": 1
         }
     ]
   },
@@ -327,3 +332,7 @@ For example with Python, you can use the following examples for RGB and greyscal
     img = Image.fromarray(rgbarray_shaped[:,:,0])
     img.show()
 ```
+
+## Lumen Lightning for Scene camera
+Unreal 5 introduces Lumen lightning. Due to the cameras using scene capture components enabling Lumen for them can be costly on performance. Settings have been added specfically for the scene camera to customize the usage of Lumen for Global Illumination and Reflections. 
+The `LumenGIEnable` and `LumenReflectionEnable` settings enable or disable Lumen for the camera. The `LumenFinalQuality`(0.25-2) setting determines the quality of the final image. The `LumenSceneDetail`(0.25-4) setting determines the quality of the scene. The `LumenSceneLightningDetail`(0.25-2) setting determines the quality of the lightning in the scene.

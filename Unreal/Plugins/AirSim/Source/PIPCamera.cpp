@@ -128,8 +128,12 @@ void APIPCamera::BeginPlay()
 
     for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
         //use final color for all calculations
-        captures_[image_type]->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
-
+        if(image_type == Utils::toNumeric(ImageType::Scene)) {
+            captures_[image_type]->CaptureSource = ESceneCaptureSource::SCS_FinalToneCurveHDR;
+        }
+        else {
+            captures_[image_type]->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+        }      
         render_targets_[image_type] = NewObject<UTextureRenderTarget2D>();
     }
 
@@ -439,10 +443,17 @@ void APIPCamera::setDistortionParam(const std::string& param_name, float value)
 
 void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
     captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowOnlyComponents = ComponentList;
+    for(TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
+        captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+	}
+    //captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents = ComponentList;
 }
 
 void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name) {
     captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents = ComponentList;
+    for (TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
+        captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+    }
 }
 
 void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type)
@@ -567,6 +578,29 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
             setDistortionMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings);
             setNoiseMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings, noise_setting);
             copyCameraSettingsToSceneCapture(camera_, captures_[image_type]); //CinemAirSim
+            if(image_type == Utils::toNumeric(ImageType::Scene)) {
+                if (capture_setting.lumen_gi_enabled) {
+                    captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
+                    captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;
+                }
+                else {
+                    captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
+                    captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::None;
+                }
+                if (capture_setting.lumen_reflections_enabled) {
+                    captures_[image_type]->PostProcessSettings.bOverride_ReflectionMethod = 1;
+                    captures_[image_type]->PostProcessSettings.ReflectionMethod = EReflectionMethod::Lumen;
+                }
+                else {
+                    captures_[image_type]->PostProcessSettings.bOverride_ReflectionMethod = 1;
+					captures_[image_type]->PostProcessSettings.ReflectionMethod = EReflectionMethod::None;
+                }
+
+                captures_[image_type]->PostProcessSettings.LumenFinalGatherQuality = capture_setting.lumen_final_quality;
+                captures_[image_type]->PostProcessSettings.LumenSceneDetail = capture_setting.lumen_scene_detail;
+                captures_[image_type]->PostProcessSettings.LumenSceneLightingQuality = capture_setting.lumen_scene_lightning_quality;
+                captures_[image_type]->bUseRayTracingIfEnabled = 1;
+			}
         }
         else { //camera component
             updateCameraSetting(camera_, capture_setting, ned_transform);
