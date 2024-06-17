@@ -187,6 +187,13 @@ namespace airlib
             float ortho_width = Utils::nan<float>();
             float chromatic_aberration_scale = Utils::nan<float>(); // 0f;
 		    bool ignore_marked = false;
+
+            // Settings only available for scene camera
+            bool lumen_gi_enabled = false;
+            bool lumen_reflections_enabled = false;
+            float lumen_final_quality = 1;
+            float lumen_scene_detail = 1.0f;
+            float lumen_scene_lightning_quality = 1;
         };
 
         struct NoiseSetting
@@ -1358,6 +1365,12 @@ namespace airlib
                 throw std::invalid_argument(std::string("CaptureSettings projection_mode has invalid value in settings_json ") + projection_mode);
 
             capture_setting.ortho_width = settings_json.getFloat("OrthoWidth", capture_setting.ortho_width);
+
+            capture_setting.lumen_gi_enabled = settings_json.getBool("LumenGIEnable", capture_setting.lumen_gi_enabled);
+            capture_setting.lumen_reflections_enabled = settings_json.getBool("LumenReflectionEnable", capture_setting.lumen_reflections_enabled);
+            capture_setting.lumen_final_quality = settings_json.getFloat("LumenFinalQuality", capture_setting.lumen_final_quality);
+            capture_setting.lumen_scene_detail = settings_json.getFloat("LumenSceneDetail", capture_setting.lumen_scene_detail);
+            capture_setting.lumen_scene_lightning_quality = settings_json.getFloat("LumenSceneLightningDetail", capture_setting.lumen_scene_lightning_quality);
         }
 
         static void loadSubWindowsSettings(const Settings& settings_json, std::vector<SubwindowSetting>& subwindow_settings)
