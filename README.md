@@ -5,7 +5,11 @@ Our goal is to develop Cosys-AirSim as a platform for AI research to experiment 
 
 This fork is based on last public AirSim release from Microsoft's GitHub.
 
-**Note that Unreal 5.3 breaks debug rendering when editor aspect ratio is not perfect! Disable it to avoid issues in editor. This means things like _DrawSensor_ and  _DrawDebugPoints_ should be disabled. [This does not happen in 5.2 and is fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454).**
+**Note that Unreal 5.3 breaks debug rendering when editor aspect ratio is not perfect! Disable it to avoid issues in editor.
+This means things like _DrawSensor_ and  _DrawDebugPoints_ should be disabled. [This does not happen in 5.2 and is fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454).**
+
+
+**Note that Unreal 5.3 breaks camera scene rendering when Effects is not set to the Epic scalability preset. You can use the console command r.DetailMode 2 to fix this at runtime!**
 
 ## Cosys-Lab Modifications
 

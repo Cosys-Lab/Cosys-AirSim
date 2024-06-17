@@ -105,6 +105,29 @@ Once you have your environment using above instructions, you should frequently u
 3. Replace [your project]/Plugins folder with AirSim/Unreal/Plugins folder.
 4. Right click on your .uproject file and chose "Generate Visual Studio project files" option. This is not required for Linux.
 
+
+## Unreal 5.3 Scene camera bug
+Note that Unreal 5.3 breaks camera scene rendering when Effects is not set to the Epic scalability preset. You can use the console command r.DetailMode 2 to fix this at runtime!
+For the Blocks and other available environments we have made a fix for this. By placing a DefaultScalability.ini file in the Config folder of your Unreal project, you can set the scalability settings to custom values for each one (low, medium, high, epic, cine).
+As you can see in the Blocks environment, we have added the following to it to fix this bug automatically.  You can find the DefaultScalability.ini file in the Unreal/Environments/Blocks folder. Copy this file to your Unreal project's Config folder.
+
+```ini
+[EffectsQuality@0]
+r.DetailMode=2
+
+[EffectsQuality@1]
+r.DetailMode=2
+
+[EffectsQuality@2]
+r.DetailMode=2
+
+[EffectsQuality@3]
+r.DetailMode=2
+
+[EffectsQuality@Cine]
+r.DetailMode=2
+```
+
 ## FAQ
 
 #### What are other cool environments?
