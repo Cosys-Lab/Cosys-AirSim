@@ -1251,7 +1251,7 @@ FColor FColorGenerator::GetColorFromColorMap(int32 color_index)
 	}
 	if (color_index < 0 || color_index >= pow((num_per_channel - full_start) + uneven_count - 3, 3))
 	{
-		UE_LOG(LogTemp, Error, TEXT("AirSim Annotation: Object index %d is out of the available color map boundary [%d, %d]"), color_index, 0, pow((num_per_channel - full_start) + uneven_count - 3, 3));
+		UE_LOG(LogTemp, Error, TEXT("AirSim Annotation: Object index %i is out of the available color map boundary [0, %s]"), color_index, *FString::SanitizeFloat(pow((num_per_channel - full_start) + uneven_count - 3, 3)));
 		return FColor(0, 0, 0);
 	}
 	else {
