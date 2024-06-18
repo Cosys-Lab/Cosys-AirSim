@@ -60,7 +60,7 @@ A manually maintained fork of this repository is available to the public: https:
 ```
 
 ## Cosys-Lab Modifications
-* Added support for Unreal to 5.4.2.
+* Added support for Unreal to 5.4.2 ([Note that Unreal 5.3/5.4 breaks camera scene rendering by default in custom environments](docs/unreal_custenv.md#unreal-5354-scene-camera-bug))
 * Added [multi-layer annotation](docs/annotation.md) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
