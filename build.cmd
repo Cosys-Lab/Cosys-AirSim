@@ -65,7 +65,7 @@ if ERRORLEVEL 1 (
 REM //---------- get rpclib ----------
 IF NOT EXIST external\rpclib mkdir external\rpclib
 
-set RPC_VERSION_FOLDER=rpclib-2.3.0
+set RPC_VERSION_FOLDER=rpclib-2.3.1
 IF NOT EXIST external\rpclib\%RPC_VERSION_FOLDER% (
     REM //leave some blank lines because %powershell% shows download banner at top of console
     ECHO(
@@ -76,9 +76,9 @@ IF NOT EXIST external\rpclib\%RPC_VERSION_FOLDER% (
     ECHO *****************************************************************************************
     @echo on
     if "%PWSHV7%" == "" (
-        %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/rpclib/rpclib/archive/v2.3.0.zip -OutFile external\rpclib.zip }"
+        %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/WouterJansen/rpclib/archive/refs/tags/v2.3.1.zip -OutFile external\rpclib.zip }"
     ) else (
-        %powershell% -command "iwr https://github.com/rpclib/rpclib/archive/v2.3.0.zip -OutFile external\rpclib.zip"
+        %powershell% -command "iwr https://github.com/WouterJansen/rpclib/archive/refs/tags/v2.3.1.zip -OutFile external\rpclib.zip"
     )
     @echo off
     
@@ -165,9 +165,9 @@ REM //---------- get Eigen library ----------
 IF NOT EXIST AirLib\deps mkdir AirLib\deps
 IF NOT EXIST AirLib\deps\eigen3 (
     if "%PWSHV7%" == "" (
-        %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip -OutFile eigen3.zip }"
+        %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip -OutFile eigen3.zip }"
     ) else (
-        %powershell% -command "iwr https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip -OutFile eigen3.zip"
+        %powershell% -command "iwr https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip -OutFile eigen3.zip"
     )
     %powershell% -command "Expand-Archive -Path eigen3.zip -DestinationPath AirLib\deps"
     %powershell% -command "Move-Item -Path AirLib\deps\eigen* -Destination AirLib\deps\del_eigen"
