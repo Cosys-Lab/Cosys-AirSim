@@ -5,12 +5,6 @@ Our goal is to develop Cosys-AirSim as a platform for AI research to experiment 
 
 This fork is based on last public AirSim release from Microsoft's GitHub.
 
-**Note that Unreal 5.3 breaks debug rendering when editor aspect ratio is not perfect! Disable it to avoid issues in editor.
-This means things like _DrawSensor_ and  _DrawDebugPoints_ should be disabled. [This does not happen in 5.2 and is fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454).**
-
-
-**Note that Unreal 5.3 breaks camera scene rendering when Effects is not set to the Epic scalability preset. You can use the console command r.DetailMode 2 to fix this at runtime!**
-
 ## Cosys-Lab Modifications
 
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
@@ -74,7 +68,7 @@ A manually maintained fork of this repository is available to the public: https:
 * Added [Matlab API Client](docs/matlab.md) implementation as an easy to install Matlab toolbox.
 * Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
-* Updated Unreal to 5.3.2.
+* Updated Unreal to 5.4.2.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.

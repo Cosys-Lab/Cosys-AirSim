@@ -6,10 +6,10 @@ The current recommended and tested environment is **Ubuntu 20.04 LTS**. Theoreti
 
 ### Build Unreal Engine
 - Make sure you are [registered with Epic Games](https://docs.unrealengine.com/en-US/SharingAndReleasing/Linux/BeginnerLinuxDeveloper/SettingUpAnUnrealWorkflow/index.html). This is required to get source code access for Unreal Engine.
-- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 5.3.2 at present.
+- Clone Unreal in your favorite folder and build it (this may take a while!). **Note**: We only support Unreal 5.4.2 at present.
 ```bash
 # go to the folder where you clone GitHub projects
-git clone -b 5.3 git@github.com:EpicGames/UnrealEngine.git
+git clone -b 5.4 git@github.com:EpicGames/UnrealEngine.git
 cd UnrealEngine
 ./Setup.sh
 ./GenerateProjectFiles.sh
