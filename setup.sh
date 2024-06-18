@@ -127,19 +127,19 @@ fi # End USB setup, CMake install
 
 
 # Download rpclib
-if [ ! -d "external/rpclib/rpclib-2.3.0" ]; then
+if [ ! -d "external/rpclib/rpclib-2.3.1" ]; then
     echo "*********************************************************************************************"
     echo "Downloading rpclib..."
     echo "*********************************************************************************************"
 
-    wget https://github.com/rpclib/rpclib/archive/v2.3.0.zip
+    wget https://github.com/WouterJansen/rpclib/archive/refs/tags/v2.3.1.zip
 
     # remove previous versions
     rm -rf "external/rpclib"
 
     mkdir -p "external/rpclib"
-    unzip -q v2.3.0.zip -d external/rpclib
-    rm v2.3.0.zip
+    unzip -q v2.3.1.zip -d external/rpclib
+    rm v2.3.1.zip
 fi
 
 # Download high-polycount SUV model

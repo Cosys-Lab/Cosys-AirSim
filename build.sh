@@ -30,7 +30,7 @@ done
 function version_less_than_equal_to() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" = "$1"; }
 
 # check for rpclib
-RPC_VERSION_FOLDER="rpclib-2.3.0"
+RPC_VERSION_FOLDER="rpclib-2.3.1"
 if [ ! -d "./external/rpclib/$RPC_VERSION_FOLDER" ]; then
     echo "ERROR: new version of AirSim requires newer rpclib."
     echo "please run setup.sh first and then run build.sh again."
