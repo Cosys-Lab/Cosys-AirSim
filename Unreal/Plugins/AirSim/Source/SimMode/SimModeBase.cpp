@@ -53,7 +53,7 @@ ASimModeBase::ASimModeBase()
 
     static ConstructorHelpers::FClassFinder<APIPCamera> external_camera_class(TEXT("Blueprint'/AirSim/Blueprints/BP_PIPCamera'"));
     external_camera_class_ = external_camera_class.Succeeded() ? external_camera_class.Class : nullptr;
-    static ConstructorHelpers::FClassFinder<ACameraDirector> camera_director_class(TEXT("Blueprint'/AirSim/Blueprints/BP_CameraDirector'"));
+    static ConstructorHelpers::FClassFinder<AAirSimCameraDirector> camera_director_class(TEXT("Blueprint'/AirSim/Blueprints/BP_CameraDirector'"));
     camera_director_class_ = camera_director_class.Succeeded() ? camera_director_class.Class : nullptr;
 
     static ConstructorHelpers::FObjectFinder<UParticleSystem> collision_display(TEXT("ParticleSystem'/AirSim/StarterContent/Particles/P_Explosion.P_Explosion'"));
@@ -733,7 +733,7 @@ std::vector<msr::airlib::Pose> ASimModeBase::GetAllInstanceSegmentationMeshPoses
     for (auto const& element : nameToComponentMapTemp) {
         UAirBlueprintLib::RunCommandOnGameThread([ned, only_visible, &retval, element, this]() {
             if (element.Value->HasBegunPlay() && element.Value->IsRenderStateCreated()) {
-                if (!element.Value->IsBeingDestroyed() && !element.Value->IsPendingKillOrUnreachable()) {
+                if (!element.Value->IsBeingDestroyed() && IsValid(element.Value)) {
                     if (!only_visible || element.Value->GetVisibleFlag()) {
                         if (ned) {
                             retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
@@ -814,7 +814,7 @@ std::vector<msr::airlib::Pose> ASimModeBase::GetAllAnnotationMeshPoses(const std
     for (auto const& element : nameToComponentMapTemp) {
         UAirBlueprintLib::RunCommandOnGameThread([ned, only_visible, &retval, element, this]() {
             if (element.Value->HasBegunPlay() && element.Value->IsRenderStateCreated()) {
-                if (!element.Value->IsBeingDestroyed() && !element.Value->IsPendingKillOrUnreachable()) {
+                if (!element.Value->IsBeingDestroyed() && IsValid(element.Value)) {
                     if (!only_visible || element.Value->GetVisibleFlag()) {
                         if (ned) {
                             retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
@@ -1515,13 +1515,13 @@ const msr::airlib::AirSimSettings& ASimModeBase::getSettings() const
 void ASimModeBase::initializeCameraDirector(const FTransform& camera_transform, float follow_distance)
 {
     TArray<AActor*> camera_dirs;
-    UAirBlueprintLib::FindAllActor<ACameraDirector>(this, camera_dirs);
+    UAirBlueprintLib::FindAllActor<AAirSimCameraDirector>(this, camera_dirs);
     if (camera_dirs.Num() == 0) {
         //create director
         FActorSpawnParameters camera_spawn_params;
         camera_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
         camera_spawn_params.Name = "CameraDirector";
-        CameraDirector = this->GetWorld()->SpawnActor<ACameraDirector>(camera_director_class_,
+        CameraDirector = this->GetWorld()->SpawnActor<AAirSimCameraDirector>(camera_director_class_,
                                                                        camera_transform,
                                                                        camera_spawn_params);
         CameraDirector->setFollowDistance(follow_distance);
@@ -1533,7 +1533,7 @@ void ASimModeBase::initializeCameraDirector(const FTransform& camera_transform, 
                                                                                   camera_spawn_params);
     }
     else {
-        CameraDirector = static_cast<ACameraDirector*>(camera_dirs[0]);
+        CameraDirector = static_cast<AAirSimCameraDirector*>(camera_dirs[0]);
     }
 }
 

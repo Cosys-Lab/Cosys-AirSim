@@ -7,7 +7,15 @@ public class BlocksTarget : TargetRules
 {
 	public BlocksTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Game;
+        DefaultBuildSettings = BuildSettingsVersion.V5;
+        bOverrideBuildEnvironment = true;
+        WindowsPlatform.bStrictConformanceMode = false;
+        CppStandard = CppStandardVersion.Cpp20;
+        ShadowVariableWarningLevel = WarningLevel.Warning;
+        bLegacyParentIncludePaths = true;
+        bLegacyPublicIncludePaths = true;
+        bValidateFormatStrings = false;
+        Type = TargetType.Game;
 		ExtraModuleNames.AddRange(new string[] { "Blocks" });
 		//bUseUnityBuild = false;
 		if (Target.Platform == UnrealTargetPlatform.Linux)

@@ -14,9 +14,12 @@ class WorldSimApi : public msr::airlib::WorldSimApiBase
 public:
     typedef msr::airlib::Pose Pose;
     typedef msr::airlib::Vector3r Vector3r;
+    typedef msr::airlib::Vector2r Vector2r;
+    typedef msr::airlib::Quaternionr Quaternionr;
     typedef msr::airlib::MeshPositionVertexBuffersResponse MeshPositionVertexBuffersResponse;
     typedef msr::airlib::ImageCaptureBase ImageCaptureBase;
     typedef msr::airlib::CameraDetails CameraDetails;
+    typedef msr::airlib::AirSimSettings AirSimSettings;
 
     WorldSimApi(ASimModeBase* simmode);
     virtual ~WorldSimApi() = default;

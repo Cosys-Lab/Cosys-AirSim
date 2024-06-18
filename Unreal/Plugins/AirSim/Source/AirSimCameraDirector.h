@@ -23,7 +23,7 @@ enum class ECameraDirectorMode : uint8
 };
 
 UCLASS()
-class AIRSIM_API ACameraDirector : public AActor
+class AIRSIM_API AAirSimCameraDirector : public AActor
 {
     GENERATED_BODY()
 
@@ -46,7 +46,7 @@ public:
     void inputEventFrontView();
 
 public:
-    ACameraDirector();
+    AAirSimCameraDirector();
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void Tick(float DeltaSeconds) override;

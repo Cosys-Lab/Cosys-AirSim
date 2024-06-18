@@ -9,7 +9,7 @@
 #include "AirBlueprintLib.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AirLib/include/common/AirSimSettings.hpp"
-#include "UnrealSensors/UnrealEchoSensor.h"
+#include "UnrealSensors/UnrealEchoCommon.h"
 
 #include "PassiveEchoBeacon.generated.h"
 
@@ -111,7 +111,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	TArray<UnrealEchoSensor::EchoPoint> getPoints();
+	TArray<UnrealEchoCommon::EchoPoint> getPoints();
 
 private:
 
@@ -127,7 +127,7 @@ private:
 	msr::airlib::vector<msr::airlib::Vector3r> sample_direction_points_;
 	msr::airlib::vector<msr::airlib::real_T> point_cloud_;
 	msr::airlib::vector<std::string> groundtruth_;
-	TArray<UnrealEchoSensor::EchoPoint> points_;
+	TArray<UnrealEchoCommon::EchoPoint> points_;
 	msr::airlib::Pose beacon_reference_frame_;
 	TArray<AActor*> ignore_actors_;
 	float reflection_distance_limit_cm_;

@@ -21,6 +21,8 @@ public:
     typedef msr::airlib::StateReporter StateReporter;
     typedef msr::airlib::UpdatableObject UpdatableObject;
     typedef msr::airlib::Pose Pose;
+    typedef msr::airlib::CollisionResponse CollisionResponse;
+    typedef msr::airlib::RotorStates RotorStates;
 
     typedef MultirotorPawnEvents::RotorActuatorInfo RotorActuatorInfo;
 
