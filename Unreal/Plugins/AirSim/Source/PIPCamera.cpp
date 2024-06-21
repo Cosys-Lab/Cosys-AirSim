@@ -291,6 +291,7 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
     noise_material_static_ = nullptr;
 	lens_distortion_material_static_ = nullptr;
 	lens_distortion_invert_material_static_ = nullptr;
+    annotation_sphere_static_ = nullptr;
     noise_materials_.Empty();
 	lens_distortion_materials_.Empty();
 
@@ -307,6 +308,7 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
     distortion_materials_.Empty();
 
 	annotator_name_to_index_map_.Empty();
+    sphere_annotation_component_map_.Empty();
 
 
     int camera_full_count = static_cast<int>(cameraCaptureCount());
