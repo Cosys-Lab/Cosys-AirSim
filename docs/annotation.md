@@ -31,7 +31,8 @@ For example:
         "Name": "RGBTestDirect",
         "Type": 0,
         "Default": true,
-        "SetDirect": true
+        "SetDirect": true,
+        "ViewDistance": 10
     },
     {
         "Name": "RGBTestIndex",
@@ -42,7 +43,8 @@ For example:
     {
         "Name": "GreyscaleTest",
         "Type": 1,
-        "Default": true
+        "Default": true,
+        "ViewDistance": 5
     },
     {
         "Name": "TextureTestDirect",
@@ -72,6 +74,10 @@ The types are:
 The `Default` setting applies to all types and is what happens when no tag is set for a actor/component. 
 When set to false, the mesh will not be rendered in the annotation layer.
 When set to true, the mesh will be rendered in the annotation layer with the default value of the layer.
+
+The `ViewDistance` setting applies to all types and allows you to set the maximum distance in meters at which the annotation layer is rendered. 
+This only applies to the camera sensor output as for LiDAR you can set the maximum range distance of the sensor differently. 
+This value is by default set to -1 which means infinite draw distance. 
 
 ### Type 1: RGB
 Similar to [instance segmentation](instance_segmentation.md), you can use the RGB annotation layer to tag objects in the environment with a unique color. 

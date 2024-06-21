@@ -18,7 +18,7 @@ FObjectAnnotator::FObjectAnnotator()
 	show_by_default_ = false;
 }
 
-FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, bool show_by_default, bool set_direct, FString texture_path, FString texture_prefix)
+FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, bool show_by_default, bool set_direct, FString texture_path, FString texture_prefix, float max_view_distance)
 {
 	name_ = name;
 	type_ = type;
@@ -26,6 +26,7 @@ FObjectAnnotator::FObjectAnnotator(FString name, AnnotatorType type, bool show_b
 	set_direct_ = set_direct;
 	texture_path_ = texture_path;
 	texture_prefix_ = texture_prefix;
+	max_view_distance_ = max_view_distance;
 }
 
 void FObjectAnnotator::Initialize(ULevel* level) {
@@ -506,6 +507,17 @@ bool FObjectAnnotator::AnnotateNewActorRGB(AActor* actor) {
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with ID # %s (RGB: %s)"), *name_, *it.Key(), *FString::FromInt(color_index), *color_string_gammacorrected);
 					}
 				}
+			}else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
+				name_to_component_map_.Emplace(it.Key(), it.Value());
+				FColor new_color = FColor(0, 0, 0);
+				name_to_color_index_map_.Emplace(it.Key(), 2744000 - 1);
+				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
+				FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
+				color_to_name_map_.Emplace(color_string, it.Key());
+				gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
+				name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
+				check(PaintRGBComponent(it.Value(), new_color, it.Key()));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged RGB annotated object %s with default color (RGB: %s)"), *name_, *it.Key(), *color_string_gammacorrected);
 			}
 		}
 		return true;
@@ -571,6 +583,17 @@ bool FObjectAnnotator::AnnotateNewActorGreyscale(AActor* actor) {
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new greyscale annotated object %s with value %f (RGB: %s)"), *name_, *it.Key(), greyscale_value, *color_string_gammacorrected);
 				}
+			}else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
+				name_to_component_map_.Emplace(it.Key(), it.Value());
+				FColor new_color = FColor(0, 0, 0);
+				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
+				FString color_string_gammacorrected = color_string;
+				color_to_name_map_.Emplace(color_string, it.Key());
+				gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
+				name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
+				name_to_value_map_.Emplace(it.Key(), 0);
+				check(PaintRGBComponent(it.Value(), new_color, it.Key()));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged greyscale annotated object %s with default color (RGB: %s)"), *name_, *it.Key(), *color_string_gammacorrected);
 			}
 		}
 		return true;
@@ -638,6 +661,12 @@ bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new texture annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
 					}
 				}
+			}else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
+				name_to_component_map_.Emplace(it.Key(), it.Value());
+				FString new_texture = "/AirSim/HUDAssets/k";
+				name_to_texture_path_map_.Emplace(it.Key(), new_texture);
+				check(PaintTextureComponent(it.Value(), new_texture, it.Key()));
+				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged texture annotated object %s with default texture"), *name_, *it.Key());
 			}
 		}
 		return true;
@@ -748,18 +777,19 @@ void FObjectAnnotator::InitializeInstanceSegmentation(ULevel* InLevel)
 			getPaintableComponentMeshes(actor, &paintable_components_meshes);
 			for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
 			{
-				name_to_component_map_.Emplace(it.Key(), it.Value());
-				FColor new_color = ColorGenerator_.GetColorFromColorMap(color_index);
-				name_to_color_index_map_.Emplace(it.Key(), color_index);
-				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
-				FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
-				color_to_name_map_.Emplace(color_string, it.Key());
-				gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
-				name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
-				check(PaintRGBComponent(it.Value(), new_color, it.Key()));
-				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new object %s with ID # %s (RGB: %s)"), *name_, *it.Key(), *FString::FromInt(color_index), *color_string_gammacorrected);
-
-				color_index++;
+				if(!it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
+					name_to_component_map_.Emplace(it.Key(), it.Value());
+					FColor new_color = ColorGenerator_.GetColorFromColorMap(color_index);
+					name_to_color_index_map_.Emplace(it.Key(), color_index);
+					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
+					FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
+					color_to_name_map_.Emplace(color_string, it.Key());
+					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
+					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
+					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
+					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new object %s with ID # %s (RGB: %s)"), *name_, *it.Key(), *FString::FromInt(color_index), *color_string_gammacorrected);
+					color_index++;
+				}				
 			}
 		}
 	}
@@ -816,7 +846,7 @@ void FObjectAnnotator::InitializeRGB(ULevel* InLevel)
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with ID # %s (RGB: %s)"), *name_, *it.Key(), *FString::FromInt(color_index), *color_string_gammacorrected);
 					}
 				}
-				else if (show_by_default_) {
+				else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 					FColor new_color = FColor(0, 0, 0);
 					name_to_color_index_map_.Emplace(it.Key(), 2744000 - 1);
@@ -878,7 +908,7 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new greyscale annotated object %s with direct greyscale value %f (RGB: %s)"), *name_, *it.Key(), greyscale_value , *color_string_gammacorrected);
 				}
-				else if (show_by_default_) {
+				else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 					FColor new_color = FColor(0, 0, 0);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
@@ -890,7 +920,6 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged greyscale annotated object %s with default color (RGB: %s)"), *name_, *it.Key(), *color_string_gammacorrected);
 				}
-
 			}
 		}
 	}
@@ -949,7 +978,7 @@ void FObjectAnnotator::InitializeTexture(ULevel* InLevel)
 						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new texture annotated object %s with texture: %s"), *name_, *it.Key(), *new_texture);
 					}
 				}
-				else if (show_by_default_) {
+				else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 					FString new_texture = "/AirSim/HUDAssets/k";
 					name_to_texture_path_map_.Emplace(it.Key(), new_texture);
@@ -1109,7 +1138,7 @@ void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 	TArray<UObject*> UObjectList;
 	bool bIncludeDerivedClasses = false;
 	EObjectFlags ExclusionFlags = EObjectFlags::RF_ClassDefaultObject;
-	EInternalObjectFlags ExclusionInternalFlags = EInternalObjectFlags::AllFlags;
+	EInternalObjectFlags ExclusionInternalFlags = EInternalObjectFlags::None;
 	GetObjectsOfClass(UAnnotationComponent::StaticClass(), UObjectList, bIncludeDerivedClasses, ExclusionFlags, ExclusionInternalFlags);
 
 	for (UObject* Object : UObjectList)
@@ -1119,7 +1148,8 @@ void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 		FString componentName = componentFName.ToString();
 		if (Component->GetWorld() == World
 			&& !annotation_component_list_.Contains(Component)
-			&& componentName.Contains(name_))
+			&& componentName.Contains(name_)
+			&& !componentName.Contains("annotation_sphere"))
 		{
 			annotation_component_list_.Add(Component);
 		}

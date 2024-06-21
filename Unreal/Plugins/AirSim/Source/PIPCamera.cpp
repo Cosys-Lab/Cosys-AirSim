@@ -5,6 +5,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/World.h"
 #include "ImageUtils.h"
+#include "Annotation/AnnotationComponent.h"
 #include "Annotation/ObjectAnnotator.h"
 #include <string>
 #include <exception>
@@ -67,6 +68,12 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlowVis), EPixelFormat::PF_B8G8R8A8);
 
     object_filter_ = FObjectFilter();
+
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Models/AnnotationSphere.AnnotationSphere'"));
+    if (loadedMesh.Succeeded())
+    {
+        annotation_sphere_static_ = loadedMesh.Object;
+    }
 }
 
 void APIPCamera::PostInitializeComponents()
@@ -451,12 +458,14 @@ void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPri
 
 void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name) {
     captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents = ComponentList;
+    if(sphere_annotation_component_map_.Contains(annotation_name))
+        captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents.Add(sphere_annotation_component_map_[annotation_name]);
     for (TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
         captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
     }
 }
 
-void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type)
+void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance)
 {
     USceneCaptureComponent2D* new_capture = NewObject<USceneCaptureComponent2D>(this, USceneCaptureComponent2D ::StaticClass(), *name);
 
@@ -468,6 +477,25 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
     new_capture->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	new_capture->RegisterComponent();
     new_capture->Deactivate();
+
+    if (max_view_distance > 0) {
+        FString sphereName  = name + "_hidden_sphere";
+        UStaticMeshComponent* annotation_sphere = NewObject<UStaticMeshComponent>(this, FName(*sphereName));
+        annotation_sphere->SetupAttachment(RootComponent);
+        annotation_sphere->RegisterComponent();
+        annotation_sphere->SetStaticMesh(annotation_sphere_static_);
+        annotation_sphere->SetRelativeScale3D(FVector(max_view_distance * 2, max_view_distance * 2, max_view_distance * 2));
+
+        FString annotatedSphereName = name + "_annotation_sphere";
+        UAnnotationComponent* AnnotationComponent = NewObject<UAnnotationComponent>(annotation_sphere, FName(*annotatedSphereName));
+        AnnotationComponent->SetupAttachment(annotation_sphere);
+        AnnotationComponent->RegisterComponent();
+        AnnotationComponent->SetAnnotationColor(FColor(0, 0, 0));
+        AnnotationComponent->MarkRenderStateDirty();
+        UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
+
+        sphere_annotation_component_map_.Add(name, PrimitiveComponent);
+	}
 
     captures_.Add(new_capture);
 

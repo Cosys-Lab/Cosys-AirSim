@@ -322,7 +322,7 @@ private:
 private:
     void InitializeInstanceSegmentation();
     void InitializeAnnotation();
-    void AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type);
+    void AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance = -1.0f);
 	void InitializeMaterialStencils();
     void initializeTimeOfDay();
     void advanceTimeOfDay();
