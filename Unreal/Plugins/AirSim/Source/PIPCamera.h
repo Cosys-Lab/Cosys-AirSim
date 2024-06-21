@@ -70,7 +70,7 @@ public:
     void setCameraOrientation(const FRotator& rotator);
     void updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList);
     void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name);
-    void addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type);
+    void addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance = -1.0f);
     void setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform);
     void setCameraPose(const msr::airlib::Pose& relative_pose);
     void setCameraFoV(float fov_degrees);
@@ -99,6 +99,8 @@ private: //members
     UPROPERTY()
     TArray<UDetectionComponent*> detections_;
 
+    UPROPERTY() UStaticMesh* annotation_sphere_static_;
+
     //CinemAirSim
     UPROPERTY()
     UCineCameraComponent* camera_;
@@ -117,8 +119,9 @@ private: //members
     UPROPERTY() UMaterial* lens_distortion_material_static_;
 	UPROPERTY() UMaterial* lens_distortion_invert_material_static_;
 	UPROPERTY() TArray<UMaterialInstanceDynamic*> lens_distortion_materials_;
-
     TMap<FString, int> annotator_name_to_index_map_;
+    TMap<FString, TWeakObjectPtr<UPrimitiveComponent>> sphere_annotation_component_map_;
+
     std::vector<bool> camera_type_enabled_;
     FRotator gimbald_rotator_;
     float gimbal_stabilization_;

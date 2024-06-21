@@ -77,9 +77,10 @@ namespace airlib
             bool set_direct;
             std::string texture_path;
             std::string texture_prefix;
+            float max_view_distance;
 
             AnnotatorSetting(int annotator_index_val = 0, int type_val = 0, bool show_by_default_val = true,
-                const std::string& name_val = "", bool set_direct_val = false, std::string texture_path_val = "", std::string texture_prefix_val = "")
+                const std::string& name_val = "", bool set_direct_val = false, std::string texture_path_val = "", std::string texture_prefix_val = "", float max_view_distance_val = -1.0f)
                 : annotator_index(annotator_index_val)
                 , type(type_val)
                 , show_by_default(show_by_default_val)
@@ -87,6 +88,7 @@ namespace airlib
                 , set_direct(set_direct_val)
                 , texture_path(texture_path_val)
 				, texture_prefix(texture_prefix_val)
+                , max_view_distance(max_view_distance_val)
             {
             }
         };
@@ -1416,6 +1418,7 @@ namespace airlib
                         annotator_setting.set_direct = json_settings_child.getBool("SetDirect", false);
                         annotator_setting.texture_path = json_settings_child.getString("TexturePath", "");
                         annotator_setting.texture_prefix = json_settings_child.getString("TexturePrefix", "");
+                        annotator_setting.max_view_distance = json_settings_child.getFloat("ViewDistance", -1.0f);
                         annotator_settings.push_back(annotator_setting);
                     }
                 }
