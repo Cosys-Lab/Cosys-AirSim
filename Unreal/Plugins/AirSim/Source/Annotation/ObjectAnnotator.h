@@ -35,7 +35,7 @@ public:
 
 	FObjectAnnotator();
 
-	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, bool show_by_default = true, bool set_direct = false, FString texture_path = FString(""), FString texture_prefix = FString(""));
+	FObjectAnnotator(FString name, AnnotatorType type = AnnotatorType::RGB, bool show_by_default = true, bool set_direct = false, FString texture_path = FString(""), FString texture_prefix = FString(""), float max_view_distance = -1.0f);
 
 	void Initialize(ULevel* level);
 	void InitializeInstanceSegmentation(ULevel* level);
@@ -90,6 +90,7 @@ private:
 	bool set_direct_;
 	FString texture_path_;
 	FString texture_prefix_;
+	float max_view_distance_;
 
 	bool PaintRGBComponent(UMeshComponent* component, const FColor& color, const FString& component_name);
 	bool UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color, const FString& component_name);

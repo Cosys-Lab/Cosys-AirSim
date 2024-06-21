@@ -20,7 +20,8 @@
         "Name": "RGBTestDirect",
         "Type": 0,
         "Default": true,
-        "SetDirect": true
+        "SetDirect": true,
+        "ViewDistance": 10
     },
     {
         "Name": "RGBTestIndex",
@@ -31,7 +32,8 @@
     {
         "Name": "GreyscaleTest",
         "Type": 1,
-        "Default": true
+        "Default": true,
+        "ViewDistance": 5
     },
     {
         "Name": "TextureTestDirect",

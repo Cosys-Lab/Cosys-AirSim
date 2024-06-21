@@ -216,9 +216,10 @@ void ASimModeBase::InitializeAnnotation() {
 		bool set_direct = annotator_setting.set_direct;
         FString texture_path = FString(annotator_setting.texture_path.c_str());
         FString texture_prefix = FString(annotator_setting.texture_prefix.c_str());
-        annotators_.Emplace(name, FObjectAnnotator(name, type, annotator_setting.show_by_default, set_direct, texture_path, texture_prefix));
+        float max_view_distance = annotator_setting.max_view_distance;
+        annotators_.Emplace(name, FObjectAnnotator(name, type, annotator_setting.show_by_default, set_direct, texture_path, texture_prefix, max_view_distance));
 		annotators_[name].Initialize(this->GetLevel());
-        AddAnnotatorCamera(name, type);
+        AddAnnotatorCamera(name, type, max_view_distance);
         ForceUpdateAnnotation(name);
         updateAnnotation(name);
 	}
@@ -1245,13 +1246,13 @@ void ASimModeBase::updateAnnotation(FString annotation_name) {
     }  
 }
 
-void ASimModeBase::AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type) {
+void ASimModeBase::AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance) {
     TArray<AActor*> cameras_found;
     UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
     if (cameras_found.Num() >= 0) {
         for (auto camera_actor : cameras_found) {
             APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
-            cur_camera->addAnnotationCamera(name, type);
+            cur_camera->addAnnotationCamera(name, type, max_view_distance);
         }
     }
 }
