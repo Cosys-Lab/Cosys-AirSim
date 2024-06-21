@@ -1003,7 +1003,7 @@ bool FObjectAnnotator::UpdatePaintRGBComponent(UMeshComponent* component, const 
 		UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(Component);
 		FName componentFName = *AnnotationComponent->GetName();
 		FString componentName = componentFName.ToString();
-		if (componentName.Contains(name_)) {
+		if (componentName.Contains(name_) && componentName.Contains(component_name)) {
 			AnnotationComponent->SetAnnotationColor(NewColor);
 			AnnotationComponent->MarkRenderStateDirty();
 		}		
@@ -1039,7 +1039,7 @@ bool FObjectAnnotator::UpdatePaintTextureComponent(UMeshComponent* component, co
 		UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(Component);
 		FName componentFName = *AnnotationComponent->GetName();
 		FString componentName = componentFName.ToString();
-		if (componentName.Contains(name_)) {
+		if (componentName.Contains(name_) && componentName.Contains(component_name)) {
 			AnnotationComponent->SetAnnotationTexture(texture_path);
 			AnnotationComponent->MarkRenderStateDirty();
 		}
