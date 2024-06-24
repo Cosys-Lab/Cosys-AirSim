@@ -16,6 +16,9 @@ struct FDetectionInfo
     UPROPERTY()
     AActor* Actor;
 
+    UPROPERTY()    
+    UMeshComponent* Component;
+
     UPROPERTY()
     FBox2D Box2D;
 
@@ -43,7 +46,7 @@ public:
     // Called every frame
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    const TArray<FDetectionInfo>& getDetections();
+    const TArray<FDetectionInfo>& getDetections(bool component_based = true);
 
     void addMeshName(const std::string& mesh_name);
     void setFilterRadius(const float radius_cm);
@@ -51,6 +54,7 @@ public:
 
 private:
     bool calcBoundingFromViewInfo(AActor* actor, FBox2D& box_out);
+    bool calcBoundingFromViewInfoComponent(UMeshComponent* component, FBox2D& box_out);
 
     FVector getRelativeLocation(FVector in_location);
 
