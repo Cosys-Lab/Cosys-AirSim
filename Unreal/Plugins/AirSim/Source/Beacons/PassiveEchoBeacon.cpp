@@ -25,7 +25,7 @@ APassiveEchoBeacon::APassiveEchoBeacon()
 // initializes information based on echo configuration
 void APassiveEchoBeacon::generateSampleDirectionPoints()
 {
-	UnrealEchoSensor::sampleSphereCap(initial_directions_, initial_lower_azimuth_limit_, initial_upper_azimuth_limit_, -initial_upper_elevation_limit_, -initial_lower_elevation_limit_, sample_direction_points_);
+	UnrealEchoCommon::sampleSphereCap(initial_directions_, initial_lower_azimuth_limit_, initial_upper_azimuth_limit_, -initial_upper_elevation_limit_, -initial_lower_elevation_limit_, sample_direction_points_);
 }
 
 void APassiveEchoBeacon::getPointCloud()
@@ -50,13 +50,13 @@ void APassiveEchoBeacon::getPointCloud()
 	{
 		Vector3r sample_direction_point = sample_direction_points_[sample_direction_point_count];
 
-		FVector trace_direction = UnrealEchoSensor::Vector3rToFVector(VectorMath::rotateVector(sample_direction_point, beacon_reference_frame_.orientation, 1)); // sensor_reference_frame_.orientation
+		FVector trace_direction = UnrealEchoCommon::Vector3rToFVector(VectorMath::rotateVector(sample_direction_point, beacon_reference_frame_.orientation, 1)); // sensor_reference_frame_.orientation
 
-		float trace_length = ned_transform_->fromNed(UnrealEchoSensor::remainingDistance(0, 0, attenuation_limit_, distance_limit_));  // Maximum possible distance for emitted signal (0 distance, 0 attenuation)
+		float trace_length = ned_transform_->fromNed(UnrealEchoCommon::remainingDistance(0, 0, attenuation_limit_, distance_limit_));  // Maximum possible distance for emitted signal (0 distance, 0 attenuation)
 		FVector trace_end_position = trace_start_position + trace_direction * trace_length;
 
 		// Shoot trace and get the impact point and remaining attenuation, if any returns
-		UnrealEchoSensor::traceDirection(0, false, trace_start_position, trace_end_position, point_cloud_, groundtruth_, point_cloud_draw_reflected_points_, ned_transform_, beacon_reference_frame_,
+		UnrealEchoCommon::traceDirection(0, false, trace_start_position, trace_end_position, point_cloud_, groundtruth_, point_cloud_draw_reflected_points_, ned_transform_, beacon_reference_frame_,
 			distance_limit_, reflection_limit_, attenuation_limit_, reflection_distance_limit_cm_, 0, attenuation_per_distance_, attenuation_per_reflection_, ignore_actors_, this, false, true,
 			draw_debug_duration_, line_thickness_ / 2, false, draw_debug_all_lines_, false, false, false, false, true, true, reflection_only_final_, std::string(TCHAR_TO_UTF8(*name_)));
 	}
@@ -79,7 +79,7 @@ void APassiveEchoBeacon::parsePointCloud()
 		std::string reflection_object = groundtruth_[point_count * string_stride];
 		std::string source_object = groundtruth_[point_count * string_stride + 1];
 
-		UnrealEchoSensor::EchoPoint echo_point; 
+		UnrealEchoCommon::EchoPoint echo_point;
 		echo_point.point = point;
 		echo_point.direction = direction;
 		echo_point.reflection_object = reflection_object;
@@ -98,7 +98,7 @@ void APassiveEchoBeacon::parsePointCloud()
 	}
 }
 
-TArray<UnrealEchoSensor::EchoPoint> APassiveEchoBeacon::getPoints() {
+TArray<UnrealEchoCommon::EchoPoint> APassiveEchoBeacon::getPoints() {
 	return points_;
 }
 
