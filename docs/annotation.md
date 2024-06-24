@@ -94,9 +94,9 @@ The instance segmentation API function to get the colormap also applies to the R
 colorMap = client.simGetSegmentationColorMap()
 ```
 
-Several RPC API functions are available to influence or retrieve the RGB annotation layer. For example in Python:
- * `simSetAnnotationObjectID(annotation_name, mesh_name, object_id, is_name_regex=False/True)` to set the color of an object in index mode (regex allows to set multiple with wildcards for example)
- * `simSetAnnotationObjectColor(annotation_name, mesh_name, r, g, b, is_name_regex=False/True)` to set the color of an object in direct mode  (regex allows to set multiple with wildcards for example)
+Several RPC API functions are available to influence or retrieve the RGB annotation layer.  Currently, it is not possible to use the RPC API to add new actors or components to the annotation system, you can only update their values. For example in Python:
+ * `simSetAnnotationObjectID(annotation_name, mesh_name, object_id, is_name_regex=False/True)` to update the color of an object in index mode (regex allows to set multiple with wildcards for example) when it already exists in the annotation system
+ * `simSetAnnotationObjectColor(annotation_name, mesh_name, r, g, b, is_name_regex=False/True)` to update the color of an object in direct mode  (regex allows to set multiple with wildcards for example) when it already exists in the annotation system
  * `simGetAnnotationObjectID(annotation_name, mesh_name)` to get the ID of an object in index mode
  * `simGetAnnotationObjectColor(annotation_name, mesh_name)` to get the color of an object in direct mode
  * `simIsValidColor(r,g,b)` You can check if a color is valid using this function
@@ -119,12 +119,12 @@ So if for example your RGB annotation layer is called `GreyscaleTest`, you can t
 
 When `Default` is set to 1, all objects without a tag for this layer will be rendered in black.
 
-Several RPC API functions are available to influence or retrieve the RGB annotation layer. For example in Python:
- * `simSetAnnotationObjectValue(annotation_name, mesh_name, greyscale_value, is_name_regex=False/True)` to set the value of an object (regex allows to set multiple with wildcards for example)
+Several RPC API functions are available to influence or retrieve the RGB annotation layer. Currently, it is not possible to use the RPC API to add new actors or components to the annotation system, you can only update their values. For example in Python:
+ * `simSetAnnotationObjectValue(annotation_name, mesh_name, greyscale_value, is_name_regex=False/True)` to update the value of an object (regex allows to set multiple with wildcards for example) when it already exists in the annotation system
  * `simGetAnnotationObjectValue(annotation_name, mesh_name)` to get the value of an object
 
 The same is available in Unreal Blueprint and Unreal c++. You can find  the functions in the `Annotation` category.
- * `Add Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)` to set the value of an object
+ * `Add Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)` to update the value of an object when it already exists in the annotation system
  * `Update Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)` to update the value of an object
 
 Note that enabling _update_annotation_ is a relatively slow process, specially on actors with lots of annotated components. 
@@ -150,7 +150,7 @@ So for example if you have a static mesh called *Cylinder* and your texture laye
 
 When `Default` is set to 1, all objects without a tag for this layer will be rendered in black.
 
-Several RPC API functions are available to influence or retrieve the RGB annotation layer. For example in Python:
+Several RPC API functions are available to influence or retrieve the RGB annotation layer.  Currently, it is not possible to use the RPC API to add new actors or components to the annotation system, you can only update their values. For example in Python:
  * `simSetAnnotationObjectTextureByPath(annotation_name, mesh_name, texture_path, is_name_regex=False/True)` to set the texture of an object in direct mode, the texture path should be same format as described above, for example `/Game/MyTextures/TestTexture1` (regex allows to set multiple with wildcards for example)
  * `simEnableAnnotationObjectTextureByPath(annotation_name, mesh_name, r, g, b, is_name_regex=False/True)` to enable the texture of an object in relative path mode, this does require a texture in the relative path as described above!  (regex allows to set multiple with wildcards for example)
  * `simGetAnnotationObjectTexturePath(annotation_name, mesh_name)` to get the texture path of an object
