@@ -486,6 +486,7 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
         annotation_sphere->SetupAttachment(RootComponent);
         annotation_sphere->RegisterComponent();
         annotation_sphere->SetStaticMesh(annotation_sphere_static_);
+        annotation_sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         annotation_sphere->SetRelativeScale3D(FVector(max_view_distance * 2, max_view_distance * 2, max_view_distance * 2));
 
         FString annotatedSphereName = name + "_annotation_sphere";
