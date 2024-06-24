@@ -2,6 +2,7 @@
 * Added [multi-layer annotation](docs/annotation.md) with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Updated Unreal to 5.2.1 (Thanks in part to [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum)!).
 * Updated instance segmentation to use proxy meshing, no longer requiring custom Unreal Engine fork. 
+* Updated object detection to also check actor child components if main actor does not match wildcard. 
 * Updated ground vehicles to use ChaosVehicles instead of PhysXVehicles. Some issues may arise.
 * Updated settings with new parameter `MoveWorldOrigin` to move the world origin to the player start location when starting the simulator. Disabled by default. This affects things like setting the sensors to external!
 * Updated LiDAR sensor with parallelization to speed up pointcloud generation.
