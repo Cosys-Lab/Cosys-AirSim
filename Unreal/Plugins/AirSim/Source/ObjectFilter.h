@@ -48,7 +48,7 @@ struct AIRSIM_API FObjectFilter
 
     FObjectFilter();
 
-    bool matchesActor(AActor* actor) const;
+    bool matchesActor(AActor* actor, bool disable_component_check = false) const;
 
     bool matchesComponent(UActorComponent* actor_component) const;
 
