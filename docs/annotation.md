@@ -1,6 +1,6 @@
 # Annotation in Cosys-AirSim
 
-An multi-layer annotation system is implemented into Cosys-AirSim. It uses Proxy Mesh rendering to allow for each object in the world to be annotated by a greyscale value, an RGB color or a texture that fits the mesh.
+A multi-layer annotation system is implemented into Cosys-AirSim. It uses Proxy Mesh rendering to allow for each object in the world to be annotated by a greyscale value, an RGB color or a texture that fits the mesh.
 An annotation layer allows the user to tag individual actors and/or their child-components with a certain annotation component. This can be used to create ground truth data for machine learning models or to create a visual representation of the environment.
 
 Let's say you want to train a model to detect cars or pedestrians, you create an RGB annotation layer where  you can tag all the cars and pedestrians in the environment with a certain RGB color respectively. 
@@ -71,7 +71,7 @@ The types are:
   Texture = 2
 ```       
 
-The `Default` setting applies to all types and is what happens when no tag is set for a actor/component. 
+The `Default` setting applies to all types and is what happens when no tag is set for na actor/component. 
 When set to false, the mesh will not be rendered in the annotation layer.
 When set to true, the mesh will be rendered in the annotation layer with the default value of the layer.
 
@@ -108,6 +108,10 @@ The same is available in Unreal Blueprint and Unreal c++. You can find  the func
  * `Update RGBIndex Annotation Tag to Component/Actor(annotation_name, component/actor, object_id, update_annotation=true/false)` to update the index of an object in index mode already in the system 
  * `Is Annotation RGB Valid(color)`You can check if a color is valid using this function
 
+Note that enabling _update_annotation_ is a relatively slow process, specially on actors with lots of annotated components. 
+Ideally set _update_annotation_ to false during the process of adding tags to the actor and only turn on update_annotation for the last component or actor you want to update.
+Alternatively, you can use the `Add New Actor To Annotation()` blueprint function to update the annotation layer for this actor after you have added all tags.
+
 ### Type 2: Greyscale
 You can use the greyscale annotation layer to tag objects in the environment with a float value between 0 and 1. Note that this has the precision of uint8.
 Actor/component tags have the following format: `annotationName_value`.
@@ -123,8 +127,12 @@ The same is available in Unreal Blueprint and Unreal c++. You can find  the func
  * `Add Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)` to set the value of an object
  * `Update Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)` to update the value of an object
 
+Note that enabling _update_annotation_ is a relatively slow process, specially on actors with lots of annotated components. 
+Ideally set _update_annotation_ to false during the process of adding tags to the actor and only turn on update_annotation for the last component or actor you want to update.
+Alternatively, you can use the `Add New Actor To Annotation()` blueprint function to update the annotation layer for this actor after you have added all tags.
+
 ### Type 3: Texture
-You can use the texture annotation layer to tag objects in the environment with a specific texture. This can be a color or greyscale texture or you can mix them. Choice is up to you.
+You can use the texture annotation layer to tag objects in the environment with a specific texture. This can be a color or greyscale texture, or you can mix them. Choice is up to you.
 You can do this by directly setting the texture yourself (direct mode), or by assigning a texture that is loaded based on a set path and the name of the mesh.
 To use direct mode, set the settings of this layer with `SetDirect` to `true`. For path reference mode, set to `false`.
 
@@ -154,6 +162,10 @@ The same is available in Unreal Blueprint and Unreal c++. You can find  the func
  * `Update Texture Direct Annotation Tag to Component/Actor(annotation_name, component/actor, texture, update_annotation=true/false)` to update texture of an object in direct mode that is already in the system, the texture can be directly referenced as UTexture* Object
  * `Enable Texture By Path Annotation Tag to Component/Actor(annotation_name, component/actor, update_annotation=true/false)` to enable the texture of an object in relative path mode, this does require a texture in the relative path as described above! 
 
+Note that enabling _update_annotation_ is a relatively slow process, specially on actors with lots of annotated components. 
+Ideally set _update_annotation_ to false during the process of adding tags to the actor and only turn on update_annotation for the last component or actor you want to update.
+Alternatively, you can use the `Add New Actor To Annotation()` blueprint function to update the annotation layer for this actor after you have added all tags.
+
 ### Common functionality
 By default, when the world loads, all meshes are checked for tags and the annotation layers are updated accordingly. 
 With the unreal blueprint and c++ functions however, you can also decide to update the annotation layer only when you want to with the `update_annotation` argument. 
@@ -163,9 +175,9 @@ Some API functions exist for all types, for example in Python:
  * `simListAnnotationObjects(annotation_name)` to get a list of all objects within this annotation layer. 
  * `simListAnnotationPoses(annotation_name, ned=True/False, only_visible=False/True)` to get the 3D poses of all objects in this annotation layer. The returned pose is in NED coordinates in SI units with its origin at Player Start by default or in Unreal NED frame if the `ned` boolean argument is set to `talse`.
 
-Similarly for Unreal Blueprint and Unreal c++. You can find  the functions in the `Annotation` category.
+Similarly, for Unreal Blueprint and Unreal c++. You can find  the functions in the `Annotation` category.
  * `Does Annotation Layer Exist(annotation_name)` to figure out if a layer exists or not
- * `Add New Actor To Annotation(annotation_name, actor, update_annotation=true/false)` if you manually added a tag and want to update the annotation layer with this actor
+ * `Add New Actor To Annotation(annotation_name, actor, update_annotation=true/false)` if you manually added a tag, and want to update the annotation layer with this actor. This is useful to run after adding multiple tags to the actor and its components with the other api calls, and you want to update the annotation layer only once, otherwise it will be much slower.
  * `Delete Actor From Annotation(annotation_name, actor, update_annotation=true/false)` if you manually remove all tags from an actor for this layer and remove it from the annotation layer
  * `Force Update Annotation(annotation_name)` to force an update of the annotation layer.
 
@@ -173,7 +185,7 @@ Similarly for Unreal Blueprint and Unreal c++. You can find  the functions in th
 The easiest way to get the images from annotation cameras, is through the image API. See the [Image API documentation](image_apis.md#annotation) for more information.
 GPU LiDAR is also supported, but each GPU Lidar can only render one annotation layer. See the [GPU LiDAR documentation](gpulidar.md) for more information.
 
-You can also display the annotation layers in the subwindows. See the [Settings documentation](settings#subwindows.md) for more information.
+You can also display the annotation layers in the subwindows. See the [Settings documentation](settings.md#subwindows) for more information.
 For example:
 ```json
 {

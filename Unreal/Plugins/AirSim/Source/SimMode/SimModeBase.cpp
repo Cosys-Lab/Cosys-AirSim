@@ -255,7 +255,9 @@ bool ASimModeBase::AddRGBDirectAnnotationTagToActor(FString annotation_name, AAc
     }
 	FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
 	actor->Tags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if(update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateRGBDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FColor color, bool update_annotation) {
@@ -281,7 +283,9 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToActor(FString annotation_name, 
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
 	actor->Tags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation) {
@@ -299,7 +303,9 @@ bool ASimModeBase::AddRGBIndexAnnotationTagToActor(FString annotation_name, AAct
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
     actor->Tags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation) {
@@ -325,7 +331,9 @@ bool ASimModeBase::UpdateRGBIndexAnnotationTagToActor(FString annotation_name, A
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
     actor->Tags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation) {
@@ -343,7 +351,9 @@ bool ASimModeBase::AddRGBDirectAnnotationTagToComponent(FString annotation_name,
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
     component->ComponentTags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation) {
@@ -369,7 +379,9 @@ bool ASimModeBase::UpdateRGBDirectAnnotationTagToComponent(FString annotation_na
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(color.R) + FString(TEXT("_")) + FString::FromInt(color.G) + FString(TEXT("_")) + FString::FromInt(color.B);
     component->ComponentTags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation) {
@@ -387,7 +399,9 @@ bool ASimModeBase::AddRGBIndexAnnotationTagToComponent(FString annotation_name, 
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
     component->ComponentTags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation) {
@@ -413,7 +427,9 @@ bool ASimModeBase::UpdateRGBIndexAnnotationTagToComponent(FString annotation_nam
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::FromInt(index);
     component->ComponentTags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation) {
@@ -427,7 +443,9 @@ bool ASimModeBase::AddGreyscaleAnnotationTagToActor(FString annotation_name, AAc
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
     actor->Tags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation) {
@@ -449,7 +467,9 @@ bool ASimModeBase::UpdateGreyscaleAnnotationTagToActor(FString annotation_name, 
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
     actor->Tags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation) {
@@ -463,7 +483,9 @@ bool ASimModeBase::AddGreyscaleAnnotationTagToComponent(FString annotation_name,
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
     component->ComponentTags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation) {
@@ -485,7 +507,9 @@ bool ASimModeBase::UpdateGreyscaleAnnotationTagToComponent(FString annotation_na
     }
     FString tag = annotation_name + FString(TEXT("_")) + FString::SanitizeFloat(greyscale_value);
     component->ComponentTags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddTextureDirectAnnotationTagToActorByPath(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation) {
@@ -503,7 +527,9 @@ bool ASimModeBase::AddTextureDirectAnnotationTagToActorByPath(FString annotation
     }
     FString tag = annotation_name + FString(TEXT("_")) + texture_path;
     actor->Tags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateTextureDirectAnnotationTagToActorByPath(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation) {
@@ -529,7 +555,9 @@ bool ASimModeBase::UpdateTextureDirectAnnotationTagToActorByPath(FString annotat
     }
     FString tag = annotation_name + FString(TEXT("_")) + texture_path;
     actor->Tags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation) {
@@ -547,7 +575,9 @@ bool ASimModeBase::AddTextureDirectAnnotationTagToComponentByPath(FString annota
     }
     FString tag = annotation_name + FString(TEXT("_")) + texture_path;
     component->ComponentTags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation) {
@@ -573,7 +603,9 @@ bool ASimModeBase::UpdateTextureDirectAnnotationTagToComponentByPath(FString ann
     }
     FString tag = annotation_name + FString(TEXT("_")) + texture_path;
     component->ComponentTags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation) {
@@ -594,7 +626,9 @@ bool ASimModeBase::AddTextureDirectAnnotationTagToActor(FString annotation_name,
     FString TextureFilePath = splitPath[0];
     FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
     actor->Tags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation) {
@@ -623,7 +657,9 @@ bool ASimModeBase::UpdateTextureDirectAnnotationTagToActor(FString annotation_na
     FString TextureFilePath = splitPath[0];
     FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
     actor->Tags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::AddTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, UTexture* texture, bool update_annotation) {
@@ -644,7 +680,9 @@ bool ASimModeBase::AddTextureDirectAnnotationTagToComponent(FString annotation_n
     FString TextureFilePath = splitPath[0];
     FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
     component->ComponentTags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::UpdateTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, UTexture* texture, bool update_annotation) {
@@ -673,7 +711,9 @@ bool ASimModeBase::UpdateTextureDirectAnnotationTagToComponent(FString annotatio
     FString TextureFilePath = splitPath[0];
     FString tag = annotation_name + FString(TEXT("_")) + TextureFilePath;
     component->ComponentTags[found_tag] = FName(*tag);
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 bool ASimModeBase::EnableTextureByPathAnnotationTagToActor(FString annotation_name, AActor* actor, bool update_annotation) {
@@ -691,7 +731,9 @@ bool ASimModeBase::EnableTextureByPathAnnotationTagToActor(FString annotation_na
     }
     FString tag = annotation_name + FString(TEXT("_enable"));
     actor->Tags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, actor, update_annotation);
+    return true;
 }
 
 bool ASimModeBase::EnableTextureByPathAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, bool update_annotation) {
@@ -709,7 +751,9 @@ bool ASimModeBase::EnableTextureByPathAnnotationTagToComponent(FString annotatio
     }
     FString tag = annotation_name + FString(TEXT("_enable"));
     component->ComponentTags.Emplace(FName(*tag));
-    return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    if (update_annotation)
+        return AddNewActorToAnnotation(annotation_name, component->GetAttachmentRootActor(), update_annotation);
+    return true;
 }
 
 void ASimModeBase::InitializeMaterialStencils()
