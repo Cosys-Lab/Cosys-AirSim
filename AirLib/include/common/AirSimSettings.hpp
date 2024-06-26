@@ -1125,7 +1125,7 @@ namespace airlib
         static void loadBeaconSettings(const std::string& simmode_name, const Settings& settings_json,
                                        std::map<std::string, std::unique_ptr<BeaconSetting>>& beacons)
         {
-            //initializeVehicleSettings(vehicles);
+            beacons.clear();
 
             msr::airlib::Settings beacons_child;
             if (settings_json.getChild("Beacons", beacons_child)) {
@@ -1147,6 +1147,8 @@ namespace airlib
         static void loadPassiveEchoBeaconSettings(const Settings& settings_json,
             std::map<std::string, std::unique_ptr<PassiveEchoBeaconSetting>>& passive_echo_beacons)
         {
+            passive_echo_beacons.clear();
+
             msr::airlib::Settings passive_echo_beacons_child;
             if (settings_json.getChild("PassiveEchoBeacons", passive_echo_beacons_child)) {
                 std::vector<std::string> keys;
