@@ -132,7 +132,6 @@
                 "LumenSceneDetail": 1,
                 "LumenSceneLightningDetail": 1
             },
-            },
             {
                 "ImageType": 1,
                 "Width": 960,
@@ -273,7 +272,7 @@
                 "frontcamera": {
                     "X": 0.25,
                     "Y": 0,
-                    "Z": -0.1,
+                    "Z": -0.3,
                     "Roll": 0,
                     "Pitch": 0,
                     "Yaw": 0,
@@ -284,7 +283,7 @@
                 "backcamera": {
                     "X": -0.25,
                     "Y": 0,
-                    "Z": -0.1,
+                    "Z": -0.3,
                     "Roll": 0,
                     "Pitch": 0,
                     "Yaw": 180,
@@ -404,41 +403,6 @@
                     "SenseActive": true,
                     "SensePassive": true,
                     "PassiveRadius": 10
-                },
-                "uwb": {
-                    "Enabled": false,
-                    "Resolution": 512,
-                    "Id": 1,
-                    "SensorType": 10,
-                    "X": 0.4275,
-                    "Y": -0.24,
-                    "Z": -0.707,
-                    "Roll": 0,
-                    "Pitch": 0,
-                    "Yaw": 0,
-                    "NumberOfTraces": 5000,
-                    "SensorOpeningAngle": 180,
-                    "DataFrame": "SensorLocalFrame",
-                    "MeasurementFrequency": 10,
-                    "PauseAfterMeasurement": false,
-                    "DrawSensor": false
-                },
-                "wifi": {
-                    "Enabled": false,
-                    "Id": 1,
-                    "SensorType": 11,
-                    "X": 0,
-                    "Y": 0,
-                    "Z": 0,
-                    "Roll": 90,
-                    "Pitch": 0,
-                    "Yaw": 0,
-                    "NumberOfTraces": 5000,
-                    "SensorOpeningAngle": 180,
-                    "DataFrame": "SensorLocalFrame",
-                    "MeasurementFrequency": 10,
-                    "PauseAfterMeasurement": false,
-                    "DrawSensor": false
                 }
             }
         }
@@ -466,41 +430,6 @@
             "DrawDebugAllPoints": false,
             "DrawDebugAllLines": false,
             "DrawDebugLocation": false
-        }
-    },
-    "Beacons": {
-        "testBeacon_1": {
-            "BeaconType": "fiducialmarker",
-            "BeaconPawnName": "1",
-            "X": 2,
-            "Y": -0.5,
-            "Z": -0.1,
-            "Roll": -180,
-            "Pitch": 0,
-            "Yaw": 0,
-            "Scale": 0.1
-        },
-        "testBeacon_2": {
-            "BeaconType": "WifiBeacon",
-            "BeaconPawnName": "1",
-            "X": 2,
-            "Y": 0,
-            "Z": 0,
-            "Roll": 0,
-            "Pitch": 0,
-            "Yaw": 180,
-            "Scale": 1
-        },
-        "testBeacon_3": {
-            "BeaconType": "UwbBeacon",
-            "BeaconPawnName": "1",
-            "X": 2,
-            "Y": 0.5,
-            "Z": 0,
-            "Roll": 0,
-            "Pitch": 0,
-            "Yaw": 180,
-            "Scale": 0.15
         }
     }
 }
