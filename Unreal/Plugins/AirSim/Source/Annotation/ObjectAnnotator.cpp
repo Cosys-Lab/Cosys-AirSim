@@ -420,6 +420,7 @@ bool FObjectAnnotator::AnnotateNewActorInstanceSegmentation(AActor* actor) {
 			else {
 				uint32 ObjectIndex = name_to_component_map_.Num();
 				name_to_component_map_.Emplace(it.Key(), it.Value());
+				component_to_name_map_.Emplace(it.Value(), it.Key());
 				FColor new_color = ColorGenerator_.GetColorFromColorMap(ObjectIndex);
 				name_to_color_index_map_.Emplace(it.Key(), ObjectIndex);
 				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
@@ -494,6 +495,7 @@ bool FObjectAnnotator::AnnotateNewActorRGB(AActor* actor) {
 				}
 				else {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 					name_to_color_index_map_.Emplace(it.Key(), color_index);
 					color_to_name_map_.Emplace(color_string, it.Key());
 					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
@@ -509,6 +511,7 @@ bool FObjectAnnotator::AnnotateNewActorRGB(AActor* actor) {
 				}
 			}else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 				name_to_component_map_.Emplace(it.Key(), it.Value());
+				component_to_name_map_.Emplace(it.Value(), it.Key());
 				FColor new_color = FColor(0, 0, 0);
 				name_to_color_index_map_.Emplace(it.Key(), 2744000 - 1);
 				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
@@ -576,6 +579,7 @@ bool FObjectAnnotator::AnnotateNewActorGreyscale(AActor* actor) {
 			}
 				else {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 					color_to_name_map_.Emplace(color_string, it.Key());
 					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
@@ -585,6 +589,7 @@ bool FObjectAnnotator::AnnotateNewActorGreyscale(AActor* actor) {
 				}
 			}else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 				name_to_component_map_.Emplace(it.Key(), it.Value());
+				component_to_name_map_.Emplace(it.Value(), it.Key());
 				FColor new_color = FColor(0, 0, 0);
 				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 				FString color_string_gammacorrected = color_string;
@@ -651,6 +656,7 @@ bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
 				}
 				else {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 					name_to_texture_path_map_.Emplace(it.Key(), new_texture);
 					check(PaintTextureComponent(it.Value(), new_texture, it.Key()));
 					if (set_direct_) {
@@ -663,6 +669,7 @@ bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
 				}
 			}else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 				name_to_component_map_.Emplace(it.Key(), it.Value());
+				component_to_name_map_.Emplace(it.Value(), it.Key());
 				FString new_texture = "/AirSim/HUDAssets/k";
 				name_to_texture_path_map_.Emplace(it.Key(), new_texture);
 				check(PaintTextureComponent(it.Value(), new_texture, it.Key()));
@@ -684,8 +691,9 @@ bool FObjectAnnotator::DeleteActor(AActor* actor)
 		for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
 		{
 			if (name_to_component_map_.Contains(it.Key())) {
+				component_to_name_map_.Remove(it.Value());
 				check(DeleteComponent(it.Value()));
-				name_to_component_map_.Remove(it.Key());
+				name_to_component_map_.Remove(it.Key());				
 				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Deleted object %s."), *name_, *it.Key());
 
 			}
@@ -779,6 +787,7 @@ void FObjectAnnotator::InitializeInstanceSegmentation(ULevel* InLevel)
 			{
 				if(!it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 					FColor new_color = ColorGenerator_.GetColorFromColorMap(color_index);
 					name_to_color_index_map_.Emplace(it.Key(), color_index);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
@@ -819,7 +828,7 @@ void FObjectAnnotator::InitializeRGB(ULevel* InLevel)
 					TArray<FString> splitTag;
 					tag.ParseIntoArray(splitTag, TEXT("_"), true);
 					name_to_component_map_.Emplace(it.Key(), it.Value());
-
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 
 					FColor new_color;
 					uint32 color_index;
@@ -848,6 +857,7 @@ void FObjectAnnotator::InitializeRGB(ULevel* InLevel)
 				}
 				else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 					FColor new_color = FColor(0, 0, 0);
 					name_to_color_index_map_.Emplace(it.Key(), 2744000 - 1);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
@@ -888,6 +898,7 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 					TArray<FString> splitTag;
 					tag.ParseIntoArray(splitTag, TEXT("_"), true);
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 
 					float greyscale_value = FCString::Atof(*splitTag[1]);
 					if (greyscale_value >= 1) {
@@ -910,6 +921,7 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 				}
 				else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 					FColor new_color = FColor(0, 0, 0);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 					FString color_string_gammacorrected = color_string;
@@ -949,6 +961,7 @@ void FObjectAnnotator::InitializeTexture(ULevel* InLevel)
 					TArray<FString> splitTag;
 					tag.ParseIntoArray(splitTag, TEXT("_"), true);
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 
 					FString new_texture;
 
@@ -980,6 +993,7 @@ void FObjectAnnotator::InitializeTexture(ULevel* InLevel)
 				}
 				else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
+					component_to_name_map_.Emplace(it.Value(), it.Key());
 					FString new_texture = "/AirSim/HUDAssets/k";
 					name_to_texture_path_map_.Emplace(it.Key(), new_texture);
 					check(PaintTextureComponent(it.Value(), new_texture, it.Key()));
@@ -1179,6 +1193,11 @@ TMap<FString, UMeshComponent*> FObjectAnnotator::GetNameToComponentMap() {
 	return name_to_component_map_;
 }
 
+TMap<UMeshComponent*, FString> FObjectAnnotator::GetComponentToNameMap() {
+	return component_to_name_map_;
+}
+
+
 TMap<FString, FString> FObjectAnnotator::GetColorToComponentNameMap() {
 	return gammacorrected_color_to_name_map_;
 }
@@ -1197,6 +1216,7 @@ void FObjectAnnotator::EndPlay() {
 	name_to_gammacorrected_color_map_.Empty();
 	name_to_value_map_.Empty();
 	name_to_texture_path_map_.Empty();
+	component_to_name_map_.Empty();
 }
 
 int32 FColorGenerator::GetChannelValue(uint32 index)

@@ -20,6 +20,9 @@ struct FDetectionInfo
     UMeshComponent* Component;
 
     UPROPERTY()
+    FString DetectionName;
+
+    UPROPERTY()
     FBox2D Box2D;
 
     UPROPERTY()
@@ -46,7 +49,7 @@ public:
     // Called every frame
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    const TArray<FDetectionInfo>& getDetections(bool component_based = true);
+    const TArray<FDetectionInfo>& getDetections(TMap<UMeshComponent*, FString>  component_to_name_map, bool component_based = true);
 
     void addMeshName(const std::string& mesh_name);
     void setFilterRadius(const float radius_cm);
