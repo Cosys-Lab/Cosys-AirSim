@@ -80,6 +80,7 @@ public:
 	TMap<FString, UMeshComponent*> GetNameToComponentMap();
 	TMap<FString, FString> GetColorToComponentNameMap();
 	TMap<FString, float> GetComponentToValueMap();
+	TMap<UMeshComponent*, FString> GetComponentToNameMap();
 
 private:
 	FColorGenerator ColorGenerator_;
@@ -112,6 +113,7 @@ private:
 	TMap<FString, FString> color_to_name_map_;
 	TMap<FString, FString> gammacorrected_color_to_name_map_;
 	TMap<FString, UMeshComponent*> name_to_component_map_;
+	TMap<UMeshComponent*, FString> component_to_name_map_;
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> annotation_component_list_;
 };
 
