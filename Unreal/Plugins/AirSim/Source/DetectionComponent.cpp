@@ -40,7 +40,7 @@ void UDetectionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-const TArray<FDetectionInfo> &UDetectionComponent::getDetections(bool component_based)
+const TArray<FDetectionInfo> &UDetectionComponent::getDetections(TMap<UMeshComponent*, FString>  component_to_name_map, bool component_based)
 {
     cached_detections_.Empty();
 
@@ -57,6 +57,7 @@ const TArray<FDetectionInfo> &UDetectionComponent::getDetections(bool component_
                     FDetectionInfo detection;
                     detection.Actor = actor;
                     detection.Box2D = box_2D_out;
+                    detection.DetectionName = actor->GetName();
 
                     FBox box_3D = actor->GetComponentsBoundingBox(true);
                     detection.Box3D = FBox(getRelativeLocation(box_3D.Min), getRelativeLocation(box_3D.Max));
@@ -83,6 +84,62 @@ const TArray<FDetectionInfo> &UDetectionComponent::getDetections(bool component_
                             detection.Actor = actor;
                             detection.Component = component;
                             detection.Box2D = box_2D_out;
+                            if(component_to_name_map.Contains(component)) {
+								detection.DetectionName = component_to_name_map[component];
+							}
+							else {
+                                int index = 0;
+                                if (actor_components.Num() == 1) {
+                                    if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
+                                        if (actor->GetParentActor()) {
+                                            if (staticmesh_component->GetStaticMesh() != nullptr) {
+                                                FString component_name = staticmesh_component->GetStaticMesh()->GetName();
+                                                component_name.Append("_");
+                                                component_name.Append(FString::FromInt(0));
+                                                component_name.Append("_");
+                                                if (actor->GetRootComponent()->GetAttachParent()) {
+                                                    component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+                                                    component_name.Append("_");
+                                                }
+                                                component_name.Append(actor->GetParentActor()->GetName());
+                                                detection.DetectionName = component_name;
+                                            }
+                                        }
+                                        else {
+                                            detection.DetectionName = actor->GetName();
+                                        }
+                                    }
+                                    if (USkinnedMeshComponent* SkinnedMeshComponent = Cast<USkinnedMeshComponent>(component)) {
+                                        detection.DetectionName = actor->GetName();
+                                    }
+                                }
+                                else {
+                                    FString component_name;
+                                    if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
+                                        if (staticmesh_component->GetStaticMesh() != nullptr) {
+                                            component_name = staticmesh_component->GetStaticMesh()->GetName();
+                                            component_name.Append("_");
+                                            component_name.Append(FString::FromInt(index));
+                                            component_name.Append("_");
+                                            if (actor->GetParentActor()) {
+                                                if (actor->GetRootComponent()->GetAttachParent()) {
+                                                    component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+                                                    component_name.Append("_");
+                                                }
+                                                component_name.Append(actor->GetParentActor()->GetName());
+                                            }
+                                            else {
+                                                component_name.Append(actor->GetName());
+                                            }
+                                        }
+                                    }
+                                    if (USkinnedMeshComponent* skinnedmesh_component = Cast<USkinnedMeshComponent>(component)) {
+                                        component_name = actor->GetName();
+                                    }
+                                    detection.DetectionName = component_name;
+                                    index++;
+                                }
+							}                            
 
                             FBox box_3D = component->Bounds.GetBox();
                             detection.Box3D = FBox(getRelativeLocation(box_3D.Min), getRelativeLocation(box_3D.Max));

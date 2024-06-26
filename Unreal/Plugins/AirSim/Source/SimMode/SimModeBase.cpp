@@ -772,6 +772,10 @@ std::vector<std::string> ASimModeBase::GetAllInstanceSegmentationMeshIDs() {
     return instance_segmentation_annotator_.GetAllComponentNames();
 }
 
+TMap<UMeshComponent*, FString> ASimModeBase::GetInstanceSegmentationComponentToNameMap() {
+    return instance_segmentation_annotator_.GetComponentToNameMap();
+}
+
 std::vector<msr::airlib::Pose> ASimModeBase::GetAllInstanceSegmentationMeshPoses(bool ned, bool only_visible) {
     std::vector<msr::airlib::Pose> retval;
     TMap<FString, UMeshComponent*> nameToComponentMapTemp = instance_segmentation_annotator_.GetNameToComponentMap();
