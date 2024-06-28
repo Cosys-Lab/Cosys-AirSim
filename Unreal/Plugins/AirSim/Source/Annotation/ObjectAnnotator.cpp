@@ -1025,6 +1025,9 @@ bool FObjectAnnotator::PaintRGBComponent(UMeshComponent* component, const FColor
 	AnnotationComponent->SetupAttachment(component);
 	AnnotationComponent->RegisterComponent();
 	AnnotationComponent->SetAnnotationColor(NewColor);
+	AnnotationComponent->SetVisibleInSceneCaptureOnly(true);
+	AnnotationComponent->SetVisibleInRayTracing(false);
+	AnnotationComponent->bVisibleInReflectionCaptures = false;
 	AnnotationComponent->MarkRenderStateDirty();
 	UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
 	annotation_component_list_.Add(PrimitiveComponent);
@@ -1063,6 +1066,9 @@ bool FObjectAnnotator::PaintTextureComponent(UMeshComponent* component, const FS
 	AnnotationComponent->SetupAttachment(component);
 	AnnotationComponent->RegisterComponent();
 	AnnotationComponent->SetAnnotationTexture(texture_path);
+	AnnotationComponent->SetVisibleInSceneCaptureOnly(true);
+	AnnotationComponent->SetVisibleInRayTracing(false);
+	AnnotationComponent->bVisibleInReflectionCaptures = false;
 	AnnotationComponent->MarkRenderStateDirty();
 	UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
 	annotation_component_list_.Add(PrimitiveComponent);	
@@ -1208,6 +1214,24 @@ TMap<FString, float> FObjectAnnotator::GetComponentToValueMap() {
 
 
 void FObjectAnnotator::EndPlay() {
+
+	// Check how much time is spent here!
+	TArray<UObject*> UObjectList;
+	bool bIncludeDerivedClasses = false;
+	EObjectFlags ExclusionFlags = EObjectFlags::RF_ClassDefaultObject;
+	EInternalObjectFlags ExclusionInternalFlags = EInternalObjectFlags::None;
+	GetObjectsOfClass(UAnnotationComponent::StaticClass(), UObjectList, bIncludeDerivedClasses, ExclusionFlags, ExclusionInternalFlags);
+	for (UObject* Object : UObjectList)
+	{
+		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Object);
+		FName componentFName = *Component->GetName();
+		FString componentName = componentFName.ToString();
+		if (componentName.Contains(name_))
+		{
+			Component->DestroyComponent();
+		}
+	}
+
 	name_to_color_index_map_.Empty();
 	color_to_name_map_.Empty();
 	gammacorrected_color_to_name_map_.Empty();

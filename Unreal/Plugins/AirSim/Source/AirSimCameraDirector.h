@@ -62,6 +62,7 @@ public:
     APIPCamera *getFpvCamera() const;
     APIPCamera *getExternalCamera() const;
     APIPCamera *getBackupCamera() const;
+    APIPCamera *getFrontCamera() const;
     void setFollowDistance(const int follow_distance) { this->follow_distance_ = follow_distance; }
     void setCameraRotationLagEnabled(const bool lag_enabled) { this->camera_rotation_lag_enabled_ = lag_enabled; }
 

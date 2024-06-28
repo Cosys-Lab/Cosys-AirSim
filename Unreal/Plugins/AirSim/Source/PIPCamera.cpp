@@ -450,20 +450,27 @@ void APIPCamera::setDistortionParam(const std::string& param_name, float value)
     distortion_param_instance_->SetScalarParameterValue(FName(param_name.c_str()), value);
 }
 
-void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList) {
-    captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowOnlyComponents = ComponentList;
+void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, bool only_hide) {
+    if(!only_hide)
+        captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowOnlyComponents = ComponentList;
+    APlayerController* controller = this->GetWorld()->GetFirstPlayerController();
     for(TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
         captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+        controller->HiddenPrimitiveComponents.AddUnique(component);
 	}
-    //captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents = ComponentList;
 }
 
-void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name) {
-    captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents = ComponentList;
-    if(sphere_annotation_component_map_.Contains(annotation_name))
-        captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents.Add(sphere_annotation_component_map_[annotation_name]);
+void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name, bool only_hide) {
+    if (!only_hide) {
+        captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents = ComponentList;
+        if (sphere_annotation_component_map_.Contains(annotation_name))
+            captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents.Add(sphere_annotation_component_map_[annotation_name]);
+    }   
+    APlayerController* controller = this->GetWorld()->GetFirstPlayerController();
+
     for (TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
         captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+        controller->HiddenPrimitiveComponents.AddUnique(component);
     }
 }
 
