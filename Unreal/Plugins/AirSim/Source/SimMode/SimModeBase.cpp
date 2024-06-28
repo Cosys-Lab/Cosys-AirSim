@@ -1260,6 +1260,16 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
                 cur_lidar_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
         }
     }
+    if (CameraDirector != nullptr) {
+        if(CameraDirector->getFpvCamera() != nullptr)
+			CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+        if (CameraDirector->getExternalCamera() != nullptr)
+            CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+        if (CameraDirector->getBackupCamera() != nullptr)
+            CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+        if (CameraDirector->getFrontCamera() != nullptr)
+            CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+    }
 }
 
 void ASimModeBase::updateAnnotation(FString annotation_name) {
@@ -1267,7 +1277,7 @@ void ASimModeBase::updateAnnotation(FString annotation_name) {
         UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
     }
     else {
-        TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = annotators_[annotation_name].GetAnnotationComponents();
+        TArray<TWeakObjectPtr<UPrimitiveComponent>> current_annotation_components = annotators_[annotation_name].GetAnnotationComponents();
         TArray<AActor*> cameras_found;
         UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
             UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
@@ -1276,7 +1286,7 @@ void ASimModeBase::updateAnnotation(FString annotation_name) {
         if (cameras_found.Num() >= 0) {
             for (auto camera_actor : cameras_found) {
                 APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
-                cur_camera->updateAnnotation(current_segmentation_components, annotation_name);
+                cur_camera->updateAnnotation(current_annotation_components, annotation_name);
             }
         }
         TArray<AActor*> lidar_cameras_found;
@@ -1288,10 +1298,20 @@ void ASimModeBase::updateAnnotation(FString annotation_name) {
             for (auto lidar_camera_actor : lidar_cameras_found) {
                 ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
                 if (!cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_ && cur_lidar_camera->annotation_name_ == annotation_name)
-                    cur_lidar_camera->updateAnnotation(current_segmentation_components);
+                    cur_lidar_camera->updateAnnotation(current_annotation_components);
             }
         }
-    }  
+        if (CameraDirector != nullptr) {
+            if (CameraDirector->getFpvCamera() != nullptr)
+                CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+            if (CameraDirector->getExternalCamera() != nullptr)
+                CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+            if (CameraDirector->getBackupCamera() != nullptr)
+                CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+            if (CameraDirector->getFrontCamera() != nullptr)
+                CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+        }
+    }
 }
 
 void ASimModeBase::AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance) {
@@ -1321,6 +1341,10 @@ void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
     spawned_actors_.Empty();
     vehicle_sim_apis_.clear();
 
+    instance_segmentation_annotator_.EndPlay();
+    for(auto& annotator : annotators_){
+		annotator.Value.EndPlay();
+	}
     annotators_.Empty();
 
     Super::EndPlay(EndPlayReason);

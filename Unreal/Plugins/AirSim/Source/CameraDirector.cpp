@@ -203,6 +203,10 @@ void ACameraDirector::EndPlay(const EEndPlayReason::Type EndPlayReason)
     manual_pose_controller_ = nullptr;
     SpringArm = nullptr;
     ExternalCamera = nullptr;
+    fpv_camera_ = nullptr;
+    backup_camera_ = nullptr;
+    front_camera_ = nullptr;
+    follow_actor_ = nullptr;
 }
 
 APIPCamera* ACameraDirector::getFpvCamera() const
@@ -218,6 +222,11 @@ APIPCamera* ACameraDirector::getExternalCamera() const
 APIPCamera* ACameraDirector::getBackupCamera() const
 {
     return backup_camera_;
+}
+
+APIPCamera* ACameraDirector::getFrontCamera() const
+{
+    return front_camera_;
 }
 
 void ACameraDirector::inputEventSpringArmChaseView()
