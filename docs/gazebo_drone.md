@@ -25,7 +25,7 @@ Run from your AirSim root folder:
 
 ## Cosys-AirSim simulator
 
-The Cosys-AirSim UE plugin needs to be built with clang, so you can't use the one compiled in the previous step. You can use [our binaries](https://github.com/microsoft/AirSim/releases) or you can clone AirSim again in another folder and buid it without the above option, then you can [run Blocks](build_linux.md#how-to-use-airsim) or your own environment.
+The Cosys-AirSim UE plugin needs to be built with clang, so you can't use the one compiled in the previous step. You can use [our binaries](https://github.com/microsoft/AirSim/releases) or you can clone AirSim again in another folder and buid it without the above option, then you can [run Blocks](install_linux.md#how-to-use-airsim) or your own environment.
 
 
 ### Cosys-AirSim settings

@@ -143,7 +143,7 @@ echo " AirSim plugin is built! Here's how to build Unreal project."
 echo "=================================================================="
 echo ""
 echo "For further info see:"
-echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/docs/build_linux.md"
+echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/docs/install_linux.md"
 echo "=================================================================="
 
 popd >/dev/null

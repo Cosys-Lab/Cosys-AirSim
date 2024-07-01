@@ -1,4 +1,4 @@
-# Build AirSim on Windows
+# Install or Build AirSim on Windows
 
 ## Install Unreal Engine
 1. [Download](https://www.unrealengine.com/download) the Epic Games Launcher. While the Unreal Engine is open source and free to download, registration is still required.

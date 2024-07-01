@@ -84,9 +84,9 @@ This branch uses a custom Unreal Engine version! Please read the documentation c
 
 
 ### Windows
-* [Build it](docs/build_windows.md)
+* [Install/Build it](docs/install_windows.md)
 ### Linux
-* [Build it](docs/build_linux.md)
+* [Install/Build it](docs/install_linux.md)
 
 ## How to Use It
 
