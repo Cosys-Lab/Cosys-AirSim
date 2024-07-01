@@ -162,7 +162,7 @@ if $downloadHighPolySuv; then
             if [ -d "../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV" ]; then
                 rm -rf "../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV"
             fi
-            unzip -q car_assets.zip -d ../Unreal/Plugins/AirSim/Content/VehicleAdv
+            unzip -q cosys_car_assets.zip -d ../Unreal/Plugins/AirSim/Content/VehicleAdv
             cd ..
             rm -rf "suv_download_tmp"
     fi
