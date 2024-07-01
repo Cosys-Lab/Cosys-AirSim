@@ -38,9 +38,10 @@ void SkidVehiclePawnApi::updateMovement(const msr::airlib::CarApiBase::CarContro
 	else
 	{
 		if (move_completed_ || controls.throttle != 0){
-			if (move_completed_)
+			if (move_completed_){
 				set_throttle = true;
 				move_completed_ = false;
+			}
 			if (controls.throttle >= 0) {
 				to_set_controls_.brake = 0;
 			}
