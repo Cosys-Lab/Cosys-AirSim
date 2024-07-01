@@ -2,8 +2,8 @@
 * Updated to be compatible with Unreal 5.4.2. 
     * Note that 5.4.2 requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here]((docs/unreal_custenv.md#unreal-5354-scene-camera-bug)).
     * Disabled treating warnings as errors on Windows to avoid build issues.
-    * Updated rpclib version to unofficial patched version 2.3.1 to support C++20.
-    * Updated Eigen version to 3.4.0 on Windows to support C++20.
+    * Updated rpclib version to unofficial patched version 2.3.1 to better support C++20.
+    * Updated Eigen version to unofficial patched version 3.4.1 to better support C++20.
     * Updated cpp-linenoise library of DroneShell to support C++20.
     * Updated json library to 3.11.3 to support C++20.
     * Updated airlib to use C++20.
