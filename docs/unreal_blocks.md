@@ -7,7 +7,7 @@ Here are quick steps to get Blocks environment up and running:
 
 ## Windows
 
-1. Make sure you have [installed Unreal and built AirSim](build_windows.md).
+1. Make sure you have [built or installed Unreal and built AirSim](install_windows.md).
 2. Navigate to folder `AirSim\Unreal\Environments\Blocks` and run `update_from_git.bat`.
 3. Double click on generated .sln file to open in Visual Studio.
 4. Make sure `Blocks` project is the startup project, build configuration is set to `DebugGame_Editor` and `Win64`. Hit F5 to run.
@@ -17,7 +17,7 @@ Here are quick steps to get Blocks environment up and running:
 For Windows, you can just change the code in Visual Studio, press F5 and re-run. There are few batch files available in folder `AirSim\Unreal\Environments\Blocks` that lets you sync code, clean etc.
 
 ## Linux
-1. Make sure you have [built the Unreal Engine and AirSim](build_linux.md).
+1. Make sure you have [built or installed the Unreal Engine and AirSim](install_linux.md).
 2. Navigate to folder `AirSim\Unreal\Environments\Blocks` and run `update_from_git.sh`.
 3. Navigate to your UnrealEngine repo folder and run `Engine/Binaries/Linux/UE4Editor` which will start Unreal Editor.
 4. On first start you might not see any projects in UE4 editor. Click on Projects tab, Browse button and then navigate to `AirSim/Unreal/Environments/Blocks/Blocks.uproject`. 
