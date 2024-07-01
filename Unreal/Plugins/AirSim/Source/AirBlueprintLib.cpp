@@ -439,11 +439,14 @@ float UAirBlueprintLib::getUnrealClockSpeed(const AActor* context)
 {
 	UAirBlueprintLib::RunCommandOnGameThread([context]() {
 		auto* world_settings = context->GetWorldSettings();
-		if (world_settings)
+		if (world_settings){
 			return world_settings->TimeDilation;
-		else
-			LogMessageString("Failed:", "WorldSettings was nullptr", LogDebugLevel::Failure);
+        }
+		else{
+            LogMessageString("Failed:", "WorldSettings was nullptr", LogDebugLevel::Failure);
 			return 1.0f;
+        }
+
 	}, true);
 	return 1.0f;
 }

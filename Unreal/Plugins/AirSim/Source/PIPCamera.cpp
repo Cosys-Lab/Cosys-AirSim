@@ -30,19 +30,19 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
         distortion_material_static_ = dist_mat_finder.Object;
         distortion_param_collection_ = Cast<UMaterialParameterCollection>(StaticLoadObject(UMaterialParameterCollection::StaticClass(), NULL, TEXT("'/AirSim/HUDAssets/DistortionParams.DistortionParams'")));
     }
-    else
+    else{
         UAirBlueprintLib::LogMessageString("Cannot create distortion material for the PIPCamera",
-                                           "",
-                                           LogDebugLevel::Failure);
+                                           "", LogDebugLevel::Failure);
+    }
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder2(TEXT("Material'/AirSim/HUDAssets/CameraSensorLensDistortion.CameraSensorLensDistortion'"));
 	if (mat_finder2.Succeeded())
 	{
 		lens_distortion_material_static_ = mat_finder2.Object;
 	}
-	else
-		UAirBlueprintLib::LogMessageString("Cannot create lens distortion material for the PIPCamera",
-			"", LogDebugLevel::Failure);
+	else{
+		UAirBlueprintLib::LogMessageString("Cannot create lens distortion material for the PIPCamera", "", LogDebugLevel::Failure);
+    }
 
 	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder3(TEXT("Material'/AirSim/HUDAssets/CameraSensorLensDistortionInvert.CameraSensorLensDistortionInvert'"));
 	if (mat_finder3.Succeeded())
