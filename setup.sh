@@ -86,7 +86,7 @@ else #linux
     fi
 
     # install additional tools
-    sudo apt-get install -y build-essential unzip
+    sudo apt-get install -y build-essential unzip libunwind-dev
 
     if version_less_than_equal_to $cmake_ver $MIN_CMAKE_VERSION; then
         # in ubuntu 18 docker CI, avoid building cmake from scratch to save time
