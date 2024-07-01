@@ -48,7 +48,7 @@ else #linux
     #     wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
     #     sudo apt-get update
     # fi
-    sudo apt-get install -y clang-11 clang++-11 libc++-11-dev libc++abi-11-dev
+    sudo apt-get install -y clang-12 clang++-12 libc++-12-dev libc++abi-12-dev
 fi
 
 if ! which cmake; then
