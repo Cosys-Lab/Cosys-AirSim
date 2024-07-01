@@ -44,7 +44,7 @@ macro(CommonSetup)
     IF(UNIX)
         set(RPC_LIB_DEFINES "-D MSGPACK_PP_VARIADICS_MSVC=0")
         set(BUILD_TYPE "linux")
-        set(CMAKE_CXX_STANDARD 20)
+        set(CMAKE_CXX_STANDARD 17)
 
         if (APPLE)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wstrict-aliasing -D__CLANG__")
@@ -73,9 +73,6 @@ macro(CommonSetup)
 
     ELSE()
         #windows cmake build is experimental
-        set(CMAKE_CXX_STANDARD 20)
-        set(CMAKE_CXX_STANDARD_REQUIRED YES)
-        set(CMAKE_CXX_EXTENSIONS NO)
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x0600 /GS /W4 /wd4100 /wd4505 /wd4820 /wd4464 /wd4514 /wd4710 /wd4571 /Zc:wchar_t /ZI /Zc:inline /fp:precise /D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /D_UNICODE /DUNICODE /WX- /Zc:forScope /Gd /EHsc ")
         set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NXCOMPAT /DYNAMICBASE /INCREMENTAL:NO ")
 
