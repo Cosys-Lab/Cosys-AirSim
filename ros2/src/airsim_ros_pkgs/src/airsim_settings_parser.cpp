@@ -1,7 +1,8 @@
 #include "airsim_settings_parser.h"
 
-AirSimSettingsParser::AirSimSettingsParser(const std::string& host_ip)
+AirSimSettingsParser::AirSimSettingsParser(const std::string& host_ip, uint16_t host_port)
     : host_ip_(host_ip)
+    , host_port_(host_port)
 {
     success_ = initializeSettings();
 }
@@ -13,7 +14,7 @@ bool AirSimSettingsParser::success()
 
 bool AirSimSettingsParser::getSettingsText(std::string& settings_text) const
 {
-    msr::airlib::RpcLibClientBase airsim_client(host_ip_);
+    msr::airlib::RpcLibClientBase airsim_client(host_ip_, host_port_);
     airsim_client.confirmConnection();
 
     settings_text = airsim_client.getSettingsString();
