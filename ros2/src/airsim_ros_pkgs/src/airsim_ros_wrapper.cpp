@@ -21,7 +21,11 @@ const std::unordered_map<int, std::string> AirsimROSWrapper::image_type_int_to_s
     { 4, "DisparityNormalized" },
     { 5, "Segmentation" },
     { 6, "SurfaceNormals" },
-    { 7, "Infrared" }
+    { 7, "Infrared" },
+    { 8, "OpticalFlow" },
+    { 9, "OpticalFlowVis" },
+    { 10, "Annotation" }
+
 };
 
 AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, const bool enable_api_control)
@@ -81,9 +85,9 @@ void AirsimROSWrapper::initialize_airsim()
         airsim_client_lidar_.confirmConnection();
 
         if(enable_api_control_){
-        for (const auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {
-            airsim_client_->enableApiControl(true, vehicle_name_ptr_pair.first); // todo expose as rosservice?
-            airsim_client_->armDisarm(true, vehicle_name_ptr_pair.first); // todo exposes as rosservice?
+            for (const auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {            
+                airsim_client_->enableApiControl(true, vehicle_name_ptr_pair.first); // todo expose as rosservice?
+                airsim_client_->armDisarm(true, vehicle_name_ptr_pair.first); // todo exposes as rosservice?
             }
         }
 
@@ -218,21 +222,30 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
                 // which initializes default capture settings for _all_ NINE msr::airlib::ImageCaptureBase::ImageType
                 if (!(std::isnan(capture_setting.fov_degrees))) {
                     ImageType curr_image_type = msr::airlib::Utils::toEnum<ImageType>(capture_setting.image_type);
-                    // if scene / segmentation / surface normals / infrared, get uncompressed image with pixels_as_floats = false
-                    if (curr_image_type == ImageType::Scene || curr_image_type == ImageType::Segmentation || curr_image_type == ImageType::SurfaceNormals || curr_image_type == ImageType::Infrared) {
-                        current_image_request_vec.push_back(ImageRequest(curr_camera_name, curr_image_type, false, false));
-                    }
-                    // if {DepthPlanar, DepthPerspective,DepthVis, DisparityNormalized}, get float image
-                    else {
-                        current_image_request_vec.push_back(ImageRequest(curr_camera_name, curr_image_type, true));
-                    }
-
-                    const std::string camera_topic_prefix = topic_prefix + "/" + curr_camera_name + "_" + image_type_int_to_string_map_.at(capture_setting.image_type);
-                    const std::string image_topic = camera_topic_prefix + "/image";
-                    const std::string camera_info_topic = camera_topic_prefix + "/camera_info";
-                    image_pub_vec_.push_back(image_transporter.advertise(image_topic, 1));
-                    cam_info_pub_vec_.push_back(nh_->create_publisher<sensor_msgs::msg::CameraInfo>(camera_info_topic, 10));
-                    camera_info_msg_vec_.push_back(generate_cam_info(curr_camera_name, camera_setting, capture_setting));
+                    if(curr_image_type == ImageType::Annotation) {
+                        for( const auto& curr_annotation_element :  AirSimSettings::singleton().annotator_settings){
+                            current_image_request_vec.push_back(ImageRequest(curr_camera_name, curr_image_type, false, false, curr_annotation_element.name));            
+                            const std::string camera_topic_prefix = topic_prefix + "/" + curr_camera_name + "_" + image_type_int_to_string_map_.at(capture_setting.image_type) + "_" + curr_annotation_element.name;
+                            const std::string image_topic = camera_topic_prefix + "/image";
+                            const std::string camera_info_topic = camera_topic_prefix + "/camera_info";
+                            image_pub_vec_.push_back(image_transporter.advertise(image_topic, 1));
+                            cam_info_pub_vec_.push_back(nh_->create_publisher<sensor_msgs::msg::CameraInfo>(camera_info_topic, 10));
+                            camera_info_msg_vec_.push_back(generate_cam_info(curr_camera_name, camera_setting, capture_setting));
+                        }
+                    }else{
+                        if (curr_image_type == ImageType::DepthPlanar || curr_image_type == ImageType::DepthPerspective || curr_image_type == ImageType::DepthVis || curr_image_type == ImageType::DisparityNormalized) {
+                            current_image_request_vec.push_back(ImageRequest(curr_camera_name, curr_image_type, true));
+                        }
+                        else {
+                            current_image_request_vec.push_back(ImageRequest(curr_camera_name, curr_image_type, false, false));                        
+                        }
+                        const std::string camera_topic_prefix = topic_prefix + "/" + curr_camera_name + "_" + image_type_int_to_string_map_.at(capture_setting.image_type);
+                        const std::string image_topic = camera_topic_prefix + "/image";
+                        const std::string camera_info_topic = camera_topic_prefix + "/camera_info";
+                        image_pub_vec_.push_back(image_transporter.advertise(image_topic, 1));
+                        cam_info_pub_vec_.push_back(nh_->create_publisher<sensor_msgs::msg::CameraInfo>(camera_info_topic, 10));
+                        camera_info_msg_vec_.push_back(generate_cam_info(curr_camera_name, camera_setting, capture_setting));
+                    }                    
                 }
             }
             // push back pair (vector of image captures, current vehicle name)
