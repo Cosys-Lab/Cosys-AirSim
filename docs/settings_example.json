@@ -14,41 +14,41 @@
     "PhysicsEngineName": "",
     "SpeedUnitFactor": 1,
     "SpeedUnitLabel": "m/s",
-    "SimMode": "SkidVehicle",
+    "SimMode": "Car",
     "Annotation": [
-    {
-        "Name": "RGBTestDirect",
-        "Type": 0,
-        "Default": true,
-        "SetDirect": true,
-        "ViewDistance": 10
-    },
-    {
-        "Name": "RGBTestIndex",
-        "Type": 0,
-        "Default": true,
-        "SetDirect": false
-    },
-    {
-        "Name": "GreyscaleTest",
-        "Type": 1,
-        "Default": true,
-        "ViewDistance": 5
-    },
-    {
-        "Name": "TextureTestDirect",
-        "Type": 2,
-        "Default": true,
-        "SetDirect": true
-    },
-    {
-        "Name": "TextureTestRelativePath",
-        "Type": 2,
-        "Default": false,
-        "SetDirect": false,
-        "TexturePath": "/Game/AnnotationTest",
-        "TexturePrefix": "Test1"
-    }
+        {
+            "Name": "RGBTestDirect",
+            "Type": 0,
+            "Default": true,
+            "SetDirect": true,
+            "ViewDistance": 10
+        },
+        {
+            "Name": "RGBTestIndex",
+            "Type": 0,
+            "Default": true,
+            "SetDirect": false
+        },
+        {
+            "Name": "GreyscaleTest",
+            "Type": 1,
+            "Default": true,
+            "ViewDistance": 5
+        },
+        {
+            "Name": "TextureTestDirect",
+            "Type": 2,
+            "Default": true,
+            "SetDirect": true
+        },
+        {
+            "Name": "TextureTestRelativePath",
+            "Type": 2,
+            "Default": false,
+            "SetDirect": false,
+            "TexturePath": "/Game/AnnotationTest",
+            "TexturePrefix": "Test1"
+        }
     ],
     "Wind": {
         "X": 0,
@@ -253,7 +253,7 @@
     },
     "Vehicles": {
         "airsimvehicle": {
-            "VehicleType": "CPHusky",
+            "VehicleType": "BoxCar",
             "DefaultVehicleState": "",
             "AutoCreate": true,
             "PawnPath": "",
@@ -314,32 +314,35 @@
                     "SensorType": 5
                 },
                 "gpulidar": {
-					"SensorType": 8,
-					"Enabled" : true,
-					"External": false,
-					"NumberOfChannels": 32,
-					"Range": 50,
-				    "Resolution": 1024,
-					"RotationsPerSecond": 10,
-					"MeasurementsPerCycle": 512,
-					"X": 0, "Y": 0, "Z": -0.3,
-					"Roll": 0, "Pitch": 0, "Yaw" : 0,
-					"VerticalFOVUpper": 20,
-					"VerticalFOVLower": -20,
-					"HorizontalFOVStart": 0,
-					"HorizontalFOVEnd": 360,
-					"DrawDebugPoints": false,
-					"DrawMode": 1,
-					"Resolution": 1024,
-					"IgnoreMarked": true,
-					"GroundTruth": true,
-					"GenerateIntensity": false,
-					"rangeMaxLambertianPercentage": 80,
-					"rainMaxIntensity": 70,
-					"rainConstantA": 0.01,
-					"rainConstantB": 0.6,
+                    "SensorType": 8,
+                    "Enabled": true,
+                    "External": false,
+                    "NumberOfChannels": 32,
+                    "Range": 50,
+                    "Resolution": 1024,
+                    "RotationsPerSecond": 10,
+                    "MeasurementsPerCycle": 512,
+                    "X": 0,
+                    "Y": 0,
+                    "Z": -0.3,
+                    "Roll": 0,
+                    "Pitch": 0,
+                    "Yaw": 0,
+                    "VerticalFOVUpper": 20,
+                    "VerticalFOVLower": -20,
+                    "HorizontalFOVStart": 0,
+                    "HorizontalFOVEnd": 360,
+                    "DrawDebugPoints": false,
+                    "DrawMode": 1,
+                    "IgnoreMarked": true,
+                    "GroundTruth": true,
+                    "GenerateIntensity": false,
+                    "rangeMaxLambertianPercentage": 80,
+                    "rainMaxIntensity": 70,
+                    "rainConstantA": 0.01,
+                    "rainConstantB": 0.6,
                     "DrawSensor": false
-				},
+                },
                 "lidar": {
                     "SensorType": 6,
                     "Enabled": true,
