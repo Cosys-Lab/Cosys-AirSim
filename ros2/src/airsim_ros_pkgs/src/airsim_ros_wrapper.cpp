@@ -24,11 +24,12 @@ const std::unordered_map<int, std::string> AirsimROSWrapper::image_type_int_to_s
     { 7, "Infrared" }
 };
 
-AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup)
+AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, const bool enable_api_control)
     : is_used_lidar_timer_cb_queue_(false)
     , is_used_img_timer_cb_queue_(false)
     , airsim_settings_parser_(host_ip)
     , host_ip_(host_ip)
+    , enable_api_control_(enable_api_control)
     , airsim_client_(nullptr)
     , airsim_client_images_(host_ip)
     , airsim_client_lidar_(host_ip)
@@ -41,13 +42,16 @@ AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const
 {
     ros_clock_.clock = rclcpp::Time(0);
 
-    if (AirSimSettings::singleton().simmode_name != AirSimSettings::kSimModeTypeCar) {
+    if (AirSimSettings::singleton().simmode_name == AirSimSettings::kSimModeTypeMultirotor) {
         airsim_mode_ = AIRSIM_MODE::DRONE;
         RCLCPP_INFO(nh_->get_logger(), "Setting ROS wrapper to DRONE mode");
     }
-    else {
+    else if (AirSimSettings::singleton().simmode_name == AirSimSettings::kSimModeTypeCar || AirSimSettings::singleton().simmode_name == AirSimSettings::kSimModeTypeSkidVehicle){
         airsim_mode_ = AIRSIM_MODE::CAR;
         RCLCPP_INFO(nh_->get_logger(), "Setting ROS wrapper to CAR mode");
+    }else{
+        airsim_mode_ = AIRSIM_MODE::COMPUTERVISION;
+        RCLCPP_INFO(nh_->get_logger(), "Setting ROS wrapper to COMPUTERVISION mode");
     }
     tf_buffer_ = std::make_shared<tf2_ros::Buffer>(nh_->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
@@ -67,16 +71,20 @@ void AirsimROSWrapper::initialize_airsim()
         if (airsim_mode_ == AIRSIM_MODE::DRONE) {
             airsim_client_ = std::unique_ptr<msr::airlib::RpcLibClientBase>(new msr::airlib::MultirotorRpcLibClient(host_ip_));
         }
-        else {
+        else if(airsim_mode_ == AIRSIM_MODE::CAR) {
             airsim_client_ = std::unique_ptr<msr::airlib::RpcLibClientBase>(new msr::airlib::CarRpcLibClient(host_ip_));
+        }else{
+            airsim_client_ = std::unique_ptr<msr::airlib::RpcLibClientBase>(new msr::airlib::ComputerVisionRpcLibClient(host_ip_));
         }
         airsim_client_->confirmConnection();
         airsim_client_images_.confirmConnection();
         airsim_client_lidar_.confirmConnection();
 
+        if(enable_api_control_){
         for (const auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {
             airsim_client_->enableApiControl(true, vehicle_name_ptr_pair.first); // todo expose as rosservice?
             airsim_client_->armDisarm(true, vehicle_name_ptr_pair.first); // todo exposes as rosservice?
+            }
         }
 
         origin_geo_point_ = get_origin_geo_point();
@@ -143,8 +151,10 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
         if (airsim_mode_ == AIRSIM_MODE::DRONE) {
             vehicle_ros = std::unique_ptr<MultiRotorROS>(new MultiRotorROS());
         }
-        else {
+        else if(airsim_mode_ == AIRSIM_MODE::CAR){
             vehicle_ros = std::unique_ptr<CarROS>(new CarROS());
+        }else{
+            vehicle_ros = std::unique_ptr<ComputerVisionROS>(new ComputerVisionROS());
         }
 
         vehicle_ros->odom_frame_id_ = curr_vehicle_name + "/" + odom_frame_id_;
@@ -179,11 +189,14 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
 
             // vehicle_ros.reset_srvr = nh_->create_service(curr_vehicle_name + "/reset",&AirsimROSWrapper::reset_srv_cb, this);
         }
-        else {
+        else if(airsim_mode_ == AIRSIM_MODE::CAR) {
             auto car = static_cast<CarROS*>(vehicle_ros.get());
             std::function<void(const airsim_interfaces::msg::CarControls::SharedPtr)> fcn_car_cmd_sub = std::bind(&AirsimROSWrapper::car_cmd_cb, this, _1, vehicle_ros->vehicle_name_);
             car->car_cmd_sub_ = nh_->create_subscription<airsim_interfaces::msg::CarControls>(topic_prefix + "/car_cmd", 1, fcn_car_cmd_sub);
             car->car_state_pub_ = nh_->create_publisher<airsim_interfaces::msg::CarState>(topic_prefix + "/car_state", 10);
+        }else{
+            auto computer_vision = static_cast<ComputerVisionROS*>(vehicle_ros.get());
+            computer_vision->computer_vision_state_pub_ = nh_->create_publisher<airsim_interfaces::msg::ComputerVisionState>(topic_prefix + "/computervision_state", 10);
         }
 
         // iterate over camera map std::map<std::string, CameraSetting> .cameras;
@@ -602,6 +615,19 @@ airsim_interfaces::msg::CarState AirsimROSWrapper::get_roscarstate_msg_from_car_
     return state_msg;
 }
 
+airsim_interfaces::msg::ComputerVisionState AirsimROSWrapper::get_roscomputervisionstate_msg_from_computer_vision_state(const msr::airlib::ComputerVisionApiBase::ComputerVisionState& computer_vision_state) const
+{
+    airsim_interfaces::msg::ComputerVisionState state_msg;
+    const auto odo = get_odom_msg_from_computer_vision_state(computer_vision_state);
+
+    state_msg.pose = odo.pose;
+    state_msg.twist = odo.twist;    
+    state_msg.header.stamp = rclcpp::Time(computer_vision_state.timestamp);
+
+    return state_msg;
+}
+
+
 nav_msgs::msg::Odometry AirsimROSWrapper::get_odom_msg_from_kinematic_state(const msr::airlib::Kinematics::State& kinematics_estimated) const
 {
     nav_msgs::msg::Odometry odom_msg;
@@ -638,6 +664,11 @@ nav_msgs::msg::Odometry AirsimROSWrapper::get_odom_msg_from_kinematic_state(cons
 nav_msgs::msg::Odometry AirsimROSWrapper::get_odom_msg_from_car_state(const msr::airlib::CarApiBase::CarState& car_state) const
 {
     return get_odom_msg_from_kinematic_state(car_state.kinematics_estimated);
+}
+
+nav_msgs::msg::Odometry AirsimROSWrapper::get_odom_msg_from_computer_vision_state(const msr::airlib::ComputerVisionApiBase::ComputerVisionState& computer_vision_state) const
+{
+    return get_odom_msg_from_kinematic_state(computer_vision_state.kinematics_estimated);
 }
 
 nav_msgs::msg::Odometry AirsimROSWrapper::get_odom_msg_from_multirotor_state(const msr::airlib::MultirotorState& drone_state) const
@@ -976,7 +1007,7 @@ rclcpp::Time AirsimROSWrapper::update_state()
 
             vehicle_ros->curr_odom_ = get_odom_msg_from_multirotor_state(drone->curr_drone_state_);
         }
-        else {
+        else if(airsim_mode_ == AIRSIM_MODE::CAR) {
             auto car = static_cast<CarROS*>(vehicle_ros.get());
             auto rpc = static_cast<msr::airlib::CarRpcLibClient*>(airsim_client_.get());
             car->curr_car_state_ = rpc->getCarState(vehicle_ros->vehicle_name_);
@@ -995,6 +1026,25 @@ rclcpp::Time AirsimROSWrapper::update_state()
             airsim_interfaces::msg::CarState state_msg = get_roscarstate_msg_from_car_state(car->curr_car_state_);
             state_msg.header.frame_id = vehicle_ros->vehicle_name_;
             car->car_state_msg_ = state_msg;
+        }else{
+            auto computer_vision = static_cast<ComputerVisionROS*>(vehicle_ros.get());
+            auto rpc = static_cast<msr::airlib::ComputerVisionRpcLibClient*>(airsim_client_.get());
+            computer_vision->curr_computer_vision_state_ = rpc->getComputerVisionState(vehicle_ros->vehicle_name_);
+
+            vehicle_time = rclcpp::Time(computer_vision->curr_computer_vision_state_.timestamp);
+            if (!got_sim_time) {
+                curr_ros_time = vehicle_time;
+                got_sim_time = true;
+            }
+
+            vehicle_ros->gps_sensor_msg_ = get_gps_sensor_msg_from_airsim_geo_point(env_data.geo_point);
+            vehicle_ros->gps_sensor_msg_.header.stamp = vehicle_time;
+
+            vehicle_ros->curr_odom_ = get_odom_msg_from_computer_vision_state(computer_vision->curr_computer_vision_state_);
+
+            airsim_interfaces::msg::ComputerVisionState state_msg = get_roscomputervisionstate_msg_from_computer_vision_state(computer_vision->curr_computer_vision_state_);
+            state_msg.header.frame_id = vehicle_ros->vehicle_name_;
+            computer_vision->computer_vision_state_msg_ = state_msg;
         }
 
         vehicle_ros->stamp_ = vehicle_time;
@@ -1025,6 +1075,9 @@ void AirsimROSWrapper::publish_vehicle_state()
             // dashboard reading from car, RPM, gear, etc
             auto car = static_cast<CarROS*>(vehicle_ros.get());
             car->car_state_pub_->publish(car->car_state_msg_);
+        }else if(airsim_mode_ == AIRSIM_MODE::COMPUTERVISION){
+            auto computer_vision = static_cast<ComputerVisionROS*>(vehicle_ros.get());
+            computer_vision->computer_vision_state_pub_->publish(computer_vision->computer_vision_state_msg_);
         }
 
         // odom and transforms
@@ -1085,7 +1138,7 @@ void AirsimROSWrapper::update_commands()
             }
             drone->has_vel_cmd_ = false;
         }
-        else {
+        else if (airsim_mode_ == AIRSIM_MODE::CAR){
             // send control commands from the last callback to airsim
             auto car = static_cast<CarROS*>(vehicle_ros.get());
             if (car->has_car_cmd_) {
