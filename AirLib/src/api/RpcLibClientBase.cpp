@@ -98,11 +98,11 @@ __pragma(warning(disable : 4239))
         }
         int RpcLibClientBase::getClientVersion() const
         {
-            return 1; //sync with Python client
+            return 3; //sync with Python client
         }
         int RpcLibClientBase::getMinRequiredServerVersion() const
         {
-            return 1; //sync with Python client
+            return 3; //sync with Python client
         }
         int RpcLibClientBase::getMinRequiredClientVersion() const
         {
