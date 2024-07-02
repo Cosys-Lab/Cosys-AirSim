@@ -14,6 +14,7 @@ STRICT_MODE_OFF //todo what does this do?
 #include "sensors/imu/ImuBase.hpp"
 #include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
 #include "vehicles/car/api/CarRpcLibClient.hpp"
+#include "vehicles/computervision/api/ComputerVisionRpcLibClient.hpp"
 #include "yaml-cpp/yaml.h"
 #include <airsim_interfaces/msg/gimbal_angle_euler_cmd.hpp>
 #include <airsim_interfaces/msg/gimbal_angle_quat_cmd.hpp>
@@ -27,6 +28,7 @@ STRICT_MODE_OFF //todo what does this do?
 #include <airsim_interfaces/msg/vel_cmd_group.hpp>
 #include <airsim_interfaces/msg/car_controls.hpp>
 #include <airsim_interfaces/msg/car_state.hpp>
+#include <airsim_interfaces/msg/computer_vision_state.hpp>
 #include <airsim_interfaces/msg/environment.hpp>
 #include <chrono>
 #include <cv_bridge/cv_bridge.h>
@@ -116,10 +118,11 @@ public:
     enum class AIRSIM_MODE : unsigned
     {
         DRONE,
-        CAR
+        CAR,
+        COMPUTERVISION
     };
 
-    AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup);
+    AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, const bool enable_api_control);
     ~AirsimROSWrapper(){};
 
     void initialize_airsim();
@@ -172,6 +175,15 @@ private:
 
         bool has_car_cmd_;
         msr::airlib::CarApiBase::CarControls car_cmd_;
+    };
+
+    class ComputerVisionROS : public VehicleROS
+    {
+    public:
+        msr::airlib::ComputerVisionApiBase::ComputerVisionState curr_computer_vision_state_;
+
+        rclcpp::Publisher<airsim_interfaces::msg::ComputerVisionState>::SharedPtr computer_vision_state_pub_;
+        airsim_interfaces::msg::ComputerVisionState computer_vision_state_msg_;
     };
 
     class MultiRotorROS : public VehicleROS
@@ -257,7 +269,9 @@ private:
     nav_msgs::msg::Odometry get_odom_msg_from_kinematic_state(const msr::airlib::Kinematics::State& kinematics_estimated) const;
     nav_msgs::msg::Odometry get_odom_msg_from_multirotor_state(const msr::airlib::MultirotorState& drone_state) const;
     nav_msgs::msg::Odometry get_odom_msg_from_car_state(const msr::airlib::CarApiBase::CarState& car_state) const;
+    nav_msgs::msg::Odometry get_odom_msg_from_computer_vision_state(const msr::airlib::ComputerVisionApiBase::ComputerVisionState& computer_vision_state) const;
     airsim_interfaces::msg::CarState get_roscarstate_msg_from_car_state(const msr::airlib::CarApiBase::CarState& car_state) const;
+    airsim_interfaces::msg::ComputerVisionState get_roscomputervisionstate_msg_from_computer_vision_state(const msr::airlib::ComputerVisionApiBase::ComputerVisionState& computer_vision_state) const;
     msr::airlib::Pose get_airlib_pose(const float& x, const float& y, const float& z, const msr::airlib::Quaternionr& airlib_quat) const;
     airsim_interfaces::msg::GPSYaw get_gps_msg_from_airsim_geo_point(const msr::airlib::GeoPoint& geo_point) const;
     sensor_msgs::msg::NavSatFix get_gps_sensor_msg_from_airsim_geo_point(const msr::airlib::GeoPoint& geo_point) const;
@@ -309,6 +323,7 @@ private:
     bool is_vulkan_; // rosparam obtained from launch file. If vulkan is being used, we BGR encoding instead of RGB
 
     std::string host_ip_;
+    bool enable_api_control_;
     std::unique_ptr<msr::airlib::RpcLibClientBase> airsim_client_;
     // seperate busy connections to airsim, update in their own thread
     msr::airlib::RpcLibClientBase airsim_client_images_;
