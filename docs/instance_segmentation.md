@@ -14,8 +14,6 @@ An Instance segmentation system is implemented into Cosys-AirSim. It uses Proxy 
 By default, at the start of the simulation, it will give a random color to each object. 
 Please see the [Image API documentation](image_apis.md#segmentation) on how to manually set or get the color information.
 
-The easiest way to get the images from segmentation cameras, is through ros. See the [ROS documentation](ros.md) for more information. 
-
 For an example of the Instance Segmentation API, please see the script  [segmentation_test.py](../PythonClient/segmentation/segmentation_test.py).
 
 For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../PythonClient/segmentation/segmentation_generate_list.py).
