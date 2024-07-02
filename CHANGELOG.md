@@ -1,4 +1,13 @@
-### May/June 2024
+### June 2024
+* Updated ROS2 wrapper to support Cosys-AirSim features and fix several issues:
+    * Added support for annotation cameras.
+    * Added option to set host port.
+    * Updated all data to be in ROS standard coordinate system (no longer NED by default). Removed ENU conversion option.
+    * Fixed static transformations not correctly converting degrees to radians.
+    * Removed none-static transformations for cameras.
+    * Removed C++ ROS1 wrapper as Python version is more up to date. 
+
+### May 2024
 * Added [multi-layer annotation](docs/annotation.md) with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Updated Unreal to 5.2.1 (Thanks in part to [Colosseum by Codex Laboratories LLC](https://github.com/CodexLabsLLC/Colosseum)!).
 * Updated instance segmentation to use proxy meshing, no longer requiring custom Unreal Engine fork. 
