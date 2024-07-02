@@ -10,9 +10,11 @@ int main(int argc, char** argv)
     std::shared_ptr<rclcpp::Node> nh_img = nh->create_sub_node("img");
     std::shared_ptr<rclcpp::Node> nh_lidar = nh->create_sub_node("lidar");
     std::string host_ip;
+    bool enable_api_control;
     nh->get_parameter("host_ip", host_ip);
+    nh->get_parameter("enable_api_control", enable_api_control);
     auto callbackGroup = nh->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-    AirsimROSWrapper airsim_ros_wrapper(nh, nh_img, nh_lidar, host_ip, callbackGroup);
+    AirsimROSWrapper airsim_ros_wrapper(nh, nh_img, nh_lidar, host_ip, callbackGroup, enable_api_control);
 
     rclcpp::executors::MultiThreadedExecutor executor;
     executor.add_node(nh);

@@ -38,7 +38,8 @@ def generate_launch_description():
                 'update_airsim_control_every_n_sec': 0.01,
                 'update_lidar_every_n_sec': 0.01,
                 'publish_clock': LaunchConfiguration('publish_clock'),
-                'host_ip': LaunchConfiguration('host')
+                'host_ip': LaunchConfiguration('host'),
+                'enable_api_control': False
             }])
 
     static_transforms = IncludeLaunchDescription(
