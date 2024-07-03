@@ -295,50 +295,25 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 			float distance_noise = dist_(gen_) * (1 + ((hit_result.Distance / 100) / params.range) * (params.noise_distance_scale - 1));
 
 			Vector3r impact_point_local = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * ((hit_result.Distance / 100) + distance_noise) + start;
-			impact_point = ned_transform_->fromLocalNed(impact_point_local);
-		}
-
-		// decide the frame for the point-cloud
-		if (params.data_frame == AirSimSettings::kVehicleInertialFrame) {
-			// current detault behavior; though it is probably not very useful.
-			// not changing the default for now to maintain backwards-compat.
-
 			if (params.external) {
-				Vector3r point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
-				point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
-			}
-			else {
-				point = ned_transform_->toLocalNed(impact_point);
-			}
+				impact_point = ned_transform_->fromRelativeNed(impact_point_local);
+			} else {
+				impact_point = ned_transform_->fromLocalNed(impact_point_local);
+			}			
 		}
-		else if (params.data_frame == AirSimSettings::kSensorLocalFrame) {
-			// point in vehicle intertial frame
 
-			Vector3r point_v_i;
-			if (params.external) {
-				point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
-			}
-			else {
-				point_v_i = ned_transform_->toLocalNed(impact_point);
-			}
+		raw_point = impact_point;
 
-			// tranform to lidar frame
-			point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
-
-			// The above should be same as first transforming to vehicle-body frame and then to lidar frame
-			//    Vector3r point_v_b = VectorMath::transformToBodyFrame(point_v_i, vehicle_pose, true);
-			//    point = VectorMath::transformToBodyFrame(point_v_b, lidar_pose, true);
-
-			// On the client side, if it is needed to transform this data back to the world frame,
-			// then do the equivalent of following,
-			//     Vector3r point_w = VectorMath::transformToWorldFrame(point, lidar_pose + vehicle_pose, true);
-			// See SimModeBase::drawLidarDebugPoints()
-
-			// TODO: Optimization -- instead of doing this for every point, it should be possible to do this
-			// for the point-cloud together? Need to look into matrix operations to do this together for all points.
+		Vector3r point_v_i;
+		if (params.external) {
+			point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
 		}
-		else
-			throw std::runtime_error("Unknown requested data frame");
+		else {
+			point_v_i = ned_transform_->toLocalNed(impact_point);
+		}
+
+		// tranform to lidar frame
+		point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
 
 		return true;
 	}

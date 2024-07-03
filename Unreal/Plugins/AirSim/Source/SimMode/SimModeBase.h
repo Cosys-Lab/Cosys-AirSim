@@ -313,8 +313,6 @@ private:
     UPROPERTY()
     TArray<AActor*> spawned_actors_; //keep refs alive from Unreal GC
 
-    bool lidar_checks_done_ = false;
-    bool lidar_draw_debug_points_ = false;
     static ASimModeBase* SIMMODE;
 
     FObjectAnnotator instance_segmentation_annotator_;
@@ -330,6 +328,5 @@ private:
     void setSunRotation(FRotator rotation);
     void setupPhysicsLoopPeriod();
     void showClockStats();
-    void drawLidarDebugPoints();
     void drawDistanceSensorDebugPoints();
 };
