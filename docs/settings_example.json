@@ -317,6 +317,7 @@
                     "SensorType": 8,
                     "Enabled": true,
                     "External": false,
+                    "ExternalLocal": true,
                     "NumberOfChannels": 32,
                     "Range": 50,
                     "Resolution": 1024,
