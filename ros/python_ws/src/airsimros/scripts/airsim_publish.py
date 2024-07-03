@@ -1351,7 +1351,7 @@ if __name__ == '__main__':
         else:
             client = airsim.CarClient(ip=ip, port=port)
         try:
-            client.confirmConnection(rospy.get_name())
+            client.confirmConnection()
         except msgpackrpc.error.TimeoutError:
             rospy.logerr("Could not connect to AirSim.")
             rospy.signal_shutdown('no connection to airsim.')
