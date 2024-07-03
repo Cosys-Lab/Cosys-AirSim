@@ -1345,7 +1345,7 @@ int FColorGenerator::GetGammaCorrectedColor(int color_index) {
 	return GammaCorrectionTable_[color_index];
 }
 
-static TArray<FColor> FColorGenerator::GetColorMap(){
+ TArray<FColor> FColorGenerator::GetColorMap(){
 	return color_map_;
 }
 

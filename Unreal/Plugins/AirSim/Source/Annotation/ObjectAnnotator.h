@@ -13,7 +13,7 @@ public:
 	FColor GetColorFromColorMap(int32 ObjectIndex);
 	int GetIndexForColor(FColor color);
 	int GetGammaCorrectedColor(int color_index);
-	static TArray<FColor> GetColorMap();
+	TArray<FColor> GetColorMap();
 
 private:
 	int32 GetChannelValue(uint32 Index);
