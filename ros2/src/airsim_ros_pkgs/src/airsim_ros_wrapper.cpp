@@ -211,8 +211,6 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
             std::vector<ImageRequest> current_image_request_vec;
             current_image_request_vec.clear();
 
-            camera_name_external_enabled_map_[curr_camera_name] = camera_setting.external;
-
             // iterate over capture_setting std::map<int, CaptureSetting> capture_settings
             for (const auto& curr_capture_elem : camera_setting.capture_settings) {
                 auto& capture_setting = curr_capture_elem.second;                
@@ -1254,7 +1252,9 @@ void AirsimROSWrapper::append_static_lidar_tf(VehicleROS* vehicle_ros, const std
     else
         lidar_tf_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
     lidar_tf_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + lidar_name;
-    lidar_tf_msg.transform = get_transform_msg_from_airsim(lidar_setting.relative_pose.position, lidar_setting.relative_pose.orientation);
+    auto lidar_data  = airsim_client_lidar_.getLidarData(lidar_name, vehicle_ros->vehicle_name_);
+
+    lidar_tf_msg.transform = get_transform_msg_from_airsim(lidar_data.pose.position, lidar_data.pose.orientation);
 
     convert_tf_msg_to_ros(lidar_tf_msg);
 
@@ -1269,12 +1269,17 @@ void AirsimROSWrapper::append_static_camera_tf(VehicleROS* vehicle_ros, const st
     else
         static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
     static_cam_tf_body_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + camera_name + "_body";
-    static_cam_tf_body_msg.transform = get_transform_msg_from_airsim(camera_setting.position, camera_setting.rotation);
+
+    auto camera_info_data = airsim_client_images_.simGetCameraInfo(camera_name, vehicle_ros->vehicle_name_);
+    static_cam_tf_body_msg.transform = get_transform_msg_from_airsim(camera_info_data.pose.position, camera_info_data.pose.orientation);
 
     convert_tf_msg_to_ros(static_cam_tf_body_msg);
 
     geometry_msgs::msg::TransformStamped static_cam_tf_optical_msg = static_cam_tf_body_msg;
-    static_cam_tf_optical_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+    if(camera_setting.external)
+        static_cam_tf_body_msg.header.frame_id = world_frame_id_;
+    else
+        static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
     static_cam_tf_optical_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + camera_name + "_optical";
     static_cam_tf_optical_msg.transform = get_camera_optical_tf_from_body_tf(static_cam_tf_body_msg.transform);
 
@@ -1385,15 +1390,7 @@ void AirsimROSWrapper::process_and_publish_img_response(const std::vector<ImageR
     int img_response_idx_internal = img_response_idx;
 
     for (const auto& curr_img_response : img_response_vec) {
-        // todo publishing a tf for each capture type seems stupid. but it foolproofs us against render thread's async stuff, I hope.
-        // Ideally, we should loop over cameras and then captures, and publish only one tf.
-        std::string main_frame_id;
-        if(camera_name_external_enabled_map_.at(curr_img_response.camera_name)){
-            main_frame_id = world_frame_id_;
-        }else{
-            main_frame_id = vehicle_name;
-        }
-
+   
         // todo simGetCameraInfo is wrong + also it's only for image type -1.
         // msr::airlib::CameraInfo camera_info = airsim_client_.simGetCameraInfo(curr_img_response.camera_name);
 
