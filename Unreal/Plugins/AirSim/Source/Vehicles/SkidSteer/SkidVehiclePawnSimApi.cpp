@@ -165,7 +165,7 @@ void SkidVehiclePawnSimApi::resetImplementation()
 //physics tick
 void SkidVehiclePawnSimApi::update(float delta)
 {
-	vehicle_api_->update(delta);
+	pawn_api_->update(delta);
 
 	PawnSimApi::update(delta);
 }

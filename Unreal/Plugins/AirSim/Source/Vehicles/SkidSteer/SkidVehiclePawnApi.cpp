@@ -123,8 +123,9 @@ void SkidVehiclePawnApi::reset()
 			//phys_comp->SetSimulatePhysics(false);
 		}
 		movement_->ResetMoveState();
-		movement_->SetActive(false);
-		movement_->SetActive(true, true);
+        movement_->SetActive(false);
+        movement_->SetActive(true, true);
+        vehicle_api_->setCarControls(msr::airlib::CarApiBase::CarControls());
 		updateMovement(msr::airlib::CarApiBase::CarControls());
 
 		//auto pv = movement_->PVehicle;
