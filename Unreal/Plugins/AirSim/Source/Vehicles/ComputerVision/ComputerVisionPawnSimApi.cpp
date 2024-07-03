@@ -69,13 +69,13 @@ void ComputerVisionPawnSimApi::resetImplementation()
 {
     PawnSimApi::resetImplementation();
 
-    vehicle_api_->reset();
+    pawn_api_->reset();
 }
 
 //physics tick
 void ComputerVisionPawnSimApi::update(float delta)
 {
-    vehicle_api_->update(delta);
+    pawn_api_->update(delta);
 
     PawnSimApi::update(delta);
 }
