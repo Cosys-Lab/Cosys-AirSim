@@ -38,7 +38,6 @@ IgnoreMarked                 | Remove objects with the Unreal Tag _MarkedIgnore_
 GroundTruth                  | Generate ground truth labeling color values
 InstanceSegmentation         | Enable to set the generated ground truth to the instance segmentation labeling. Set to false to choose a different annotation label
 Annotation                   | If GroundTruth is enabled and InstanceSegmentation is disabled, you can set this value to the name of the annotation you want to use. This will be used for the ground truth color labels.
-GroundTruth                  | Generate ground truth segmentation color values
 DrawSensor                   | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
 External                     | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.
 ExternalLocal                | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
