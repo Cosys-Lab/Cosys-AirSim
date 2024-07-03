@@ -50,11 +50,11 @@
       <arg name="sensor_camera_toggle_segmentation" default="[1, 1]"/>
       <arg name="sensor_camera_toggle_depth" default="[1, 1]"/>
       <arg name="sensor_camera_toggle_annotation" default="[1, 1]"/>
-      <arg name="sensor_camera_annotation_layers" default="[TextureTest, GreyscaleTest]"/>
+      <arg name="sensor_camera_annotation_layers" default="[TextureTestDirect, GreyscaleTest]"/>
       <arg name="sensor_camera_scene_topics" default="[airsim/frontcamera/rgb/image, airsim/backcamera/rgb/image]"/>
       <arg name="sensor_camera_segmentation_topics" default="[airsim/frontcamera/segmentation/image, airsim/backcamera/segmentation/image]"/>
       <arg name="sensor_camera_depth_topics" default="[airsim/frontcamera/depth/image, airsim/backcamera/depth/image]"/>
-      <arg name="sensor_camera_annotation_topics" default="[airsim/frontcamera/annotation/TextureTest/image, airsim/backcamera/annotation/GreyscaleTest/image]"/>
+      <arg name="sensor_camera_annotation_topics" default="[airsim/frontcamera/annotation/TextureTestDirect/image, airsim/backcamera/annotation/GreyscaleTest/image]"/>
       <arg name="sensor_camera_frames" default="[base_frontcamera, base_backcamera]"/>
       <arg name="sensor_camera_optical_frames" default="[frontcamera_optical_link, backcamera_optical_link]"/>
       <arg name="sensor_camera_toggle_camera_info" default="[1, 1]"/>

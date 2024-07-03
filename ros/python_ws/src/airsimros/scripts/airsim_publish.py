@@ -1313,7 +1313,7 @@ if __name__ == '__main__':
         sensor_camera_toggle_depth = rospy.get_param('~sensor_camera_toggle_depth', 1)
         sensor_camera_toggle_annotation = rospy.get_param('~sensor_camera_toggle_annotation', 0)
         sensor_camera_annotation_layers = rospy.get_param('~sensor_camera_annotation_layers',
-                                                          ["TextureTest", "GreyscaleTest"])
+                                                          ["TextureTestDirect", "GreyscaleTest"])
         sensor_camera_scene_topics = rospy.get_param('~sensor_camera_scene_topics',
                                                      ["airsim/leftcamera/rgb/image", "airsim/rightcamera/rgb/image"])
         sensor_camera_segmentation_topics = rospy.get_param('~sensor_camera_segmentation_topics',
@@ -1323,7 +1323,7 @@ if __name__ == '__main__':
                                                      ["airsim/leftcamera/depth/image",
                                                       "airsim/rightcamera/depth/image"])
         sensor_camera_annotation_topics = rospy.get_param('~sensor_camera_annotation_topics',
-                                                          ["airsim/frontcamera/annotation/TextureTest/image",
+                                                          ["airsim/frontcamera/annotation/TextureTestDirect/image",
                                                            "airsim/backcamera/annotation/GreyscaleTest/image"])
         sensor_camera_frames = rospy.get_param('~sensor_camera_frames', ["base_leftcamera", "base_rightcamera"])
         sensor_camera_optical_frames = rospy.get_param('~sensor_camera_optical_frames',
