@@ -36,7 +36,7 @@
       <arg name="sensor_imu_topic" default="airsim/imu"/>
       <arg name="sensor_imu_frame" default="base_imu"/>
 
-      <arg name="sensor_echo_names" default="[]"/>
+      <arg name="sensor_echo_names" default="[echo]"/>
       <arg name="sensor_echo_topics" default="[airsim/echo/active/pointcloud]"/>
       <arg name="sensor_echo_segmentation_topics" default="[airsim/echo/active/segmentation]"/>
       <arg name="sensor_echo_frames" default="[base_echo]"/>
@@ -50,23 +50,23 @@
       <arg name="sensor_lidar_segmentation_topics" default="[airsim/lidar/segmentation]"/>
       <arg name="sensor_lidar_frames" default="[base_lidar]"/>
 
-      <arg name="sensor_gpulidar_names" default="[]"/>
+      <arg name="sensor_gpulidar_names" default="[gpulidar]"/>
       <arg name="sensor_gpulidar_topics" default="[airsim/gpulidar/pointcloud]"/>
       <arg name="sensor_gpulidar_frames" default="[base_gpulidar]"/>
 
-      <arg name="sensor_uwb_names" default="[]"/>
+      <arg name="sensor_uwb_names" default="[uwb]"/>
       <arg name="sensor_uwb_topic" default="airsim/uwb/ranges"/>
       <arg name="sensor_uwb_frames" default="[base_uwb]"/>
 
-      <arg name="sensor_wifi_names" default="[]"/>
+      <arg name="sensor_wifi_names" default="[wifi]"/>
       <arg name="sensor_wifi_topic" default="airsim/wifi/ranges"/>
       <arg name="sensor_wifi_frames" default="[base_wifi]"/>
 
       <arg name="sensor_camera_names" default="[frontcamera, backcamera]"/>
       <arg name="sensor_camera_toggle_scene_mono" default="[0, 0]"/>
       <arg name="sensor_camera_scene_quality" default="[0, 0]"/>
-      <arg name="sensor_camera_toggle_segmentation" default="[0, 0]"/>
-      <arg name="sensor_camera_toggle_depth" default="[0, 0]"/>
+      <arg name="sensor_camera_toggle_segmentation" default="[1, 1]"/>
+      <arg name="sensor_camera_toggle_depth" default="[1, 1]"/>
       <arg name="sensor_camera_toggle_annotation" default="[1, 1]"/>
       <arg name="sensor_camera_annotation_layers" default="[TextureTest, GreyscaleTest]"/>
       <arg name="sensor_camera_scene_topics" default="[airsim/frontcamera/rgb/image, airsim/backcamera/rgb/image]"/>
