@@ -50,7 +50,6 @@ namespace airlib
         };
 
         bool draw_debug_points = false;
-        std::string data_frame = AirSimSettings::kSensorLocalFrame;
 
         bool external_controller = true;
 
@@ -66,7 +65,6 @@ namespace airlib
             range = settings_json.getFloat("Range", range);
             measurement_per_cycle = settings_json.getInt("MeasurementsPerCycle", measurement_per_cycle);
             horizontal_rotation_frequency = settings_json.getInt("RotationsPerSecond", horizontal_rotation_frequency);
-            data_frame = settings_json.getString("DataFrame", data_frame);
             external_controller = settings_json.getBool("ExternalController", external_controller);
 		    update_frequency = settings_json.getFloat("UpdateFrequency", update_frequency);
             vertical_FOV_upper = settings_json.getFloat("VerticalFOVUpper", Utils::nan<float>());
