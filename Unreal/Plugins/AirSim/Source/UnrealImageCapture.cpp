@@ -35,11 +35,20 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
     std::vector<std::shared_ptr<RenderRequest::RenderParams>> render_params;
     std::vector<std::shared_ptr<RenderRequest::RenderResult>> render_results;
 
+    
+
     bool visibilityChanged = false;
     for (unsigned int i = 0; i < requests.size(); ++i) {
         APIPCamera* camera = cameras_->at(requests.at(i).camera_name);
         //TODO: may be we should have these methods non-const?
-        visibilityChanged = const_cast<UnrealImageCapture*>(this)->updateCameraVisibility(camera, requests[i]) || visibilityChanged;
+        if (requests[i].image_type == ImageType::Annotation) {
+            if (camera->GetAnnotationNameExist(requests[i].annotation_name)){
+                visibilityChanged = const_cast<UnrealImageCapture*>(this)->updateCameraVisibility(camera, requests[i]) || visibilityChanged;
+			}
+        }
+        else {
+            visibilityChanged = const_cast<UnrealImageCapture*>(this)->updateCameraVisibility(camera, requests[i]) || visibilityChanged;
+        }
     }
 
     if (use_safe_method && visibilityChanged) {
@@ -50,24 +59,45 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
 
     UGameViewportClient* gameViewport = nullptr;
     for (unsigned int i = 0; i < requests.size(); ++i) {
+
         APIPCamera* camera = cameras_->at(requests.at(i).camera_name);
+
         if (gameViewport == nullptr) {
             gameViewport = camera->GetWorld()->GetGameViewport();
         }
 
         responses.push_back(ImageResponse());
-        ImageResponse& response = responses.at(i);
-
+        ImageResponse& response = responses.at(i);          
         UTextureRenderTarget2D* textureTarget = nullptr;
-        USceneCaptureComponent2D* capture = camera->getCaptureComponent(requests[i].image_type, false, requests[i].annotation_name);
-        if (capture == nullptr) {
-            response.message = "Can't take screenshot because none camera type is not active";
+        USceneCaptureComponent2D* capture = nullptr;
+        if (requests[i].image_type == ImageType::Annotation) {
+            if (camera->GetAnnotationNameExist(requests[i].annotation_name)) {
+                capture = camera->getCaptureComponent(requests[i].image_type, false, requests[i].annotation_name);
+                if (capture == nullptr) {
+                    response.message = "Can't take screenshot because none camera type is not active";
+                }
+                else if (capture->TextureTarget == nullptr) {
+                    response.message = "Can't take screenshot because texture target is null";
+                }
+                else
+                    textureTarget = capture->TextureTarget;
+            }
+            else {
+                response.message = "Can't take screenshot because none annotation name does not exist for this camera";
+            }
         }
-        else if (capture->TextureTarget == nullptr) {
-            response.message = "Can't take screenshot because texture target is null";
+        else {
+            capture = camera->getCaptureComponent(requests[i].image_type, false, requests[i].annotation_name);
+            if (capture == nullptr) {
+                response.message = "Can't take screenshot because none camera type is not active";
+            }
+            else if (capture->TextureTarget == nullptr) {
+                response.message = "Can't take screenshot because texture target is null";
+            }
+            else
+                textureTarget = capture->TextureTarget;
         }
-        else
-            textureTarget = capture->TextureTarget;
+        
         bool disable_gamma = false;
         if (requests[i].image_type == ImageCaptureBase::ImageType::Segmentation || requests[i].image_type == ImageCaptureBase::ImageType::Annotation)disable_gamma = true;
         render_params.push_back(std::make_shared<RenderRequest::RenderParams>(capture, textureTarget, requests[i].pixels_as_float, requests[i].compress, disable_gamma));
