@@ -13,7 +13,7 @@ def generate_launch_description():
 
     output = DeclareLaunchArgument(
         "output",
-        default_value='log')
+        default_value='screen')
 
     publish_clock = DeclareLaunchArgument(
         "publish_clock",
@@ -30,21 +30,25 @@ def generate_launch_description():
     host_port = DeclareLaunchArgument(
         "host_port",
         default_value='41451')
+    
+    enable_api_control = DeclareLaunchArgument(
+        "enable_api_control",
+        default_value='False')
   
     airsim_node = Node(
             package='airsim_ros_pkgs',
             executable='airsim_node',
             name='airsim_node',
-            output='screen',
+            output=LaunchConfiguration('output'),
             parameters=[{
-                'is_vulkan': True,
+                'is_vulkan': LaunchConfiguration('is_vulkan'),
                 'update_airsim_img_response_every_n_sec': 0.05,
                 'update_airsim_control_every_n_sec': 0.01,
                 'update_lidar_every_n_sec': 0.01,
                 'publish_clock': LaunchConfiguration('publish_clock'),
                 'host_ip': LaunchConfiguration('host_ip'),
                 'host_port': LaunchConfiguration('host_port'),
-                'enable_api_control': False
+                'enable_api_control': LaunchConfiguration('enable_api_control')
             }])
 
     # Create the launch description and populate
@@ -56,6 +60,7 @@ def generate_launch_description():
     ld.add_action(is_vulkan)
     ld.add_action(host_ip)
     ld.add_action(host_port)
+    ld.add_action(enable_api_control)
     ld.add_action(airsim_node)
 
     return ld
