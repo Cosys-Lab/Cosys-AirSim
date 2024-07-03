@@ -283,6 +283,8 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 			label = TCHAR_TO_UTF8(*hitActor->GetName());
 		}
 
+		raw_point = impact_point;
+
 		//if (label.empty())
 		//{
 		//	UE_LOG(LogTemp, Warning, TEXT("Empty label!"));
@@ -295,8 +297,6 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 			Vector3r impact_point_local = VectorMath::rotateVector(VectorMath::front(), ray_q_w, true) * ((hit_result.Distance / 100) + distance_noise) + start;
 			impact_point = ned_transform_->fromLocalNed(impact_point_local);
 		}
-
-		raw_point = impact_point;
 
 		// decide the frame for the point-cloud
 		if (params.data_frame == AirSimSettings::kVehicleInertialFrame) {
