@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <package format="3">
   <name>airsim_ros_pkgs</name>
-  <version>0.0.1</version>
-  <description>ROS Wrapper over AirSim's C++ client library</description>
+  <version>3.0.0</version>
+  <description>ROS Wrapper over Cosys-AirSim's C++ client library</description>
 
-  <maintainer email="ratneshmadaan@gmail.com">Ratnesh Madaan</maintainer>
+  <maintainer email="wouter.jansen@uantwerpen.be">Wouter Jansen</maintainer>
 
   <license>MIT</license>
 
