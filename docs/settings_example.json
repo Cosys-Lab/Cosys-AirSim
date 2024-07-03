@@ -56,7 +56,7 @@
         "Z": 0
     },
     "CameraDirector": {
-        "FollowDistance": -3
+        "FollowDistance": -5
     },
     "Recording": {
         "RecordOnMove": false,
