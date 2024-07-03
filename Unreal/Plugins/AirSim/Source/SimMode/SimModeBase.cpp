@@ -772,11 +772,11 @@ std::vector<std::string> ASimModeBase::GetAllInstanceSegmentationMeshIDs() {
     return instance_segmentation_annotator_.GetAllComponentNames();
 }
 
-TArray<msr::airlib::Vector3r> ASimModeBase::GetInstanceSegmentationColorMap() {
+std::vector<msr::airlib::Vector3r> ASimModeBase::GetInstanceSegmentationColorMap() {
     TArray<FColor> color_map = instance_segmentation_annotator_.GetColorMap();
-    TArray<msr::airlib::Vector3r> color_map_vector;
+    std::vector<msr::airlib::Vector3r> color_map_vector;
     for (FColor color : color_map) {
-        color_map_vector.Add(msr::airlib::Vector3r(color.R, color.G, color.B));
+        color_map_vector.push_back(msr::airlib::Vector3r(color.R, color.G, color.B));
     }
     return color_map_vector;
 }
