@@ -278,7 +278,7 @@
                     "Yaw": 0,
                     "DrawSensor": false,
                     "External": false,
-                    "ExternalLocal": false
+                    "ExternalLocal": true
                 },
                 "backcamera": {
                     "X": -0.25,
@@ -289,7 +289,7 @@
                     "Yaw": 180,
                     "DrawSensor": false,
                     "External": false,
-                    "ExternalLocal": false
+                    "ExternalLocal": true
                 }
             },
             "Sensors": {
@@ -347,7 +347,7 @@
                     "SensorType": 6,
                     "Enabled": true,
                     "External": false,
-                    "ExternalLocal": false,
+                    "ExternalLocal": true,
                     "NumberOfChannels": 32,
                     "Range": 120,
                     "RotationsPerSecond": 10,
@@ -372,7 +372,7 @@
                     "SensorType": 7,
                     "Enabled": true,
                     "External": false,
-                    "ExternalLocal": false,
+                    "ExternalLocal": true,
                     "RunParallel": true,
                     "X": 0,
                     "Y": 0,
