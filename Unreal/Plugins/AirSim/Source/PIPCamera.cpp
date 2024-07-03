@@ -361,6 +361,14 @@ bool APIPCamera::getCameraTypeEnabled(ImageType type, std::string annotation_nam
     }    
 }
 
+bool APIPCamera::GetAnnotationNameExist(std::string annotation_name)
+{
+    if (annotator_name_to_index_map_.Contains(FString(annotation_name.c_str())))
+        return true;
+    else
+        return false;
+}
+
 void APIPCamera::setCameraTypeEnabled(ImageType type, bool enabled, std::string annotation_name)
 {
     enableCaptureComponent(type, enabled, annotation_name);
