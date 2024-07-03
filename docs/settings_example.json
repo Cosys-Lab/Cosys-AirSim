@@ -365,7 +365,6 @@
                     "HorizontalFOVEnd": 360,
                     "DrawDebugPoints": false,
                     "IgnoreMarked": true,
-                    "GroundTruth": true,
                     "GenerateNoise": true,
                     "DrawSensor": false
                 },
