@@ -43,7 +43,7 @@ def generate_launch_description():
                 'update_lidar_every_n_sec': 0.01,
                 'publish_clock': LaunchConfiguration('publish_clock'),
                 'host_ip': LaunchConfiguration('host_ip'),
-                'host_port': 41451,
+                'host_port': LaunchConfiguration('host_port'),
                 'enable_api_control': False
             }])
 
