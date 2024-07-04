@@ -99,7 +99,7 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 	if (point_cloud.size() == 0 && sensor_params_.parallel)
 	{
 		point_cloud.assign(sample_direction_points_.size() * 6, 0);
-		groundtruth.assign(sample_direction_points_.size(), "");
+		groundtruth.assign(sample_direction_points_.size(), "label_not_set");
 	}
 
 	if (sensor_params_.active) {
@@ -162,6 +162,17 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 					draw_time_, line_thickness_, sensor_params_.draw_reflected_paths, sensor_params_.draw_bounce_lines, sensor_params_.draw_initial_points, sensor_params_.draw_reflected_points, sensor_params_.draw_reflected_lines);
 			}
 		}
+	}
+
+	if(sensor_params_.parallel){
+		for (int i = groundtruth.size() - 1; i >= 0; --i) {
+			if (groundtruth[i] == "label_not_set") {
+				groundtruth.erase(groundtruth.begin() + i);
+				if (i * 6 < point_cloud.size()) {
+					point_cloud.erase(point_cloud.begin() + i * 6, point_cloud.begin() + i * 6 + 6);
+				}
+			}
+  	    }
 	}
 
 	if (sensor_params_.passive) {
