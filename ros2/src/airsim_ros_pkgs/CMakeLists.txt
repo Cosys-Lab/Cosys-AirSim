@@ -22,6 +22,8 @@ find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_default_runtime REQUIRED)
 find_package(airsim_interfaces REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(pcl_conversions REQUIRED)
+find_package(PCL REQUIRED)
 
 set(AIRSIM_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../)
 
@@ -80,6 +82,8 @@ ament_target_dependencies(airsim_ros
   tf2_geometry_msgs
   tf2_sensor_msgs
   tf2
+  pcl_conversions
+  PCL
 )
 
 add_executable(airsim_node src/airsim_node.cpp)
@@ -140,6 +144,8 @@ ament_export_dependencies(ament_cmake)
 ament_export_dependencies(std_msgs)
 ament_export_dependencies(rosidl_default_runtime)
 ament_export_dependencies(airsim_interfaces)
+ament_export_dependencies(pcl_conversions)
+ament_export_dependencies(PCL)
 
 ament_export_include_directories(${INCLUDE_DIRS})
 ament_export_libraries(airsim_settings_parser pd_position_controller_simple
