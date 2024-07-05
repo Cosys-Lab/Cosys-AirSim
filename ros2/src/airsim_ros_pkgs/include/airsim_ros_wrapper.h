@@ -10,6 +10,8 @@ STRICT_MODE_OFF //todo what does this do?
 #include "common/AirSimSettings.hpp"
 #include "common/common_utils/FileSystem.hpp"
 #include "sensors/lidar/LidarSimpleParams.hpp"
+#include "sensors/lidar/GPULidarSimpleParams.hpp"
+#include "sensors/echo/EchoSimpleParams.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensors/imu/ImuBase.hpp"
 #include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
@@ -29,6 +31,7 @@ STRICT_MODE_OFF //todo what does this do?
 #include <airsim_interfaces/msg/car_controls.hpp>
 #include <airsim_interfaces/msg/car_state.hpp>
 #include <airsim_interfaces/msg/computer_vision_state.hpp>
+#include <airsim_interfaces/msg/string_array.hpp>
 #include <airsim_interfaces/msg/environment.hpp>
 #include <chrono>
 #include <cv_bridge/cv_bridge.h>
@@ -51,6 +54,10 @@ STRICT_MODE_OFF //todo what does this do?
 #include <airsim_interfaces/msg/altimeter.hpp> //hector_uav_msgs defunct?
 #include <sensor_msgs/msg/magnetic_field.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <pcl/io/pcd_io.h>
 #include <sensor_msgs/msg/range.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <std_srvs/srv/empty.hpp>
@@ -65,7 +72,33 @@ STRICT_MODE_OFF //todo what does this do?
 #include <unordered_map>
 #include <memory>
 
-    struct SimpleMatrix
+struct PointXYZRGBI
+{
+    PCL_ADD_POINT4D;
+    float intensity;
+    union
+    {
+        struct
+        {
+            uint8_t b;
+            uint8_t g;
+            uint8_t r;
+        };
+        float rgb;
+    };
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;   
+
+// Register the point type
+POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZRGBI,
+                                  (float, x, x)
+                                  (float, y, y)
+                                  (float, z, z)
+                                  (float, rgb, rgb)
+                                  (float, intensity, intensity)
+)
+
+struct SimpleMatrix
 {
     int rows;
     int cols;
@@ -109,6 +142,8 @@ class AirsimROSWrapper
     using CameraSetting = msr::airlib::AirSimSettings::CameraSetting;
     using CaptureSetting = msr::airlib::AirSimSettings::CaptureSetting;
     using LidarSetting = msr::airlib::AirSimSettings::LidarSetting;
+    using GPULidarSetting = msr::airlib::AirSimSettings::GPULidarSetting;
+    using EchoSetting = msr::airlib::AirSimSettings::EchoSetting;
     using VehicleSetting = msr::airlib::AirSimSettings::VehicleSetting;
     using ImageRequest = msr::airlib::ImageCaptureBase::ImageRequest;
     using ImageResponse = msr::airlib::ImageCaptureBase::ImageResponse;
@@ -122,7 +157,7 @@ public:
         COMPUTERVISION
     };
 
-    AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, uint16_t host_port);
+    AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::shared_ptr<rclcpp::Node> nh_gpulidar, const std::shared_ptr<rclcpp::Node> nh_echo, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, uint16_t host_port);
     ~AirsimROSWrapper(){};
 
     void initialize_airsim();
@@ -130,6 +165,8 @@ public:
 
     bool is_used_lidar_timer_cb_queue_;
     bool is_used_img_timer_cb_queue_;
+    bool is_used_gpulidar_timer_cb_queue_;
+    bool is_used_echo_timer_cb_queue_;
 
 private:
     // utility struct for a SINGLE robot
@@ -151,6 +188,12 @@ private:
         std::vector<SensorPublisher<sensor_msgs::msg::MagneticField>> magnetometer_pubs_;
         std::vector<SensorPublisher<sensor_msgs::msg::Range>> distance_pubs_;
         std::vector<SensorPublisher<sensor_msgs::msg::PointCloud2>> lidar_pubs_;
+        std::vector<SensorPublisher<airsim_interfaces::msg::StringArray>> lidar_labels_pubs_;
+        std::vector<SensorPublisher<sensor_msgs::msg::PointCloud2>> gpulidar_pubs_;
+        std::vector<SensorPublisher<sensor_msgs::msg::PointCloud2>> echo_active_pubs_;
+        std::vector<SensorPublisher<airsim_interfaces::msg::StringArray>> echo_active_labels_pubs_;
+        std::vector<SensorPublisher<sensor_msgs::msg::PointCloud2>> echo_passive_pubs_;
+        std::vector<SensorPublisher<airsim_interfaces::msg::StringArray>> echo_passive_labels_pubs_;
 
         // handle lidar seperately for max performance as data is collected on its own thread/callback
 
@@ -206,6 +249,8 @@ private:
     void img_response_timer_cb(); // update images from airsim_client_ every nth sec
     void drone_state_timer_cb(); // update drone state from airsim_client_ every nth sec
     void lidar_timer_cb();
+    void gpulidar_timer_cb();
+    void echo_timer_cb();
 
     /// ROS subscriber callbacks
     void vel_cmd_world_frame_cb(const airsim_interfaces::msg::VelCmd::SharedPtr msg, const std::string& vehicle_name);
@@ -256,10 +301,14 @@ private:
     void convert_tf_msg_to_ros(geometry_msgs::msg::TransformStamped& tf_msg);
     void append_static_camera_tf(VehicleROS* vehicle_ros, const std::string& camera_name, const CameraSetting& camera_setting);
     void append_static_lidar_tf(VehicleROS* vehicle_ros, const std::string& lidar_name, const msr::airlib::LidarSimpleParams& lidar_setting);
+    void append_static_gpulidar_tf(VehicleROS* vehicle_ros, const std::string& gpulidar_name, const msr::airlib::GPULidarSimpleParams& gpulidar_setting);
+    void append_static_echo_tf(VehicleROS* vehicle_ros, const std::string& echo_name, const msr::airlib::EchoSimpleParams& echo_setting);
     void append_static_vehicle_tf(VehicleROS* vehicle_ros, const VehicleSetting& vehicle_setting);
     void set_nans_to_zeros_in_pose(VehicleSetting& vehicle_setting) const;
     void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, CameraSetting& camera_setting) const;
     void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, LidarSetting& lidar_setting) const;
+    void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, GPULidarSetting& gpulidar_setting) const;
+    void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, EchoSetting& echo_setting) const;
     geometry_msgs::msg::Transform get_camera_optical_tf_from_body_tf(const geometry_msgs::msg::Transform& body_tf) const;
 
     /// utils. todo parse into an Airlib<->ROS conversion class
@@ -279,6 +328,12 @@ private:
     airsim_interfaces::msg::Altimeter get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const;
     sensor_msgs::msg::Range get_range_from_airsim(const msr::airlib::DistanceSensorData& dist_data) const;
     sensor_msgs::msg::PointCloud2 get_lidar_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
+    airsim_interfaces::msg::StringArray get_lidar_labels_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
+    sensor_msgs::msg::PointCloud2 get_gpulidar_msg_from_airsim(const msr::airlib::GPULidarData& gpulidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
+    sensor_msgs::msg::PointCloud2 get_active_echo_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const;   
+    airsim_interfaces::msg::StringArray get_active_echo_labels_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const;
+    sensor_msgs::msg::PointCloud2 get_passive_echo_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const;
+    airsim_interfaces::msg::StringArray get_passive_echo_labels_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const;   
     sensor_msgs::msg::NavSatFix get_gps_msg_from_airsim(const msr::airlib::GpsBase::Output& gps_data) const;
     sensor_msgs::msg::MagneticField get_mag_msg_from_airsim(const msr::airlib::MagnetometerBase::Output& mag_data) const;
     airsim_interfaces::msg::Environment get_environment_msg_from_airsim(const msr::airlib::Environment::State& env_data) const;
@@ -329,10 +384,14 @@ private:
     // seperate busy connections to airsim, update in their own thread
     msr::airlib::RpcLibClientBase airsim_client_images_;
     msr::airlib::RpcLibClientBase airsim_client_lidar_;
+    msr::airlib::RpcLibClientBase airsim_client_gpulidar_;
+    msr::airlib::RpcLibClientBase airsim_client_echo_;
 
     std::shared_ptr<rclcpp::Node> nh_;
     std::shared_ptr<rclcpp::Node> nh_img_;
     std::shared_ptr<rclcpp::Node> nh_lidar_;
+    std::shared_ptr<rclcpp::Node> nh_gpulidar_;
+    std::shared_ptr<rclcpp::Node> nh_echo_;
     std::shared_ptr<rclcpp::CallbackGroup> cb_;
 
     // todo not sure if async spinners shuold be inside this class, or should be instantiated in airsim_node.cpp, and cb queues should be public
@@ -359,11 +418,16 @@ private:
     rclcpp::TimerBase::SharedPtr airsim_img_response_timer_;
     rclcpp::TimerBase::SharedPtr airsim_control_update_timer_;
     rclcpp::TimerBase::SharedPtr airsim_lidar_update_timer_;
+    rclcpp::TimerBase::SharedPtr airsim_gpulidar_update_timer_;
+    rclcpp::TimerBase::SharedPtr airsim_echo_update_timer_;
 
     typedef std::pair<std::vector<ImageRequest>, std::string> airsim_img_request_vehicle_name_pair;
     std::vector<airsim_img_request_vehicle_name_pair> airsim_img_request_vehicle_name_pair_vec_;
     std::vector<image_transport::Publisher> image_pub_vec_;
     std::vector<rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr> cam_info_pub_vec_;
+
+    std::unordered_map<std::string, bool> sensor_name_to_passive_enable_map_;
+    std::unordered_map<std::string, bool> sensor_name_to_active_enable_map_;
 
     std::vector<sensor_msgs::msg::CameraInfo> camera_info_msg_vec_;
 
