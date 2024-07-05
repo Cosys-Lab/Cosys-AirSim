@@ -100,6 +100,28 @@ void AirsimROSWrapper::initialize_airsim()
         origin_geo_point_ = get_origin_geo_point();
         // todo there's only one global origin geopoint for environment. but airsim API accept a parameter vehicle_name? inside carsimpawnapi.cpp, there's a geopoint being assigned in the constructor. by?
         origin_geo_point_msg_ = get_gps_msg_from_airsim_geo_point(origin_geo_point_);
+        
+        auto& vehicle_ros = vehicle_name_ptr_map_.begin().second;
+
+        airsim_interfaces::msg::InstanceSegmentationList instance_segmentation_list_msg;
+        std::vector<std::string> object_name_list = airsim_client_->simListInstanceSegmentationObjects();
+        std::vector<msr::airlib::Vector3r> color_map = airsim_client_->simGetInstanceSegmentationColorMap();
+        int object_index = 0;
+        std::vector<std::string>::iterator it = object_name_list.begin();
+        for(; it < object_name_list.end(); it++, object_index++ )
+        {
+            airsim_interfaces::msg::InstanceSegmentationLabel instance_segmentation_label_msg;
+            instance_segmentation_label_msg.name = *it;
+            instance_segmentation_label_msg.r = color_map[object_index].x();
+            instance_segmentation_label_msg.g = color_map[object_index].y();
+            instance_segmentation_label_msg.b = color_map[object_index].z();
+            instance_segmentation_label_msg.index = object_index;
+            instance_segmentation_list_msg.labels.push_back(instance_segmentation_label_msg);
+        }
+        instance_segmentation_list_msg.header.stamp = vehicle_ros->stamp_;
+        instance_segmentation_list_msg.header.frame_id = world_frame_id_;
+
+        vehicle_ros->instance_segmentation_pub_->publish(instance_segmentation_list_msg);
     }
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
@@ -177,6 +199,8 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
         vehicle_ros->env_pub_ = nh_->create_publisher<airsim_interfaces::msg::Environment>(topic_prefix + "/environment", 10);
 
         vehicle_ros->global_gps_pub_ = nh_->create_publisher<sensor_msgs::msg::NavSatFix>(topic_prefix + "/global_gps", 10);
+
+        vehicle_ros->instance_segmentation_pub_ = nh_->create_publisher<airsim_interfaces::msg::InstanceSegmentationList>("~/instance_segmentation_labels", 10);
 
         if (airsim_mode_ == AIRSIM_MODE::DRONE) {
             auto drone = static_cast<MultiRotorROS*>(vehicle_ros.get());
@@ -357,7 +381,9 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
         }
 
         vehicle_name_ptr_map_.emplace(curr_vehicle_name, std::move(vehicle_ros)); // allows fast lookup in command callbacks in case of a lot of drones
-    }
+    
+      
+    }   
 
     // add takeoff and land all services if more than 2 drones
     if (vehicle_name_ptr_map_.size() > 1 && airsim_mode_ == AIRSIM_MODE::DRONE) {

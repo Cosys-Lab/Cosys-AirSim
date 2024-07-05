@@ -26,11 +26,14 @@ STRICT_MODE_OFF //todo what does this do?
 #include <airsim_interfaces/srv/reset.hpp>
 #include <airsim_interfaces/srv/takeoff.hpp>
 #include <airsim_interfaces/srv/takeoff_group.hpp>
+#include <airsim_interfaces/srv/refresh_instance_segmentation.hpp>
 #include <airsim_interfaces/msg/vel_cmd.hpp>
 #include <airsim_interfaces/msg/vel_cmd_group.hpp>
 #include <airsim_interfaces/msg/car_controls.hpp>
 #include <airsim_interfaces/msg/car_state.hpp>
 #include <airsim_interfaces/msg/computer_vision_state.hpp>
+#include <airsim_interfaces/msg/instance_segmentation_label.hpp>
+#include <airsim_interfaces/msg/instance_segmentation_list.hpp>
 #include <airsim_interfaces/msg/string_array.hpp>
 #include <airsim_interfaces/msg/environment.hpp>
 #include <chrono>
@@ -180,6 +183,7 @@ private:
         rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_local_pub_;
         rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr global_gps_pub_;
         rclcpp::Publisher<airsim_interfaces::msg::Environment>::SharedPtr env_pub_;
+        rclcpp::Publisher<airsim_interfaces::msg::InstanceSegmentationList>::SharedPtr instance_segmentation_pub_;
         airsim_interfaces::msg::Environment env_msg_;
 
         std::vector<SensorPublisher<airsim_interfaces::msg::Altimeter>> barometer_pubs_;
