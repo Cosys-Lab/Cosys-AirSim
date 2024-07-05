@@ -1212,6 +1212,10 @@ TMap<FString, float> FObjectAnnotator::GetComponentToValueMap() {
 	return name_to_value_map_;
 }
 
+TArray<FColor> FObjectAnnotator::GetColorMap(){
+	return ColorGenerator_.GetColorMap();
+}
+
 
 void FObjectAnnotator::EndPlay() {
 
@@ -1339,6 +1343,10 @@ int FColorGenerator::GetIndexForColor(FColor color) {
 
 int FColorGenerator::GetGammaCorrectedColor(int color_index) {
 	return GammaCorrectionTable_[color_index];
+}
+
+static TArray<FColor> FColorGenerator::GetColorMap(){
+	return color_map_;
 }
 
 int32 FColorGenerator::GammaCorrectionTable_[256] =

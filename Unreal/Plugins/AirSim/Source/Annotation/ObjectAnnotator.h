@@ -13,6 +13,7 @@ public:
 	FColor GetColorFromColorMap(int32 ObjectIndex);
 	int GetIndexForColor(FColor color);
 	int GetGammaCorrectedColor(int color_index);
+	static TArray<FColor> GetColorMap();
 
 private:
 	int32 GetChannelValue(uint32 Index);
@@ -70,6 +71,8 @@ public:
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> GetAnnotationComponents();
 
 	static void SetViewForAnnotationRender(FEngineShowFlags& show_flags);
+
+	TArray<FColor> GetColorMap();
 
 	bool IsDirect();
 	FObjectAnnotator::AnnotatorType GetType();
