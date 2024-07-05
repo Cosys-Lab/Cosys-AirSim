@@ -132,11 +132,11 @@ set +x
 
 echo ""
 echo ""
-echo "=================================================================="
-echo " AirSim plugin is built! Here's how to build Unreal project."
-echo "=================================================================="
+echo "==============================="
+echo " Cosys-AirSim plugin is built!."
+echo "==============================="
 echo ""
-echo "For further info see:"
+echo "For further info see for installation see:"
 echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/docs/install_linux.md"
 echo "=================================================================="
 

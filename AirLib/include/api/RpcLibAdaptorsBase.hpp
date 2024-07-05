@@ -79,6 +79,24 @@ namespace airlib_rpclib
             {
                 return msr::airlib::Vector3r(x_val, y_val, z_val);
             }
+            static std::vector<Vector3r> from(
+                const std::vector<msr::airlib::Vector3r>& vectors
+            ) {
+                std::vector<Vector3r> vector_adaptor;
+                for (const auto& item : vectors)
+                    vector_adaptor.push_back(Vector3r(item));
+
+                return vector_adaptor;
+            }
+            static std::vector<msr::airlib::Vector3r> to(
+                const std::vector<Vector3r>& vector_adaptor
+            ) {
+                std::vector<msr::airlib::Vector3r> vectors;
+                for (const auto& item : vector_adaptor)
+                    vectors.push_back(item.to());
+
+                return vectors;
+            }
         };
 
         struct CollisionInfo

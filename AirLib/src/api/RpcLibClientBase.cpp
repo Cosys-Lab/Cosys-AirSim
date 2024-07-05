@@ -573,6 +573,12 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simListInstanceSegmentationObjects").as<vector<string>>();
         }
 
+        vector<msr::airlib::Vector3r> RpcLibClientBase::simGetInstanceSegmentationColorMap() const
+        {
+            const auto& response_adaptor = pimpl_->client.call("simGetInstanceSegmentationColorMap").as<vector<RpcLibAdaptorsBase::Vector3r>>();
+            return RpcLibAdaptorsBase::Vector3r::to(response_adaptor);
+        }
+
         vector<msr::airlib::Pose> RpcLibClientBase::simListInstanceSegmentationPoses(bool ned, bool only_visible) const
         {
             const auto& response_adaptor = pimpl_->client.call("simListInstanceSegmentationPoses", ned, only_visible).as<vector<RpcLibAdaptorsBase::Pose>>();
