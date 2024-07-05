@@ -28,9 +28,11 @@ const std::unordered_map<int, std::string> AirsimROSWrapper::image_type_int_to_s
 
 };
 
-AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, uint16_t host_port)
+AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::shared_ptr<rclcpp::Node> nh_gpulidar, const std::shared_ptr<rclcpp::Node> nh_echo, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, uint16_t host_port)
     : is_used_lidar_timer_cb_queue_(false)
     , is_used_img_timer_cb_queue_(false)
+    , is_used_gpulidar_timer_cb_queue_(false)
+    , is_used_echo_timer_cb_queue_(false)
     , airsim_settings_parser_(host_ip, host_port)
     , host_ip_(host_ip)
     , host_port_(host_port)
@@ -38,9 +40,13 @@ AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const
     , airsim_client_(nullptr)
     , airsim_client_images_(host_ip, host_port)
     , airsim_client_lidar_(host_ip, host_port)
+    , airsim_client_gpulidar_(host_ip, host_port)
+    , airsim_client_echo_(host_ip, host_port)
     , nh_(nh)
     , nh_img_(nh_img)
     , nh_lidar_(nh_lidar)
+    , nh_gpulidar_(nh_gpulidar)
+    , nh_echo_(nh_echo)
     , cb_(callbackGroup)
     , publish_clock_(false)
 {
@@ -81,6 +87,8 @@ void AirsimROSWrapper::initialize_airsim()
         airsim_client_->confirmConnection();
         airsim_client_images_.confirmConnection();
         airsim_client_lidar_.confirmConnection();
+        airsim_client_gpulidar_.confirmConnection();
+        airsim_client_echo_.confirmConnection();
 
         if(enable_api_control_){
             for (const auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {            
@@ -133,6 +141,8 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
     camera_info_msg_vec_.clear();
     vehicle_name_ptr_map_.clear();
     size_t lidar_cnt = 0;
+    size_t gpulidar_cnt = 0;
+    size_t echo_cnt = 0;
 
     image_transport::ImageTransport image_transporter(nh_);
 
@@ -259,31 +269,31 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
                 switch (sensor_setting->sensor_type) {
                 case SensorBase::SensorType::Barometer: {
                     SensorPublisher<airsim_interfaces::msg::Altimeter> sensor_publisher =
-                        create_sensor_publisher<airsim_interfaces::msg::Altimeter>("Barometer", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/altimeter/" + sensor_name, 10);
+                        create_sensor_publisher<airsim_interfaces::msg::Altimeter>("Barometer sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/altimeter/" + sensor_name, 10);
                     vehicle_ros->barometer_pubs_.emplace_back(sensor_publisher);
                     break;
                 }
                 case SensorBase::SensorType::Imu: {
                     SensorPublisher<sensor_msgs::msg::Imu> sensor_publisher =
-                        create_sensor_publisher<sensor_msgs::msg::Imu>("Imu", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/imu/" + sensor_name, 10);
+                        create_sensor_publisher<sensor_msgs::msg::Imu>("Imu sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/imu/" + sensor_name, 10);
                     vehicle_ros->imu_pubs_.emplace_back(sensor_publisher);
                     break;
                 }
                 case SensorBase::SensorType::Gps: {
                     SensorPublisher<sensor_msgs::msg::NavSatFix> sensor_publisher =
-                        create_sensor_publisher<sensor_msgs::msg::NavSatFix>("Gps", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/gps/" + sensor_name, 10);
+                        create_sensor_publisher<sensor_msgs::msg::NavSatFix>("Gps sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/gps/" + sensor_name, 10);
                     vehicle_ros->gps_pubs_.emplace_back(sensor_publisher);
                     break;
                 }
                 case SensorBase::SensorType::Magnetometer: {
                     SensorPublisher<sensor_msgs::msg::MagneticField> sensor_publisher =
-                        create_sensor_publisher<sensor_msgs::msg::MagneticField>("Magnetometer", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/magnetometer/" + sensor_name, 10);
+                        create_sensor_publisher<sensor_msgs::msg::MagneticField>("Magnetometer sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/magnetometer/" + sensor_name, 10);
                     vehicle_ros->magnetometer_pubs_.emplace_back(sensor_publisher);
                     break;
                 }
                 case SensorBase::SensorType::Distance: {
                     SensorPublisher<sensor_msgs::msg::Range> sensor_publisher =
-                        create_sensor_publisher<sensor_msgs::msg::Range>("Distance", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/distance/" + sensor_name, 10);
+                        create_sensor_publisher<sensor_msgs::msg::Range>("Distance sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/distance/" + sensor_name, 10);
                     vehicle_ros->distance_pubs_.emplace_back(sensor_publisher);
                     break;
                 }
@@ -294,9 +304,49 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
                     append_static_lidar_tf(vehicle_ros.get(), sensor_name, params);
 
                     SensorPublisher<sensor_msgs::msg::PointCloud2> sensor_publisher =
-                        create_sensor_publisher<sensor_msgs::msg::PointCloud2>("Lidar", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/lidar/" + sensor_name, 10);
+                        create_sensor_publisher<sensor_msgs::msg::PointCloud2>("Lidar sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/lidar/points/" + sensor_name, 10);
                     vehicle_ros->lidar_pubs_.emplace_back(sensor_publisher);
+                    SensorPublisher<airsim_interfaces::msg::StringArray> sensor_publisher_labels =
+                        create_sensor_publisher<airsim_interfaces::msg::StringArray>("", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/lidar/labels/" + sensor_name, 10);
+                    vehicle_ros->lidar_labels_pubs_.emplace_back(sensor_publisher_labels);
                     lidar_cnt += 1;
+                    break;
+                }
+                case SensorBase::SensorType::GPULidar: {
+                    auto gpulidar_setting = *static_cast<GPULidarSetting*>(sensor_setting.get());
+                    msr::airlib::GPULidarSimpleParams params;
+                    params.initializeFromSettings(gpulidar_setting);
+                    append_static_gpulidar_tf(vehicle_ros.get(), sensor_name, params);
+
+                    SensorPublisher<sensor_msgs::msg::PointCloud2> sensor_publisher =
+                        create_sensor_publisher<sensor_msgs::msg::PointCloud2>("GPULidar sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/gpulidar/points/" + sensor_name, 10);
+                    vehicle_ros->gpulidar_pubs_.emplace_back(sensor_publisher);
+                    gpulidar_cnt += 1;
+                    break;
+                }
+                case SensorBase::SensorType::Echo: {
+                    auto echo_setting = *static_cast<EchoSetting*>(sensor_setting.get());
+                    msr::airlib::EchoSimpleParams params;
+                    params.initializeFromSettings(echo_setting);
+                    append_static_echo_tf(vehicle_ros.get(), sensor_name, params);
+                    if(params.active){
+                        SensorPublisher<sensor_msgs::msg::PointCloud2> sensor_publisher =
+                            create_sensor_publisher<sensor_msgs::msg::PointCloud2>("Echo (active) sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/echo/active/points/" + sensor_name, 10);
+                        vehicle_ros->echo_active_pubs_.emplace_back(sensor_publisher);
+                        SensorPublisher<airsim_interfaces::msg::StringArray> sensor_publisher_labels =
+                        create_sensor_publisher<airsim_interfaces::msg::StringArray>("", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/echo/active/labels/" + sensor_name, 10);
+                        vehicle_ros->echo_active_labels_pubs_.emplace_back(sensor_publisher_labels);
+
+                    }
+                    if(params.passive){
+                        SensorPublisher<sensor_msgs::msg::PointCloud2> sensor_publisher =
+                            create_sensor_publisher<sensor_msgs::msg::PointCloud2>("Echo (passive) sensor ", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/echo/passive/points/" + sensor_name, 10);
+                        vehicle_ros->echo_passive_pubs_.emplace_back(sensor_publisher);
+                        SensorPublisher<airsim_interfaces::msg::StringArray> sensor_publisher_labels =
+                        create_sensor_publisher<airsim_interfaces::msg::StringArray>("", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/echo/passive/labels/" + sensor_name, 10);
+                        vehicle_ros->echo_passive_labels_pubs_.emplace_back(sensor_publisher_labels);
+                    }                    
+                    echo_cnt += 1;
                     break;
                 }
                 default: {
@@ -340,13 +390,27 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
         is_used_img_timer_cb_queue_ = true;
     }
 
-    // lidars update on their own callback/thread at a given rate
+    // lidar, gpulidar and echo sensors update on their own callbacks/threads at a given rate
     if (lidar_cnt > 0) {
         double update_lidar_every_n_sec;
         nh_->get_parameter("update_lidar_every_n_sec", update_lidar_every_n_sec);
         airsim_lidar_update_timer_ = nh_lidar_->create_wall_timer(std::chrono::duration<double>(update_lidar_every_n_sec), std::bind(&AirsimROSWrapper::lidar_timer_cb, this), cb_);
         is_used_lidar_timer_cb_queue_ = true;
     }
+    if (gpulidar_cnt > 0) {
+        double update_gpulidar_every_n_sec;
+        nh_->get_parameter("update_gpulidar_every_n_sec", update_gpulidar_every_n_sec);
+        airsim_gpulidar_update_timer_ = nh_gpulidar_->create_wall_timer(std::chrono::duration<double>(update_gpulidar_every_n_sec), std::bind(&AirsimROSWrapper::gpulidar_timer_cb, this), cb_);
+        is_used_gpulidar_timer_cb_queue_ = true;
+    }
+
+    if (echo_cnt > 0) {
+        double update_echo_every_n_sec;
+        nh_->get_parameter("update_echo_every_n_sec", update_echo_every_n_sec);
+        airsim_echo_update_timer_ = nh_echo_->create_wall_timer(std::chrono::duration<double>(update_echo_every_n_sec), std::bind(&AirsimROSWrapper::echo_timer_cb, this), cb_);
+        is_used_echo_timer_cb_queue_ = true;
+    }
+
 
     initialize_airsim();
 }
@@ -357,7 +421,9 @@ template <typename T>
 const SensorPublisher<T> AirsimROSWrapper::create_sensor_publisher(const std::string& sensor_type_name, const std::string& sensor_name,
                                                                    SensorBase::SensorType sensor_type, const std::string& topic_name, int QoS)
 {
-    RCLCPP_INFO_STREAM(nh_->get_logger(), sensor_type_name);
+    if(sensor_type_name != "")
+        RCLCPP_INFO_STREAM(nh_->get_logger(), "Publishing " << sensor_type_name << " '" << sensor_name << "'");
+
     SensorPublisher<T> sensor_publisher;
     sensor_publisher.sensor_name = sensor_name;
     sensor_publisher.sensor_type = sensor_type;
@@ -684,11 +750,13 @@ nav_msgs::msg::Odometry AirsimROSWrapper::get_odom_msg_from_multirotor_state(con
     return get_odom_msg_from_kinematic_state(drone_state.kinematics_estimated);
 }
 
-void flipSigns(std::vector<float>& data) {
-    for (size_t i = 1; i < data.size(); i += 3) {
+void fixPointCloud(std::vector<float>& data, int offset, std::vector<int> flip_indexes) {
+    for (size_t i = 1; i < data.size(); i += offset) {
         data[i] = -data[i];
-        if (i + 1 < data.size()) {
-            data[i + 1] = -data[i + 1];
+        for (int flip_index : flip_indexes) {
+            if (i + flip_index < data.size()) {
+                data[i + flip_index] = -data[i + flip_index];
+            }
         }
     }
 }
@@ -725,7 +793,7 @@ sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_lidar_msg_from_airsim(const 
 
         lidar_msg.is_dense = true; // todo
         std::vector<float> data_std = lidar_data.point_cloud;
-        flipSigns(data_std);
+        fixPointCloud(data_std, 3, {1});
 
         const unsigned char* bytes = reinterpret_cast<const unsigned char*>(data_std.data());
         std::vector<unsigned char> lidar_msg_data(bytes, bytes + sizeof(float) * data_std.size());
@@ -736,6 +804,201 @@ sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_lidar_msg_from_airsim(const 
     }
 
     return lidar_msg;
+}
+
+airsim_interfaces::msg::StringArray AirsimROSWrapper::get_lidar_labels_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const
+{
+    airsim_interfaces::msg::StringArray lidar_labels_msg;
+    lidar_labels_msg.header.stamp = rclcpp::Time(lidar_data.time_stamp);
+    lidar_labels_msg.header.frame_id = vehicle_name + "/" + sensor_name;
+
+    if (lidar_data.point_cloud.size() > 3) {
+        lidar_labels_msg.data = std::move(lidar_data.groundtruth);           
+    }
+    else {
+        // msg = []
+    }
+
+    return lidar_labels_msg;
+}
+
+sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_gpulidar_msg_from_airsim(const msr::airlib::GPULidarData& gpulidar_data, const std::string& vehicle_name, const std::string& sensor_name) const
+{
+    sensor_msgs::msg::PointCloud2 gpulidar_msg;    
+    gpulidar_msg.header.stamp = rclcpp::Time(gpulidar_data.time_stamp);
+    gpulidar_msg.header.frame_id = vehicle_name + "/" + sensor_name;
+
+    if (gpulidar_data.point_cloud.size() > 5) {    
+        
+        std::vector<float> data_std = gpulidar_data.point_cloud;
+        fixPointCloud(data_std, 5, {1});
+
+        size_t num_points = data_std.size() / 5;
+        pcl::PointCloud<PointXYZRGBI> cloud;   
+        cloud.points.resize(num_points); 
+        cloud.width = static_cast<uint32_t>(num_points);
+        cloud.height = 1; 
+        cloud.is_dense = true;
+
+        for (size_t i = 0; i < num_points; ++i)
+        {
+            // Extract x, y, z, and rgb values
+            float x = data_std[i * 5 + 0];
+            float y = data_std[i * 5 + 1];
+            float z = data_std[i * 5 + 2];
+            float rgb_packed = data_std[i * 5 + 3];
+            float intensity = data_std[i * 5 + 4];
+            
+            // Unpack the RGB value
+            uint8_t r = ((std::uint32_t)rgb_packed >> 16) & 0x0000ff;
+            uint8_t g = ((std::uint32_t)rgb_packed >> 8) & 0x0000ff;
+            uint8_t b = ((std::uint32_t)rgb_packed) & 0x0000ff;
+
+            // Populate the point
+            PointXYZRGBI point;
+            point.x = x;
+            point.y = y;
+            point.z = z;
+            std::uint32_t rgb = ((std::uint32_t)r << 16 | (std::uint32_t)g << 8 | (std::uint32_t)b);
+            point.rgb = *reinterpret_cast<float*>(&rgb);
+            point.intensity = intensity;
+            cloud.points[i] = point;
+        }
+
+        pcl::toROSMsg(cloud, gpulidar_msg);
+        gpulidar_msg.header.stamp = rclcpp::Time(gpulidar_data.time_stamp);
+        gpulidar_msg.header.frame_id = vehicle_name + "/" + sensor_name;
+    }
+    else {
+        // msg = []
+    }
+
+    return gpulidar_msg;
+}
+
+sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_active_echo_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const
+{
+    sensor_msgs::msg::PointCloud2 echo_msg;
+    echo_msg.header.stamp = rclcpp::Time(echo_data.time_stamp);
+    echo_msg.header.frame_id = vehicle_name + "/" + sensor_name;
+
+    if (echo_data.point_cloud.size() > 6) {
+        echo_msg.height = 1;
+        echo_msg.width = echo_data.point_cloud.size() / 6;
+
+        echo_msg.fields.resize(6);
+        echo_msg.fields[0].name = "x";
+        echo_msg.fields[1].name = "y";
+        echo_msg.fields[2].name = "z";
+        echo_msg.fields[3].name = "a";
+        echo_msg.fields[4].name = "d";
+        echo_msg.fields[5].name = "r";
+
+
+        int offset = 0;
+        for (size_t d = 0; d < echo_msg.fields.size(); ++d, offset += 4) {
+            echo_msg.fields[d].offset = offset;
+            echo_msg.fields[d].datatype = sensor_msgs::msg::PointField::FLOAT32;
+            echo_msg.fields[d].count = 1;
+        }
+
+        echo_msg.is_bigendian = false;
+        echo_msg.point_step = offset;
+        echo_msg.row_step = echo_msg.point_step * echo_msg.width;
+
+        echo_msg.is_dense = true; 
+        std::vector<float> data_std = echo_data.point_cloud;
+        fixPointCloud(data_std, 6, {1});
+
+        const unsigned char* bytes = reinterpret_cast<const unsigned char*>(data_std.data());
+        std::vector<unsigned char> echo_msg_data(bytes, bytes + sizeof(float) * data_std.size());
+        echo_msg.data = std::move(echo_msg_data);   
+    }
+    else {
+        // msg = []
+    }
+
+    return echo_msg;
+}
+
+airsim_interfaces::msg::StringArray AirsimROSWrapper::get_active_echo_labels_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const
+{
+    airsim_interfaces::msg::StringArray echo_active_labels_msg;
+    echo_active_labels_msg.header.stamp = rclcpp::Time(echo_data.time_stamp);
+    echo_active_labels_msg.header.frame_id = vehicle_name + "/" + sensor_name;
+
+    if (echo_data.point_cloud.size() > 6) {
+        echo_active_labels_msg.data = std::move(echo_data.groundtruth);           
+    }
+    else {
+        // msg = []
+    }
+
+    return echo_active_labels_msg;
+}
+
+sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_passive_echo_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const
+{
+    sensor_msgs::msg::PointCloud2 echo_msg;
+    echo_msg.header.stamp = rclcpp::Time(echo_data.time_stamp);
+    echo_msg.header.frame_id = vehicle_name + "/" + sensor_name;
+
+    if (echo_data.passive_beacons_point_cloud.size() > 9) {
+        echo_msg.height = 1;
+        echo_msg.width = echo_data.passive_beacons_point_cloud.size() / 9;
+
+        echo_msg.fields.resize(9);
+        echo_msg.fields[0].name = "x";
+        echo_msg.fields[1].name = "y";
+        echo_msg.fields[2].name = "z";
+        echo_msg.fields[3].name = "a";
+        echo_msg.fields[4].name = "d";
+        echo_msg.fields[5].name = "r";
+        echo_msg.fields[6].name = "xd";
+        echo_msg.fields[7].name = "yd";
+        echo_msg.fields[8].name = "zd";
+
+
+        int offset = 0;
+        for (size_t d = 0; d < echo_msg.fields.size(); ++d, offset += 4) {
+            echo_msg.fields[d].offset = offset;
+            echo_msg.fields[d].datatype = sensor_msgs::msg::PointField::FLOAT32;
+            echo_msg.fields[d].count = 1;
+        }
+
+        echo_msg.is_bigendian = false;
+        echo_msg.point_step = offset;
+        echo_msg.row_step = echo_msg.point_step * echo_msg.width;
+
+        echo_msg.is_dense = true; 
+        std::vector<float> data_std = echo_data.passive_beacons_point_cloud;
+        fixPointCloud(data_std, 9, {1, 6, 7});
+
+        const unsigned char* bytes = reinterpret_cast<const unsigned char*>(data_std.data());
+        std::vector<unsigned char> echo_msg_data(bytes, bytes + sizeof(float) * data_std.size());
+        echo_msg.data = std::move(echo_msg_data);   
+    }
+    else {
+        // msg = []
+    }
+
+    return echo_msg;
+}
+
+airsim_interfaces::msg::StringArray AirsimROSWrapper::get_passive_echo_labels_msg_from_airsim(const msr::airlib::EchoData& echo_data, const std::string& vehicle_name, const std::string& sensor_name) const
+{
+    airsim_interfaces::msg::StringArray echo_passive_labels_msg;
+    echo_passive_labels_msg.header.stamp = rclcpp::Time(echo_data.time_stamp);
+    echo_passive_labels_msg.header.frame_id = vehicle_name + "/" + sensor_name;
+
+    if (echo_data.point_cloud.size() > 9) {
+        echo_passive_labels_msg.data = std::move(echo_data.passive_beacons_groundtruth);           
+    }
+    else {
+        // msg = []
+    }
+
+    return echo_passive_labels_msg;
 }
 
 airsim_interfaces::msg::Environment AirsimROSWrapper::get_environment_msg_from_airsim(const msr::airlib::Environment::State& env_data) const
@@ -1261,6 +1524,40 @@ void AirsimROSWrapper::append_static_lidar_tf(VehicleROS* vehicle_ros, const std
     vehicle_ros->static_tf_msg_vec_.emplace_back(lidar_tf_msg);
 }
 
+void AirsimROSWrapper::append_static_gpulidar_tf(VehicleROS* vehicle_ros, const std::string& gpulidar_name, const msr::airlib::GPULidarSimpleParams& gpulidar_setting)
+{
+    geometry_msgs::msg::TransformStamped gpulidar_tf_msg;
+    if(gpulidar_setting.external)
+        gpulidar_tf_msg.header.frame_id = world_frame_id_;
+    else
+        gpulidar_tf_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+    gpulidar_tf_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + gpulidar_name;
+    auto gpulidar_data  = airsim_client_gpulidar_.getGPULidarData(gpulidar_name, vehicle_ros->vehicle_name_);
+
+    gpulidar_tf_msg.transform = get_transform_msg_from_airsim(gpulidar_data.pose.position, gpulidar_data.pose.orientation);
+
+    convert_tf_msg_to_ros(gpulidar_tf_msg);
+
+    vehicle_ros->static_tf_msg_vec_.emplace_back(gpulidar_tf_msg);
+}
+
+void AirsimROSWrapper::append_static_echo_tf(VehicleROS* vehicle_ros, const std::string& echo_name, const msr::airlib::EchoSimpleParams& echo_setting)
+{
+    geometry_msgs::msg::TransformStamped echo_tf_msg;
+    if(echo_setting.external)
+        echo_tf_msg.header.frame_id = world_frame_id_;
+    else
+        echo_tf_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+    echo_tf_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + echo_name;
+    auto echo_data  = airsim_client_echo_.getEchoData(echo_name, vehicle_ros->vehicle_name_);
+
+    echo_tf_msg.transform = get_transform_msg_from_airsim(echo_data.pose.position, echo_data.pose.orientation);
+
+    convert_tf_msg_to_ros(echo_tf_msg);
+
+    vehicle_ros->static_tf_msg_vec_.emplace_back(echo_tf_msg);
+}
+
 void AirsimROSWrapper::append_static_camera_tf(VehicleROS* vehicle_ros, const std::string& camera_name, const CameraSetting& camera_setting)
 {
     geometry_msgs::msg::TransformStamped static_cam_tf_body_msg;
@@ -1312,17 +1609,109 @@ void AirsimROSWrapper::lidar_timer_cb()
     try {
         for (auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {
             if (!vehicle_name_ptr_pair.second->lidar_pubs_.empty()) {
+                std::unordered_map<std::string, msr::airlib::LidarData> sensor_names_to_lidar_data_map;
                 for (auto& lidar_publisher : vehicle_name_ptr_pair.second->lidar_pubs_) {
                     auto lidar_data = airsim_client_lidar_.getLidarData(lidar_publisher.sensor_name, vehicle_name_ptr_pair.first);
+                    sensor_names_to_lidar_data_map[lidar_publisher.sensor_name] = lidar_data;
                     sensor_msgs::msg::PointCloud2 lidar_msg = get_lidar_msg_from_airsim(lidar_data, vehicle_name_ptr_pair.first, lidar_publisher.sensor_name);
                     lidar_publisher.publisher->publish(lidar_msg);
+                }
+                for (auto& lidar_labels_publisher : vehicle_name_ptr_pair.second->lidar_labels_pubs_) {
+                    msr::airlib::LidarData lidar_data;
+                    auto it = sensor_names_to_lidar_data_map.find(lidar_labels_publisher.sensor_name);
+                    if (it != sensor_names_to_lidar_data_map.end()) {
+                        lidar_data = it->second;
+                    }
+                    else {
+                        lidar_data = airsim_client_echo_.getLidarData(lidar_labels_publisher.sensor_name, vehicle_name_ptr_pair.first);
+                    }
+                    airsim_interfaces::msg::StringArray lidar_label_msg = get_lidar_labels_msg_from_airsim(lidar_data, vehicle_name_ptr_pair.first, lidar_labels_publisher.sensor_name);
+                    lidar_labels_publisher.publisher->publish(lidar_label_msg);
                 }
             }
         }
     }
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
-        RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get image response.\n%s", msg.c_str());
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get lidar response.\n%s", msg.c_str());
+    }
+}
+
+void AirsimROSWrapper::gpulidar_timer_cb()
+{
+    try {
+        for (auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {
+            if (!vehicle_name_ptr_pair.second->gpulidar_pubs_.empty()) {
+                for (auto& gpulidar_publisher : vehicle_name_ptr_pair.second->gpulidar_pubs_) {
+                    auto gpulidar_data = airsim_client_gpulidar_.getGPULidarData(gpulidar_publisher.sensor_name, vehicle_name_ptr_pair.first);
+                    sensor_msgs::msg::PointCloud2 gpulidar_msg = get_gpulidar_msg_from_airsim(gpulidar_data, vehicle_name_ptr_pair.first, gpulidar_publisher.sensor_name);
+                    gpulidar_publisher.publisher->publish(gpulidar_msg);
+                }
+            }
+        }
+    }
+    catch (rpc::rpc_error& e) {
+        std::string msg = e.get_error().as<std::string>();
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get gpulidar response.\n%s", msg.c_str());
+    }
+}
+
+void AirsimROSWrapper::echo_timer_cb()
+{
+    try {
+        for (auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {
+            if (!vehicle_name_ptr_pair.second->echo_active_pubs_.empty() && !vehicle_name_ptr_pair.second->echo_passive_pubs_.empty()) {
+                std::unordered_map<std::string, msr::airlib::EchoData> sensor_names_to_echo_data_map;
+                for (auto& active_echo_publisher : vehicle_name_ptr_pair.second->echo_active_pubs_) {                    
+                    auto echo_data = airsim_client_echo_.getEchoData(active_echo_publisher.sensor_name, vehicle_name_ptr_pair.first);
+                    sensor_names_to_echo_data_map[active_echo_publisher.sensor_name] = echo_data;
+                    sensor_msgs::msg::PointCloud2 echo_msg = get_active_echo_msg_from_airsim(echo_data, vehicle_name_ptr_pair.first, active_echo_publisher.sensor_name);
+                    active_echo_publisher.publisher->publish(echo_msg);
+                }
+                for (auto& passive_echo_publisher : vehicle_name_ptr_pair.second->echo_passive_pubs_) {
+                    msr::airlib::EchoData echo_data;
+                    auto it = sensor_names_to_echo_data_map.find(passive_echo_publisher.sensor_name);
+                    if (it != sensor_names_to_echo_data_map.end()) {
+                        echo_data = it->second;
+                    }
+                    else {
+                        echo_data = airsim_client_echo_.getEchoData(passive_echo_publisher.sensor_name, vehicle_name_ptr_pair.first);
+                        sensor_names_to_echo_data_map[passive_echo_publisher.sensor_name] = echo_data;
+                    }
+                    sensor_msgs::msg::PointCloud2 echo_msg = get_passive_echo_msg_from_airsim(echo_data, vehicle_name_ptr_pair.first, passive_echo_publisher.sensor_name);
+                    passive_echo_publisher.publisher->publish(echo_msg);
+                }
+                for (auto& active_echo_labels_publisher : vehicle_name_ptr_pair.second->echo_active_labels_pubs_) {
+                    msr::airlib::EchoData echo_data;
+                    auto it = sensor_names_to_echo_data_map.find(active_echo_labels_publisher.sensor_name);
+                    if (it != sensor_names_to_echo_data_map.end()) {
+                        echo_data = it->second;
+                    }
+                    else {
+                        echo_data = airsim_client_echo_.getEchoData(active_echo_labels_publisher.sensor_name, vehicle_name_ptr_pair.first);
+                        sensor_names_to_echo_data_map[active_echo_labels_publisher.sensor_name] = echo_data;
+                    }
+                    airsim_interfaces::msg::StringArray echo_labels_msg = get_active_echo_labels_msg_from_airsim(echo_data, vehicle_name_ptr_pair.first, active_echo_labels_publisher.sensor_name);
+                    active_echo_labels_publisher.publisher->publish(echo_labels_msg);
+                }
+                for (auto& passive_echo_labels_publisher : vehicle_name_ptr_pair.second->echo_passive_labels_pubs_) {
+                    msr::airlib::EchoData echo_data;
+                    auto it = sensor_names_to_echo_data_map.find(passive_echo_labels_publisher.sensor_name);
+                    if (it != sensor_names_to_echo_data_map.end()) {
+                        echo_data = it->second;
+                    }
+                    else {
+                        echo_data = airsim_client_echo_.getEchoData(passive_echo_labels_publisher.sensor_name, vehicle_name_ptr_pair.first);
+                    }
+                    airsim_interfaces::msg::StringArray echo_labels_msg = get_passive_echo_labels_msg_from_airsim(echo_data, vehicle_name_ptr_pair.first, passive_echo_labels_publisher.sensor_name);
+                    passive_echo_labels_publisher.publisher->publish(echo_labels_msg);
+                }
+            }
+        }
+    }
+    catch (rpc::rpc_error& e) {
+        std::string msg = e.get_error().as<std::string>();
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get echo response.\n%s", msg.c_str());
     }
 }
 

@@ -45,6 +45,8 @@ def generate_launch_description():
                 'update_airsim_img_response_every_n_sec': 0.05,
                 'update_airsim_control_every_n_sec': 0.01,
                 'update_lidar_every_n_sec': 0.01,
+                'update_gpulidar_every_n_sec': 0.01,
+                'update_echo_every_n_sec': 0.01,
                 'publish_clock': LaunchConfiguration('publish_clock'),
                 'host_ip': LaunchConfiguration('host_ip'),
                 'host_port': LaunchConfiguration('host_port'),
