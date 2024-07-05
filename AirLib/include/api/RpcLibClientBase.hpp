@@ -61,6 +61,7 @@ namespace airlib
 
         vector<string> simListSceneObjects(const string& name_regex = string(".*")) const;
         vector<string> simListInstanceSegmentationObjects() const;
+        vector<Vector3r> simGetInstanceSegmentationColorMap() const;
         vector<Pose> simListInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const;
         Pose simGetObjectPose(const std::string& object_name, bool ned = true) const;
         bool simLoadLevel(const string& level_name);

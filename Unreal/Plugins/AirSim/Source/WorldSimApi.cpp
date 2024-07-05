@@ -383,9 +383,15 @@ bool WorldSimApi::runConsoleCommand(const std::string& command)
                                              true);
     return succeeded;
 }
+
 std::vector<std::string> WorldSimApi::listInstanceSegmentationObjects() const
 {
     return simmode_->GetAllInstanceSegmentationMeshIDs();
+}
+
+std::vector<msr::airlib::Vector3r> WorldSimApi::getInstanceSegmentationColorMap() const
+{
+    return simmode_->GetInstanceSegmentationColorMap();
 }
 
 std::vector <msr::airlib::Pose> WorldSimApi::listInstanceSegmentationPoses(bool ned, bool only_visible) const

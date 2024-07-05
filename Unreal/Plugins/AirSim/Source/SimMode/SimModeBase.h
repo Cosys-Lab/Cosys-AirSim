@@ -184,7 +184,7 @@ public:
     const PawnSimApi* getVehicleSimApi(const std::string& vehicle_name = "") const
     {
         return static_cast<PawnSimApi*>(api_provider_->getVehicleSimApi(vehicle_name));
-    }
+    }W
     PawnSimApi* getVehicleSimApi(const std::string& vehicle_name = "")
     {
         return static_cast<PawnSimApi*>(api_provider_->getVehicleSimApi(vehicle_name));
@@ -192,6 +192,7 @@ public:
 	std::vector<std::string> GetAllInstanceSegmentationMeshIDs();
     std::vector<msr::airlib::Pose> GetAllInstanceSegmentationMeshPoses(bool ned = true, bool only_visible = false);
     TMap<UMeshComponent*, FString> GetInstanceSegmentationComponentToNameMap();
+    TArray<msr::airlib::Vector3r> GetInstanceSegmentationColorMap();
 
 	bool SetMeshInstanceSegmentationID(const std::string& mesh_name, int object_id, bool is_name_regex, bool update_annotation = true);
     int GetMeshInstanceSegmentationID(const std::string& mesh_name);

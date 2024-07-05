@@ -40,6 +40,7 @@ public:
     virtual void setWeatherParameter(WeatherParameter param, float val);
 
     virtual std::vector<std::string> listInstanceSegmentationObjects() const override;
+    virtual std::vector<Vector3r> getInstanceSegmentationColorMap() const override;
     virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const override;
 
     virtual bool setSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex = false) override;

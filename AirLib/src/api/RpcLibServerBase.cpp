@@ -444,6 +444,10 @@ namespace airlib
             return getWorldSimApi()->listInstanceSegmentationObjects();
         });
 
+        pimpl_->server.bind("simGetInstanceSegmentationColorMap", [&]() -> std::vector<RpcLibAdaptorsBase::Vector3r> {
+            return RpcLibAdaptorsBase::Vector3r::from(getWorldSimApi()->getInstanceSegmentationColorMap());
+        });
+
         pimpl_->server.bind("simListInstanceSegmentationPoses", [&](bool ned, bool only_visible) -> std::vector<RpcLibAdaptorsBase::Pose> {
             return RpcLibAdaptorsBase::Pose::from(getWorldSimApi()->listInstanceSegmentationPoses(ned, only_visible));
         });

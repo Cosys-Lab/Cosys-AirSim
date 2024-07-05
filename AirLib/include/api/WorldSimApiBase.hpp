@@ -81,6 +81,7 @@ namespace airlib
 
         virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const = 0;
         virtual std::vector<std::string> listInstanceSegmentationObjects() const = 0;
+        virtual std::vector<Vector3r> getInstanceSegmentationColorMap() const = 0;
         virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const = 0;
         virtual Pose getObjectPose(const std::string& object_name, bool ned = true) const = 0;
         virtual Vector3r getObjectScale(const std::string& object_name) const = 0;

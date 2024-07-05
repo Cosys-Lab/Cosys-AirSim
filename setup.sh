@@ -188,6 +188,6 @@ popd >/dev/null
 
 set +x
 echo ""
-echo "************************************"
-echo "AirSim setup completed successfully!"
-echo "************************************"
+echo "******************************************"
+echo "Cosys-AirSim setup completed successfully!"
+echo "******************************************"
