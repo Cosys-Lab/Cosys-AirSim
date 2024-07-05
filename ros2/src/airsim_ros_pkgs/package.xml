@@ -30,6 +30,8 @@
   <build_depend>tf2_sensor_msgs</build_depend>
   
   <depend>airsim_interfaces</depend>
+  <depend>pcl_conversions</depend>
+  <depend>pcl</depend>
 
   <build_depend>builtin_interfaces</build_depend>
   <exec_depend>builtin_interfaces</exec_depend>
