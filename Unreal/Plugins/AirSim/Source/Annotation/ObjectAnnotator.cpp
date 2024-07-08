@@ -1028,6 +1028,9 @@ bool FObjectAnnotator::PaintRGBComponent(UMeshComponent* component, const FColor
 	AnnotationComponent->SetVisibleInSceneCaptureOnly(true);
 	AnnotationComponent->SetVisibleInRayTracing(false);
 	AnnotationComponent->bVisibleInReflectionCaptures = false;
+	AnnotationComponent->bAffectDynamicIndirectLighting = false;
+	AnnotationComponent->bAffectDistanceFieldLighting = false;
+	AnnotationComponent->bVisibleInRealTimeSkyCaptures = false;
 	AnnotationComponent->MarkRenderStateDirty();
 	UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
 	annotation_component_list_.Add(PrimitiveComponent);
@@ -1069,6 +1072,9 @@ bool FObjectAnnotator::PaintTextureComponent(UMeshComponent* component, const FS
 	AnnotationComponent->SetVisibleInSceneCaptureOnly(true);
 	AnnotationComponent->SetVisibleInRayTracing(false);
 	AnnotationComponent->bVisibleInReflectionCaptures = false;
+	AnnotationComponent->bAffectDynamicIndirectLighting = false;
+	AnnotationComponent->bAffectDistanceFieldLighting = false;
+	AnnotationComponent->bVisibleInRealTimeSkyCaptures = false;
 	AnnotationComponent->MarkRenderStateDirty();
 	UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
 	annotation_component_list_.Add(PrimitiveComponent);	
