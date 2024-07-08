@@ -54,7 +54,7 @@ bool FObjectFilter::matchesActor(AActor* actor, bool disable_component_check) co
                         return true;
                     }
                     if (wildcard_mesh_names_.Num() != 0 &&
-                        skeletal_mesh_component->SkeletalMesh() &&
+                        skeletal_mesh_component->SkeletalMesh &&
                         isMatchAnyWildcard(skeletal_mesh_component->SkeletalMesh->GetName())) {
                         return true;
                     }
