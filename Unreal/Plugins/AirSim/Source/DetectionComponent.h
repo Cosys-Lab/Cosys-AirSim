@@ -30,6 +30,16 @@ struct FDetectionInfo
 
     UPROPERTY()
     FTransform RelativeTransform;
+
+    FDetectionInfo()
+        : Actor(nullptr)
+        , Component(nullptr)
+        , DetectionName(TEXT(""))
+        , Box2D(FBox2D(EForceInit::ForceInit))
+        , Box3D(FBox())
+        , RelativeTransform(FTransform::Identity)
+    {
+    }
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
