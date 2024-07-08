@@ -23,3 +23,4 @@ Packaged/
 # avoid checking in MacOS XCode assets
 *.xcworkspace
 /.vsconfig
+/Builds/*
