@@ -60,7 +60,7 @@ A manually maintained fork of this repository is available to the public: https:
 ```
 
 ## Cosys-Lab Modifications
-* Added support for Unreal to 5.4.2 ([Note that Unreal 5.3/5.4 breaks camera scene rendering by default in custom environments](docs/unreal_custenv.md#unreal-5354-scene-camera-bug))
+* Added support for Unreal up to 5.4.2 ([Note that Unreal 5.3/5.4 breaks camera scene rendering by default in custom environments](docs/unreal_custenv.md#unreal-5354-scene-camera-bug))
 * Added [multi-layer annotation](docs/annotation.md) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
@@ -74,7 +74,8 @@ A manually maintained fork of this repository is available to the public: https:
 * Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated cameras sensor with more distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
+* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set.
+* Updated C++ [ROS2 implementation](docs/ros.md) to support custom Cosys-AirSim features.
 * Dropped support for Unity Environments.
 
 Some more details on our changes can be found in the [changelog](CHANGELOG.md).
