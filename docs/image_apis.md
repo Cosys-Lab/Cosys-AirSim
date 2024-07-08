@@ -242,9 +242,9 @@ When you specify `ImageType = DepthVis` in `ImageRequest`, you get an image that
 You normally want to retrieve disparity image as float (i.e. set `pixels_as_float = true` and specify `ImageType = DisparityNormalized` in `ImageRequest`) in which case each pixel is `(Xl - Xr)/Xmax`, which is thereby normalized to values between 0 to 1.
 
 ### Segmentation
-When you specify `ImageType = Segmentation` in `ImageRequest`, you get an image that gives you ground truth segmentation of the scene. At the startup, AirSim assigns a random color index to each mesh available in environment. The RGB values for each color index ID can be retrieved from the API.
+When you specify `ImageType = Segmentation` in `ImageRequest`, you get an image that gives you ground truth instance segmentation of the scene. At the startup, AirSim assigns a random color index to each mesh available in environment. The RGB values for each color index ID can be retrieved from the API.
 
-You can assign a specific value to a specific mesh using APIs. For example, below Python code sets the object ID for the mesh called "Ground" to 20 in Blocks environment and hence changes its color in Segmentation view to the 20th color of the segmentation colormap:
+You can assign a specific value to a specific mesh using APIs. For example, below Python code sets the object ID for the mesh called "Ground" to 20 in Blocks environment and hence changes its color in Segmentation view to the 20th color of the instance segmentation colormap:
 Note that this will not do a check if this color is already assigned to a different object! 
 ```python
 success = client.simSetSegmentationObjectID("Ground", 20)
@@ -288,7 +288,7 @@ This will use an understandable naming depending on the hierarchy the object bel
 Note that this provides a different result from `simListSceneObjects()` as this one will make a simple list of all Unreal Actors in the scene, without keeping the hierarchy in mind. 
 
 An extension to `simListInstanceSegmentationObjects()` is `simListInstanceSegmentationPoses(ned=True, only_visible=True)` which will retrieve the 3D object pose of each element in the same order as the first mentioned function. _only_visible_ allows you to only get the objects that are physically visible in the scene. 
-Once you decide on the meshes you are interested, note down their names and use above API to set their object IDs. There are [few settings](settings.md#segmentation-settings) available to change object ID generation behavior.
+Once you decide on the meshes you are interested, note down their names and use above API to set their object IDs. T
 
 #### Changing Colors for Object IDs
 At present the color for each object ID is fixed as in [this pallet](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/Unreal/Plugins/AirSim/Content/HUDAssets/seg_color_palette.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
