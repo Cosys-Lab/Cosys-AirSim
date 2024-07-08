@@ -36,7 +36,7 @@ struct FDetectionInfo
         , Component(nullptr)
         , DetectionName(TEXT(""))
         , Box2D(FBox2D(EForceInit::ForceInit))
-        , Box3D(FBox())
+        , Box3D(FBox(EForceInit::ForceInit))
         , RelativeTransform(FTransform::Identity)
     {
     }
