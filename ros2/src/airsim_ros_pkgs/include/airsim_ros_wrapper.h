@@ -27,6 +27,7 @@ STRICT_MODE_OFF //todo what does this do?
 #include <airsim_interfaces/srv/takeoff.hpp>
 #include <airsim_interfaces/srv/takeoff_group.hpp>
 #include <airsim_interfaces/srv/refresh_instance_segmentation.hpp>
+#include <airsim_interfaces/srv/refresh_object_transforms.hpp>
 #include <airsim_interfaces/msg/vel_cmd.hpp>
 #include <airsim_interfaces/msg/vel_cmd_group.hpp>
 #include <airsim_interfaces/msg/car_controls.hpp>
@@ -34,6 +35,7 @@ STRICT_MODE_OFF //todo what does this do?
 #include <airsim_interfaces/msg/computer_vision_state.hpp>
 #include <airsim_interfaces/msg/instance_segmentation_label.hpp>
 #include <airsim_interfaces/msg/instance_segmentation_list.hpp>
+#include <airsim_interfaces/msg/object_transforms_list.hpp>
 #include <airsim_interfaces/msg/string_array.hpp>
 #include <airsim_interfaces/msg/environment.hpp>
 #include <chrono>
@@ -160,7 +162,7 @@ public:
         COMPUTERVISION
     };
 
-    AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::shared_ptr<rclcpp::Node> nh_gpulidar, const std::shared_ptr<rclcpp::Node> nh_echo, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, uint16_t host_port);
+    AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::shared_ptr<rclcpp::Node> nh_gpulidar, const std::shared_ptr<rclcpp::Node> nh_echo, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, bool enable_object_transforms_list, uint16_t host_port);
     ~AirsimROSWrapper(){};
 
     void initialize_airsim();
@@ -184,6 +186,7 @@ private:
         rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr global_gps_pub_;
         rclcpp::Publisher<airsim_interfaces::msg::Environment>::SharedPtr env_pub_;
         rclcpp::Publisher<airsim_interfaces::msg::InstanceSegmentationList>::SharedPtr instance_segmentation_pub_;
+        rclcpp::Publisher<airsim_interfaces::msg::ObjectTransformsList>::SharedPtr object_transforms_pub_;
         airsim_interfaces::msg::Environment env_msg_;
 
         std::vector<SensorPublisher<airsim_interfaces::msg::Altimeter>> barometer_pubs_;
@@ -207,6 +210,7 @@ private:
         std::vector<geometry_msgs::msg::TransformStamped> static_tf_msg_vec_;
 
         rclcpp::Service<airsim_interfaces::srv::RefreshInstanceSegmentation>::SharedPtr instance_segmentation_refresh_srvr_;
+        rclcpp::Service<airsim_interfaces::srv::RefreshObjectTransforms>::SharedPtr object_transforms_refresh_srvr_;
 
         rclcpp::Time stamp_;
 
@@ -290,6 +294,7 @@ private:
     bool land_all_srv_cb(const std::shared_ptr<airsim_interfaces::srv::Land::Request> request, const std::shared_ptr<airsim_interfaces::srv::Land::Response> response);
     bool reset_srv_cb(const std::shared_ptr<airsim_interfaces::srv::Reset::Request> request, const std::shared_ptr<airsim_interfaces::srv::Reset::Response> response);
     bool instance_segmentation_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Response> response);
+    bool object_transforms_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Response> response);
 
     /// ROS tf broadcasters
     void publish_odom_tf(const nav_msgs::msg::Odometry& odom_msg);
@@ -335,6 +340,7 @@ private:
     airsim_interfaces::msg::Altimeter get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const;
     sensor_msgs::msg::Range get_range_from_airsim(const msr::airlib::DistanceSensorData& dist_data) const;
     airsim_interfaces::msg::InstanceSegmentationList get_instance_segmentation_list_msg_from_airsim() const;
+    airsim_interfaces::msg::ObjectTransformsList get_object_transforms_list_msg_from_airsim(rclcpp::Time timestamp) const;
     sensor_msgs::msg::PointCloud2 get_lidar_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     airsim_interfaces::msg::StringArray get_lidar_labels_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     sensor_msgs::msg::PointCloud2 get_gpulidar_msg_from_airsim(const msr::airlib::GPULidarData& gpulidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
@@ -388,6 +394,7 @@ private:
     std::string host_ip_;
     uint16_t host_port_;
     bool enable_api_control_;
+    bool enable_object_transforms_list_;
     std::unique_ptr<msr::airlib::RpcLibClientBase> airsim_client_;
     // seperate busy connections to airsim, update in their own thread
     msr::airlib::RpcLibClientBase airsim_client_images_;

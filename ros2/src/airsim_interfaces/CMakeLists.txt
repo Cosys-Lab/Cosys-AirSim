@@ -27,6 +27,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ComputerVisionState.msg"
   "msg/InstanceSegmentationLabel.msg"
   "msg/InstanceSegmentationList.msg"
+  "msg/ObjectTransformsList.msg"
   "msg/StringArray.msg"
   "msg/Altimeter.msg"
   "msg/Environment.msg"
@@ -37,6 +38,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/LandGroup.srv"
   "srv/Reset.srv"
   "srv/RefreshInstanceSegmentation.srv"
+  "srv/RefreshObjectTransforms.srv"
   "srv/SetLocalPosition.srv" DEPENDENCIES std_msgs geometry_msgs geographic_msgs LIBRARY_NAME ${PROJECT_NAME}
 )
 
