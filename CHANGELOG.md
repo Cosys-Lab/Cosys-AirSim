@@ -1,8 +1,14 @@
 ### June 2024
 * Updated ROS2 wrapper to support Cosys-AirSim features and fix several issues:
     * Added support for annotation cameras.
+    * Added support for GPU-Lidar and Echos sensors.
+    * Added support for ground truth labels of Lidar sensor.
+    * Added custom message for instance segmentation data (list with names and colors) with service to refresh the data.
+    * Added custom message for optional object poses data (list with names and transforms) with service to refresh the data.
     * Added option to set host port.
+    * Added support for skidsteer and computervision modes.
     * Updated all data to be in ROS standard coordinate system (no longer NED by default). Removed ENU conversion option.
+    * Updated transform data to work for sensors set to external mode. 
     * Fixed static transformations not correctly converting degrees to radians.
     * Removed none-static transformations for cameras.
     * Removed C++ ROS1 wrapper as Python version is more up to date. 

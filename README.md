@@ -60,6 +60,7 @@ A manually maintained fork of this repository is available to the public: https:
 ```
 
 ## Cosys-Lab Modifications
+* Added support for Unreal to 5.2.1.
 * Added [multi-layer annotation](docs/annotation.md) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](docs/instance_segmentation.md). 
 * Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
@@ -68,13 +69,13 @@ A manually maintained fork of this repository is available to the public: https:
 * Added [Matlab API Client](docs/matlab.md) implementation as an easy to install Matlab toolbox.
 * Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
-* Updated Unreal to 5.2.1.
 * Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
 * Updated cameras sensor with more distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set. C++ version is not supported.
+* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set.
+* Updated C++ [ROS2 implementation](docs/ros.md) to support custom Cosys-AirSim features.
 * Dropped support for Unity Environments.
 
 Some more details on our changes can be found in the [changelog](CHANGELOG.md).
