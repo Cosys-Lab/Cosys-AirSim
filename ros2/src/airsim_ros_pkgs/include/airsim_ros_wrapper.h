@@ -206,6 +206,8 @@ private:
 
         std::vector<geometry_msgs::msg::TransformStamped> static_tf_msg_vec_;
 
+        rclcpp::Service<airsim_interfaces::srv::RefreshInstanceSegmentation>::SharedPtr instance_segmentation_refresh_srvr_;
+
         rclcpp::Time stamp_;
 
         std::string odom_frame_id_;
@@ -287,6 +289,7 @@ private:
     bool land_group_srv_cb(const std::shared_ptr<airsim_interfaces::srv::LandGroup::Request> request, const std::shared_ptr<airsim_interfaces::srv::LandGroup::Response> response);
     bool land_all_srv_cb(const std::shared_ptr<airsim_interfaces::srv::Land::Request> request, const std::shared_ptr<airsim_interfaces::srv::Land::Response> response);
     bool reset_srv_cb(const std::shared_ptr<airsim_interfaces::srv::Reset::Request> request, const std::shared_ptr<airsim_interfaces::srv::Reset::Response> response);
+    bool instance_segmentation_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Response> response);
 
     /// ROS tf broadcasters
     void publish_odom_tf(const nav_msgs::msg::Odometry& odom_msg);
@@ -331,6 +334,7 @@ private:
     sensor_msgs::msg::Imu get_imu_msg_from_airsim(const msr::airlib::ImuBase::Output& imu_data) const;
     airsim_interfaces::msg::Altimeter get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const;
     sensor_msgs::msg::Range get_range_from_airsim(const msr::airlib::DistanceSensorData& dist_data) const;
+    airsim_interfaces::msg::InstanceSegmentationList get_instance_segmentation_list_msg_from_airsim() const;
     sensor_msgs::msg::PointCloud2 get_lidar_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     airsim_interfaces::msg::StringArray get_lidar_labels_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     sensor_msgs::msg::PointCloud2 get_gpulidar_msg_from_airsim(const msr::airlib::GPULidarData& gpulidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;

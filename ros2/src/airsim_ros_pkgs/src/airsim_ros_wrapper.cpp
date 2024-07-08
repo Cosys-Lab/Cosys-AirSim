@@ -101,26 +101,11 @@ void AirsimROSWrapper::initialize_airsim()
         // todo there's only one global origin geopoint for environment. but airsim API accept a parameter vehicle_name? inside carsimpawnapi.cpp, there's a geopoint being assigned in the constructor. by?
         origin_geo_point_msg_ = get_gps_msg_from_airsim_geo_point(origin_geo_point_);
         
-        auto& vehicle_ros = vehicle_name_ptr_map_.begin().second;
-
-        airsim_interfaces::msg::InstanceSegmentationList instance_segmentation_list_msg;
-        std::vector<std::string> object_name_list = airsim_client_->simListInstanceSegmentationObjects();
-        std::vector<msr::airlib::Vector3r> color_map = airsim_client_->simGetInstanceSegmentationColorMap();
-        int object_index = 0;
-        std::vector<std::string>::iterator it = object_name_list.begin();
-        for(; it < object_name_list.end(); it++, object_index++ )
-        {
-            airsim_interfaces::msg::InstanceSegmentationLabel instance_segmentation_label_msg;
-            instance_segmentation_label_msg.name = *it;
-            instance_segmentation_label_msg.r = color_map[object_index].x();
-            instance_segmentation_label_msg.g = color_map[object_index].y();
-            instance_segmentation_label_msg.b = color_map[object_index].z();
-            instance_segmentation_label_msg.index = object_index;
-            instance_segmentation_list_msg.labels.push_back(instance_segmentation_label_msg);
-        }
+        auto vehicle_name_ptr_pair = vehicle_name_ptr_map_.begin();
+        auto& vehicle_ros = vehicle_name_ptr_pair->second;
+        airsim_interfaces::msg::InstanceSegmentationList instance_segmentation_list_msg  = get_instance_segmentation_list_msg_from_airsim();      
         instance_segmentation_list_msg.header.stamp = vehicle_ros->stamp_;
         instance_segmentation_list_msg.header.frame_id = world_frame_id_;
-
         vehicle_ros->instance_segmentation_pub_->publish(instance_segmentation_list_msg);
     }
     catch (rpc::rpc_error& e) {
@@ -199,8 +184,11 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
         vehicle_ros->env_pub_ = nh_->create_publisher<airsim_interfaces::msg::Environment>(topic_prefix + "/environment", 10);
 
         vehicle_ros->global_gps_pub_ = nh_->create_publisher<sensor_msgs::msg::NavSatFix>(topic_prefix + "/global_gps", 10);
+        auto qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable();
+        vehicle_ros->instance_segmentation_pub_ = nh_->create_publisher<airsim_interfaces::msg::InstanceSegmentationList>("~/instance_segmentation_labels", qos_settings);
 
-        vehicle_ros->instance_segmentation_pub_ = nh_->create_publisher<airsim_interfaces::msg::InstanceSegmentationList>("~/instance_segmentation_labels", 10);
+        std::function<bool(std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Request>, std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Response>)> fcn_ins_seg_refresh_srvr = std::bind(&AirsimROSWrapper::instance_segmentation_refresh_cb, this, _1, _2);
+        vehicle_ros->instance_segmentation_refresh_srvr_ = nh_->create_service<airsim_interfaces::srv::RefreshInstanceSegmentation>(topic_prefix + "/instance_segmentation_refresh", fcn_ins_seg_refresh_srvr);
 
         if (airsim_mode_ == AIRSIM_MODE::DRONE) {
             auto drone = static_cast<MultiRotorROS*>(vehicle_ros.get());
@@ -503,6 +491,25 @@ bool AirsimROSWrapper::takeoff_all_srv_cb(std::shared_ptr<airsim_interfaces::srv
         for (const auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_)
             static_cast<msr::airlib::MultirotorRpcLibClient*>(airsim_client_.get())->takeoffAsync(20, vehicle_name_ptr_pair.first);
     // response->success =
+
+    return true;
+}
+
+bool AirsimROSWrapper::instance_segmentation_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Response> response)
+{
+    unused(response);
+    std::lock_guard<std::mutex> guard(control_mutex_);
+
+    RCLCPP_INFO_STREAM(nh_->get_logger(), "Starting instance segmentation refresh...");
+
+    auto vehicle_name_ptr_pair = vehicle_name_ptr_map_.begin();
+    auto& vehicle_ros = vehicle_name_ptr_pair->second;
+    airsim_interfaces::msg::InstanceSegmentationList instance_segmentation_list_msg  = get_instance_segmentation_list_msg_from_airsim();      
+    instance_segmentation_list_msg.header.stamp = vehicle_ros->stamp_;
+    instance_segmentation_list_msg.header.frame_id = world_frame_id_;
+    vehicle_ros->instance_segmentation_pub_->publish(instance_segmentation_list_msg);
+
+        RCLCPP_INFO_STREAM(nh_->get_logger(), "Completed instance segmentation refresh!");
 
     return true;
 }
@@ -1085,6 +1092,26 @@ sensor_msgs::msg::Range AirsimROSWrapper::get_range_from_airsim(const msr::airli
     dist_msg.max_range = dist_data.max_distance;
 
     return dist_msg;
+}
+
+
+airsim_interfaces::msg::InstanceSegmentationList AirsimROSWrapper::get_instance_segmentation_list_msg_from_airsim() const{
+    airsim_interfaces::msg::InstanceSegmentationList instance_segmentation_list_msg;
+    std::vector<std::string> object_name_list = airsim_client_->simListInstanceSegmentationObjects();
+    std::vector<msr::airlib::Vector3r> color_map = airsim_client_->simGetInstanceSegmentationColorMap();
+    int object_index = 0;
+    std::vector<std::string>::iterator it = object_name_list.begin();
+    for(; it < object_name_list.end(); it++, object_index++ )
+    {
+        airsim_interfaces::msg::InstanceSegmentationLabel instance_segmentation_label_msg;
+        instance_segmentation_label_msg.name = *it;
+        instance_segmentation_label_msg.r = color_map[object_index].x();
+        instance_segmentation_label_msg.g = color_map[object_index].y();
+        instance_segmentation_label_msg.b = color_map[object_index].z();
+        instance_segmentation_label_msg.index = object_index;
+        instance_segmentation_list_msg.labels.push_back(instance_segmentation_label_msg);
+    }
+    return instance_segmentation_list_msg;
 }
 
 airsim_interfaces::msg::Altimeter AirsimROSWrapper::get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const
