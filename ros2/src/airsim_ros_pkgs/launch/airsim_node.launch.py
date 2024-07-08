@@ -34,6 +34,10 @@ def generate_launch_description():
     enable_api_control = DeclareLaunchArgument(
         "enable_api_control",
         default_value='False')
+    
+    enable_object_transforms_list = DeclareLaunchArgument(
+        "enable_object_transforms_list",
+        default_value='True')
   
     airsim_node = Node(
             package='airsim_ros_pkgs',
@@ -50,7 +54,8 @@ def generate_launch_description():
                 'publish_clock': LaunchConfiguration('publish_clock'),
                 'host_ip': LaunchConfiguration('host_ip'),
                 'host_port': LaunchConfiguration('host_port'),
-                'enable_api_control': LaunchConfiguration('enable_api_control')
+                'enable_api_control': LaunchConfiguration('enable_api_control'),
+                'enable_object_transforms_list': LaunchConfiguration('enable_object_transforms_list')
             }])
 
     # Create the launch description and populate
@@ -63,6 +68,7 @@ def generate_launch_description():
     ld.add_action(host_ip)
     ld.add_action(host_port)
     ld.add_action(enable_api_control)
+    ld.add_action(enable_object_transforms_list)
     ld.add_action(airsim_node)
 
     return ld
