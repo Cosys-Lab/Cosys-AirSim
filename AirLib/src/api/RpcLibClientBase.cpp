@@ -159,9 +159,6 @@ __pragma(warning(disable : 4239))
                 std::cerr << std::endl
                           << "AirSim client is of older version and not supported by this server. Please upgrade!" << std::endl;
             }
-            else
-                std::cout << std::endl
-                          << ver_info << std::endl;
         }
 
         bool RpcLibClientBase::armDisarm(bool arm, const std::string& vehicle_name)
