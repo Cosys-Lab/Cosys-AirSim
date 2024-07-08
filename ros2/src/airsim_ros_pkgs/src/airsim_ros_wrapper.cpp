@@ -28,7 +28,7 @@ const std::unordered_map<int, std::string> AirsimROSWrapper::image_type_int_to_s
 
 };
 
-AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::shared_ptr<rclcpp::Node> nh_gpulidar, const std::shared_ptr<rclcpp::Node> nh_echo, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, uint16_t host_port)
+AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const std::shared_ptr<rclcpp::Node> nh_img, const std::shared_ptr<rclcpp::Node> nh_lidar, const std::shared_ptr<rclcpp::Node> nh_gpulidar, const std::shared_ptr<rclcpp::Node> nh_echo, const std::string& host_ip, const std::shared_ptr<rclcpp::CallbackGroup> callbackGroup, bool enable_api_control, bool enable_object_transforms_list, uint16_t host_port)
     : is_used_lidar_timer_cb_queue_(false)
     , is_used_img_timer_cb_queue_(false)
     , is_used_gpulidar_timer_cb_queue_(false)
@@ -37,6 +37,7 @@ AirsimROSWrapper::AirsimROSWrapper(const std::shared_ptr<rclcpp::Node> nh, const
     , host_ip_(host_ip)
     , host_port_(host_port)
     , enable_api_control_(enable_api_control)
+    , enable_object_transforms_list_(enable_object_transforms_list)
     , airsim_client_(nullptr)
     , airsim_client_images_(host_ip, host_port)
     , airsim_client_lidar_(host_ip, host_port)
@@ -103,10 +104,15 @@ void AirsimROSWrapper::initialize_airsim()
         
         auto vehicle_name_ptr_pair = vehicle_name_ptr_map_.begin();
         auto& vehicle_ros = vehicle_name_ptr_pair->second;
-        airsim_interfaces::msg::InstanceSegmentationList instance_segmentation_list_msg  = get_instance_segmentation_list_msg_from_airsim();      
+        airsim_interfaces::msg::InstanceSegmentationList instance_segmentation_list_msg = get_instance_segmentation_list_msg_from_airsim();      
         instance_segmentation_list_msg.header.stamp = vehicle_ros->stamp_;
         instance_segmentation_list_msg.header.frame_id = world_frame_id_;
         vehicle_ros->instance_segmentation_pub_->publish(instance_segmentation_list_msg);
+
+        if(enable_object_transforms_list_){
+            airsim_interfaces::msg::ObjectTransformsList object_transforms_list_msg = get_object_transforms_list_msg_from_airsim(vehicle_ros->stamp_);      
+            vehicle_ros->object_transforms_pub_->publish(object_transforms_list_msg);
+        }
     }
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
@@ -184,11 +190,20 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
         vehicle_ros->env_pub_ = nh_->create_publisher<airsim_interfaces::msg::Environment>(topic_prefix + "/environment", 10);
 
         vehicle_ros->global_gps_pub_ = nh_->create_publisher<sensor_msgs::msg::NavSatFix>(topic_prefix + "/global_gps", 10);
+
         auto qos_settings = rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable();
+
         vehicle_ros->instance_segmentation_pub_ = nh_->create_publisher<airsim_interfaces::msg::InstanceSegmentationList>("~/instance_segmentation_labels", qos_settings);
 
         std::function<bool(std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Request>, std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Response>)> fcn_ins_seg_refresh_srvr = std::bind(&AirsimROSWrapper::instance_segmentation_refresh_cb, this, _1, _2);
         vehicle_ros->instance_segmentation_refresh_srvr_ = nh_->create_service<airsim_interfaces::srv::RefreshInstanceSegmentation>(topic_prefix + "/instance_segmentation_refresh", fcn_ins_seg_refresh_srvr);
+
+        if(enable_object_transforms_list_){
+            vehicle_ros->object_transforms_pub_ = nh_->create_publisher<airsim_interfaces::msg::ObjectTransformsList>("~/object_transforms", qos_settings);
+
+            std::function<bool(std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Request>, std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Response>)> fcn_obj_trans_refresh_srvr = std::bind(&AirsimROSWrapper::object_transforms_refresh_cb, this, _1, _2);
+            vehicle_ros->object_transforms_refresh_srvr_ = nh_->create_service<airsim_interfaces::srv::RefreshObjectTransforms>(topic_prefix + "/object_transforms_refresh", fcn_obj_trans_refresh_srvr);
+        }
 
         if (airsim_mode_ == AIRSIM_MODE::DRONE) {
             auto drone = static_cast<MultiRotorROS*>(vehicle_ros.get());
@@ -498,6 +513,7 @@ bool AirsimROSWrapper::takeoff_all_srv_cb(std::shared_ptr<airsim_interfaces::srv
 bool AirsimROSWrapper::instance_segmentation_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Response> response)
 {
     unused(response);
+    unused(request);
     std::lock_guard<std::mutex> guard(control_mutex_);
 
     RCLCPP_INFO_STREAM(nh_->get_logger(), "Starting instance segmentation refresh...");
@@ -509,7 +525,25 @@ bool AirsimROSWrapper::instance_segmentation_refresh_cb(const std::shared_ptr<ai
     instance_segmentation_list_msg.header.frame_id = world_frame_id_;
     vehicle_ros->instance_segmentation_pub_->publish(instance_segmentation_list_msg);
 
-        RCLCPP_INFO_STREAM(nh_->get_logger(), "Completed instance segmentation refresh!");
+    RCLCPP_INFO_STREAM(nh_->get_logger(), "Completed instance segmentation refresh!");
+
+    return true;
+}
+
+bool AirsimROSWrapper::object_transforms_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Response> response)
+{
+    unused(response);
+    unused(request);
+    std::lock_guard<std::mutex> guard(control_mutex_);
+
+    RCLCPP_INFO_STREAM(nh_->get_logger(), "Starting object transforms refresh...");
+
+    auto vehicle_name_ptr_pair = vehicle_name_ptr_map_.begin();
+    auto& vehicle_ros = vehicle_name_ptr_pair->second;
+    airsim_interfaces::msg::ObjectTransformsList object_transforms_list_msg  = get_object_transforms_list_msg_from_airsim(vehicle_ros->stamp_);      
+    vehicle_ros->object_transforms_pub_->publish(object_transforms_list_msg);
+
+    RCLCPP_INFO_STREAM(nh_->get_logger(), "Completed object transforms refresh!");
 
     return true;
 }
@@ -1112,6 +1146,34 @@ airsim_interfaces::msg::InstanceSegmentationList AirsimROSWrapper::get_instance_
         instance_segmentation_list_msg.labels.push_back(instance_segmentation_label_msg);
     }
     return instance_segmentation_list_msg;
+}
+
+airsim_interfaces::msg::ObjectTransformsList AirsimROSWrapper::get_object_transforms_list_msg_from_airsim(rclcpp::Time timestamp) const{
+    airsim_interfaces::msg::ObjectTransformsList object_transforms_list_msg;
+    std::vector<std::string> object_name_list = airsim_client_->simListInstanceSegmentationObjects();
+    std::vector<msr::airlib::Pose> poses = airsim_client_->simListInstanceSegmentationPoses();
+    int object_index = 0;
+    std::vector<std::string>::iterator it = object_name_list.begin();
+    for(; it < object_name_list.end(); it++, object_index++ )
+    {
+        msr::airlib::Pose cur_object_pose = poses[object_index]; 
+        if(!std::isnan(cur_object_pose.position.x())){
+            geometry_msgs::msg::TransformStamped object_transform_msg;
+            object_transform_msg.child_frame_id = *it;
+            object_transform_msg.transform.translation.x = cur_object_pose.position.x();
+            object_transform_msg.transform.translation.y = -cur_object_pose.position.y();
+            object_transform_msg.transform.translation.z = -cur_object_pose.position.z();
+            object_transform_msg.transform.rotation.x = cur_object_pose.orientation.inverse().x();
+            object_transform_msg.transform.rotation.y = cur_object_pose.orientation.inverse().y();
+            object_transform_msg.transform.rotation.z = cur_object_pose.orientation.inverse().z();
+            object_transform_msg.transform.rotation.w = cur_object_pose.orientation.inverse().w();
+            object_transform_msg.header.stamp = timestamp;
+            object_transforms_list_msg.objects.push_back(object_transform_msg);            
+        }
+    }
+    object_transforms_list_msg.header.stamp = timestamp;
+    object_transforms_list_msg.header.frame_id = world_frame_id_;
+    return object_transforms_list_msg;
 }
 
 airsim_interfaces::msg::Altimeter AirsimROSWrapper::get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const
