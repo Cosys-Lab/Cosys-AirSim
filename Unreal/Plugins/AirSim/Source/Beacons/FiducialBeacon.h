@@ -3,6 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Components/StaticMeshComponent.h"
+#include <Engine/StaticMesh.h>
+#include "Engine/Texture2D.h"
 #include "GameFramework/Actor.h"
 #include "FiducialBeacon.generated.h"
 

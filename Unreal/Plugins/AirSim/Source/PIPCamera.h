@@ -8,6 +8,8 @@
 #include "Annotation/ObjectAnnotator.h"
 #include "common/ImageCaptureBase.hpp"
 #include "common/common_utils/Utils.hpp"
+#include "Components/StaticMeshComponent.h"
+#include <Engine/StaticMesh.h>
 #include "common/AirSimSettings.hpp"
 #include "NedTransform.h"
 #include "DetectionComponent.h"

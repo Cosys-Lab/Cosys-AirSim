@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/StaticMeshComponent.h"
+#include <Engine/StaticMesh.h>
 #include "AirLib/include/common/AirSimSettings.hpp"
-
 #include "WifiBeacon.generated.h"
 
 

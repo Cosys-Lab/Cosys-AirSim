@@ -10,6 +10,7 @@
 #include <string>
 #include "CameraDirector.h"
 #include "common/AirSimSettings.hpp"
+#include "AssetRegistry/AssetData.h"
 #include "common/ClockFactory.hpp"
 #include "api/ApiServerBase.hpp"
 #include "api/ApiProvider.hpp"
