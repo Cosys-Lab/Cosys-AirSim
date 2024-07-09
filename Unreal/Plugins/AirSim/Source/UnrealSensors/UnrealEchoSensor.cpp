@@ -3,6 +3,7 @@
 #include "UnrealEchoSensor.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
+#include "Async/ParallelFor.h"
 #include "NedTransform.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"

@@ -5,6 +5,7 @@
 #include <vector>
 #include "Kismet/KismetSystemLibrary.h"
 #include "api/VehicleSimApiBase.hpp"
+#include "AssetRegistry/AssetData.h"
 #include "physics/PhysicsEngineBase.hpp"
 #include "physics/World.hpp"
 #include "physics/PhysicsWorld.hpp"

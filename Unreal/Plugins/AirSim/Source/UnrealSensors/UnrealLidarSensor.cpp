@@ -4,6 +4,7 @@
 #include "UnrealLidarSensor.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
+#include "Async/ParallelFor.h"
 #include "NedTransform.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"

@@ -6,6 +6,7 @@
 #include "api/WorldSimApiBase.hpp"
 #include "SimMode/SimModeBase.h"
 #include "Components/StaticMeshComponent.h"
+#include "AssetRegistry/AssetData.h"
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include <string>
 

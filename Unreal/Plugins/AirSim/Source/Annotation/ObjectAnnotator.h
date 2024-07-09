@@ -5,6 +5,13 @@
 
 #include <vector>
 #include <string>
+#include "Components/MeshComponent.h"
+#include "Components/SceneComponent.h"
+#include "UObject/ObjectMacros.h"
+#include "Components/StaticMeshComponent.h"
+#include <Engine/StaticMesh.h>
+#include "ShowFlags.h"
+#include "UObject/ScriptMacros.h"
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
 
 class FColorGenerator
