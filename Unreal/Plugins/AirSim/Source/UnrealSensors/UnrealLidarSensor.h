@@ -5,6 +5,7 @@
 
 #include "common/Common.hpp"
 #include "GameFramework/Actor.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "sensors/lidar/LidarSimple.hpp"
 #include "NedTransform.h"
 
