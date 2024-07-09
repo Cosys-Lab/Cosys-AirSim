@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "sensors/wifi/WifiSimple.hpp"
 #include "Components/StaticMeshComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "NedTransform.h"
 #include "AirBlueprintLib.h"
 #include "Weather/WeatherLib.h"

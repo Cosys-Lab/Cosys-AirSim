@@ -8,6 +8,7 @@
 #include "sensors/template/SensorTemplateSimple.hpp"
 #include "Components/StaticMeshComponent.h"
 #include "NedTransform.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "AirBlueprintLib.h"
 #include "Weather/WeatherLib.h"
 #include "map"
