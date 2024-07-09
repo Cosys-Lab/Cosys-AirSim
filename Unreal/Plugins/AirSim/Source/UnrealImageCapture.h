@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "PIPCamera.h"
+#include "UnrealClient.h"
 #include "common/ImageCaptureBase.hpp"
 #include "common/common_utils/UniqueValueMap.hpp"
 

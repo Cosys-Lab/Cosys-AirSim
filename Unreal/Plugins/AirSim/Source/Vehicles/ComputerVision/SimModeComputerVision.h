@@ -2,12 +2,10 @@
 
 #include "CoreMinimal.h"
 
+#include "SimMode/SimModeBase.h"
 #include "ComputerVisionPawn.h"
 #include "common/Common.hpp"
-#include "ComputerVisionPawnSimApi.h"
 #include "api/VehicleSimApiBase.hpp"
-#include "SimMode/SimModeBase.h"
-
 #include "SimModeComputerVision.generated.h"
 
 
@@ -19,8 +17,6 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
-	virtual bool isPaused() const override;
-	virtual void pause(bool is_paused) override;
 	virtual void continueForTime(double seconds) override;
 	virtual void continueForFrames(uint32_t frames) override;
 
