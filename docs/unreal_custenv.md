@@ -60,10 +60,18 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
     }
     ```
     
-1. Edit the `Config\DefaultGame.ini` to add the following line at the end:
+1. Edit the `Config\DefaultGame.ini` to add the following lines at the end:
 
     ```
     +MapsToCook=(FilePath="/AirSim/AirSimAssets")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/HUDAssets")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/Beacons")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/Blueprints")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/Models")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/Sensors")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/StarterContent")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/VehicleAdv")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/Weather")
     ```
     
     Doing this forces Unreal to include all necessary AirSim content in packaged builds of your project.
