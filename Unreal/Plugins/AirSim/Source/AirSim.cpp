@@ -11,11 +11,9 @@ class FAirSim : public IModuleInterface
     virtual void StartupModule() override;
     virtual void ShutdownModule() override;
 };
-#if WITH_EDITOR
-IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, AirSim, "AirSim")
-#else
+
 IMPLEMENT_MODULE(FAirSim, AirSim)
-#endif
+
 void FAirSim::StartupModule()
 {
     //plugin startup
