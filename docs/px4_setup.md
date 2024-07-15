@@ -32,7 +32,7 @@ See also [initial firmware setup video](https://docs.px4.io/master/en/config/).
 8. In [AirSim settings](settings.md) file, specify PX4 for your vehicle config like this:
 ```
     {
-        "SettingsVersion": 1.2,
+        "SettingsVersion": 2.0,
         "SimMode": "Multirotor",
         "ClockType": "SteppableClock",
         "Vehicles": {

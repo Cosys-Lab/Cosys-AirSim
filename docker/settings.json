@@ -1,6 +1,6 @@
 {
-  "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
-  "SettingsVersion": 1.2,
+  "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+  "SettingsVersion": 2.0,
   "SimMode": "Multirotor",
   "ClockSpeed": 1.0,
   "Vehicles": {

@@ -45,13 +45,13 @@ Let's look at the ROS API for both nodes:
 #### Publishers:
 The publishers will be automatically created based on the settings in the `settings.json` file for all vehicles and the sensors.
 
-- `/airsim_node/VEHICLE-NAME/car_state` [airsim_interfaces::CarState](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/CarState.msg)
+- `/airsim_node/VEHICLE-NAME/car_state` [airsim_interfaces::CarState](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/CarState.msg)
   The state of the car if the vehicle is of this sim-mode type.
 
-- `/airsim_node/VEHICLE-NAME/computervision_state` [airsim_interfaces::ComputerVisionState](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/ComputerVisionState.msg)
+- `/airsim_node/VEHICLE-NAME/computervision_state` [airsim_interfaces::ComputerVisionState](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/ComputerVisionState.msg)
   The state of the computer vision actor if the vehicle is of this sim-mode type.
 
-- `/airsim_node/origin_geo_point` [airsim_interfaces::GPSYaw](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/GPSYaw.msg)
+- `/airsim_node/origin_geo_point` [airsim_interfaces::GPSYaw](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/GPSYaw.msg)
   GPS coordinates corresponding to global frame. This is set in the airsim's [settings.json](https://cosys-lab.github.io/settings/) file under the `OriginGeopoint` key.
 
 - `/airsim_node/VEHICLE-NAME/global_gps` [sensor_msgs::NavSatFix](https://docs.ros.org/api/sensor_msgs/html/msg/NavSatFix.html)
@@ -70,7 +70,7 @@ The publishers will be automatically created based on the settings in the `setti
 
 - `/tf` [tf2_msgs::TFMessage](https://docs.ros.org/api/tf2_msgs/html/msg/TFMessage.html)
 
-- `/airsim_node/VEHICLE-NAME/altimeter/SENSOR_NAME` [airsim_interfaces::Altimeter](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/Altimeter.msg)
+- `/airsim_node/VEHICLE-NAME/altimeter/SENSOR_NAME` [airsim_interfaces::Altimeter](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/Altimeter.msg)
   This the current altimeter reading for altitude, pressure, and [QNH](https://en.wikipedia.org/wiki/QNH)
 
 - `/airsim_node/VEHICLE-NAME/imu/SENSOR_NAME` [sensor_msgs::Imu](http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html)
@@ -85,7 +85,7 @@ The publishers will be automatically created based on the settings in the `setti
 - `/airsim_node/VEHICLE-NAME/lidar/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
   LIDAR pointcloud 
 
-- `/airsim_node/VEHICLE-NAME/lidar/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/StringArray.msg)
+- `/airsim_node/VEHICLE-NAME/lidar/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/StringArray.msg)
   Custom message type with an array of string that are the labels for each point in the pointcloud of the lidar sensor
 
 - `/airsim_node/VEHICLE-NAME/gpulidar/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
@@ -97,69 +97,69 @@ The publishers will be automatically created based on the settings in the `setti
 - `/airsim_node/VEHICLE-NAME/echo/passive/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
   Echo sensor pointcloud for passive sensing
 
-- `/airsim_node/VEHICLE-NAME/echo/active/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/StringArray.msg)
+- `/airsim_node/VEHICLE-NAME/echo/active/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/StringArray.msg)
   Custom message type with an array of string that are the labels for each point in the pointcloud for the active echo pointcloud
 
-- `/airsim_node/VEHICLE-NAME/echo/passive/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/StringArray.msg)
+- `/airsim_node/VEHICLE-NAME/echo/passive/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/StringArray.msg)
   Custom message type with an array of string that are the labels for each point in the pointcloud for the passive echo pointcloud
 
-- `/airsim_node/instance_segmentation_labels` [airsim_interfaces::InstanceSegmentationList](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/InstanceSegmentationList.msg)
+- `/airsim_node/instance_segmentation_labels` [airsim_interfaces::InstanceSegmentationList](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/InstanceSegmentationList.msg)
   Custom message type with an array of a custom messages that are the names, color and index of the instance segmentation system for each object in the world.
    
-- `/airsim_node/object_transforms` [airsim_interfaces::ObjectTransformsList](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/ObjectTransformsList.msg)
+- `/airsim_node/object_transforms` [airsim_interfaces::ObjectTransformsList](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/ObjectTransformsList.msg)
   Custom message type with an array of [geometry_msgs::TransformStamped](http://docs.ros.org/api/geometry_msgs/html/msg/TransformStamped.html) that are the transforms of all objects in the world, each child frame ID is the object name.
    
 #### Subscribers:
 
-- `/airsim_node/VEHICLE-NAME/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/airsim_node/VEHICLE-NAME/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   
-- `/airsim_node/VEHICLE-NAME/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/airsim_node/VEHICLE-NAME/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   
-- `/airsim_node/all_robots/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/airsim_node/all_robots/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   Set velocity command for all drones.
 
-- `/airsim_node/all_robots/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/airsim_node/all_robots/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
 
-- `/airsim_node/group_of_robots/vel_cmd_body_frame` [airsim_interfaces::VelCmdGroup](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmdGroup.msg)
+- `/airsim_node/group_of_robots/vel_cmd_body_frame` [airsim_interfaces::VelCmdGroup](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmdGroup.msg)
   Set velocity command for a specific set of drones.
 - 
-- `/airsim_node/group_of_robots/vel_cmd_world_frame` [airsim_interfaces::VelCmdGroup](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmdGroup.msg)
+- `/airsim_node/group_of_robots/vel_cmd_world_frame` [airsim_interfaces::VelCmdGroup](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmdGroup.msg)
   Set velocity command for a specific set of drones.
 
-- `/gimbal_angle_euler_cmd` [airsim_interfaces::GimbalAngleEulerCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/GimbalAngleEulerCmd.msg)
+- `/gimbal_angle_euler_cmd` [airsim_interfaces::GimbalAngleEulerCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/GimbalAngleEulerCmd.msg)
   Gimbal set point in euler angles.
 
-- `/gimbal_angle_quat_cmd` [airsim_interfaces::GimbalAngleQuatCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/GimbalAngleQuatCmd.msg)
+- `/gimbal_angle_quat_cmd` [airsim_interfaces::GimbalAngleQuatCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/GimbalAngleQuatCmd.msg)
   Gimbal set point in quaternion.
 
-- `/airsim_node/VEHICLE-NAME/car_cmd` [airsim_interfaces::CarControls](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/CarControls.msg)
-Throttle, brake, steering and gear selections for control. Both automatic and manual transmission control possible, see the [`car_joy.py`](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/scripts/car_joy) script for use.
+- `/airsim_node/VEHICLE-NAME/car_cmd` [airsim_interfaces::CarControls](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/CarControls.msg)
+Throttle, brake, steering and gear selections for control. Both automatic and manual transmission control possible, see the [`car_joy.py`](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/scripts/car_joy) script for use.
 
 #### Services:
 
-- `/airsim_node/VEHICLE-NAME/land` [airsim_interfaces::Land](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/Land.html)
+- `/airsim_node/VEHICLE-NAME/land` [airsim_interfaces::Land](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/Land.html)
 
-- `/airsim_node/VEHICLE-NAME/takeoff` [airsim_interfaces::Takeoff](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/Takeoff.html)
+- `/airsim_node/VEHICLE-NAME/takeoff` [airsim_interfaces::Takeoff](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/Takeoff.html)
 
-- `/airsim_node/all_robots/land` [airsim_interfaces::Land](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/Land.html)
+- `/airsim_node/all_robots/land` [airsim_interfaces::Land](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/Land.html)
  land all drones
 
-- `/airsim_node/all_robots/takeoff` [airsim_interfaces::Takeoff](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/Takeoff.html)
+- `/airsim_node/all_robots/takeoff` [airsim_interfaces::Takeoff](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/Takeoff.html)
  take-off all drones
 
-- `/airsim_node/group_of_robots/land` [airsim_interfaces::LandGroup](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/LandGroup.html)
+- `/airsim_node/group_of_robots/land` [airsim_interfaces::LandGroup](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/LandGroup.html)
  land a specific set of drones
 
-- `/airsim_node/group_of_robots/takeoff` [airsim_interfaces::TakeoffGroup](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/TakeoffGroup.html)
+- `/airsim_node/group_of_robots/takeoff` [airsim_interfaces::TakeoffGroup](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/TakeoffGroup.html)
  take-off a specific set of drones
 
-- `/airsim_node/reset` [airsim_interfaces::Reset](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/Reset.html)
+- `/airsim_node/reset` [airsim_interfaces::Reset](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/Reset.html)
  Resets *all* vehicles
 
-- `/airsim_node/instance_segmentation_refresh` [airsim_interfaces::RefreshInstanceSegmentation](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/RefreshInstanceSegmentation.html)
+- `/airsim_node/instance_segmentation_refresh` [airsim_interfaces::RefreshInstanceSegmentation](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/RefreshInstanceSegmentation.html)
  Refresh the instance segmentation list
 
-- `/airsim_node/object_transforms_refresh` [airsim_interfaces::RefreshObjectTransforms](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/srv/RefreshObjectTransforms.html)
+- `/airsim_node/object_transforms_refresh` [airsim_interfaces::RefreshObjectTransforms](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/RefreshObjectTransforms.html)
  Refresh the object transforms list
 
   
@@ -270,16 +270,16 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Services:
 
-- `/airsim_node/VEHICLE-NAME/gps_goal` [Request: [airsim_interfaces::SetGPSPosition](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/srv/SetGPSPosition.srv)]
+- `/airsim_node/VEHICLE-NAME/gps_goal` [Request: [airsim_interfaces::SetGPSPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetGPSPosition.srv)]
   Target gps position + yaw.
   In **absolute** altitude.
 
-- `/airsim_node/VEHICLE-NAME/local_position_goal` [Request: [airsim_interfaces::SetLocalPosition](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros/src/airsim_ros_pkgs/srv/SetLocalPosition.srv)]
+- `/airsim_node/VEHICLE-NAME/local_position_goal` [Request: [airsim_interfaces::SetLocalPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetLocalPosition.srv)]
   Target local position + yaw in global frame.
 
 #### Subscribers:
 
-- `/airsim_node/origin_geo_point` [airsim_interfaces::GPSYaw](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/GPSYaw.msg)
+- `/airsim_node/origin_geo_point` [airsim_interfaces::GPSYaw](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/GPSYaw.msg)
   Listens to home geo coordinates published by `airsim_node`.
 
 - `/airsim_node/VEHICLE-NAME/odom_local` [nav_msgs::Odometry](https://docs.ros.org/api/nav_msgs/html/msg/Odometry.html)
@@ -287,10 +287,10 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Publishers:
 
-- `/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   Sends velocity command to `airsim_node`
 
-- `/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   Sends velocity command to `airsim_node`
 
 #### Global params

@@ -45,8 +45,8 @@ External                  | Uncouple the sensor from the vehicle. If enabled, th
 ExternalLocal             | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
 ```
 {
-    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/docs/settings_json.md",
-    "SettingsVersion": 1.2,
+    "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+    "SettingsVersion": 2.0,
 
     "SimMode": "Multirotor",
 

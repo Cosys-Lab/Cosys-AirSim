@@ -11,7 +11,7 @@ tell AirSim to use a `SteppableClock`, and set `UseTcp` to `true` and `LockStep`
 
 ```
     {
-        "SettingsVersion": 1.2,
+        "SettingsVersion": 2.0,
         "SimMode": "Multirotor",
         "ClockType": "SteppableClock",
         "Vehicles": {
