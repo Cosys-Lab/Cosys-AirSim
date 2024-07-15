@@ -9,13 +9,10 @@ This fork is based on last public AirSim release from Microsoft's GitHub.
 
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
 Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to collaborate. 
-The [original AirSim MIT license](LICENSE) applies to all native AirSim source files. 
-Please note that we use that same [MIT license](LICENSE) as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
+The [original AirSim MIT license](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE) applies to all native AirSim source files. 
+Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE) as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
-The biggest difference is that this requires custom Unreal Engine! See [documentation](README.md#how-to-get-it) below. 
-
-A manually maintained fork of this repository is available to the public: https://github.com/Cosys-Lab/Cosys-AirSim
 
 ### Associated publications
 
@@ -31,8 +28,6 @@ A manually maintained fork of this repository is available to the public: https:
   pages={37-48},
   doi={}}
 ```
-
-You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSIM '23 conference [here](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/annsim23_tutorial) together with the associated videos.
 
 - [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)
 ```
@@ -63,39 +58,39 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 
 ## Cosys-Lab Modifications
 * Added support for Unreal to 5.2.1.
-* Added [multi-layer annotation](docs/annotation.md) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
-* Added [Instance Segmentation](docs/instance_segmentation.md). 
-* Added [Echo sensor type](docs/echo.md) for simulation of sensors like sonar and radar.
-* Added [GPU LIDAR sensor type](docs/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
-* Added [skid steering SimMode and vehicle type](docs/skid_steer_vehicle.md). ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
-* Added [Matlab API Client](docs/matlab.md) implementation as an easy to install Matlab toolbox.
-* Added various [random but deterministic dynamic object types and world configuration options](docs/dynamic_objects.md).
+* Added [multi-layer annotation]https://cosys-lab.github.io/annotation.md) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
+* Added [Instance Segmentation]https://cosys-lab.github.io/instance_segmentation.md). 
+* Added [Echo sensor type]https://cosys-lab.github.io/echo.md) for simulation of sensors like sonar and radar.
+* Added [GPU LIDAR sensor type]https://cosys-lab.github.io/gpulidar.md): Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.
+* Added [skid steering SimMode and vehicle type]https://cosys-lab.github.io/skid_steer_vehicle.md). ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
+* Added [Matlab API Client]https://cosys-lab.github.io/matlab.md) implementation as an easy to install Matlab toolbox.
+* Added various [random but deterministic dynamic object types and world configuration options]https://cosys-lab.github.io/dynamic_objects.md).
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
-* Updated [ComputerVision mode](docs/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
-* Updated [LIDAR sensor type](docs/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
+* Updated [ComputerVision mode]https://cosys-lab.github.io/image_apis.md#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
+* Updated [LIDAR sensor type]https://cosys-lab.github.io/lidar.md): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
-* Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](docs/settings.md).
+* Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file]https://cosys-lab.github.io/settings.md).
 * Updated cameras sensor with more distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](docs/ros.md) with completely new implementation and feature set.
-* Updated C++ [ROS2 implementation](docs/ros.md) to support custom Cosys-AirSim features.
+* Updated Python [ROS implementation]https://cosys-lab.github.io/ros.md) with completely new implementation and feature set.
+* Updated C++ [ROS2 implementation]https://cosys-lab.github.io/ros.md) to support custom Cosys-AirSim features.
 * Dropped support for Unity Environments.
 
-Some more details on our changes can be found in the [changelog](CHANGELOG.md).
+Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
 
 ## How to Get It
 This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
 
 ### Windows
-* [Install/Build it](docs/install_windows.md)
+* [Install/Build it](https://cosys-lab.github.io/install_windows.md)
 ### Linux
-* [Install/Build it](docs/install_linux.md)
+* [Install/Build it](https://cosys-lab.github.io/install_linux.md)
 
 ## How to Use It
 
 ### Documentation
 
-View our [detailed documentation](docs) on all aspects of Cosys-AirSim.
+View our [detailed documentation](https://cosys-lab.github.io/) on all aspects of Cosys-AirSim.
 
 ## Participate
 
@@ -115,4 +110,4 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
 
 ## License
 
-This project is released under the MIT License. Please review the [License file](LICENSE) for more details.
+This project is released under the MIT License. Please review the [License file](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE) for more details.
