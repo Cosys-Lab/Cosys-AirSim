@@ -23,7 +23,7 @@ You can alternatively install Unreal Engine from source if you do not use a Ubun
 - Clone AirSim and build it:
    ```bash
    # go to the folder where you clone GitHub projects
-   git clone https://cosysgit.uantwerpen.be/sensorsimulation/airsim.git
+   git clone https://github.com/Cosys-Lab/Cosys-AirSim.git
    cd AirSim
    ./setup.sh
    ./build.sh

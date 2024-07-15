@@ -122,20 +122,20 @@ for response in responses:
 * `simListSceneObjects`:  Provides a list of all objects in the environment. You can also use regular expression to filter specific objects by name. For example, the code below sets all meshes which have names starting with "wall" you can use `simListSceneObjects("wall[\w]*")`.
 
 ### Image/Computer Vision/Instance segmentation APIs
-AirSim offers comprehensive images APIs to retrieve synchronized images from multiple cameras along with ground truth including depth, disparity, surface normals and vision. You can set the resolution, FOV, motion blur etc parameters in [settings.json](settings.md). There is also API for detecting collision state. See also [complete code](https://github.com/Microsoft/AirSim/tree/master/Examples/DataCollection/StereoImageGenerator.hpp) that generates specified number of stereo images and ground truth depth with normalization to camera plan, computation of disparity image and saving it to [pfm format](pfm.md).
+AirSim offers comprehensive images APIs to retrieve synchronized images from multiple cameras along with ground truth including depth, disparity, surface normals and vision. You can set the resolution, FOV, motion blur etc parameters in [settings.json](settings.md). There is also API for detecting collision state. See also [complete code](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Examples/DataCollection/StereoImageGenerator.hpp) that generates specified number of stereo images and ground truth depth with normalization to camera plan, computation of disparity image and saving it to [pfm format](pfm.md).
 Furthermore, the [Instance Segmentation](instance_segmentation.md) system can also be manipulated through the API.
 
 More on [image APIs, Computer Vision mode and instance segmentation configuration](image_apis.md).
 
 ### Pause and Continue APIs
-AirSim allows to pause and continue the simulation through `pause(is_paused)` API. To pause the simulation call `pause(True)` and to continue the simulation call `pause(False)`. You may have scenario, especially while using reinforcement learning, to run the simulation for specified amount of time and then automatically pause. While simulation is paused, you may then do some expensive computation, send a new command and then again run the simulation for specified amount of time. This can be achieved by API `continueForTime(seconds)`. This API runs the simulation for the specified number of seconds and then pauses the simulation. For example usage, please see [pause_continue_car.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//car/pause_continue_car.py) and [pause_continue_drone.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//multirotor/pause_continue_drone.py).
+AirSim allows to pause and continue the simulation through `pause(is_paused)` API. To pause the simulation call `pause(True)` and to continue the simulation call `pause(False)`. You may have scenario, especially while using reinforcement learning, to run the simulation for specified amount of time and then automatically pause. While simulation is paused, you may then do some expensive computation, send a new command and then again run the simulation for specified amount of time. This can be achieved by API `continueForTime(seconds)`. This API runs the simulation for the specified number of seconds and then pauses the simulation. For example usage, please see [pause_continue_car.py](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/car/pause_continue_car.py) and [pause_continue_drone.py](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/multirotor/pause_continue_drone.py).
 
 
 ### Collision API
 The collision information can be obtained using `simGetCollisionInfo` API. This call returns a struct that has information not only whether collision occurred but also collision position, surface normal, penetration depth and so on.
 
 ### Time of Day API
-AirSim assumes there exist sky sphere of class `EngineSky/BP_Sky_Sphere` in your environment with [ADirectionalLight actor](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/masterv1.4.0-linux/Unreal/Plugins/AirSim/Source/SimMode/SimModeBase.cpp#L224). By default, the position of the sun in the scene doesn't move with time. You can use [settings](settings.md#timeofday) to set up latitude, longitude, date and time which AirSim uses to compute the position of sun in the scene.
+AirSim assumes there exist sky sphere of class `EngineSky/BP_Sky_Sphere` in your environment with ADirectionalLight actor. By default, the position of the sun in the scene doesn't move with time. You can use [settings](settings.md#timeofday) to set up latitude, longitude, date and time which AirSim uses to compute the position of sun in the scene.
 
 You can also use following API call to set the sun position according to given date time:
 
@@ -177,9 +177,9 @@ class WeatherParameter:
     Fog = 7
 ```
 
-Please note that `Roadwetness`, `RoadSnow` and `RoadLeaf` effects requires adding [materials](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/Unreal/Plugins/AirSim/Content/Weather/WeatherFX) to your scene.
+Please note that `Roadwetness`, `RoadSnow` and `RoadLeaf` effects requires adding [materials](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/Weather/WeatherFX) to your scene.
 
-Please see [example code](https://cosysgit.uantwerpen.be/sensorsimulation/AirSim/-/blob/main/PythonClient/environment/weather.py) for more details.
+Please see [example code](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/environment/weather.py) for more details.
 
 ### Recording APIs
 
@@ -207,7 +207,7 @@ wind = airsim.Vector3r(20, 0, 0)
 client.simSetWind(wind)
 ```
 
-Also see example script in [set_wind.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient/multirotor/set_wind.py)
+Also see example script in [set_wind.py](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/multirotor/set_wind.py)
 
 ### Lidar APIs
 AirSim offers API to retrieve point cloud data from (GPU)Lidar sensors on vehicles. You can set the number of channels, points per second, horizontal and vertical FOV, etc parameters in [settings.json](settings.md). 
@@ -292,9 +292,9 @@ See the [Adding New APIs](adding_new_apis.md) page
 ## References and Examples
 
 * [C++ API Examples](apis_cpp.md)
-* [Car Examples](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//car)
-* [Multirotor Examples](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//multirotor)
-* [Computer Vision Examples](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//computer_vision)
+* [Car Examples](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/car)
+* [Multirotor Examples](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/multirotor)
+* [Computer Vision Examples](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/computer_vision)
 * [Move on Path](https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo) demo showing video of fast multirotor flight through Modular Neighborhood environment
 * [Building a Hexacopter](https://github.com/Microsoft/AirSim/wiki/hexacopter)
 * [Building Point Clouds](https://github.com/Microsoft/AirSim/wiki/Point-Clouds)

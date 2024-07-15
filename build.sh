@@ -137,7 +137,7 @@ echo " Cosys-AirSim plugin is built!."
 echo "==============================="
 echo ""
 echo "For further info see for installation see:"
-echo "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/mastermaster/docs/install_linux.md"
+echo "https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/install_linux.md"
 echo "=================================================================="
 
 popd >/dev/null

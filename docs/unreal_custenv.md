@@ -98,7 +98,7 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
 
 1. Go to 'Edit->Editor Preferences' in Unreal Editor, in the 'Search' box type 'CPU' and ensure that the 'Use Less CPU when in Background' is unchecked. If you don't do this then UE will be slowed down dramatically when UE window loses focus.
 
-1. Be sure to `Save` these edits. Hit the Play button in the Unreal Editor. See [how to use AirSim](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/#how-to-use-it).
+1. Be sure to `Save` these edits. Hit the Play button in the Unreal Editor. See the other documentation pages for how to use it.
 
 Congratulations! You are now running AirSim in your own Unreal environment.
 
@@ -108,7 +108,7 @@ By default AirSim prompts user for which vehicle to use. You can easily change t
 ## Updating Your Environment to Latest Version of AirSim
 Once you have your environment using above instructions, you should frequently update your local AirSim code to latest version from GitHub. Below are the instructions to do this:
 
-1. First put [clean.bat](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/Unreal/Environments/Blocks/clean.bat) (or [clean.sh](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/Unreal/Environments/Blocks/clean.sh) for Linux users) in the root folder of your environment. Run this file to clean up all intermediate files in your Unreal project.
+1. First put [clean.bat](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Environments/Blocks/clean.bat) (or [clean.sh](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Environments/Blocks/clean.sh) for Linux users) in the root folder of your environment. Run this file to clean up all intermediate files in your Unreal project.
 2. Do `git pull` in your AirSim repo followed by `build.cmd` (or `./build.sh` for Linux users).
 3. Replace [your project]/Plugins folder with AirSim/Unreal/Plugins folder.
 4. Right click on your .uproject file and chose "Generate Visual Studio project files" option. This is not required for Linux.

@@ -1,6 +1,6 @@
 {
-    "SeeDocsAt": "https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/blob/master/docs/settings.md",
-    "SettingsVersion": 2,
+    "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+    "SettingsVersion": 2.0,
     "ClockSpeed": 1,
     "LocalHostIp": "127.0.0.1",
     "ApiServerPort": 41451,
