@@ -1,3 +1,0 @@
-msgpack-rpc-python
-numpy
-opencv-contrib-python

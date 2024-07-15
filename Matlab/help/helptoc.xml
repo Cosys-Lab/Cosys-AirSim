@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding="utf-8"?>
-
-<toc version="2.0">
-<!-- First tocitem specifies top level in Help browser Contents pane -->
-<!-- This can be a roadmap page, as shown below, or a content page -->
-    <tocitem target="help.html">Documentation
-    </tocitem>
-</toc>
