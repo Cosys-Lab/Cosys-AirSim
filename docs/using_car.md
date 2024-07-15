@@ -4,7 +4,7 @@ By default Cosys-AirSim prompts user for which vehicle to use. You can easily ch
 
 ```
 {
-  "SettingsVersion": 1.2,
+  "SettingsVersion": 2.0,
   "SimMode": "Car"
 }
 ```

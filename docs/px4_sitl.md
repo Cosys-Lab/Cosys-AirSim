@@ -54,7 +54,7 @@ The default ports have changed recently, so check them closely to make sure Cosy
 5. Now edit [Cosys-AirSim settings](settings.md) file to make sure you have matching UDP and TCP port settings:
     ```json
     {
-        "SettingsVersion": 1.2,
+        "SettingsVersion": 2.0,
         "SimMode": "Multirotor",
         "ClockType": "SteppableClock",
         "Vehicles": {

@@ -27,7 +27,7 @@ You can also get a realtime view if you connect the LogViewer `before` you run t
 For this to work you need to configure the `settings.json` with the following settings:
 ```
 {
-    "SettingsVersion": 1.2,
+    "SettingsVersion": 2.0,
     "SimMode": "Multirotor",
     "Vehicles": {
         "PX4": {

@@ -8,7 +8,7 @@ AirSim can capture mavlink log files if you add the following to the PX4 section
 
 ```json
 {
-    "SettingsVersion": 1.2,
+    "SettingsVersion": 2.0,
     "SimMode": "Multirotor",
     "Vehicles": {
         "PX4": {

@@ -10,14 +10,14 @@ You can either use XBox controller or [FrSky Taranis X9D Plus](https://hobbyking
 
 ### Other Devices
 
-AirSim can detect large variety of devices however devices other than above *might* need extra configuration. In future we will add ability to set this config through settings.json. For now, if things are not working then you might want to try workarounds such as [x360ce](http://www.x360ce.com/) or change code in [SimJoystick.cpp file](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/Unreal/Plugins/AirSim/Source/SimJoyStick/SimJoyStick.cpp#L50).
+AirSim can detect large variety of devices however devices other than above *might* need extra configuration. In future we will add ability to set this config through settings.json. For now, if things are not working then you might want to try workarounds such as [x360ce](http://www.x360ce.com/) or change code in [SimJoystick.cpp file](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Source/SimJoyStick/SimJoyStick.cpp#L50).
 
 ### Note on FrSky Taranis X9D Plus
 
 [FrSky Taranis X9D Plus](https://hobbyking.com/en_us/frsky-2-4ghz-accst-taranis-x9d-plus-and-x8r-combo-digital-telemetry-radio-system-mode-2.html) is real UAV remote control with an advantage that it has USB port so it can be directly connected to PC. You can [download AirSim config file](misc/AirSim_FrSkyTaranis.bin) and [follow this tutorial](https://www.youtube.com/watch?v=qe-13Gyb0sw) to import it in your RC. You should then see "sim" model in RC with all channels configured properly.
 
 ### Note on Linux
-Currently default config on Linux is for using Xbox controller. This means other devices might not work properly. In future we will add ability to configure RC in settings.json but for now you *might* have to change  code in [SimJoystick.cpp file](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/Unreal/Plugins/AirSim/Source/SimJoyStick/SimJoyStick.cpp#L340) to use other devices.
+Currently default config on Linux is for using Xbox controller. This means other devices might not work properly. In future we will add ability to configure RC in settings.json but for now you *might* have to change  code in [SimJoystick.cpp file](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Source/SimJoyStick/SimJoyStick.cpp#L340) to use other devices.
 
 ## RC Setup for PX4
 
@@ -49,7 +49,7 @@ Nils Tijtgat wrote an excellent blog on how to get the [DJI controller working w
 This typically happens if you have multiple RCs and or XBox/Playstation gamepads etc connected. In Windows, hit Windows+S key and search for "Set up USB Game controllers" (in older versions of Windows try "joystick"). This will show you all game controllers connected to your PC. If you don't see yours than Windows haven't detected it and so you need to first solve that issue. If you do see yours but not at the top of the list (i.e. index 0) than you need to tell AirSim because AirSim by default tries to use RC at index 0. To do this, navigate to your `~/Documents/AirSim` folder, open up `settings.json` and add/modify following setting. Below tells AirSim to use RC at index = 2.
 ```
 {
-    "SettingsVersion": 1.2,
+    "SettingsVersion": 2.0,
     "SimMode": "Multirotor",
     "Vehicles": {
         "SimpleFlight": {

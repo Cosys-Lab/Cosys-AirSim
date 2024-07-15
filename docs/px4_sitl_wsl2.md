@@ -46,7 +46,7 @@ This resolves to the WSL 2 remote ip address found in the TCP socket.
 
 ```json
 {
-    "SettingsVersion": 1.2,
+    "SettingsVersion": 2.0,
     "SimMode": "Multirotor",
     "ClockType": "SteppableClock",
     "Vehicles": {

@@ -1,11 +1,11 @@
 This is a tutorial for generating simulated thermal infrared (IR) images using Cosys-AirSim. 
 
-To generate your own data, you may use two python files: [create_ir_segmentation_map.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//computer_vision/create_ir_segmentation_map.py) and 
-[capture_ir_segmentation.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//computer_vision/capture_ir_segmentation.py).
+To generate your own data, you may use two python files: [create_ir_segmentation_map.py](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/computer_vision/create_ir_segmentation_map.py) and 
+[capture_ir_segmentation.py](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/computer_vision/capture_ir_segmentation.py).
 
-[create_ir_segmentation_map.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//computer_vision/create_ir_segmentation_map.py) uses temperature, emissivity, and camera response information to estimate the thermal digital count that could be expected for the objects in the environment, and then reassigns the segmentation IDs in Cosys-AirSim to match these digital counts. It should be run before starting to capture thermal IR data. Otherwise, digital counts in the IR images will be incorrect. The camera response, temperature, and emissivity data are all included for the Africa environment.
+[create_ir_segmentation_map.py](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/computer_vision/create_ir_segmentation_map.py) uses temperature, emissivity, and camera response information to estimate the thermal digital count that could be expected for the objects in the environment, and then reassigns the segmentation IDs in Cosys-AirSim to match these digital counts. It should be run before starting to capture thermal IR data. Otherwise, digital counts in the IR images will be incorrect. The camera response, temperature, and emissivity data are all included for the Africa environment.
 
-[capture_ir_segmentation.py](https://cosysgit.uantwerpen.be/sensorsimulation/airsim/-/tree/master/PythonClient//computer_vision/capture_ir_segmentation.py) is run after the segmentation IDs have been reassigned. It tracks objects of interest and records the infrared and scene images from the multirotor. It uses Computer Vision mode.
+[capture_ir_segmentation.py](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/computer_vision/capture_ir_segmentation.py) is run after the segmentation IDs have been reassigned. It tracks objects of interest and records the infrared and scene images from the multirotor. It uses Computer Vision mode.
 
 Finally, the details about how temperatures were estimated for plants and animals in the Africa environment, etc. can be found in this paper:
 
