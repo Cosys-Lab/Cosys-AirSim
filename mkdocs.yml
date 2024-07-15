@@ -14,9 +14,10 @@ nav:
   - "Home":
     - "Home": 'README.md'
   - "Changelog": 'https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md'
-  - "Building AirSim":
-    - "Install on Windows": 'install_windows.md'
-    - "Install on Linux": 'install_linux.md'
+  - "Installing AirSim":
+    - "Download and install from precompiled plugin": 'install_precompiled.md'
+    - "Install from Source on Windows": 'install_windows.md'
+    - "Install from Source on Linux": 'install_linux.md'
     - "Custom Unreal Environment": 'unreal_custenv.md'
   - "Using AirSim":
     - "Core APIs": 'apis.md'
