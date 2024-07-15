@@ -1,0 +1,86 @@
+site_name: Cosys-AirSim
+repo_url: https://github.com/Cosys-Lab/Cosys-AirSim
+site_description: 'AirSim is a simulator for drones, cars and more, built on Unreal Engine. We expand it with new implementations and sensor modalities.'
+
+theme: readthedocs
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+edit_uri: https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/
+
+nav:
+  - "Home":
+    - "Home": 'README.md'
+  - "Changelog": 'https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md'
+  - "Building AirSim":
+    - "Build on Windows": 'build_windows.md'
+    - "Build on Linux": 'build_linux.md'
+    - "Custom Unreal Environment": 'unreal_custenv.md'
+  - "Using AirSim":
+    - "Core APIs": 'apis.md'
+    - "Image APIs": 'image_apis.md'
+    - "Instance Segmentation": 'instance_segmentation.md'
+    - "Development Workflow": 'dev_workflow.md'
+    - "Settings": 'settings.md'
+    - "Camera Views": 'camera_views.md'
+    - "Car Mode": 'using_car.md'
+    - "Remote Control": 'remote_control.md'
+    - "XBox Controller": 'xbox_controller.md'
+    - "Steering Wheel": 'steering_wheel_installation.md'
+    - "Multiple Vehicles": 'multi_vehicle.md'
+    - "Skid Steer Vehicles": 'skid_steer_vehicle.md'
+    - "Sensors":
+      - "Sensors": 'sensors.md'
+      - "LIDAR": 'lidar.md'
+      - "GPU LIDAR": 'gpulidar.md'
+      - "Pulse Echo": 'echo.md'
+      - "Infrared Camera": "InfraredCamera.md"
+    - "ROS":
+      - "ROS: AirSim ROS Wrapper": "ros.md"
+      - "Using ROS on Windows with WSL": "ROS_on_Windows_with_WSL.md"
+    - "Matlab": 'matlab.md'
+    - "Playing Logs": 'playback.md'
+  - "Design":
+    - "Code Structure": 'code_structure.md'
+    - "Modifying Recording Data": 'modify_recording_data.md'
+    - "Coding Guidelines": 'coding_guidelines.md'
+    - "Flight Controller": 'flight_controller.md'
+    - "Simple Flight": 'simple_flight.md'
+  - "External Flight Controllers":
+    - "MavLink and PX4":
+      - "PX4 Setup for AirSim": 'px4_setup.md'
+      - "PX4 in SITL": 'px4_sitl.md'
+      - "AirSim with Pixhawk": 'https://youtu.be/1oY8Qu5maQQ'
+      - "PX4 Setup with AirSim": 'https://youtu.be/HNWdYrtw3f0'
+      - "Debugging Attitude Estimation": 'https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be'
+      - "Intercepting MavLink Messages": 'https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages'
+      - "Rapid Descent on PX4 Drones": 'https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones'
+      - "Building PX4": "px4_build.md"
+      - "PX4/MavLink Logging": 'px4_logging.md'
+      - "MavLink LogViewer": "log_viewer.md"
+    - "ArduPilot":
+      - "ArduPilot SITL Setup": "https://ardupilot.org/dev/docs/building-the-code.html"
+      - "AirSim & ArduPilot": "https://ardupilot.org/dev/docs/sitl-with-airsim.html"
+  - "Contributed Tutorials":
+    - "Reinforcement Learning": 'reinforcement_learning.md'
+    - "Using Environments from Marketplace": 'https://www.youtube.com/watch?v=y09VbdQWvQY'
+    - "Simple Collision Avoidance": 'https://github.com/simondlevy/AirSimTensorFlow'
+    - "Autonomous Driving on Azure": 'https://aka.ms/AutonomousDrivingCookbook'
+    - "Building Hexacopter": 'https://github.com/Microsoft/AirSim/wiki/hexacopter'
+    - "Moving on Path Demo": 'https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo'
+    - "Importing a custom multirotor mesh": 'https://youtu.be/Bp86WiLUC80'
+    - "AirSim with MAVROS and PX4": 'https://youtu.be/ZonkdMcwXH4'
+  - "Misc":
+    - "AirSim on Real Drones": 'custom_drone.md'
+    - "Installing cmake on Linux": 'cmake_linux.md'
+    - "Tips for Busy HDD": 'hard_drive.md'
+    - "pfm format": 'pfm.md'
+    - "Setting up Unreal Environment": 'unreal_proj.md'
+    - "Blocks Environment": 'unreal_blocks.md'
+    - "Who is Using AirSim": 'who_is_using.md'
+    - "Working with UE Plugin Contents": 'working_with_plugin_contents.md'
+    - "Formula Student Technion Self-drive": 'https://github.com/Microsoft/AirSim/wiki/technion'
+  - "Support":
+    - "FAQ": 'faq.md'
