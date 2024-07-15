@@ -54,14 +54,14 @@ public:
         return keyboard_controls_;
     }
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkidVehicle|General")
     float max_angular_velocity_ = 15;
 
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkidVehicle|General")
     float fixed_turn_rate_ = 0.1;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere) 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkidVehicle|General")
     bool stop_turn_ = false;
 
 private:

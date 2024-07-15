@@ -25,7 +25,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "UWBBeacon|General")
 	UStaticMeshComponent* Mesh;
 
 	//msr::airlib::AirSimSettings::BeaconSetting* beaconSetting;
