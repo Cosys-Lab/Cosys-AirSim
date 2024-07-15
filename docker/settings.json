@@ -1,0 +1,19 @@
+{
+  "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+  "SettingsVersion": 2.0,
+  "SimMode": "Multirotor",
+  "ClockSpeed": 1.0,
+  "Vehicles": {
+    "SimpleFlight": {
+      "VehicleType": "SimpleFlight",
+      "DefaultVehicleState": "Armed",
+      "EnableCollisionPassthrough": false,
+      "EnableCollisions": true,
+      "AllowAPIAlways": true,
+      "RC": {
+        "RemoteControlID": 0,
+        "AllowAPIWhenDisconnected": false
+      }
+    }
+  }
+}

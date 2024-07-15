@@ -1,0 +1,50 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "/home/girmi/opt/UnrealEngine"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"files.associations": {
+			"*.launch": "xml",
+			"*.machine": "xml",
+			"cctype": "cpp",
+			"clocale": "cpp",
+			"cmath": "cpp",
+			"cstdarg": "cpp",
+			"cstddef": "cpp",
+			"cstdio": "cpp",
+			"cstdlib": "cpp",
+			"cstring": "cpp",
+			"ctime": "cpp",
+			"cwchar": "cpp",
+			"cwctype": "cpp",
+			"atomic": "cpp",
+			"hash_map": "cpp",
+			"strstream": "cpp",
+			"*.tcc": "cpp",
+			"chrono": "cpp",
+			"cinttypes": "cpp",
+			"codecvt": "cpp",
+			"condition_variable": "cpp",
+			"cstdint": "cpp",
+			"forward_list": "cpp",
+			"optional": "cpp",
+			"string_view": "cpp",
+			"slist": "cpp",
+			"future": "cpp",
+			"initializer_list": "cpp",
+			"iosfwd": "cpp",
+			"mutex": "cpp",
+			"ratio": "cpp",
+			"system_error": "cpp",
+			"thread": "cpp",
+			"typeindex": "cpp",
+			"algorithm": "cpp"
+		}
+	}
+}
