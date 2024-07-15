@@ -29,6 +29,9 @@ Please contact a Cosys-Lab researcher to get more in depth information on which 
   doi={}}
 ```
 
+You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSIM '23 conference [here](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/annsim23_tutorial) together with the associated videos.
+
+
 - [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)
 ```
 @inproceedings{lidarsim2022jansen,
