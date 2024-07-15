@@ -78,12 +78,12 @@ Please contact a Cosys-Lab researcher to get more in depth information on which 
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
 
 ## How to Get It
-This branch uses a custom Unreal Engine version! Please read the documentation carefully. 
 
-
-### Windows
+#### Download and install from precompiled plugin - Windows/Linux
+* [Download and install it](https://cosys-lab.github.io/install_precompiled)
+#### Install and use from source - Windows
 * [Install/Build it](https://cosys-lab.github.io/install_windows)
-### Linux
+#### Install and use from source - Linux
 * [Install/Build it](https://cosys-lab.github.io/install_linux)
 
 ## How to Use It
