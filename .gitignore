@@ -397,3 +397,4 @@ PythonClient/docs/_build
 /PythonClient/cosysairsim.egg-info/
 .vscode/
 .vscode/settings.json
+/site/
