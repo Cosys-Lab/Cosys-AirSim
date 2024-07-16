@@ -1,4 +1,4 @@
-### June 2024 (Version 3.0)
+### June/July 2024 (Version 3.0)
 * Updated to be compatible with Unreal 5.4.2. 
     * Note that 5.4.2 requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-5354-scene-camera-bug).
     * Updated rpclib version to unofficial patched version 2.3.1 to better support C++20.
