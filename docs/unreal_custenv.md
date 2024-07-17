@@ -18,7 +18,7 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
     
     !!!note
 
-        The Landscape Mountains project is supported up to Unreal Engine version 4.24. If you do not have 4.24 installed, you should see a dialog titled `Select Unreal Engine Version` with a dropdown to select from installed versions. Select 5.4.2 to migrate the project to a supported engine version. If you have 4.24 installed, you can manually migrate the project by navigating to the corresponding .uproject file in Windows Explorer, right-clicking it, and selecting the `Switch Unreal Engine version...` option. 
+        The Landscape Mountains project is supported up to Unreal Engine version 4.24. If you do not have 4.24 installed, you should see a dialog titled `Select Unreal Engine Version` with a dropdown to select from installed versions. Select 5.4 to migrate the project to a supported engine version. If you have 4.24 installed, you can manually migrate the project by navigating to the corresponding .uproject file in Windows Explorer, right-clicking it, and selecting the `Switch Unreal Engine version...` option. 
 
 4. Go to the `LandscapeMountains` project folder and create a new subfolder called `Plugins`. Now copy the precompiled AirSim Plugin folder into this newly created folder. This way now your own Unreal project has AirSim plugin.
 
@@ -67,7 +67,7 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
 
 ## Step-by-Step Instructions when using Cosys-AirSim from Source Build
 
-1. Make sure AirSim is built and Unreal 5.4.2 is installed as described in [the installation instructions](install_windows.md).
+1. Make sure AirSim is built and Unreal 5.4 is installed as described in [the installation instructions](install_windows.md).
 2. In `Epic Games Launcher` click the Samples tab then scroll down and find `Landscape Mountains`. Click the `Create Project` and download this content (~2GB download). 
 
     ![current version](images/landscape_mountains.png)
@@ -78,7 +78,7 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
     
     !!!note
 
-        The Landscape Mountains project is supported up to Unreal Engine version 4.24. If you do not have 4.24 installed, you should see a dialog titled `Select Unreal Engine Version` with a dropdown to select from installed versions. Select 5.4.2 to migrate the project to a supported engine version. If you have 4.24 installed, you can manually migrate the project by navigating to the corresponding .uproject file in Windows Explorer, right-clicking it, and selecting the `Switch Unreal Engine version...` option. 
+        The Landscape Mountains project is supported up to Unreal Engine version 4.24. If you do not have 4.24 installed, you should see a dialog titled `Select Unreal Engine Version` with a dropdown to select from installed versions. Select 5.4 to migrate the project to a supported engine version. If you have 4.24 installed, you can manually migrate the project by navigating to the corresponding .uproject file in Windows Explorer, right-clicking it, and selecting the `Switch Unreal Engine version...` option. 
 
 4. From the `File menu` select `New C++ class`, leave default `None` on the type of class, click `Next`, leave default name `MyClass`, and click `Create Class`. We need to do this because Unreal requires at least one source file in project. It should trigger compile and open up Visual Studio solution `LandscapeMountains.sln`.
 
