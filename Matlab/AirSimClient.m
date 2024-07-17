@@ -143,7 +143,7 @@ classdef AirSimClient < handle
 
             data = obj.rpc_client.call("getImuData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(data{"time_stamp"}))/1e9);
+            timestamp = double(double(data{"time_stamp"}))/1e9;
 
             imuData.orientation = quatinv(struct2array(struct(data{"orientation"})));
             imuData.angularVelocity = obj.nedToRightHandCoordinates(struct2array(struct(data{"angular_velocity"})));
@@ -165,7 +165,7 @@ classdef AirSimClient < handle
 
             data = obj.rpc_client.call("getBarometerData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(data{"time_stamp"}))/1e9);
+            timestamp = double(double(data{"time_stamp"}))/1e9;
             barometerData.altitude = quatinv(struct2array(struct(data{"altitude"})));
             barometerData.pressure = obj.nedToRightHandCoordinates(struct2array(struct(data{"pressure"})));
             barometerData.qnh = obj.nedToRightHandCoordinates(struct2array(struct(data{"qnh"})));
@@ -186,7 +186,7 @@ classdef AirSimClient < handle
 
             data = obj.rpc_client.call("getMagnetometerData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(data{"time_stamp"}))/1e9);
+            timestamp = double(double(data{"time_stamp"}))/1e9;
             MagnetometerData.magnetic_field_body = obj.nedToRightHandCoordinates(struct2array(struct(data{"magnetic_field_body"})));
             MagnetometerData.magnetic_field_covariance = double(data{"magnetic_field_covariance"});
         end
@@ -207,7 +207,7 @@ classdef AirSimClient < handle
 
             data = obj.rpc_client.call("getGpsData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(data{"time_stamp"}))/1e9);
+            timestamp = double(double(data{"time_stamp"}))/1e9;
 
             gnssDataRaw = data{"gnss"};
             gnssData.eph = double(gnssDataRaw{"eph"});
@@ -220,7 +220,7 @@ classdef AirSimClient < handle
             geopoint.altitude = double(curGeoPointData{"altitude"});
             gnssData.geo_point = geopoint;            
             gnssData.fix_type = double(curGeoPointData{"fix_type"});
-            gnssData.time_utc = floor(double(double(curGeoPointData{"time_utc"}))/1e9);   
+            gnssData.time_utc = double(double(curGeoPointData{"time_utc"}))/1e9;   
             
             isValid = data{"is_valid"};
         end
@@ -240,7 +240,7 @@ classdef AirSimClient < handle
 
             data = obj.rpc_client.call("getDistanceSensorData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(data{"time_stamp"}))/1e9);
+            timestamp = double(double(data{"time_stamp"}))/1e9;
             curPoseData = data{"relative_pose"};
             DistanceSensorData.relative_pose.position = obj.nedToRightHandCoordinates(struct2array(struct(curPoseData{"position"})));
             DistanceSensorData.relative_pose.orientation = quatinv(struct2array(struct(curPoseData{"orientation"})));
@@ -269,7 +269,7 @@ classdef AirSimClient < handle
             
             echoData = obj.rpc_client.call("getEchoData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(echoData{"time_stamp"}))/1e9);
+            timestamp = double(double(echoData{"time_stamp"}))/1e9;
 
             % Get the sensor pose
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(echoData{"pose"}{"position"})));
@@ -347,7 +347,7 @@ classdef AirSimClient < handle
             
             lidarData = obj.rpc_client.call("getLidarData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(lidarData{"time_stamp"}))/1e9);
+            timestamp = double(double(lidarData{"time_stamp"}))/1e9;
 
             % Get the sensor pose
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(lidarData{"pose"}{"position"})));
@@ -386,7 +386,7 @@ classdef AirSimClient < handle
             
             lidarData = obj.rpc_client.call("getGPULidarData", sensorName, obj.vehicle_name);
 
-            timestamp = floor(double(double(lidarData{"time_stamp"}))/1e9);
+            timestamp = double(double(lidarData{"time_stamp"}))/1e9;
 
             % Get the sensor pose
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(lidarData{"pose"}{"position"})));
@@ -456,7 +456,7 @@ classdef AirSimClient < handle
                 image_reshaped = reshape(image_bytes, 3, camera_image.width.int32, camera_image.height.int32);
                 image = permute(image_reshaped,[3 2 1]);
             end
-            timestamp = floor(double(double(camera_image.time_stamp))/1e9);
+            timestamp = double(double(camera_image.time_stamp))/1e9;
         end
 
         function [images, timestamp] = getCameraImages(obj, sensorName, cameraTypes, annotationLayers)
@@ -507,7 +507,7 @@ classdef AirSimClient < handle
                     images{i} = rescale(permute(image_reshaped,[3 2 1]));
                 end
             end
-            timestamp = floor(double(double(camera_image.time_stamp))/1e9);
+            timestamp = double(double(camera_image.time_stamp))/1e9;
         end
 
         function [intrinsics, sensorPose] = getCameraInfo(obj, sensorName)
@@ -1049,7 +1049,7 @@ classdef AirSimClient < handle
 
             collisionData = vehicleStateAirSim{"collision"};
             collisionInfo = struct(collisionData);
-            collisionInfo.time_stamp = floor(double(double(collisionData{"time_stamp"}))/1e9);
+            collisionInfo.time_stamp = double(double(collisionData{"time_stamp"}))/1e9;
             collisionInfo.object_name = string(collisionData{"object_name"});
             collisionInfo.object_id = double(collisionData{"object_id"});
             collisionInfo.position = struct2array(struct(collisionData{"position"}));
@@ -1072,7 +1072,7 @@ classdef AirSimClient < handle
             geopoint.altitude = double(geopointData{"altitude"});
             MultirotorState.gps_location = geopoint;
 
-            MultirotorState.timestamp = floor(double(double(vehicleStateAirSim{"timestamp"}))/1e9);
+            MultirotorState.timestamp = double(double(vehicleStateAirSim{"timestamp"}))/1e9;
             MultirotorState.landed_state = vehicleStateAirSim{"landed_state"};
             MultirotorState.ready = vehicleStateAirSim{"ready"};
             MultirotorState.ready_message = string(vehicleStateAirSim{"ready_message"});
@@ -1101,7 +1101,7 @@ classdef AirSimClient < handle
 
             collisionData = vehicleStateAirSim{"collision"};
             collisionInfo = struct(collisionData);
-            collisionInfo.time_stamp = floor(double(double(collisionData{"time_stamp"}))/1e9);
+            collisionInfo.time_stamp = double(double(collisionData{"time_stamp"}))/1e9;
             collisionInfo.object_name = string(collisionData{"object_name"});
             collisionInfo.object_id = double(collisionData{"object_id"});
             collisionInfo.position = struct2array(struct(collisionData{"position"}));
@@ -1118,7 +1118,7 @@ classdef AirSimClient < handle
             kinematicsState.angular_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(kinematicData{"angular_acceleration"})));
             CarState.kinematics_estimated = kinematicsState;
 
-            CarState.timestamp = floor(double(double(vehicleStateAirSim{"timestamp"}))/1e9);
+            CarState.timestamp = double(double(vehicleStateAirSim{"timestamp"}))/1e9;
             CarState.speed = vehicleStateAirSim{"speed"};
             CarState.gear = vehicleStateAirSim{"gear"};
             CarState.rpm = vehicleStateAirSim{"rpm"};
@@ -1291,7 +1291,7 @@ classdef AirSimClient < handle
 
             collisionData = obj.rpc_client.call("simGetCollisionInfo", obj.vehicle_name);
             collisionInfo = struct(collisionData);
-            collisionInfo.time_stamp = floor(double(double(collisionData{"time_stamp"}))/1e9);
+            collisionInfo.time_stamp = double(double(collisionData{"time_stamp"}))/1e9;
             collisionInfo.object_name = string(collisionData{"object_name"});
             collisionInfo.object_id = double(collisionData{"object_id"});
             collisionInfo.position = struct2array(struct(collisionData{"position"}));
