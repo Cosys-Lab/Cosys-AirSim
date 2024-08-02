@@ -275,8 +275,8 @@ To retrieve the color map to know which color is assign to each color index you 
 ```python
 colorMap = client.simGetSegmentationColorMap()
 ```
-An example can be found in [segmentation_test.py](../PythonClient/segmentation/segmentation_test.py).
-For a script that generates a full list of objects and their associated color, please see the script  [segmentation_generate_list.py](../PythonClient/segmentation/segmentation_generate_list.py).
+An example can be found in _segmentation_test.py_ (Cosys-AirSim/PythonClient/segmentation/segmentation_test.py).
+For a script that generates a full list of objects and their associated color, please see the script _segmentation_generate_list.py_ (Cosys-AirSim/PythonClient/segmentation/segmentation_generate_list.py).
 
 #### How to Find Mesh names?
 To get desired ground truth segmentation you will need to know the names of the meshes in your Unreal environment. To do this, you can use the API:

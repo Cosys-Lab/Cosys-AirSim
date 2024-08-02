@@ -50,4 +50,3 @@ Testing is required to ensure that the API is working as expected. For this, as 
 
 It is recommended to use a virtual environment for dealing with Python packaging so as to not break any existing setup.
 
-When opening a PR, make sure to follow the [coding guidelines](coding_guidelines.md). Also add a docstring for the API in the Python files, and please include any example scripts and settings required in the script as well.
