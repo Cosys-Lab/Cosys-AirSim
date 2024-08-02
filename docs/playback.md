@@ -2,8 +2,7 @@
 
 AirSim supports playing back the high level commands in a *.mavlink log file that were recorded using the MavLinkTest app
 for the purpose of comparing real and simulated flight.
-The [recording.mavlink](logs/recording.mavlink) is an example of a log file captured using a real drone using the following
-command line:
+Example command line:
 
 ```
 MavLinkTest -serial:/dev/ttyACM0,115200 -logdir:. 

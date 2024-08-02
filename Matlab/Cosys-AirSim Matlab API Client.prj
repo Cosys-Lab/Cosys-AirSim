@@ -8,7 +8,7 @@
     <param.description>This a client implementation of the RPC API for Matlab for the Cosys-AirSim simulation framework. A main class AirSimClient is available which implements all API calls.
 Do note that at this point not all functions have been tested and most function documentation was auto-generated. This is still a WIP client.</param.description>
     <param.screenshot />
-    <param.version>3.0.0.2</param.version>
+    <param.version>3.0.1.0</param.version>
     <param.output>${PROJECT_ROOT}\Cosys-AirSim Matlab API Client.mltbx</param.output>
     <param.products.name>
       <item>Aerospace Toolbox</item>
@@ -105,7 +105,6 @@ Do note that at this point not all functions have been tested and most function 
     </fileset.rootdir>
     <fileset.rootfiles>
       <file>${PROJECT_ROOT}\AirSimCameraTypes.m</file>
-      <file>${PROJECT_ROOT}\AirSimClient.asv</file>
       <file>${PROJECT_ROOT}\AirSimClient.m</file>
       <file>${PROJECT_ROOT}\AirSimDrivetrainTypes.m</file>
       <file>${PROJECT_ROOT}\AirSimGenerateColorMap.m</file>
