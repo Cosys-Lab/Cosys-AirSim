@@ -2268,7 +2268,7 @@ class MultirotorClient(VehicleClient, object):
             vehicle_name (str, optional): Vehicle to get the state of
 
         Returns:
-            MultirotorState:
+            MultirotorState: Struct containing multirotor state values
         """
         return MultirotorState.from_msgpack(self.client.call('getMultirotorState', vehicle_name))
 
@@ -2313,7 +2313,7 @@ class CarClient(VehicleClient, object):
             vehicle_name (str, optional): Name of vehicle
 
         Returns:
-            CarState:
+            CarState: Struct containing car state values
         """
         state_raw = self.client.call('getCarState', vehicle_name)
         return CarState.from_msgpack(state_raw)
@@ -2324,7 +2324,26 @@ class CarClient(VehicleClient, object):
             vehicle_name (str, optional): Name of vehicle
 
         Returns:
-            CarControls:
+            CarControls: Struct containing control values
         """
         controls_raw = self.client.call('getCarControls', vehicle_name)
         return CarControls.from_msgpack(controls_raw)
+
+
+#------------------------------ ComputerVision APIs ---------------------------------------
+class ComputerVisionClient(VehicleClient, object):
+    def __init__(self, ip="", port=41451, timeout_value=3600):
+        super(ComputerVisionClient, self).__init__(ip, port, timeout_value)
+
+    def getComputerVisionState(self, vehicle_name=''):
+        """
+        The position inside the returned ComputerVisionState is in the frame of the vehicle's starting point
+
+        Args:
+            vehicle_name (str, optional): Name of vehicle
+
+        Returns:
+            ComputerVisionState: Struct containing computer vision state values
+        """
+        state_raw = self.client.call('getComputerVisionState', vehicle_name)
+        return ComputerVisionState.from_msgpack(state_raw)
