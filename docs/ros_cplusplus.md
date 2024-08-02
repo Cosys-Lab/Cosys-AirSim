@@ -7,7 +7,7 @@ The following was tested on Ubuntu 22.04 with ROS2 Iron.
 
 - Build Cosys-AirSim as per the instructions.
 
-- Make sure that you have set up the environment variables for ROS as mentioned in the installation pages above. Add the `source` command to your `.bashrc` for convenience (replace `iron` with specific version name) -
+- Make sure that you have set up the environment variables for ROS. Add the `source` command to your `.bashrc` for convenience (replace `iron` with specific version name) -
 ```shell
 echo "source /opt/ros/iron/setup.bash" >> ~/.bashrc
 source ~/.bashrc
@@ -19,13 +19,13 @@ source ~/.bashrc
 apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
-rosdep install --from-paths src -y --ignore-src
+rosdep install --from-paths src -y --ignore-src --skip-keys pcl --skip-keys message_runtime --skip-keys message_generation
 ```
 
 - Build ROS package
 
 ```shell
-colcon build DCMAKE_BUILD_TYPE=Release
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
 ## Running
@@ -57,7 +57,7 @@ The publishers will be automatically created based on the settings in the `setti
 - `/airsim_node/VEHICLE-NAME/global_gps` [sensor_msgs::NavSatFix](https://docs.ros.org/api/sensor_msgs/html/msg/NavSatFix.html)
   This the current GPS coordinates of the drone in airsim.
 
-- `/airsim_node/VEHICLE-NAME/environment` [sensor_msgs::Environment](https://docs.ros.org/api/sensor_msgs/html/msg/Environment.html)
+- `/airsim_node/VEHICLE-NAME/environment` [airsim_interfaces::Environment](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/Environment.msg)
 
 - `/airsim_node/VEHICLE-NAME/odom_local` [nav_msgs::Odometry](https://docs.ros.org/api/nav_msgs/html/msg/Odometry.html)
   Odometry frame (default name: odom_local, launch name and frame type are configurable) wrt take-off point.

@@ -19,6 +19,7 @@ nav:
     - "Install from Source on Windows": 'install_windows.md'
     - "Install from Source on Linux": 'install_linux.md'
     - "Custom Unreal Environment": 'unreal_custenv.md'
+    - "Dynamic Objects": 'dynamic_objects.md'
   - "Using AirSim":
     - "Core APIs": 'apis.md'
     - "Image APIs": 'image_apis.md'
@@ -87,12 +88,8 @@ nav:
   - "Misc":
     - "AirSim on Real Drones": 'custom_drone.md'
     - "Installing cmake on Linux": 'cmake_linux.md'
-    - "Tips for Busy HDD": 'hard_drive.md'
     - "pfm format": 'pfm.md'
     - "Setting up Unreal Environment": 'unreal_proj.md'
     - "Blocks Environment": 'unreal_blocks.md'
-    - "Who is Using AirSim": 'who_is_using.md'
     - "Working with UE Plugin Contents": 'working_with_plugin_contents.md'
     - "Formula Student Technion Self-drive": 'https://github.com/Microsoft/AirSim/wiki/technion'
-  - "Support":
-    - "FAQ": 'faq.md'

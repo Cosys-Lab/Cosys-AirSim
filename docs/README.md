@@ -3,9 +3,6 @@
 Cosys-AirSim is a simulator for drones, cars and more, with extensive API support, built on [Unreal Engine](https://www.unrealengine.com/). It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. 
 
 This fork is based on last public AirSim release from Microsoft's GitHub.
-
-## Cosys-Lab Modifications
-
 Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
 Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to collaborate. 
 The [original AirSim MIT license](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE) applies to all native AirSim source files. 
@@ -13,7 +10,7 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
-### Associated publications
+## Associated publications
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
 ```
@@ -94,9 +91,7 @@ Some more details on our changes can be found in the [changelog](https://github.
 
 View our [detailed documentation](https://cosys-lab.github.io/) on all aspects of Cosys-AirSim.
 
-## Participate
-
-### Original AirSim Paper
+## Original AirSim Paper
 
 More technical details are available in [AirSim paper (FSR 2017 Conference)](https://arxiv.org/abs/1705.05065). Please cite this as:
 ```

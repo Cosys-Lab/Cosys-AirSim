@@ -1,7 +1,6 @@
-# Setup Dynamic Objects for Scenario Environments for AirSim
+# Setup Dynamic Objects for Scenario Environments for Cosys-AirSim
 
 The available environments often feature some custom-made dynamic blueprints that can be used to create random but deterministic change in your environment. 
-
 
 ## Location
 While these can be found in the environments available, they are also separately saved in _Unreal/Environments/DynamicObjects_.
