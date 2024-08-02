@@ -1,4 +1,4 @@
-# Install or Build AirSim on Windows
+# Install or Build Cosys-AirSim on Windows
 
 ## Install Unreal Engine
 1. [Download](https://www.unrealengine.com/download) the Epic Games Launcher. While the Unreal Engine is open source and free to download, registration is still required.
@@ -10,12 +10,12 @@ Click on the `Install` button on the top right, which should show the option to 
 ## Build AirSim
 * Install Visual Studio 2022. Make sure to select Desktop Development with C++ and Windows 10/11 SDK **10.0.X (choose latest)** and select the latest .NET Framework SDK under the 'Individual Components' tab while installing VS 2022. More info [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/setting-up-visual-studio-development-environment-for-cplusplus-projects-in-unreal-engine?application_version=5.3).
 * Start `Developer Command Prompt for VS 2022`. 
-* Clone the repo: `git clone https://github.com/Cosys-Lab/Cosys-AirSim.git`, and go the AirSim directory by `cd AirSim`. 
+* Clone the repo: `git clone https://github.com/Cosys-Lab/Cosys-AirSim.git`, and go the AirSim directory by `cd Cosys-AirSim`. 
 * Run `build.cmd` from the command line. This will create ready to use plugin bits in the `Unreal\Plugins` folder that can be dropped into any Unreal project.
 
 ## Build Unreal Project
 
-Finally, you will need an Unreal project that hosts the environment for your vehicles. Make sure to close and re-open the Unreal Engine and the Epic Games Launcher before building your first environment if you haven't done so already. After restarting the Epic Games Launcher it will ask you to associate project file extensions with Unreal Engine, click on 'fix now' to fix it. AirSim comes with a built-in "Blocks Environment" which you can use, or you can create your own. Please see [setting up Unreal Environment](unreal_proj.md).
+Finally, you will need an Unreal project that hosts the environment for your vehicles. Make sure to close and re-open the Unreal Engine and the Epic Games Launcher before building your first environment if you haven't done so already. After restarting the Epic Games Launcher it will ask you to associate project file extensions with Unreal Engine, click on 'fix now' to fix it. Cosys-AirSim comes with a built-in "Blocks Environment" which you can use, or you can create your own. Please see [setting up Unreal Environment](unreal_proj.md).
 
 ## Setup Remote Control (Multirotor only)
 
@@ -23,9 +23,9 @@ A remote control is required if you want to fly manually. See the [remote contro
 
 Alternatively, you can use [APIs](apis.md) for programmatic control or use the so-called [Computer Vision mode](image_apis.md) to move around using the keyboard.
 
-## How to Use AirSim
+## How to Use Cosys-AirSim
 
-Once AirSim is set up by following above steps, you can,
+Once Cosys-AirSim is set up by following above steps, you can,
 1. Navigate to folder `Unreal\Environments\Blocks` and run `update_from_git.bat`.
 2. Double click on .sln file to load the Blocks project in `Unreal\Environments\Blocks` (or .sln file in your own [custom](unreal_custenv.md) Unreal project). If you don't see .sln file then you probably haven't completed steps in Build Unreal Project section above.
 3. Select your Unreal project as Start Up project (for example, Blocks project) and make sure Build config is set to "Develop Editor" and x64.
@@ -36,13 +36,11 @@ Once AirSim is set up by following above steps, you can,
 
 See [Using APIs](apis.md) and [settings.json](settings.md) for various options available.
 
-The other environments available often need additional asset packs to be downloaded first, read [here](environments.md) for more information.
-
 # FAQ
 
 
 #### I get an error `Il ‘P1’, version ‘X’, does not match ‘P2’, version ‘X’`
-This is caused by multiple versions of Visual Studio installed on the machine. The build script of AirSim will use the latest versions it can find so need to make Unreal does the same.
+This is caused by multiple versions of Visual Studio installed on the machine. The build script of Cosys-AirSim will use the latest versions it can find so need to make Unreal does the same.
 Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppData\Roaming\Unreal Engine\UnrealBuildTool_ and add the following:
 
 ```xml
@@ -56,13 +54,13 @@ Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppD
 
 
 #### I get `error C100 : An internal error has occurred in the compiler` when running build.cmd
-We have noticed this happening with VS version `15.9.0` and have checked-in a workaround in AirSim code. If you have this VS version, please make sure to pull the latest AirSim code.
+We have noticed this happening with VS version `15.9.0` and have checked-in a workaround in Cosys-AirSim code. If you have this VS version, please make sure to pull the latest Cosys-AirSim code.
 
 #### I get error "'corecrt.h': No such file or directory" or "Windows SDK version 8.1 not found"
 Very likely you don't have [Windows SDK](https://developercommunity.visualstudio.com/content/problem/3754/cant-compile-c-program-because-of-sdk-81cant-add-a.html) installed with Visual Studio. 
 
-#### How do I use PX4 firmware with AirSim?
-By default, AirSim uses its own built-in firmware called [simple_flight](simple_flight.md). There is no additional setup if you just want to go with it. If you want to switch to using PX4 instead then please see [this guide](px4_setup.md).
+#### How do I use PX4 firmware with Cosys-AirSim?
+By default, Cosys-AirSim uses its own built-in firmware called [simple_flight](simple_flight.md). There is no additional setup if you just want to go with it. If you want to switch to using PX4 instead then please see [this guide](px4_setup.md).
 
 #### I made changes in Visual Studio but there is no effect
 

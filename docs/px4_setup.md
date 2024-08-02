@@ -81,8 +81,6 @@ There are a few reasons that can cause this. First, make sure your drone doesn't
 
 You should [also use QGroundControl](#setting-up-px4-hardware-in-loop) and make sure you can arm and takeoff in QGroundControl properly.
 
-Finally, this also can be a machine performance issue in some rare cases, check your [hard drive performance](hard_drive.md).
-
 #### Can I use Arducopter or other MavLink implementations?
 
 Our code is tested with the [PX4 firmware](https://dev.px4.io/). We have not tested Arducopter or other mavlink implementations. Some of the flight API's do use the
