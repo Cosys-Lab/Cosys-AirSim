@@ -1126,6 +1126,32 @@ classdef AirSimClient < handle
             CarState.handbrake = vehicleStateAirSim{"handbrake"};
         end
 
+        function [ComputerVisionState] = getComputerVisionState(obj)
+            % GETCOMPUTERVISIONSTATE Get the current state of a computerVision vehicle
+            %
+            % Description:
+            %   Retrieves and parses the current state of a computer vision vehicle from the AirSim API.
+            %
+            % Outputs:
+            %   ComputerVisionState - Struct containing various state information:
+            %     - kinematics_estimated: Estimated kinematic state including position, orientation, velocities,
+            %                             and accelerations.
+            %     - timestamp: Timestamp of the state.
+
+            vehicleStateAirSim = obj.rpc_client.call("getComputerVisionState", obj.vehicle_name);
+
+            kinematicData = vehicleStateAirSim{"kinematics_estimated"};
+            kinematicsState.position = obj.nedToRightHandCoordinates(struct2array(struct(kinematicData{"position"})));
+            kinematicsState.orientation = quatinv(struct2array(struct(kinematicData{"orientation"})));
+            kinematicsState.linear_velocity = obj.nedToRightHandCoordinates(struct2array(struct(kinematicData{"linear_velocity"})));
+            kinematicsState.angular_velocity = obj.nedToRightHandCoordinates(struct2array(struct(kinematicData{"angular_velocity"})));
+            kinematicsState.linear_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(kinematicData{"linear_acceleration"})));
+            kinematicsState.angular_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(kinematicData{"angular_acceleration"})));
+            ComputerVisionState.kinematics_estimated = kinematicsState;
+
+            ComputerVisionState.timestamp = double(double(vehicleStateAirSim{"timestamp"}))/1e9;
+        end
+
 
         function reset(obj)
             % RESET Reset the simulation environment
