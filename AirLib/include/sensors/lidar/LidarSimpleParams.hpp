@@ -33,7 +33,7 @@ namespace airlib
 
         bool external = false;                    // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
         bool external_ned = true;                 // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
-        bool draw_sensor;
+        bool draw_sensor = false;
 
         uint measurement_per_cycle = 512;
         uint horizontal_rotation_frequency = 10; // rotations/sec

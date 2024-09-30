@@ -46,7 +46,7 @@ namespace msr {
 
 			bool draw_debug_points = false;				 // Enable the drawing of debug cubes of the pointcloud. Disable this for real measurements as it is impacted(detected) by the virtual camera! 
 			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = impact angle, 4 = intensity
-			bool draw_sensor;						     // Draw the physical sensor in the world on the vehicle with a 3d colored axis
+			bool draw_sensor = false;						     // Draw the physical sensor in the world on the vehicle with a 3d colored axis
 
 			real_T update_frequency = 10;                // Frequency to update the sensor at in Hz
 			real_T startup_delay = 1;                    // Delay until sensor is enabled in seconds
