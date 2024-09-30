@@ -10,7 +10,6 @@ classdef AirSimClient < handle
         vehicle_name;   
         car_controls;
         drone_client;
-        api_control;
     end
     
     properties (Constant)
@@ -101,25 +100,21 @@ classdef AirSimClient < handle
 
             argParser = inputParser();
             argParser.addOptional("IsDrone", false, @islogical);
-            argParser.addOptional("ApiControl", false, @islogical);
             argParser.addOptional("IP", "127.0.0.1", @isstring);
             argParser.addOptional("Port", 41451, @isnumeric);
             argParser.parse(varargin{:});
 
             obj.is_drone = argParser.Results.IsDrone;
-            obj.api_control = argParser.Results.ApiControl;
             obj.ip = argParser.Results.IP;
             obj.port = argParser.Results.Port;
 
             obj.rpc_client = AirSimClient.setupRPC(obj.ip, obj.port);
             
-            if obj.api_control
-                if obj.is_drone
-                    obj.drone_client = AirSimClient.getDroneControls();
-                else
-                    obj.car_controls = AirSimClient.getCarControls();
-                end
-            end 
+            if obj.is_drone
+                obj.drone_client = AirSimClient.getDroneControls();
+            else
+                obj.car_controls = AirSimClient.getCarControls();
+            end
         end     
 
            function [imuData, timestamp] = getIMUData(obj, sensorName, vehicleName)
