@@ -189,8 +189,10 @@ void ALidarCamera::InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpl
 		while (std::getline(ss, word, ',')) {
 			row.push_back(word);
 		}
-		material_map_.emplace(stencil_index, std::stof(row[1]));
-		stencil_index = stencil_index + 1;
+		if (row.size() > 1) {
+			material_map_.emplace(stencil_index, std::stof(row[1]));
+			stencil_index = stencil_index + 1;
+		}
 	}
 
 	// Set the sensor in the Unreal world at the right position and rotation by transforming the coordinate system to that of Unreal from AirSim NED
