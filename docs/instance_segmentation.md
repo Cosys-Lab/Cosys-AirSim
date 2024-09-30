@@ -11,7 +11,7 @@ An Instance segmentation system is implemented into Cosys-AirSim. It uses Proxy 
   * These and other unsupported object types that are less common that either will not be rendered (decals, text, foliage, ...) or will by default be given the RGB color value of [149,149,149] or [0,0,0]. (brush objects, landscape,...).
 
 ## Usage
-By default, at the start of the simulation, it will give a random color to each object. 
+By default, at the start of the simulation, it will give a random color to each object. You can disable this by setting the main parameter `InitialInstanceSegmentation` to false in the settings.json file.
 Please see the [Image API documentation](image_apis.md#segmentation) on how to manually set or get the color information.
 
 For an example of the Instance Segmentation API, please see the script _segmentation_test.py_ (Cosys-Airsim/PythonClient/segmentation/segmentation_test.py).

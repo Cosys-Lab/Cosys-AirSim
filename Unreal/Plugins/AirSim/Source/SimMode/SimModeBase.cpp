@@ -235,7 +235,9 @@ bool ASimModeBase::IsAnnotationRGBValid(FString annotation_name, FColor color) {
 
 void ASimModeBase::InitializeInstanceSegmentation()
 {
-    instance_segmentation_annotator_.Initialize(this->GetLevel());
+    if (getSettings().initial_instance_segmentation) {
+        instance_segmentation_annotator_.Initialize(this->GetLevel());
+    }
     ForceUpdateInstanceSegmentation();
     updateInstanceSegmentationAnnotation();
 }

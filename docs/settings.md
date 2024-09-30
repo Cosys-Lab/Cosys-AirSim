@@ -55,6 +55,7 @@ Note this does not include most sensor types.
   "ApiServerPort": 41451,
   "RecordUIVisible": true,
   "MoveWorldOrigin": false,
+  "InitialInstanceSegmentation": true,
   "LogMessagesVisible": true,
   "ShowLosDebugLines": false,
   "ViewMode": "",

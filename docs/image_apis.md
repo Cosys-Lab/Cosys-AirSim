@@ -242,7 +242,7 @@ When you specify `ImageType = DepthVis` in `ImageRequest`, you get an image that
 You normally want to retrieve disparity image as float (i.e. set `pixels_as_float = true` and specify `ImageType = DisparityNormalized` in `ImageRequest`) in which case each pixel is `(Xl - Xr)/Xmax`, which is thereby normalized to values between 0 to 1.
 
 ### Segmentation
-When you specify `ImageType = Segmentation` in `ImageRequest`, you get an image that gives you ground truth instance segmentation of the scene. At the startup, AirSim assigns a random color index to each mesh available in environment. The RGB values for each color index ID can be retrieved from the API.
+When you specify `ImageType = Segmentation` in `ImageRequest`, you get an image that gives you ground truth instance segmentation of the scene. At the startup, AirSim assigns a random color index to each mesh available in environment. You can disable this by setting the main parameter `InitialInstanceSegmentation` to false in the settings.json file. The RGB values for each color index ID can be retrieved from the API.
 
 You can assign a specific value to a specific mesh using APIs. For example, below Python code sets the object ID for the mesh called "Ground" to 20 in Blocks environment and hence changes its color in Segmentation view to the 20th color of the instance segmentation colormap:
 Note that this will not do a check if this color is already assigned to a different object! 
