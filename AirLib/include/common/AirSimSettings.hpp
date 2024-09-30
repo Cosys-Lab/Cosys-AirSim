@@ -509,6 +509,7 @@ namespace airlib
         float clock_speed = 1.0f;
         bool engine_sound = false;
         bool move_world_origin = false;
+        bool initial_instance_segmentation = true;
         bool log_messages_visible = true;
         bool show_los_debug_lines_ = false;
         HomeGeoPoint origin_geopoint{ GeoPoint(47.641468, -122.140165, 122) }; //The geo-coordinate assigned to Unreal coordinate 0,0,0
@@ -1454,6 +1455,7 @@ namespace airlib
             speed_unit_factor = settings_json.getFloat("SpeedUnitFactor", 1.0f);
             speed_unit_label = settings_json.getString("SpeedUnitLabel", "m\\s");
             move_world_origin = settings_json.getBool("MoveWorldOrigin", false);
+            initial_instance_segmentation = settings_json.getBool("InitialInstanceSegmentation", true);
             log_messages_visible = settings_json.getBool("LogMessagesVisible", true);
             show_los_debug_lines_ = settings_json.getBool("ShowLosDebugLines", false);
 
