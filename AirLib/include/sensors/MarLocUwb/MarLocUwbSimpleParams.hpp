@@ -15,7 +15,7 @@ struct MarLocUwbSimpleParams {
 	bool pause_after_measurement ;			// Pause the simulation after each measurement. Useful for API interaction to be synced
     bool external = false;                  // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
     bool external_ned = true;               // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
-    bool draw_sensor;						// Draw the physical sensor in the world on the vehicle
+    bool draw_sensor = false;						// Draw the physical sensor in the world on the vehicle
 
 
     Pose relative_pose {
