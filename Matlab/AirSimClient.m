@@ -50,14 +50,12 @@ classdef AirSimClient < handle
         function carControls = getCarControls()
             carClient = py.cosysairsim.CarClient();
             carClient.confirmConnection();
-            carClient.enableApiControl(true);
             carControls = py.cosysairsim.CarControls();
         end
 
         function droneClient = getDroneControls()
             droneClient = py.cosysairsim.MultirotorClient();
             droneClient.confirmConnection();
-            droneClient.enableApiControl(true);
         end
 
         function [pointCloud] = nedToLeftHandCoordinates(pointCloud)
@@ -95,40 +93,36 @@ classdef AirSimClient < handle
             %
             % Inputs (Name-Value pairs):
             %   'IsDrone' - Logical flag indicating whether the vehicle is a drone (default: false).
-            %   'ApiControl' - Logical flag indicating whether API control is enabled (default: false).
             %   'IP' - String specifying the IP address of the AirSim server (default: "127.0.0.1").
             %   'Port' - Numeric value specifying the port of the AirSim server (default: 41451).
-            %   'VehicleName' - String specifying the name of the vehicle (default: "airsimvehicle").
             %
             % Outputs:
-            %   obj - Instance of the AirSimClient class.
+            %   Instance of the AirSimClient class.
 
             argParser = inputParser();
             argParser.addOptional("IsDrone", false, @islogical);
             argParser.addOptional("ApiControl", false, @islogical);
             argParser.addOptional("IP", "127.0.0.1", @isstring);
             argParser.addOptional("Port", 41451, @isnumeric);
-            argParser.addOptional("VehicleName", "airsimvehicle", @isstring);
             argParser.parse(varargin{:});
 
             obj.is_drone = argParser.Results.IsDrone;
             obj.api_control = argParser.Results.ApiControl;
             obj.ip = argParser.Results.IP;
             obj.port = argParser.Results.Port;
-            obj.vehicle_name = argParser.Results.VehicleName;            
 
             obj.rpc_client = AirSimClient.setupRPC(obj.ip, obj.port);
             
             if obj.api_control
                 if obj.is_drone
-                    obj.drone_client = AirSimClient.getDroneClient();
+                    obj.drone_client = AirSimClient.getDroneControls();
                 else
                     obj.car_controls = AirSimClient.getCarControls();
                 end
             end 
         end     
 
-           function [imuData, timestamp] = getIMUData(obj, sensorName)
+           function [imuData, timestamp] = getIMUData(obj, sensorName, vehicleName)
             % GETIMUDATA Get IMU sensor data
             %
             % Description:
@@ -136,12 +130,13 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the IMU sensor.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   imuData - Struct containing orientation(1x4), angular velocity(1x3), and linear acceleration(1x3).
             %   timestamp - Timestamp of the sensor data.
 
-            data = obj.rpc_client.call("getImuData", sensorName, obj.vehicle_name);
+            data = obj.rpc_client.call("getImuData", sensorName, vehicleName);
 
             timestamp = double(double(data{"time_stamp"}))/1e9;
 
@@ -150,7 +145,7 @@ classdef AirSimClient < handle
             imuData.linearAcceleration = obj.nedToRightHandCoordinates(struct2array(struct(data{"linear_acceleration"})));
         end
 
-        function [barometerData, timestamp] = getBarometerData(obj, sensorName)
+        function [barometerData, timestamp] = getBarometerData(obj, sensorName, vehicleName)
             % GETBAROMETERDATA Get barometer sensor data
             %
             % Description:
@@ -158,12 +153,13 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the barometer sensor.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   barometerData - Struct containing altitude, pressure, and qnh.
             %   timestamp - Timestamp of the sensor data.
 
-            data = obj.rpc_client.call("getBarometerData", sensorName, obj.vehicle_name);
+            data = obj.rpc_client.call("getBarometerData", sensorName, vehicleName);
 
             timestamp = double(double(data{"time_stamp"}))/1e9;
             barometerData.altitude = quatinv(struct2array(struct(data{"altitude"})));
@@ -171,7 +167,7 @@ classdef AirSimClient < handle
             barometerData.qnh = obj.nedToRightHandCoordinates(struct2array(struct(data{"qnh"})));
         end
 
-        function [MagnetometerData, timestamp] = getMagnetometerData(obj, sensorName)
+        function [MagnetometerData, timestamp] = getMagnetometerData(obj, sensorName, vehicleName)
             % GETMAGNETOMETERDATA Get magnetometer sensor data
             %
             % Description:
@@ -179,19 +175,20 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the magnetometer sensor.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   MagnetometerData - Struct containing magnetic field data.
             %   timestamp - Timestamp of the sensor data.
 
-            data = obj.rpc_client.call("getMagnetometerData", sensorName, obj.vehicle_name);
+            data = obj.rpc_client.call("getMagnetometerData", sensorName, vehicleName);
 
             timestamp = double(double(data{"time_stamp"}))/1e9;
             MagnetometerData.magnetic_field_body = obj.nedToRightHandCoordinates(struct2array(struct(data{"magnetic_field_body"})));
             MagnetometerData.magnetic_field_covariance = double(data{"magnetic_field_covariance"});
         end
 
-        function [gnssData, timestamp, isValid] = getGpsData(obj, sensorName)
+        function [gnssData, timestamp, isValid] = getGpsData(obj, sensorName, vehicleName)
             % GETGPSDATA Get GPS sensor data
             %
             % Description:
@@ -199,13 +196,14 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the GPS sensor.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   gnssData - Struct containing GPS data (geo point, eph, epv, velocity, fix_type, time_utc)
             %   timestamp - Timestamp of the sensor data.
             %   isValid - boolean if the data is valid.            
 
-            data = obj.rpc_client.call("getGpsData", sensorName, obj.vehicle_name);
+            data = obj.rpc_client.call("getGpsData", sensorName, vehicleName);
 
             timestamp = double(double(data{"time_stamp"}))/1e9;
 
@@ -225,7 +223,7 @@ classdef AirSimClient < handle
             isValid = data{"is_valid"};
         end
 
-        function [DistanceSensorData, timestamp] = getDistanceSensorData(obj, sensorName)
+        function [DistanceSensorData, timestamp] = getDistanceSensorData(obj, sensorName, vehicleName)
             % GETDISTANCESENSORDATA Get distance sensor data
             %
             % Description:
@@ -233,12 +231,13 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the distance sensor.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   DistanceSensorData - Struct containing distance data (relative pose, distance, min/max distance)
             %   timestamp - Timestamp of the sensor data.
 
-            data = obj.rpc_client.call("getDistanceSensorData", sensorName, obj.vehicle_name);
+            data = obj.rpc_client.call("getDistanceSensorData", sensorName, vehicleName);
 
             timestamp = double(double(data{"time_stamp"}))/1e9;
             curPoseData = data{"relative_pose"};
@@ -249,7 +248,7 @@ classdef AirSimClient < handle
             DistanceSensorData.min_distance = double(data{"min_distance"});
         end
 
-        function [activePointCloud, activeData, passivePointCloud, passiveData, timestamp, sensorPose] = getEchoData(obj, sensorName, enablePassive)
+        function [activePointCloud, activeData, passivePointCloud, passiveData, timestamp, sensorPose] = getEchoData(obj, sensorName, enablePassive, vehicleName)
             % GETECHODATA Get sensor data from an echo sensor
             %
             % Description:
@@ -258,6 +257,7 @@ classdef AirSimClient < handle
             % Inputs:
             %   sensorName - Name of the echo sensor.
             %   enablePassive - Logical value to enable passive data retrieval.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   activePointCloud - Active point cloud data.
@@ -267,7 +267,7 @@ classdef AirSimClient < handle
             %   timestamp - Timestamp of the sensor data.
             %   sensorPose - Sensor pose struct.
             
-            echoData = obj.rpc_client.call("getEchoData", sensorName, obj.vehicle_name);
+            echoData = obj.rpc_client.call("getEchoData", sensorName, vehicleName);
 
             timestamp = double(double(echoData{"time_stamp"}))/1e9;
 
@@ -309,26 +309,27 @@ classdef AirSimClient < handle
             end               
         end   
 
-        function [] = pointcloudFeedback(obj, echoData, sensorName, pointCloud)
+        function [] = pointcloudFeedback(obj, echoData, sensorName, pointCloud, vehicleName)
             % POINTCLOUDFEEDBACK Send point cloud data as feedback to the
             % simulation for echo sensors.
             %
             % Description:
             %   Sends point cloud data received as feedback to the
             %   simulation via the AirSim API for echo sensors.
+            %   vehicleName - name of the vehicle.
             %
             % Inputs:
-            %   obj - Instance of AirSimClient.
             %   echoData - Echo data structure to update with point cloud.
             %   sensorName - Name of the echo sensor providing the point cloud.
             %   pointCloud - Point cloud data to send (N x 3 matrix of [x, y, z] coordinates).
 
+
             pointCloud(:, 3) = -pointCloud(:, 3);
             echoData{"point_cloud"} = py.list(num2cell(reshape(pointCloud.', 1, [])));           
-            obj.rpc_client.call("setEchoData", sensorName, obj.vehicle_name, echoData);
+            obj.rpc_client.call("setEchoData", sensorName, vehicleName, echoData);
         end        
 
-        function [lidarPointCloud, lidarLabels, timestamp, sensorPose] = getLidarData(obj, sensorName, enableLabels)
+        function [lidarPointCloud, lidarLabels, timestamp, sensorPose] = getLidarData(obj, sensorName, enableLabels, vehicleName)
             % GETLIDARDATA Get sensor data from a lidar sensor
             %
             % Description:
@@ -337,15 +338,15 @@ classdef AirSimClient < handle
             % Inputs:
             %   sensorName - Name of the lidar sensor.
             %   enableLabels - Logical value to enable label retrieval.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   lidarPointCloud - Lidar point cloud data.
             %   lidarLabels - Lidar labels.
             %   timestamp - Timestamp of the sensor data.
-            %   sensorPose - Sensor pose struct.
+            %   sensorPose - Sensor pose struct.            
             
-            
-            lidarData = obj.rpc_client.call("getLidarData", sensorName, obj.vehicle_name);
+            lidarData = obj.rpc_client.call("getLidarData", sensorName, vehicleName);
 
             timestamp = double(double(lidarData{"time_stamp"}))/1e9;
 
@@ -370,7 +371,7 @@ classdef AirSimClient < handle
             end    
         end   
 
-        function [lidarPointCloud, timestamp, sensorPose] = getGPULidarData(obj, sensorName)
+        function [lidarPointCloud, timestamp, sensorPose] = getGPULidarData(obj, sensorName, vehicleName)
             % GETGPULIDARDATA Get sensor data from a GPU lidar sensor
             %
             % Description:
@@ -378,13 +379,14 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the GPU lidar sensor.
+            %   vehicleName - name of the vehicle.            
             %
             % Outputs:
             %   lidarPointCloud - Lidar point cloud data.
             %   timestamp - Timestamp of the sensor data.
             %   sensorPose - Sensor pose struct.
             
-            lidarData = obj.rpc_client.call("getGPULidarData", sensorName, obj.vehicle_name);
+            lidarData = obj.rpc_client.call("getGPULidarData", sensorName, vehicleName);
 
             timestamp = double(double(lidarData{"time_stamp"}))/1e9;
 
@@ -414,7 +416,7 @@ classdef AirSimClient < handle
             end    
         end    
 
-        function [image, timestamp] = getCameraImage(obj, sensorName, cameraType, annotationLayer)
+        function [image, timestamp] = getCameraImage(obj, sensorName, cameraType, vehicleName, annotationLayer)
             % GETCAMERAIMAGE Get camera data from a camera sensor
             %
             % Description:
@@ -423,6 +425,7 @@ classdef AirSimClient < handle
             % Inputs:
             %   sensorName - Name of the camera sensor.
             %   cameraType - Type of the camera (use AirSimCameraTypes enum).
+            %   vehicleName - name of the vehicle.
             %   annotationLayer - Optional annotation layer name if using annotation system (default '').
             %
             % Outputs:
@@ -433,7 +436,8 @@ classdef AirSimClient < handle
                 obj AirSimClient
                 sensorName string 
                 cameraType uint32
-                annotationLayer string = ""
+                vehicleName string
+                annotationLayer string = ""                
             end
 
             if cameraType == 1 || cameraType == 2 || cameraType == 3 || cameraType == 4
@@ -444,7 +448,7 @@ classdef AirSimClient < handle
                 image_request = py.cosysairsim.ImageRequest(sensorName, int32(cameraType), false, false);
             end
             image_request_list = py.list({image_request});
-            camera_image_response_request = obj.rpc_client.call("simGetImages", image_request_list, obj.vehicle_name);
+            camera_image_response_request = obj.rpc_client.call("simGetImages", image_request_list, vehicleName);
             image_response = py.cosysairsim.ImageResponse();
             camera_image = image_response.from_msgpack(camera_image_response_request{1});
             if cameraType == 1 || cameraType == 2 || cameraType == 3 || cameraType == 4
@@ -492,7 +496,7 @@ classdef AirSimClient < handle
                 end
             end
             image_request_list = py.list(image_requests);
-            camera_image_response_request = obj.rpc_client.call("simGetImages", image_request_list, obj.vehicle_name);
+            camera_image_response_request = obj.rpc_client.call("simGetImages", image_request_list, vehicleName);
 
             for i = 1: numel(cameraTypes)
                 image_response = py.cosysairsim.ImageResponse();
@@ -510,7 +514,7 @@ classdef AirSimClient < handle
             timestamp = double(double(camera_image.time_stamp))/1e9;
         end
 
-        function [intrinsics, sensorPose] = getCameraInfo(obj, sensorName)
+        function [intrinsics, sensorPose] = getCameraInfo(obj, sensorName, vehicleName)
             % GETCAMERAINFO Get camera pose and intrinsics
             %
             % Description:
@@ -519,18 +523,19 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the camera sensor.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   intrinsics - Camera intrinsics (focal length, principal point, image size).
             %   sensorPose - Sensor pose struct (position and orientation).
 
-            cameraData = obj.rpc_client.call("simGetCameraInfo", sensorName, obj.vehicle_name);
+            cameraData = obj.rpc_client.call("simGetCameraInfo", sensorName, vehicleName);
             sensorPose.position = obj.nedToRightHandCoordinates(struct2array(struct(cameraData{"pose"}{"position"})));
             sensorPose.orientation = quatinv(struct2array(struct(cameraData{"pose"}{"orientation"})));
             curFov = cameraData{"fov"};
             tempRequest = py.cosysairsim.ImageRequest(sensorName, int32(1), true, false);
             tempRequestList = py.list({tempRequest});
-            tempCameraResponseRequest = obj.rpc_client.call("simGetImages", tempRequestList, obj.vehicle_name);
+            tempCameraResponseRequest = obj.rpc_client.call("simGetImages", tempRequestList, vehicleName);
             testImageResponse = py.cosysairsim.ImageResponse();
             tempCameraImage = testImageResponse.from_msgpack(tempCameraResponseRequest{1});
             cameraWidth = tempCameraImage.width.int32;
@@ -539,7 +544,7 @@ classdef AirSimClient < handle
             intrinsics = cameraIntrinsics([focalLength, focalLength], [double(cameraWidth / 2), double(cameraHeight / 2)], [double(cameraWidth), double(cameraHeight)]);
         end
 
-        function [wifiState] = getWifiState(obj, sensorName)
+        function [wifiState] = getWifiState(obj, sensorName, vehicleName)
             % GETWIFISTATE Get Wi-Fi state information from a sensor
             %
             % Description:
@@ -547,12 +552,13 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the Wi-Fi sensor.
+            %   vehicleName - name of the vehicle.
             %
             % Outputs:
             %   wifiState - Struct containing Wi-Fi state information.
 
             wifiState = struct();
-            wifiStateAirsim = obj.rpc_client.call("getWifiData", sensorName, obj.vehicle_name);
+            wifiStateAirsim = obj.rpc_client.call("getWifiData", sensorName, vehicleName);
             wifiState.wr_time_stamp = [];
             wifiState.wr_anchorId = string([]);
             wifiState.wr_anchorPosX = [];
@@ -614,18 +620,21 @@ classdef AirSimClient < handle
             end
         end
 
-        function [uwbState] = getUWBState(obj)
+        function [uwbState] = getUWBState(obj, vehicleName)
             % GETUWBSTATE Get UWB (Ultra-Wideband) state information
             %
             % Description:
             %   Retrieves UWB (Ultra-Wideband) state information from the sensor.
             %
+            % Inputs:
+            %   vehicleName - name of the vehicle.            
+            %
             % Outputs:
             %   uwbState - Struct containing UWB state information.
 
             uwbState = struct();
-            %uwbStateAirsim = obj.rpc_client.call("getUWBData", sensorName, obj.vehicle_name);
-            uwbStateAirsim = obj.rpc_client.call("getUWBData", "", obj.vehicle_name);
+            %uwbStateAirsim = obj.rpc_client.call("getUWBData", sensorName, vehicleName);
+            uwbStateAirsim = obj.rpc_client.call("getUWBData", "", vehicleName);
             
             uwbState.mur_time_stamp = [];
             uwbState.mur_anchorId = string([]);
@@ -694,7 +703,7 @@ classdef AirSimClient < handle
             end
         end
 
-        function [uwbState] = getUWBSensorState(obj, sensorName)
+        function [uwbState] = getUWBSensorState(obj, sensorName, vehicleName)
             % GETUWBSENSORSTATE Get UWB sensor state information
             %
             % Description:
@@ -702,14 +711,15 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the UWB sensor.
+            %   vehicleName - name of the vehicle.         
             %
             % Outputs:
             %   uwbState - Struct containing UWB sensor state information.
 
             uwbState = struct();
-            %uwbStateAirsim = struct(obj.rpc_client.call("getWifiData", "wifi", obj.vehicle_names(idx)));
-            %uwbStateAirsim = struct(obj.rpc_client.call("getUWBSensorData", "UnrealMarLocUwbSensor", obj.vehicle_names(idx)));
-            uwbStateAirsim = obj.rpc_client.call("getUWBSensorData", sensorName, obj.vehicle_name);
+            %uwbStateAirsim = struct(obj.rpc_client.call("getWifiData", "wifi", vehicleNames(idx)));
+            %uwbStateAirsim = struct(obj.rpc_client.call("getUWBSensorData", "UnrealMarLocUwbSensor", vehicleNames(idx)));
+            uwbStateAirsim = obj.rpc_client.call("getUWBSensorData", sensorName, vehicleName);
             ts = uwbStateAirsim(1);
             ts = double(ts{1});
             uwbState.timestamp = ts;
@@ -732,23 +742,23 @@ classdef AirSimClient < handle
             uwbState.beaconPos = [beaconID', beaconX', beaconY', beaconZ'];
         end
 
-        function [wifiState] = getWifiSensorState(obj, sensorName)
+        function [wifiState] = getWifiSensorState(obj, sensorName, vehicleName)
             % GETWIFISENSORSTATE Get Wi-Fi sensor state information
             %
             % Description:
             %   Retrieves Wi-Fi sensor state information from the specified sensor.
             %
             % Inputs:
-            %   obj - Instance of AirSimClient.
             %   sensorName - Name of the Wi-Fi sensor.
+            %   vehicleName - name of the vehicle.         
             %
             % Outputs:
             %   wifiState - Struct containing Wi-Fi sensor state information.
 
             wifiState = struct();
-            %wifiStateAirsim = struct(obj.rpc_client.call("getWifiData", "wifi", obj.vehicle_names(idx)));
-            %wifiStateAirsim = struct(obj.rpc_client.call("getwifiSensorData", "UnrealMarLocwifiSensor", obj.vehicle_names(idx)));
-            wifiStateAirsim = obj.rpc_client.call("getWifiSensorData", sensorName, obj.vehicle_name);
+            %wifiStateAirsim = struct(obj.rpc_client.call("getWifiData", "wifi", vehicleNames(idx)));
+            %wifiStateAirsim = struct(obj.rpc_client.call("getwifiSensorData", "UnrealMarLocwifiSensor", vehicleNames(idx)));
+            wifiStateAirsim = obj.rpc_client.call("getWifiSensorData", sensorName, vehicleName);
             ts = wifiStateAirsim(1);
             ts = double(ts{1});
             wifiState.timestamp = ts;
@@ -771,23 +781,26 @@ classdef AirSimClient < handle
             wifiState.beaconPos = [beaconID', beaconX', beaconY', beaconZ'];
         end
         
-        function [vehiclePose] = getVehiclePose(obj)
+        function [vehiclePose] = getVehiclePose(obj, vehicleName)
             % GETVEHICLEPOSE Retrieve the current pose (position and orientation) of the vehicle.
             %
             % Description:
-            %   Retrieves the current pose (position and orientation) of the vehicle..
+            %   Retrieves the current pose (position and orientation) of the vehicle.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.                  
             %
             % Outputs:
             %   vehiclePose - A structure containing:
-            %     position(1x3) - The position of the vehicle in right-hand coordinates.
-            %     orientation(1x4) - The quaternion representing the orientation of the vehicle in right-hand coordinates.
+            %   position(1x3) - The position of the vehicle in right-hand coordinates.
+            %   orientation(1x4) - The quaternion representing the orientation of the vehicle in right-hand coordinates.
 
-            vehicleState = obj.rpc_client.call("simGetVehiclePose", obj.vehicle_name);            
+            vehicleState = obj.rpc_client.call("simGetVehiclePose", vehicleName);            
             vehiclePose.position = obj.nedToRightHandCoordinates(struct2array(struct(vehicleState{"position"})));
             vehiclePose.orientation = quatinv(struct2array(struct(vehicleState{"orientation"})));
         end
 
-        function [] = setVehiclePose(obj, position, orientation, ignoreCollisions)
+        function [] = setVehiclePose(obj, position, orientation, ignoreCollisions, vehicleName)
             % SETVEHICLEPOSE Set the pose of the vehicle.
             %
             % Description:
@@ -797,6 +810,7 @@ classdef AirSimClient < handle
             %   position(1x3) - Desired position of the vehicle.
             %   orientation(1x4) - Desired quaternion orientation of the vehicle.
             %   ignoreCollisions - Boolean flag to ignore collisions (default: true).
+            %   vehicleName - name of the vehicle.      
             
             if nargin() < 4
                 ignoreCollisions = true;
@@ -812,10 +826,10 @@ classdef AirSimClient < handle
             newPose.orientation.y_val = orientation(3);
             newPose.orientation.z_val = orientation(4);
             
-            obj.rpc_client.call("simSetVehiclePose", newPose, ignoreCollisions, obj.vehicle_name);
+            obj.rpc_client.call("simSetVehiclePose", newPose, ignoreCollisions, vehicleName);
         end
         
-        function [] = setVehicleControls(obj, throttle, steering)
+        function [] = setVehicleControls(obj, throttle, steering, vehicleName)
             % SETVEHICLECONTROLS Set the controls of the vehicle.
             %
             % Description:
@@ -824,6 +838,8 @@ classdef AirSimClient < handle
             % Inputs:
             %   throttle - Throttle value.
             %   steering - Steering value.
+            %   vehicleName - name of the vehicle.      
+
             if ~obj.is_drone
                 if throttle < 0
                     obj.car_controls.manual_gear = py.int(-1);
@@ -837,57 +853,71 @@ classdef AirSimClient < handle
             obj.car_controls.throttle = throttle;
             obj.car_controls.steering = steering;
             
-            obj.rpc_client.call("setCarControls", obj.car_controls, obj.vehicle_name);
+            obj.rpc_client.call("setCarControls", obj.car_controls, vehicleName);
         end
 
         % Enable disable or prompt api control status
         % Necessary to send speed control from matlab to the api
-        function setEnableApiControl(obj)
+        function setEnableApiControl(obj, vehicleName)
             % SETENABLEAPICONTROL Enable API control.
             %
             % Description:
             %   Enables API control for the vehicle.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.                  
 
-           obj.rpc_client.call("enableApiControl", true, obj.vehicle_name);
+           obj.rpc_client.call("enableApiControl", true, vehicleName);
         end
 
-        function setDisableApiControl(obj)
+        function setDisableApiControl(obj, vehicleName)
             % SETDISABLEAPICONTROL Disable API control.
             %
             % Description:
             %   Disables API control for the vehicle.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
 
-
-            obj.rpc_client.call("enableApiControl", false, obj.vehicle_name);
+            obj.rpc_client.call("enableApiControl", false, vehicleName);
         end   
 
-        function isEnabled = getApiControlEnabled(obj)
+        function isEnabled = getApiControlEnabled(obj, vehicleName)
             % GETAPICONTROLENABLED Check if API control is enabled.
             %
             % Description:
             %   Returns a logical value indicating whether API control is enabled for the vehicle.
             %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
+            %
             % Outputs:
             %   isEnabled - Logical value indicating the API control status.
-            isEnabled = obj.rpc_client.call("isApiControlEnabled", obj.vehicle_name);
+            isEnabled = obj.rpc_client.call("isApiControlEnabled", vehicleName);
         end
         
-        function setEnableDroneArm(obj)
+        function setEnableDroneArm(obj, vehicleName)
             % SETENABLEDRONEARM Enable drone arm.
             %
             % Description:
             %   Enables the arm of the drone.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
 
-           obj.rpc_client.call("armDisarm", true, obj.vehicle_name);
+           obj.rpc_client.call("armDisarm", true, vehicleName);
         end
 
-        function setDisableDroneArm(obj)
+        function setDisableDroneArm(obj, vehicleName)
             % SETDISABLEDRONEARM Disable drone arm.
             %
             % Description:
             %   Disables the arm of the drone.
-
-           obj.rpc_client.call("armDisarm", false, obj.vehicle_name);
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
+            
+           obj.rpc_client.call("armDisarm", false, vehicleName);
         end
 
         function pause(obj)
@@ -932,11 +962,14 @@ classdef AirSimClient < handle
             obj.rpc_client.call("simContinueForFrames", frames);
         end
         
-        function [kinematicsState] = getGroundTruthKinematics(obj)
+        function [kinematicsState] = getGroundTruthKinematics(obj, vehicleName)
             % GETGROUNDTRUTHKINEMATICS Retrieve the ground truth kinematics of the vehicle.            
             %
             % Description:
             %   Retrieves the ground truth kinematics of the vehicle, including position, orientation, linear and angular velocities, and accelerations.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   kinematicsState - A structure containing:
@@ -947,7 +980,7 @@ classdef AirSimClient < handle
             %     linear_acceleration(1x3) - The linear acceleration of the vehicle in right-hand coordinates.
             %     angular_acceleration(1x3) - The angular acceleration of the vehicle in right-hand coordinates.
 
-            vehicleStateAirSim = obj.rpc_client.call("simGetGroundTruthKinematics", obj.vehicle_name);
+            vehicleStateAirSim = obj.rpc_client.call("simGetGroundTruthKinematics", vehicleName);
             kinematicsState.position = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"position"})));
             kinematicsState.orientation = quatinv(struct2array(struct(vehicleStateAirSim{"orientation"})));
             kinematicsState.linear_velocity = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"linear_velocity"})));
@@ -990,14 +1023,17 @@ classdef AirSimClient < handle
             kinematicsState.angular_acceleration.x_val = angular_acceleration(1);
             kinematicsState.angular_acceleration.y_val = -angular_acceleration(2);
             kinematicsState.angular_acceleration.z_val = -angular_acceleration(3);
-            obj.rpc_client.call("setKinematics", kinematicsState, ignore_collision, obj.vehicle_name);
+            obj.rpc_client.call("setKinematics", kinematicsState, ignore_collision, vehicleName);
         end
 
-        function [EnvironmentState] = getGroundTruthEnvironment(obj)
+        function [EnvironmentState] = getGroundTruthEnvironment(obj, vehicleName)
             % GETGROUNDTRUTHENVIRONMENT Retrieve the ground truth environment data.
             %
             % Description:
             %   Retrieves the ground truth environment data including position, gravity, air pressure, temperature, air density, and geographic coordinates.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   EnvironmentState - A structure containing:
@@ -1011,7 +1047,7 @@ classdef AirSimClient < handle
             %       longitude - The longitude.
             %       altitude - The altitude.
 
-            EnvironmentStateData = obj.rpc_client.call("simGetGroundTruthEnvironment", obj.vehicle_name);
+            EnvironmentStateData = obj.rpc_client.call("simGetGroundTruthEnvironment", vehicleName);
             EnvironmentState.position = obj.nedToRightHandCoordinates(struct2array(struct(EnvironmentStateData{"position"})));
             EnvironmentState.gravity = obj.nedToRightHandCoordinates(struct2array(struct(EnvironmentStateData{"gravity"})));
             EnvironmentState.air_pressure = double(EnvironmentStateData{"air_pressure"});
@@ -1045,7 +1081,7 @@ classdef AirSimClient < handle
             %     - ready_message: Message indicating readiness status.
             %     - can_arm: Flag indicating if the vehicle can be armed.
 
-            vehicleStateAirSim = obj.rpc_client.call("getMultirotorState", obj.vehicle_name);
+            vehicleStateAirSim = obj.rpc_client.call("getMultirotorState", vehicleName);
 
             collisionData = vehicleStateAirSim{"collision"};
             collisionInfo = struct(collisionData);
@@ -1079,11 +1115,14 @@ classdef AirSimClient < handle
             MultirotorState.can_arm = vehicleStateAirSim{"can_arm"};
         end
 
-        function [CarState] = getCarState(obj)
+        function [CarState] = getCarState(obj, vehicleName)
             % GETCARSTATE Get the current state of a car vehicle
             %
             % Description:
             %   Retrieves and parses the current state of a car vehicle from the AirSim API.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   CarState - Struct containing various state information:
@@ -1097,7 +1136,7 @@ classdef AirSimClient < handle
             %     - maxrpm: Maximum RPM of the car engine.
             %     - handbrake: Handbrake status of the car.
 
-            vehicleStateAirSim = obj.rpc_client.call("getCarState", obj.vehicle_name);
+            vehicleStateAirSim = obj.rpc_client.call("getCarState", vehicleName);
 
             collisionData = vehicleStateAirSim{"collision"};
             collisionInfo = struct(collisionData);
@@ -1126,11 +1165,14 @@ classdef AirSimClient < handle
             CarState.handbrake = vehicleStateAirSim{"handbrake"};
         end
 
-        function [ComputerVisionState] = getComputerVisionState(obj)
+        function [ComputerVisionState] = getComputerVisionState(obj, vehicleName)
             % GETCOMPUTERVISIONSTATE Get the current state of a computerVision vehicle
             %
             % Description:
             %   Retrieves and parses the current state of a computer vision vehicle from the AirSim API.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   ComputerVisionState - Struct containing various state information:
@@ -1138,7 +1180,7 @@ classdef AirSimClient < handle
             %                             and accelerations.
             %     - timestamp: Timestamp of the state.
 
-            vehicleStateAirSim = obj.rpc_client.call("getComputerVisionState", obj.vehicle_name);
+            vehicleStateAirSim = obj.rpc_client.call("getComputerVisionState", vehicleName);
 
             kinematicData = vehicleStateAirSim{"kinematics_estimated"};
             kinematicsState.position = obj.nedToRightHandCoordinates(struct2array(struct(kinematicData{"position"})));
@@ -1162,16 +1204,19 @@ classdef AirSimClient < handle
             obj.rpc_client.call("reset");
         end
         
-        function resetVehicle(obj)
+        function resetVehicle(obj, vehicleName)
             % RESETVEHICLE Reset a specific vehicle in the simulation
             %
             % Description:
             %   Resets a specific vehicle in the simulation environment to its initial state.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("resetCar", obj.vehicle_name);
+            obj.rpc_client.call("resetCar", vehicleName);
         end
         
-        function [] = followTrajectory(obj, trajectoryPoses, elapsedTime)
+        function [] = followTrajectory(obj, trajectoryPoses, elapsedTime, ignoreCollisions, vehicleName)
             % FOLLOWTRAJECTORY Move the vehicle to follow a trajectory
             %
             % Description:
@@ -1180,12 +1225,14 @@ classdef AirSimClient < handle
             % Inputs:
             %   trajectoryPoses - Struct with trajectory poses including positions and orientations.
             %   elapsedTime - Current elapsed time to determine the trajectory step.
+            %   ignoreCollisions - boolean toggle to ignore collisions or not.
+            %   vehicleName - name of the vehicle.   
 
             stepIdx = find(elapsedTime <= trajectoryPoses.timestamps, 1, "first");
     
-            currentPose.position = trajectoryPoses.position(stepIdx, :);
-            currentPose.orientation = trajectoryPoses.orientation(stepIdx, :);
-            obj.setVehiclePose(currentPose);
+            position = trajectoryPoses.position(stepIdx, :);
+            orientation = trajectoryPoses.orientation(stepIdx, :);
+            obj.setVehiclePose(position, orientation, ignoreCollisions, vehicleName);
         end
         
         function setWeather(obj, weatherType, weatherValue)
@@ -1195,7 +1242,6 @@ classdef AirSimClient < handle
             %   Sets weather conditions such as rain, snow, or fog in the simulation.
             %
             % Inputs:
-            %   obj - Instance of AirSimClient.
             %   weatherType - Type of weather condition to set (use AirSimWeather enum)
             %   weatherValue - Intensity or specific value of the weather condition.
 
@@ -1306,16 +1352,19 @@ classdef AirSimClient < handle
             end
         end
 
-        function collisionInfo = getCollisionInfo(obj)
+        function collisionInfo = getCollisionInfo(obj, vehicleName)
             % GETCOLLISIONINFO Get collision information for the vehicle
             %
             % Description:
             %   Retrieves collision information for the vehicle from the AirSim API.
             %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
+            %
             % Outputs:
             %   collisionInfo - Struct containing collision information such as time stamp, object name, ID, position, normal, and impact point.
 
-            collisionData = obj.rpc_client.call("simGetCollisionInfo", obj.vehicle_name);
+            collisionData = obj.rpc_client.call("simGetCollisionInfo", vehicleName);
             collisionInfo = struct(collisionData);
             collisionInfo.time_stamp = double(double(collisionData{"time_stamp"}))/1e9;
             collisionInfo.object_name = string(collisionData{"object_name"});
@@ -1326,16 +1375,19 @@ classdef AirSimClient < handle
         end
 
 
-        function geopoint = getHomeGeoPoint(obj)
+        function geopoint = getHomeGeoPoint(obj, vehicleName)
             % GETHOMEGEOPOINT Get the home geopoint of the vehicle
             %
             % Description:
             %   Retrieves the geopoint (latitude, longitude, altitude) of the vehicle's home position.
             %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
+            %
             % Outputs:
             %   geopoint - Struct containing latitude, longitude, and altitude of the home position.
 
-            geopointData = obj.rpc_client.call("getHomeGeoPoint", obj.vehicle_name);
+            geopointData = obj.rpc_client.call("getHomeGeoPoint", vehicleName);
             geopoint.latitude = double(geopointData{"latitude"});
             geopoint.longitude = double(geopointData{"longitude"});
             geopoint.altitude = double(geopointData{"altitude"});
@@ -1425,13 +1477,16 @@ classdef AirSimClient < handle
             obj.rpc_client.call('simFlushPersistentMarkers');
         end               
         
-        function cancelLastTask(obj)
+        function cancelLastTask(obj, vehicleName)
             % CANCELLASTTASK Cancel the last task in the simulation
             %
             % Description:
             %   Cancels the last task executed in the simulation.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call('cancelLastTask', obj.vehicle_name);
+            obj.rpc_client.call('cancelLastTask', vehicleName);
         end
         
         function startRecording(obj)
@@ -1572,7 +1627,7 @@ classdef AirSimClient < handle
             obj.rpc_client.call('simSetExtForce', newForce);
         end
 
-        function setTraceLine(obj, color_rgba, thickness)
+        function setTraceLine(obj, color_rgba, thickness, vehicleName)
             % SETTRACELINE Set a trace line for visualization in the simulation
             %
             % Description:
@@ -1581,8 +1636,9 @@ classdef AirSimClient < handle
             % Inputs:
             %   color_rgba - RGBA color array [R, G, B, A] for the trace line.
             %   thickness - Thickness of the trace line.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simSetTraceLine", py.list(color_rgba), thickness, obj.vehicle_name);
+            obj.rpc_client.call("simSetTraceLine", py.list(color_rgba), thickness, vehicleName);
         end
 
         function [objectPose] = getObjectPose(obj, objectName, local)
@@ -1966,7 +2022,6 @@ classdef AirSimClient < handle
             %   This works only for RGB layers.
             %
             % Inputs:
-            %   obj - Instance of AirSimClient.
             %   annotation_name (char) - Name of the annotation layer to retrieve color for.
             %   mesh_name (char) - Name of the mesh object to retrieve color for.
             %
@@ -2066,7 +2121,7 @@ classdef AirSimClient < handle
             texturePath = string(obj.rpc_client.call("simGetAnnotationObjectTexturePath", mesh_name));
         end
 
-        function addDetectionFilterMeshName(obj, camera_name, image_type, mesh_name, annotation_name)
+        function addDetectionFilterMeshName(obj, camera_name, image_type, mesh_name, vehicleName, annotation_name)
             % ADDDETECTIONFILTERMESHNAME Add mesh name to detection filter.
             %
             % Description:
@@ -2076,6 +2131,7 @@ classdef AirSimClient < handle
             %   camera_name (string) - Name of the camera to add detection filter for.
             %   image_type (uint32) - Type of image to add detection filter for.
             %   mesh_name (string) - Name of the mesh object to add to the detection filter.
+            %   vehicleName - name of the vehicle.   
             %   annotation_name (string, optional) - Name of the annotation to filter (default is ".*").
 
             arguments
@@ -2083,12 +2139,13 @@ classdef AirSimClient < handle
                 camera_name string
                 image_type uint32
                 mesh_name string
+                vehicleName string
                 annotation_name string = ".*"
             end
-            obj.rpc_client.call("simAddDetectionFilterMeshName", camera_name, image_type, mesh_name, obj.vehicle_name, annotation_name);
+            obj.rpc_client.call("simAddDetectionFilterMeshName", camera_name, image_type, mesh_name, vehicleName, annotation_name);
         end
 
-        function setDetectionFilterRadius(obj, camera_name, image_type, radius_cm, annotation_name)
+        function setDetectionFilterRadius(obj, camera_name, image_type, radius_cm, vehicleName, annotation_name)
             % SETDETECTIONFILTERRADIUS Set detection filter radius.
             %
             % Description:
@@ -2098,19 +2155,21 @@ classdef AirSimClient < handle
             %   camera_name (string) - Name of the camera to set detection filter for.
             %   image_type (uint32) - Type of image to set detection filter for.
             %   radius_cm (int32) - Radius value in centimeters.
+            %   vehicleName - name of the vehicle.   
             %   annotation_name (string, optional) - Name of the annotation to filter (default is ".*").
-            
+
             arguments
                 obj AirSimClient
                 camera_name string
                 image_type uint32
                 radius_cm int32
+                vehicleName string
                 annotation_name string = ".*"
             end
-            obj.rpc_client.call("simSetDetectionFilterRadius", camera_name, image_type, radius_cm, obj.vehicle_name, annotation_name);
+            obj.rpc_client.call("simSetDetectionFilterRadius", camera_name, image_type, radius_cm, vehicleName, annotation_name);
         end
 
-        function clearDetectionMeshNames(obj, camera_name, image_type, annotation_name)
+        function clearDetectionMeshNames(obj, camera_name, image_type, vehicleName, annotation_name)
             % CLEARDETECTIONMESHNAMES Clear detection mesh names from filter.
             %
             % Description:
@@ -2119,15 +2178,17 @@ classdef AirSimClient < handle
             % Inputs:
             %   camera_name (string) - Name of the camera to clear detection filter for.
             %   image_type (uint32) - Type of image to clear detection filter for.
+            %   vehicleName - name of the vehicle.   
             %   annotation_name (string, optional) - Name of the annotation to clear (default is ".*").
-    
+
             arguments
                 obj AirSimClient
                 camera_name string
                 image_type uint32
+                vehicleName string
                 annotation_name string = ".*"
             end
-            obj.rpc_client.call("simClearDetectionMeshNames", camera_name, image_type, obj.vehicle_name, annotation_name);
+            obj.rpc_client.call("simClearDetectionMeshNames", camera_name, image_type, vehicleName, annotation_name);
         end
 
         function detectionInfo = simGetDetections(obj)
@@ -2186,7 +2247,7 @@ classdef AirSimClient < handle
             end
         end     
 
-        function setDistortionParam(obj, camera_name, param_name, value)
+        function setDistortionParam(obj, camera_name, param_name, value, vehicleName)
             % SETDISTORTIONPARAM Set distortion parameter via AirSim API.
             %
             % Description:
@@ -2196,11 +2257,12 @@ classdef AirSimClient < handle
             %   camera_name (string) - Name of the camera to set distortion parameter for.
             %   param_name (string) - Name of the distortion parameter to set.
             %   value - Value to set for the distortion parameter.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simSetDistortionParam", camera_name, param_name, value, obj.vehicle_name);
+            obj.rpc_client.call("simSetDistortionParam", camera_name, param_name, value, vehicleName);
         end
 
-        function setCameraPose(obj, camera_name, position, orientation)
+        function setCameraPose(obj, camera_name, position, orientation, vehicleName)
             % SETCAMERAPOSE Set camera pose via AirSim API.
             %
             % Description:
@@ -2210,6 +2272,7 @@ classdef AirSimClient < handle
             %   camera_name (string) - Name of the camera to set pose for.
             %   position (double array) - Position coordinates [x, y, z] of the camera.
             %   orientation (quaternion array) - Orientation quaternion [w, x, y, z] of the camera.
+            %   vehicleName - name of the vehicle.   
 
             newPose.position.x_val = position(1);
             newPose.position.y_val = -position(2);
@@ -2220,10 +2283,10 @@ classdef AirSimClient < handle
             newPose.orientation.x_val = orientation(2);
             newPose.orientation.y_val = orientation(3);
             newPose.orientation.z_val = orientation(4);
-            obj.rpc_client.call("simSetCameraPose", camera_name, newPose, obj.vehicle_name);
+            obj.rpc_client.call("simSetCameraPose", camera_name, newPose, vehicleName);
         end
 
-        function simSetCameraFov(obj, camera_name, fov_degrees)
+        function simSetCameraFov(obj, camera_name, fov_degrees, vehicleName)
             % SIMSETCAMERAFOV Set camera field of view (FOV) via AirSim API.
             %
             % Description:
@@ -2232,11 +2295,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   camera_name (string) - Name of the camera to set FOV for.
             %   fov_degrees (double) - Field of view angle in degrees.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("setCameraFov", camera_name, fov_degrees, obj.vehicle_name);
+            obj.rpc_client.call("setCameraFov", camera_name, fov_degrees, vehicleName);
         end
 
-        function settings = getPresetLensSettings(obj, sensorName)
+        function settings = getPresetLensSettings(obj, sensorName, vehicleName)
             % GETPRESETLENSSETTINGS Get preset lens settings for a specific sensor
             %
             % Description:
@@ -2244,15 +2308,16 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve settings for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - String representing the preset lens settings.
 
-            returnData = obj.rpc_client.call("simGetPresetLensSettings", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetPresetLensSettings", sensorName, vehicleName);
             settings = string(cell(returnData));
         end
 
-        function settings = getLensSettings(obj, sensorName)
+        function settings = getLensSettings(obj, sensorName, vehicleName)
             % GETLENSSETTINGS Get current lens settings for a specific sensor
             %
             % Description:
@@ -2260,15 +2325,16 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve settings for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - String representing the current lens settings.
 
-            returnData = obj.rpc_client.call("simGetLensSettings", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetLensSettings", sensorName, vehicleName);
             settings = string(returnData);
         end
 
-        function settings = setPresetLensSettings(obj, preset_lens_settings, sensorName)
+        function settings = setPresetLensSettings(obj, preset_lens_settings, sensorName, vehicleName)
             % SETPRESETLENSSETTINGS Set preset lens settings for a specific sensor
             %
             % Description:
@@ -2277,15 +2343,16 @@ classdef AirSimClient < handle
             % Inputs:
             %   preset_lens_settings - String representing the preset lens settings to set.
             %   sensorName - Name of the sensor to set settings for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - String representing the updated preset lens settings.
 
-            returnData = obj.rpc_client.call("simSetPresetLensSettings", preset_lens_settings, sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simSetPresetLensSettings", preset_lens_settings, sensorName, vehicleName);
             settings = string(returnData);
         end
 
-        function settings = getPresetFilmbackSettings(obj, sensorName)
+        function settings = getPresetFilmbackSettings(obj, sensorName, vehicleName)
             % GETPRESETFILMBACKSETTINGS Get preset filmback settings for a specific sensor
             %
             % Description:
@@ -2293,15 +2360,16 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve settings for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - String representing the preset filmback settings.
 
-            returnData = obj.rpc_client.call("simGetPresetFilmbackSettings", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetPresetFilmbackSettings", sensorName, vehicleName);
             settings = string(cell(returnData));
         end
 
-        function setPresetFilmbackSettings(obj, preset_filmback_settings, sensorName)
+        function setPresetFilmbackSettings(obj, preset_filmback_settings, sensorName, vehicleName)
             % SETPRESETFILMBACKSETTINGS Set preset filmback settings for a specific sensor
             %
             % Description:
@@ -2310,11 +2378,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   preset_filmback_settings - String representing the preset filmback settings to set.
             %   sensorName - Name of the sensor to set settings for.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simGetPresetFilmbackSettings", preset_filmback_settings, sensorName, obj.vehicle_name);
+            obj.rpc_client.call("simGetPresetFilmbackSettings", preset_filmback_settings, sensorName, vehicleName);
         end
 
-        function settings = getFilmbackSettings(obj, sensorName)
+        function settings = getFilmbackSettings(obj, sensorName, vehicleName)
             % GETFILMBACKSETTINGS Get current filmback settings for a specific sensor
             %
             % Description:
@@ -2322,15 +2391,16 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve settings for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - String representing the current filmback settings.
 
-            returnData = obj.rpc_client.call("simGetFilmbackSettings", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetFilmbackSettings", sensorName, vehicleName);
             settings = string(returnData);
         end
 
-        function setFilmbackSettings(obj, sensor_width, sensor_height, sensorName)
+        function setFilmbackSettings(obj, sensor_width, sensor_height, sensorName, vehicleName)
             % SETFILMBACKSETTINGS Set filmback settings for a specific sensor
             %
             % Description:
@@ -2340,11 +2410,12 @@ classdef AirSimClient < handle
             %   sensor_width - Width of the sensor.
             %   sensor_height - Height of the sensor.
             %   sensorName - Name of the sensor to set settings for.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simSetFilmbackSettings", sensor_width, sensor_height, sensorName, obj.vehicle_name);
+            obj.rpc_client.call("simSetFilmbackSettings", sensor_width, sensor_height, sensorName, vehicleName);
         end
 
-        function settings = getFocalLength(obj, sensorName)
+        function settings = getFocalLength(obj, sensorName, vehicleName)
             % GETFOCALLENGTH Get current focal length for a specific sensor
             %
             % Description:
@@ -2352,15 +2423,16 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve focal length for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - Double representing the current focal length.
 
-            returnData = obj.rpc_client.call("simGetFocalLength", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetFocalLength", sensorName, vehicleName);
             settings = double(returnData);
         end
 
-        function setFocalLength(obj, focal_length, sensorName)
+        function setFocalLength(obj, focal_length, sensorName, vehicleName)
             % SETFOCALLENGTH Set focal length for a specific sensor
             %
             % Description:
@@ -2369,11 +2441,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   focal_length - Focal length value to set.
             %   sensorName - Name of the sensor to set focal length for.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simSetFocalLength", focal_length, sensorName, obj.vehicle_name);
+            obj.rpc_client.call("simSetFocalLength", focal_length, sensorName, vehicleName);
         end
 
-        function enableManualFocus(obj, enable, sensorName)
+        function enableManualFocus(obj, enable, sensorName, vehicleName)
             % ENABLEMANUALFOCUS Enable or disable manual focus for a specific sensor
             %
             % Description:
@@ -2382,11 +2455,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   enable - Logical value indicating whether to enable (true) or disable (false) manual focus.
             %   sensorName - Name of the sensor to enable/disable manual focus for.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simEnableManualFocus", enable, sensorName, obj.vehicle_name);
+            obj.rpc_client.call("simEnableManualFocus", enable, sensorName, vehicleName);
         end
 
-        function settings = getFocusDistance(obj, sensorName)
+        function settings = getFocusDistance(obj, sensorName, vehicleName)
             % GETFOCUSDISTANCE Get current focus distance for a specific sensor
             %
             % Description:
@@ -2394,15 +2468,16 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve focus distance for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - Double representing the current focus distance.
 
-            returnData = obj.rpc_client.call("simGetFocusDistance", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetFocusDistance", sensorName, vehicleName);
             settings = double(returnData);
         end
 
-        function setFocusDistance(obj, focus_distance, sensorName)
+        function setFocusDistance(obj, focus_distance, sensorName, vehicleName)
             % SETFOCUSDISTANCE Set focus distance for a specific sensor
             %
             % Description:
@@ -2411,11 +2486,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   focus_distance - Focus distance value to set.
             %   sensorName - Name of the sensor to set focus distance for.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simSetFocusDistance", focus_distance, sensorName, obj.vehicle_name);
+            obj.rpc_client.call("simSetFocusDistance", focus_distance, sensorName, vehicleName);
         end
 
-        function settings = getFocusAperture(obj, sensorName)
+        function settings = getFocusAperture(obj, sensorName, vehicleName)
             % GETFOCUSAPERTURE Get current focus aperture for a specific sensor
             %
             % Description:
@@ -2423,15 +2499,16 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve focus aperture for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - Double representing the current focus aperture.
 
-            returnData = obj.rpc_client.call("simGetFocusAperture", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetFocusAperture", sensorName, vehicleName);
             settings = double(returnData);
         end
 
-        function setFocusAperture(obj, focus_aperture, sensorName)
+        function setFocusAperture(obj, focus_aperture, sensorName, vehicleName)
             % SETFOCUSAPERTURE Set focus aperture for a specific sensor
             %
             % Description:
@@ -2440,11 +2517,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   focus_aperture - Focus aperture value to set.
             %   sensorName - Name of the sensor to set focus aperture for.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simSetFocusAperture", focus_aperture, sensorName, obj.vehicle_name);
+            obj.rpc_client.call("simSetFocusAperture", focus_aperture, sensorName, vehicleName);
         end
 
-        function enableFocusPlane(obj, enable, sensorName)
+        function enableFocusPlane(obj, enable, sensorName, vehicleName)
             % ENABLEFOCUSPLANE Enable or disable focus plane for a specific sensor
             %
             % Description:
@@ -2453,11 +2531,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   enable - Logical value indicating whether to enable (true) or disable (false) focus plane.
             %   sensorName - Name of the sensor to enable/disable focus plane for.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("simEnableFocusPlane", enable, sensorName, obj.vehicle_name);
+            obj.rpc_client.call("simEnableFocusPlane", enable, sensorName, vehicleName);
         end
 
-        function settings = getCurrentFieldOfView(obj, sensorName)
+        function settings = getCurrentFieldOfView(obj, sensorName, vehicleName)
             % GETCURRENTFIELDOFVIEW Get current field of view for a specific sensor
             %
             % Description:
@@ -2465,11 +2544,12 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   sensorName - Name of the sensor to retrieve field of view for.
+            %   vehicleName - name of the vehicle.   
             %
             % Outputs:
             %   settings - String representing the current field of view.
 
-            returnData = obj.rpc_client.call("simGetCurrentFieldOfView", sensorName, obj.vehicle_name);
+            returnData = obj.rpc_client.call("simGetCurrentFieldOfView", sensorName, vehicleName);
             settings = string(returnData);
         end 
 
@@ -2480,14 +2560,15 @@ classdef AirSimClient < handle
             %   Initiates asynchronous takeoff of the vehicle with optional timeout.
             %
             % Inputs:
+            %   vehicleName - name of the vehicle.   
             %   t - Optional timeout value (default 20 seconds).
 
-            if nargin == 2
-                t = varargin{1};
+            if nargin == 3
+                t = varargin{2};
             else
                 t = 20;
             end
-            obj.drone_client.takeoffAsync(t, obj.vehicle_name);
+            obj.drone_client.takeoffAsync(t, varargin{1});
         end
 
         function landAsync(obj, varargin)
@@ -2497,14 +2578,15 @@ classdef AirSimClient < handle
             %   Initiates asynchronous landing of the vehicle with optional timeout.
             %
             % Inputs:
-            %   t - Optional timeout value (default 60 seconds).
+            %   vehicleName - name of the vehicle. 
+            %   t - Optional timeout value (default 60 seconds).  
 
-            if nargin == 2
-                t = varargin{1};
+            if nargin == 3
+                t = varargin{2};
             else
                 t = 60;
             end
-            obj.drone_client.landAsync(t, obj.vehicle_name)
+            obj.drone_client.landAsync(t, varargin{1})
         end        
 
         function goHomeAsync(obj, varargin)
@@ -2514,17 +2596,18 @@ classdef AirSimClient < handle
             %   Initiates asynchronous return to home of the vehicle with optional timeout.
             %
             % Inputs:
+            %   vehicleName - name of the vehicle.   
             %   t - Optional timeout value (default 3e38 seconds, effectively infinite).
 
-            if nargin == 2
-                t = varargin{1};
+            if nargin == 3
+                t = varargin{2};
             else
                 t = 3e38;
             end
-            obj.drone_client.goHomeAsync(t, obj.vehicle_name)
+            obj.drone_client.goHomeAsync(t, varargin{1})
         end
 
-        function moveByVelocityBodyFrameAsync(obj, vx, vy, vz, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate)
+        function moveByVelocityBodyFrameAsync(obj, vx, vy, vz, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
             % MOVEBYVELOCITYBODYFRAMEASYNC Move the vehicle by velocity in body frame asynchronously
             %
             % Description:
@@ -2536,13 +2619,14 @@ classdef AirSimClient < handle
             %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
             %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocityBodyFrame", vx, vy, vz, duration, int32(drivetrain), yawMode, obj.vehicle_name);
+            obj.rpc_client.call("moveByVelocityBodyFrame", vx, vy, vz, duration, int32(drivetrain), yawMode, vehicleName);
         end
 
-        function moveByVelocityZBodyFrameAsync(obj, vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate)
+        function moveByVelocityZBodyFrameAsync(obj, vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
             % MOVEBYVELOCITYZBODYFRAMEASYNC Move the vehicle by velocity and z in body frame asynchronously
             %
             % Description:
@@ -2555,13 +2639,14 @@ classdef AirSimClient < handle
             %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
             %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocityZBodyFrame", vx, vy, z, duration, int32(drivetrain), yawMode, obj.vehicle_name);
+            obj.rpc_client.call("moveByVelocityZBodyFrame", vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName);
         end
 
-        function moveByVelocityAsync(obj, vx, vy, vz, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate)
+        function moveByVelocityAsync(obj, vx, vy, vz, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
             % MOVEBYVELOCITYASYNC Move the vehicle by velocity asynchronously
             %
             % Description:
@@ -2573,13 +2658,14 @@ classdef AirSimClient < handle
             %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
             %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocity", vx, vy, vz, duration, int32(drivetrain), yawMode, obj.vehicle_name);
+            obj.rpc_client.call("moveByVelocity", vx, vy, vz, duration, int32(drivetrain), yawMode, vehicleName);
         end
 
-        function moveByVelocityZAsync(obj,  vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate)
+        function moveByVelocityZAsync(obj,  vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
             % MOVEBYVELOCITYZASYNC Move the vehicle by velocity and z asynchronously
             %
             % Description:
@@ -2592,13 +2678,14 @@ classdef AirSimClient < handle
             %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
             %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocityZ", vx, vy, z, duration, int32(drivetrain), yawMode, obj.vehicle_name);
+            obj.rpc_client.call("moveByVelocityZ", vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName);
         end
 
-        function moveOnPathAsync(obj, path, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead)
+        function moveOnPathAsync(obj, path, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
             % MOVEONPATHASYNC Move the vehicle on a path asynchronously
             %
             % Description:
@@ -2613,13 +2700,14 @@ classdef AirSimClient < handle
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
             %   lookahead - Lookahead distance.
             %   adaptive_lookahead - Adaptive lookahead distance.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveOnPath", path, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, obj.vehicle_name);
+            obj.rpc_client.call("moveOnPath", path, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
         end
 
-        function moveToPositionAsync(obj, x, y, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead)
+        function moveToPositionAsync(obj, x, y, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
             % MOVETOPOSITIONASYNC Move the vehicle to a position asynchronously
             %
             % Description:
@@ -2634,13 +2722,14 @@ classdef AirSimClient < handle
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
             %   lookahead - Lookahead distance.
             %   adaptive_lookahead - Adaptive lookahead distance.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveToPosition", x, y, z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, obj.vehicle_name);
+            obj.rpc_client.call("moveToPosition", x, y, z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
         end
 
-        function moveToGPSAsync(obj, latitude, longitude, altitude, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead)
+        function moveToGPSAsync(obj, latitude, longitude, altitude, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
             % MOVETOGPSASYNC Move the vehicle to a GPS location asynchronously
             %
             % Description:
@@ -2655,13 +2744,14 @@ classdef AirSimClient < handle
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
             %   lookahead - Lookahead distance.
             %   adaptive_lookahead - Adaptive lookahead distance.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveToGPS", latitude, longitude, altitude, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, obj.vehicle_name);
+            obj.rpc_client.call("moveToGPS", latitude, longitude, altitude, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
         end
 
-        function moveToZAsync(obj, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead)
+        function moveToZAsync(obj, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
             % MOVETOZASYNC Move the vehicle to a specific Z position asynchronously
             %
             % Description:
@@ -2676,13 +2766,14 @@ classdef AirSimClient < handle
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
             %   lookahead - Lookahead distance.
             %   adaptive_lookahead - Adaptive lookahead distance.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveToZ", z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, obj.vehicle_name);
+            obj.rpc_client.call("moveToZ", z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
         end
 
-        function moveByManualAsync(obj, vx_max, vy_max, z_min, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate)
+        function moveByManualAsync(obj, vx_max, vy_max, z_min, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
             % MOVEBYMANUALASYNC Move the vehicle manually by specifying max velocities and minimum Z
             %
             % Description:
@@ -2695,13 +2786,14 @@ classdef AirSimClient < handle
             %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
             %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
             %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %   vehicleName - name of the vehicle.   
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByManual", vx_max, vy_max, z_min, duration, int32(drivetrain), yawMode, obj.vehicle_name);
+            obj.rpc_client.call("moveByManual", vx_max, vy_max, z_min, duration, int32(drivetrain), yawMode, vehicleName);
         end
 
-        function rotateToYawAsync(obj, yaw, timeout_sec, margin)
+        function rotateToYawAsync(obj, yaw, timeout_sec, margin, vehicleName)
             % ROTATETOYAWASYNC Rotate the vehicle to a specified yaw asynchronously
             %
             % Description:
@@ -2711,11 +2803,12 @@ classdef AirSimClient < handle
             %   yaw - Yaw angle to rotate to.
             %   timeout_sec - Timeout duration in seconds.
             %   margin - Margin for error in rotation.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("rotateToYaw", yaw, timeout_sec, margin, obj.vehicle_name);
+            obj.rpc_client.call("rotateToYaw", yaw, timeout_sec, margin, vehicleName);
         end
 
-        function rotateByYawRateAsync(obj, yaw_rate, duration)
+        function rotateByYawRateAsync(obj, yaw_rate, duration, vehicleName)
             % ROTATEBYYAWRATEASYNC Rotate the vehicle by a specified yaw rate asynchronously
             %
             % Description:
@@ -2724,20 +2817,24 @@ classdef AirSimClient < handle
             % Inputs:
             %   yaw_rate - Yaw rate to rotate by.
             %   duration - Duration of the rotation.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("rotateByYawRate", yaw_rate, duration, obj.vehicle_name);
+            obj.rpc_client.call("rotateByYawRate", yaw_rate, duration, vehicleName);
         end
 
-        function hoverAsync(obj)
+        function hoverAsync(obj, vehicleName)
             % HOVERASYNC Make the vehicle hover at its current position asynchronously
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.   
             %
             % Description:
             %   Makes the vehicle hover at its current position asynchronously.
 
-            obj.rpc_client.call("hover", obj.vehicle_name);
+            obj.rpc_client.call("hover", vehicleName);
         end
 
-        function moveByMotorPWMsAsync(obj, front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration)
+        function moveByMotorPWMsAsync(obj, front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, vehicleName)
             % MOVEBYMOTORPWMSASYNC Move the vehicle by specifying motor PWM values asynchronously
             %
             % Description:
@@ -2746,11 +2843,12 @@ classdef AirSimClient < handle
             % Inputs:
             %   front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm - PWM values for each motor.
             %   duration - Duration of the movement.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("moveByMotorPWMs", front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, obj.vehicle_name);
+            obj.rpc_client.call("moveByMotorPWMs", front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, vehicleName);
         end
 
-        function moveByRollPitchYawZAsync(obj, roll, pitch, yaw, z, duration)
+        function moveByRollPitchYawZAsync(obj, roll, pitch, yaw, z, duration, vehicleName)
             % MOVEBYROLLPITCHYAWZASYNC Move the vehicle by specifying roll, pitch, yaw, and Z position asynchronously
             %
             % Description:
@@ -2760,11 +2858,12 @@ classdef AirSimClient < handle
             %   roll, pitch, yaw - Roll, pitch, and yaw angles.
             %   z - Z position to move to.
             %   duration - Duration of the movement.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("moveByRollPitchYawZ", roll, -pitch, -yaw, z, duration, obj.vehicle_name);
+            obj.rpc_client.call("moveByRollPitchYawZ", roll, -pitch, -yaw, z, duration, vehicleName);
         end
 
-        function moveByRollPitchYawThrottleAsync(obj, roll, pitch, yaw, throttle, duration)
+        function moveByRollPitchYawThrottleAsync(obj, roll, pitch, yaw, throttle, duration, vehicleName)
             % MOVEBYROLLPITCHYAWTHROTTLEASYNC Move the vehicle by specifying roll, pitch, yaw, and throttle asynchronously
             %
             % Description:
@@ -2774,11 +2873,12 @@ classdef AirSimClient < handle
             %   roll, pitch, yaw - Roll, pitch, and yaw angles.
             %   throttle - Throttle value.
             %   duration - Duration of the movement.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("moveByRollPitchYawThrottle", roll, -pitch, -yaw, throttle, duration, obj.vehicle_name);
+            obj.rpc_client.call("moveByRollPitchYawThrottle", roll, -pitch, -yaw, throttle, duration, vehicleName);
         end
 
-        function moveByRollPitchYawrateThrottleAsync(obj, roll, pitch, yaw_rate, throttle, duration)
+        function moveByRollPitchYawrateThrottleAsync(obj, roll, pitch, yaw_rate, throttle, duration, vehicleName)
             % MOVEBYROLLPITCHYAWTHROTTLEASYNC Move the vehicle by specifying roll, pitch, yaw, and throttle asynchronously
             %
             % Description:
@@ -2788,11 +2888,12 @@ classdef AirSimClient < handle
             %   roll, pitch, yaw - Roll, pitch, and yaw angles.
             %   throttle - Throttle value.
             %   duration - Duration of the movement.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("moveByRollPitchYawrateThrottle", roll, -pitch, -yaw_rate, throttle, duration, obj.vehicle_name);
+            obj.rpc_client.call("moveByRollPitchYawrateThrottle", roll, -pitch, -yaw_rate, throttle, duration, vehicleName);
         end
 
-        function moveByRollPitchYawrateZAsync(obj, roll, pitch, yaw_rate, z, duration)
+        function moveByRollPitchYawrateZAsync(obj, roll, pitch, yaw_rate, z, duration, vehicleName)
             % MOVEBYROLLPITCHYAWRATEZASYNC Move the vehicle by specifying roll, pitch, yaw rate, and Z position asynchronously
             %
             % Description:
@@ -2803,11 +2904,12 @@ classdef AirSimClient < handle
             %   yaw_rate - Yaw rate.
             %   z - Z position to move to.
             %   duration - Duration of the movement.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("moveByRollPitchYawrateZ", roll, -pitch, -yaw_rate, z, duration, obj.vehicle_name);
+            obj.rpc_client.call("moveByRollPitchYawrateZ", roll, -pitch, -yaw_rate, z, duration, vehicleName);
         end
 
-        function moveByAngleRatesZAsync(obj, roll_rate, pitch_rate, yaw_rate, z, duration)
+        function moveByAngleRatesZAsync(obj, roll_rate, pitch_rate, yaw_rate, z, duration, vehicleName)
             % MOVEBYANGLERATESZASYNC Move the vehicle by specifying roll, pitch, yaw rates, and Z position asynchronously
             %
             % Description:
@@ -2817,11 +2919,12 @@ classdef AirSimClient < handle
             %   roll_rate, pitch_rate, yaw_rate - Roll, pitch, and yaw rates.
             %   z - Z position to move to.
             %   duration - Duration of the movement.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("moveByRollPitchYawrateZ", roll_rate, -pitch_rate, -yaw_rate, z, duration, obj.vehicle_name);
+            obj.rpc_client.call("moveByRollPitchYawrateZ", roll_rate, -pitch_rate, -yaw_rate, z, duration, vehicleName);
         end
 
-        function moveByAngleRatesThrottleAsync(obj, roll_rate, pitch_rate, yaw_rate, throttle, duration)
+        function moveByAngleRatesThrottleAsync(obj, roll_rate, pitch_rate, yaw_rate, throttle, duration, vehicleName)
             % MOVEBYANGLERATESTHROTTLEASYNC Move the vehicle by specifying roll, pitch, yaw rates, and throttle asynchronously
             %
             % Description:
@@ -2831,8 +2934,9 @@ classdef AirSimClient < handle
             %   roll_rate, pitch_rate, yaw_rate - Roll, pitch, and yaw rates.
             %   throttle - Throttle value.
             %   duration - Duration of the movement.
+            %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("moveByAngleRatesThrottle", roll_rate, -pitch_rate, -yaw_rate, throttle, duration, obj.vehicle_name);
+            obj.rpc_client.call("moveByAngleRatesThrottle", roll_rate, -pitch_rate, -yaw_rate, throttle, duration, vehicleName);
         end
     end
 end
