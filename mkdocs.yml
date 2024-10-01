@@ -18,6 +18,7 @@ nav:
     - "Download and install from precompiled plugin": 'install_precompiled.md'
     - "Install from Source on Windows": 'install_windows.md'
     - "Install from Source on Linux": 'install_linux.md'
+    - "Using Docker on Ubuntu": 'docker_ubuntu.md'
     - "Custom Unreal Environment": 'unreal_custenv.md'
     - "Dynamic Objects": 'dynamic_objects.md'
   - "Using AirSim":
