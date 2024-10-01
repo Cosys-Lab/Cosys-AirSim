@@ -458,7 +458,7 @@ classdef AirSimClient < handle
             timestamp = double(double(camera_image.time_stamp))/1e9;
         end
 
-        function [images, timestamp] = getCameraImages(obj, sensorName, cameraTypes, annotationLayers)
+        function [images, timestamp] = getCameraImages(obj, sensorName, cameraTypes, vehicleName, annotationLayers)
             % GETCAMERAIMAGES Get synchronized camera data from multiple camera sensors
             %
             % Description:
@@ -467,6 +467,7 @@ classdef AirSimClient < handle
             % Inputs:
             %   sensorName - Name of the camera sensor.
             %   cameraTypes - Array of camera types (use AirSimCameraTypes enum).
+            %   vehicleName - name of the vehicle.
             %   annotationLayers - Array of optional annotation layer name if using annotation system (default '').
             %
             % Outputs:
@@ -477,6 +478,7 @@ classdef AirSimClient < handle
                 obj AirSimClient
                 sensorName string 
                 cameraTypes uint32
+                vehicleName
                 annotationLayers string = ""
             end
             images = {};
@@ -2548,7 +2550,7 @@ classdef AirSimClient < handle
             settings = string(returnData);
         end 
 
-        function takeoffAsync(obj, varargin)
+        function takeoffAsync(obj, vehicleName, t, join)
             % TAKEOFFASYNC Initiate asynchronous takeoff of the vehicle
             %
             % Description:
@@ -2556,17 +2558,17 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   vehicleName - name of the vehicle.   
-            %   t - Optional timeout value (default 20 seconds).
+            %   t - timeout value.
+            %   join - toggle on to wait for the method to finish. 
 
-            if nargin == 3
-                t = varargin{2};
+            if join
+                obj.drone_client.takeoffAsync(t, vehicleName).join();
             else
-                t = 20;
+                obj.drone_client.takeoffAsync(t, vehicleName);
             end
-            obj.drone_client.takeoffAsync(t, varargin{1});
         end
 
-        function landAsync(obj, varargin)
+        function landAsync(obj, vehicleName, t, join)
             % LANDASYNC Initiate asynchronous landing of the vehicle
             %
             % Description:
@@ -2574,17 +2576,17 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   vehicleName - name of the vehicle. 
-            %   t - Optional timeout value (default 60 seconds).  
+            %   t - timeout value.  
+            %   join - toggle on to wait for the method to finish. 
 
-            if nargin == 3
-                t = varargin{2};
+            if join
+                obj.drone_client.landAsync(t, vehicleName).join();
             else
-                t = 60;
+                obj.drone_client.landAsync(t, vehicleName);
             end
-            obj.drone_client.landAsync(t, varargin{1})
         end        
 
-        function goHomeAsync(obj, varargin)
+        function goHomeAsync(obj, vehicleName, t, join)
             % GOHOMEASYNC Initiate asynchronous return to home of the vehicle
             %
             % Description:
@@ -2592,139 +2594,150 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   vehicleName - name of the vehicle.   
-            %   t - Optional timeout value (default 3e38 seconds, effectively infinite).
+            %   t - timeout value.  
+            %   join - toggle on to wait for the method to finish. 
 
-            if nargin == 3
-                t = varargin{2};
+            if join
+                obj.drone_client.goHomeAsync(t, vehicleName).join();
             else
-                t = 3e38;
+                obj.drone_client.goHomeAsync(t, vehicleName);
             end
-            obj.drone_client.goHomeAsync(t, varargin{1})
         end
 
-        function moveByVelocityBodyFrameAsync(obj, vx, vy, vz, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
-            % MOVEBYVELOCITYBODYFRAMEASYNC Move the vehicle by velocity in body frame asynchronously
-            %
-            % Description:
-            %   Moves the vehicle by velocity in the body frame asynchronously.
-            %
-            % Inputs:
-            %   vx, vy, vz - Velocity components in body frame.
-            %   duration - Duration of the movement.
-            %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
-            %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
-            %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
-            %   vehicleName - name of the vehicle.   
-
-            yawMode.is_rate = yaw_mode_is_rate;
-            yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocityBodyFrame", vx, vy, vz, duration, int32(drivetrain), yawMode, vehicleName);
-        end
-
-        function moveByVelocityZBodyFrameAsync(obj, vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
+        function moveByVelocityZBodyFrameAsync(obj, vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName, join)
             % MOVEBYVELOCITYZBODYFRAMEASYNC Move the vehicle by velocity and z in body frame asynchronously
             %
             % Description:
-            %   Moves the vehicle by velocity and z in the body frame asynchronously.
+            %     Moves the vehicle by velocity and z in the body frame asynchronously.
             %
             % Inputs:
-            %   vx, vy - Velocity components in body frame.
-            %   z - Z position to move to.
-            %   duration - Duration of the movement.
-            %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
-            %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
-            %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
-            %   vehicleName - name of the vehicle.   
-
+            %     vx, vy - Velocity components in body frame.
+            %     z - Z position to move to.
+            %     duration - Duration of the movement.
+            %     drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
+            %     yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
+            %     yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocityZBodyFrame", vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName);
+            
+            if join
+                obj.drone_client.moveByVelocityZBodyFrameAsync(vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName).join();
+            else
+                obj.drone_client.moveByVelocityZBodyFrameAsync(vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName);
+            end
         end
 
-        function moveByVelocityAsync(obj, vx, vy, vz, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
+        function moveByVelocityAsync(obj, vx, vy, vz, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName, join)
             % MOVEBYVELOCITYASYNC Move the vehicle by velocity asynchronously
             %
             % Description:
-            %   Moves the vehicle by velocity asynchronously.
+            %     Moves the vehicle by velocity asynchronously.
             %
             % Inputs:
-            %   vx, vy, vz - Velocity components.
-            %   duration - Duration of the movement.
-            %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
-            %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
-            %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
-            %   vehicleName - name of the vehicle.   
-
+            %     vx, vy, vz - Velocity components.
+            %     duration - Duration of the movement.
+            %     drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
+            %     yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
+            %     yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocity", vx, vy, vz, duration, int32(drivetrain), yawMode, vehicleName);
+            
+            if join
+                obj.drone_client.moveByVelocityAsync(vx, vy, vz, duration, int32(drivetrain), yawMode, vehicleName).join();
+            else
+                obj.drone_client.moveByVelocityAsync(vx, vy, vz, duration, int32(drivetrain), yawMode, vehicleName);
+            end
         end
 
-        function moveByVelocityZAsync(obj,  vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
+        function moveByVelocityZAsync(obj, vx, vy, z, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName, join)
             % MOVEBYVELOCITYZASYNC Move the vehicle by velocity and z asynchronously
             %
             % Description:
-            %   Moves the vehicle by velocity and z asynchronously.
+            %     Moves the vehicle by velocity and z asynchronously.
             %
             % Inputs:
-            %   vx, vy - Velocity components.
-            %   z - Z position to move to.
-            %   duration - Duration of the movement.
-            %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
-            %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
-            %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
-            %   vehicleName - name of the vehicle.   
-
+            %     vx, vy - Velocity components.
+            %     z - Z position to move to.
+            %     duration - Duration of the movement.
+            %     drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
+            %     yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
+            %     yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByVelocityZ", vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName);
+            
+            if join
+                obj.drone_client.moveByVelocityZAsync(vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName).join();
+            else
+                obj.drone_client.moveByVelocityZAsync(vx, vy, z, duration, int32(drivetrain), yawMode, vehicleName);
+            end
         end
 
-        function moveOnPathAsync(obj, path, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
+        function moveOnPathAsync(obj, path, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName, join)
             % MOVEONPATHASYNC Move the vehicle on a path asynchronously
             %
             % Description:
-            %   Moves the vehicle along a specified path asynchronously.
+            %     Moves the vehicle along a specified path asynchronously.
             %
             % Inputs:
-            %   path - Path to follow.
-            %   velocity - Velocity of the vehicle.
-            %   timeout_sec - Timeout duration in seconds.
-            %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
-            %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
-            %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
-            %   lookahead - Lookahead distance.
-            %   adaptive_lookahead - Adaptive lookahead distance.
-            %   vehicleName - name of the vehicle.   
-
+            %     path - Path to follow.
+            %     velocity - Velocity of the vehicle.
+            %     timeout_sec - Timeout duration in seconds.
+            %     drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
+            %     yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
+            %     yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %     lookahead - Lookahead distance.
+            %     adaptive_lookahead - Adaptive lookahead distance.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveOnPath", path, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+            
+            if join
+                obj.drone_client.moveOnPathAsync(path, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName).join();
+            else
+                obj.drone_client.moveOnPathAsync(path, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+            end
         end
 
-        function moveToPositionAsync(obj, x, y, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
+        function moveToPositionAsync(obj, x, y, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName, join)
             % MOVETOPOSITIONASYNC Move the vehicle to a position asynchronously
             %
             % Description:
-            %   Moves the vehicle to a specified position asynchronously.
+            %     Moves the vehicle to a specified position asynchronously.
             %
             % Inputs:
-            %   x, y, z - Coordinates of the position to move to.
-            %   velocity - Velocity of the vehicle.
-            %   timeout_sec - Timeout duration in seconds.
-            %   drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
-            %   yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
-            %   yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
-            %   lookahead - Lookahead distance.
-            %   adaptive_lookahead - Adaptive lookahead distance.
-            %   vehicleName - name of the vehicle.   
-
+            %     x, y, z - Coordinates of the position to move to.
+            %     velocity - Velocity of the vehicle.
+            %     timeout_sec - Timeout duration in seconds.
+            %     drivetrain - Drivetrain type (Use AirSimDrivetrainTypes enum)
+            %     yaw_mode_is_rate - Logical value indicating if yaw mode is rate.
+            %     yaw_mode_yaw_or_rate - Yaw or rate value depending on mode.
+            %     lookahead - Lookahead distance.
+            %     adaptive_lookahead - Adaptive lookahead distance.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveToPosition", x, y, z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+            
+            if join
+                obj.drone_client.moveToPositionAsync(x, y, z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName).join();
+            else
+                obj.drone_client.moveToPositionAsync(x, y, z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+            end
         end
 
-        function moveToGPSAsync(obj, latitude, longitude, altitude, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
+        function moveToGPSAsync(obj, latitude, longitude, altitude, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName, join)
             % MOVETOGPSASYNC Move the vehicle to a GPS location asynchronously
             %
             % Description:
@@ -2740,13 +2753,19 @@ classdef AirSimClient < handle
             %   lookahead - Lookahead distance.
             %   adaptive_lookahead - Adaptive lookahead distance.
             %   vehicleName - name of the vehicle.   
+            %   join - toggle on to wait for the method to finish. 
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveToGPS", latitude, longitude, altitude, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+            
+            if join
+                obj.drone_client.moveToGPSAsync(latitude, longitude, altitude, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName).join();
+            else
+                obj.drone_client.moveToGPSAsync(latitude, longitude, altitude, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+            end
         end
 
-        function moveToZAsync(obj, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName)
+        function moveToZAsync(obj, z, velocity, timeout_sec, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, lookahead, adaptive_lookahead, vehicleName, join)
             % MOVETOZASYNC Move the vehicle to a specific Z position asynchronously
             %
             % Description:
@@ -2762,10 +2781,16 @@ classdef AirSimClient < handle
             %   lookahead - Lookahead distance.
             %   adaptive_lookahead - Adaptive lookahead distance.
             %   vehicleName - name of the vehicle.   
+            %   join - toggle on to wait for the method to finish. 
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveToZ", z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+
+            if join
+                obj.drone_client.moveToZAsync(z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName).join();
+            else
+                obj.drone_client.moveToZAsync(z, velocity, timeout_sec, int32(drivetrain), yawMode, lookahead, adaptive_lookahead, vehicleName);
+            end
         end
 
         function moveByManualAsync(obj, vx_max, vy_max, z_min, duration, drivetrain, yaw_mode_is_rate, yaw_mode_yaw_or_rate, vehicleName)
@@ -2785,141 +2810,190 @@ classdef AirSimClient < handle
 
             yawMode.is_rate = yaw_mode_is_rate;
             yawMode.yaw_or_rate = yaw_mode_yaw_or_rate;
-            obj.rpc_client.call("moveByManual", vx_max, vy_max, z_min, duration, int32(drivetrain), yawMode, vehicleName);
+            if join
+                obj.drone_client.moveByManualAsync(vx_max, vy_max, z_min, duration, int32(drivetrain), yawMode, vehicleName).join();
+            else
+                obj.drone_client.moveByManualAsync(vx_max, vy_max, z_min, duration, int32(drivetrain), yawMode, vehicleName);
+            end
         end
 
-        function rotateToYawAsync(obj, yaw, timeout_sec, margin, vehicleName)
+        function rotateToYawAsync(obj, yaw, timeout_sec, margin, vehicleName, join)
             % ROTATETOYAWASYNC Rotate the vehicle to a specified yaw asynchronously
             %
             % Description:
-            %   Rotates the vehicle to a specified yaw asynchronously.
+            %     Rotates the vehicle to a specified yaw asynchronously.
             %
             % Inputs:
-            %   yaw - Yaw angle to rotate to.
-            %   timeout_sec - Timeout duration in seconds.
-            %   margin - Margin for error in rotation.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("rotateToYaw", yaw, timeout_sec, margin, vehicleName);
+            %     yaw - Yaw angle to rotate to.
+            %     timeout_sec - Timeout duration in seconds.
+            %     margin - Margin for error in rotation.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.rotateToYawAsync(yaw, timeout_sec, margin, vehicleName).join();
+            else
+                obj.drone_client.rotateToYawAsync(yaw, timeout_sec, margin, vehicleName);
+            end
         end
-
-        function rotateByYawRateAsync(obj, yaw_rate, duration, vehicleName)
+        
+        function rotateByYawRateAsync(obj, yaw_rate, duration, vehicleName, join)
             % ROTATEBYYAWRATEASYNC Rotate the vehicle by a specified yaw rate asynchronously
             %
             % Description:
-            %   Rotates the vehicle by a specified yaw rate asynchronously.
+            %     Rotates the vehicle by a specified yaw rate asynchronously.
             %
             % Inputs:
-            %   yaw_rate - Yaw rate to rotate by.
-            %   duration - Duration of the rotation.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("rotateByYawRate", yaw_rate, duration, vehicleName);
+            %     yaw_rate - Yaw rate to rotate by.
+            %     duration - Duration of the rotation.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.rotateByYawRateAsync(yaw_rate, duration, vehicleName).join();
+            else
+                obj.drone_client.rotateByYawRateAsync(yaw_rate, duration, vehicleName);
+            end
         end
-
-        function hoverAsync(obj, vehicleName)
+        
+        function hoverAsync(obj, vehicleName, join)
             % HOVERASYNC Make the vehicle hover at its current position asynchronously
             %
             % Inputs:
-            %   vehicleName - name of the vehicle.   
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
             %
             % Description:
-            %   Makes the vehicle hover at its current position asynchronously.
-
-            obj.rpc_client.call("hover", vehicleName);
+            %     Makes the vehicle hover at its current position asynchronously.
+        
+            if join
+                obj.drone_client.hoverAsync(vehicleName).join();
+            else
+                obj.drone_client.hoverAsync(vehicleName);
+            end
         end
-
-        function moveByMotorPWMsAsync(obj, front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, vehicleName)
+        
+        function moveByMotorPWMsAsync(obj, front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, vehicleName, join)
             % MOVEBYMOTORPWMSASYNC Move the vehicle by specifying motor PWM values asynchronously
             %
             % Description:
-            %   Moves the vehicle by specifying motor PWM values asynchronously.
+            %     Moves the vehicle by specifying motor PWM values asynchronously.
             %
             % Inputs:
-            %   front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm - PWM values for each motor.
-            %   duration - Duration of the movement.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("moveByMotorPWMs", front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, vehicleName);
+            %     front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm - PWM values for each motor.
+            %     duration - Duration of the movement.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.moveByMotorPWMsAsync(front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, vehicleName).join();
+            else
+                obj.drone_client.moveByMotorPWMsAsync(front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm, duration, vehicleName);
+            end
         end
-
-        function moveByRollPitchYawZAsync(obj, roll, pitch, yaw, z, duration, vehicleName)
+        
+        function moveByRollPitchYawZAsync(obj, roll, pitch, yaw, z, duration, vehicleName, join)
             % MOVEBYROLLPITCHYAWZASYNC Move the vehicle by specifying roll, pitch, yaw, and Z position asynchronously
             %
             % Description:
-            %   Moves the vehicle by specifying roll, pitch, yaw, and Z position asynchronously.
+            %     Moves the vehicle by specifying roll, pitch, yaw, and Z position asynchronously.
             %
             % Inputs:
-            %   roll, pitch, yaw - Roll, pitch, and yaw angles.
-            %   z - Z position to move to.
-            %   duration - Duration of the movement.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("moveByRollPitchYawZ", roll, -pitch, -yaw, z, duration, vehicleName);
+            %     roll, pitch, yaw - Roll, pitch, and yaw angles.
+            %     z - Z position to move to.
+            %     duration - Duration of the movement.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.moveByRollPitchYawZAsync(roll, -pitch, -yaw, z, duration, vehicleName).join();
+            else
+                obj.drone_client.moveByRollPitchYawZAsync(roll, -pitch, -yaw, z, duration, vehicleName);
+            end
         end
-
-        function moveByRollPitchYawThrottleAsync(obj, roll, pitch, yaw, throttle, duration, vehicleName)
+        
+        function moveByRollPitchYawThrottleAsync(obj, roll, pitch, yaw, throttle, duration, vehicleName, join)
             % MOVEBYROLLPITCHYAWTHROTTLEASYNC Move the vehicle by specifying roll, pitch, yaw, and throttle asynchronously
             %
             % Description:
-            %   Moves the vehicle by specifying roll, pitch, yaw, and throttle asynchronously.
+            %     Moves the vehicle by specifying roll, pitch, yaw, and throttle asynchronously.
             %
             % Inputs:
-            %   roll, pitch, yaw - Roll, pitch, and yaw angles.
-            %   throttle - Throttle value.
-            %   duration - Duration of the movement.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("moveByRollPitchYawThrottle", roll, -pitch, -yaw, throttle, duration, vehicleName);
+            %     roll, pitch, yaw - Roll, pitch, and yaw angles.
+            %     throttle - Throttle value.
+            %     duration - Duration of the movement.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.moveByRollPitchYawThrottleAsync(roll, -pitch, -yaw, throttle, duration, vehicleName).join();
+            else
+                obj.drone_client.moveByRollPitchYawThrottleAsync(roll, -pitch, -yaw, throttle, duration, vehicleName);
+            end
         end
-
-        function moveByRollPitchYawrateThrottleAsync(obj, roll, pitch, yaw_rate, throttle, duration, vehicleName)
+        
+        function moveByRollPitchYawrateThrottleAsync(obj, roll, pitch, yaw_rate, throttle, duration, vehicleName, join)
             % MOVEBYROLLPITCHYAWTHROTTLEASYNC Move the vehicle by specifying roll, pitch, yaw, and throttle asynchronously
             %
             % Description:
-            %   Moves the vehicle by specifying roll, pitch, yaw, and throttle asynchronously.
+            %     Moves the vehicle by specifying roll, pitch, yaw, and throttle asynchronously.
             %
             % Inputs:
-            %   roll, pitch, yaw - Roll, pitch, and yaw angles.
-            %   throttle - Throttle value.
-            %   duration - Duration of the movement.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("moveByRollPitchYawrateThrottle", roll, -pitch, -yaw_rate, throttle, duration, vehicleName);
+            %     roll, pitch, yaw - Roll, pitch, and yaw angles.
+            %     throttle - Throttle value.
+            %     duration - Duration of the movement.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.moveByRollPitchYawrateThrottleAsync(roll, -pitch, -yaw_rate, throttle, duration, vehicleName).join();
+            else
+                obj.drone_client.moveByRollPitchYawrateThrottleAsync(roll, -pitch, -yaw_rate, throttle, duration, vehicleName);
+            end
         end
-
-        function moveByRollPitchYawrateZAsync(obj, roll, pitch, yaw_rate, z, duration, vehicleName)
+        
+        function moveByRollPitchYawrateZAsync(obj, roll, pitch, yaw_rate, z, duration, vehicleName, join)
             % MOVEBYROLLPITCHYAWRATEZASYNC Move the vehicle by specifying roll, pitch, yaw rate, and Z position asynchronously
             %
             % Description:
-            %   Moves the vehicle by specifying roll, pitch, yaw rate, and Z position asynchronously.
+            %     Moves the vehicle by specifying roll, pitch, yaw rate, and Z position asynchronously.
             %
             % Inputs:
-            %   roll, pitch - Roll and pitch angles.
-            %   yaw_rate - Yaw rate.
-            %   z - Z position to move to.
-            %   duration - Duration of the movement.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("moveByRollPitchYawrateZ", roll, -pitch, -yaw_rate, z, duration, vehicleName);
+            %     roll, pitch - Roll and pitch angles.
+            %     yaw_rate - Yaw rate.
+            %     z - Z position to move to.
+            %     duration - Duration of the movement.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.moveByRollPitchYawrateZAsync(roll, -pitch, -yaw_rate, z, duration, vehicleName).join();
+            else
+                obj.drone_client.moveByRollPitchYawrateZAsync(roll, -pitch, -yaw_rate, z, duration, vehicleName);
+            end
         end
 
-        function moveByAngleRatesZAsync(obj, roll_rate, pitch_rate, yaw_rate, z, duration, vehicleName)
+        function moveByAngleRatesZAsync(obj, roll_rate, pitch_rate, yaw_rate, z, duration, vehicleName, join)
             % MOVEBYANGLERATESZASYNC Move the vehicle by specifying roll, pitch, yaw rates, and Z position asynchronously
             %
             % Description:
-            %   Moves the vehicle by specifying roll, pitch, yaw rates, and Z position asynchronously.
+            %     Moves the vehicle by specifying roll, pitch, yaw rates, and Z position asynchronously.
             %
             % Inputs:
-            %   roll_rate, pitch_rate, yaw_rate - Roll, pitch, and yaw rates.
-            %   z - Z position to move to.
-            %   duration - Duration of the movement.
-            %   vehicleName - name of the vehicle.   
-
-            obj.rpc_client.call("moveByRollPitchYawrateZ", roll_rate, -pitch_rate, -yaw_rate, z, duration, vehicleName);
+            %     roll_rate, pitch_rate, yaw_rate - Roll, pitch, and yaw rates.
+            %     z - Z position to move to.
+            %     duration - Duration of the movement.
+            %     vehicleName - name of the vehicle.   
+            %     join - toggle on to wait for the method to finish. 
+        
+            if join
+                obj.drone_client.moveByAngleRatesZAsync(roll_rate, -pitch_rate, -yaw_rate, z, duration, vehicleName).join();
+            else
+                obj.drone_client.moveByAngleRatesZAsync(roll_rate, -pitch_rate, -yaw_rate, z, duration, vehicleName);
+            end
         end
 
-        function moveByAngleRatesThrottleAsync(obj, roll_rate, pitch_rate, yaw_rate, throttle, duration, vehicleName)
+        function moveByAngleRatesThrottleAsync(obj, roll_rate, pitch_rate, yaw_rate, throttle, duration, vehicleName, join)
             % MOVEBYANGLERATESTHROTTLEASYNC Move the vehicle by specifying roll, pitch, yaw rates, and throttle asynchronously
             %
             % Description:
@@ -2930,8 +3004,13 @@ classdef AirSimClient < handle
             %   throttle - Throttle value.
             %   duration - Duration of the movement.
             %   vehicleName - name of the vehicle.   
+            %   join - toggle on to wait for the method to finish. 
 
-            obj.rpc_client.call("moveByAngleRatesThrottle", roll_rate, -pitch_rate, -yaw_rate, throttle, duration, vehicleName);
+            if join
+                obj.drone_client.moveByAngleRatesThrottleAsync(roll_rate, -pitch_rate, -yaw_rate, throttle, duration, vehicleName).join();
+            else
+                obj.drone_client.moveByAngleRatesThrottleAsync(roll_rate, -pitch_rate, -yaw_rate, throttle, duration, vehicleName);
+            end
         end
     end
 end

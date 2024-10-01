@@ -7,8 +7,8 @@
     <param.summary>This a client implementation of the RPC API for Matlab for the Cosys-AirSim simulation framework.</param.summary>
     <param.description>This a client implementation of the RPC API for Matlab for the Cosys-AirSim simulation framework. A main class AirSimClient is available which implements all API calls.
 Do note that at this point not all functions have been tested and most function documentation was auto-generated. This is still a WIP client.</param.description>
-    <param.screenshot />
-    <param.version>3.0.1.0</param.version>
+    <param.screenshot>D:\BigProjects\Cosys-AirSim-Public\promo\thumbnail_matlab.png</param.screenshot>
+    <param.version>3.1.0.0</param.version>
     <param.output>${PROJECT_ROOT}\Cosys-AirSim Matlab API Client.mltbx</param.output>
     <param.products.name>
       <item>Aerospace Toolbox</item>
@@ -35,14 +35,7 @@ Do note that at this point not all functions have been tested and most function 
       &lt;example name="example" type="html"&gt;
          &lt;file type="source"&gt;/html/example.html&lt;/file&gt;
          &lt;file type="main"&gt;/example.m&lt;/file&gt;
-         &lt;file type="thumbnail"&gt;/html/example.png&lt;/file&gt;
-         &lt;file type="image"&gt;/html/example_01.png&lt;/file&gt;
-         &lt;file type="image"&gt;/html/example_02.png&lt;/file&gt;
-         &lt;file type="image"&gt;/html/example_03.png&lt;/file&gt;
-         &lt;file type="image"&gt;/html/example_04.png&lt;/file&gt;
-         &lt;file type="image"&gt;/html/example_05.png&lt;/file&gt;
-         &lt;file type="image"&gt;/html/example_06.png&lt;/file&gt;
-         &lt;file type="image"&gt;/html/example_07.png&lt;/file&gt;
+         &lt;file type="thumbnail"/&gt;
       &lt;/example&gt;
    &lt;/exampleCategory&gt;
 &lt;/examples&gt;</param.examples>
@@ -53,7 +46,7 @@ Do note that at this point not all functions have been tested and most function 
     <param.getting.started.guide>${PROJECT_ROOT}\doc\GettingStarted.mlx</param.getting.started.guide>
     <param.matlabpath.excludes />
     <param.javaclasspath.excludes />
-    <param.exported.on.package>false</param.exported.on.package>
+    <param.exported.on.package>true</param.exported.on.package>
     <param.required.addons />
     <param.matlab.project.id />
     <param.matlab.project.name />
@@ -74,7 +67,6 @@ Do note that at this point not all functions have been tested and most function 
       <param.authnamewatermark />
       <param.email />
       <param.company />
-      <param.screenshot />
       <param.output />
       <param.platforms />
       <param.exclude.filters />
@@ -84,7 +76,6 @@ Do note that at this point not all functions have been tested and most function 
       <param.registered.apps />
       <param.matlabpath.excludes />
       <param.javaclasspath.excludes />
-      <param.exported.on.package />
       <param.required.addons />
       <param.matlab.project.id />
       <param.matlab.project.name />
@@ -113,6 +104,7 @@ Do note that at this point not all functions have been tested and most function 
       <file>${PROJECT_ROOT}\demos.xml</file>
       <file>${PROJECT_ROOT}\doc</file>
       <file>${PROJECT_ROOT}\example.m</file>
+      <file>${PROJECT_ROOT}\example_twodrones.m</file>
       <file>${PROJECT_ROOT}\help</file>
       <file>${PROJECT_ROOT}\html</file>
       <file>${PROJECT_ROOT}\info.xml</file>
