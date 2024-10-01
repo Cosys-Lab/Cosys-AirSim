@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
-  <configuration build-checksum="4071223196" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
+  <configuration build-checksum="3699191630" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Cosys-AirSim Matlab API Client</param.appname>
     <param.authnamewatermark>Wouter Jansen</param.authnamewatermark>
     <param.email>wouter.jansen@uantwerpen.be</param.email>
@@ -35,7 +35,14 @@ Do note that at this point not all functions have been tested and most function 
       &lt;example name="example" type="html"&gt;
          &lt;file type="source"&gt;/html/example.html&lt;/file&gt;
          &lt;file type="main"&gt;/example.m&lt;/file&gt;
-         &lt;file type="thumbnail"/&gt;
+         &lt;file type="thumbnail"&gt;/html/example.png&lt;/file&gt;
+         &lt;file type="image"&gt;/html/example_01.png&lt;/file&gt;
+         &lt;file type="image"&gt;/html/example_02.png&lt;/file&gt;
+         &lt;file type="image"&gt;/html/example_03.png&lt;/file&gt;
+         &lt;file type="image"&gt;/html/example_04.png&lt;/file&gt;
+         &lt;file type="image"&gt;/html/example_05.png&lt;/file&gt;
+         &lt;file type="image"&gt;/html/example_06.png&lt;/file&gt;
+         &lt;file type="image"&gt;/html/example_07.png&lt;/file&gt;
       &lt;/example&gt;
    &lt;/exampleCategory&gt;
 &lt;/examples&gt;</param.examples>
@@ -46,7 +53,7 @@ Do note that at this point not all functions have been tested and most function 
     <param.getting.started.guide>${PROJECT_ROOT}\doc\GettingStarted.mlx</param.getting.started.guide>
     <param.matlabpath.excludes />
     <param.javaclasspath.excludes />
-    <param.exported.on.package>true</param.exported.on.package>
+    <param.exported.on.package>false</param.exported.on.package>
     <param.required.addons />
     <param.matlab.project.id />
     <param.matlab.project.name />
@@ -76,6 +83,7 @@ Do note that at this point not all functions have been tested and most function 
       <param.registered.apps />
       <param.matlabpath.excludes />
       <param.javaclasspath.excludes />
+      <param.exported.on.package />
       <param.required.addons />
       <param.matlab.project.id />
       <param.matlab.project.name />
