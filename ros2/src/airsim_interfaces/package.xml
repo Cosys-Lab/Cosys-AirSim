@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>airsim_interfaces</name>
-  <version>3.0.0</version>
+  <version>3.1.0</version>
   <description>Custom messages for the Coys-AirSim ROS Wrapper.</description>
 
   <maintainer email="wouter.jansen@uantwerpen.be">Wouter Jansen</maintainer>
