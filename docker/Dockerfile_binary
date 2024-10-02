@@ -1,17 +1,15 @@
-ARG BASE_IMAGE=ghcr.io/epicgames/unreal-engine:runtime
+ARG BASE_IMAGE=ghcr.io/epicgames/unreal-engine:runtime-pixel-streaming
 FROM $BASE_IMAGE
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
+USER root
+RUN DEBIAN_FRONTEND=noninteractive apt-get update
+
+RUN apt-get install -y --no-install-recommends \
 	python3 \
 	python3-pip \
-	sudo \
-	libglu1-mesa-dev \
-	xdg-user-dirs \
-	pulseaudio \
-	x11-xserver-utils
+	sudo
 
 RUN python3 -m pip install --upgrade pip && \
-    pip3 install setuptools wheel && \
     pip3 install cosysairsim
 
 RUN adduser --force-badname --disabled-password --gecos '' --shell /bin/bash airsim_user && \
