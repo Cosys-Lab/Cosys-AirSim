@@ -15,6 +15,7 @@ nav:
     - "Home": 'README.md'
   - "Changelog": 'https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md'
   - "Installing AirSim":
+    - "Download and run": 'run_packaged.md'
     - "Download and install from precompiled plugin": 'install_precompiled.md'
     - "Install from Source on Windows": 'install_windows.md'
     - "Install from Source on Linux": 'install_linux.md'
