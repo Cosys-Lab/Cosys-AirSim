@@ -398,3 +398,6 @@ PythonClient/docs/_build
 .vscode/
 .vscode/settings.json
 /site/
+/promo/
+/Unreal/Environments/BlocksComp/
+docker/LinuxBlocks/*
