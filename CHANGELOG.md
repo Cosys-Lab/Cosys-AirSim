@@ -1,3 +1,15 @@
+### September/October 2024 (version 3.1)
+* Updated Docker support to use new official Unreal 5 containers for runtime binaries and source development with updated [tutorial](docs/docker_ubuntu.md) and scripts.
+* Added main setting parameter `InitialInstanceSegmentation` to toggle initial [Instance Segmentation](docs/instance_segmentation.md). It is enabled by default.
+* Added packaged binary of Blocks environment to releases for Windows and Linux for testing the simulation without needing the Unreal Editor.
+* Updated Matlab API Client:
+    * Removed startup arguments for API control and vehicle name when creating client.
+    * Added vehicle name argument to most functions. 
+    * Updated async drone functions to optionally be run in sync (wait for completion) with new `join` boolean argument.
+* Fixed [multi-layer annotation](docs/annotation.md) to no longer have very dark shadows with Lumen GI when enabling a max viewdistance for an annotation layer.
+* Fixed crash when the GPU Lidar material CSV file is empty or contains empty lines.
+* Updated sensor setting `DrawSensor` to false by default to avoid crashes.
+
 ### June/July 2024 (Version 3.0)
 * Updated to be compatible with Unreal 5.4. 
     * Note that 5.4 requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-5354-scene-camera-bug).
