@@ -77,6 +77,9 @@ Some more details on our changes can be found in the [changelog](https://github.
 
 ## How to Get It
 
+## How to Get It
+#### Download and run from packaged binary - Windows/Linux
+* [Download and run it](https://cosys-lab.github.io/run_packaged)
 #### Download and install from precompiled plugin - Windows/Linux
 * [Download and install it](https://cosys-lab.github.io/install_precompiled)
 #### Install and use from source - Windows
