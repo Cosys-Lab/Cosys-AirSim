@@ -2,20 +2,25 @@ ARG BASE_IMAGE=ghcr.io/epicgames/unreal-engine:dev-5.4.3
 FROM $BASE_IMAGE
 
 USER root
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update
+
+RUN apt-get install -y --no-install-recommends \
+	python3 \
+	python3-pip \
 	rsync \
-    sudo \
-    wget \
-    x11-xserver-utils
+	wget \
+	sudo
 
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-    adduser ue5 sudo
+RUN apt-get install -y --upgrade cmake
 
-USER ue5
-RUN cd /home/ue5 && \
+RUN python3 -m pip install --upgrade pip && \
+pip3 install cosysairsim
+
+USER ue4
+RUN cd /home/ue4 && \
 	git clone --progress https://github.com/Cosys-Lab/Cosys-AirSim.git && \
-	cd AirSim && \
+	cd Cosys-AirSim && \
 	./setup.sh && \
 	./build.sh
 
-WORKDIR /home/ue5
+WORKDIR /home/ue4
