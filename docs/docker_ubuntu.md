@@ -88,7 +88,7 @@ xhost +local:docker
 * Start unreal engine inside the container:
    `/home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor`
 * [Specifying an airsim settings.json](#specifying-settingsjson)
-* Continue with [Cosys-AirSims's Linux docs](build_linux.md#build-unreal-environment).
+* Continue with [Cosys-AirSims's Linux docs](install_linux.md#build-unreal-environment).
   For example start the Blocks environment in the container run (This will first copy the plugin and afterwards start open the project with the Unreal Editor):
 ```bash
 /home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/update_from_git.sh
