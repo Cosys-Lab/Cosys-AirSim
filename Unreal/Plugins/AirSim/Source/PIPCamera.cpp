@@ -508,7 +508,6 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
         UAnnotationComponent* AnnotationComponent = NewObject<UAnnotationComponent>(annotation_sphere, FName(*annotatedSphereName));
         AnnotationComponent->SetupAttachment(annotation_sphere);
         AnnotationComponent->RegisterComponent();
-        AnnotationComponent->SetAnnotationColor(FColor(0, 0, 0));
         AnnotationComponent->MarkRenderStateDirty();
         UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
 

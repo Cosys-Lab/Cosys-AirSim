@@ -34,6 +34,8 @@ class FStaticAnnotationSceneProxy : public FStaticMeshSceneProxy
 public:
 	FMaterialRenderProxy* MaterialRenderProxy;
 
+	//FStaticMeshSceneProxyDesc::InitializeFrom(UStaticMeshComponent* Component);
+
 	FStaticAnnotationSceneProxy(UStaticMeshComponent* Component, bool bForceLODsShareStaticLighting, UMaterialInterface* AnnotationMID) :
 		FStaticMeshSceneProxy(Component, bForceLODsShareStaticLighting)
 	{
@@ -187,8 +189,8 @@ UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectIniti
 {
 	bSkeletalMesh = false;
 	bTexture = false;
-	FString MaterialPath = TEXT("Material'/AirSim/HUDAssets/AnnotationMaterial.AnnotationMaterial'");
 
+	FString MaterialPath = TEXT("Material'/AirSim/HUDAssets/AnnotationMaterial.AnnotationMaterial'");
 	static ConstructorHelpers::FObjectFinder<UMaterial> AnnotationMaterialObject(*MaterialPath);
 	if (AnnotationMaterialObject.Object == nullptr)
     {
@@ -198,6 +200,18 @@ UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectIniti
     {
         AnnotationMaterial = AnnotationMaterialObject.Object;
 	}
+
+	FString MaterialPathSphere = TEXT("Material'/AirSim/HUDAssets/AnnotationMaterialSphere.AnnotationMaterialSphere'");
+	static ConstructorHelpers::FObjectFinder<UMaterial> SphereMaterialObject(*MaterialPathSphere);
+	if (SphereMaterialObject.Object == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Sphere annotation material is not valid."));
+	}
+	else
+	{
+		SphereMaterial = SphereMaterialObject.Object;
+	}
+
 	// ParentMeshInfo = MakeShareable(new FParentMeshInfo(nullptr));
 	// This will be invalid until attached to a MeshComponent
 	this->PrimaryComponentTick.bCanEverTick = true;
@@ -207,21 +221,33 @@ void UAnnotationComponent::OnRegister()
 {
 	Super::OnRegister();
 
-	// Note: This can not be placed in the constructor, MID means material instance dynamic
-	AnnotationMID = UMaterialInstanceDynamic::Create(AnnotationMaterial, this, TEXT("AnnotationMaterialMID"));
-	if (!IsValid(AnnotationMID))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: ColorAnnotationMaterial is not correctly initialized"));
-		return;
+	if (this->GetFName().ToString().Contains("annotation_sphere")) {
+		AnnotationMID = UMaterialInstanceDynamic::Create(SphereMaterial, this, TEXT("AnnotationMaterialMID"));
+		if (!IsValid(AnnotationMID))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: SphereMaterial is not correctly initialized"));
+			return;
+		}
+		FLinearColor LinearAnnotationColor = FLinearColor(0, 0, 0, 1.0);
+		AnnotationMID->SetVectorParameterValue("AnnotationColor", LinearAnnotationColor);
 	}
-	const float OneOver255 = 1.0f / 255.0f;
-	FLinearColor LinearAnnotationColor = FLinearColor(
-		this->AnnotationColor.R * OneOver255,
-		this->AnnotationColor.G * OneOver255,
-		this->AnnotationColor.B * OneOver255,
-		1.0
-	);
-	AnnotationMID->SetVectorParameterValue("AnnotationColor", LinearAnnotationColor);
+	else {
+		// Note: This can not be placed in the constructor, MID means material instance dynamic
+		AnnotationMID = UMaterialInstanceDynamic::Create(AnnotationMaterial, this, TEXT("AnnotationMaterialMID"));
+		if (!IsValid(AnnotationMID))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: ColorAnnotationMaterial is not correctly initialized"));
+			return;
+		}
+		const float OneOver255 = 1.0f / 255.0f;
+		FLinearColor LinearAnnotationColor = FLinearColor(
+			this->AnnotationColor.R * OneOver255,
+			this->AnnotationColor.G * OneOver255,
+			this->AnnotationColor.B * OneOver255,
+			1.0
+		);
+		AnnotationMID->SetVectorParameterValue("AnnotationColor", LinearAnnotationColor);
+	}
 }
 
 /** 
