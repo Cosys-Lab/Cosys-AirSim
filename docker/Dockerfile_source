@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ghcr.io/epicgames/unreal-engine:dev-5.2.1
+ARG BASE_IMAGE=ghcr.io/epicgames/unreal-engine:dev-5.3.2
 FROM $BASE_IMAGE
 
 USER root
@@ -19,7 +19,7 @@ pip3 install cosysairsim
 USER ue4
 RUN cd /home/ue4 && \
 	git clone --progress https://github.com/Cosys-Lab/Cosys-AirSim.git && \
-    git checkout 5.2.1 && \
+    git checkout 5.3.2 && \
 	cd Cosys-AirSim && \
 	./setup.sh && \
 	./build.sh
