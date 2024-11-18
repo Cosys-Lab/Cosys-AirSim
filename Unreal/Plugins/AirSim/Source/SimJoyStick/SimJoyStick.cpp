@@ -187,265 +187,352 @@ private:
     std::unique_ptr<DirectInputJoyStick> controllers_[kMaxControllers];
 };
 
-#else
+#elif defined __linux__
+// implementation for modern linux systems via /dev/input
+// based on userspace api docs: https://www.kernel.org/doc/html/latest/input/input_uapi.html
 
-#include <limits>
-#include <fcntl.h>
-#include <iostream>
 #include <string>
-#include <sstream>
-#include <iostream>
-//#include <libudev.h>
-#include "unistd.h"
+#include <cstring>
+#include <map>
 
-//implementation for unsupported OS
+extern "C" {
+    #include <linux/version.h>
+    #include <linux/input.h>
+    #include <sys/stat.h>
+    #include <dirent.h>
+    #include <unistd.h>
+    #include <fcntl.h>
+}
+
+#define DEV_INPUT "/dev/input"
+#define SYS_CLASS_INPUT "/sys/class/input"
+
+#define BITS_PER_LONG (sizeof(long) * 8)
+#define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)
+#define OFF(x)  ((x)%BITS_PER_LONG)
+#define BIT(x)  (1UL<<OFF(x))
+#define LONG(x) ((x)/BITS_PER_LONG)
+#define test_bit(bit, array)	((array[LONG(bit)] >> OFF(bit)) & 1)
+
 struct SimJoyStick::impl
 {
-private:
-    class JoystickEvent
-    {
-    public:
-        /** Minimum value of axes range */
-        static const short MIN_AXES_VALUE = -32768;
+    impl() {
+    }
 
-        /** Maximum value of axes range */
-        static const short MAX_AXES_VALUE = 32767;
-
-        /**
-       * The timestamp of the event, in milliseconds.
-       */
-        unsigned int time;
-
-        /**
-       * The value associated with this joystick event.
-       * For buttons this will be either 1 (down) or 0 (up).
-       * For axes, this will range between MIN_AXES_VALUE and MAX_AXES_VALUE.
-       */
-        short value;
-
-        /**
-       * The event type.
-       */
-        unsigned char type;
-
-        /**
-       * The axis/button number.
-       */
-        unsigned char number;
-
-        /**
-       * Returns true if this event is the result of a button press.
-       */
-        bool isButton()
-        {
-            static constexpr unsigned char JS_EVENT_BUTTON = 0x01; // button pressed/released
-            return (type & JS_EVENT_BUTTON) != 0;
-        }
-
-        /**
-       * Returns true if this event is the result of an axis movement.
-       */
-        bool isAxis()
-        {
-            static constexpr unsigned char JS_EVENT_AXIS = 0x02; // joystick moved
-            return (type & JS_EVENT_AXIS) != 0;
-        }
-
-        /**
-       * Returns true if this event is part of the initial state obtained when
-       * the joystick is first connected to.
-       */
-        bool isInitialState()
-        {
-            static constexpr unsigned char JS_EVENT_INIT = 0x80; // initial state of device
-            return (type & JS_EVENT_INIT) != 0;
-        }
-
-        /**
-       * The ostream inserter needs to be a friend so it can access the
-       * internal data structures.
-       */
-        friend std::ostream& operator<<(std::ostream& os, const JoystickEvent& e);
-    };
-
-public:
-    ~impl()
-    {
+    ~impl() {
         if (fd_ >= 0)
             close(fd_);
     }
 
-    static float normalizeAxisVal(int axis_val, bool wide, bool zero2One, bool reversed)
-    {
-        float min_val = wide ? -32768 : -16384;
-        float max_val = wide ? 32767 : 16383;
+    /**
+     * scans /sys/class/input to get the event device number that coressponds with a given
+     * joystick device number in effect this lets us figure out which event device file
+     * corresponds to a specific joystick device file
+     *
+     * returns -1 if the specified js device number is not valid
+     */
+    static int getEventDeviceNumber(int jsDeviceNumber) {
+        // unfortunately std::filesystem is a c++17 thing
+        auto device_folder = SYS_CLASS_INPUT "/js" + std::to_string(jsDeviceNumber) + "/device";
 
-        float val = (axis_val - min_val) / (max_val - min_val);
-        if (zero2One) {
-            if (reversed)
-                val = 1 - val;
+        DIR *dir = opendir(device_folder.c_str());
+        if (dir == NULL)
+            return -1;
+
+        int event_dev_num = -1;
+        struct dirent *entry;
+        while ((entry = readdir(dir)) != NULL) {
+            auto name = std::string(entry->d_name);
+
+            if(name.rfind("event", 0) == 0) {
+                // bingo
+                event_dev_num = std::stoi(name.substr(5, name.length()));
+                break;
+            }
         }
-        else {
-            val = 2 * val - 1;
-            if (reversed)
-                val *= -1;
-        }
+        closedir(dir);
+        return event_dev_num;
+    }
+
+    static inline float normalize(int value, input_absinfo &info, bool reversed=false) {
+        float val = (value - info.minimum) / ((float) (info.maximum - info.minimum));
+        val = 2 * val - 1;
+
+        if(reversed)
+           val *= -1;
 
         return val;
     }
 
-    void getJoyStickState(int index, SimJoyStick::State& state, const AxisMaps& maps)
-    {
+    void getJoyStickState(int index, SimJoyStick::State &state, const AxisMaps &maps) {
         unused(maps);
 
-        static constexpr bool blocking = false;
-
-        //if this is new index
         if (index != last_index_) {
-            //getJoystickInfo(1, manufacturerID, productID, state.message);
-
-            //close previous one
-            if (fd_ >= 0)
+            // close previous one
+            if (fd_ >= 0) {
                 close(fd_);
+                state.is_valid = false;
+                state.is_initialized = false;
+            }
 
-            //open new device
-            std::stringstream devicePath;
-            devicePath << "/dev/input/js" << index;
+            int devNo = getEventDeviceNumber(index);
+            if(devNo < 0) {
+                // joystick index specified either doesn't have an event interface
+                // or is not a valid joystick
+                last_index_ = index;
+                goto getJoyStickState_device_missing_failure;
+            }
 
-            fd_ = open(devicePath.str().c_str(), blocking ? O_RDONLY : O_RDONLY | O_NONBLOCK);
-            state.is_initialized = fd_ >= 0;
+            // open the device file and run ioctls to grab info about the device real quick
+            auto devicePath = DEV_INPUT "/event" + std::to_string(devNo);
+            fd_ = open(devicePath.c_str(), O_RDONLY|O_NONBLOCK);
+            if(fd_ < 0) {
+                goto getJoyStickState_device_missing_failure;
+            }
+            state.is_valid = true;
+
+            // initialize the device and to the controller's default values
+            // cache device ids and name
+            if(ioctl(fd_, EVIOCGID, id)) {
+                goto getJoyStickState_device_read_failure;
+            }
+            char buffer[128];
+            if(ioctl(fd_, EVIOCGNAME(sizeof(name)), buffer) < 0) {
+                goto getJoyStickState_device_read_failure;
+            }
+            name = buffer;
+
+            // get list of valid EV_ABS codes and their related input_absinfo
+            // and cache for later use when normalizing values, these seem to be the same but
+            // it's possible for them to be different so we're going to cache it for later use
+            unsigned long bits[NBITS(KEY_MAX)];
+            ioctl(fd_, EVIOCGBIT(EV_ABS, KEY_MAX), bits);
+            for(unsigned int code = 0; code < KEY_MAX; code++) {
+                if(test_bit(code, bits)) {
+                    input_absinfo abs;
+                    if(ioctl(fd_, EVIOCGABS(code), &abs) == 0) { // errs when code is invalid
+                        absinfo_map[code] = abs;
+                    }
+                }
+            }
+
+            intializeStateToDefaults(state);
+            state.is_initialized = true;
+
             last_index_ = index;
         }
 
-        //if open was successful
-        if (fd_ >= 0) {
-            //read the device
-            int bytes = read(fd_, &event_, sizeof(event_));
+        // read all remaining events in buffer and process them
+        if(fd_ > 0) {
+            auto bytes_read = read(fd_, ev_, sizeof ev_);
+            if(bytes_read != -1) {
+                int count = bytes_read / sizeof(struct input_event);
+                processInputEvents(state, count);
 
-            //if we didn't had valid read
-            if (bytes == -1 || bytes != sizeof(event_)) {
-                // NOTE if this condition is not met, we're probably out of sync and this
-                // Joystick instance is likely unusable
-                //TODO: set below to false?
-                //state.is_valid = false;
+                // do this here so processInputEvents can set default values for state if necessary
+                state.is_initialized = true;
+            } else if (!(errno == EWOULDBLOCK || errno == EAGAIN)){
+                // something went wrong
+                goto getJoyStickState_device_read_failure;
             }
-            else {
-                state.is_valid = true;
-
-                if (event_.isButton()) {
-                    if (event_.value == 0)
-                        state.buttons &= ~(1 << event_.number);
-                    else
-                        state.buttons |= (1 << event_.number);
-                }
-                else if (event_.isAxis()) {
-                    if (device_type > 0) { //RCs like FrSky Taranis
-                        switch (event_.number) {
-                        case 0:
-                            state.left_y = event_.value;
-                            break;
-                        case 1:
-                            state.right_x = event_.value;
-                            break;
-                        case 2:
-                            state.right_y = event_.value;
-                            break;
-                        case 3:
-                            state.left_x = event_.value;
-                            break;
-                        default:
-                            break;
-                        }
-                    }
-                    else { //XBox
-                        switch (event_.number) {
-                        case 0:
-                            state.left_x = normalizeAxisVal(event_.value, true, false, false);
-                            break;
-                        case 1:
-                            state.left_y = normalizeAxisVal(event_.value, true, false, true);
-                            break;
-                        case 2:
-                            state.left_z = normalizeAxisVal(event_.value, true, false, false);
-                            break;
-                        case 3:
-                            state.right_x = normalizeAxisVal(event_.value, true, false, false);
-                            break;
-                        case 4:
-                            state.right_y = normalizeAxisVal(event_.value, true, false, false);
-                            break;
-                        case 5:
-                            state.right_z = normalizeAxisVal(event_.value, true, false, false);
-                            break;
-
-                        default:
-                            break;
-                        }
-                    }
-                }
-                //else ignore
-            }
+        } else {
+            goto getJoyStickState_device_missing_failure;
         }
-        else
-            state.is_valid = false;
+
+        return; // everything ran as correcty
+
+getJoyStickState_device_read_failure:
+        close(fd_);
+getJoyStickState_device_missing_failure:
+        fd_ = -1;
+        name = "";
+        memset(&id, 0, sizeof(id));
+        absinfo_map.clear();
+        return;
     }
 
     void setAutoCenter(unsigned int index, double strength)
     {
+        //TODO: implement this
         unused(index);
         unused(strength);
-        //TODO: implement this for linux
     }
 
     void setWheelRumble(unsigned int index, double strength)
     {
+        //TODO: implement this via FF_RUMBLE
+        // see: https://www.kernel.org/doc/html/latest/input/ff.html
         unused(index);
         unused(strength);
-        //TODO: implement this for linux
     }
 
-    // bool getJoystickInfo(int index, std::string& manufacturerID, std::string& productID, std::string& message)
-    // {
-    //     manufacturerID = productID = "";
-    //     // Use udev to look up the product and manufacturer IDs
-    //     struct udev *udev = udev_new();
-    //     if (udev) {
-    //         char sysname[32];
-    //         std::snprintf(sysname, sizeof(sysname), "js%u", index);
-    //         struct udev_device *dev = udev_device_new_from_subsystem_sysname(udev, "input", sysname);
-    //         dev = udev_device_get_parent_with_subsystem_devtype(dev, "usb", "usb_device");
-    //         if (!dev)
-    //         {
-    //             message = "Unable to find parent USB device";
-    //             return false;
-    //         }
-
-    //         std::stringstream ss;
-    //         ss << std::hex << udev_device_get_sysattr_value(dev, "idVendor");
-    //         ss >> manufacturerID;
-
-    //         ss.clear();
-    //         ss.str("");
-    //         ss << std::hex << udev_device_get_sysattr_value(dev, "idProduct");
-    //         ss >> productID;
-
-    //         udev_device_unref(dev);
-    //     }
-    //     else
-    //     {
-    //         message = "Cannot create udev";
-    //         return false;
-    //     }
-    //     udev_unref(udev);
-    //     return true;
-    // }
-
 private:
+
+    void intializeStateToDefaults(SimJoyStick::State &state) {
+        if((id[ID_VENDOR] == 0x45e) && (id[ID_PRODUCT] == 0x2fd)) {
+            // "Xbox One S Controller [Bluetooth]" gamepad
+            // when RT and LT are not pressed, they should be treated as -1 for the this controller
+            //
+            // NOTE: it might make sense to set left_z and right_z to scale from 0 to 1 instead but
+            // these axis are unused afaik, so it's left as is for now
+            state.left_z = -1.0f;
+            state.right_z = -1.0f;
+        }
+    }
+
+    // update state by processing the first len input_event entries in ev_
+    void processInputEvents(SimJoyStick::State &state, int len) {
+        // TODO: add support to handle EV_SYN in the unlikely event that it occurs
+        // see: https://www.kernel.org/doc/html/latest/input/event-codes.html#ev-syn
+
+        /* to add support for a new game pad add to the if block below and match based on id[ID_VENDOR] and
+         * id[ID_PRODUCT] and/or name; see the default implementation at the end for an example
+         *
+         * NOTE: if you are trying to figure out which events get triggered because your controller does
+         * something non standard, the `evtest` is very helpful (available via apt)
+         *
+         * NOTE: we could loop through the events buffer backwards to optimize performance a little bit but the buffer
+         * shouldn't really get filled up unless the device file isn't read often enough and there's nothing
+         * to suggest that this is necessary
+         */
+        if((id[ID_VENDOR] == 0x45e) && (id[ID_PRODUCT] == 0x2fd)) {
+            // "Xbox One S Controller [Bluetooth]" gamepad
+
+            for(int i=0; i < len; i++) {
+                auto &ev = ev_[i];
+                switch(ev.type) {
+                    case EV_ABS: {
+                        switch(ev.code) {
+                            case ABS_X: {state.left_x = normalize(ev.value, absinfo_map[ev.code]);} break;
+                            case ABS_Y: {state.left_y = normalize(ev.value, absinfo_map[ev.code], true);} break;
+                            case ABS_BRAKE: {state.left_z = normalize(ev.value, absinfo_map[ev.code]);} break;
+                            case ABS_Z: {state.right_x = normalize(ev.value, absinfo_map[ev.code]);} break;
+                            case ABS_RZ: {state.right_y = normalize(ev.value, absinfo_map[ev.code], true);} break;
+                            case ABS_GAS: {state.right_z = normalize(ev.value, absinfo_map[ev.code]);} break;
+                            case ABS_HAT0X: {
+                                switch(ev.value) {
+                                    case 1: {
+                                        state.buttons |= (1 << 6); // DPAD_LEFT pressed
+                                        state.buttons &= ~(1 << 7); // DPAD_RIGHT released
+                                    } break;
+                                    case 0: {
+                                        state.buttons &= ~((1 << 6) & (1 << 7)); // DPAD_X released
+                                    } break;
+                                    case -1: {
+                                        state.buttons &= ~(1 <<6); // DPAD_LEFT released
+                                        state.buttons |= (1 <<7); // DPAD_RIGHT pressed
+                                    } break;
+                                }
+                            } break;
+                            case ABS_HAT0Y: {
+                                switch(ev.value) {
+                                    case 1: {
+                                        state.buttons |= (1 << 5); // DPAD_DOWN pressed
+                                        state.buttons &= ~(1 << 4); // DPAD_UP released
+                                    } break;
+                                    case 0: {
+                                        state.buttons &= ~((1 << 4) & (1 << 5)); // DPAD_Y released
+                                    } break;
+                                    case -1: {
+                                        state.buttons &= ~(1 << 5); // DPAD_DOWN released
+                                        state.buttons |= (1 << 4); // DPAD_UP pressed
+                                    } break;
+                                }
+                            } break;
+                        }
+                    } break;
+                    case EV_KEY: {
+                         uint16_t button_change = 1;
+                         switch(ev.code) {
+                            case BTN_A: {button_change <<= 0;} break;
+                            case BTN_B: {button_change <<= 1;} break;
+                            case BTN_X: {button_change <<= 2;} break;
+                            case BTN_Y: {button_change <<= 3;} break;
+                            case BTN_TL: {button_change <<= 8;} break;
+                            case BTN_TR: {button_change <<= 9;} break;
+                            case KEY_BACK: {button_change <<= 12;} break;
+                            case BTN_START: {button_change <<= 13;} break;
+                            case BTN_THUMBL: {button_change <<= 14;} break;
+                            case BTN_THUMBR: {button_change <<= 15;} break;
+                        }
+
+                        if(ev.value == 0) {
+                            state.buttons &= ~(button_change);
+                        } else {
+                            state.buttons |= button_change;
+                        }
+                    } break;
+                }
+            }
+        } else {
+            /* this is the default mapping, it essentially trusts that the linux driver mapped everything
+             * correctly and should be a good starting point to copy
+             *
+             * based on the linux uapi docs: https://www.kernel.org/doc/html/latest/input/gamepad.html
+             */
+
+            for(int i=0; i < len; i++) {
+                auto &ev = ev_[i];
+                switch(ev.type) {
+                    case EV_ABS: {
+                        switch(ev.code) {
+                            case ABS_X: {state.left_x = normalize(ev.value, absinfo_map[ev.code]);} break;
+                            case ABS_Y: {state.left_y = normalize(ev.value, absinfo_map[ev.code]);} break;
+                            case ABS_RX: {state.right_x = normalize(ev.value, absinfo_map[ev.code]);} break;
+                            case ABS_RY: {state.right_y = normalize(ev.value, absinfo_map[ev.code]);} break;
+                        }
+                    } break;
+                    case EV_KEY: {
+                         uint16_t button_change = 1;
+                         switch(ev.code) {
+                            // NOTE: the position in state.buttons that each BTN is mapped to was an arbitrary choice
+                            // but it's probably a good idea to stay consistent across controllers
+                            case BTN_A: {button_change <<= 0;} break;
+                            case BTN_B: {button_change <<= 1;} break;
+                            case BTN_X: {button_change <<= 2;} break;
+                            case BTN_Y: {button_change <<= 3;} break;
+
+                            // The BTN_DPAD entires are valid in Ubuntu 22.04 LTS but they are not shipped as part of the
+                            // HostLinux headers that come with UnrealEngine 5.4; the following defines are copied over
+                            // from mainline linux/input-event-codes.h
+
+                            #define BTN_DPAD_UP         0x220
+                            #define BTN_DPAD_DOWN       0x221
+                            #define BTN_DPAD_LEFT       0x222
+                            #define BTN_DPAD_RIGHT      0x223
+
+                            case BTN_DPAD_UP: {button_change <<= 4;} break;
+                            case BTN_DPAD_DOWN: {button_change <<= 5;} break;
+                            case BTN_DPAD_LEFT: {button_change <<= 6;} break;
+                            case BTN_DPAD_RIGHT: {button_change <<= 7;} break;
+                            case BTN_TL: {button_change <<= 8;} break;
+                            case BTN_TR: {button_change <<= 9;} break;
+                            case BTN_TL2: {button_change <<= 10;} break; // could map this to state.left_z instead
+                            case BTN_TR2: {button_change <<= 11;} break; // could map this to state.right_z instead
+                            case BTN_SELECT: {button_change <<= 12;} break;
+                            case BTN_START: {button_change <<= 13;} break;
+                            case BTN_THUMBL: {button_change <<= 14;} break;
+                            case BTN_THUMBR: {button_change <<= 15;} break;
+                       }
+
+                        if(ev.value == 0) {
+                            state.buttons &= ~(button_change);
+                        } else {
+                            state.buttons |= button_change;
+                        }
+                    } break;
+                }
+            }
+        }
+    }
+
     int last_index_ = -1;
     int fd_ = -1;
-    JoystickEvent event_;
-    std::string manufacturerID, productID;
-    int device_type = 0;
+    struct input_event ev_[64]; // event cache; 64 is likely overkill but ram is cheap
+
+    std::string name; // EVIOCGNAME response
+    unsigned short id[4]; // EVIOCGID icotl response
+    std::map<uint16_t, input_absinfo> absinfo_map;
 };
 
 #endif
