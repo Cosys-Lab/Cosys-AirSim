@@ -64,7 +64,7 @@ are also enabling `LockStep`, see [PX4 LockStep](px4_lockstep.md) for more infor
 `Barometer` setting keeps PX4 happy because the default AirSim barometer has a bit too much noise
 generation.  This setting clamps that down a bit which allows PX4 to achieve GPS lock more quickly.
 
-After above setup you should be able to use a remote control (RC) to fly with AirSim. You can usually arm the vehicle by lowering and bringing two sticks of RC together down and in-wards. You don't need QGroundControl after the initial setup. Typically the Stabilized (instead of Manual) mode gives better experience for beginners.  See [PX4 Basic Flying Guide](https://docs.px4.io/master/en/flying/basic_flying.html).
+After above setup you should be able to use a remote control (RC) to fly with AirSim. You can usually arm the vehicle by lowering and bringing two sticks of RC together down and in-wards. You don't need QGroundControl after the initial setup. Typically the Stabilized (instead of Manual) mode gives better experience for beginners. See [PX4 Basic Flying Guide](https://docs.px4.io/main/en/flying/basic_flying_mc.html).
 
 You can also control the drone from [Python APIs](apis.md).
 
@@ -88,17 +88,18 @@ PX4 custom modes in the MAV_CMD_DO_SET_MODE messages (like PX4_CUSTOM_MAIN_MODE_
 
 #### It is not finding my Pixhawk hardware
 
-Check your settings.json file for this line "SerialPort":"*,115200".  The asterisk here means "find any
-serial port that looks like a Pixhawk device, but this doesn't always work for all types of Pixhawk hardware.
-So on Windows you can find the actual COM port using Device Manager, look under "Ports (COM & LPT), plug the
-device in and see what new COM port shows up.  Let's say you see a new port named "USB Serial Port (COM5)".
-Well, then change the SerialPort setting to this: "SerialPort":"COM5,115200".
+Check your settings.json file for this line `"SerialPort": "*,115200"`. The asterisk here means "find any
+serial port that looks like a Pixhawk device", but this doesn't always work for all types of Pixhawk hardware.
 
-On Linux, the device can be found by running "ls /dev/serial/by-id" if you see a device name listed that looks
+On Windows you can find the actual COM port using Device Manager, look under "Ports (COM & LPT)", plug the
+device in and see what new COM port shows up. Let's say you see a new port named "USB Serial Port (COM5)".
+Well, then change the SerialPort setting to this: `"SerialPort": "COM5,115200"`.
+
+On Linux, the device can be found by running `ls /dev/serial/by-id`. If you see a device name listed that looks
 like this `usb-3D_Robotics_PX4_FMU_v2.x_0-if00` then you can use that name to connect, like this:
-"SerialPort":"/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00".  Note this long name is actually a symbolic link to the real
-name, if you use "ls -l ..." you can find that symbolic link, it is usually something like "/dev/ttyACM0",
-so this will also work "SerialPort":"/dev/ttyACM0,115200".  But that mapping is similar to windows, it is
+`"SerialPort": "/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00"`.
+Note this long name is actually a symbolic link to the real name, if you use `ls -l ...` you can find that symbolic link, it is usually something like `/dev/ttyACM0`,
+so this will also work `"SerialPort": "/dev/ttyACM0,115200"`. But that mapping is similar to windows, it is
 automatically assigned and can change, whereas the long name will work even if the actual TTY serial device
 mapping changes.
 
