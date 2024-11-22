@@ -69,8 +69,8 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 * Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
 * Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the _MarkedIgnore_ Unreal tag and enabling the "IgnoreMarked" setting in [the settings file](https://cosys-lab.github.io/settings).
 * Updated cameras sensor with more distortion features such as chromatic aberration, motion blur and lens distortion. 
-* Updated Python [ROS implementation](https://cosys-lab.github.io/ros) with completely new implementation and feature set.
-* Updated C++ [ROS2 implementation](https://cosys-lab.github.io/ros) to support custom Cosys-AirSim features.
+* Updated Python [ROS implementation](https://cosys-lab.github.io/ros_python) with completely new implementation and feature set.
+* Updated C++ [ROS2 implementation](https://cosys-lab.github.io/ros_cplusplus) to support custom Cosys-AirSim features.
 * Dropped support for Unity Environments.
 
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
