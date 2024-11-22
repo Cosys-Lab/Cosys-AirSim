@@ -23,6 +23,8 @@ and you want it to work with the instance segmentation system, you can use the e
 
 Make sure to provide human-readable names to your objects in your environment as the ground truth tables that the AirSim API can provide will use your object naming to create the table.
 
+If you want to not label specific components/meshes of an actor, you can add the Unreal Tag `InstanceSegmentation_disable` to the components/meshes you want to ignore.
+
 ## Credits
 The method used to use Proxy meshes to segment object is a derivative of and inspired by the work of [UnrealCV](https://unrealcv.org/). Their work is licensed under the MIT License.
 It is made by students from Johns Hopkins University and Peking University under the supervision of Prof. Alan Yuille and Prof. Yizhou Wang.
