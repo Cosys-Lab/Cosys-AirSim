@@ -55,7 +55,7 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 ```
 
 ## Cosys-Lab Modifications
-* Added support for Unreal up to 5.4 ([Note that Unreal 5.3+ breaks camera scene rendering by default in custom environments](https://cosys-lab.github.io/unreal_custenv#unreal-scene-camera-bug))
+* Added support for Unreal up to 5.5 ([Note that Unreal 5.3+ breaks camera scene rendering by default in custom environments](https://cosys-lab.github.io/unreal_custenv#unreal-scene-camera-bug))
 * Added [multi-layer annotation](https://cosys-lab.github.io/annotation) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation). 
 * Added [Echo sensor type](https://cosys-lab.github.io/echo) for simulation of sensors like sonar and radar.
