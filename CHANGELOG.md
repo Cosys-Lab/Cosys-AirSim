@@ -12,7 +12,7 @@
 
 ### June/July 2024 (Version 3.0)
 * Updated to be compatible with Unreal 5.4. 
-    * Note that 5.4 requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-5354-scene-camera-bug).
+    * Note that 5.3 and higher requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-scene-camera-bug).
     * Updated rpclib version to unofficial patched version 2.3.1 to better support C++20.
     * Updated Eigen version to unofficial patched version 3.4.1 to better support C++20.
     * Updated cpp-linenoise library of DroneShell to support C++20.
@@ -20,7 +20,7 @@
     * Updated airlib to use C++20.
 * Updated to be compatible with Unreal 5.3. 
     * Note that 5.3 breaks debug rendering! Disable it to avoid issues in editor. [Fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454)
-    * Note that 5.3 requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-5354-scene-camera-bug).
+    * Note that 5.3 and higher requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-scene-camera-bug).
 * Updated [ROS2 wrapper](docs/ros_cplusplus.md) to support Cosys-AirSim features and fix several issues:
     * Added support for annotation cameras.
     * Added support for GPU-Lidar and Echos sensors.
