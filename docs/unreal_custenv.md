@@ -53,7 +53,7 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
     
     Doing this forces Unreal to include all necessary AirSim content in packaged builds of your project.
 
-7. If using Unreal Engine 5.3/5.4 check [here](#unreal-5354-scene-camera-bug) for a fix to the camera scene rendering bug in these engine versions!
+7. If using Unreal Engine 5.3 or higher check [here](#unreal-scene-camera-bug) for a fix to the camera scene rendering bug in these engine versions!
 
 8. Close the `Unreal Editor` and restart it by opening the uproject file again.
 
@@ -135,7 +135,7 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
     
     Doing this forces Unreal to include all necessary AirSim content in packaged builds of your project.
 
-8. If using Unreal Engine 5.3/5.4 check [here](#unreal-5354-scene-camera-bug) for a fix to the camera scene rendering bug in these engine versions!
+8. If using Unreal Engine or higher check [here](#unreal-scene-camera-bug) for a fix to the camera scene rendering bug in these engine versions!
 
 9. Close Visual Studio and the  `Unreal Editor` and right-click the LandscapeMountains.uproject in Windows Explorer and select `Generate Visual Studio Project Files`.  This step detects all plugins and source files in your Unreal project and generates `.sln` file for Visual Studio.
 
@@ -174,10 +174,11 @@ Once you have your environment using above instructions, you should frequently u
 ## Choosing Your Vehicle: Car or Multirotor
 By default, AirSim prompts user for which vehicle to use. You can easily change this by setting [SimMode](settings.md#SimMode). Please see [using car](using_car.md) guide.
 
-## Unreal 5.3/5.4 Scene camera bug
-Note that Unreal 5.3 and 5.4 breaks camera scene rendering when Effects is not set to the Epic scalability preset. You can use the console command r.DetailMode 2 to fix this at runtime!
+## Unreal Scene camera bug
+Note that Unreal 5.3 and higher breaks camera scene rendering when Effects is not set to the Epic scalability preset. You can use the console command r.DetailMode 2 to fix this at runtime!
 For the Blocks and other available environments we have made a fix for this. By placing a DefaultScalability.ini file in the Config folder of your Unreal project, you can set the scalability settings to custom values for each one (low, medium, high, epic, cine).
 As you can see in the Blocks environment, we have added the following to it to fix this bug automatically.  You can find the DefaultScalability.ini file in the Unreal/Environments/Blocks folder. Copy this file to your Unreal project's Config folder.
+
 
 ```ini
 [EffectsQuality@0]
