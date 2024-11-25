@@ -1,4 +1,4 @@
-### September/October 2024
+### September/October 2024 (version 3.1)
 * Updated Docker support to use new official Unreal 5 containers for runtime binaries and source development with updated [tutorial](docs/docker_ubuntu.md) and scripts.
 * Added main setting parameter `InitialInstanceSegmentation` to toggle initial [Instance Segmentation](docs/instance_segmentation.md). It is enabled by default.
 * Added packaged binary of Blocks environment to releases for Windows and Linux for testing the simulation without needing the Unreal Editor.
@@ -10,11 +10,18 @@
 * Fixed crash when the GPU Lidar material CSV file is empty or contains empty lines.
 * Updated sensor setting `DrawSensor` to false by default to avoid crashes.
 
-### June 2024
-* Updated to be compatible with Unreal 5.3.2. 
-    * Note that 5.3.2 breaks debug rendering! Disable it to avoid issues in editor. [Fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454)
-    * Note that 5.3.2 requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-5354-scene-camera-bug).
-* Updated ROS2 wrapper to support Cosys-AirSim features and fix several issues:
+### June/July 2024 (Version 3.0)
+* Updated to be compatible with Unreal 5.4. 
+    * Note that 5.3 and higher requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-scene-camera-bug).
+    * Updated rpclib version to unofficial patched version 2.3.1 to better support C++20.
+    * Updated Eigen version to unofficial patched version 3.4.1 to better support C++20.
+    * Updated cpp-linenoise library of DroneShell to support C++20.
+    * Updated json library to 3.11.3 to support C++20.
+    * Updated airlib to use C++20.
+* Updated to be compatible with Unreal 5.3. 
+    * Note that 5.3 breaks debug rendering! Disable it to avoid issues in editor. [Fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454)
+    * Note that 5.3 and higher requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-scene-camera-bug).
+* Updated [ROS2 wrapper](docs/ros_cplusplus.md) to support Cosys-AirSim features and fix several issues:
     * Added support for annotation cameras.
     * Added support for GPU-Lidar and Echos sensors.
     * Added support for ground truth labels of Lidar sensor.
