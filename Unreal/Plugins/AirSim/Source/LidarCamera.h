@@ -156,6 +156,7 @@ private:
 		UArrowComponent* arrow_;
 
 	TArray<float> h_angles_;
+	TArray<float> h_angles_atan2_;
 	TArray<float> v_angles_;
 	float h_delta_angle_ = 0;
 	float v_delta_angle_ = 0;
@@ -174,7 +175,9 @@ private:
 	bool initialized = false;
 	int32 wait_frames_ = 100;
 	int32 waited_frames_ = 0;
-
+	float hfov_ = 0;
+	float completed_hfov_ = 0;
+	bool reset_hfov_ = false;
 
 	//bool saved_DisableWorldRendering_ = false;
 	//UGameViewportClient* game_viewport_;
