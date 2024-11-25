@@ -27,7 +27,7 @@ classifiers = [
 keywords = ["simulation", "airsim", "api"]
 dependencies = [
     "numpy",
-    "msgpack-rpc-python"
+    "rpc-msgpack"
 ]
 requires-python = ">=3.7"
 

@@ -1,3 +1,3 @@
-msgpack-rpc-python
+rpc-msgpack
 numpy
 opencv-contrib-python
