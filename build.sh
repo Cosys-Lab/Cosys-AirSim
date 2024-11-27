@@ -63,12 +63,24 @@ if [ "$(uname)" == "Darwin" ]; then
     export CC="$(brew --prefix)/opt/llvm/bin/clang"
     export CXX="$(brew --prefix)/opt/llvm/bin/clang++"
 else
+    VERSION=$(lsb_release -rs | cut -d. -f1)
     if $gcc; then
-        export CC="gcc-12"
-        export CXX="g++-12"
+        if [ "$VERSION" -gt "22" ]; then
+            export CC="gcc-13"
+            export CXX="g++-13"
+        else
+            export CC="gcc-12"
+            export CXX="g++-12"
+        fi
     else
-        export CC="clang-12"
-        export CXX="clang++-12"
+        export CXXFLAGS="-stdlib=libstdc++"
+        if [ "$VERSION" -gt "22" ]; then
+            export CC="clang-16"
+            export CXX="clang++-16"
+        else
+            export CC="clang-12"
+            export CXX="clang++-12"
+        fi
     fi
 fi
 
@@ -133,7 +145,7 @@ set +x
 echo ""
 echo ""
 echo "==============================="
-echo " Cosys-AirSim plugin is built!."
+echo " Cosys-AirSim plugin is built! "
 echo "==============================="
 echo ""
 echo "For further info see for installation see:"

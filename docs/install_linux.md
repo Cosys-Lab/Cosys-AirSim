@@ -36,7 +36,7 @@ Finally, you will need an Unreal project that hosts the environment for your veh
 ## How to Use Cosys-AirSim
 
 Once Cosys-AirSim is setup:
-- Navigate to the environment folder (for example for BLocks it is `Unreal\Environments\Blocks`), and run `update_from_git.sh`.
+- Navigate to the environment folder (for example for BLocks it is `./Unreal/Environments/Blocks`), and run `update_from_git.sh`.
 - Go to `UnrealEngine` installation folder and start Unreal by running `./Engine/Binaries/Linux/UnrealEditor`.
 - When Unreal Engine prompts for opening or creating project, select Browse and choose `Cosys-AirSim/Unreal/Environments/Blocks` (or your [custom](unreal_custenv.md) Unreal project).
 - Alternatively, the project file can be passed as a commandline argument. For Blocks: `./Engine/Binaries/Linux/UnrealEditor <Cosys-AirSim_path>/Unreal/Environments/Blocks/Blocks.uproject`
