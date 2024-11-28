@@ -9,7 +9,7 @@ If you want to use Python to call AirSim APIs, we recommend using Anaconda with 
 First install this package:
 
 ```
-pip install msgpack-rpc-python
+pip install rpc-msgpack
 ```
 
 Once you can run AirSim, choose Car as vehicle and then navigate to `PythonClient\car\` folder and run:
