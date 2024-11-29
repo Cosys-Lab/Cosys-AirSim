@@ -92,6 +92,7 @@ nav:
     - "Installing cmake on Linux": 'cmake_linux.md'
     - "pfm format": 'pfm.md'
     - "Setting up Unreal Environment": 'unreal_proj.md'
+    - "Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects": 'packaging.md'
     - "Blocks Environment": 'unreal_blocks.md'
     - "Working with UE Plugin Contents": 'working_with_plugin_contents.md'
     - "Formula Student Technion Self-drive": 'https://github.com/Microsoft/AirSim/wiki/technion'
