@@ -165,9 +165,9 @@ REM //---------- get Eigen library ----------
 IF NOT EXIST AirLib\deps mkdir AirLib\deps
 IF NOT EXIST AirLib\deps\eigen3 (
     if "%PWSHV7%" == "" (
-        %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/WouterJansen/eigen/archive/refs/tags/3.4.1.zip -OutFile eigen3.zip }"
+        %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/WouterJansen/eigen/archive/refs/tags/3.4.1r.zip -OutFile eigen3.zip }"
     ) else (
-        %powershell% -command "iwr https://github.com/WouterJansen/eigen/archive/refs/tags/3.4.1.zip -OutFile eigen3.zip"
+        %powershell% -command "iwr https://github.com/WouterJansen/eigen/archive/refs/tags/3.4.1r.zip -OutFile eigen3.zip"
     )
     %powershell% -command "Expand-Archive -Path eigen3.zip -DestinationPath AirLib\deps"
     %powershell% -command "Move-Item -Path AirLib\deps\eigen* -Destination AirLib\deps\del_eigen"
