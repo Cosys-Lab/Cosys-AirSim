@@ -2,6 +2,14 @@
 
 The current recommended and tested environment is **Ubuntu 22.04 LTS**. Theoretically, you can build on other distros as well, but we haven't tested it.
 
+## Install Compiler Toolchain
+Unreal Engine requires a correct version of the compiler toolchain clang. You can find the right version on [this page](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-requirements-for-unreal-engine#gettingthetoolchain) for the Unreal version you wish to install.
+To easily install this version on your machine, you can use the following script:
+```bash
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+sudo ./llvm.sh <version number>
+```
 
 ## Install Unreal Engine
 Download the latest version of Unreal Engine 5.X from the [official download page](https://www.unrealengine.com/en-US/linux). 

@@ -43,7 +43,7 @@ else # linux
     # install clang and build tools
     VERSION=$(lsb_release -rs | cut -d. -f1)
     if [ "$VERSION" -gt "22" ]; then
-        clang_version='16'
+        clang_version='18'
         cpp_version='14'
     elif [ "$VERSION" -gt "20" ]; then
         clang_version='12'
