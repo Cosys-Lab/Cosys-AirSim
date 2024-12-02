@@ -66,7 +66,7 @@ bool WorldSimApi::destroyObject(const std::string& object_name)
         AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
         if (actor) {
             actor->Destroy();
-            result = actor->IsPendingKill();
+            result = !IsValid(actor);
         }
         if (result)
             simmode_->scene_object_map.Remove(FString(object_name.c_str()));

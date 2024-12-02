@@ -937,7 +937,7 @@ void APIPCamera::onViewModeChanged(bool nodisplay)
 std::vector<std::string> APIPCamera::getPresetLensSettings() const
 {
     std::vector<std::string> vector;
-    const TArray<FNamedLensPreset> lens_presets = camera_->GetLensPresets();
+    const TArray<FNamedLensPreset> lens_presets = UCineCameraSettings::GetLensPresets();
     for (const FNamedLensPreset& preset : lens_presets) {
         std::ostringstream current_lens_string;
         std::string name = (TCHAR_TO_UTF8(*preset.Name));
@@ -979,7 +979,7 @@ void APIPCamera::setPresetLensSettings(std::string preset_string)
 std::vector<std::string> APIPCamera::getPresetFilmbackSettings() const
 {
     std::vector<std::string> vector_all_presets;
-    TArray<FNamedFilmbackPreset> lens_presets = camera_->GetFilmbackPresets();
+    TArray<FNamedFilmbackPreset> lens_presets = UCineCameraSettings::GetFilmbackPresets();
     for (const FNamedFilmbackPreset& preset : lens_presets) {
         std::ostringstream preset_string;
         std::string name = (TCHAR_TO_UTF8(*preset.Name));

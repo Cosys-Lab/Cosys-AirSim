@@ -9,7 +9,8 @@ public class BlocksTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		ExtraModuleNames.AddRange(new string[] { "Blocks" });
-
+        DefaultBuildSettings = BuildSettingsVersion.V2;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_2;
 		//bUseUnityBuild = false;
 		if (Target.Platform == UnrealTargetPlatform.Linux)
 			bUsePCHFiles = false;

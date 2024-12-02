@@ -817,7 +817,7 @@ std::vector<msr::airlib::MeshPositionVertexBuffersResponse> UAirBlueprintLib::Ge
 TArray<FName> UAirBlueprintLib::ListWorldsInRegistry()
 {
     FARFilter Filter;
-    Filter.ClassNames.Add(UWorld::StaticClass()->GetFName());
+    FTopLevelAssetPath UPath(UWorld::StaticClass()->GetPathName());
     Filter.bRecursivePaths = true;
 
     TArray<FAssetData> AssetData;
@@ -833,7 +833,7 @@ TArray<FName> UAirBlueprintLib::ListWorldsInRegistry()
 UObject* UAirBlueprintLib::GetMeshFromRegistry(const std::string& load_object)
 {
     FARFilter Filter;
-    Filter.ClassNames.Add(UStaticMesh::StaticClass()->GetFName());
+    FTopLevelAssetPath MPath(UStaticMesh::StaticClass()->GetPathName());
     Filter.bRecursivePaths = true;
 
     TArray<FAssetData> AssetData;

@@ -50,12 +50,12 @@ bool FObjectFilter::matchesActor(AActor* actor, bool disable_component_check) co
                 USkeletalMeshComponent* skeletal_mesh_component = Cast<USkeletalMeshComponent>(actor_component);
                 if (skeletal_mesh_component) {
                     if (skeletal_mesh_ &&
-                        skeletal_mesh_component->SkeletalMesh == skeletal_mesh_) {
+                        skeletal_mesh_component->GetSkeletalMeshAsset() == skeletal_mesh_) {
                         return true;
                     }
                     if (wildcard_mesh_names_.Num() != 0 &&
-                        skeletal_mesh_component->SkeletalMesh &&
-                        isMatchAnyWildcard(skeletal_mesh_component->SkeletalMesh->GetName())) {
+                        skeletal_mesh_component->GetSkeletalMeshAsset() &&
+                        isMatchAnyWildcard(skeletal_mesh_component->GetSkeletalMeshAsset()->GetName())) {
                         return true;
                     }
                 }
@@ -114,11 +114,11 @@ bool FObjectFilter::matchesComponent(UActorComponent* actor_component) const
     if (skeletal_mesh_ || wildcard_mesh_names_.Num() != 0) {
         USkeletalMeshComponent* SkeletalMeshComponent = Cast<USkeletalMeshComponent>(actor_component);
         if (SkeletalMeshComponent) {
-            if (skeletal_mesh_ && SkeletalMeshComponent->SkeletalMesh == skeletal_mesh_) {
+            if (skeletal_mesh_ && SkeletalMeshComponent->GetSkeletalMeshAsset() == skeletal_mesh_) {
                 bMatchesSkeletalMesh = true;
             }
             if (wildcard_mesh_names_.Num() != 0 &&
-                isMatchAnyWildcard(SkeletalMeshComponent->SkeletalMesh->GetName())) {
+                isMatchAnyWildcard(SkeletalMeshComponent->GetSkeletalMeshAsset()->GetName())) {
                 bMatchesWildcardMeshName = true;
             }
         }

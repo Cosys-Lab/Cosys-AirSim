@@ -2,6 +2,7 @@
 
 #include "DetectionComponent.h"
 
+#include "SceneView.h"
 #include <Components/SceneCaptureComponent2D.h>
 #include <Components/StaticMeshComponent.h>
 #include <DrawDebugHelpers.h>
