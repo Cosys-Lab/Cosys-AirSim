@@ -4,7 +4,7 @@ The current recommended and tested environment is **Ubuntu 22.04 LTS**. Theoreti
 
 
 ## Install Unreal Engine
-Download Unreal Engine 5.2.1 from the [official download page]](https://www.unrealengine.com/en-US/linux). 
+Download Unreal Engine 5.2.1 from the [official download page](https://www.unrealengine.com/en-US/linux). 
 This will require an Epic Games account. Once the zip archive is downloaded you can extract it to where you want to install the Unreal Engine.
 ```bash
 unzip Linux_Unreal_Engine_5.2.1.zip -d destination_folder
