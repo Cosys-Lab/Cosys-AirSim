@@ -69,8 +69,8 @@ xhost +local:docker
 $ cd Airsim/docker;
 $ python build_airsim_image.py \
    --source \
-   ----base_image ghcr.io/epicgames/unreal-engine:dev-5.4.3 \
-   --target_image=airsim_source:dev-5.4.3
+   ----base_image ghcr.io/epicgames/unreal-engine:dev-5.X.X \
+   --target_image=airsim_source:dev-5.X.X
 ```
 
 #### Running Cosys-AirSim container
@@ -78,7 +78,7 @@ $ python build_airsim_image.py \
 
 ```bash
 xhost +local:docker
-./run_airsim_image_source.sh airsim_source:dev-5.4.3 
+./run_airsim_image_source.sh airsim_source:dev-5.X.X
 ```
 
    Syntax is `./run_airsim_image_source.sh DOCKER_IMAGE_NAME`

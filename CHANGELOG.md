@@ -1,4 +1,6 @@
 ### November/December 2024 (version 3.2)
+* Unreal 5.2.1 is now long term support and will continue to get releases build for it.
+* Next to 5.2.1, the latest available Unreal Engine version will be targeted for releases, which currently is 5.5.
 * Updated to be compatible with Unreal 5.5. 
 * Updated Python Client to have a much faster and more recent RPC library. 
 * Updated and improved various documentation pages.
