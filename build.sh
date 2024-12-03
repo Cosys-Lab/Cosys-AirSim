@@ -9,6 +9,9 @@ set -x
 
 debug=false
 gcc=false
+customclang=false
+customclang_path=""
+
 # Parse command line arguments
 while [[ $# -gt 0 ]]
 do
@@ -21,6 +24,12 @@ do
         ;;
     --gcc)
         gcc=true
+        shift # past argument
+        ;;
+    --customclang)
+        customclang=true
+        customclang_path="$2"
+        shift # past argument
         shift # past argument
         ;;
     esac
@@ -65,18 +74,22 @@ if [ "$(uname)" == "Darwin" ]; then
 else
     VERSION=$(lsb_release -rs | cut -d. -f1)
     if $gcc; then
-        if [ "$VERSION" -gt "22" ]; then
+        if [ "$VERSION" -ge "22" ]; then
             export CC="gcc-13"
             export CXX="g++-13"
         else
             export CC="gcc-12"
             export CXX="g++-12"
         fi
+    elif $customclang; then
+        export CXXFLAGS="-stdlib=libstdc++"
+        export CC="$customclang_path/clang"
+        export CXX="$customclang_path/clang++"
     else
         export CXXFLAGS="-stdlib=libstdc++"
-        if [ "$VERSION" -gt "22" ]; then
-            export CC="clang-16"
-            export CXX="clang++-16"
+        if [ "$VERSION" -ge "22" ]; then
+            export CC="clang-18"
+            export CXX="clang++-18"
         else
             export CC="clang-12"
             export CXX="clang++-12"
@@ -123,7 +136,7 @@ pushd $build_dir  >/dev/null
 # final linking of the binaries can fail due to a missing libc++abi library
 # (happens on Fedora, see https://bugzilla.redhat.com/show_bug.cgi?id=1332306).
 # So we only build the libraries here for now
-make -lc++fs -j"$(nproc)"
+make -j"$(nproc)"
 popd >/dev/null
 
 mkdir -p AirLib/lib/x64/$folder_name
