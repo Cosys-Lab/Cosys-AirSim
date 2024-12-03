@@ -9,7 +9,7 @@
 * Fixed the horizontal scanning pattern calculation of the GPULiDAR causing various issues when not using full 360 degrees FOV.
 * Fixed RGB color rendering for annotation system and instance segmentation having a few edge cases.
 
-* ### September/October 2024 (version 3.1)
+### September/October 2024 (version 3.1)
 * Updated Docker support to use new official Unreal 5 containers for runtime binaries and source development with updated [tutorial](docs/docker_ubuntu.md) and scripts.
 * Added main setting parameter `InitialInstanceSegmentation` to toggle initial [Instance Segmentation](docs/instance_segmentation.md). It is enabled by default.
 * Added packaged binary of Blocks environment to releases for Windows and Linux for testing the simulation without needing the Unreal Editor.
