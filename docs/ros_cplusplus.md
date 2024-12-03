@@ -19,6 +19,7 @@ source ~/.bashrc
 apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
+cd <path-to-cosys-airsim>/ros2
 rosdep install --from-paths src -y --ignore-src --skip-keys pcl --skip-keys message_runtime --skip-keys message_generation
 ```
 
