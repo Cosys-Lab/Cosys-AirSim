@@ -9,7 +9,7 @@ It is build using the Chaos engine of Unreal which does not support this vehicle
 
 ## Creating a new skid steer vehicle
 The steps to setup the vehicle are largely the same as a WheeledVehiclePawn with some slight adjustments.
-1. Follow [this guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/how-to-set-up-vehicles-in-unreal-engine?application_version=5.5) to create the skeletal mesh and physics asset.
+1. Follow [this guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/how-to-set-up-vehicles-in-unreal-engine?application_version=5.2) to create the skeletal mesh and physics asset.
 2. For the wheels setup, the vehicle should have 4 wheels, 2 for the left side and 2 for the right side. Please use SkidWheel as the wheel class.
 3. For the vehicle blueprint to create the pawn it is also largely the same as in that tutorial however as class one should use the *SkidVehiclePawn* sub-class. The vehicle setup parameters are more simplified. 
 4. To have animated wheels, proper physics and correct steering behavior, please take a look at how the CPHusky is configured in the AirSim plugin. The Husky is a skid steer vehicle and can be used as a reference.

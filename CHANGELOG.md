@@ -1,11 +1,11 @@
 ### November/December 2024 (version 3.2)
 * Unreal 5.2.1 is now long term support and will continue to get releases build for it and new features and fixes added to it. 
-* Next to 5.2.1, the latest available Unreal Engine version will be targeted for releases, which currently is 5.5.
+* Next to 5.2.1, the latest available stable Unreal Engine version will be targeted for releases, which currently is 5.4.
 * Other branches for other Unreal versions might be updated in the future, but no guarantees are given and are not actively maintained or tested.
-* Updated to be compatible with Unreal 5.5. 
-* Updated Python Client to have a much faster and more recent RPC library. 
+* Updated to be compatible with Unreal 5.5 on Windows, Linux is a work in progress.
+* Updated Python Client to have a much faster and more recent RPC library.
 * Updated and improved various documentation pages.
-* Updated joystick support on Linux. 
+* Updated joystick support on Linux.
 * Updated instance segmentation with option to add the Unreal Tag `InstanceSegmentation_disable` to the components/meshes you want to ignore in instance segmentation process.
 * Fixed the horizontal scanning pattern calculation of the GPULiDAR causing various issues when not using full 360 degrees FOV.
 * Fixed RGB color rendering for annotation system and instance segmentation having a few edge cases.
