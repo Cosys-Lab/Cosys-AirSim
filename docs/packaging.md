@@ -24,12 +24,12 @@ Then you can package the plugin as a standalone plugin from a Unreal Project lik
 On Windows:
 
 * Open the Blocks project in Unreal Engine `cd Cosys-AirSim/Unreal/Environments/Blocks` and pull the latest plugin files by running `update_from_git.bat`.
-* Go to your Unreal Engine installation folder and run the build script while pointing at the Blocks project: `./RunUAT.bat BuildPlugin -Plugin=....\Cosys-AirSim\Unreal\Environments\Blocks\Plugins\AirSim\AirSim.uplugin -Package=...\airsimpluginpackagewin -Rocket -TargetPlatforms=Win64`
+* Go to your Unreal Engine installation folder and run the build script while pointing at the Blocks project: `./RunUAT.bat BuildPlugin -Plugin=....\Cosys-AirSim\Unreal\Environments\Blocks\Plugins\AirSim\AirSim.uplugin -Package=....\airsimpluginpackagewin -Rocket -TargetPlatforms=Win64`
 
 On Linux:
 
 * Open the Blocks project in Unreal Engine `cd Cosys-AirSim/Unreal/Environments/Blocks` and pull the latest plugin files by running `update_from_git.sh`.
-* Go to your Unreal Engine installation folder and run the build script while pointing at the Blocks project: `./RunUAT.sh BuildPlugin -Plugin=.../Cosys-AirSim/Unreal/Environments/Blocks/Plugins/AirSim/AirSim.uplugin -Package=.../airsimpluginpackagelinux -Rocket -TargetPlatforms=Linux`
+* Go to your Unreal Engine installation folder and run the build script while pointing at the Blocks project: `./RunUAT.sh BuildPlugin -Plugin=..../Cosys-AirSim/Unreal/Environments/Blocks/Plugins/AirSim/AirSim.uplugin -Package=..../airsimpluginpackagelinux -Rocket -TargetPlatforms=Linux`
 
 ## Building an Unreal Project with Cosys-AirSim Plugin
 
@@ -57,7 +57,7 @@ On Windows:
 On Linux:
 
 * Open the Blocks project in Unreal Engine `cd Cosys-AirSim/Unreal/Environments/Blocks` and pull the latest plugin files by running `update_from_git.sh`.
-* Go to your Unreal Engine installation folder and run the build script while pointing at the Blocks project: `./RunUAT.sh BuildCookRun -cook -noP4 -build -stage -noiterate -archive -project=.../Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject -archivedirectory=.../blockslinux -Rocket -TargetPlatforms=Linux -configuration=Development`
+* Go to your Unreal Engine installation folder and run the build script while pointing at the Blocks project: `./RunUAT.sh BuildCookRun -nop4 -utf8output -nocompileeditor -skipbuildeditor -cook -project="..../Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject" -target=Blocks -platform=Linux -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory="..../blockslinux/" -clientconfig=Development -nocompile -nocompileuat`
 
 
 
