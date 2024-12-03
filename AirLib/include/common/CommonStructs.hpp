@@ -307,13 +307,14 @@ namespace airlib
         Box2D box2D = Box2D();
         Box3D box3D = Box3D();
         Pose relative_pose = Pose();
+        std::vector<std::string> tags;
 
         DetectionInfo()
         {
         }
 
-        DetectionInfo(const std::string& name_val, const GeoPoint& geo_point_val, const Box2D& box2D_val, const Box3D& box3D_val, const Pose& relative_pose_val)
-            : name(name_val), geo_point(geo_point_val), box2D(box2D_val), box3D(box3D_val), relative_pose(relative_pose_val)
+        DetectionInfo(const std::string& name_val, const GeoPoint& geo_point_val, const Box2D& box2D_val, const Box3D& box3D_val, const Pose& relative_pose_val, const std::vector<std::string>& tags_val)
+            : name(name_val), geo_point(geo_point_val), box2D(box2D_val), box3D(box3D_val), relative_pose(relative_pose_val), tags(tags_val)
         {
         }
     };

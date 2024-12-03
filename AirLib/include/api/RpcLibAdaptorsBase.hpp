@@ -354,8 +354,9 @@ namespace airlib_rpclib
             Box2D box2D;
             Box3D box3D;
             Pose relative_pose;
+            std::vector<std::string> tags;
 
-            MSGPACK_DEFINE_MAP(name, geo_point, box2D, box3D, relative_pose);
+            MSGPACK_DEFINE_MAP(name, geo_point, box2D, box3D, relative_pose, tags);
 
             DetectionInfo()
             {
@@ -368,6 +369,7 @@ namespace airlib_rpclib
                 box2D = d.box2D;
                 box3D = d.box3D;
                 relative_pose = d.relative_pose;
+                tags = d.tags;
             }
 
             msr::airlib::DetectionInfo to() const
@@ -378,6 +380,7 @@ namespace airlib_rpclib
                 d.box2D = box2D.to();
                 d.box3D = box3D.to();
                 d.relative_pose = relative_pose.to();
+                d.tags = tags;
 
                 return d;
             }

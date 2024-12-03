@@ -574,6 +574,7 @@ class DetectionInfo(MsgpackMixin):
     box2D = Box2D()
     box3D = Box3D()
     relative_pose = Pose()
+    tags = []
 
 class PIDGains():
     """

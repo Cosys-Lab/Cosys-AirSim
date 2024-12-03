@@ -1125,6 +1125,14 @@ std::vector<msr::airlib::DetectionInfo> WorldSimApi::getDetections(ImageCaptureB
             const Quaternionr& orientation = ned_transform.toNed(detections[i].RelativeTransform.GetRotation());
 
             result[i].relative_pose = Pose(position, orientation);
+            
+            if (detections[i].Actor->Tags.Num() > 0) {
+                for (const auto& tag : detections[i].Actor->Tags) {
+                    result[i].tags.push_back(std::string(TCHAR_TO_UTF8(*tag.ToString())));
+                }
+            } else {
+                result[i].tags.clear();
+            }
         }
     },
                                              true);
