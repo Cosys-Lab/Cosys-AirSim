@@ -23,7 +23,7 @@ sudo chmod -R 777 /opt/UnrealEngine
 sudo chown -r yourusername /opt/UnrealEngine
 ```
 From where you install Unreal Engine, you can run `Engine/Binaries/Linux/UnrealEditor` from the terminal to launch Unreal Engine.
-For more information you can read the [quick start guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.5).
+For more information you can read the [quick start guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.4).
 
 You can alternatively install Unreal Engine from source if you do not use a Ubuntu distribution, see the documentation linked above for more information. 
 
