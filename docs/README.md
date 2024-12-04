@@ -59,8 +59,7 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 ```
 
 ## Cosys-Lab Modifications
-* This documentation is the latest supported Unreal Version v5.4.0 on the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main), maintained for support, and is available for builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
-* Unreal [5.2.1](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is also available for long term support builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases) but the documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs).
+* Updated for Unreal 5.
 * Added [multi-layer annotation](https://cosys-lab.github.io/annotation) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation). 
 * Added [Echo sensor type](https://cosys-lab.github.io/echo) for simulation of sensors like sonar and radar.
