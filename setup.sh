@@ -30,7 +30,7 @@ if [ "$(uname)" == "Darwin" ]; then # osx
     brew update
     # Update below line for newer versions
     brew install llvm@8
-else # linux
+else #linux
     sudo apt-get update
     sudo apt-get -y install --no-install-recommends \
         lsb-release \
@@ -40,24 +40,15 @@ else # linux
         libvulkan1 \
         vulkan-tools
 
-    # install clang and build tools
+    #install clang and build tools
     VERSION=$(lsb_release -rs | cut -d. -f1)
-    if [ "$VERSION" -gt "22" ]; then
-        clang_version='16'
-        cpp_version='14'
-    elif [ "$VERSION" -gt "20" ]; then
-        clang_version='12'
-        cpp_version='12'
-    else
-        clang_version='12'
-        cpp_version='10'
-    fi
-    sudo apt-get install -y \
-        clang-$clang_version \
-        clang++-$clang_version \
-        libc++-$clang_version-dev \
-        libc++abi-$clang_version-dev \
-        libstdc++-$cpp_version-dev
+    # Since Ubuntu 17 clang is part of the core repository
+    # See https://packages.ubuntu.com/search?keywords=clang-8
+    # if [ "$VERSION" -lt "17" ]; then
+    #     wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+    #     sudo apt-get update
+    # fi
+    sudo apt-get install -y clang-12 clang++-12 libc++-12-dev libc++abi-12-dev libstdc++-12-dev
 fi
 
 if ! which cmake; then
@@ -98,10 +89,9 @@ else #linux
     sudo apt-get install -y build-essential unzip libunwind-dev
 
     if version_less_than_equal_to $cmake_ver $MIN_CMAKE_VERSION; then
-        VERSION=$(lsb_release -rs | cut -d. -f1)
-        # For Ubuntu 18 and up, avoid building cmake from scratch to save time
-        # ref: https://apt.kitware.com
-        if [ "$VERSION" -ge "18" ]; then
+        # in ubuntu 18 docker CI, avoid building cmake from scratch to save time
+        # ref: https://apt.kitware.com/
+        if [ "$(lsb_release -rs)" == "18.04" ]; then
             sudo apt-get -y install \
                 apt-transport-https \
                 ca-certificates \
@@ -198,9 +188,6 @@ popd >/dev/null
 
 set +x
 echo ""
-echo ""
-echo "============================================"
-echo " Cosys-AirSim setup completed successfully! "
-echo "============================================"
-echo ""
-echo "Run ./build.sh to compile."
+echo "******************************************"
+echo "Cosys-AirSim setup completed successfully!"
+echo "******************************************"
