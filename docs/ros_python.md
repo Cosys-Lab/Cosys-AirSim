@@ -4,7 +4,7 @@ AirSim and ROS can be integrated using Python. Some example ROS node are provide
 
 ## Prerequisites
 
-These instructions are for Ubuntu 20.04, ROS Noetic, UE 5.3.2 and latest Cosys-AirSim release.
+These instructions are for Ubuntu 20.04, ROS Noetic, UE 5.X+ and latest Cosys-AirSim release.
 You should have these components installed and working before proceeding.
 
 **Note that you need to install the Python module first for this to work. More information [here](apis.md) in the section 'Installing AirSim Package'.**

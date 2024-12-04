@@ -10,6 +10,8 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
+This documentation is for Unreal Version v5.3.0 on the [5.3 branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.3.2). The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.3.2/docs).
+
 ## Associated publications
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
@@ -26,6 +28,7 @@ Please contact a Cosys-Lab researcher to get more in depth information on which 
 ```
 
 You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSIM '23 conference [here](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/annsim23_tutorial) together with the associated videos.
+
 
 - [Physical LiDAR Simulation in Real-Time Engine](https://arxiv.org/abs/2208.10295)
 ```
@@ -55,9 +58,7 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 ```
 
 ## Cosys-Lab Modifications
-* Added support for Unreal to 5.3.2.
- * Note that Unreal 5.3 breaks debug rendering when editor aspect ratio is not perfect! Disable it to avoid issues in editor. This means things like _DrawSensor_ and  _DrawDebugPoints_ should be disabled. [This does not happen in 5.2 and is fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454).
- * Note that Unreal 5.3 breaks camera scene rendering when Effects is not set to the Epic scalability preset. You can use the console command r.DetailMode 2 to fix this at runtime!
+* Updated for Unreal 5.
 * Added [multi-layer annotation](https://cosys-lab.github.io/annotation) for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.
 * Added [Instance Segmentation](https://cosys-lab.github.io/instance_segmentation). 
 * Added [Echo sensor type](https://cosys-lab.github.io/echo) for simulation of sensors like sonar and radar.
@@ -76,8 +77,6 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 * Dropped support for Unity Environments.
 
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
-
-## How to Get It
 
 ## How to Get It
 #### Download and run from packaged binary - Windows/Linux

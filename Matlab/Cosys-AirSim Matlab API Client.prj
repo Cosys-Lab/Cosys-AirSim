@@ -8,7 +8,7 @@
     <param.description>This a client implementation of the RPC API for Matlab for the Cosys-AirSim simulation framework. A main class AirSimClient is available which implements all API calls.
 Do note that at this point not all functions have been tested and most function documentation was auto-generated. This is still a WIP client.</param.description>
     <param.screenshot>D:\BigProjects\Cosys-AirSim-Public\promo\thumbnail_matlab.png</param.screenshot>
-    <param.version>3.1.0.0</param.version>
+    <param.version>3.2.0.0</param.version>
     <param.output>${PROJECT_ROOT}\Cosys-AirSim Matlab API Client.mltbx</param.output>
     <param.products.name>
       <item>Aerospace Toolbox</item>

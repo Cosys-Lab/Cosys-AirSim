@@ -793,7 +793,7 @@ std::vector<msr::airlib::Pose> ASimModeBase::GetAllInstanceSegmentationMeshPoses
     for (auto const& element : nameToComponentMapTemp) {
         UAirBlueprintLib::RunCommandOnGameThread([ned, only_visible, &retval, element, this]() {
             if (element.Value->HasBegunPlay() && element.Value->IsRenderStateCreated()) {
-                if (!element.Value->IsBeingDestroyed() && !element.Value->IsPendingKillOrUnreachable()) {
+                if (!element.Value->IsBeingDestroyed() && IsValid(element.Value)) {
                     if (!only_visible || element.Value->GetVisibleFlag()) {
                         if (ned) {
                             retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));
@@ -874,7 +874,7 @@ std::vector<msr::airlib::Pose> ASimModeBase::GetAllAnnotationMeshPoses(const std
     for (auto const& element : nameToComponentMapTemp) {
         UAirBlueprintLib::RunCommandOnGameThread([ned, only_visible, &retval, element, this]() {
             if (element.Value->HasBegunPlay() && element.Value->IsRenderStateCreated()) {
-                if (!element.Value->IsBeingDestroyed() && !element.Value->IsPendingKillOrUnreachable()) {
+                if (!element.Value->IsBeingDestroyed() && IsValid(element.Value)) {
                     if (!only_visible || element.Value->GetVisibleFlag()) {
                         if (ned) {
                             retval.emplace_back(getGlobalNedTransform().toGlobalNed(FTransform(element.Value->GetComponentRotation(), element.Value->GetComponentLocation())));

@@ -450,18 +450,18 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 	TArray<FColor> buffer_2D_intensity_;
 
 	// Read the RGB data from the cameras and transfer them to the buffers
-	FTextureRenderTarget2DResource* render_target_2D_depth = (FTextureRenderTarget2DResource*)capture_2D_depth_->TextureTarget->Resource;
+	FTextureRenderTarget2DResource* render_target_2D_depth = (FTextureRenderTarget2DResource*)capture_2D_depth_->TextureTarget->GetResource();
 	render_target_2D_depth->ReadPixels(buffer_2D_depth_);
 	if (generate_groundtruth_) {
 		FTextureRenderTarget2DResource* render_target_2D_segmentation;
-		render_target_2D_segmentation = (FTextureRenderTarget2DResource*)capture_2D_segmentation_->TextureTarget->Resource;
+		render_target_2D_segmentation = (FTextureRenderTarget2DResource*)capture_2D_segmentation_->TextureTarget->GetResource();
 		FReadSurfaceDataFlags flags(RCM_UNorm, CubeFace_MAX);
 		flags.SetLinearToGamma(false);
 		render_target_2D_segmentation->ReadPixels(buffer_2D_segmentation_);
 	}
 	if (generate_intensity_) {
 		FTextureRenderTarget2DResource* render_target_2D_intensity;
-		render_target_2D_intensity = (FTextureRenderTarget2DResource*)capture_2D_intensity_->TextureTarget->Resource;
+		render_target_2D_intensity = (FTextureRenderTarget2DResource*)capture_2D_intensity_->TextureTarget->GetResource();
 		render_target_2D_intensity->ReadPixels(buffer_2D_intensity_);
 	}
 
