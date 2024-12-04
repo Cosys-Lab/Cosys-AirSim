@@ -9,9 +9,6 @@ set -x
 
 debug=false
 gcc=false
-customclang=false
-customclang_path=""
-
 # Parse command line arguments
 while [[ $# -gt 0 ]]
 do
@@ -24,12 +21,6 @@ do
         ;;
     --gcc)
         gcc=true
-        shift # past argument
-        ;;
-    --customclang)
-        customclang=true
-        customclang_path="$2"
-        shift # past argument
         shift # past argument
         ;;
     esac
@@ -72,28 +63,12 @@ if [ "$(uname)" == "Darwin" ]; then
     export CC="$(brew --prefix)/opt/llvm/bin/clang"
     export CXX="$(brew --prefix)/opt/llvm/bin/clang++"
 else
-    VERSION=$(lsb_release -rs | cut -d. -f1)
     if $gcc; then
-        if [ "$VERSION" -ge "22" ]; then
-            export CC="gcc-13"
-            export CXX="g++-13"
-        else
-            export CC="gcc-12"
-            export CXX="g++-12"
-        fi
-    elif $customclang; then
-        export CXXFLAGS="-stdlib=libstdc++"
-        export CC="$customclang_path/clang"
-        export CXX="$customclang_path/clang++"
+        export CC="gcc-12"
+        export CXX="g++-12"
     else
-        export CXXFLAGS="-stdlib=libstdc++"
-        if [ "$VERSION" -ge "22" ]; then
-            export CC="clang-18"
-            export CXX="clang++-18"
-        else
-            export CC="clang-12"
-            export CXX="clang++-12"
-        fi
+        export CC="clang-12"
+        export CXX="clang++-12"
     fi
 fi
 
@@ -136,7 +111,7 @@ pushd $build_dir  >/dev/null
 # final linking of the binaries can fail due to a missing libc++abi library
 # (happens on Fedora, see https://bugzilla.redhat.com/show_bug.cgi?id=1332306).
 # So we only build the libraries here for now
-make -j"$(nproc)"
+make -lc++fs -j"$(nproc)"
 popd >/dev/null
 
 mkdir -p AirLib/lib/x64/$folder_name
@@ -158,7 +133,7 @@ set +x
 echo ""
 echo ""
 echo "==============================="
-echo " Cosys-AirSim plugin is built! "
+echo " Cosys-AirSim plugin is built!."
 echo "==============================="
 echo ""
 echo "For further info see for installation see:"
