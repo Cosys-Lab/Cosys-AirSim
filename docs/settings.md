@@ -326,14 +326,13 @@ The `ImageType` element in JSON array determines which image type that settings 
 For example, `CaptureSettings` element is json array so you can add settings for multiple image types easily.
 
 ### CaptureSettings
-The `CaptureSettings` determines how different image types such as scene, depth, disparity, surface normals and segmentation views are rendered. The Width, Height and FOV settings should be self explanatory. The AutoExposureSpeed decides how fast eye adaptation works. We set to generally high value such as 100 to avoid artifacts in image capture. Similarly we set MotionBlurAmount to 0 by default to avoid artifacts in ground truth images. The `ProjectionMode` decides the projection used by the capture camera and can take value "perspective" (default) or "orthographic". If projection mode is "orthographic" then `OrthoWidth` determines width of projected area captured in meters.
-To disable the rendering of certain objects on specific cameras or all, use the `IgnoreMarked` boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_. You can also tweak the motion blur and chromatic Aberration here. 
+The `CaptureSettings` determines how different image types such as scene, depth, disparity, surface normals and segmentation views are rendered.
+To disable the rendering of certain objects on specific cameras or all, use the `IgnoreMarked` boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_. 
 
-Unreal 5 introduces Lumen lightning. Due to the cameras using scene capture components enabling Lumen for them can be costly on performance. Settings have been added specfically for the scene camera to customize the usage of Lumen for Global Illumination and Reflections. 
+Unreal 5 introduces Lumen lightning. Due to the cameras using scene capture components enabling Lumen for them can be costly on performance. Settings have been added specifically for the scene camera to customize the usage of Lumen for Global Illumination and Reflections. 
 The `LumenGIEnable` and `LumenReflectionEnable` settings enable or disable Lumen for the camera. The `LumenFinalQuality`(0.25-2) setting determines the quality of the final image. The `LumenSceneDetail`(0.25-4) setting determines the quality of the scene. The `LumenSceneLightningDetail`(0.25-2) setting determines the quality of the lightning in the scene.
 
-For explanation of other settings, please see [this article](https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/AutomaticExposure/).
-
+For explanation of all settings, see [here](camerasettings.md).
 
 ### NoiseSettings
 The `NoiseSettings` allows to add noise to the specified image type with a goal of simulating camera sensor noise, interference and other artifacts. By default no noise is added, i.e., `Enabled: false`. If you set `Enabled: true` then following different types of noise and interference artifacts are enabled, each can be further tuned using setting. The noise effects are implemented as shader created as post processing material in Unreal Engine called [CameraSensorNoise](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/HUDAssets/CameraSensorNoise.uasset).
