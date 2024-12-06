@@ -173,29 +173,63 @@ namespace airlib
 
             unsigned int width = 256, height = 144; //960 X 540
             float fov_degrees = Utils::nan<float>(); //90.0f
-            int auto_exposure_method = -1; //histogram
-            float auto_exposure_speed = Utils::nan<float>(); // 100.0f;
-            float auto_exposure_bias = Utils::nan<float>(); // 0;
-            float auto_exposure_max_brightness = Utils::nan<float>(); // 0.64f;
-            float auto_exposure_min_brightness = Utils::nan<float>(); // 0.03f;
-            float auto_exposure_low_percent = Utils::nan<float>(); // 80.0f;
-            float auto_exposure_high_percent = Utils::nan<float>(); // 98.3f;
-            float auto_exposure_histogram_log_min = Utils::nan<float>(); // -8;
-            float auto_exposure_histogram_log_max = Utils::nan<float>(); // 4;
-            float motion_blur_amount = Utils::nan<float>();
-            float motion_blur_max = Utils::nan<float>(); // 5f;
             float target_gamma = Utils::nan<float>(); //1.0f; //This would be reset to kSceneTargetGamma for scene as default
             int projection_mode = 0; // ECameraProjectionMode::Perspective
             float ortho_width = Utils::nan<float>();
-            float chromatic_aberration_scale = Utils::nan<float>(); // 0f;
-		    bool ignore_marked = false;
+
+            // Motion blur
+            float motion_blur_amount = Utils::nan<float>();
+            float motion_blur_max = Utils::nan<float>(); // 5f;
+            float motion_blur_target_fps = Utils::nan<float>(); // Add motion blur target FPS
+
+            // Bloom settings
+            float bloom_intensity = Utils::nan<float>();
+            float bloom_threshold = Utils::nan<float>();
+
+            // Exposure settings
+            int auto_exposure_method = -1; // 0: Histogram, 1: Basic, 2: Manual
+            float auto_exposure_bias = Utils::nan<float>();
+            bool auto_exposure_apply_physical_camera_exposure = false;
+            float auto_exposure_min_brightness = Utils::nan<float>();
+            float auto_exposure_max_brightness = Utils::nan<float>();
+            float auto_exposure_speed_up = Utils::nan<float>();
+            float auto_exposure_speed_down = Utils::nan<float>();
+            float auto_exposure_low_percent = Utils::nan<float>();
+            float auto_exposure_high_percent = Utils::nan<float>();
+            float auto_exposure_histogram_log_min = Utils::nan<float>();
+            float auto_exposure_histogram_log_max = Utils::nan<float>();
+
+            // Chromatic aberration settings
+            float chromatic_aberration_intensity = Utils::nan<float>();
+            float chromatic_aberration_start_offset = Utils::nan<float>();
+
+            // Camera settings
+            float camera_shutter_speed = Utils::nan<float>();
+            float camera_iso = Utils::nan<float>();
+            float camera_aperture = Utils::nan<float>();
+            float camera_max_aperture = Utils::nan<float>();
+            float camera_num_blades = Utils::nan<float>();
+            bool ignore_marked = false;
 
             // Settings only available for scene camera
             bool lumen_gi_enabled = false;
             bool lumen_reflections_enabled = false;
             float lumen_final_quality = 1;
             float lumen_scene_detail = 1.0f;
-            float lumen_scene_lightning_quality = 1;
+            float lumen_scene_lightning_quality = 1;   
+
+            // Lens Flare settings
+            float lens_flare_intensity = Utils::nan<float>();
+            float lens_flare_bokeh_size = Utils::nan<float>();
+            float lens_flare_threshold = Utils::nan<float>();
+
+            // Depth of Field settings
+            float depth_of_field_sensor_width = Utils::nan<float>();
+            float depth_of_field_squeeze_factor = Utils::nan<float>();
+            float depth_of_field_focal_distance = Utils::nan<float>();
+            float depth_of_field_depth_blur_amount = Utils::nan<float>();
+            float depth_of_field_depth_blur_radius = Utils::nan<float>();
+            float depth_of_field_use_hair_depth = Utils::nan<float>(); // Use float and convert to bool in updateCameraPostProcessingSetting
         };
 
         struct NoiseSetting
@@ -1350,16 +1384,10 @@ namespace airlib
             capture_setting.width = settings_json.getInt("Width", capture_setting.width);
             capture_setting.height = settings_json.getInt("Height", capture_setting.height);
             capture_setting.fov_degrees = settings_json.getFloat("FOV_Degrees", capture_setting.fov_degrees);
-            capture_setting.auto_exposure_speed = settings_json.getFloat("AutoExposureSpeed", capture_setting.auto_exposure_speed);
-            capture_setting.auto_exposure_bias = settings_json.getFloat("AutoExposureBias", capture_setting.auto_exposure_bias);
-            capture_setting.auto_exposure_max_brightness = settings_json.getFloat("AutoExposureMaxBrightness", capture_setting.auto_exposure_max_brightness);
-            capture_setting.auto_exposure_min_brightness = settings_json.getFloat("AutoExposureMinBrightness", capture_setting.auto_exposure_min_brightness);
-            capture_setting.motion_blur_amount = settings_json.getFloat("MotionBlurAmount", capture_setting.motion_blur_amount);
-            capture_setting.motion_blur_max = settings_json.getFloat("MotionBlurMax", capture_setting.motion_blur_max);
+          
             capture_setting.image_type = settings_json.getInt("ImageType", 0);
             capture_setting.target_gamma = settings_json.getFloat("TargetGamma",
                                                                   capture_setting.image_type == 0 ? CaptureSetting::kSceneTargetGamma : Utils::nan<float>());
-            capture_setting.chromatic_aberration_scale = settings_json.getFloat("ChromaticAberrationScale", capture_setting.chromatic_aberration_scale);
 		    capture_setting.ignore_marked = settings_json.getBool("IgnoreMarked", capture_setting.ignore_marked);
             std::string projection_mode = Utils::toLower(settings_json.getString("ProjectionMode", ""));
             if (projection_mode == "" || projection_mode == "perspective")
@@ -1376,6 +1404,45 @@ namespace airlib
             capture_setting.lumen_final_quality = settings_json.getFloat("LumenFinalQuality", capture_setting.lumen_final_quality);
             capture_setting.lumen_scene_detail = settings_json.getFloat("LumenSceneDetail", capture_setting.lumen_scene_detail);
             capture_setting.lumen_scene_lightning_quality = settings_json.getFloat("LumenSceneLightningDetail", capture_setting.lumen_scene_lightning_quality);
+         
+            capture_setting.auto_exposure_method = settings_json.getInt("AutoExposureMethod", capture_setting.auto_exposure_method);
+            capture_setting.auto_exposure_bias = settings_json.getFloat("AutoExposureCompensation", capture_setting.auto_exposure_bias);
+            capture_setting.auto_exposure_apply_physical_camera_exposure = settings_json.getBool("AutoExposureApplyPhysicalCameraExposure", capture_setting.auto_exposure_apply_physical_camera_exposure);
+            capture_setting.auto_exposure_min_brightness = settings_json.getFloat("AutoExposureMinBrightness", capture_setting.auto_exposure_min_brightness);
+            capture_setting.auto_exposure_max_brightness = settings_json.getFloat("AutoExposureMaxBrightness", capture_setting.auto_exposure_max_brightness);
+            capture_setting.auto_exposure_speed_up = settings_json.getFloat("AutoExposureSpeedUp", capture_setting.auto_exposure_speed_up);
+            capture_setting.auto_exposure_speed_down = settings_json.getFloat("AutoExposureSpeedDown", capture_setting.auto_exposure_speed_down);
+            capture_setting.auto_exposure_low_percent = settings_json.getFloat("AutoExposureLowPercent", capture_setting.auto_exposure_low_percent);
+            capture_setting.auto_exposure_high_percent = settings_json.getFloat("AutoExposureHighPercent", capture_setting.auto_exposure_high_percent);
+            capture_setting.auto_exposure_histogram_log_min = settings_json.getFloat("AutoExposureHistogramLogMin", capture_setting.auto_exposure_histogram_log_min);
+            capture_setting.auto_exposure_histogram_log_max = settings_json.getFloat("AutoExposureHistogramLogMax", capture_setting.auto_exposure_histogram_log_max);
+
+            capture_setting.motion_blur_amount = settings_json.getFloat("MotionBlurAmount", capture_setting.motion_blur_amount);
+            capture_setting.motion_blur_max = settings_json.getFloat("MotionBlurMax", capture_setting.motion_blur_max);
+            capture_setting.motion_blur_target_fps = settings_json.getFloat("MotionBlurTargetFPS", capture_setting.motion_blur_target_fps);
+           
+            capture_setting.bloom_intensity = settings_json.getFloat("BloomIntensity", capture_setting.bloom_intensity);
+            capture_setting.bloom_threshold = settings_json.getFloat("BloomThreshold", capture_setting.bloom_threshold);
+          
+            capture_setting.chromatic_aberration_intensity = settings_json.getFloat("ChromaticAberrationIntensity", capture_setting.chromatic_aberration_intensity);
+            capture_setting.chromatic_aberration_start_offset = settings_json.getFloat("ChromaticAberrationStartOffset", capture_setting.chromatic_aberration_start_offset);
+            
+            capture_setting.camera_shutter_speed = settings_json.getFloat("CameraShutterSpeed", capture_setting.camera_shutter_speed);
+            capture_setting.camera_iso = settings_json.getFloat("CameraISO", capture_setting.camera_iso);
+            capture_setting.camera_aperture = settings_json.getFloat("CameraAperture", capture_setting.camera_aperture);
+            capture_setting.camera_max_aperture = settings_json.getFloat("CameraMaxAperture", capture_setting.camera_max_aperture);
+            capture_setting.camera_num_blades = settings_json.getFloat("CameraNumBlades", capture_setting.camera_num_blades);
+
+            capture_setting.lens_flare_intensity = settings_json.getFloat("LensFlareIntensity", capture_setting.lens_flare_intensity);
+            capture_setting.lens_flare_bokeh_size = settings_json.getFloat("LensFlareBokehSize", capture_setting.lens_flare_bokeh_size);
+            capture_setting.lens_flare_threshold = settings_json.getFloat("LensFlareThreshold", capture_setting.lens_flare_threshold);
+
+            capture_setting.depth_of_field_sensor_width = settings_json.getFloat("DepthOfFieldSensorWidth", capture_setting.depth_of_field_sensor_width);
+            capture_setting.depth_of_field_squeeze_factor = settings_json.getFloat("DepthOfFieldSqueezeFactor", capture_setting.depth_of_field_squeeze_factor);
+            capture_setting.depth_of_field_focal_distance = settings_json.getFloat("DepthOfFieldFocalDistance", capture_setting.depth_of_field_focal_distance);
+            capture_setting.depth_of_field_depth_blur_amount = settings_json.getFloat("DepthOfFieldDepthBlurAmount", capture_setting.depth_of_field_depth_blur_amount);
+            capture_setting.depth_of_field_depth_blur_radius = settings_json.getFloat("DepthOfFieldDepthBlurRadius", capture_setting.depth_of_field_depth_blur_radius);
+            capture_setting.depth_of_field_use_hair_depth = settings_json.getFloat("DepthOfFieldUseHairDepth", capture_setting.depth_of_field_use_hair_depth);
         }
 
         static void loadSubWindowsSettings(const Settings& settings_json, std::vector<SubwindowSetting>& subwindow_settings)

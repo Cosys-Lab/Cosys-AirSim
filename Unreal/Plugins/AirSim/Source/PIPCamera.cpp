@@ -298,7 +298,11 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
     if (distortion_materials_.Num()) {
         for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
             if (distortion_materials_[image_type + 1])
-                captures_[image_type]->PostProcessSettings.RemoveBlendable(distortion_materials_[image_type + 1]);
+            {
+                if (captures_[image_type] != NULL) {
+                    captures_[image_type]->PostProcessSettings.RemoveBlendable(distortion_materials_[image_type + 1]);
+                }
+            }                
         }
         if (distortion_materials_[0])
             camera_->PostProcessSettings.RemoveBlendable(distortion_materials_[0]);
@@ -711,26 +715,40 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
 	{
 		obj.bOverride_MotionBlurMax = 1;
 		obj.MotionBlurMax = setting.motion_blur_max;
-	}
+	} 
+    if (!std::isnan(setting.motion_blur_target_fps))
+    {
+        obj.bOverride_MotionBlurTargetFPS = 1;
+        obj.MotionBlurTargetFPS = setting.motion_blur_target_fps;
+    }
+
     if (setting.auto_exposure_method >= 0) {
         obj.bOverride_AutoExposureMethod = 1;
         obj.AutoExposureMethod = Utils::toEnum<EAutoExposureMethod>(setting.auto_exposure_method);
     }
-    if (!std::isnan(setting.auto_exposure_speed)) {
-        obj.bOverride_AutoExposureSpeedDown = 1;
-        obj.AutoExposureSpeedDown = obj.AutoExposureSpeedUp = setting.auto_exposure_speed;
+    if (!std::isnan(setting.auto_exposure_bias)) {
+        obj.bOverride_AutoExposureBias = 1;
+        obj.AutoExposureBias = setting.auto_exposure_bias;
     }
-    if (!std::isnan(setting.auto_exposure_max_brightness)) {
-        obj.bOverride_AutoExposureMaxBrightness = 1;
-        obj.AutoExposureMaxBrightness = setting.auto_exposure_max_brightness;
+    if (!std::isnan(setting.auto_exposure_apply_physical_camera_exposure)) {
+        obj.bOverride_AutoExposureApplyPhysicalCameraExposure = 1;
+        obj.AutoExposureApplyPhysicalCameraExposure = setting.auto_exposure_apply_physical_camera_exposure ? 1 : 0;
     }
     if (!std::isnan(setting.auto_exposure_min_brightness)) {
         obj.bOverride_AutoExposureMinBrightness = 1;
         obj.AutoExposureMinBrightness = setting.auto_exposure_min_brightness;
     }
-    if (!std::isnan(setting.auto_exposure_bias)) {
-        obj.bOverride_AutoExposureBias = 1;
-        obj.AutoExposureBias = setting.auto_exposure_bias;
+    if (!std::isnan(setting.auto_exposure_max_brightness)) {
+        obj.bOverride_AutoExposureMaxBrightness = 1;
+        obj.AutoExposureMaxBrightness = setting.auto_exposure_max_brightness;
+    }
+    if (!std::isnan(setting.auto_exposure_speed_up)) {
+        obj.bOverride_AutoExposureSpeedUp = 1;
+        obj.AutoExposureSpeedUp = setting.auto_exposure_speed_up;
+    }
+    if (!std::isnan(setting.auto_exposure_speed_down)) {
+        obj.bOverride_AutoExposureSpeedDown = 1;
+        obj.AutoExposureSpeedDown = setting.auto_exposure_speed_down;
     }
     if (!std::isnan(setting.auto_exposure_low_percent)) {
         obj.bOverride_AutoExposureLowPercent = 1;
@@ -748,11 +766,84 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
         obj.bOverride_HistogramLogMax = 1;
         obj.HistogramLogMax = setting.auto_exposure_histogram_log_max;
     }
-	if (!std::isnan(setting.chromatic_aberration_scale))
-	{
-		obj.bOverride_SceneFringeIntensity = 1;
-		obj.SceneFringeIntensity = setting.chromatic_aberration_scale;
-	}
+
+    if (!std::isnan(setting.bloom_intensity)) {
+        obj.bOverride_BloomIntensity = 1;
+        obj.BloomIntensity = setting.bloom_intensity;
+    }
+    if (!std::isnan(setting.bloom_threshold)) {
+        obj.bOverride_BloomThreshold = 1;
+        obj.BloomThreshold = setting.bloom_threshold;
+    }
+
+    if (!std::isnan(setting.chromatic_aberration_intensity)) {
+        obj.bOverride_SceneFringeIntensity = 1;
+        obj.SceneFringeIntensity = setting.chromatic_aberration_intensity;
+    }
+    if (!std::isnan(setting.chromatic_aberration_start_offset)) {
+        obj.bOverride_ChromaticAberrationStartOffset = 1;
+        obj.ChromaticAberrationStartOffset = setting.chromatic_aberration_start_offset;
+    }
+
+    if (!std::isnan(setting.camera_shutter_speed)) {
+        obj.bOverride_CameraShutterSpeed = 1;
+        obj.CameraShutterSpeed = setting.camera_shutter_speed;
+    }
+    if (!std::isnan(setting.camera_iso)) {
+        obj.bOverride_CameraISO = 1;
+        obj.CameraISO = setting.camera_iso;
+    }
+    if (!std::isnan(setting.camera_aperture)) {
+        obj.bOverride_DepthOfFieldFstop = 1;
+        obj.DepthOfFieldFstop = setting.camera_aperture;
+    }
+    if (!std::isnan(setting.camera_max_aperture)) {
+        obj.bOverride_DepthOfFieldMinFstop = 1;
+        obj.DepthOfFieldMinFstop = setting.camera_max_aperture;
+    }
+    if (!std::isnan(setting.camera_num_blades)) {
+        obj.bOverride_DepthOfFieldBladeCount = 1;
+        obj.DepthOfFieldBladeCount = static_cast<int32>(setting.camera_num_blades);
+    }
+
+    if (!std::isnan(setting.lens_flare_intensity)) {
+        obj.bOverride_LensFlareIntensity = 1;
+        obj.LensFlareIntensity = setting.lens_flare_intensity;
+    }
+    if (!std::isnan(setting.lens_flare_bokeh_size)) {
+        obj.bOverride_LensFlareBokehSize = 1;
+        obj.LensFlareBokehSize = setting.lens_flare_bokeh_size;
+    }
+    if (!std::isnan(setting.lens_flare_threshold)) {
+        obj.bOverride_LensFlareThreshold = 1;
+        obj.LensFlareThreshold = setting.lens_flare_threshold;
+    }
+
+    if (!std::isnan(setting.depth_of_field_sensor_width)) {
+        obj.bOverride_DepthOfFieldSensorWidth = 1;
+        obj.DepthOfFieldSensorWidth = setting.depth_of_field_sensor_width;
+    }
+    if (!std::isnan(setting.depth_of_field_squeeze_factor)) {
+        obj.bOverride_DepthOfFieldSqueezeFactor = 1;
+        obj.DepthOfFieldSqueezeFactor = setting.depth_of_field_squeeze_factor;
+    }
+    if (!std::isnan(setting.depth_of_field_focal_distance)) {
+        obj.bOverride_DepthOfFieldFocalDistance = 1;
+        obj.DepthOfFieldFocalDistance = setting.depth_of_field_focal_distance;
+    }
+    if (!std::isnan(setting.depth_of_field_depth_blur_amount)) {
+        obj.bOverride_DepthOfFieldDepthBlurAmount = 1;
+        obj.DepthOfFieldDepthBlurAmount = setting.depth_of_field_depth_blur_amount;
+    }
+    if (!std::isnan(setting.depth_of_field_depth_blur_radius)) {
+        obj.bOverride_DepthOfFieldDepthBlurRadius = 1;
+        obj.DepthOfFieldDepthBlurRadius = setting.depth_of_field_depth_blur_radius;
+    }
+    if (!std::isnan(setting.depth_of_field_use_hair_depth)) {
+        obj.bOverride_DepthOfFieldUseHairDepth = 1;
+        obj.DepthOfFieldUseHairDepth = setting.depth_of_field_use_hair_depth ? 1 : 0;
+    }
+
 }
 
 void APIPCamera::setDistortionMaterial(int image_type, UObject* outer, FPostProcessSettings& obj)
