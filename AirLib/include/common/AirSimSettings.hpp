@@ -265,7 +265,7 @@ namespace airlib
 
             bool FakeMotionBlurEnable = false;
             float FakeMotionBlurDirectionX = 0.0f;
-            float FakeMotionBlurDirectionY = 1.0f;
+            float FakeMotionBlurDirectionY = 0.1f;
             float FakeMotionBlurMovementSpeed = 1.0f;
             float FakeMotionBlurShutterSpeed = 0.0167f;
             float FakeMotionBlurFocalLength = 35.0f;
