@@ -127,7 +127,9 @@ private: //members
     UPROPERTY() UMaterial* radial_blur_material_static_;
     UPROPERTY() UMaterial* guassian_blur_material_static_;
 
-    UPROPERTY() TArray<UMaterialInstanceDynamic*> blur_materials_;
+    UPROPERTY() TArray<UMaterialInstanceDynamic*> fake_motion_blur_materials_;
+    UPROPERTY() TArray<UMaterialInstanceDynamic*> guassian_blur_materials_;
+    UPROPERTY() TArray<UMaterialInstanceDynamic*> radial_blur_materials_;
 
     TMap<FString, int> annotator_name_to_index_map_;
     TMap<FString, TWeakObjectPtr<UPrimitiveComponent>> sphere_annotation_component_map_;
