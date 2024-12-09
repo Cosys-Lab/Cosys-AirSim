@@ -156,7 +156,9 @@ void APIPCamera::BeginPlay()
     noise_materials_.AddZeroed(imageTypeCount() + 1);
     distortion_materials_.AddZeroed(imageTypeCount() + 1);
 	lens_distortion_materials_.AddZeroed(imageTypeCount() + 1);
-    blur_materials_.AddZeroed(imageTypeCount() + 1);
+    fake_motion_blur_materials_.AddZeroed(imageTypeCount() + 1);
+    radial_blur_materials_.AddZeroed(imageTypeCount() + 1);
+    guassian_blur_materials_.AddZeroed(imageTypeCount() + 1);
 
     //by default all image types are disabled
     camera_type_enabled_.assign(imageTypeCount(), false);
@@ -316,13 +318,31 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			camera_->PostProcessSettings.RemoveBlendable(lens_distortion_materials_[0]);
 	}
 
-    if (blur_materials_.Num()) {
+    if (radial_blur_materials_.Num()) {
         for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
-            if (blur_materials_[image_type + 1])
-                captures_[image_type]->PostProcessSettings.RemoveBlendable(blur_materials_[image_type + 1]);
+            if (radial_blur_materials_[image_type + 1])
+                captures_[image_type]->PostProcessSettings.RemoveBlendable(radial_blur_materials_[image_type + 1]);
         }
-        if (blur_materials_[0])
-            camera_->PostProcessSettings.RemoveBlendable(blur_materials_[0]);
+        if (radial_blur_materials_[0])
+            camera_->PostProcessSettings.RemoveBlendable(radial_blur_materials_[0]);
+    }
+
+    if (guassian_blur_materials_.Num()) {
+        for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
+            if (guassian_blur_materials_[image_type + 1])
+                captures_[image_type]->PostProcessSettings.RemoveBlendable(guassian_blur_materials_[image_type + 1]);
+        }
+        if (guassian_blur_materials_[0])
+            camera_->PostProcessSettings.RemoveBlendable(guassian_blur_materials_[0]);
+    }
+
+    if (fake_motion_blur_materials_.Num()) {
+        for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
+            if (fake_motion_blur_materials_[image_type + 1])
+                captures_[image_type]->PostProcessSettings.RemoveBlendable(fake_motion_blur_materials_[image_type + 1]);
+        }
+        if (fake_motion_blur_materials_[0])
+            camera_->PostProcessSettings.RemoveBlendable(fake_motion_blur_materials_[0]);
     }
 
     noise_material_static_ = nullptr;
@@ -334,7 +354,9 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
     motion_blur_material_static_ = nullptr;
     noise_materials_.Empty();
 	lens_distortion_materials_.Empty();
-    blur_materials_.Empty();
+    radial_blur_materials_.Empty();
+    guassian_blur_materials_.Empty();
+    fake_motion_blur_materials_.Empty();
 
     if (distortion_materials_.Num()) {
         for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
@@ -942,8 +964,7 @@ void APIPCamera::setNoiseMaterial(int image_type, UObject* outer, FPostProcessSe
 
     if (settings.FakeMotionBlurEnable) {
         UMaterialInstanceDynamic* motion_blur_material = UMaterialInstanceDynamic::Create(motion_blur_material_static_, outer);
-        blur_materials_[image_type + 1] = motion_blur_material;
-
+        fake_motion_blur_materials_[image_type + 1] = motion_blur_material;
         
         motion_blur_material->SetScalarParameterValue("MotionBlurDirectionX", settings.FakeMotionBlurDirectionX);
         motion_blur_material->SetScalarParameterValue("MotionBlurDirectionY", settings.FakeMotionBlurDirectionY);
@@ -951,21 +972,28 @@ void APIPCamera::setNoiseMaterial(int image_type, UObject* outer, FPostProcessSe
         motion_blur_material->SetScalarParameterValue("MotionBlurShutterSpeed", settings.FakeMotionBlurShutterSpeed);
         motion_blur_material->SetScalarParameterValue("MotionBlurFocalLength", settings.FakeMotionBlurFocalLength);
         motion_blur_material->SetScalarParameterValue("MotionBlurMovementSpeed", settings.FakeMotionBlurSamples);
+
+        obj.AddBlendable(motion_blur_material, 1.0f);
     }
     if (settings.RadialBlurEnable) {
         UMaterialInstanceDynamic* radial_blur_material = UMaterialInstanceDynamic::Create(radial_blur_material_static_, outer);
-        blur_materials_[image_type + 1] = radial_blur_material;
+        radial_blur_materials_[image_type + 1] = radial_blur_material;
+
         radial_blur_material->SetScalarParameterValue("RadialBlurDistance", settings.RadialBlurDistance);
         radial_blur_material->SetScalarParameterValue("RadialBlurRadius", settings.RadialBlurRadius);
         radial_blur_material->SetScalarParameterValue("RadialBlurDensity", settings.RadialBlurDensity);
 
+        obj.AddBlendable(radial_blur_material, 1.0f);
     }
     if (settings.GuassianBlurEnable) {
         UMaterialInstanceDynamic* guassian_blur_material = UMaterialInstanceDynamic::Create(guassian_blur_material_static_, outer);
-        blur_materials_[image_type + 1] = guassian_blur_material;
+        guassian_blur_materials_[image_type + 1] = guassian_blur_material;
+
         guassian_blur_material->SetScalarParameterValue("GuassianDirections", settings.GuassianBlurDirections);
         guassian_blur_material->SetScalarParameterValue("GuassianQuality", settings.GuassianBlurQuality);
         guassian_blur_material->SetScalarParameterValue("GuassianSize", settings.GuassianBlurSize);
+
+        obj.AddBlendable(guassian_blur_material, 1.0f);
     }
 }
 
