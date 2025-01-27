@@ -189,7 +189,7 @@ namespace airlib
             // Exposure settings
             int auto_exposure_method = -1; // 0: Histogram, 1: Basic, 2: Manual
             float auto_exposure_bias = Utils::nan<float>();
-            bool auto_exposure_apply_physical_camera_exposure = false;
+            bool auto_exposure_apply_physical_camera_exposure = true;
             float auto_exposure_min_brightness = Utils::nan<float>();
             float auto_exposure_max_brightness = Utils::nan<float>();
             float auto_exposure_speed_up = Utils::nan<float>();
