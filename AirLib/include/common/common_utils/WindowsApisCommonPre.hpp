@@ -6,7 +6,7 @@
 //following is required to support Unreal Build System
 #if (defined _WIN32 || defined _WIN64) && (defined UE_GAME || defined UE_EDITOR)
 #include "CoreTypes.h"
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "Windows/AllowWindowsPlatformAtomics.h"
 //remove warnings for VC++
