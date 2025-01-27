@@ -181,7 +181,7 @@ void APIPCamera::BeginPlay()
     gimbal_stabilization_ = 0;
     gimbald_rotator_ = this->GetActorRotation();
     this->SetActorTickEnabled(false);
-    
+
 
     if (distortion_param_collection_)
         distortion_param_instance_ = this->GetWorld()->GetParameterCollectionInstance(distortion_param_collection_);
@@ -695,7 +695,6 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                 if (capture_setting.lumen_gi_enabled) {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
                     captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;
-                    
                 }
                 else {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
@@ -799,6 +798,7 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
         obj.bOverride_AutoExposureBias = 1;
         obj.AutoExposureBias = setting.auto_exposure_bias;
     }
+
     obj.bOverride_AutoExposureApplyPhysicalCameraExposure = 1;
     obj.AutoExposureApplyPhysicalCameraExposure = setting.auto_exposure_apply_physical_camera_exposure ? 1 : 0;
 
@@ -1120,8 +1120,8 @@ void APIPCamera::onViewModeChanged(bool nodisplay)
                 if (capture) {
                     setCaptureUpdate(capture, nodisplay);
                 }
-            }           
-        }                
+            }
+        }
     }
 }
 
