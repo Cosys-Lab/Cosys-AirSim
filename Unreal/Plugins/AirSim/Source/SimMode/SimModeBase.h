@@ -24,122 +24,128 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoaded);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResetEvent);
+
+
 UCLASS()
 class AIRSIM_API ASimModeBase : public AActor
 {
 public:
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintAssignable, BlueprintCallable)
+    UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "airsim | Utils")
     FLevelLoaded OnLevelLoaded;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Refs")
+    UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "airsim | Utils")
+    FLevelLoaded FOnResetEvent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "airsim | Utils")
     AAirSimCameraDirector* CameraDirector;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debugging")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "airsim | Utils")
     bool EnableReport = false;
 
-    UFUNCTION(BlueprintCallable, Category = "Recording")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Utils")
     bool toggleRecording();
 
-	UFUNCTION(BlueprintCallable, Category = "Instance Segmentation")
+	UFUNCTION(BlueprintCallable, Category = "airsim | Instance Segmentation")
 	bool AddNewActorToInstanceSegmentation(AActor* Actor, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Instance Segmentation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Instance Segmentation")
     bool DeleteActorFromInstanceSegmentation(AActor* Actor, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Instance Segmentation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Instance Segmentation")
     void ForceUpdateInstanceSegmentation();
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool DoesAnnotationLayerExist(FString annotation_name);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddNewActorToAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddRGBDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FColor color, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateRGBDirectAnnotationTagToActor(FString annotation_name, AActor* actor, FColor color, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateRGBIndexAnnotationTagToActor(FString annotation_name, AActor* actor, int32 index, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateRGBDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, FColor color, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateRGBIndexAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, int32 index, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateGreyscaleAnnotationTagToActor(FString annotation_name, AActor* actor, float greyscale_value, bool update_annotation = true);
   
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateGreyscaleAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, float greyscale_value, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddTextureDirectAnnotationTagToActorByPath(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateTextureDirectAnnotationTagToActorByPath(FString annotation_name, AActor* actor, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, UTexture* texture, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateTextureDirectAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, UTexture* texture, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool EnableTextureByPathAnnotationTagToActor(FString annotation_name, AActor* actor, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool EnableTextureByPathAnnotationTagToComponent(FString annotation_name, UMeshComponent* component, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool DeleteActorFromAnnotation(FString annotation_name, AActor* Actor, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     void ForceUpdateAnnotation(FString annotation_name);
 
-    UFUNCTION(BlueprintCallable, Category = "Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool IsAnnotationRGBValid(FString annotation_name, FColor color);
 
 public:
-    UFUNCTION(BlueprintPure, Category = "Airsim | get stuff")
+    UFUNCTION(BlueprintPure, Category = "airsim | Utils")
     static ASimModeBase* getSimMode();
 
-    UFUNCTION(BlueprintCallable, Category = "Airsim | get stuff")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Utils")
     void toggleLoadingScreen(bool is_visible);
 
-    UFUNCTION(BlueprintCallable, Category = "Airsim | get stuff")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Utils")
     virtual void reset();
 
     // Sets default values for this actor's properties
