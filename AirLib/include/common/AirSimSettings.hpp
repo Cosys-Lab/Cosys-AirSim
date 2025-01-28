@@ -875,7 +875,7 @@ namespace airlib
             for (int i = -1; i < Utils::toNumeric(ImageType::Count); ++i) {
                 capture_settings[i] = CaptureSetting();
             }
-            capture_settings.at(Utils::toNumeric(ImageType::Scene)).target_gamma = CaptureSetting::kSceneTargetGamma;
+            //capture_settings.at(Utils::toNumeric(ImageType::Scene)).target_gamma = CaptureSetting::kSceneTargetGamma;
         }
 
         static void loadCaptureSettings(const Settings& settings_json, CaptureSettingsMap& capture_settings)

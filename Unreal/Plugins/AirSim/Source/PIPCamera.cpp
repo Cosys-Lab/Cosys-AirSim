@@ -631,6 +631,7 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                 if (capture_setting.lumen_gi_enabled) {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
                     captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;
+                    
                 }
                 else {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
@@ -644,7 +645,7 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                     captures_[image_type]->PostProcessSettings.bOverride_ReflectionMethod = 1;
 					captures_[image_type]->PostProcessSettings.ReflectionMethod = EReflectionMethod::None;
                 }
-
+                captures_[image_type]->PostProcessSettings.LumenSurfaceCacheResolution = 1;
                 captures_[image_type]->PostProcessSettings.LumenFinalGatherQuality = capture_setting.lumen_final_quality;
                 captures_[image_type]->PostProcessSettings.LumenSceneDetail = capture_setting.lumen_scene_detail;
                 captures_[image_type]->PostProcessSettings.LumenSceneLightingQuality = capture_setting.lumen_scene_lightning_quality;
