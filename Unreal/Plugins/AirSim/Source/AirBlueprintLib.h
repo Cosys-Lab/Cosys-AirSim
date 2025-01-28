@@ -52,7 +52,7 @@ public:
     static void OnBeginPlay();
     static void OnEndPlay();
     static void LogMessageString(const std::string& prefix, const std::string& suffix, LogDebugLevel level, float persist_sec = 60);
-    UFUNCTION(BlueprintCallable, Category = "Utils")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Utils")
     static void LogMessage(const FString& prefix, const FString& suffix, LogDebugLevel level, float persist_sec = 60);
     static float GetWorldToMetersScale(const AActor* context);
     template <typename T>
@@ -79,17 +79,17 @@ public:
 
     static std::vector<std::string> ListMatchingActorsOriginal(const UObject* context, const std::string& name_regex);
     static std::vector<std::string> ListMatchingActors(const UObject *context, const std::string& name_regex);
-    UFUNCTION(BlueprintCallable, Category = "AirSim|LevelAPI")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Utils")
     static bool loadLevel(UObject* context, const FString& level_name);
-    UFUNCTION(BlueprintCallable, Category = "AirSim|LevelAPI")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Utils")
     static bool spawnPlayer(UWorld* context);
-    UFUNCTION(BlueprintPure, Category = "AirSim|LevelAPI")
+    UFUNCTION(BlueprintPure, Category = "airsim | Utils")
     static TArray<FName> ListWorldsInRegistry();
     static UObject* GetMeshFromRegistry(const std::string& load_object);
     static void GenerateAssetRegistryMap(const UObject* context, TMap<FString, FAssetData>& asset_map);
     static void GenerateActorMap(const UObject* context, TMap<FString, AActor*>& scene_object_map);
 
-    UFUNCTION(BlueprintCallable, Category = "AirSim")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Utils")
     static bool RunConsoleCommand(const AActor* context, const FString& command);
 
     static bool HasObstacle(const AActor* actor, const FVector& start, const FVector& end,
