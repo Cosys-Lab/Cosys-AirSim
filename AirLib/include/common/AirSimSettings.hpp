@@ -171,6 +171,8 @@ namespace airlib
 
             int image_type = 0;
 
+            bool force_update = false; // Force updating the capture every frame, costly for performance!
+
             unsigned int width = 256, height = 144; //960 X 540
             float fov_degrees = Utils::nan<float>(); //90.0f
             float target_gamma = Utils::nan<float>(); //1.0f; //This would be reset to kSceneTargetGamma for scene as default
@@ -1381,8 +1383,9 @@ namespace airlib
 
         static void createCaptureSettings(const msr::airlib::Settings& settings_json, CaptureSetting& capture_setting)
         {
+            capture_setting.force_update = settings_json.getBool("ForceUpdate", capture_setting.force_update);
             capture_setting.width = settings_json.getInt("Width", capture_setting.width);
-            capture_setting.height = settings_json.getInt("Height", capture_setting.height);
+            capture_setting.height = settings_json.getInt("Height", capture_setting.height);            
             capture_setting.fov_degrees = settings_json.getFloat("FOV_Degrees", capture_setting.fov_degrees);
           
             capture_setting.image_type = settings_json.getInt("ImageType", 0);

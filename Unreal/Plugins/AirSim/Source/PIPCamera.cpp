@@ -151,6 +151,7 @@ void APIPCamera::BeginPlay()
     gimbal_stabilization_ = 0;
     gimbald_rotator_ = this->GetActorRotation();
     this->SetActorTickEnabled(false);
+    
 
     if (distortion_param_collection_)
         distortion_param_instance_ = this->GetWorld()->GetParameterCollectionInstance(distortion_param_collection_);
@@ -659,6 +660,10 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
             copyCameraSettingsToAllSceneCapture(camera_); //CinemAirSim
         }
     }
+    if (camera_setting.capture_settings.at(Utils::toNumeric(ImageType::Scene)).force_update){
+        setCameraTypeEnabled(ImageType::Scene, true);
+        setCameraTypeUpdate(ImageType::Scene, false);
+    }
 }
 
 void APIPCamera::updateCaptureComponentSetting(USceneCaptureComponent2D* capture, UTextureRenderTarget2D* render_target,
@@ -1016,12 +1021,16 @@ void APIPCamera::onViewModeChanged(bool nodisplay)
                 }
             }
         }
-        else {
-            USceneCaptureComponent2D* capture = getCaptureComponent(static_cast<ImageType>(image_type), false);
-            if (capture) {
-                setCaptureUpdate(capture, nodisplay);
-            }
-        }        
+        else
+        {
+            if (Utils::toEnum<ImageType>(image_type) != ImageType::Scene)
+            {
+                USceneCaptureComponent2D* capture = getCaptureComponent(static_cast<ImageType>(image_type), false);
+                if (capture) {
+                    setCaptureUpdate(capture, nodisplay);
+                }
+            }           
+        }                
     }
 }
 
