@@ -695,6 +695,7 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                 if (capture_setting.lumen_gi_enabled) {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
                     captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;
+                    
                 }
                 else {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
