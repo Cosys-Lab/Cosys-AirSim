@@ -334,8 +334,11 @@ To disable the rendering of certain objects on specific cameras or all, use the 
 Unreal 5 introduces Lumen lightning. Due to the cameras using scene capture components enabling Lumen for them can be costly on performance. Settings have been added specfically for the scene camera to customize the usage of Lumen for Global Illumination and Reflections. 
 The `LumenGIEnable` and `LumenReflectionEnable` settings enable or disable Lumen for the camera. The `LumenFinalQuality`(0.25-2) setting determines the quality of the final image. The `LumenSceneDetail`(0.25-4) setting determines the quality of the scene. The `LumenSceneLightningDetail`(0.25-2) setting determines the quality of the lightning in the scene.
 
+`ForceUpdate` can be enabled to force a camera (only works for scene) to update the render target every frame. This is costly on performance but can solve issues with with exposure settings not applying for example. 
+
 Below you can find a list of all available settings and their purpose.
 They are settings that are directly transferred to the post-processing settings of cameras of which more documentation can be found [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/post-process-effects-in-unreal-engine). 
+
 
 #### General
 * **Width**: The width of the captured image in pixels. (Default: 256)
@@ -346,6 +349,7 @@ They are settings that are directly transferred to the post-processing settings 
 * **IgnoreMarked**: Whether to ignore objects marked for a specific purpose (e.g., segmentation). (Default: false)
 * **ProjectionMode**: The camera's projection mode ("Perspective" or "Orthographic"). (Default: "Perspective")
 * **OrthoWidth**: The width of the orthographic view frustum. 
+* **ForceUpdate**: Force a camera to update the render target every frame. Costly on performance! Only works for scene camera type. (Default: false)
 
 #### Lumen Global Illumination and Reflections
 * **LumenGIEnable**: Whether Lumen Global Illumination is enabled. (Default: false)
@@ -372,7 +376,7 @@ They are settings that are directly transferred to the post-processing settings 
 #### Exposure
 * **AutoExposureMethod**: Luminance computation method. (0: Histogram, 1: Basic, 2: Manual)
 * **AutoExposureCompensation**: Logarithmic adjustment for the exposure. 0: no adjustment, -1: 2x darker, -2: 4x darker, 1: 2x brighter, 2: 4x brighter, ...
-* **AutoExposureApplyPhysicalCameraExposure**: Enables physical camera exposure using Shutter Speed, ISO, and Aperture. (Only affects Manual exposure mode)
+* **AutoExposureApplyPhysicalCameraExposure**: Enables physical camera exposure using Shutter Speed, ISO, and Aperture. (Only affects Manual exposure mode, default=: true)
 * **AutoExposureMinBrightness**: Minimum brightness for auto exposure adaptation.
 * **AutoExposureMaxBrightness**: Maximum brightness for auto exposure adaptation.
 * **AutoExposureSpeedUp**: Speed of exposure adaptation upwards (in f-stops per second).
