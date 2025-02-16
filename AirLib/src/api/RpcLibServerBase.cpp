@@ -528,6 +528,15 @@ namespace airlib
             getVehicleSimApi(vehicle_name)->setKinematics(state.to(), ignore_collision);
         });
 
+        pimpl_->server.bind("simGetPhysicsRawKinematics", [&](const std::string& vehicle_name) -> void {
+            const Kinematics::State result = getVehicleSimApi(vehicle_name)->getPhysicsRawKinematics();
+            return RpcLibAdaptorsBase::KinematicsState(result);
+        });
+
+        pimpl_->server.bind("simSetPhysicsRawKinematics", [&](const RpcLibAdaptorsBase::KinematicsState& state, const std::string& vehicle_name) -> bool {
+            getVehicleSimApi(vehicle_name)->setPhysicsRawKinematics(state.to());
+        });
+
         pimpl_->server.bind("simGetGroundTruthEnvironment", [&](const std::string& vehicle_name) -> RpcLibAdaptorsBase::EnvironmentState {
             const Environment::State& result = (*getVehicleSimApi(vehicle_name)->getGroundTruthEnvironment()).getState();
             return RpcLibAdaptorsBase::EnvironmentState(result);
