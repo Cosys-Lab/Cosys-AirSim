@@ -28,6 +28,7 @@ STRICT_MODE_OFF //todo what does this do?
 #include <airsim_interfaces/srv/takeoff_group.hpp>
 #include <airsim_interfaces/srv/refresh_instance_segmentation.hpp>
 #include <airsim_interfaces/srv/refresh_object_transforms.hpp>
+#include <airsim_interfaces/srv/list_scene_object_tags.hpp>
 #include <airsim_interfaces/msg/vel_cmd.hpp>
 #include <airsim_interfaces/msg/vel_cmd_group.hpp>
 #include <airsim_interfaces/msg/car_controls.hpp>
@@ -295,6 +296,7 @@ private:
     bool reset_srv_cb(const std::shared_ptr<airsim_interfaces::srv::Reset::Request> request, const std::shared_ptr<airsim_interfaces::srv::Reset::Response> response);
     bool instance_segmentation_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshInstanceSegmentation::Response> response);
     bool object_transforms_refresh_cb(const std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Request> request, const std::shared_ptr<airsim_interfaces::srv::RefreshObjectTransforms::Response> response);
+    bool list_scene_object_tags_srv_cb(const std::shared_ptr<airsim_interfaces::srv::ListSceneObjectTags::Request> request, const std::shared_ptr<airsim_interfaces::srv::ListSceneObjectTags::Response> response);
 
     /// ROS tf broadcasters
     void publish_odom_tf(const nav_msgs::msg::Odometry& odom_msg);
@@ -384,6 +386,7 @@ private:
     rclcpp::Publisher<airsim_interfaces::msg::GPSYaw>::SharedPtr origin_geo_point_pub_; // home geo coord of drones
     msr::airlib::GeoPoint origin_geo_point_; // gps coord of unreal origin
     airsim_interfaces::msg::GPSYaw origin_geo_point_msg_; // todo duplicate
+    rclcpp::Service<airsim_interfaces::srv::ListSceneObjectTags>::SharedPtr list_scene_object_tags_srvr_;
 
     AirSimSettingsParser airsim_settings_parser_;
     std::unordered_map<std::string, std::unique_ptr<VehicleROS>> vehicle_name_ptr_map_;

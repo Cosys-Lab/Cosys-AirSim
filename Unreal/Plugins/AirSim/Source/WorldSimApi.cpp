@@ -377,6 +377,16 @@ std::vector<std::string> WorldSimApi::listSceneObjects(const std::string& name_r
     return result;
 }
 
+std::vector<std::pair<std::string, std::string>> WorldSimApi::listSceneObjectsTags(const std::string& name_regex) const
+{
+    std::vector<std::pair<std::string, std::string>> result;
+    UAirBlueprintLib::RunCommandOnGameThread([this, &name_regex, &result]() {
+        result = UAirBlueprintLib::ListMatchingActorsTags(simmode_, name_regex);
+    },
+        true);
+    return result;
+}
+
 bool WorldSimApi::runConsoleCommand(const std::string& command)
 {
     bool succeeded = false;
