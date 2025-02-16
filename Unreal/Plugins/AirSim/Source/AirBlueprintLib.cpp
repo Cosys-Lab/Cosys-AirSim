@@ -620,6 +620,30 @@ std::vector<std::string> UAirBlueprintLib::ListMatchingActorsOriginal(const UObj
     return results;
 }
 
+std::vector<std::pair<std::string, std::string>> UAirBlueprintLib::ListMatchingActorsTags(const UObject* context, const std::string& name_regex)
+{
+    std::vector<std::pair<std::string, std::string>> results;
+    auto world = context->GetWorld();
+    std::regex compiledRegex(name_regex, std::regex::optimize);
+    for (TActorIterator<AActor> actorIterator(world); actorIterator; ++actorIterator) {
+        AActor* actor = *actorIterator;
+        bool match = false;
+        auto& tags = actor->Tags;
+        for (int32 i = 0; i < tags.Num(); ++i)
+        {
+            auto name = std::string(TCHAR_TO_UTF8(*tags[i].ToString()));
+            match = std::regex_match(name, compiledRegex);
+            if (match)
+            {
+                auto actorName = std::string(TCHAR_TO_UTF8(*actor->GetName()));
+                results.push_back({actorName, name});
+                break;
+            }
+        }
+    }
+    return results;
+}
+
 std::vector<std::string> UAirBlueprintLib::ListMatchingActors(const UObject *context, const std::string& name_regex)
 {
     std::vector<std::string> results;
