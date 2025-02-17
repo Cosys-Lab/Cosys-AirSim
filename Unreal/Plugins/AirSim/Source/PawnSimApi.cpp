@@ -739,7 +739,22 @@ void PawnSimApi::setKinematics(const Kinematics::State& state, bool ignore_colli
     return kinematics_->setState(state);
 }
 
-const msr::airlib::Kinematics::State PawnSimApi::getPhysicsRawKinematics() const
+msr::airlib::Vector3r toVector3r(const FVector vector)
+{
+    return msr::airlib::Vector3r{ msr::airlib::Vector3r::Scalar(vector[0]), 
+                                  msr::airlib::Vector3r::Scalar(vector[1]), 
+                                  msr::airlib::Vector3r::Scalar(vector[2])};
+}
+
+msr::airlib::Quaternionr toQuaternion(const FQuat quat)
+{
+    return msr::airlib::Quaternionr{ msr::airlib::Quaternionr::Scalar(quat.W),
+                                     msr::airlib::Quaternionr::Scalar(quat.X), 
+                                     msr::airlib::Quaternionr::Scalar(quat.Y), 
+                                     msr::airlib::Quaternionr::Scalar(quat.Z) };
+}
+
+msr::airlib::Kinematics::State PawnSimApi::getPhysicsRawKinematics()
 {
     msr::airlib::Kinematics::State state;
 
@@ -750,12 +765,22 @@ const msr::airlib::Kinematics::State PawnSimApi::getPhysicsRawKinematics() const
         return state;
     }
 
-    state.pose.position = PrimComp->GetComponentLocation();
-    state.pose.orientation = PrimComp->GetComponentQuat();
-    state.twist.linear = PrimComp->GetPhysicsLinearVelocity();
-    state.twist.angular = PrimComp->GetPhysicsAngularVelocityInDegrees();
+    state.pose.position = toVector3r(PrimComp->GetComponentLocation());
+    state.pose.orientation = toQuaternion(PrimComp->GetComponentQuat());
+    state.twist.linear = toVector3r(PrimComp->GetPhysicsLinearVelocity());
+    state.twist.angular = toVector3r(PrimComp->GetPhysicsAngularVelocityInDegrees());
 
     return state;
+}
+
+FVector toFVector(const msr::airlib::Vector3r vector)
+{
+    return FVector{ vector[0], vector[1], vector[2]};
+}
+
+FQuat toQuaternion(const msr::airlib::Quaternionr quat)
+{
+    return FQuat{ quat.x(), quat.y(), quat.z(), quat.w()};
 }
 
 void PawnSimApi::setPhysicsRawKinematics(const Kinematics::State& state)
@@ -768,12 +793,12 @@ void PawnSimApi::setPhysicsRawKinematics(const Kinematics::State& state)
             return;
         }
         // Set position and rotation
-        PrimComp->SetWorldLocation(state.pose.position);
-        PrimComp->SetWorldRotation(state.pose.orientation);
+        PrimComp->SetWorldLocation(toFVector(state.pose.position));
+        PrimComp->SetWorldRotation(toQuaternion(state.pose.orientation));
 
         // Set linear and angular velocity
-        PrimComp->SetPhysicsLinearVelocity(state.twist.linear, false);
-        PrimComp->SetPhysicsAngularVelocityInDegrees(state.twist.angular, false);
+        PrimComp->SetPhysicsLinearVelocity(toFVector(state.twist.linear), false);
+        PrimComp->SetPhysicsAngularVelocityInDegrees(toFVector(state.twist.angular), false);
 
         // Force update physics state
         PrimComp->SyncComponentToRBPhysics();
