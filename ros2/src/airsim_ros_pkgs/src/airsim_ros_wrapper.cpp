@@ -406,6 +406,8 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
     // todo add per vehicle reset in AirLib API
     reset_srvr_ = nh_->create_service<airsim_interfaces::srv::Reset>("~/reset", std::bind(&AirsimROSWrapper::reset_srv_cb, this, _1, _2));
 
+    list_scene_object_tags_srvr_ = nh_->create_service<airsim_interfaces::srv::ListSceneObjectTags>("~/list_scene_object_tags", std::bind(&AirsimROSWrapper::list_scene_object_tags_srv_cb, this, _1, _2));
+
     if (publish_clock_) {
         clock_pub_ = nh_->create_publisher<rosgraph_msgs::msg::Clock>("~/clock", 1);
     }
@@ -601,6 +603,20 @@ bool AirsimROSWrapper::reset_srv_cb(std::shared_ptr<airsim_interfaces::srv::Rese
 
     airsim_client_->reset();
     return true; //todo
+}
+
+bool AirsimROSWrapper::list_scene_object_tags_srv_cb(const std::shared_ptr<airsim_interfaces::srv::ListSceneObjectTags::Request> request, const std::shared_ptr<airsim_interfaces::srv::ListSceneObjectTags::Response> response)
+{
+    std::lock_guard<std::mutex> guard(control_mutex_);
+    std::string regex_name = request->regex_name.empty() ? ".*": request->regex_name;
+    std::vector<std::pair<std::string, std::string>> first_tag = airsim_client_->simListSceneObjectsTags(regex_name);
+
+    for(const auto& pair: first_tag)
+    {
+        response->objects.push_back(pair.first);
+        response->tags.push_back(pair.second);
+    }
+    return true;
 }
 
 tf2::Quaternion AirsimROSWrapper::get_tf2_quat(const msr::airlib::Quaternionr& airlib_quat) const

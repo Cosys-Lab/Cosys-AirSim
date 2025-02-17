@@ -9,6 +9,7 @@
 #include "AssetRegistry/AssetData.h"
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include <string>
+#include <utility>
 
 class WorldSimApi : public msr::airlib::WorldSimApiBase
 {
@@ -73,6 +74,7 @@ public:
     virtual bool setObjectMaterial(const std::string& object_name, const std::string& material_name, const int component_id = 0) override;
     virtual bool setObjectMaterialFromTexture(const std::string& object_name, const std::string& texture_path, const int component_id = 0) override;
     virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const override;
+    virtual std::vector<std::pair<std::string, std::string>> listSceneObjectsTags(const std::string& name_regex) const override;
     virtual Pose getObjectPose(const std::string& object_name, bool ned = true) const override;
     virtual bool setObjectPose(const std::string& object_name, const Pose& pose, bool teleport) override;
     virtual bool runConsoleCommand(const std::string& command) override;

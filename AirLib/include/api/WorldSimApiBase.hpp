@@ -80,6 +80,7 @@ namespace airlib
         virtual void simPlotTransformsWithNames(const vector<Pose>& poses, const vector<std::string>& names, float tf_scale, float tf_thickness, float text_scale, const vector<float>& text_color_rgba, float duration) = 0;
 
         virtual std::vector<std::string> listSceneObjects(const std::string& name_regex) const = 0;
+        virtual std::vector<std::pair<std::string, std::string>> listSceneObjectsTags(const std::string& name_regex) const = 0;
         virtual std::vector<std::string> listInstanceSegmentationObjects() const = 0;
         virtual std::vector<Vector3r> getInstanceSegmentationColorMap() const = 0;
         virtual std::vector<Pose> listInstanceSegmentationPoses(bool ned = true, bool only_visible = false) const = 0;

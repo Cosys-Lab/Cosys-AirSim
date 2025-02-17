@@ -565,6 +565,11 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("simListSceneObjects", name_regex).as<vector<string>>();
         }
 
+        vector<std::pair<string, string> > RpcLibClientBase::simListSceneObjectsTags(const string& name_regex) const
+        {
+            return pimpl_->client.call("simListSceneObjectsTags", name_regex).as<vector<std::pair<string, string>>>();
+        }
+
         vector<string> RpcLibClientBase::simListInstanceSegmentationObjects() const
         {
             return pimpl_->client.call("simListInstanceSegmentationObjects").as<vector<string>>();
