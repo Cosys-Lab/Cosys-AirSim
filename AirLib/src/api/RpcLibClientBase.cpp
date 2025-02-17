@@ -667,20 +667,22 @@ __pragma(warning(disable : 4239))
         {
             return pimpl_->client.call("simGetGroundTruthKinematics", vehicle_name).as<RpcLibAdaptorsBase::KinematicsState>().to();
         }
-        msr::airlib::Kinematics::State RpcLibClientBase::simGetPhysicsRawKinematics(const std::string& vehicle_name)
+
+        msr::airlib::Kinematics::State RpcLibClientBase::simGetPhysicsRawKinematics(const std::string& vehicle_name) const
         {
-            return pimpl_->client.call("simGetPhysicsRawKinematics", vehicle_name).as<Kinematics::State>();
+            return pimpl_->client.call("simGetPhysicsRawKinematics", vehicle_name).as<RpcLibAdaptorsBase::KinematicsState>().to();
         }
 
-        msr::airlib::Kinematics::State RpcLibClientBase::simSetPhysicsRawKinematics(const msr::airlib::Kinematics::State& state, const std::string& vehicle_name)
+        void RpcLibClientBase::simSetPhysicsRawKinematics(const msr::airlib::Kinematics::State& state, const std::string& vehicle_name)
         {
-            pimpl_->client.call("simSetPhysicsRawKinematics", state, vehicle_name);
+            pimpl_->client.call("simSetPhysicsRawKinematics", RpcLibAdaptorsBase::KinematicsState(state), vehicle_name);
         }
+
         msr::airlib::Environment::State RpcLibClientBase::simGetGroundTruthEnvironment(const std::string& vehicle_name) const
         {
             return pimpl_->client.call("simGetGroundTruthEnvironment", vehicle_name).as<RpcLibAdaptorsBase::EnvironmentState>().to();
-            ;
         }
+
         bool RpcLibClientBase::simCreateVoxelGrid(const msr::airlib::Vector3r& position, const int& x, const int& y, const int& z, const float& res, const std::string& output_file)
         {
             return pimpl_->client.call("simCreateVoxelGrid", RpcLibAdaptorsBase::Vector3r(position), x, y, z, res, output_file).as<bool>();
