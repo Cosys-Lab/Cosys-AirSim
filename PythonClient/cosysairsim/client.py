@@ -1229,6 +1229,38 @@ class VehicleClient:
         """
         self.client.call('simSetKinematics', state, ignore_collision, vehicle_name)
 
+    def simGetPhysicsRawKinematics(self, vehicle_name=''):
+        """
+        Get Physics engine raw kinematics of the vehicle
+
+        The position inside the returned KinematicsState is physics engine coordinate system, not Airsim
+        If you save it then you can load it back with simSetPhysicsRawKinematics
+        Accelaration is not used
+
+        Args:
+            vehicle_name (str, optional): Name of the vehicle
+
+        Returns:
+            KinematicsState: Physics engine raw kinematics
+        """
+        kinematics_state = self.client.call('simGetGroundTruthKinematics', vehicle_name)
+        return KinematicsState.from_msgpack(kinematics_state)
+
+    simGetPhysicsRawKinematics.__annotations__ = {'return': KinematicsState}
+
+    def simSetPhysicsRawKinematics(self, state, vehicle_name=''):
+        """
+        Set Physics engine raw kinematics of the vehicle
+
+        Need to be simGetPhysicsRawKinematics value or same coordinate system
+        Accelaration is not used
+
+        Args:
+            state (KinematicsState): Desired Pose pf the vehicle
+            vehicle_name (str, optional): Name of the vehicle to move
+        """
+        self.client.call('simSetPhysicsRawKinematics', state, vehicle_name)
+
     def simGetGroundTruthEnvironment(self, vehicle_name=''):
         """
         Get ground truth environment state

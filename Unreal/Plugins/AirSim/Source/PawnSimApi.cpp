@@ -577,6 +577,48 @@ void PawnSimApi::setKinematics(const Kinematics::State& state, bool ignore_colli
 
     return kinematics_->setState(state);
 }
+
+const msr::airlib::Kinematics::State PawnSimApi::getPhysicsRawKinematics() const
+{
+    msr::airlib::Kinematics::State state;
+
+    UPrimitiveComponent* PrimComp = dynamic_cast<UPrimitiveComponent*>(getPawn()->GetRootComponent());
+    if (PrimComp == nullptr)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PrimComp nullptr"))
+        return state;
+    }
+
+    state.pose.position = PrimComp->GetComponentLocation();
+    state.pose.orientation = PrimComp->GetComponentQuat();
+    state.twist.linear = PrimComp->GetPhysicsLinearVelocity();
+    state.twist.angular = PrimComp->GetPhysicsAngularVelocityInDegrees();
+
+    return state;
+}
+
+void PawnSimApi::setPhysicsRawKinematics(const Kinematics::State& state)
+{
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        UPrimitiveComponent* PrimComp = dynamic_cast<UPrimitiveComponent*>(getPawn()->GetRootComponent());
+        if (PrimComp == nullptr)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("PrimComp nullptr"))
+            return;
+        }
+        // Set position and rotation
+        PrimComp->SetWorldLocation(state.pose.position);
+        PrimComp->SetWorldRotation(state.pose.orientation);
+
+        // Set linear and angular velocity
+        PrimComp->SetPhysicsLinearVelocity(state.twist.linear, false);
+        PrimComp->SetPhysicsAngularVelocityInDegrees(state.twist.angular, false);
+
+        // Force update physics state
+        PrimComp->SyncComponentToRBPhysics();
+    }, true);
+}
+
 const msr::airlib::Environment* PawnSimApi::getGroundTruthEnvironment() const
 {
     return environment_.get();
