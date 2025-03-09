@@ -3,6 +3,7 @@
 * Added fake motion blur, guassian blur and radial blur noise effects to the camera settings.
 * Added ForceUpdate to CaptureSettings to force it update every render frame. can fix issues with post processing not applying correctly or other bugs related to camera appearing not correct.
 * Updated documentation for capture and noise camera settings to include all available parameters.
+* Fixed annotation names not always containing staticmesh name if available
 
 ### November/December 2024 (version 3.2)
 * Unreal 5.2.1 is now long term support and will continue to get releases build for it and new features and fixes added to it. 
