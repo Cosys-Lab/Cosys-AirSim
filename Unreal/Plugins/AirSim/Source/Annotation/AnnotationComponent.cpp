@@ -377,7 +377,7 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(USkeletalMeshCompon
 
 	// Only create a scene proxy for rendering if properly initialized
 	if (SkelMeshRenderData &&
-		SkelMeshRenderData->LODRenderData.IsValidIndex(SkeletalMeshComponent->PredictedLODLevel) &&
+		SkelMeshRenderData->LODRenderData.IsValidIndex(SkeletalMeshComponent->GetPredictedLODLevel()) &&
 		SkeletalMeshComponent->MeshObject) // The risk of using MeshObject
 	{
 		// Only create a scene proxy if the bone count being used is supported, or if we don't have a skeleton (this is the case with destructibles)
