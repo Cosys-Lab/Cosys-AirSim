@@ -370,7 +370,7 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(USkeletalMeshCompon
 {
 	UMaterialInterface* ProxyMaterial = AnnotationMID; // Material Instance Dynamic
 
-	ERHIFeatureLevel::Type SceneFeatureLevel = GetWorld()->FeatureLevel;
+	ERHIFeatureLevel::Type SceneFeatureLevel = GetWorld()->GetFeatureLevel();
 
 	// Ref: https://github.com/EpicGames/UnrealEngine/blob/4.19/Engine/Source/Runtime/Engine/Private/Components/SkinnedMeshComponent.cpp#L415
 	FSkeletalMeshRenderData* SkelMeshRenderData = SkeletalMeshComponent->GetSkeletalMeshRenderData();
