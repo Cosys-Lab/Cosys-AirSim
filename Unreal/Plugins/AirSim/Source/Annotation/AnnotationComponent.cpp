@@ -6,20 +6,22 @@
 // Overwrite the material
 
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
-#include "Runtime/Engine/Classes/Materials/Material.h"
-#include "Runtime/Engine/Classes/Materials/MaterialInstanceDynamic.h"
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "Runtime/Engine/Public/MaterialShared.h"
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "AirBlueprintLib.h"
-
+#if ENGINE_MAJOR_VERSION < 5
+#include "Runtime/Engine/Classes/Materials/Material.h"
+#include "Runtime/Engine/Classes/Materials/MaterialInstanceDynamic.h"
+#endif
 #if ENGINE_MAJOR_VERSION >= 5
 //different header files in UE
+#include "Runtime/Engine/Public/Materials/Material.h"
+#include "Runtime/Engine/Public/Materials/MaterialInstanceDynamic.h"
 #include "Runtime/Engine/Public/StaticMeshSceneProxy.h"
 #include "Runtime/Engine/Public/SkeletalMeshSceneProxy.h"
-
 #endif
 #include "Runtime/Engine/Public/Rendering/SkeletalMeshRenderData.h"
 
