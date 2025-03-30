@@ -28,8 +28,8 @@ namespace msr
                 return static_cast<ComputerVisionApiBase*>(RpcLibServerBase::getVehicleApi(vehicle_name));
             }
         };
-
-#endif
     }
 } //namespace
+
+#endif
 #endif
