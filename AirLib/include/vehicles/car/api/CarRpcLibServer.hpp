@@ -28,8 +28,8 @@ namespace airlib
             return static_cast<CarApiBase*>(RpcLibServerBase::getVehicleApi(vehicle_name));
         }
     };
-
-#endif
 }
 } //namespace
+
+#endif
 #endif
