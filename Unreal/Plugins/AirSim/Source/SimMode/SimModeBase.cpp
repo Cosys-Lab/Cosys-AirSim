@@ -13,7 +13,6 @@
 #include "AirBlueprintLib.h"
 #include "Annotation/ObjectAnnotator.h"
 #include "LidarCamera.h"
-
 #include "api/VehicleApiBase.hpp"
 #include "common/AirSimSettings.hpp"
 #include "common/ScalableClock.hpp"
@@ -1343,7 +1342,7 @@ bool ASimModeBase::SetWorldLightVisibility(const std::string& light_name, bool i
     {
         UAirBlueprintLib::RunCommandOnGameThread([this, light_name, is_visible]() {
             ALight* light = world_lights_[FString(light_name.c_str())];
-            light->SetVisibility(is_visible);
+            light->SetEnabled(is_visible);
         }, true);        
         return true;
     }
@@ -1799,7 +1798,7 @@ std::unique_ptr<PawnSimApi> ASimModeBase::createVehicleApi(APawn* vehicle_pawn)
     const auto& home_geopoint = msr::airlib::EarthUtils::nedToGeodetic(pawn_ned_pos, getSettings().origin_geopoint);
     const std::string vehicle_name(TCHAR_TO_UTF8(*(vehicle_pawn->GetName())));
 
-    PawnSimApi::Params pawn_sim_api_params(vehicle_pawn, &getGlobalNedTransform(), getVehiclePawnEvents(vehicle_pawn), getVehiclePawnCameras(vehicle_pawn), pip_camera_class, collision_display_template, home_geopoint, vehicle_name);
+    PawnSimApi::Params pawn_sim_api_params(vehicle_pawn, &getGlobalNedTransform(), getVehiclePawnEvents(vehicle_pawn), getVehiclePawnCameras(vehicle_pawn), pip_camera_class, getVehiclePawnLights(vehicle_pawn), collision_display_template, home_geopoint, vehicle_name);
 
     std::unique_ptr<PawnSimApi> vehicle_sim_api = createVehicleSimApi(pawn_sim_api_params);
     auto vehicle_sim_api_p = vehicle_sim_api.get();
@@ -2003,32 +2002,52 @@ void ASimModeBase::setupVehiclesAndCamera()
                 light_spawn_params.bDeferConstruction = true;
 
                 //spawn the right type of light, set specific settings and attach to pawn
-                ALight* light;
-                if (setting.type ==2) // Rect light
+                ALight* light = nullptr;
+                if (world_light_settings.type ==2) // Rect light
                 {
                     ARectLight* rectLight = GetWorld()->SpawnActor<ARectLight>(spawn_position, spawn_rotation, light_spawn_params);
                     if (IsValid(rectLight))
                     {
                         URectLightComponent* rectLightComponent = rectLight->GetComponentByClass<URectLightComponent>();
-                        rectLightComponent->SetSourceWidth(setting.source_width);
-                        rectLightComponent->SetSourceHeight(setting.source_height);
-                        rectLightComponent->SetBarnDoorAngle(setting.barn_door_angle);
-                        rectLightComponent->SetBarnDoorLength(setting.barn_door_length);                
-                        rectLightComponent->SetAttenuationRadius(setting.attenuation_radius);
-                        rectLight->FinishSpawning(light_transform);
+                        rectLightComponent->SetSourceWidth(world_light_settings.source_width);
+                        rectLightComponent->SetSourceHeight(world_light_settings.source_height);
+                        rectLightComponent->SetBarnDoorAngle(world_light_settings.barn_door_angle);
+                        rectLightComponent->SetBarnDoorLength(world_light_settings.barn_door_length);                
+                        rectLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
+                        if (world_light_settings.intensity_unit == 2)
+                        {
+                            rectLightComponent->SetIntensityUnits(ELightUnits::EV);
+                        }else if (world_light_settings.intensity_unit == 1)
+                        {
+                            rectLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                        }else
+                        {
+                            rectLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                        }
+                        rectLight->FinishSpawning(FTransform(spawn_rotation, spawn_position));
                         light = static_cast<ALight*>(rectLight);
                     }           
-                }else if (setting.type == 1) // Point light
+                }else if (world_light_settings.type == 1) // Point light
                 {
                     APointLight* pointLight = GetWorld()->SpawnActor<APointLight>(spawn_position, spawn_rotation, light_spawn_params);
                     if (IsValid(pointLight))
                     {
                         UPointLightComponent* pointLightComponent = pointLight->GetComponentByClass<UPointLightComponent>();
-                        pointLightComponent->SetSourceRadius(setting.source_radius);
-                        pointLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
-                        pointLightComponent->SetSourceLength(setting.source_length);
-                        pointLightComponent->SetAttenuationRadius(setting.attenuation_radius);
-                        pointLight->FinishSpawning(light_transform);
+                        pointLightComponent->SetSourceRadius(world_light_settings.source_radius);
+                        pointLightComponent->SetSoftSourceRadius(world_light_settings.source_soft_radius);
+                        pointLightComponent->SetSourceLength(world_light_settings.source_length);
+                        pointLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
+                        if (world_light_settings.intensity_unit == 2)
+                        {
+                            pointLightComponent->SetIntensityUnits(ELightUnits::EV);
+                        }else if (world_light_settings.intensity_unit == 1)
+                        {
+                            pointLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                        }else
+                        {
+                            pointLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                        }
+                        pointLight->FinishSpawning(FTransform(spawn_rotation, spawn_position));
                         light = static_cast<ALight*>(pointLight);
                     }
                 }else // Spot Light
@@ -2037,11 +2056,21 @@ void ASimModeBase::setupVehiclesAndCamera()
                     if (IsValid(spotLight))
                     {
                         USpotLightComponent* spotLightComponent = spotLight->GetComponentByClass<USpotLightComponent>();
-                        spotLightComponent->SetSourceRadius(setting.source_radius);
-                        spotLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
-                        spotLightComponent->SetSourceLength(setting.source_length);
-                        spotLightComponent->SetAttenuationRadius(setting.attenuation_radius);
-                        spotLight->FinishSpawning(light_transform);
+                        spotLightComponent->SetSourceRadius(world_light_settings.source_radius);
+                        spotLightComponent->SetSoftSourceRadius(world_light_settings.source_soft_radius);
+                        spotLightComponent->SetSourceLength(world_light_settings.source_length);
+                        spotLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
+                        if (world_light_settings.intensity_unit == 2)
+                        {
+                            spotLightComponent->SetIntensityUnits(ELightUnits::EV);
+                        }else if (world_light_settings.intensity_unit == 1)
+                        {
+                            spotLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                        }else
+                        {
+                            spotLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                        }
+                        spotLight->FinishSpawning(FTransform(spawn_rotation, spawn_position));
                         light = static_cast<ALight*>(spotLight);
                     }
                 }
@@ -2050,27 +2079,17 @@ void ASimModeBase::setupVehiclesAndCamera()
                 {
                     // Set other common settings
                     ULightComponent* lightComponent = light->GetComponentByClass<ULightComponent>();
-                    if (setting.intensity_unit == 2)
-                    {
-                        lightComponent->SetIntensityUnits(ELightUnits::EV);
-                    }else if (setting.intensity_unit == 1)
-                    {
-                        lightComponent->SetIntensityUnits(ELightUnits::Lumens);
-                    }else
-                    {
-                        lightComponent->SetIntensityUnits(ELightUnits::Candelas);
-                    }
-                    lightComponent->SetIntensity(setting.intensity);            
-                    lightComponent->SetCastShadows(setting.cast_shadows);
-                    if (setting.cast_shadows)
+                    lightComponent->SetIntensity(world_light_settings.intensity);            
+                    lightComponent->SetCastShadows(world_light_settings.cast_shadows);
+                    if (world_light_settings.cast_shadows)
                     {
                         lightComponent->SetCastVolumetricShadow(true);                
                     }
                     lightComponent->SetUseTemperature(true);
-                    lightComponent->SetTemperature(setting.temperature);            
-                    lightComponent->SetVisibility(setting.enable);
+                    lightComponent->SetTemperature(world_light_settings.temperature);            
+                    lightComponent->SetVisibility(world_light_settings.enable);
                     
-                    world_lights_[setting.name] = light;
+                    world_lights_[FString(world_light_settings.name.c_str())] = light;
                 }
             }
         }
@@ -2141,6 +2160,13 @@ const common_utils::UniqueValueMap<std::string, APIPCamera*> ASimModeBase::getVe
 
     //derived class should override this method to retrieve types of pawns they support
     return common_utils::UniqueValueMap<std::string, APIPCamera*>();
+}
+const common_utils::UniqueValueMap<std::string, ALight*> ASimModeBase::getVehiclePawnLights(APawn* pawn) const
+{
+    unused(pawn);
+
+    //derived class should override this method to retrieve types of pawns they support
+    return common_utils::UniqueValueMap<std::string, ALight*>();
 }
 void ASimModeBase::initializeVehiclePawn(APawn* pawn)
 {
