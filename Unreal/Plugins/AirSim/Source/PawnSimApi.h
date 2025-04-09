@@ -81,6 +81,8 @@ public: //implementation of VehicleSimApiBase
     virtual void setPose(const Pose& pose, bool ignore_collision) override;
     virtual msr::airlib::CameraInfo getCameraInfo(const std::string& camera_name) const override;
     virtual void setCameraOrientation(const std::string& camera_name, const Quaternionr& orientation) override;
+    virtual bool setLightVisibility(const std::string& light_name, bool is_visible) override;
+    virtual bool setLightIntensity(const std::string& light_name, float intensity) override;
     virtual CollisionInfo getCollisionInfo() const override;
     virtual CollisionInfo getCollisionInfoAndReset() override;
     virtual int getRemoteControlID() const override;
@@ -115,6 +117,9 @@ public: //Unreal specific methods
     APIPCamera* getCamera(const std::string& camera_name);
     int getCameraCount();
 
+    const ALight* getLight(const std::string& light_name) const;
+    ALight* getLight(const std::string& light_name);
+    
     virtual bool testLineOfSightToPoint(const msr::airlib::GeoPoint& point) const;
 
     //if enabled, this would show some flares
@@ -140,7 +145,9 @@ private: //methods
     void allowPassthroughToggleInput();
     void detectUsbRc();
     void setupCamerasFromSettings(const common_utils::UniqueValueMap<std::string, APIPCamera*>& cameras);
+    void setupLightsFromSettings(const common_utils::UniqueValueMap<std::string, ALight*>& lights);
     void createCamerasFromSettings();
+    void createAndInitializeFromSettings();
     //on collision, pawns should update this
     void onCollision(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp,
                      bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit);
@@ -157,6 +164,7 @@ private: //vars
 
     Params params_;
     common_utils::UniqueValueMap<std::string, APIPCamera*> cameras_;
+    common_utils::UniqueValueMap<std::string, ALight*> lights_;
     msr::airlib::GeoPoint home_geo_point_;
 
     std::string vehicle_name_;

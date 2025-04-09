@@ -1336,6 +1336,33 @@ void ASimModeBase::AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorT
     }
 }
 
+
+bool ASimModeBase::SetWorldLightVisibility(const std::string& light_name, bool is_visible)
+{
+    if (world_lights_.Contains(FString(light_name.c_str())) == true)
+    {
+        UAirBlueprintLib::RunCommandOnGameThread([this, light_name, is_visible]() {
+            ALight* light = world_lights_[FString(light_name.c_str())];
+            light->SetVisibility(is_visible);
+        }, true);        
+        return true;
+    }
+    return false;
+}
+
+bool ASimModeBase::SetWorldLightIntensity(const std::string& light_name, float intensity)
+{
+    if (world_lights_.Contains(FString(light_name.c_str())) == true)
+    {
+        UAirBlueprintLib::RunCommandOnGameThread([this, light_name, intensity]() {
+            ALight* light = world_lights_[FString(light_name.c_str())];
+            light->SetBrightness(intensity);
+        }, true);
+        return true;
+    }
+    return false;
+}
+
 void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     FRecordingThread::stopRecording();
@@ -1955,6 +1982,96 @@ void ASimModeBase::setupVehiclesAndCamera()
                 spawned_passive_echo_beacon->draw_debug_all_lines_ = passive_echo_beacon_setting.draw_debug_all_lines;
                 spawned_passive_echo_beacon->draw_debug_duration_ = passive_echo_beacon_setting.draw_debug_duration;
                 spawned_passive_echo_beacon->FinishSpawning(FTransform(spawn_rotation, spawn_position));
+            }
+        }
+
+        // Add world lights from settings
+        for (auto const& world_light_setting_pair : getSettings().world_lights)
+        {
+            const auto& world_light_settings = *world_light_setting_pair.second;
+            //compute initial pose
+            if (world_light_settings.enable) {
+                FVector spawn_position = FVector(0, 0, 0);
+                msr::airlib::Vector3r settings_position = world_light_settings.position;
+                if (!msr::airlib::VectorMath::hasNan(settings_position))
+                    spawn_position = global_ned_transform_->toFVector(settings_position, 100, true);
+                FRotator spawn_rotation = toFRotator(world_light_settings.rotation, FRotator());
+
+                FActorSpawnParameters light_spawn_params;
+                light_spawn_params.Name = FName(world_light_settings.name.c_str());
+                light_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+                light_spawn_params.bDeferConstruction = true;
+
+                //spawn the right type of light, set specific settings and attach to pawn
+                ALight* light;
+                if (setting.type ==2) // Rect light
+                {
+                    ARectLight* rectLight = GetWorld()->SpawnActor<ARectLight>(spawn_position, spawn_rotation, light_spawn_params);
+                    if (IsValid(rectLight))
+                    {
+                        URectLightComponent* rectLightComponent = rectLight->GetComponentByClass<URectLightComponent>();
+                        rectLightComponent->SetSourceWidth(setting.source_width);
+                        rectLightComponent->SetSourceHeight(setting.source_height);
+                        rectLightComponent->SetBarnDoorAngle(setting.barn_door_angle);
+                        rectLightComponent->SetBarnDoorLength(setting.barn_door_length);                
+                        rectLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                        rectLight->FinishSpawning(light_transform);
+                        light = static_cast<ALight*>(rectLight);
+                    }           
+                }else if (setting.type == 1) // Point light
+                {
+                    APointLight* pointLight = GetWorld()->SpawnActor<APointLight>(spawn_position, spawn_rotation, light_spawn_params);
+                    if (IsValid(pointLight))
+                    {
+                        UPointLightComponent* pointLightComponent = pointLight->GetComponentByClass<UPointLightComponent>();
+                        pointLightComponent->SetSourceRadius(setting.source_radius);
+                        pointLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
+                        pointLightComponent->SetSourceLength(setting.source_length);
+                        pointLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                        pointLight->FinishSpawning(light_transform);
+                        light = static_cast<ALight*>(pointLight);
+                    }
+                }else // Spot Light
+                {
+                    ASpotLight* spotLight = GetWorld()->SpawnActor<ASpotLight>(spawn_position, spawn_rotation, light_spawn_params);
+                    if (IsValid(spotLight))
+                    {
+                        USpotLightComponent* spotLightComponent = spotLight->GetComponentByClass<USpotLightComponent>();
+                        spotLightComponent->SetSourceRadius(setting.source_radius);
+                        spotLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
+                        spotLightComponent->SetSourceLength(setting.source_length);
+                        spotLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                        spotLight->FinishSpawning(light_transform);
+                        light = static_cast<ALight*>(spotLight);
+                    }
+                }
+
+                if (IsValid(light))
+                {
+                    // Set other common settings
+                    ULightComponent* lightComponent = light->GetComponentByClass<ULightComponent>();
+                    if (setting.intensity_unit == 2)
+                    {
+                        lightComponent->SetIntensityUnits(ELightUnits::EV);
+                    }else if (setting.intensity_unit == 1)
+                    {
+                        lightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                    }else
+                    {
+                        lightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                    }
+                    lightComponent->SetIntensity(setting.intensity);            
+                    lightComponent->SetCastShadows(setting.cast_shadows);
+                    if (setting.cast_shadows)
+                    {
+                        lightComponent->SetCastVolumetricShadow(true);                
+                    }
+                    lightComponent->SetUseTemperature(true);
+                    lightComponent->SetTemperature(setting.temperature);            
+                    lightComponent->SetVisibility(setting.enable);
+                    
+                    world_lights_[setting.name] = light;
+                }
             }
         }
 
