@@ -2006,6 +2006,7 @@ void ASimModeBase::setupVehiclesAndCamera()
                 if (world_light_settings.type ==2) // Rect light
                 {
                     ARectLight* rectLight = GetWorld()->SpawnActor<ARectLight>(spawn_position, spawn_rotation, light_spawn_params);
+                    rectLight->SetMobility(EComponentMobility::Movable);
                     if (IsValid(rectLight))
                     {
                         URectLightComponent* rectLightComponent = rectLight->GetComponentByClass<URectLightComponent>();
@@ -2030,12 +2031,12 @@ void ASimModeBase::setupVehiclesAndCamera()
                 }else if (world_light_settings.type == 1) // Point light
                 {
                     APointLight* pointLight = GetWorld()->SpawnActor<APointLight>(spawn_position, spawn_rotation, light_spawn_params);
+                    pointLight->SetMobility(EComponentMobility::Movable);
                     if (IsValid(pointLight))
                     {
                         UPointLightComponent* pointLightComponent = pointLight->GetComponentByClass<UPointLightComponent>();
                         pointLightComponent->SetSourceRadius(world_light_settings.source_radius);
                         pointLightComponent->SetSoftSourceRadius(world_light_settings.source_soft_radius);
-                        pointLightComponent->SetSourceLength(world_light_settings.source_length);
                         pointLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
                         if (world_light_settings.intensity_unit == 2)
                         {
@@ -2053,12 +2054,14 @@ void ASimModeBase::setupVehiclesAndCamera()
                 }else // Spot Light
                 {
                     ASpotLight* spotLight = GetWorld()->SpawnActor<ASpotLight>(spawn_position, spawn_rotation, light_spawn_params);
+                    spotLight->SetMobility(EComponentMobility::Movable);
                     if (IsValid(spotLight))
                     {
                         USpotLightComponent* spotLightComponent = spotLight->GetComponentByClass<USpotLightComponent>();
                         spotLightComponent->SetSourceRadius(world_light_settings.source_radius);
-                        spotLightComponent->SetSoftSourceRadius(world_light_settings.source_soft_radius);
-                        spotLightComponent->SetSourceLength(world_light_settings.source_length);
+                        spotLightComponent->SetSoftSourceRadius(world_light_settings.source_soft_radius);                        
+                        spotLightComponent->SetOuterConeAngle(world_light_settings.outer_cone_angle);
+                        spotLightComponent->SetInnerConeAngle(world_light_settings.inner_cone_angle);
                         spotLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
                         if (world_light_settings.intensity_unit == 2)
                         {
@@ -2088,8 +2091,9 @@ void ASimModeBase::setupVehiclesAndCamera()
                     lightComponent->SetUseTemperature(true);
                     lightComponent->SetTemperature(world_light_settings.temperature);            
                     lightComponent->SetVisibility(world_light_settings.enable);
-                    
-                    world_lights_[FString(world_light_settings.name.c_str())] = light;
+                    lightComponent->SetLightColor(FColor(world_light_settings.color_r, world_light_settings.color_g, world_light_settings.color_b));
+                    FString lightName = UTF8_TO_TCHAR(world_light_settings.name.c_str());
+                    world_lights_.Add(lightName, light);
                 }
             }
         }

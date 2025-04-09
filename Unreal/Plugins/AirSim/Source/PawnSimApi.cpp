@@ -163,11 +163,14 @@ void PawnSimApi::createAndInitializeFromSettings()
     USceneComponent* bodyMesh = params_.pawn->GetRootComponent();
     FActorSpawnParameters light_spawn_params;
     light_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    light_spawn_params.bDeferConstruction = true;
     const auto& transform = getNedTransform();
 
     //for each light in settings
     for (const auto& light_setting_pair : getVehicleSetting()->lights) {
         const auto& setting = light_setting_pair.second;
+
+        light_spawn_params.Name = FName(setting.name.c_str());
 
         //get pose
         FVector position = transform.fromLocalNed(setting.position) - transform.fromLocalNed(Vector3r::Zero());
@@ -181,6 +184,7 @@ void PawnSimApi::createAndInitializeFromSettings()
             ARectLight* rectLight = params_.pawn->GetWorld()->SpawnActor<ARectLight>(position, rotation, light_spawn_params);
             if (IsValid(rectLight))
             {
+                rectLight->SetMobility(EComponentMobility::Movable);
                 URectLightComponent* rectLightComponent = rectLight->GetComponentByClass<URectLightComponent>();
                 rectLightComponent->SetSourceWidth(setting.source_width);
                 rectLightComponent->SetSourceHeight(setting.source_height);
@@ -205,10 +209,10 @@ void PawnSimApi::createAndInitializeFromSettings()
             APointLight* pointLight = params_.pawn->GetWorld()->SpawnActor<APointLight>(position, rotation, light_spawn_params);
             if (IsValid(pointLight))
             {
+                pointLight->SetMobility(EComponentMobility::Movable);
                 UPointLightComponent* pointLightComponent = pointLight->GetComponentByClass<UPointLightComponent>();
                 pointLightComponent->SetSourceRadius(setting.source_radius);
                 pointLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
-                pointLightComponent->SetSourceLength(setting.source_length);
                 pointLightComponent->SetAttenuationRadius(setting.attenuation_radius);
                 if (setting.intensity_unit == 2)
                 {
@@ -228,11 +232,13 @@ void PawnSimApi::createAndInitializeFromSettings()
             ASpotLight* spotLight = params_.pawn->GetWorld()->SpawnActor<ASpotLight>(position, rotation, light_spawn_params);
             if (IsValid(spotLight))
             {
+                spotLight->SetMobility(EComponentMobility::Movable);
                 USpotLightComponent* spotLightComponent = spotLight->GetComponentByClass<USpotLightComponent>();
                 spotLightComponent->SetSourceRadius(setting.source_radius);
                 spotLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
-                spotLightComponent->SetSourceLength(setting.source_length);
-                spotLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                spotLightComponent->SetAttenuationRadius(setting.attenuation_radius);                
+                spotLightComponent->SetOuterConeAngle(setting.outer_cone_angle);
+                spotLightComponent->SetInnerConeAngle(setting.inner_cone_angle);
                 if (setting.intensity_unit == 2)
                 {
                     spotLightComponent->SetIntensityUnits(ELightUnits::EV);
@@ -261,6 +267,7 @@ void PawnSimApi::createAndInitializeFromSettings()
             lightComponent->SetUseTemperature(true);
             lightComponent->SetTemperature(setting.temperature);            
             lightComponent->SetVisibility(setting.enable);
+            lightComponent->SetLightColor(FColor(setting.color_r, setting.color_g, setting.color_b));
             // Attach to pawn
             light->AttachToComponent(bodyMesh, FAttachmentTransformRules::KeepRelativeTransform);
             
