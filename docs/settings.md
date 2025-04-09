@@ -645,3 +645,9 @@ Unit conversion factor for speed related to `m/s`, default is 1. Used in conjunc
 
 ### SpeedUnitLabel
 Unit label for speed, default is `m/s`.  Used in conjunction with SpeedUnitFactor.
+
+### PassiveEchoBeacons
+For the [Echo Sensor](echo.md) one can define through the settings file passive sources directly. For more information see [here](echo.md#passive-echo-beacons).
+
+### WorldLights
+For the [Artificial Lights](lights.md) system, one can define static world lights through the settings file directly. For more information see [here](lights.md).
