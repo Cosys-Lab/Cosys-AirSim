@@ -1465,6 +1465,76 @@ classdef AirSimClient < handle
                                 update_interval_secs, move_sun);
         end
 
+        function success = setVehicleLightIntensity(obj, vehicle_name, light_name, intensity)
+            % SETVEHICLELIGHTINTENSITY Set the intensity of a vehicle light
+            %
+            % Description:
+            %   Sets the intensity value of an artificial light associated with a specific vehicle.
+            %
+            % Inputs:
+            %   vehicle_name - Name of the vehicle (string).
+            %   light_name - Name of the light within the vehicle (string).
+            %   intensity - Intensity value for the light (float). The unit depends on the simulation's intensity unit setting.
+            %
+            % Outputs:
+            %   success - Logical value, true if the light intensity was changed successfully.
+            %
+
+            success = obj.rpc_client.call("simSetVehicleLightIntensity", vehicle_name, light_name, intensity);
+        end
+
+        function success = setWorldLightVisibility(obj, light_name, is_visible)
+            % SETWORLDLIGHTVISIBILITY Enable or disable a static world light
+            %
+            % Description:
+            %   Toggles the visibility of an artificial light set as a static world light.
+            %
+            % Inputs:
+            %   light_name - Name of the world light (string).
+            %   is_visible - Logical value to enable (true) or disable (false) the light.
+            %
+            % Outputs:
+            %   success - Logical value, true if the light visibility was toggled successfully.
+            %
+
+            success = obj.rpc_client.call("simSetWorldLightVisibility", light_name, is_visible);
+        end
+
+        function success = setWorldLightIntensity(obj, light_name, intensity)
+            % SETWORLDLIGHTINTENSITY Set the intensity of a static world light
+            %
+            % Description:
+            %   Sets the intensity value of an artificial light set as a static world light.
+            %
+            % Inputs:
+            %   light_name - Name of the world light (string).
+            %   intensity - Intensity value for the light (float). The unit depends on the simulation's intensity unit setting.
+            %
+            % Outputs:
+            %   success - Logical value, true if the light intensity was changed successfully.
+            %
+
+            success = obj.rpc_client.call("simSetWorldLightIntensity", light_name, intensity);
+        end
+
+        function success = setVehicleLightVisibility(obj, vehicle_name, light_name, is_visible)
+            % SETVEHICLELIGHTVISIBILITY Enable or disable a vehicle light
+            %
+            % Description:
+            %   Toggles the visibility of an artificial light set as a vehicle light.
+            %
+            % Inputs:
+            %   vehicle_name - Name of the vehicle associated with the light (string).
+            %   light_name - Name of the light within the vehicle (string).
+            %   is_visible - Logical value to enable (true) or disable (false) the light.
+            %
+            % Outputs:
+            %   success - Logical value, true if the vehicle light visibility was toggled successfully.
+            %
+
+            success = obj.rpc_client.call("simSetVehicleLightVisibility", vehicle_name, light_name, is_visible);
+        end
+
         function flushPersistentMarkers(obj)
             % FLUSHPERSISTENTMARKERS Flush persistent markers in the simulation
             %
