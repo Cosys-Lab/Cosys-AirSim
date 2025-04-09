@@ -122,10 +122,26 @@ namespace airlib
 
         pimpl_->server.bind("simEnableWeather", [&](bool enable) -> void {
             getWorldSimApi()->enableWeather(enable);
-        });
+        });        
 
         pimpl_->server.bind("simSetWeatherParameter", [&](WorldSimApiBase::WeatherParameter param, float val) -> void {
             getWorldSimApi()->setWeatherParameter(param, val);
+        });
+        
+        pimpl_->server.bind("simSetWorldLightVisibility", [&](const string& light_name, bool is_visible) -> bool {
+            return getWorldSimApi()->setWorldLightVisibility(light_name, is_visible);
+        });
+
+        pimpl_->server.bind("simSetWorldLightIntensity", [&](const string& light_name, float intensity) -> bool {
+            return getWorldSimApi()->setWorldLightIntensity(light_name, intensity);
+        });
+
+        pimpl_->server.bind("simSetVehicleLightVisibility", [&](const string& vehicle_name, const string& light_name, bool is_visible) -> bool {
+            return getWorldSimApi()->setVehicleLightVisibility(vehicle_name, light_name, is_visible);
+        });
+
+        pimpl_->server.bind("simSetVehicleLightIntensity", [&](const string& vehicle_name, const string& light_name, float intensity) -> bool {
+            return getWorldSimApi()->setVehicleLightIntensity(vehicle_name, light_name, intensity);
         });
 
         pimpl_->server.bind("enableApiControl", [&](bool is_enabled, const std::string& vehicle_name) -> void {
@@ -536,11 +552,7 @@ namespace airlib
         pimpl_->server.bind("simCreateVoxelGrid", [&](const RpcLibAdaptorsBase::Vector3r& position, const int& x, const int& y, const int& z, const float& res, const std::string& output_file) -> bool {
             return getWorldSimApi()->createVoxelGrid(position.to(), x, y, z, res, output_file);
         });
-
-        pimpl_->server.bind("simSetLightIntensity", [&](const std::string& light_name, float intensity) -> bool {
-            return getWorldSimApi()->setLightIntensity(light_name, intensity);
-        });
-
+        
         pimpl_->server.bind("getUWBData", [&](const std::string& sensor_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::MarLocUwbReturnMessage {
             const auto& marLocUwbReturnMessage = getVehicleApi(vehicle_name)->getUWBData(sensor_name);
             return RpcLibAdaptorsBase::MarLocUwbReturnMessage(marLocUwbReturnMessage);

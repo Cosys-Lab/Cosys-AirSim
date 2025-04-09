@@ -111,7 +111,7 @@ public:
     UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
+    UFUNCTION(BlueprintCallable, CateisApiControlEnabledgory = "airsim | Annotation")
     bool AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
@@ -219,6 +219,9 @@ public:
     bool SetMeshTextureAnnotationPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex, bool update_annotation = true);
     std::string GetMeshTextureAnnotationPath(const std::string& annotation_name, const std::string& mesh_name);
 
+    bool SetWorldLightVisibility(const std::string& light_name, bool is_visible);
+    bool SetWorldLightIntensity(const std::string& light_name, float intensity);
+    
 	static void RunCommandOnGameThread(TFunction<void()> InFunction, bool wait = false, const TStatId InStatId = TStatId());
 
     const APIPCamera* getCamera(const msr::airlib::CameraDetails& camera_details) const;
@@ -325,6 +328,8 @@ private:
 
     FObjectAnnotator instance_segmentation_annotator_;
     TMap<FString, FObjectAnnotator> annotators_;
+
+    TMap<FString, ALight*> world_lights_;
 
 private:
     void InitializeInstanceSegmentation();

@@ -554,6 +554,26 @@ __pragma(warning(disable : 4239))
             pimpl_->client.call("simSetWeatherParameter", param, val);
         }
 
+        bool RpcLibClientBase::simSetWorldLightVisibility(const string& light_name, bool is_visible)
+        {
+            return pimpl_->client.call("simSetWorldLightVisibility", light_name, is_visible).as<bool>();
+        }
+
+        bool RpcLibClientBase::simSetWorldLightIntensity(const string& light_name, float intensity)
+        {
+            return pimpl_->client.call("simSetWorldLightIntensity", light_name, intensity).as<bool>();
+        }
+
+        bool RpcLibClientBase::simSetVehicleLightVisibility(const string& vehicle_name, const string& light_name, bool is_visible)
+        {
+            return pimpl_->client.call("simSetVehicleLightVisibility", vehicle_name, is_visible).as<bool>();
+        }
+
+        bool RpcLibClientBase::simSetVehicleLightIntensity(const string& vehicle_name, const string& light_name, float intensity)
+        {
+            return pimpl_->client.call("simSetVehicleLightIntensity", vehicle_name, intensity).as<bool>();
+        }
+
         void RpcLibClientBase::simSetTimeOfDay(bool is_enabled, const string& start_datetime, bool is_start_datetime_dst,
                                                float celestial_clock_speed, float update_interval_secs, bool move_sun)
         {
@@ -671,6 +691,7 @@ __pragma(warning(disable : 4239))
         {
             return pimpl_->client.call("simCreateVoxelGrid", RpcLibAdaptorsBase::Vector3r(position), x, y, z, res, output_file).as<bool>();
         }
+
 
         void RpcLibClientBase::cancelLastTask(const std::string& vehicle_name)
         {

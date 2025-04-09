@@ -358,7 +358,32 @@ namespace airlib
         struct WifiSetting : SensorSetting
         {
         };
+        
+        struct LightSetting {
+            //required
+            std::string name;
+            bool enable = true;
+            int type = 0; // 0 = spot, 1 == point, 2 == rect
+            int intensity_unit = 0; // 0 = candelas, 1 = lumens , 2 EV
+            int intensity = 8;
+            float attenuation_radius = 1000;
+            float source_radius = 0; // only for spot and point
+            float source_soft_radius = 0; // only for spot and point
+            float source_length = 0; // only for spot and point
+            float source_width = 64; // only for rect lights
+            float source_height = 64; // only for rect lights
+            float barn_door_angle = 88; // only for rect lights
+            float barn_door_length = 20; // only for rect lights
+            float temperature = 6500; // Kelvin
+            bool cast_shadows = true;
 
+            //nan means use player start
+            Vector3r position = VectorMath::nanVector(); //in global NED
+            Rotation rotation = Rotation::nanRotation();
+        };    
+
+        using VehicleLightSettingMap = std::map<std::string, LightSetting>;
+        
         struct VehicleSetting
         {
             //required
@@ -382,6 +407,8 @@ namespace airlib
             CameraSettingMap cameras;
             std::map<std::string, std::shared_ptr<SensorSetting>> sensors;
 
+            VehicleLightSettingMap lights;
+
             RCSettings rc;
 
             VehicleSetting()
@@ -392,62 +419,62 @@ namespace airlib
                 : vehicle_name(vehicle_name_val), vehicle_type(vehicle_type_val)
             {
             }
-    };
+        };
 
-    struct BeaconSetting {
-        //required
-        std::string beacon_name;
-        std::string beacon_type;
-        std::string beacon_pawn_name;
+        struct BeaconSetting {
+            //required
+            std::string beacon_name;
+            std::string beacon_type;
+            std::string beacon_pawn_name;
 
-        //optional
-        std::string default_beacon_state;
-        std::string pawn_path;
-        bool allow_api_always = true;
-        bool auto_create = true;
-        bool enable_collision_passthrough = false;
-        bool enable_trace = false;
-        bool enable_collisions = true;
-        bool is_fpv_vehicle = false;
-        float debug_symbol_scale = 0.0f;
+            //optional
+            std::string default_beacon_state;
+            std::string pawn_path;
+            bool allow_api_always = true;
+            bool auto_create = true;
+            bool enable_collision_passthrough = false;
+            bool enable_trace = false;
+            bool enable_collisions = true;
+            bool is_fpv_vehicle = false;
+            float debug_symbol_scale = 0.0f;
 
-        //nan means use player start
-        Vector3r position = VectorMath::nanVector(); //in global NED
-        Rotation rotation = Rotation::nanRotation();
+            //nan means use player start
+            Vector3r position = VectorMath::nanVector(); //in global NED
+            Rotation rotation = Rotation::nanRotation();
 
-        std::map<std::string, CameraSetting> cameras;
-        std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
-        std::vector<std::pair<std::string, std::string>> collision_blacklist;
-        RCSettings rc;
+            std::map<std::string, CameraSetting> cameras;
+            std::map<std::string, std::unique_ptr<SensorSetting>> sensors;
+            std::vector<std::pair<std::string, std::string>> collision_blacklist;
+            RCSettings rc;
 
-        float scale = 1.0f;
-    };
+            float scale = 1.0f;
+        };
 
-    struct PassiveEchoBeaconSetting {
-        //required
-        std::string name;
-        bool enable = true;
-        int initial_directions = 1000;
-        float initial_lower_azimuth_limit = -90;
-        float initial_upper_azimuth_limit = 90;
-        float initial_lower_elevation_limit = -90;
-        float initial_upper_elevation_limit = 90;
-        float attenuation_limit = -100;
-        float reflection_distance_limit = 0.4f;
-        bool reflection_only_final = false;
-        float attenuation_per_distance = 0;
-        float attenuation_per_reflection = 0;
-        float distance_limit = 3;
-        int reflection_limit = 3;
-        bool draw_debug_location = false;
-        bool draw_debug_all_points = false;
-        bool draw_debug_all_lines = false;
-        float draw_debug_duration = -1.f;
+        struct PassiveEchoBeaconSetting {
+            //required
+            std::string name;
+            bool enable = true;
+            int initial_directions = 1000;
+            float initial_lower_azimuth_limit = -90;
+            float initial_upper_azimuth_limit = 90;
+            float initial_lower_elevation_limit = -90;
+            float initial_upper_elevation_limit = 90;
+            float attenuation_limit = -100;
+            float reflection_distance_limit = 0.4f;
+            bool reflection_only_final = false;
+            float attenuation_per_distance = 0;
+            float attenuation_per_reflection = 0;
+            float distance_limit = 3;
+            int reflection_limit = 3;
+            bool draw_debug_location = false;
+            bool draw_debug_all_points = false;
+            bool draw_debug_all_lines = false;
+            float draw_debug_duration = -1.f;
 
-        //nan means use player start
-        Vector3r position = VectorMath::nanVector(); //in global NED
-        Rotation rotation = Rotation::nanRotation();
-    };
+            //nan means use player start
+            Vector3r position = VectorMath::nanVector(); //in global NED
+            Rotation rotation = Rotation::nanRotation();
+        };
 
         struct MavLinkConnectionInfo
         {
@@ -555,6 +582,7 @@ namespace airlib
         CameraDirectorSetting camera_director;
         std::map<std::string, std::unique_ptr<BeaconSetting>> beacons;
         std::map<std::string, std::unique_ptr<PassiveEchoBeaconSetting>> passive_echo_beacons;
+        std::map<std::string, std::unique_ptr<LightSetting>> world_lights;
         float speed_unit_factor = 1.0f;
         std::string speed_unit_label = "m\\s";
         std::map<std::string, std::shared_ptr<SensorSetting>> sensor_defaults;
@@ -598,6 +626,7 @@ namespace airlib
             loadVehicleSettings(simmode_name, settings_json, vehicles, sensor_defaults, camera_defaults);
             loadBeaconSettings(simmode_name, settings_json, beacons);
             loadPassiveEchoBeaconSettings(settings_json, passive_echo_beacons);
+            loadWorldLightSettings(settings_json, world_lights);
 
             //this should be done last because it depends on vehicles (and/or their type) we have
             loadRecordingSetting(settings_json);
@@ -1011,87 +1040,113 @@ namespace airlib
             vehicle_setting->rotation = createRotationSetting(settings_json, vehicle_setting->rotation);
 
             loadCameraSettings(settings_json, vehicle_setting->cameras, camera_defaults);
+            loadVehicleLightSettings(settings_json, vehicle_setting->lights);
             loadSensorSettings(settings_json, "Sensors", vehicle_setting->sensors, sensor_defaults, simmode_name);
 
             return vehicle_setting;
         }
 
-         static std::unique_ptr<BeaconSetting> createBeaconSetting(const std::string& simmode_name, const Settings& settings_json,
-        const std::string beacon_name)
-    {
-        auto beacon_type = Utils::toLower(settings_json.getString("BeaconType", ""));
-        auto beacon_pawn_name = settings_json.getString("BeaconPawnName", "");
+        static std::unique_ptr<BeaconSetting> createBeaconSetting(const std::string& simmode_name, const Settings& settings_json, const std::string beacon_name)
+        {
+            auto beacon_type = Utils::toLower(settings_json.getString("BeaconType", ""));
+            auto beacon_pawn_name = settings_json.getString("BeaconPawnName", "");
 
-        std::unique_ptr<BeaconSetting> beacon_setting;
-        beacon_setting = std::unique_ptr<BeaconSetting>(new BeaconSetting());
-        beacon_setting->beacon_name = beacon_name;
+            std::unique_ptr<BeaconSetting> beacon_setting;
+            beacon_setting = std::unique_ptr<BeaconSetting>(new BeaconSetting());
+            beacon_setting->beacon_name = beacon_name;
 
-        //required settings_json
-        beacon_setting->beacon_type = beacon_type;
+            //required settings_json
+            beacon_setting->beacon_type = beacon_type;
 
-        beacon_setting->beacon_pawn_name = beacon_pawn_name;
+            beacon_setting->beacon_pawn_name = beacon_pawn_name;
 
-        //optional settings_json
-        beacon_setting->scale = settings_json.getFloat("Scale", beacon_setting->scale);
-        beacon_setting->pawn_path = settings_json.getString("PawnPath", "");
-        beacon_setting->default_beacon_state = settings_json.getString("DefaultbeaconState", "");
-        beacon_setting->allow_api_always = settings_json.getBool("AllowAPIAlways",
-            beacon_setting->allow_api_always);
-        beacon_setting->auto_create = settings_json.getBool("AutoCreate",
-            beacon_setting->auto_create);
-        beacon_setting->enable_collision_passthrough = settings_json.getBool("EnableCollisionPassthrough",
-            beacon_setting->enable_collision_passthrough);
-        beacon_setting->enable_trace = settings_json.getBool("EnableTrace",
-            beacon_setting->enable_trace);
-        beacon_setting->enable_collisions = settings_json.getBool("EnableCollisions",
-            beacon_setting->enable_collisions);
-        //beacon_setting->is_fpv_beacon = settings_json.getBool("IsFpvbeacon",
-            //beacon_setting->is_fpv_beacon);
+            //optional settings_json
+            beacon_setting->scale = settings_json.getFloat("Scale", beacon_setting->scale);
+            beacon_setting->pawn_path = settings_json.getString("PawnPath", "");
+            beacon_setting->default_beacon_state = settings_json.getString("DefaultbeaconState", "");
+            beacon_setting->allow_api_always = settings_json.getBool("AllowAPIAlways",
+                beacon_setting->allow_api_always);
+            beacon_setting->auto_create = settings_json.getBool("AutoCreate",
+                beacon_setting->auto_create);
+            beacon_setting->enable_collision_passthrough = settings_json.getBool("EnableCollisionPassthrough",
+                beacon_setting->enable_collision_passthrough);
+            beacon_setting->enable_trace = settings_json.getBool("EnableTrace",
+                beacon_setting->enable_trace);
+            beacon_setting->enable_collisions = settings_json.getBool("EnableCollisions",
+                beacon_setting->enable_collisions);
+            //beacon_setting->is_fpv_beacon = settings_json.getBool("IsFpvbeacon",
+                //beacon_setting->is_fpv_beacon);
 
-        Settings rc_json;
-        if (settings_json.getChild("RC", rc_json)) {
-            loadRCSetting(simmode_name, rc_json, beacon_setting->rc);
+            Settings rc_json;
+            if (settings_json.getChild("RC", rc_json)) {
+                loadRCSetting(simmode_name, rc_json, beacon_setting->rc);
+            }
+
+            beacon_setting->position = createVectorSetting(settings_json, beacon_setting->position);
+            beacon_setting->rotation = createRotationSetting(settings_json, beacon_setting->rotation);
+
+            //loadCameraSettings(settings_json, beacon_setting->cameras);
+            //loadSensorSettings(settings_json, "Sensors", beacon_setting->sensors  simmode_name);
+
+            return beacon_setting;
+        }
+        
+        static std::unique_ptr<LightSetting> createLightSetting(const Settings& settings_json, const std::string light_name)
+        {
+            std::unique_ptr<LightSetting> light_setting;
+            light_setting = std::unique_ptr<LightSetting>(new LightSetting());
+            light_setting->name = light_name;
+            
+            light_setting->enable = settings_json.getBool("Enable", light_setting->enable);
+            light_setting->type = settings_json.getInt("Type", light_setting->type);
+            light_setting->intensity_unit = settings_json.getInt("IntensityUnit", light_setting->intensity_unit);
+            light_setting->intensity = settings_json.getInt("Intensity", light_setting->intensity);            
+            light_setting->attenuation_radius = settings_json.getFloat("AttenuationRadius", light_setting->attenuation_radius);
+            light_setting->source_radius = settings_json.getFloat("SourceRadius", light_setting->source_radius);
+            light_setting->source_soft_radius = settings_json.getFloat("SourceSoftRadius", light_setting->source_soft_radius);
+            light_setting->source_length = settings_json.getFloat("SourceLength", light_setting->source_length);
+            light_setting->source_width = settings_json.getFloat("SourceWidth", light_setting->source_width);
+            light_setting->source_height = settings_json.getFloat("SourceHeight", light_setting->source_height);
+            light_setting->barn_door_angle = settings_json.getFloat("BarnDoorAngle", light_setting->barn_door_angle);
+            light_setting->barn_door_length = settings_json.getFloat("BarnDoorLength", light_setting->barn_door_length);
+            light_setting->temperature = settings_json.getFloat("Temperature", light_setting->temperature);            
+            light_setting->cast_shadows = settings_json.getBool("CastShadows", light_setting->cast_shadows);
+
+            light_setting->position = createVectorSetting(settings_json, light_setting->position);
+            light_setting->rotation = createRotationSetting(settings_json, light_setting->rotation);
+
+            return light_setting;
         }
 
-        beacon_setting->position = createVectorSetting(settings_json, beacon_setting->position);
-        beacon_setting->rotation = createRotationSetting(settings_json, beacon_setting->rotation);
+        static std::unique_ptr<PassiveEchoBeaconSetting> createPassiveEchoBeaconSetting(const Settings& settings_json, const std::string passive_echo_beacon_name)
+        {
+            std::unique_ptr<PassiveEchoBeaconSetting> passive_echo_beacon_setting;
+            passive_echo_beacon_setting = std::unique_ptr<PassiveEchoBeaconSetting>(new PassiveEchoBeaconSetting());
+            passive_echo_beacon_setting->name = passive_echo_beacon_name;
 
-        //loadCameraSettings(settings_json, beacon_setting->cameras);
-        //loadSensorSettings(settings_json, "Sensors", beacon_setting->sensors  simmode_name);
+            passive_echo_beacon_setting->enable = settings_json.getBool("Enable", passive_echo_beacon_setting->enable);
+            passive_echo_beacon_setting->initial_directions = settings_json.getInt("InitialDirections", passive_echo_beacon_setting->initial_directions);
+            passive_echo_beacon_setting->initial_lower_azimuth_limit = settings_json.getFloat("SensorLowerAzimuthLimit", passive_echo_beacon_setting->initial_lower_azimuth_limit);
+            passive_echo_beacon_setting->initial_upper_azimuth_limit = settings_json.getFloat("SensorUpperAzimuthLimit", passive_echo_beacon_setting->initial_upper_azimuth_limit);
+            passive_echo_beacon_setting->initial_lower_elevation_limit = settings_json.getFloat("SensorLowerElevationLimit", passive_echo_beacon_setting->initial_lower_elevation_limit);
+            passive_echo_beacon_setting->initial_upper_elevation_limit = settings_json.getFloat("SensorUpperElevationLimit", passive_echo_beacon_setting->initial_upper_elevation_limit);
+            passive_echo_beacon_setting->attenuation_limit = settings_json.getFloat("AttenuationLimit", passive_echo_beacon_setting->attenuation_limit);
+            passive_echo_beacon_setting->reflection_distance_limit = settings_json.getFloat("ReflectionDistanceLimit", passive_echo_beacon_setting->reflection_distance_limit);
+            passive_echo_beacon_setting->reflection_only_final = settings_json.getBool("ReflectionOnlyFinal", passive_echo_beacon_setting->reflection_only_final);
+            passive_echo_beacon_setting->attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", passive_echo_beacon_setting->attenuation_per_distance);
+            passive_echo_beacon_setting->attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", passive_echo_beacon_setting->attenuation_per_reflection);
+            passive_echo_beacon_setting->distance_limit = settings_json.getFloat("DistanceLimit", passive_echo_beacon_setting->distance_limit);
+            passive_echo_beacon_setting->reflection_limit = settings_json.getInt("ReflectionLimit", passive_echo_beacon_setting->reflection_limit);
+            passive_echo_beacon_setting->draw_debug_location = settings_json.getBool("DrawDebugLocation", passive_echo_beacon_setting->draw_debug_location);
+            passive_echo_beacon_setting->draw_debug_all_points = settings_json.getBool("DrawDebugAllPoints", passive_echo_beacon_setting->draw_debug_all_points);
+            passive_echo_beacon_setting->draw_debug_all_lines = settings_json.getBool("DrawDebugAllLines", passive_echo_beacon_setting->draw_debug_all_lines);
+            passive_echo_beacon_setting->draw_debug_duration = settings_json.getFloat("DrawDebugDuration", passive_echo_beacon_setting->draw_debug_duration);
 
-        return beacon_setting;
-    }
+            passive_echo_beacon_setting->position = createVectorSetting(settings_json, passive_echo_beacon_setting->position);
+            passive_echo_beacon_setting->rotation = createRotationSetting(settings_json, passive_echo_beacon_setting->rotation);
 
-    static std::unique_ptr<PassiveEchoBeaconSetting> createPassiveEchoBeaconSetting(const Settings& settings_json, const std::string passive_echo_beacon_name)
-    {
-        std::unique_ptr<PassiveEchoBeaconSetting> passive_echo_beacon_setting;
-        passive_echo_beacon_setting = std::unique_ptr<PassiveEchoBeaconSetting>(new PassiveEchoBeaconSetting());
-        passive_echo_beacon_setting->name = passive_echo_beacon_name;
-
-
-        passive_echo_beacon_setting->enable = settings_json.getBool("Enable", passive_echo_beacon_setting->enable);
-        passive_echo_beacon_setting->initial_directions = settings_json.getInt("InitialDirections", passive_echo_beacon_setting->initial_directions);
-        passive_echo_beacon_setting->initial_lower_azimuth_limit = settings_json.getFloat("SensorLowerAzimuthLimit", passive_echo_beacon_setting->initial_lower_azimuth_limit);
-        passive_echo_beacon_setting->initial_upper_azimuth_limit = settings_json.getFloat("SensorUpperAzimuthLimit", passive_echo_beacon_setting->initial_upper_azimuth_limit);
-        passive_echo_beacon_setting->initial_lower_elevation_limit = settings_json.getFloat("SensorLowerElevationLimit", passive_echo_beacon_setting->initial_lower_elevation_limit);
-        passive_echo_beacon_setting->initial_upper_elevation_limit = settings_json.getFloat("SensorUpperElevationLimit", passive_echo_beacon_setting->initial_upper_elevation_limit);
-        passive_echo_beacon_setting->attenuation_limit = settings_json.getFloat("AttenuationLimit", passive_echo_beacon_setting->attenuation_limit);
-        passive_echo_beacon_setting->reflection_distance_limit = settings_json.getFloat("ReflectionDistanceLimit", passive_echo_beacon_setting->reflection_distance_limit);
-        passive_echo_beacon_setting->reflection_only_final = settings_json.getBool("ReflectionOnlyFinal", passive_echo_beacon_setting->reflection_only_final);
-        passive_echo_beacon_setting->attenuation_per_distance = settings_json.getFloat("AttenuationPerDistance", passive_echo_beacon_setting->attenuation_per_distance);
-        passive_echo_beacon_setting->attenuation_per_reflection = settings_json.getFloat("AttenuationPerReflection", passive_echo_beacon_setting->attenuation_per_reflection);
-        passive_echo_beacon_setting->distance_limit = settings_json.getFloat("DistanceLimit", passive_echo_beacon_setting->distance_limit);
-        passive_echo_beacon_setting->reflection_limit = settings_json.getInt("ReflectionLimit", passive_echo_beacon_setting->reflection_limit);
-        passive_echo_beacon_setting->draw_debug_location = settings_json.getBool("DrawDebugLocation", passive_echo_beacon_setting->draw_debug_location);
-        passive_echo_beacon_setting->draw_debug_all_points = settings_json.getBool("DrawDebugAllPoints", passive_echo_beacon_setting->draw_debug_all_points);
-        passive_echo_beacon_setting->draw_debug_all_lines = settings_json.getBool("DrawDebugAllLines", passive_echo_beacon_setting->draw_debug_all_lines);
-        passive_echo_beacon_setting->draw_debug_duration = settings_json.getFloat("DrawDebugDuration", passive_echo_beacon_setting->draw_debug_duration);
-
-        passive_echo_beacon_setting->position = createVectorSetting(settings_json, passive_echo_beacon_setting->position);
-        passive_echo_beacon_setting->rotation = createRotationSetting(settings_json, passive_echo_beacon_setting->rotation);
-
-        return passive_echo_beacon_setting;
-    }
+            return passive_echo_beacon_setting;
+        }
 
         static void createDefaultVehicle(const std::string& simmode_name, std::map<std::string, std::unique_ptr<VehicleSetting>>& vehicles,
                                          const std::map<std::string, std::shared_ptr<SensorSetting>>& sensor_defaults)
@@ -1177,6 +1232,27 @@ namespace airlib
                     msr::airlib::Settings child;
                     beacons_child.getChild(key, child);
                     beacons[key] = createBeaconSetting(simmode_name, child, key);
+                }
+            }
+        }
+
+        static void loadWorldLightSettings(const Settings& settings_json, std::map<std::string, std::unique_ptr<LightSetting>>& world_lights)
+        {
+            world_lights.clear();
+
+            msr::airlib::Settings world_light_settings;
+            if (settings_json.getChild("WorldLights", world_light_settings)) {
+                std::vector<std::string> keys;
+                world_light_settings.getChildNames(keys);
+
+                //remove default lights, if values are specified in settings
+                if (keys.size())
+                    world_lights.clear();
+
+                for (const auto& key : keys) {
+                    msr::airlib::Settings child;
+                    world_light_settings.getChild(key, child);
+                    world_lights[key] = createLightSetting(child, key);
                 }
             }
         }
@@ -1361,6 +1437,23 @@ namespace airlib
             loadUnrealEngineSetting(settings_json, setting.ue_setting);
 
             return setting;
+        }
+
+        static void loadVehicleLightSettings(const Settings& settings_json, VehicleLightSettingMap& lights)
+        {
+            lights.clear();
+
+            Settings json_parent;
+            if (settings_json.getChild("Lights", json_parent)) {
+                std::vector<std::string> keys;
+                json_parent.getChildNames(keys);
+
+                for (const auto& key : keys) {
+                    msr::airlib::Settings child;
+                    json_parent.getChild(key, child);
+                    lights[key] = *createLightSetting(child, key);
+                }
+            }
         }
 
         static void loadCameraSettings(const Settings& settings_json, CameraSettingMap& cameras,
