@@ -68,6 +68,7 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 * Added [skid steering SimMode and vehicle type](https://cosys-lab.github.io/skid_steer_vehicle). ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. 
 * Added [Matlab API Client](https://cosys-lab.github.io/matlab) implementation as an easy to install Matlab toolbox.
 * Added various [random but deterministic dynamic object types and world configuration options](https://cosys-lab.github.io/dynamic_objects).
+* Added [Artificial Lights](https://cosys-lab.github.io/lights). 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
 * Updated [ComputerVision mode](https://cosys-lab.github.io/image_apis#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](https://cosys-lab.github.io/lidar): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
