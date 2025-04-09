@@ -13,11 +13,6 @@
 
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "DrawDebugHelpers.h"
-#include "Components/RectLightComponent.h"
-#include "Components/SpotLightComponent.h"
-#include "Engine/PointLight.h"
-#include "Engine/RectLight.h"
-#include "Engine/SpotLight.h"
 
 PawnSimApi::PawnSimApi(const Params& params)
     : params_(params), ned_transform_(params.pawn, *params.global_transform)
@@ -57,7 +52,7 @@ void PawnSimApi::initialize()
     setupCamerasFromSettings(params_.cameras);
     image_capture_.reset(new UnrealImageCapture(&cameras_));
 
-    setupLightsFromSettings(Params_.lights);
+    setupLightsFromSettings(params_.lights);
 
     //add listener for pawn's collision event
     params_.pawn_events->getCollisionSignal().connect_member(this, &PawnSimApi::onCollision);
@@ -180,7 +175,7 @@ void PawnSimApi::createAndInitializeFromSettings()
         FTransform light_transform(rotation, position, FVector(1., 1., 1.));
 
         //spawn the right type of light, set specific settings and attach to pawn
-        ALight* light;
+        ALight* light = nullptr;
         if (setting.type ==2) // Rect light
         {
             ARectLight* rectLight = params_.pawn->GetWorld()->SpawnActor<ARectLight>(position, rotation, light_spawn_params);
@@ -192,6 +187,16 @@ void PawnSimApi::createAndInitializeFromSettings()
                 rectLightComponent->SetBarnDoorAngle(setting.barn_door_angle);
                 rectLightComponent->SetBarnDoorLength(setting.barn_door_length);                
                 rectLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                if (setting.intensity_unit == 2)
+                {
+                    rectLightComponent->SetIntensityUnits(ELightUnits::EV);
+                }else if (setting.intensity_unit == 1)
+                {
+                    rectLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                }else
+                {
+                    rectLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                }
                 rectLight->FinishSpawning(light_transform);
                 light = static_cast<ALight*>(rectLight);
             }           
@@ -205,6 +210,16 @@ void PawnSimApi::createAndInitializeFromSettings()
                 pointLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
                 pointLightComponent->SetSourceLength(setting.source_length);
                 pointLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                if (setting.intensity_unit == 2)
+                {
+                    pointLightComponent->SetIntensityUnits(ELightUnits::EV);
+                }else if (setting.intensity_unit == 1)
+                {
+                    pointLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                }else
+                {
+                    pointLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                }
                 pointLight->FinishSpawning(light_transform);
                 light = static_cast<ALight*>(pointLight);
             }
@@ -218,6 +233,16 @@ void PawnSimApi::createAndInitializeFromSettings()
                 spotLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
                 spotLightComponent->SetSourceLength(setting.source_length);
                 spotLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                if (setting.intensity_unit == 2)
+                {
+                    spotLightComponent->SetIntensityUnits(ELightUnits::EV);
+                }else if (setting.intensity_unit == 1)
+                {
+                    spotLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                }else
+                {
+                    spotLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                }
                 spotLight->FinishSpawning(light_transform);
                 light = static_cast<ALight*>(spotLight);
             }
@@ -227,16 +252,6 @@ void PawnSimApi::createAndInitializeFromSettings()
         {
             // Set other common settings
             ULightComponent* lightComponent = light->GetComponentByClass<ULightComponent>();
-            if (setting.intensity_unit == 2)
-            {
-                lightComponent->SetIntensityUnits(ELightUnits::EV);
-            }else if (setting.intensity_unit == 1)
-            {
-                lightComponent->SetIntensityUnits(ELightUnits::Lumens);
-            }else
-            {
-                lightComponent->SetIntensityUnits(ELightUnits::Candelas);
-            }
             lightComponent->SetIntensity(setting.intensity);            
             lightComponent->SetCastShadows(setting.cast_shadows);
             if (setting.cast_shadows)
@@ -374,7 +389,7 @@ const ALight* PawnSimApi::getLight(const std::string& light_name) const
 ALight* PawnSimApi::getLight(const std::string& light_name)
 {
     return const_cast<ALight*>(
-        static_cast<const PawnSimApi*>(this)->getLight(camera_name));
+        static_cast<const PawnSimApi*>(this)->getLight(light_name));
 }
 
 const UnrealImageCapture* PawnSimApi::getImageCapture() const
@@ -586,7 +601,7 @@ bool PawnSimApi::setLightVisibility(const std::string& light_name, bool is_visib
 {
     UAirBlueprintLib::RunCommandOnGameThread([this, light_name, is_visible]() {
         ALight* light = getLight(light_name);
-        light->SetVisibility(is_visible);
+        light->SetEnabled(is_visible);
     }, true);
     return true;
 }

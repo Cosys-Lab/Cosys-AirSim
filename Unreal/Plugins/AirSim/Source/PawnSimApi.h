@@ -18,6 +18,13 @@
 #include "SimJoyStick/SimJoyStick.h"
 #include "api/VehicleApiBase.hpp"
 #include "api/VehicleSimApiBase.hpp"
+#include "Components/RectLightComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Engine/PointLight.h"
+#include "Engine/RectLight.h"
+#include "Engine/SpotLight.h"
+#include "Engine/Light.h"
+
 #include "common/common_utils/UniqueValueMap.hpp"
 
 #include "PawnEvents.h"
@@ -46,6 +53,7 @@ public: //types
         PawnEvents* pawn_events;
         common_utils::UniqueValueMap<std::string, APIPCamera*> cameras;
         UClass* pip_camera_class;
+        common_utils::UniqueValueMap<std::string, ALight*> lights;
         UParticleSystem* collision_display_template;
         msr::airlib::GeoPoint home_geopoint;
         std::string vehicle_name;
@@ -56,6 +64,7 @@ public: //types
 
         Params(APawn* pawn_val, const NedTransform* global_transform_val, PawnEvents* pawn_events_val,
                const common_utils::UniqueValueMap<std::string, APIPCamera*>& cameras_val, UClass* pip_camera_class_val,
+               const common_utils::UniqueValueMap<std::string, ALight*>& lights_val,
                UParticleSystem* collision_display_template_val, const msr::airlib::GeoPoint& home_geopoint_val,
                const std::string& vehicle_name_val)
             : pawn(pawn_val)
@@ -63,6 +72,7 @@ public: //types
             , pawn_events(pawn_events_val)
             , cameras(cameras_val)
             , pip_camera_class(pip_camera_class_val)
+            , lights(lights_val)
             , collision_display_template(collision_display_template_val)
             , home_geopoint(home_geopoint_val)
             , vehicle_name(vehicle_name_val)
@@ -81,8 +91,6 @@ public: //implementation of VehicleSimApiBase
     virtual void setPose(const Pose& pose, bool ignore_collision) override;
     virtual msr::airlib::CameraInfo getCameraInfo(const std::string& camera_name) const override;
     virtual void setCameraOrientation(const std::string& camera_name, const Quaternionr& orientation) override;
-    virtual bool setLightVisibility(const std::string& light_name, bool is_visible) override;
-    virtual bool setLightIntensity(const std::string& light_name, float intensity) override;
     virtual CollisionInfo getCollisionInfo() const override;
     virtual CollisionInfo getCollisionInfoAndReset() override;
     virtual int getRemoteControlID() const override;
@@ -136,6 +144,9 @@ public: //Unreal specific methods
     FRotator getUUOrientation() const;
 
     const NedTransform& getNedTransform() const;
+
+    bool setLightVisibility(const std::string& light_name, bool is_visible);
+    bool setLightIntensity(const std::string& light_name, float intensity);
 
     void possess();
     void setRCForceFeedback(float rumble_strength, float auto_center);

@@ -12,6 +12,7 @@
 #include "common/AirSimSettings.hpp"
 #include "AssetRegistry/AssetData.h"
 #include "common/ClockFactory.hpp"
+#include "engine/Light.h"
 #include "api/ApiServerBase.hpp"
 #include "api/ApiProvider.hpp"
 #include "PawnSimApi.h"
@@ -111,7 +112,7 @@ public:
     UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool UpdateTextureDirectAnnotationTagToComponentByPath(FString annotation_name, UMeshComponent* component, FString texture_path, bool update_annotation = true);
 
-    UFUNCTION(BlueprintCallable, CateisApiControlEnabledgory = "airsim | Annotation")
+    UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
     bool AddTextureDirectAnnotationTagToActor(FString annotation_name, AActor* actor, UTexture* texture, bool update_annotation = true);
 
     UFUNCTION(BlueprintCallable, Category = "airsim | Annotation")
@@ -247,6 +248,7 @@ protected: //must overrides
     virtual std::string getBeaconPawnPathName(const AirSimSettings::BeaconSetting& beacon_setting) const;
     virtual PawnEvents* getVehiclePawnEvents(APawn* pawn) const;
     virtual const common_utils::UniqueValueMap<std::string, APIPCamera*> getVehiclePawnCameras(APawn* pawn) const;
+    virtual const common_utils::UniqueValueMap<std::string, ALight*> getVehiclePawnLights(APawn* pawn) const;
     virtual void initializeVehiclePawn(APawn* pawn);
     virtual std::unique_ptr<PawnSimApi> createVehicleSimApi(
         const PawnSimApi::Params& pawn_sim_api_params) const;
