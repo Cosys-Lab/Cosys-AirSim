@@ -385,14 +385,18 @@ namespace airlib
             int intensity_unit = 0; // 0 = candelas, 1 = lumens , 2 EV
             int intensity = 8;
             float attenuation_radius = 1000;
+            float inner_cone_angle = 0; // only for spot
+            float outer_cone_angle = 44; // only for spot
             float source_radius = 0; // only for spot and point
             float source_soft_radius = 0; // only for spot and point
-            float source_length = 0; // only for spot and point
             float source_width = 64; // only for rect lights
             float source_height = 64; // only for rect lights
             float barn_door_angle = 88; // only for rect lights
             float barn_door_length = 20; // only for rect lights
             float temperature = 6500; // Kelvin
+            uint8_t color_r = 255;
+            uint8_t color_g = 255;
+            uint8_t color_b = 255;
             bool cast_shadows = true;
 
             //nan means use player start
@@ -1120,15 +1124,19 @@ namespace airlib
             light_setting->intensity_unit = settings_json.getInt("IntensityUnit", light_setting->intensity_unit);
             light_setting->intensity = settings_json.getInt("Intensity", light_setting->intensity);            
             light_setting->attenuation_radius = settings_json.getFloat("AttenuationRadius", light_setting->attenuation_radius);
+            light_setting->inner_cone_angle = settings_json.getFloat("InnerConeAngle", light_setting->inner_cone_angle);
+            light_setting->outer_cone_angle = settings_json.getFloat("OuterConeAngle", light_setting->outer_cone_angle);
             light_setting->source_radius = settings_json.getFloat("SourceRadius", light_setting->source_radius);
-            light_setting->source_soft_radius = settings_json.getFloat("SourceSoftRadius", light_setting->source_soft_radius);
-            light_setting->source_length = settings_json.getFloat("SourceLength", light_setting->source_length);
+            light_setting->source_soft_radius = settings_json.getFloat("SourceSoftRadius", light_setting->source_soft_radius);            
             light_setting->source_width = settings_json.getFloat("SourceWidth", light_setting->source_width);
             light_setting->source_height = settings_json.getFloat("SourceHeight", light_setting->source_height);
             light_setting->barn_door_angle = settings_json.getFloat("BarnDoorAngle", light_setting->barn_door_angle);
             light_setting->barn_door_length = settings_json.getFloat("BarnDoorLength", light_setting->barn_door_length);
             light_setting->temperature = settings_json.getFloat("Temperature", light_setting->temperature);            
             light_setting->cast_shadows = settings_json.getBool("CastShadows", light_setting->cast_shadows);
+            light_setting->color_r =  static_cast<uint8_t>(settings_json.getInt("ColorR", light_setting->color_r));
+            light_setting->color_g =  static_cast<uint8_t>(settings_json.getInt("ColorG", light_setting->color_g));
+            light_setting->color_b =  static_cast<uint8_t>(settings_json.getInt("ColorB", light_setting->color_b));
 
             light_setting->position = createVectorSetting(settings_json, light_setting->position);
             light_setting->rotation = createRotationSetting(settings_json, light_setting->rotation);
