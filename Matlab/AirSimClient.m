@@ -1025,6 +1025,74 @@ classdef AirSimClient < handle
             obj.rpc_client.call("setKinematics", kinematicsState, ignore_collision, vehicleName);
         end
 
+        function [kinematicsState] = getGroundTruthKinematics(obj, vehicleName)
+            % GETGROUNDTRUTHKINEMATICS Get Physics engine raw kinematics of the vehicle.
+            %
+            % Description:
+            %   The position inside the returned KinematicsState is physics engine coordinate system, not Airsim.
+            %   If you save it then you can load it back with simSetPhysicsRawKinematics.
+            %   Accelaration is not used.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.
+            %
+            % Outputs:
+            %   kinematicsState - A structure containing:
+            %     position(1x3) - The position of the vehicle in right-hand coordinates.
+            %     orientation(1x4) - The quaternion representing the orientation of the vehicle in right-hand coordinates.
+            %     linear_velocity(1x3) - The linear velocity of the vehicle in right-hand coordinates.
+            %     angular_velocity(1x3) - The angular velocity of the vehicle in right-hand coordinates.
+            %     linear_acceleration(1x3) - The linear acceleration of the vehicle in right-hand coordinates.
+            %     angular_acceleration(1x3) - The angular acceleration of the vehicle in right-hand coordinates.
+
+            vehicleStateAirSim = obj.rpc_client.call("simGetPhysicsRawKinematics", vehicleName);
+            kinematicsState.position = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"position"})));
+            kinematicsState.orientation = quatinv(struct2array(struct(vehicleStateAirSim{"orientation"})));
+            kinematicsState.linear_velocity = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"linear_velocity"})));
+            kinematicsState.angular_velocity = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"angular_velocity"})));
+            kinematicsState.linear_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"linear_acceleration"})));
+            kinematicsState.angular_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"angular_acceleration"})));
+        end
+
+        function setPhysicsRawKinematics(obj, position, orientation, linear_velocity, angular_velocity, linear_acceleration, angular_acceleration, vehicleName)
+            % SETPHYSICSRAWKINEMATICS Set Physics engine raw kinematics of the vehicle.
+            %
+            % Description:
+            %   Need to be simGetPhysicsRawKinematics value or same coordinate system.
+            %   Accelaration is not used.
+            %
+            % Inputs:
+            %   position(1x3) - The position of the vehicle in right-hand coordinates.
+            %   orientation(1x4) - The quaternion representing the orientation of the vehicle in right-hand coordinates.
+            %   linear_velocity(1x3) - The linear velocity of the vehicle in right-hand coordinates.
+            %   angular_velocity(1x3) - The angular velocity of the vehicle in right-hand coordinates.
+            %   linear_acceleration(1x3) - The linear acceleration of the vehicle in right-hand coordinates.
+            %   angular_acceleration(1x3) - The angular acceleration of the vehicle in right-hand coordinates.
+            %   vehicleName - name of the vehicle.
+
+            kinematicsState.position.x_val = position(1);
+            kinematicsState.position.y_val = -position(2);
+            kinematicsState.position.z_val = -position(3);
+            orientation = quatinv(orientation);
+            kinematicsState.orientation.w_val = orientation(1);
+            kinematicsState.orientation.x_val = orientation(2);
+            kinematicsState.orientation.y_val = orientation(3);
+            kinematicsState.orientation.z_val = orientation(4);
+            kinematicsState.linear_velocity.x_val = linear_velocity(1);
+            kinematicsState.linear_velocity.y_val = -linear_velocity(2);
+            kinematicsState.linear_velocity.z_val = -linear_velocity(3);
+            kinematicsState.angular_velocity.x_val = angular_velocity(1);
+            kinematicsState.angular_velocity.y_val = -angular_velocity(2);
+            kinematicsState.angular_velocity.z_val = -angular_velocity(3);
+            kinematicsState.linear_acceleration.x_val = 0;
+            kinematicsState.linear_acceleration.y_val = 0;
+            kinematicsState.linear_acceleration.z_val = 0;
+            kinematicsState.angular_acceleration.x_val = 0;
+            kinematicsState.angular_acceleration.y_val = 0;
+            kinematicsState.angular_acceleration.z_val = 0;
+            obj.rpc_client.call("simSetPhysicsRawKinematics", kinematicsState, vehicleName);
+        end
+
         function [EnvironmentState] = getGroundTruthEnvironment(obj, vehicleName)
             % GETGROUNDTRUTHENVIRONMENT Retrieve the ground truth environment data.
             %
@@ -1839,6 +1907,26 @@ classdef AirSimClient < handle
                 name_regex string = ".*"
             end
             objectList = string(cell(obj.rpc_client.call("simListSceneObjects", name_regex)))';
+        end
+
+        function [objectList] = listSceneObjectsTags(obj, name_regex)
+            % LISTSCENEOBJECTTAGS ists the objects present and the given tag matching the regular expression in the environment.
+            %
+            % Description:
+            % The default behavior is to list all objects with first tag. A regex can be used to return a smaller list
+            % of matching objects or actors.
+            %
+            % Inputs:
+            %   name_regex - String to match actor tags against, e.g., "Gate.*".
+            %
+            % Outputs:
+            %   objectList - String array containing names of scene objects matching the pattern.
+
+            arguments
+                obj AirSimClient
+                name_regex string = ".*"
+            end
+            objectList = string(cell(obj.rpc_client.call("simListSceneObjectsTags", name_regex)))';
         end
 
         function success = loadLevel(obj, level_name)
