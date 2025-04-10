@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
-  <configuration build-checksum="3699191630" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
+  <configuration build-checksum="3085333039" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Cosys-AirSim Matlab API Client</param.appname>
     <param.authnamewatermark>Wouter Jansen</param.authnamewatermark>
     <param.email>wouter.jansen@uantwerpen.be</param.email>
@@ -21,9 +21,9 @@ Do note that at this point not all functions have been tested and most function 
       <item>8</item>
     </param.products.id>
     <param.products.version>
-      <item>24.1</item>
-      <item>24.1</item>
-      <item>24.1</item>
+      <item>24.2</item>
+      <item>24.2</item>
+      <item>24.2</item>
     </param.products.version>
     <param.platforms />
     <param.guid>3a9ac55d-69ef-4d53-9167-e1958860a717</param.guid>
@@ -57,8 +57,8 @@ Do note that at this point not all functions have been tested and most function 
     <param.required.addons />
     <param.matlab.project.id />
     <param.matlab.project.name />
-    <param.release.start>R2024a</param.release.start>
-    <param.release.end>latest</param.release.end>
+    <param.release.start />
+    <param.release.end />
     <param.release.current.only>false</param.release.current.only>
     <param.compatiblity.windows>true</param.compatiblity.windows>
     <param.compatiblity.macos>true</param.compatiblity.macos>
@@ -112,6 +112,7 @@ Do note that at this point not all functions have been tested and most function 
       <file>${PROJECT_ROOT}\demos.xml</file>
       <file>${PROJECT_ROOT}\doc</file>
       <file>${PROJECT_ROOT}\example.m</file>
+      <file>${PROJECT_ROOT}\example_lights.m</file>
       <file>${PROJECT_ROOT}\example_twodrones.m</file>
       <file>${PROJECT_ROOT}\help</file>
       <file>${PROJECT_ROOT}\html</file>
@@ -125,7 +126,7 @@ Do note that at this point not all functions have been tested and most function 
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2024a</root>
+      <root>C:\Program Files\MATLAB\R2024b</root>
       <toolboxes>
         <toolbox name="neuralnetwork" />
       </toolboxes>
