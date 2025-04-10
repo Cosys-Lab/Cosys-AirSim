@@ -41,7 +41,7 @@ class VehicleClient:
         Returns:
             int: Client version number
         """
-        return 3  # sync with C++ client
+        return 4  # sync with C++ client
 
     def getServerVersion(self):
         """
@@ -60,7 +60,7 @@ class VehicleClient:
         Returns:
             int: Minimum required server version number
         """
-        return 3  # sync with C++ client
+        return 4  # sync with C++ client
 
     def getMinRequiredClientVersion(self):
         """
