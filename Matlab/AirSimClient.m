@@ -1025,8 +1025,8 @@ classdef AirSimClient < handle
             obj.rpc_client.call("setKinematics", kinematicsState, ignore_collision, vehicleName);
         end
 
-        function [kinematicsState] = getGroundTruthKinematics(obj, vehicleName)
-            % GETGROUNDTRUTHKINEMATICS Get Physics engine raw kinematics of the vehicle.
+        function [kinematicsState] = getPhysicsRawKinematics(obj, vehicleName)
+            % GETPHYSICSRAWKINEMATICS Get Physics engine raw kinematics of the vehicle.
             %
             % Description:
             %   The position inside the returned KinematicsState is physics engine coordinate system, not Airsim.
