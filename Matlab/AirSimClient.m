@@ -1400,7 +1400,8 @@ classdef AirSimClient < handle
             %   light_name - Name of the light.
             %   intensity - Intensity value to set.            
 
-            obj.rpc_client.call("simSetLightIntensity", light_name, intensity);
+            warning("simSetLightIntensity is deprecated, use the new Artificial Light API instead");
+            obj.setWorldLightIntensity(light_name, intensity);
         end
 
         function swapTextures(obj, tags, tex_id, component_id, material_id)
