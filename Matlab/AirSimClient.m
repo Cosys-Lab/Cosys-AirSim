@@ -1750,8 +1750,8 @@ classdef AirSimClient < handle
             settings = string(obj.rpc_client.call('getSettingsString'));
         end
         
-        function simSetExtForce(obj, ext_force)
-            % SIMSETEXTFORCE Set an external force in the simulation
+        function setExtForce(obj, ext_force)
+            % SETEXTFORCE Set an external force in the simulation
             %
             % Description:
             %   Sets an external force in the simulation environment.
@@ -2067,7 +2067,7 @@ classdef AirSimClient < handle
         end
 
         function [objectList] = listAnnotationObjects(obj, annotation_name)
-            % SIMLISTANNOTATIONOBJECTS List annotation objects for a specific annotation layer.
+            % LISTANNOTATIONOBJECTS List annotation objects for a specific annotation layer.
             %
             % Description:
             %   Retrieves a list of annotation objects matching for a specific annotation layer from the AirSim API.
@@ -2116,7 +2116,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectID(obj, annotation_name, mesh_name, object_id, is_name_regex)
-            % SIMSETANNOTATIONOBJECTID Set ID for an annotation object. This works only for RGB layers.
+            % SETANNOTATIONOBJECTID Set ID for an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Sets the ID for a specified annotation object in the simulation via the AirSim API.
@@ -2135,7 +2135,7 @@ classdef AirSimClient < handle
         end
 
         function objectID = getAnnotationObjectID(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTID Get ID of an annotation object. This works only for RGB layers.
+            % GETANNOTATIONOBJECTID Get ID of an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Retrieves the ID of a specified annotation object from the AirSim API.
@@ -2152,7 +2152,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectColor(obj, annotation_name, mesh_name, r, g, b, is_name_regex)
-            % SIMSETANNOTATIONOBJECTCOLOR Set color for an annotation object. This works only for RGB layers.
+            % SETANNOTATIONOBJECTCOLOR Set color for an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Sets the color for a specified annotation object in the simulation via the AirSim API.
@@ -2173,7 +2173,7 @@ classdef AirSimClient < handle
         end
 
         function objectColor = getAnnotationObjectColor(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTCOLOR Get color of an annotation object. This works only for RGB layers.
+            % GETANNOTATIONOBJECTCOLOR Get color of an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Retrieves the color of a specified annotation object from the AirSim API. 
@@ -2190,7 +2190,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectValue(obj, annotation_name, mesh_name, greyscale_value, is_name_regex)
-            % SIMSETANNOTATIONOBJECTVALUE Set value for an annotation object. This only works for greyscale layers.
+            % SETANNOTATIONOBJECTVALUE Set value for an annotation object. This only works for greyscale layers.
             %
             % Description:
             %   Sets the greyscale value for a specified annotation object in the simulation via the AirSim API.
@@ -2209,7 +2209,7 @@ classdef AirSimClient < handle
         end
 
         function greyscaleValue = getAnnotationObjectValue(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTVALUE Get value of an annotation object. his only works for greyscale layers.
+            % GETANNOTATIONOBJECTVALUE Get value of an annotation object. his only works for greyscale layers.
             %
             % Description:
             %   Retrieves the greyscale value of a specified annotation object from the AirSim API.
@@ -2226,7 +2226,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectTextureByPath(obj, annotation_name, mesh_name, texture_path, is_name_regex)
-            % SIMSETANNOTATIONOBJECTTEXTUREBYPATH Set texture for an annotation object by path. This only works for texture layers.
+            % SETANNOTATIONOBJECTTEXTUREBYPATH Set texture for an annotation object by path. This only works for texture layers.
             %
             % Description:
             %   Sets the texture for a specified annotation object by specifying the texture path via the AirSim API.
@@ -2245,7 +2245,7 @@ classdef AirSimClient < handle
         end
 
         function success = enableAnnotationObjectTextureByPath(obj, annotation_name, mesh_name, is_name_regex)
-            % SIMENABLEANNOTATIONOBJECTTEXTUREBYPATH Enable texture for an annotation object by path. This only works for texture layers.
+            % ENABLEANNOTATIONOBJECTTEXTUREBYPATH Enable texture for an annotation object by path. This only works for texture layers.
             %
             % Description:
             %   Enables the texture for a specified annotation object by specifying the texture path via the AirSim API.
@@ -2263,7 +2263,7 @@ classdef AirSimClient < handle
         end
 
         function texturePath = getAnnotationObjectTexturePath(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTTEXTUREPATH Get texture path of an annotation object. This only works for texture layers.
+            % GETANNOTATIONOBJECTTEXTUREPATH Get texture path of an annotation object. This only works for texture layers.
             %
             % Description:
             %   Retrieves the texture path assigned to a specified annotation object from the AirSim API.
@@ -2349,8 +2349,8 @@ classdef AirSimClient < handle
             obj.rpc_client.call("simClearDetectionMeshNames", camera_name, image_type, vehicleName, annotation_name);
         end
 
-        function detectionInfo = simGetDetections(obj)
-            % SIMGETDETECTIONS Get detection information.
+        function detectionInfo = getDetections(obj)
+            % GETDETECTIONS Get detection information.
             %
             % Description:
             %   Retrieves information about detections from the AirSim API.
@@ -2444,8 +2444,8 @@ classdef AirSimClient < handle
             obj.rpc_client.call("simSetCameraPose", camera_name, newPose, vehicleName);
         end
 
-        function simSetCameraFov(obj, camera_name, fov_degrees, vehicleName)
-            % SIMSETCAMERAFOV Set camera field of view (FOV) via AirSim API.
+        function setCameraFov(obj, camera_name, fov_degrees, vehicleName)
+            % SETCAMERAFOV Set camera field of view (FOV) via AirSim API.
             %
             % Description:
             %   Sets the field of view (FOV) of a specified camera.
@@ -2455,7 +2455,7 @@ classdef AirSimClient < handle
             %   fov_degrees (double) - Field of view angle in degrees.
             %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("setCameraFov", camera_name, fov_degrees, vehicleName);
+            obj.rpc_client.call("simSetCameraFov", camera_name, fov_degrees, vehicleName);
         end
 
         function settings = getPresetLensSettings(obj, sensorName, vehicleName)
