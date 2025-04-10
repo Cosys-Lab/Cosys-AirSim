@@ -1300,7 +1300,7 @@ class VehicleClient:
         Returns:
             KinematicsState: Physics engine raw kinematics
         """
-        kinematics_state = self.client.call('simGetGroundTruthKinematics', vehicle_name)
+        kinematics_state = self.client.call('simGetPhysicsRawKinematics', vehicle_name)
         return KinematicsState.from_msgpack(kinematics_state)
 
     simGetPhysicsRawKinematics.__annotations__ = {'return': KinematicsState}
