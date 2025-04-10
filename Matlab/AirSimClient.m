@@ -212,7 +212,7 @@ classdef AirSimClient < handle
             geopoint.longitude = double(curGeoPointData{"longitude"});
             geopoint.altitude = double(curGeoPointData{"altitude"});
             gnssData.geo_point = geopoint;            
-            gnssData.fix_type = double(curGeoPointData{"fix_type"});
+            gnssData.fix_type = double(gnssDataRaw{"fix_type"});
             gnssData.time_utc = double(double(curGeoPointData{"time_utc"}))/1e9;   
             
             isValid = data{"is_valid"};
