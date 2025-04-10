@@ -2,14 +2,16 @@
 * Added [Artificial Lights](docs/lights.md) for generating static world lights or moving vehicle lights with many parameters exposed. 
 * Added fake motion blur, guassian blur, and radial blur noise effects to the camera settings.
 * Added ForceUpdate to CaptureSettings to force it to update every render frame. This can fix issues with post-processing not applying correctly or other bugs related to camera appearing not correct.
-* Updated camera configuration to include all useful camera settings for post-processing. 
-* Updated documentation for capture and noise camera settings to include all available parameters.
-* Updated Client/Server RPC API version to 4 to force upgrades. 
-* Fixed annotation names not always containing the static mesh name if available.
-* Fixed typo on GNSS data retrieval in Matlab API Client.
 * Added shell scripts for building Docker with ROS2 package [#62 by kestr31](https://github.com/Cosys-Lab/Cosys-AirSim/pull/62).
 * Added `simListSceneObjectsTags` API call. [#68 by Kokika](https://github.com/Cosys-Lab/Cosys-AirSim/pull/68).
 * Added `simGetPhysicsRawKinematics` and `simSetPhysicsRawKinematics` API calls. [#69 and #70 by Kokika](https://github.com/Cosys-Lab/Cosys-AirSim/pull/69).
+* Updated camera configuration to include all useful camera settings for post-processing. 
+* Updated documentation for capture and noise camera settings to include all available parameters.
+* Updated Client/Server RPC API version to 4 to force upgrades. 
+* Fixed several matlab functions not following the correct naming scheme without `sim` prefix. 
+* Fixed annotation names not always containing the static mesh name if available.
+* Fixed `getGpsData` not working in Matlab API Client.
+* Fixed `setKinematics` not working in Matlab API Client.
 * Fixed some Python API test scripts as they were failing due to deprecated functions. [#73 by bsamadi](https://github.com/Cosys-Lab/Cosys-AirSim/pull/73).
 
 ### November/December 2024 (version 3.2)
