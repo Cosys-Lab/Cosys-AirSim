@@ -986,8 +986,8 @@ classdef AirSimClient < handle
             kinematicsState.angular_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"angular_acceleration"})));
         end
 
-        function simSetKinematics(obj, position, orientation, linear_velocity, angular_velocity, linear_acceleration, angular_acceleration)
-            % SIMSETKINEMATICS Set the kinematic state of the vehicle.
+        function setKinematics(obj, position, orientation, linear_velocity, angular_velocity, linear_acceleration, angular_acceleration, ignore_collision, vehicleName)
+            % SETKINEMATICS Set the kinematic state of the vehicle.
             %
             % Description:
             %   Sets the kinematic state of the vehicle including position, orientation, linear and angular velocities, and accelerations.
@@ -999,6 +999,8 @@ classdef AirSimClient < handle
             %   angular_velocity(1x3) - The angular velocity of the vehicle in right-hand coordinates.
             %   linear_acceleration(1x3) - The linear acceleration of the vehicle in right-hand coordinates.
             %   angular_acceleration(1x3) - The angular acceleration of the vehicle in right-hand coordinates.
+            %   ignore_collision: Whether to ignore any collision or not.
+            %   vehicleName - name of the vehicle.
 
             kinematicsState.position.x_val = position(1);
             kinematicsState.position.y_val = -position(2);
