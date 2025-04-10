@@ -195,7 +195,9 @@ class VehicleClient:
         Returns:
             bool: True if successful, otherwise False
         """
-        return self.client.call("simSetLightIntensity", light_name, intensity)
+
+        logging.warning("simSetLightIntensity is deprecated, use the new Artificial Light API instead")
+        return self.simSetWorldLightIntensity(light_name, intensity)
 
     def simSwapTextures(self, tags, tex_id=0, component_id=0, material_id=0):
         """
