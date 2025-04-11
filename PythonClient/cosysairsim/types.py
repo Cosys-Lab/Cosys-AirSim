@@ -51,6 +51,8 @@ class _ImageType(type):
         return 9
     def Annotation(cls):
         return 10
+    def Lighting(cls):
+        return 11
 
     def __getattr__(self, key):
         if key == 'DepthPlanar':
@@ -69,6 +71,7 @@ class ImageType(metaclass=_ImageType):
     OpticalFlow = 8
     OpticalFlowVis = 9
     Annotation = 10
+    Lighting = 11
 
 class DrivetrainType:
     MaxDegreeOfFreedom = 0

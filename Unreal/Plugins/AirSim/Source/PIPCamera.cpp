@@ -93,6 +93,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Infrared), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlow), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlowVis), EPixelFormat::PF_B8G8R8A8);
+    image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Lighting), EPixelFormat::PF_B8G8R8A8);
 
     object_filter_ = FObjectFilter();
 
@@ -133,6 +134,8 @@ void APIPCamera::PostInitializeComponents()
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("OpticalFlowCaptureComponent"));
     captures_[Utils::toNumeric(ImageType::OpticalFlowVis)] =
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("OpticalFlowVisCaptureComponent"));
+    captures_[Utils::toNumeric(ImageType::Lighting)] =
+        UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("LightningCaptureComponent"));
 
     for (unsigned int i = 0; i < imageTypeCount(); ++i) {
         detections_[i] = NewObject<UDetectionComponent>(this);
@@ -147,6 +150,18 @@ void APIPCamera::PostInitializeComponents()
 
     FObjectAnnotator::SetViewForAnnotationRender(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
     captures_[Utils::toNumeric(ImageType::Segmentation)]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetMaterials(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetPostProcessing(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetHMDDistortion(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetTonemapper(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetEyeAdaptation(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetFog(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetPaper2DSprites(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetBloom(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetMotionBlur(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetVisualizeSkyAtmosphere(false);
+    //captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetAtmosphere(false);
 }
 
 void APIPCamera::BeginPlay()

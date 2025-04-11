@@ -24,7 +24,8 @@ const std::unordered_map<int, std::string> AirsimROSWrapper::image_type_int_to_s
     { 7, "Infrared" },
     { 8, "OpticalFlow" },
     { 9, "OpticalFlowVis" },
-    { 10, "Annotation" }
+    { 10, "Annotation" },
+    { 11, "Lighting" },
 
 };
 

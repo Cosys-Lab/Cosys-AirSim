@@ -68,6 +68,7 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 * Added various [random but deterministic dynamic object types and world configuration options](https://cosys-lab.github.io/dynamic_objects).
 * Added [Artificial Lights](https://cosys-lab.github.io/lights). 
 * Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.
+* Added a new image type called [Lighting](https://cosys-lab.github.io/image_apis) which only shows the light information and no materials.
 * Updated [ComputerVision mode](https://cosys-lab.github.io/image_apis#computer-vision-mode-1): Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.
 * Updated [LIDAR sensor type](https://cosys-lab.github.io/lidar): Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.
 * Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.
