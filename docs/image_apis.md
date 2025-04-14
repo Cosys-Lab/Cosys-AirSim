@@ -229,8 +229,8 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
   Infrared = 7,
   OpticalFlow = 8,
   OpticalFlowVis = 9
-  Annotation = 10
-  Lighting = 11
+  Lighting = 10
+  Annotation = 11
 ```                
 
 ### DepthPlanar and DepthPerspective

@@ -2,7 +2,7 @@
 * The latest available stable Unreal Engine version that is now targeted for release is 5.5. This means 5.4 will no longer be actively maintained. 
 * Added [Artificial Lights](docs/lights.md) for generating static world lights or moving vehicle lights with many parameters exposed. 
 * Added fake motion blur, guassian blur, and radial blur noise effects to the camera settings.
-* Added new image type called _Lighting_ which only shows the light information and no materials. See [here](docs/image_apis.md#lighting) for more information.
+* Added new image type called _Lighting_ which only shows the light information and no materials. See [here](docs/image_apis.md#lighting) for more information. **Note this changes Annotation ImageType number to 11!** 
 * Added ForceUpdate to CaptureSettings to force it to update every render frame. This can fix issues with post-processing not applying correctly or other bugs related to camera appearing not correct.
 * Added shell scripts for building Docker with ROS2 package [#62 by kestr31](https://github.com/Cosys-Lab/Cosys-AirSim/pull/62).
 * Added `simListSceneObjectsTags` API call. [#68 by Kokika](https://github.com/Cosys-Lab/Cosys-AirSim/pull/68).

@@ -232,6 +232,16 @@
                 "ProjectionMode": "",
                 "OrthoWidth": 5.12,
                 "IgnoreMarked": false
+            },
+            {
+                "ImageType": 11,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
             }
         ],
         "NoiseSettings": [
