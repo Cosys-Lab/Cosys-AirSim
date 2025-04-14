@@ -9,6 +9,7 @@
 * Updated camera configuration to include all useful camera settings for post-processing. 
 * Updated documentation for capture and noise camera settings to include all available parameters.
 * Updated Client/Server RPC API version to 4 to force upgrades. 
+* Fixed BoxCar getting stuck in reverse. 
 * Fixed several matlab functions not following the correct naming scheme without `sim` prefix. 
 * Fixed annotation names not always containing the static mesh name if available.
 * Fixed `getGpsData` not working in Matlab API Client.
