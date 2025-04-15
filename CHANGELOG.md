@@ -1,9 +1,23 @@
-### In Development
-* Exposed all useful camera settings for post processing from the Unreal Engine to the settings. 
-* Added fake motion blur, guassian blur and radial blur noise effects to the camera settings.
-* Added ForceUpdate to CaptureSettings to force it update every render frame. can fix issues with post processing not applying correctly or other bugs related to camera appearing not correct.
+### April 2025 (version 3.3)
+* The latest available stable Unreal Engine version that is now targeted for release is 5.5. This means 5.4 will no longer be actively maintained. 
+* The documentation now is placed on a sub-URL page here: https://cosys-lab.github.io/Cosys-AirSim
+* Added [Artificial Lights](docs/lights.md) for generating static world lights or moving vehicle lights with many parameters exposed. 
+* Added fake motion blur, guassian blur, and radial blur noise effects to the camera settings.
+* Added new image type called _Lighting_ which only shows the light information and no materials. See [here](docs/image_apis.md#lighting) for more information. **Note this changes Annotation ImageType number to 11!** 
+* Added ForceUpdate to CaptureSettings to force it to update every render frame. This can fix issues with post-processing not applying correctly or other bugs related to camera appearing not correct.
+* Added shell scripts for building Docker with ROS2 package [#62 by kestr31](https://github.com/Cosys-Lab/Cosys-AirSim/pull/62).
+* Added `simListSceneObjectsTags` API call. [#68 by Kokika](https://github.com/Cosys-Lab/Cosys-AirSim/pull/68).
+* Added `simGetPhysicsRawKinematics` and `simSetPhysicsRawKinematics` API calls. [#69 and #70 by Kokika](https://github.com/Cosys-Lab/Cosys-AirSim/pull/69).
+* Added new blueprint callable event `OnResetEvent` for the AirSim game-mode that triggers when the reset function is used in AirSim.
+* Updated camera configuration to include all useful camera settings for post-processing. 
 * Updated documentation for capture and noise camera settings to include all available parameters.
-* Fixed annotation names not always containing staticmesh name if available
+* Updated Client/Server RPC API version to 4 to force upgrades. 
+* Fixed BoxCar getting stuck in reverse. 
+* Fixed several matlab functions not following the correct naming scheme without `sim` prefix. 
+* Fixed annotation names not always containing the static mesh name if available.
+* Fixed `getGpsData` not working in Matlab API Client.
+* Fixed `setKinematics` not working in Matlab API Client.
+* Fixed some Python API test scripts as they were failing due to deprecated functions. [#73 by bsamadi](https://github.com/Cosys-Lab/Cosys-AirSim/pull/73).
 
 ### November/December 2024 (version 3.2)
 * Unreal 5.2.1 is now long term support and will continue to get releases build for it and new features and fixes added to it. 

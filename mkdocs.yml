@@ -90,7 +90,6 @@ nav:
     - "AirSim with MAVROS and PX4": 'https://youtu.be/ZonkdMcwXH4'
   - "Misc":
     - "AirSim on Real Drones": 'custom_drone.md'
-    - "Installing cmake on Linux": 'cmake_linux.md'
     - "pfm format": 'pfm.md'
     - "Setting up Unreal Environment": 'unreal_proj.md'
     - "Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects": 'packaging.md'
