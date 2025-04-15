@@ -39,6 +39,7 @@ nav:
     - "Import Gazebo models": "gazebo_drone.md"
     - "Domain Randomization": "retexturing.md"
     - "Mesh Vertex Buffers": "meshes.md"
+    - "Artificial Lights": 'lights.md'
     - "Sensors":
       - "Sensors": 'sensors.md'
       - "LIDAR": 'lidar.md'
