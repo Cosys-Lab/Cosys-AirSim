@@ -8,6 +8,7 @@
 * Added shell scripts for building Docker with ROS2 package [#62 by kestr31](https://github.com/Cosys-Lab/Cosys-AirSim/pull/62).
 * Added `simListSceneObjectsTags` API call. [#68 by Kokika](https://github.com/Cosys-Lab/Cosys-AirSim/pull/68).
 * Added `simGetPhysicsRawKinematics` and `simSetPhysicsRawKinematics` API calls. [#69 and #70 by Kokika](https://github.com/Cosys-Lab/Cosys-AirSim/pull/69).
+* Added new blueprint callable event `OnResetEvent` for the AirSim game-mode that triggers when the reset function is used in AirSim.
 * Updated camera configuration to include all useful camera settings for post-processing. 
 * Updated documentation for capture and noise camera settings to include all available parameters.
 * Updated Client/Server RPC API version to 4 to force upgrades. 
