@@ -336,46 +336,46 @@ Please contact a Cosys-Lab researcher to get more in depth information on which 
 <h2 id="cosys-lab-modifications">Cosys-Lab Modifications</h2>
 <ul>
 <li>Updated for Unreal 5.</li>
-<li>Added <a href="https://cosys-lab.github.io/annotation">multi-layer annotation</a> for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.</li>
-<li>Added <a href="https://cosys-lab.github.io/instance_segmentation">Instance Segmentation</a>. </li>
-<li>Added <a href="https://cosys-lab.github.io/echo">Echo sensor type</a> for simulation of sensors like sonar and radar.</li>
-<li>Added <a href="https://cosys-lab.github.io/gpulidar">GPU LIDAR sensor type</a>: Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.</li>
-<li>Added <a href="https://cosys-lab.github.io/skid_steer_vehicle">skid steering SimMode and vehicle type</a>. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. </li>
-<li>Added <a href="https://cosys-lab.github.io/matlab">Matlab API Client</a> implementation as an easy to install Matlab toolbox.</li>
-<li>Added various <a href="https://cosys-lab.github.io/dynamic_objects">random but deterministic dynamic object types and world configuration options</a>.</li>
-<li>Added <a href="https://cosys-lab.github.io/lights">Artificial Lights</a>. </li>
+<li>Added <a href="https://cosys-lab.github.io/Cosys-AirSim/annotation">multi-layer annotation</a> for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.</li>
+<li>Added <a href="https://cosys-lab.github.io/Cosys-AirSim/instance_segmentation">Instance Segmentation</a>. </li>
+<li>Added <a href="https://cosys-lab.github.io/Cosys-AirSim/echo">Echo sensor type</a> for simulation of sensors like sonar and radar.</li>
+<li>Added <a href="https://cosys-lab.github.io/Cosys-AirSim/gpulidar">GPU LIDAR sensor type</a>: Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.</li>
+<li>Added <a href="https://cosys-lab.github.io/Cosys-AirSim/skid_steer_vehicle">skid steering SimMode and vehicle type</a>. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. </li>
+<li>Added <a href="https://cosys-lab.github.io/Cosys-AirSim/matlab">Matlab API Client</a> implementation as an easy to install Matlab toolbox.</li>
+<li>Added various <a href="https://cosys-lab.github.io/Cosys-AirSim/dynamic_objects">random but deterministic dynamic object types and world configuration options</a>.</li>
+<li>Added <a href="https://cosys-lab.github.io/Cosys-AirSim/lights">Artificial Lights</a>. </li>
 <li>Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.</li>
-<li>Added a new image type called <a href="https://cosys-lab.github.io/image_apis">Lighting</a> which only shows the light information and no materials.</li>
-<li>Updated <a href="https://cosys-lab.github.io/image_apis#computer-vision-mode-1">ComputerVision mode</a>: Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.</li>
-<li>Updated <a href="https://cosys-lab.github.io/lidar">LIDAR sensor type</a>: Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.</li>
+<li>Added a new image type called <a href="https://cosys-lab.github.io/Cosys-AirSim/image_apis">Lighting</a> which only shows the light information and no materials.</li>
+<li>Updated <a href="https://cosys-lab.github.io/Cosys-AirSim/image_apis#computer-vision-mode-1">ComputerVision mode</a>: Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.</li>
+<li>Updated <a href="https://cosys-lab.github.io/Cosys-AirSim/lidar">LIDAR sensor type</a>: Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.</li>
 <li>Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.</li>
-<li>Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the <em>MarkedIgnore</em> Unreal tag and enabling the "IgnoreMarked" setting in <a href="https://cosys-lab.github.io/settings">the settings file</a>.</li>
+<li>Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the <em>MarkedIgnore</em> Unreal tag and enabling the "IgnoreMarked" setting in <a href="https://cosys-lab.github.io/Cosys-AirSim/settings">the settings file</a>.</li>
 <li>Updated cameras sensor with more distortion features such as chromatic aberration, motion blur and lens distortion. </li>
-<li>Updated Python <a href="https://cosys-lab.github.io/ros_python">ROS implementation</a> with completely new implementation and feature set.</li>
-<li>Updated C++ <a href="https://cosys-lab.github.io/ros_cplusplus">ROS2 implementation</a> to support custom Cosys-AirSim features.</li>
+<li>Updated Python <a href="https://cosys-lab.github.io/Cosys-AirSim/ros_python">ROS implementation</a> with completely new implementation and feature set.</li>
+<li>Updated C++ <a href="https://cosys-lab.github.io/Cosys-AirSim/ros_cplusplus">ROS2 implementation</a> to support custom Cosys-AirSim features.</li>
 <li>Dropped support for Unity Environments.</li>
 </ul>
 <p>Some more details on our changes can be found in the <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">changelog</a>.</p>
 <h2 id="how-to-get-it">How to Get It</h2>
 <h4 id="download-and-run-from-packaged-binary-windowslinux">Download and run from packaged binary - Windows/Linux</h4>
 <ul>
-<li><a href="https://cosys-lab.github.io/run_packaged">Download and run it</a></li>
+<li><a href="https://cosys-lab.github.io/Cosys-AirSim/run_packaged">Download and run it</a></li>
 </ul>
 <h4 id="download-and-install-from-precompiled-plugin-windowslinux">Download and install from precompiled plugin - Windows/Linux</h4>
 <ul>
-<li><a href="https://cosys-lab.github.io/install_precompiled">Download and install it</a></li>
+<li><a href="https://cosys-lab.github.io/Cosys-AirSim/install_precompiled">Download and install it</a></li>
 </ul>
 <h4 id="install-and-use-from-source-windows">Install and use from source - Windows</h4>
 <ul>
-<li><a href="https://cosys-lab.github.io/install_windows">Install/Build it</a></li>
+<li><a href="https://cosys-lab.github.io/Cosys-AirSim/install_windows">Install/Build it</a></li>
 </ul>
 <h4 id="install-and-use-from-source-linux">Install and use from source - Linux</h4>
 <ul>
-<li><a href="https://cosys-lab.github.io/install_linux">Install/Build it</a></li>
+<li><a href="https://cosys-lab.github.io/Cosys-AirSim/install_linux">Install/Build it</a></li>
 </ul>
 <h2 id="how-to-use-it">How to Use It</h2>
 <h3 id="documentation">Documentation</h3>
-<p>View our <a href="https://cosys-lab.github.io/">detailed documentation</a> on all aspects of Cosys-AirSim.</p>
+<p>View our <a href="https://cosys-lab.github.io/Cosys-AirSim/">detailed documentation</a> on all aspects of Cosys-AirSim.</p>
 <h2 id="original-airsim-paper">Original AirSim Paper</h2>
 <p>More technical details are available in <a href="https://arxiv.org/abs/1705.05065">AirSim paper (FSR 2017 Conference)</a>. Please cite this as:</p>
 <pre><code>@inproceedings{airsim2017fsr,
