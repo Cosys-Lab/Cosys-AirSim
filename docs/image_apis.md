@@ -229,7 +229,8 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
   Infrared = 7,
   OpticalFlow = 8,
   OpticalFlowVis = 9
-  Annotation = 10
+  Lighting = 10
+  Annotation = 11
 ```                
 
 ### DepthPlanar and DepthPerspective
@@ -332,6 +333,12 @@ For example with Python, you can use the following examples for RGB and greyscal
     img = Image.fromarray(rgbarray_shaped[:,:,0])
     img.show()
 ```
+
+### Lighting
+This layer only shows lighting information and as such does not include other material information (color, normal maps, PBR material parameters, ...) in the image. 
+It shows a neutral material only affected by lighting. 
+Note that objects using transparent materials may still show their full diffuse color due to engine limitations. 
+This can be useful to indicate what parts of an image are in shadow or how much light is received on certain objects by artificial or natural light sources. 
 
 ## Lumen Lightning for Scene camera
 Unreal 5 introduces Lumen lightning. Due to the cameras using scene capture components enabling Lumen for them can be costly on performance. Settings have been added specfically for the scene camera to customize the usage of Lumen for Global Illumination and Reflections. 
