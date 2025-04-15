@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
-  <configuration build-checksum="3085333039" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
+  <configuration build-checksum="1964184424" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Cosys-AirSim Matlab API Client</param.appname>
     <param.authnamewatermark>Wouter Jansen</param.authnamewatermark>
     <param.email>wouter.jansen@uantwerpen.be</param.email>
@@ -112,7 +112,6 @@ Do note that at this point not all functions have been tested and most function 
       <file>${PROJECT_ROOT}\demos.xml</file>
       <file>${PROJECT_ROOT}\doc</file>
       <file>${PROJECT_ROOT}\example.m</file>
-      <file>${PROJECT_ROOT}\example_lights.m</file>
       <file>${PROJECT_ROOT}\example_twodrones.m</file>
       <file>${PROJECT_ROOT}\help</file>
       <file>${PROJECT_ROOT}\html</file>
