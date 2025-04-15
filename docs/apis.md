@@ -216,9 +216,7 @@ More on [lidar APIs and settings](lidar.md), [GPUlidar APIs and settings](gpulid
 
 ### Light Control APIs
 
-Lights that can be manipulated inside AirSim can be created via the `simSpawnObject()` API by passing either `PointLightBP` or `SpotLightBP` as the `asset_name` parameter and `True` as the `is_blueprint` parameter. Once a light has been spawned, it can be manipulated using the following API:
-
-* `simSetLightIntensity`: This allows you to edit a light's intensity or brightness. It takes two parameters, `light_name`, the name of the light object returned by a previous call to `simSpawnObject()`, and `intensity`, a float value.
+Lights that can be manipulated inside Cosys-AirSim can be created via the [Artificial Lights system](lights.md). The original AirSim Lights API is deprecated. 
 
 ### Texture APIs
 

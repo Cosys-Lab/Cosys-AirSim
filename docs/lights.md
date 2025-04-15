@@ -92,7 +92,8 @@ The following parameters can be configured:
 
 ## Client API 
 You can toggle lights on and off with the API as well as set their intensity value. There are seperate commands for vehicle and world lights:
- - `simSetWorldLightVisibility(light_name (string), is_visible (boolean))` 
- - `simSetWorldLightIntensity(light_name (string), intensity (float))` 
- - `simSetVehicleLightVisibility(vehicle_name (string), light_name (string), is_visible (boolean))` 
- - `simSetVehicleLightIntensity(vehicle_name (string), light_name (string), intensity (float))` 
+
+* `simSetWorldLightVisibility(light_name (string), is_visible (boolean))` 
+* `simSetWorldLightIntensity(light_name (string), intensity (float))` 
+* `simSetVehicleLightVisibility(vehicle_name (string), light_name (string), is_visible (boolean))` 
+* `simSetVehicleLightIntensity(vehicle_name (string), light_name (string), intensity (float))` 
