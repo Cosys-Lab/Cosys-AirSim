@@ -1,5 +1,6 @@
 ### In Development
 * The latest available stable Unreal Engine version that is now targeted for release is 5.5. This means 5.4 will no longer be actively maintained. 
+* The documentation now is placed on a sub-URL page here: https://cosys-lab.github.io/Cosys-AirSim
 * Added [Artificial Lights](docs/lights.md) for generating static world lights or moving vehicle lights with many parameters exposed. 
 * Added fake motion blur, guassian blur, and radial blur noise effects to the camera settings.
 * Added new image type called _Lighting_ which only shows the light information and no materials. See [here](docs/image_apis.md#lighting) for more information. **Note this changes Annotation ImageType number to 11!** 
