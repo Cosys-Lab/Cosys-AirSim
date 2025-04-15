@@ -336,7 +336,8 @@ For example with Python, you can use the following examples for RGB and greyscal
 
 ### Lighting
 This layer only shows lighting information and as such does not include other material information (color, normal maps, PBR material parameters, ...) in the image. 
-It shows a neutral material only affected by lighting. It includes colored illumination when using [Unreal's Global Illumination](https://dev.epicgames.com/documentation/en-us/unreal-engine/global-illumination-in-unreal-engine).
+It shows a neutral material only affected by lighting. 
+Note that objects using transparent materials may still show their full diffuse color due to engine limitations. 
 This can be useful to indicate what parts of an image are in shadow or how much light is received on certain objects by artificial or natural light sources. 
 
 ## Lumen Lightning for Scene camera
