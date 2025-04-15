@@ -1,4 +1,4 @@
-### In Development
+### April 2025 (version 3.3)
 * The latest available stable Unreal Engine version that is now targeted for release is 5.5. This means 5.4 will no longer be actively maintained. 
 * The documentation now is placed on a sub-URL page here: https://cosys-lab.github.io/Cosys-AirSim
 * Added [Artificial Lights](docs/lights.md) for generating static world lights or moving vehicle lights with many parameters exposed. 
