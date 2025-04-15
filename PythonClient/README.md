@@ -22,5 +22,5 @@ For this go into the _PythonClient_ folder of the Cosys-AirSim repository and us
 ## More Info
 
 More information on AirSim can be found at:
-https://cosys-lab.github.io/
+https://cosys-lab.github.io/Cosys-AirSim/
 
