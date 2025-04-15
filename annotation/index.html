@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Annotation - Cosys-AirSim</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Annotation";
+        var mkdocs_page_input_path = "annotation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cosys-AirSim
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Home</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">Changelog</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Installing AirSim</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../run_packaged/">Download and run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_precompiled/">Download and install from precompiled plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_windows/">Install from Source on Windows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_linux/">Install from Source on Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../docker_ubuntu/">Using Docker on Ubuntu</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_custenv/">Custom Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dynamic_objects/">Dynamic Objects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Using AirSim</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../apis/">Core APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../image_apis/">Image APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apis_cpp/">C++ APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../instance_segmentation/">Instance Segmentation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Annotation</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#settings-json-definition-of-layers">Settings JSON definition of layers</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#type-1-rgb">Type 1: RGB</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#type-2-greyscale">Type 2: Greyscale</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#type-3-texture">Type 3: Texture</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#common-functionality">Common functionality</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#getting-annotation-data-from-sensors">Getting annotation data from sensors</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../camera_views/">Camera Views</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../using_car/">Car Mode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remote_control/">Remote Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../xbox_controller/">XBox Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../steering_wheel_installation/">Steering Wheel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../multi_vehicle/">Multiple Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../skid_steer_vehicle/">Skid Steer Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gazebo_drone/">Import Gazebo models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../retexturing/">Domain Randomization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../meshes/">Mesh Vertex Buffers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lights/">Artificial Lights</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sensors</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../sensors/">Sensors</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../lidar/">LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpulidar/">GPU LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../echo/">Pulse Echo</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../InfraredCamera/">Infrared Camera</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../distance_sensor/">Distance Sensor</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ROS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_python/">ROS: AirSim ROS Python Wrapper</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_cplusplus/">ROS2: AirSim ROS C++ Wrapper</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matlab/">Matlab</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playback/">Playing Logs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../voxel_grid/">Voxel Grid Generator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event_sim/">Event camera</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Design</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../modify_recording_data/">Modifying Recording Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flight_controller/">Flight Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../adding_new_apis/">Adding new APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../simple_flight/">Simple Flight</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">External Flight Controllers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">MavLink and PX4</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_setup/">PX4 Setup for AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl/">PX4 in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl_wsl2/">PX4 SITL with WSL 2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_lockstep/">PX4 Lockstep</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_multi_vehicle/">PX4 Multi-vehicle in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/1oY8Qu5maQQ">AirSim with Pixhawk</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/HNWdYrtw3f0">PX4 Setup with AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be">Debugging Attitude Estimation</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages">Intercepting MavLink Messages</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones">Rapid Descent on PX4 Drones</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_build/">Building PX4</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_logging/">PX4/MavLink Logging</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../log_viewer/">MavLink LogViewer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom/">MavLinkCom</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom_mocap/">MavLink MoCap</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ArduPilot</a>
+    <ul>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/building-the-code.html">ArduPilot SITL Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/sitl-with-airsim.html">AirSim & ArduPilot</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Contributed Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://www.youtube.com/watch?v=y09VbdQWvQY">Using Environments from Marketplace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/simondlevy/AirSimTensorFlow">Simple Collision Avoidance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://aka.ms/AutonomousDrivingCookbook">Autonomous Driving on Azure</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building Hexacopter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo">Moving on Path Demo</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/Bp86WiLUC80">Importing a custom multirotor mesh</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object_detection/">Object Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/ZonkdMcwXH4">AirSim with MAVROS and PX4</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Misc</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom_drone/">AirSim on Real Drones</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pfm/">pfm format</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_proj/">Setting up Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../packaging/">Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_blocks/">Blocks Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../working_with_plugin_contents/">Working with UE Plugin Contents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/technion">Formula Student Technion Self-drive</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cosys-AirSim</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Using AirSim &raquo;</li>
+      <li>Annotation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/annotation.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="annotation-in-cosys-airsim">Annotation in Cosys-AirSim</h1>
+<p>A multi-layer annotation system is implemented into Cosys-AirSim. It uses Proxy Mesh rendering to allow for each object in the world to be annotated by a greyscale value, an RGB color or a texture that fits the mesh.
+An annotation layer allows the user to tag individual actors and/or their child-components with a certain annotation component. This can be used to create ground truth data for machine learning models or to create a visual representation of the environment.</p>
+<p>Let's say you want to train a model to detect cars or pedestrians, you create an RGB annotation layer where  you can tag all the cars and pedestrians in the environment with a certain RGB color respectively. 
+Through the API you can then get the image of this RGB annotation layer (GPU LiDAR is also supported next to cameras). 
+Or you want to assign a ripeness value to all the apples in your environment, you can create a greyscale annotation layer where you can tag all the apples with a certain greyscale value between 0 and 1.
+Similarly, you can also load a texture to a specific mesh component only visible in the annotation layer. For example when trying to show where defects are in a mesh.
+The annotation system uses actor and/or component tags to set these values for the 3 modes (greyscale, RGB, texture). You can add these manually or use the APIs (RPC API, Unreal Blueprint, Unreal c++).</p>
+<h2 id="limitations">Limitations</h2>
+<ul>
+<li>2744000 different RGB colors are currently available to be assigned to unique objects. If your environment during a run requires more colors, you will generate errors and new objects will be assigned color [0,0,0].</li>
+<li>Only static and skeletal meshes are supported.</li>
+<li>Landscape objects aren't supported. This is the special object type in Unreal to make terrain with. As a work-around, StaticMesh terrain must be used.</li>
+<li>Foliage objects aren't supported. This is the special object type in Unreal to place trees, grass and other plants that move with the wind. As a work-around, StaticMesh objects must be used.</li>
+<li>Brush objects aren't supported. This is a special object type in Unreal to create your own meshes with. As a work-around, you can convert them to a StaticMesh.</li>
+<li>These and other unsupported object types that are less common that either will not be rendered (decals, text, foliage, ...) or will by default be given the RGB color value of [149,149,149] or [0,0,0]. (brush objects, landscape,...).</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<h3 id="settings-json-definition-of-layers">Settings JSON definition of layers</h3>
+<p>To use the annotation system, you need to set the annotation mode in the settings.json file. You can define as many as you want and use them simultaneously. You will always have to ID them by the name.
+Here you define each layer with a name, the type and some other settings, often specific to the type. 
+For example:</p>
+<pre><code class="language-json">{
+  ...
+    &quot;Annotation&quot;: [
+    {
+        &quot;Name&quot;: &quot;RGBTestDirect&quot;,
+        &quot;Type&quot;: 0,
+        &quot;Default&quot;: true,
+        &quot;SetDirect&quot;: true,
+        &quot;ViewDistance&quot;: 10
+    },
+    {
+        &quot;Name&quot;: &quot;RGBTestIndex&quot;,
+        &quot;Type&quot;: 0,
+        &quot;Default&quot;: true,
+        &quot;SetDirect&quot;: false
+    },
+    {
+        &quot;Name&quot;: &quot;GreyscaleTest&quot;,
+        &quot;Type&quot;: 1,
+        &quot;Default&quot;: true,
+        &quot;ViewDistance&quot;: 5
+    },
+    {
+        &quot;Name&quot;: &quot;TextureTestDirect&quot;,
+        &quot;Type&quot;: 2,
+        &quot;Default&quot;: true,
+        &quot;SetDirect&quot;: true
+    },
+    {
+        &quot;Name&quot;: &quot;TextureTestRelativePath&quot;,
+        &quot;Type&quot;: 2,
+        &quot;Default&quot;: false,
+        &quot;SetDirect&quot;: false,
+        &quot;TexturePath&quot;: &quot;/Game/AnnotationTest&quot;,
+        &quot;TexturePrefix&quot;: &quot;Test1&quot;
+    }
+    ], 
+  ...
+}
+</code></pre>
+<p>The types are:</p>
+<pre><code class="language-cpp">  RGB = 0, 
+  Greyscale = 1, 
+  Texture = 2
+</code></pre>
+<p>The <code>Default</code> setting applies to all types and is what happens when no tag is set for na actor/component. 
+When set to false, the mesh will not be rendered in the annotation layer.
+When set to true, the mesh will be rendered in the annotation layer with the default value of the layer.</p>
+<p>The <code>ViewDistance</code> setting applies to all types and allows you to set the maximum distance in meters at which the annotation layer is rendered. 
+This only applies to the camera sensor output as for LiDAR you can set the maximum range distance of the sensor differently. 
+This value is by default set to -1 which means infinite draw distance. </p>
+<h3 id="type-1-rgb">Type 1: RGB</h3>
+<p>Similar to <a href="../instance_segmentation/">instance segmentation</a>, you can use the RGB annotation layer to tag objects in the environment with a unique color. 
+You can do this by directly setting the color yourself (direct mode), or by assigning the object an index (0-2744000 unique colors) that will be linked to the colormap.
+To use direct mode, set the settings of this layer with <code>SetDirect</code> to <code>true</code>. For index mode, set to <code>false</code>.
+Actor/component tags have the following format: <code>annotationName_R_G_B</code> for direct mode or <code>annotationName_ID</code> for direct mode.
+So if for example your RGB annotation layer is called <code>RGBTestDirect</code>, you can tag an actor with the tag <code>RGBTestDirect_255_0_0</code> to give it a red color. 
+Or for index mode, <code>RGBTest_5</code> to give it the fifth color in the colormap. </p>
+<p>When <code>Default</code> is set to 1, all objects without a tag for this layer will be rendered in black.</p>
+<p>The instance segmentation API function to get the colormap also applies to the RGB index mode. For example in Python you can use:</p>
+<pre><code class="language-python">colorMap = client.simGetSegmentationColorMap()
+</code></pre>
+<p>Several RPC API functions are available to influence or retrieve the RGB annotation layer.  Currently, it is not possible to use the RPC API to add new actors or components to the annotation system, you can only update their values. For example in Python:</p>
+<ul>
+<li><code>simSetAnnotationObjectID(annotation_name, mesh_name, object_id, is_name_regex=False/True)</code> to update the color of an object in index mode (regex allows to set multiple with wildcards for example) when it already exists in the annotation system</li>
+<li><code>simSetAnnotationObjectColor(annotation_name, mesh_name, r, g, b, is_name_regex=False/True)</code> to update the color of an object in direct mode  (regex allows to set multiple with wildcards for example) when it already exists in the annotation system</li>
+<li><code>simGetAnnotationObjectID(annotation_name, mesh_name)</code> to get the ID of an object in index mode</li>
+<li><code>simGetAnnotationObjectColor(annotation_name, mesh_name)</code> to get the color of an object in direct mode</li>
+<li><code>simIsValidColor(r,g,b)</code> You can check if a color is valid using this function</li>
+</ul>
+<p>The same is available in Unreal Blueprint and Unreal c++. You can find  the functions in the <code>Annotation</code> category.</p>
+<ul>
+<li><code>Add RGBDirect Annotation Tag to Component/Actor(annotation_name, component/actor, color, update_annotation=true/false)</code> to set the color of an object in direct mode</li>
+<li><code>Update RGBDirect Annotation Tag to Component/Actor(annotation_name, component/actor, color, update_annotation=true/false)</code> to update the color of an object in direct mode already in the system</li>
+<li><code>Add RGBIndex Annotation Tag to Component/Actor(annotation_name, component/actor, object_id, update_annotation=true/false)</code> to set the index of an object in index mode</li>
+<li><code>Update RGBIndex Annotation Tag to Component/Actor(annotation_name, component/actor, object_id, update_annotation=true/false)</code> to update the index of an object in index mode already in the system </li>
+<li><code>Is Annotation RGB Valid(color)</code>You can check if a color is valid using this function</li>
+</ul>
+<p>Note that enabling <em>update_annotation</em> is a relatively slow process, specially on actors with lots of annotated components. 
+Ideally set <em>update_annotation</em> to false during the process of adding tags to the actor and only turn on update_annotation for the last component or actor you want to update.
+Alternatively, you can use the <code>Add New Actor To Annotation()</code> blueprint function to update the annotation layer for this actor after you have added all tags.</p>
+<h3 id="type-2-greyscale">Type 2: Greyscale</h3>
+<p>You can use the greyscale annotation layer to tag objects in the environment with a float value between 0 and 1. Note that this has the precision of uint8.
+Actor/component tags have the following format: <code>annotationName_value</code>.
+So if for example your RGB annotation layer is called <code>GreyscaleTest</code>, you can tag an actor with the tag <code>GreyscaleTest_0.76</code> to give it a value of 0.76 which would result in a color of (194, 194, 194).</p>
+<p>When <code>Default</code> is set to 1, all objects without a tag for this layer will be rendered in black.</p>
+<p>Several RPC API functions are available to influence or retrieve the RGB annotation layer. Currently, it is not possible to use the RPC API to add new actors or components to the annotation system, you can only update their values. For example in Python:</p>
+<ul>
+<li><code>simSetAnnotationObjectValue(annotation_name, mesh_name, greyscale_value, is_name_regex=False/True)</code> to update the value of an object (regex allows to set multiple with wildcards for example) when it already exists in the annotation system</li>
+<li><code>simGetAnnotationObjectValue(annotation_name, mesh_name)</code> to get the value of an object</li>
+</ul>
+<p>The same is available in Unreal Blueprint and Unreal c++. You can find  the functions in the <code>Annotation</code> category.</p>
+<ul>
+<li><code>Add Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)</code> to update the value of an object when it already exists in the annotation system</li>
+<li><code>Update Greyscale Annotation Tag to Component/Actor(annotation_name, component/actor, value, update_annotation=true/false)</code> to update the value of an object</li>
+</ul>
+<p>Note that enabling <em>update_annotation</em> is a relatively slow process, specially on actors with lots of annotated components. 
+Ideally set <em>update_annotation</em> to false during the process of adding tags to the actor and only turn on update_annotation for the last component or actor you want to update.
+Alternatively, you can use the <code>Add New Actor To Annotation()</code> blueprint function to update the annotation layer for this actor after you have added all tags.</p>
+<h3 id="type-3-texture">Type 3: Texture</h3>
+<p>You can use the texture annotation layer to tag objects in the environment with a specific texture. This can be a color or greyscale texture, or you can mix them. Choice is up to you.
+You can do this by directly setting the texture yourself (direct mode), or by assigning a texture that is loaded based on a set path and the name of the mesh.
+To use direct mode, set the settings of this layer with <code>SetDirect</code> to <code>true</code>. For path reference mode, set to <code>false</code>.</p>
+<p>Actor/component tags have the following format: <code>annotationName_texturepath</code> for direct mode.
+The Unreal texture path name has to be rather specific:
+ - If your texture is in the environment content folder, you must add <code>/Game/</code> in front of the path. 
+ - If it is in the Cosys-AirSim plugin content folder, you must add <code>/AirSim/</code> in front of the path. 
+ - For Engine textures, you must add <code>/Engine/</code> in front of the path.
+So if for example your texture annotation layer is called <code>TextureTestDirect</code>, and your texture <em>TestTexture</em> is in the game content folder under a subfolder <em>AnnotationTest</em> you can tag an actor with the tag <code>TextureTest_/Game/AnnotationTest/TestTexture</code> to give it this texture. </p>
+<p>For path reference mod, the content of the tag is not really important as long as it contains the name of the annotation layer and an underscore, for example <code>annotationName_enable</code>.
+What is important is in reference mode is that you have a texture in the content folder with the name of the mesh if you do enable this object by setting a tag.
+You must place your textures in the folder defined by the <code>TexturePath</code> setting in the settings.json file for this layer. And the texture must have the same name as the mesh and start with the prefix set by the <code>TexturePrefix</code> setting in the settings.json file for this layer followed by a hyphen.
+So for example if you have a static mesh called <em>Cylinder</em> and your texture layer is called <code>TextureTestDirect</code> with the settings <code>TexturePath</code> set to <code>/Game/AnnotationTest</code> and <code>TexturePrefix</code> set to <code>Test1</code>, you must have a texture called <code>Test1-Cylinder</code> in the folder <code>/Game/AnnotationTest</code>.</p>
+<p>When <code>Default</code> is set to 1, all objects without a tag for this layer will be rendered in black.</p>
+<p>Several RPC API functions are available to influence or retrieve the RGB annotation layer.  Currently, it is not possible to use the RPC API to add new actors or components to the annotation system, you can only update their values. For example in Python:</p>
+<ul>
+<li><code>simSetAnnotationObjectTextureByPath(annotation_name, mesh_name, texture_path, is_name_regex=False/True)</code> to set the texture of an object in direct mode, the texture path should be same format as described above, for example <code>/Game/MyTextures/TestTexture1</code> (regex allows to set multiple with wildcards for example)</li>
+<li><code>simEnableAnnotationObjectTextureByPath(annotation_name, mesh_name, r, g, b, is_name_regex=False/True)</code> to enable the texture of an object in relative path mode, this does require a texture in the relative path as described above!  (regex allows to set multiple with wildcards for example)</li>
+<li><code>simGetAnnotationObjectTexturePath(annotation_name, mesh_name)</code> to get the texture path of an object</li>
+</ul>
+<p>The same is available in Unreal Blueprint and Unreal c++. You can find  the functions in the <code>Annotation</code> category.</p>
+<ul>
+<li><code>Add Texture Direct Annotation Tag to Component/Actor By Path(annotation_name, component/actor, texture_path, update_annotation=true/false)</code> to set the texture of an object in direct mode, the texture path should be same format as described above, for example <code>/Game/MyTextures/TestTexture1</code></li>
+<li><code>Update Texture Direct Annotation Tag to Component/Actor By Path(annotation_name, component/actor, texture_path, update_annotation=true/false)</code> to update texture of an object in direct mode that is already in the system, the texture path should be same format as described above, for example <code>/Game/MyTextures/TestTexture1</code></li>
+<li><code>Add Texture Direct Annotation Tag to Component/Actor(annotation_name, component/actor, texture, update_annotation=true/false)</code> to set the texture of an object in direct mode, the texture can be directly referenced as UTexture* Object</li>
+<li><code>Update Texture Direct Annotation Tag to Component/Actor(annotation_name, component/actor, texture, update_annotation=true/false)</code> to update texture of an object in direct mode that is already in the system, the texture can be directly referenced as UTexture* Object</li>
+<li><code>Enable Texture By Path Annotation Tag to Component/Actor(annotation_name, component/actor, update_annotation=true/false)</code> to enable the texture of an object in relative path mode, this does require a texture in the relative path as described above! </li>
+</ul>
+<p>Note that enabling <em>update_annotation</em> is a relatively slow process, specially on actors with lots of annotated components. 
+Ideally set <em>update_annotation</em> to false during the process of adding tags to the actor and only turn on update_annotation for the last component or actor you want to update.
+Alternatively, you can use the <code>Add New Actor To Annotation()</code> blueprint function to update the annotation layer for this actor after you have added all tags.</p>
+<h3 id="common-functionality">Common functionality</h3>
+<p>By default, when the world loads, all meshes are checked for tags and the annotation layers are updated accordingly. 
+With the unreal blueprint and c++ functions however, you can also decide to update the annotation layer only when you want to with the <code>update_annotation</code> argument. 
+If you have many objects to update, this can save a lot of time by doing it only for the last object.</p>
+<p>Some API functions exist for all types, for example in Python:</p>
+<ul>
+<li><code>simListAnnotationObjects(annotation_name)</code> to get a list of all objects within this annotation layer. </li>
+<li><code>simListAnnotationPoses(annotation_name, ned=True/False, only_visible=False/True)</code> to get the 3D poses of all objects in this annotation layer. The returned pose is in NED coordinates in SI units with its origin at Player Start by default or in Unreal NED frame if the <code>ned</code> boolean argument is set to <code>talse</code>.</li>
+</ul>
+<p>Similarly, for Unreal Blueprint and Unreal c++. You can find  the functions in the <code>Annotation</code> category.</p>
+<ul>
+<li><code>Does Annotation Layer Exist(annotation_name)</code> to figure out if a layer exists or not</li>
+<li><code>Add New Actor To Annotation(annotation_name, actor, update_annotation=true/false)</code> if you manually added a tag, and want to update the annotation layer with this actor. This is useful to run after adding multiple tags to the actor and its components with the other api calls, and you want to update the annotation layer only once, otherwise it will be much slower.</li>
+<li><code>Delete Actor From Annotation(annotation_name, actor, update_annotation=true/false)</code> if you manually remove all tags from an actor for this layer and remove it from the annotation layer</li>
+<li><code>Force Update Annotation(annotation_name)</code> to force an update of the annotation layer.</li>
+</ul>
+<h3 id="getting-annotation-data-from-sensors">Getting annotation data from sensors</h3>
+<p>The easiest way to get the images from annotation cameras, is through the image API. See the <a href="../image_apis/#annotation">Image API documentation</a> for more information.
+GPU LiDAR is also supported, but each GPU Lidar can only render one annotation layer. See the <a href="../gpulidar/">GPU LiDAR documentation</a> for more information.</p>
+<p>You can also display the annotation layers in the subwindows. See the <a href="../settings/#subwindows">Settings documentation</a> for more information.
+For example:</p>
+<pre><code class="language-json">{
+  ...
+    &quot;SubWindows&quot;: [
+        {
+            &quot;WindowID&quot;: 0,
+            &quot;CameraName&quot;: &quot;front_center&quot;,
+            &quot;ImageType&quot;: 10,
+            &quot;VehicleName&quot;: &quot;robot1&quot;,
+            &quot;Annotation&quot;: &quot;GreyscaleTest&quot;,
+            &quot;Visible&quot;: false
+        }, 
+  ...
+</code></pre>
+<h2 id="credits">Credits</h2>
+<p>The method used to use Proxy meshes to segment object is a derivative of and inspired by the work of <a href="https://unrealcv.org/">UnrealCV</a>. Their work is licensed under the MIT License.
+It is made by students from Johns Hopkins University and Peking University under the supervision of Prof. Alan Yuille and Prof. Yizhou Wang.
+You can read the paper on their work <a href="https://dl.acm.org/doi/10.1145/3123266.3129396">here</a>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../instance_segmentation/" class="btn btn-neutral float-left" title="Instance Segmentation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../settings/" class="btn btn-neutral float-right" title="Settings">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../instance_segmentation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../settings/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

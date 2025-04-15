@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Pulse Echo - Cosys-AirSim</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Pulse Echo";
+        var mkdocs_page_input_path = "echo.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cosys-AirSim
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Home</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">Changelog</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Installing AirSim</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../run_packaged/">Download and run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_precompiled/">Download and install from precompiled plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_windows/">Install from Source on Windows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_linux/">Install from Source on Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../docker_ubuntu/">Using Docker on Ubuntu</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_custenv/">Custom Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dynamic_objects/">Dynamic Objects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Using AirSim</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../apis/">Core APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../image_apis/">Image APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apis_cpp/">C++ APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../instance_segmentation/">Instance Segmentation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../annotation/">Annotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../camera_views/">Camera Views</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../using_car/">Car Mode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remote_control/">Remote Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../xbox_controller/">XBox Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../steering_wheel_installation/">Steering Wheel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../multi_vehicle/">Multiple Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../skid_steer_vehicle/">Skid Steer Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gazebo_drone/">Import Gazebo models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../retexturing/">Domain Randomization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../meshes/">Mesh Vertex Buffers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lights/">Artificial Lights</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Sensors</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../sensors/">Sensors</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../lidar/">LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpulidar/">GPU LIDAR</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Pulse Echo</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#enabling-echo-sensor-on-a-vehicle">Enabling echo sensor on a vehicle</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#echo-configuration">Echo configuration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#passive-echo-beacons">Passive Echo Beacons</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#client-api">Client API</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../InfraredCamera/">Infrared Camera</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../distance_sensor/">Distance Sensor</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ROS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_python/">ROS: AirSim ROS Python Wrapper</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_cplusplus/">ROS2: AirSim ROS C++ Wrapper</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matlab/">Matlab</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playback/">Playing Logs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../voxel_grid/">Voxel Grid Generator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event_sim/">Event camera</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Design</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../modify_recording_data/">Modifying Recording Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flight_controller/">Flight Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../adding_new_apis/">Adding new APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../simple_flight/">Simple Flight</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">External Flight Controllers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">MavLink and PX4</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_setup/">PX4 Setup for AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl/">PX4 in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl_wsl2/">PX4 SITL with WSL 2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_lockstep/">PX4 Lockstep</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_multi_vehicle/">PX4 Multi-vehicle in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/1oY8Qu5maQQ">AirSim with Pixhawk</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/HNWdYrtw3f0">PX4 Setup with AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be">Debugging Attitude Estimation</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages">Intercepting MavLink Messages</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones">Rapid Descent on PX4 Drones</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_build/">Building PX4</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_logging/">PX4/MavLink Logging</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../log_viewer/">MavLink LogViewer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom/">MavLinkCom</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom_mocap/">MavLink MoCap</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ArduPilot</a>
+    <ul>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/building-the-code.html">ArduPilot SITL Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/sitl-with-airsim.html">AirSim & ArduPilot</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Contributed Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://www.youtube.com/watch?v=y09VbdQWvQY">Using Environments from Marketplace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/simondlevy/AirSimTensorFlow">Simple Collision Avoidance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://aka.ms/AutonomousDrivingCookbook">Autonomous Driving on Azure</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building Hexacopter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo">Moving on Path Demo</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/Bp86WiLUC80">Importing a custom multirotor mesh</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object_detection/">Object Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/ZonkdMcwXH4">AirSim with MAVROS and PX4</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Misc</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom_drone/">AirSim on Real Drones</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pfm/">pfm format</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_proj/">Setting up Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../packaging/">Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_blocks/">Blocks Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../working_with_plugin_contents/">Working with UE Plugin Contents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/technion">Formula Student Technion Self-drive</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cosys-AirSim</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Using AirSim &raquo;</li>
+          <li>Sensors &raquo;</li>
+      <li>Pulse Echo</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/echo.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="how-to-use-echo-sensor-modalities-in-cosys-airsim">How to Use Echo sensor modalities in Cosys-AirSim</h1>
+<p>Cosys-AirSim supports Echo sensors for multirotors and cars.  Echo sensors can be configured to behave like sonar, radar or other echo-based sensor types.</p>
+<p>The enablement of an echo sensor and the other settings can be configured via AirSimSettings json.
+Please see <a href="../sensors/">general sensors</a> for information on configuration of general/shared sensor settings.</p>
+<h2 id="enabling-echo-sensor-on-a-vehicle">Enabling echo sensor on a vehicle</h2>
+<ul>
+<li>By default, echo sensors are not enabled. To enable one, set the SensorType and Enabled attributes in settings json.</li>
+</ul>
+<pre><code>        &quot;echo1&quot;: { 
+             &quot;SensorType&quot;: 7,
+             &quot;Enabled&quot; : true,
+</code></pre>
+<ul>
+<li>Multiple echo sensors can be enabled on a vehicle .</li>
+</ul>
+<h2 id="echo-configuration">Echo configuration</h2>
+<p>The following parameters can be configured right now via settings json.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X Y Z</td>
+<td>Position of the echo sensor relative to the vehicle (in NED, in meters)</td>
+</tr>
+<tr>
+<td>Roll Pitch Yaw</td>
+<td>Orientation of the echo sensor relative to the vehicle  (in degrees, yaw-pitch-roll order to front vector +X)</td>
+</tr>
+<tr>
+<td>External</td>
+<td>Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates</td>
+</tr>
+<tr>
+<td>ExternalLocal</td>
+<td>When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default</td>
+</tr>
+<tr>
+<td>runParallel</td>
+<td>Uses CPU parallelisation for speeding up the ray casting for active sensing. This disables all debug drawing except for the final reflected points if enabled (DrawReflectedPoints)</td>
+</tr>
+<tr>
+<td>SenseActive</td>
+<td>Enable active sensing where the sensor will emit a signal and receive signals from the reflections</td>
+</tr>
+<tr>
+<td>SensePassive</td>
+<td>Enable passive sensing where the sensor will receive signals from other active sources in the world (Passive Echo Beacons, see details below)</td>
+</tr>
+<tr>
+<td>PassiveRadius</td>
+<td>The radius in meters in which the sensor will receive signals from passive sources if that mode is enabled</td>
+</tr>
+<tr>
+<td>NumberOfTraces</td>
+<td>Amount of traces (rays) being cast. If set to a negative value, it will only do 2D sensing in horizontal plane!</td>
+</tr>
+<tr>
+<td>SensorLowerAzimuthLimit</td>
+<td>The lower azimuth angle limit in degrees for receiving signals on the sensor (default = -90)</td>
+</tr>
+<tr>
+<td>SensorUpperAzimuthLimit</td>
+<td>The upper azimuth angle limit in degrees for receiving signals on the sensor (default = 90)</td>
+</tr>
+<tr>
+<td>SensorLowerElevationLimit</td>
+<td>The lower elevation angle limit in degrees for receiving signals on the sensor (default = -90)</td>
+</tr>
+<tr>
+<td>SensorUpperElevationLimit</td>
+<td>The upper elevation angle limit in degrees for receiving signals on the sensor (default = 90)</td>
+</tr>
+<tr>
+<td>MeasurementFrequency</td>
+<td>The frequency of the sensor (measurements/s)</td>
+</tr>
+<tr>
+<td>SensorDiameter</td>
+<td>The diameter of the sensor plane used to capture the reflecting traces (meter)</td>
+</tr>
+<tr>
+<td>ReflectionOpeningAngle</td>
+<td>Opening angle of reflections (degrees)</td>
+</tr>
+<tr>
+<td>ReflectionLimit</td>
+<td>Maximum amount of reflections that can happen.</td>
+</tr>
+<tr>
+<td>ReflectionDistanceLimit</td>
+<td>Maximum distance between two reflections (meters)</td>
+</tr>
+<tr>
+<td>AttenuationPerDistance</td>
+<td>Attenuation of signal wrt distance traveled (dB/m)</td>
+</tr>
+<tr>
+<td>AttenuationPerReflection</td>
+<td>Attenuation of signal wrt reflections (dB)</td>
+</tr>
+<tr>
+<td>AttenuationLimit</td>
+<td>Attenuation at which the signal is considered dissipated (dB)</td>
+</tr>
+<tr>
+<td>DistanceLimit</td>
+<td>Maximum distance a reflection can travel (meters)</td>
+</tr>
+<tr>
+<td>PauseAfterMeasurement</td>
+<td>Pause the simulation after each measurement. Useful for API interaction to be synced</td>
+</tr>
+<tr>
+<td>IgnoreMarked</td>
+<td>Remove objects with the Unreal Tag <em>MarkedIgnore</em> from the sensor data</td>
+</tr>
+<tr>
+<td>DrawReflectedPoints</td>
+<td>Draw debug points in world where reflected points are captured by the sensor</td>
+</tr>
+<tr>
+<td>DrawReflectedLines</td>
+<td>Draw debug lines in world from reflected points to the sensor</td>
+</tr>
+<tr>
+<td>DrawReflectedPaths</td>
+<td>Draw the full paths of the reflected points</td>
+</tr>
+<tr>
+<td>DrawInitialPoints</td>
+<td>Draw the points of the initial half sphere where the traces (rays) are cast</td>
+</tr>
+<tr>
+<td>DrawExternalPoints</td>
+<td>Draw a pointcloud coming through the API from an external source</td>
+</tr>
+<tr>
+<td>DrawBounceLines</td>
+<td>Draw lines of all bouncing reflections of the traces with their color depending on attenuation</td>
+</tr>
+<tr>
+<td>DrawPassiveSources</td>
+<td>Draw debug points and reflection lines for all detected passive echo sources (original sources and their reflection echos against objects)</td>
+</tr>
+<tr>
+<td>DrawPassiveLines</td>
+<td>Draw debug lines of the sensor to the passive echo sources that are detected with line of sight.</td>
+</tr>
+<tr>
+<td>DrawSensor</td>
+<td>Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is</td>
+</tr>
+<tr>
+<td>e.g.,</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre><code>{
+    &quot;SeeDocsAt&quot;: &quot;https://cosys-lab.github.io/settings/&quot;,
+    &quot;SettingsVersion&quot;: 2.0,
+    &quot;SimMode&quot;: &quot;SkidVehicle&quot;,
+    &quot;Vehicles&quot;: {
+        &quot;CPHusky&quot;: {
+            &quot;VehicleType&quot;: &quot;CPHusky&quot;,
+            &quot;AutoCreate&quot;: true,
+            &quot;Sensors&quot;: {
+                &quot;SonarSensor1&quot;: {
+                      &quot;SensorType&quot;: 7,
+                      &quot;Enabled&quot;: true,
+                      &quot;X&quot;: 0,
+                      &quot;Y&quot;: 0,
+                      &quot;Z&quot;: -0.55,
+                      &quot;Roll&quot;: 0,
+                      &quot;Pitch&quot;: 0,
+                      &quot;Yaw&quot;: 0,
+                      &quot;SenseActive&quot;: true,
+                      &quot;SensePassive&quot;: false,
+                      &quot;MeasurementFrequency&quot;: 5,
+                      &quot;NumberOfTraces&quot;: 10000,
+                      &quot;SensorDiameter&quot;: 0.5,
+                      &quot;SensorLowerAzimuthLimit&quot;: -90,
+                      &quot;SensorUpperAzimuthLimit&quot;: 90,
+                      &quot;SensorLowerElevationLimit&quot;: -90,
+                      &quot;SensorUpperElevationLimit&quot;: 90,
+                      &quot;AttenuationPerDistance&quot;: 0,
+                      &quot;AttenuationPerReflection&quot;: 0,
+                      &quot;AttenuationLimit&quot;: -100,
+                      &quot;DistanceLimit&quot;: 10,
+                      &quot;ReflectionLimit&quot;: 3,
+                      &quot;ReflectionDistanceLimit&quot;: 0.4,
+                      &quot;ReflectionOpeningAngle&quot;: 10
+                }   
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="passive-echo-beacons">Passive Echo Beacons</h2>
+<p>While the default configuration of the echo sensor is to emit a signal and receive the reflections, it is also possible to have passive echo sources in the world.
+These are objects that emit a signal and the echo sensor will receive the reflections of these signals. This can be used to simulate other echo sources in the world that are not the echo sensor itself.</p>
+<p>One can define these from the Unreal Editor itself or through the AirSimSettings json file. 
+In the Editor, use the search function to look for <code>Passive Echo Beacon</code> and add it to the world. You can alter the settings from the Details panel. 
+In the AirSimSettings json file you can define new beacons under the <code>PassiveEchoBeacons</code> section. The beacons have the following settings: </p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X Y Z</td>
+<td>Position of the beacon relative to the Unreal World origin, so not in robot reference frame! (in NED, in meters)</td>
+</tr>
+<tr>
+<td>Roll Pitch Yaw</td>
+<td>Orientation of the beacon relative to the Unreal World origin, so not in robot reference frame! (in degrees, yaw-pitch-roll order to front vector +X)</td>
+</tr>
+<tr>
+<td>Enabe</td>
+<td>Toggle the beacon on or off.</td>
+</tr>
+<tr>
+<td>InitialDirections</td>
+<td>Amount of traces (rays) being cast. This defines the resolution of the resulting reflection point cloud.</td>
+</tr>
+<tr>
+<td>SensorLowerAzimuthLimit</td>
+<td>The lower azimuth angle limit in degrees for sending out the initial rays of the source. (default = -90)</td>
+</tr>
+<tr>
+<td>SensorUpperAzimuthLimit</td>
+<td>The upper azimuth angle limit in degrees for sending out the initial rays of the source. (default = 90)</td>
+</tr>
+<tr>
+<td>SensorLowerElevationLimit</td>
+<td>The lower elevation angle limit in degrees for sending out the initial rays of the source. (default = -90)</td>
+</tr>
+<tr>
+<td>SensorUpperElevationLimit</td>
+<td>The upper elevation angle limit in degrees for sending out the initial rays of the source. (default = 90)</td>
+</tr>
+<tr>
+<td>ReflectionLimit</td>
+<td>Maximum amount of reflections that can happen.</td>
+</tr>
+<tr>
+<td>ReflectionDistanceLimit</td>
+<td>Maximum distance between two reflections (meters)</td>
+</tr>
+<tr>
+<td>ReflectionOnlyFinal</td>
+<td>Only save the final reflection along a trace. This will ignore all other reflections that happen along the trace in the data</td>
+</tr>
+<tr>
+<td>AttenuationPerDistance</td>
+<td>Attenuation of signal wrt distance traveled (dB/m)</td>
+</tr>
+<tr>
+<td>AttenuationPerReflection</td>
+<td>Attenuation of signal wrt reflections (dB)</td>
+</tr>
+<tr>
+<td>AttenuationLimit</td>
+<td>Attenuation at which the signal is considered dissipated (dB)</td>
+</tr>
+<tr>
+<td>DistanceLimit</td>
+<td>Maximum distance a reflection can travel (meters)</td>
+</tr>
+<tr>
+<td>DrawDebugAllPoints</td>
+<td>Draw debug points in world where reflected points are happening due to this source. It will also show the reflection direction with a line</td>
+</tr>
+<tr>
+<td>DrawDebugAllLines</td>
+<td>Draw all lines that are being cast from the source to the reflections, not only the ones that are reflected</td>
+</tr>
+<tr>
+<td>DrawDebugLocation</td>
+<td>Draw a 3D axes shown where the source is</td>
+</tr>
+<tr>
+<td>DrawDebugDuration</td>
+<td>Duration in seconds that the debug points and lines will be shown in the world. -1 is infinite.</td>
+</tr>
+</tbody>
+</table>
+<p>In the settings file this can look like this example : </p>
+<pre><code>{
+  &quot;SeeDocsAt&quot;: &quot;https://cosys-lab.github.io/settings/&quot;,
+  &quot;SettingsVersion&quot;: 2.0,
+  &quot;SimMode&quot;: &quot;SkidVehicle&quot;,
+  &quot;ViewMode&quot;: &quot;&quot;,
+  &quot;Vehicles&quot;: {
+    &quot;airsimvehicle&quot;: {
+      &quot;VehicleType&quot;: &quot;CPHusky&quot;,
+      &quot;AutoCreate&quot;: true,
+      &quot;Sensors&quot;: {
+        ...
+        &quot;echo&quot;: {
+          &quot;SensorType&quot;: 7,
+          &quot;Enabled&quot;: true,
+          ...
+          &quot;DrawPassiveSources&quot;: false,
+          &quot;DrawPassiveLines&quot;: true,
+          &quot;DrawSensor&quot;: true,
+          &quot;SenseActive&quot;: false,
+          &quot;SensePassive&quot;: true,
+          &quot;PassiveRadius&quot; : 10
+        }
+      }   
+    }
+  },
+  &quot;PassiveEchoBeacons&quot;: {
+      &quot;passiveEchoBeacon1&quot;: {
+          &quot;X&quot;: 5,
+          &quot;Y&quot;: 5,
+          &quot;Z&quot;: -5,
+          &quot;Roll&quot;: 0,
+          &quot;Pitch&quot;: 0,
+          &quot;Yaw&quot;: 0,
+          &quot;Enable&quot; : true,
+          &quot;InitialDirections&quot;: 1000,
+          &quot;SensorLowerAzimuthLimit&quot;: -90,
+          &quot;SensorUpperAzimuthLimit&quot;: 90,
+          &quot;SensorLowerElevationLimit&quot;: -90,
+          &quot;SensorUpperElevationLimit&quot;: 90,
+          &quot;AttenuationPerDistance&quot;: 0,
+          &quot;AttenuationPerReflection&quot;: 0,
+          &quot;AttenuationLimit&quot;: -100,
+          &quot;DistanceLimit&quot;: 10,
+          &quot;ReflectionLimit&quot;: 3,      
+          &quot;DrawDebugAllPoints&quot;: true,
+          &quot;DrawDebugAllLines&quot;: false,
+          &quot;DrawDebugLocation&quot;: true,
+          &quot;DrawDebugDuration&quot;: -1
+      }
+  }
+}
+</code></pre>
+<h2 id="client-api">Client API</h2>
+<p>Use <code>getEchoData(sensor name, vehicle name)</code> API to retrieve the echo sensor data. The API returns Point-Cloud(s) as a flat array of floats, the final attenuation, total distance and reflection count (+ reflection normal for passive beacon reflections) along with the timestamp of the capture and sensor pose.</p>
+<ul>
+<li><strong>Echo Pose:</strong> Default:Active Point-Cloud: Echo sensor pose in the vehicle frame / External: If set to <code>External</code>(see table) the coordinates will be in either Unreal NED when <code>ExternalLocal</code> is <code>false</code> or Local NED (from starting position from vehicle) when <code>ExternalLocal</code> is <code>true</code>.</li>
+<li><strong>Active Point-Cloud</strong> The floats represent [x, y, z, attenuation, total_distance, reflection_count] for each point hit within the range in the last scan in NED format.</li>
+<li><strong>Active Groundtruth:</strong> For each point of the Active Point-Cloud a label string is kept that has the name of the object that the point belongs to.</li>
+<li><strong>Passive Point-Cloud:</strong> The floats represent [x, y, z, attenuation, total_distance, reflection_count, reflection angle x, reflection angle y, reflection angle z] for each point hit within the range in the last scan in NED format.</li>
+<li><strong>Passive Groundtruth:</strong> For each point two strings are kept of the Passive Point-Cloud. The first a label string representing the object of the reflection and second the name of the Passive Echo Beacon that was the source of this reflection. </li>
+</ul>
+<p>Use <code>setEchoData(sensor name, vehicle name, echo data)</code> API to render an external pointcloud back to the simulation. It expects it to be [x,y,z] as a flat array of floats.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../gpulidar/" class="btn btn-neutral float-left" title="GPU LIDAR"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../InfraredCamera/" class="btn btn-neutral float-right" title="Infrared Camera">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../gpulidar/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../InfraredCamera/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Artificial Lights - Cosys-AirSim</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Artificial Lights";
+        var mkdocs_page_input_path = "lights.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cosys-AirSim
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Home</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">Changelog</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Installing AirSim</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../run_packaged/">Download and run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_precompiled/">Download and install from precompiled plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_windows/">Install from Source on Windows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_linux/">Install from Source on Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../docker_ubuntu/">Using Docker on Ubuntu</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_custenv/">Custom Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dynamic_objects/">Dynamic Objects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Using AirSim</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../apis/">Core APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../image_apis/">Image APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apis_cpp/">C++ APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../instance_segmentation/">Instance Segmentation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../annotation/">Annotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../camera_views/">Camera Views</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../using_car/">Car Mode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remote_control/">Remote Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../xbox_controller/">XBox Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../steering_wheel_installation/">Steering Wheel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../multi_vehicle/">Multiple Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../skid_steer_vehicle/">Skid Steer Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gazebo_drone/">Import Gazebo models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../retexturing/">Domain Randomization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../meshes/">Mesh Vertex Buffers</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Artificial Lights</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#vehicle-lights">Vehicle Lights</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#world-lights">World Lights</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#general-light-settings">General Light Settings</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#client-api">Client API</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sensors</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../sensors/">Sensors</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../lidar/">LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpulidar/">GPU LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../echo/">Pulse Echo</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../InfraredCamera/">Infrared Camera</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../distance_sensor/">Distance Sensor</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ROS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_python/">ROS: AirSim ROS Python Wrapper</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_cplusplus/">ROS2: AirSim ROS C++ Wrapper</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matlab/">Matlab</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playback/">Playing Logs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../voxel_grid/">Voxel Grid Generator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event_sim/">Event camera</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Design</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../modify_recording_data/">Modifying Recording Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flight_controller/">Flight Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../adding_new_apis/">Adding new APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../simple_flight/">Simple Flight</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">External Flight Controllers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">MavLink and PX4</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_setup/">PX4 Setup for AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl/">PX4 in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl_wsl2/">PX4 SITL with WSL 2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_lockstep/">PX4 Lockstep</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_multi_vehicle/">PX4 Multi-vehicle in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/1oY8Qu5maQQ">AirSim with Pixhawk</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/HNWdYrtw3f0">PX4 Setup with AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be">Debugging Attitude Estimation</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages">Intercepting MavLink Messages</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones">Rapid Descent on PX4 Drones</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_build/">Building PX4</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_logging/">PX4/MavLink Logging</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../log_viewer/">MavLink LogViewer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom/">MavLinkCom</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom_mocap/">MavLink MoCap</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ArduPilot</a>
+    <ul>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/building-the-code.html">ArduPilot SITL Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/sitl-with-airsim.html">AirSim & ArduPilot</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Contributed Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://www.youtube.com/watch?v=y09VbdQWvQY">Using Environments from Marketplace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/simondlevy/AirSimTensorFlow">Simple Collision Avoidance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://aka.ms/AutonomousDrivingCookbook">Autonomous Driving on Azure</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building Hexacopter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo">Moving on Path Demo</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/Bp86WiLUC80">Importing a custom multirotor mesh</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object_detection/">Object Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/ZonkdMcwXH4">AirSim with MAVROS and PX4</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Misc</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom_drone/">AirSim on Real Drones</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pfm/">pfm format</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_proj/">Setting up Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../packaging/">Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_blocks/">Blocks Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../working_with_plugin_contents/">Working with UE Plugin Contents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/technion">Formula Student Technion Self-drive</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cosys-AirSim</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Using AirSim &raquo;</li>
+      <li>Artificial Lights</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/lights.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="artificial-lights-in-cosys-airsim">Artificial Lights in Cosys-AirSim</h1>
+<p>Cosys-AirSim supports adding artificial lights that are either static in the world or attached to the vehicle. 
+These can be configured via the <a href="../settings/">settings.json file</a>.</p>
+<h2 id="vehicle-lights">Vehicle Lights</h2>
+<p>If lights should move with the vehicle, they can be attached to it. Multiple lights can be enabled on a vehicle.
+This is done in the <code>Lights</code> section of the <code>Vehicles</code> section in the settings file, each light has a unique name. </p>
+<pre><code class="language-json">  ...
+  &quot;Vehicles&quot;: {
+        &quot;airsimvehicle&quot;: {
+            ... 
+            &quot;Lights&quot;: {
+                &quot;vehiclelight1&quot;: {
+                    &quot;X&quot;: 0,
+                    &quot;Y&quot;: 0,
+                    &quot;Z&quot;: -1,
+                    &quot;Roll&quot;: 0,
+                    &quot;Pitch&quot;: 90,
+                    &quot;Yaw&quot;: 0,
+                    &quot;Type&quot;: 0,
+                    &quot;Temperature&quot;: 2500,
+                    ...
+                },
+                &quot;vehiclelight2&quot;: {
+                    ...
+                },
+                ...
+            },
+            ...
+        }
+  ...
+  },
+  ...
+</code></pre>
+<h2 id="world-lights">World Lights</h2>
+<p>If lights should be static in the world, they should be defined as a world light.
+This is done in the <code>WorldLights</code> section in the settings file, each world light has a unique name. </p>
+<pre><code class="language-json">...
+    &quot;WorldLights&quot;: {
+        &quot;worldlight1&quot;: {
+            &quot;X&quot;: 10,
+            &quot;Y&quot;: 10,
+            &quot;Z&quot;: -5,                    
+            &quot;Type&quot;: 0,
+            &quot;Temperature&quot;: 2500,
+            &quot;IntensityUnit&quot;: 2,
+            &quot;Intensity&quot;: 8,
+            &quot;ColorR&quot;: 255,
+            &quot;ColorG&quot;: 128,
+            &quot;ColorB&quot;: 255,
+            ...
+        },
+        &quot;worldlight2&quot;: {
+          ...
+        },
+        ...
+    }
+</code></pre>
+<h2 id="general-light-settings">General Light Settings</h2>
+<p>A light can be configured with several parameters. There are three types of light: <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/spot-lights-in-unreal-engine">spot</a>, <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/point-lights-in-unreal-engine">point</a> andd <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/rectangular-area-lights-in-unreal-engine">rectangular area</a> lights. 
+These correspond to the Unreal light types available. Please see the Unreal documentation for more information on these light types and when to use which. </p>
+<p>The following parameters can be configured:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>X Y Z</strong></td>
+<td>Position of the light relative to the vehicle/world (in NED coordinate system, in meters).</td>
+</tr>
+<tr>
+<td><strong>Roll Pitch Yaw</strong></td>
+<td>Orientation of the light relative to the vehicle/world (in degrees, yaw-pitch-roll order relative to the front vector +X).</td>
+</tr>
+<tr>
+<td><strong>Enable</strong></td>
+<td>Boolean flag indicating whether the light is enabled by default.</td>
+</tr>
+<tr>
+<td><strong>Type</strong></td>
+<td>Specifies the type of light: <code>0</code> = Spot light (default), <code>1</code> = Point light, <code>2</code> = Rectangular area light</td>
+</tr>
+<tr>
+<td><strong>IntensityUnit</strong></td>
+<td>Defines the unit used for light intensity: , <code>0</code> = Candelas (default), <code>1</code> = Lumens, <code>2</code> = EV (Exposure Value)</td>
+</tr>
+<tr>
+<td><strong>Intensity</strong></td>
+<td>Specifies the brightness of the light, expressed in the selected <strong>IntensityUnit</strong>. Default is 8.</td>
+</tr>
+<tr>
+<td><strong>AttenuationRadius</strong></td>
+<td>Defines the distance over which the light gradually fades out, measured in cm. Default is 1000.</td>
+</tr>
+<tr>
+<td><strong>InnerConeAngle</strong></td>
+<td>Applicable <strong>only for spotlights</strong>; specifies the inner angle of the spotlight’s cone (in degrees). Default is 0.</td>
+</tr>
+<tr>
+<td><strong>OuterConeAngle</strong></td>
+<td>Applicable <strong>only for spotlights</strong>; specifies the outer angle of the spotlight’s cone (in degrees). Default is 44.</td>
+</tr>
+<tr>
+<td><strong>SourceRadius</strong></td>
+<td>Applicable <strong>only for spotlights and point lights</strong>; specifies the radius of the light source in cm.</td>
+</tr>
+<tr>
+<td><strong>SourceSoftRadius</strong></td>
+<td>Applicable <strong>only for spotlights and point lights</strong>; defines the soft edge radius of the light source in meters.</td>
+</tr>
+<tr>
+<td><strong>SourceWidth</strong></td>
+<td>Applicable <strong>only for rectangular lights</strong>; specifies the width of the rectangular light source in cm. Default is 64.</td>
+</tr>
+<tr>
+<td><strong>SourceHeight</strong></td>
+<td>Applicable <strong>only for rectangular lights</strong>; specifies the height of the rectangular light source in cm. Default is 64.</td>
+</tr>
+<tr>
+<td><strong>BarnDoorAngle</strong></td>
+<td>Applicable <strong>only for rectangular lights</strong>; defines the angle of the barn door (in degrees). Default is 88.</td>
+</tr>
+<tr>
+<td><strong>BarnDoorLength</strong></td>
+<td>Applicable <strong>only for rectangular lights</strong>; specifies the length of the barn door in meters.</td>
+</tr>
+<tr>
+<td><strong>Temperature</strong></td>
+<td>Color temperature of the light in Kelvin. Defaults to <code>6500</code> (standard daylight white light).</td>
+</tr>
+<tr>
+<td><strong>CastShadows</strong></td>
+<td>Boolean flag indicating whether the light casts shadows.</td>
+</tr>
+<tr>
+<td><strong>ColorR</strong></td>
+<td>Red component of the light color (0-255). Default color is white.</td>
+</tr>
+<tr>
+<td><strong>ColorG</strong></td>
+<td>Green component of the light color (0-255). Default color is white.</td>
+</tr>
+<tr>
+<td><strong>ColorB</strong></td>
+<td>Blue component of the light color (0-255). Default color is white.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="client-api">Client API</h2>
+<p>You can toggle lights on and off with the API as well as set their intensity value. There are seperate commands for vehicle and world lights:
+ - <code>simSetWorldLightVisibility(light_name (string), is_visible (boolean))</code> 
+ - <code>simSetWorldLightIntensity(light_name (string), intensity (float))</code> 
+ - <code>simSetVehicleLightVisibility(vehicle_name (string), light_name (string), is_visible (boolean))</code> 
+ - <code>simSetVehicleLightIntensity(vehicle_name (string), light_name (string), intensity (float))</code> </p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../meshes/" class="btn btn-neutral float-left" title="Mesh Vertex Buffers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../sensors/" class="btn btn-neutral float-right" title="Sensors">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../meshes/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../sensors/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

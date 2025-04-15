@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Sensors - Cosys-AirSim</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Sensors";
+        var mkdocs_page_input_path = "sensors.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cosys-AirSim
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Home</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">Changelog</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Installing AirSim</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../run_packaged/">Download and run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_precompiled/">Download and install from precompiled plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_windows/">Install from Source on Windows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_linux/">Install from Source on Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../docker_ubuntu/">Using Docker on Ubuntu</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_custenv/">Custom Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dynamic_objects/">Dynamic Objects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Using AirSim</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../apis/">Core APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../image_apis/">Image APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apis_cpp/">C++ APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../instance_segmentation/">Instance Segmentation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../annotation/">Annotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../camera_views/">Camera Views</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../using_car/">Car Mode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remote_control/">Remote Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../xbox_controller/">XBox Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../steering_wheel_installation/">Steering Wheel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../multi_vehicle/">Multiple Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../skid_steer_vehicle/">Skid Steer Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gazebo_drone/">Import Gazebo models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../retexturing/">Domain Randomization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../meshes/">Mesh Vertex Buffers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lights/">Artificial Lights</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Sensors</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Sensors</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#default-sensors">Default sensors</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#multirotor">Multirotor</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#car">Car</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#computervision">ComputerVision</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#configuring-the-default-sensor-list">Configuring the default sensor list</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#configuring-vehicle-specific-sensor-list">Configuring vehicle-specific sensor list</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#sensor-specific-settings">Sensor specific settings</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sensor-apis">Sensor APIs</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#barometer">Barometer</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#imu">IMU</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#gps">GPS</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#magnetometer">Magnetometer</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#distance-sensor">Distance sensor</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../lidar/">LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpulidar/">GPU LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../echo/">Pulse Echo</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../InfraredCamera/">Infrared Camera</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../distance_sensor/">Distance Sensor</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ROS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_python/">ROS: AirSim ROS Python Wrapper</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_cplusplus/">ROS2: AirSim ROS C++ Wrapper</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matlab/">Matlab</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playback/">Playing Logs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../voxel_grid/">Voxel Grid Generator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event_sim/">Event camera</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Design</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../modify_recording_data/">Modifying Recording Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flight_controller/">Flight Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../adding_new_apis/">Adding new APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../simple_flight/">Simple Flight</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">External Flight Controllers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">MavLink and PX4</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_setup/">PX4 Setup for AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl/">PX4 in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl_wsl2/">PX4 SITL with WSL 2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_lockstep/">PX4 Lockstep</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_multi_vehicle/">PX4 Multi-vehicle in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/1oY8Qu5maQQ">AirSim with Pixhawk</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/HNWdYrtw3f0">PX4 Setup with AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be">Debugging Attitude Estimation</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages">Intercepting MavLink Messages</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones">Rapid Descent on PX4 Drones</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_build/">Building PX4</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_logging/">PX4/MavLink Logging</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../log_viewer/">MavLink LogViewer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom/">MavLinkCom</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom_mocap/">MavLink MoCap</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ArduPilot</a>
+    <ul>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/building-the-code.html">ArduPilot SITL Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/sitl-with-airsim.html">AirSim & ArduPilot</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Contributed Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://www.youtube.com/watch?v=y09VbdQWvQY">Using Environments from Marketplace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/simondlevy/AirSimTensorFlow">Simple Collision Avoidance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://aka.ms/AutonomousDrivingCookbook">Autonomous Driving on Azure</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building Hexacopter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo">Moving on Path Demo</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/Bp86WiLUC80">Importing a custom multirotor mesh</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object_detection/">Object Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/ZonkdMcwXH4">AirSim with MAVROS and PX4</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Misc</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom_drone/">AirSim on Real Drones</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pfm/">pfm format</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_proj/">Setting up Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../packaging/">Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_blocks/">Blocks Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../working_with_plugin_contents/">Working with UE Plugin Contents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/technion">Formula Student Technion Self-drive</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cosys-AirSim</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Using AirSim &raquo;</li>
+          <li>Sensors &raquo;</li>
+      <li>Sensors</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/sensors.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="sensors-in-cosys-airsim">Sensors in Cosys-AirSim</h1>
+<p>Cosys-AirSim currently supports the following sensors.  <br />
+Each sensor is associated with a integer enum specifying its sensor type.</p>
+<ul>
+<li>Camera</li>
+<li>Barometer = 1</li>
+<li>Imu = 2</li>
+<li>Gps = 3</li>
+<li>Magnetometer = 4</li>
+<li>Distance Sensor = 5</li>
+<li>Lidar = 6</li>
+<li>Echo = 7</li>
+<li>GPULidar = 8</li>
+<li>Uwb = 10</li>
+<li>Wi-Fi = 11</li>
+</ul>
+<p><strong>Note</strong> :  Cameras are configured differently than the other sensors and do not have an enum associated with them. Look at <a href="../settings/">general settings</a> and <a href="../image_apis/">image API</a> for camera config and API.</p>
+<h2 id="default-sensors">Default sensors</h2>
+<p>If no sensors are specified in the <code>settings.json</code>, then the following sensors are enabled by default based on the sim mode.</p>
+<h3 id="multirotor">Multirotor</h3>
+<ul>
+<li>Imu</li>
+<li>Magnetometer</li>
+<li>Gps</li>
+<li>Barometer</li>
+</ul>
+<h3 id="car">Car</h3>
+<ul>
+<li>Gps</li>
+</ul>
+<h3 id="computervision">ComputerVision</h3>
+<ul>
+<li>None</li>
+</ul>
+<p>Behind the scenes, 'createDefaultSensorSettings' method in <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/AirLib/include/common/AirSimSettings.hpp">AirSimSettings.hpp</a> which sets up the above sensors with their default parameters, depending on the sim mode specified in the <code>settings.json</code> file. </p>
+<h2 id="configuring-the-default-sensor-list">Configuring the default sensor list</h2>
+<p>The default sensor list can be configured in settings json:</p>
+<pre><code class="language-json">&quot;DefaultSensors&quot;: {
+    &quot;Barometer&quot;: {
+        &quot;SensorType&quot;: 1,
+        &quot;Enabled&quot; : true,
+        &quot;PressureFactorSigma&quot;: 0.001825,
+        &quot;PressureFactorTau&quot;: 3600,
+        &quot;UncorrelatedNoiseSigma&quot;: 2.7,
+        &quot;UpdateLatency&quot;: 0,
+        &quot;UpdateFrequency&quot;: 50,
+        &quot;StartupDelay&quot;: 0
+
+    },
+    &quot;Imu&quot;: {
+        &quot;SensorType&quot;: 2,
+        &quot;Enabled&quot; : true,
+        &quot;GenerateNoise&quot;: false,        
+        &quot;AngularRandomWalk&quot;: 0.3,
+        &quot;GyroBiasStabilityTau&quot;: 500,
+        &quot;GyroBiasStability&quot;: 4.6,
+        &quot;VelocityRandomWalk&quot;: 0.24,
+        &quot;AccelBiasStabilityTau&quot;: 800,
+        &quot;AccelBiasStability&quot;: 36
+    },
+    &quot;Gps&quot;: {
+        &quot;SensorType&quot;: 3,
+        &quot;Enabled&quot; : true,
+        &quot;EphTimeConstant&quot;: 0.9,
+        &quot;EpvTimeConstant&quot;: 0.9,
+        &quot;EphInitial&quot;: 25,
+        &quot;EpvInitial&quot;: 25,
+        &quot;EphFinal&quot;: 0.1,
+        &quot;EpvFinal&quot;: 0.1,
+        &quot;EphMin3d&quot;: 3,
+        &quot;EphMin2d&quot;: 4,
+        &quot;UpdateLatency&quot;: 0.2,
+        &quot;UpdateFrequency&quot;: 50,
+        &quot;StartupDelay&quot;: 1
+    },
+    &quot;Magnetometer&quot;: {
+        &quot;SensorType&quot;: 4,
+        &quot;Enabled&quot; : true,
+        &quot;NoiseSigma&quot;: 0.005,
+        &quot;ScaleFactor&quot;: 1,
+        &quot;NoiseBias&quot;: 0,
+        &quot;UpdateLatency&quot;: 0,
+        &quot;UpdateFrequency&quot;: 50,
+        &quot;StartupDelay&quot;: 0
+    },
+    &quot;Distance&quot;: {
+        &quot;SensorType&quot;: 5,
+        &quot;Enabled&quot; : true,
+        &quot;MinDistance&quot;: 0.2,
+        &quot;MaxDistance&quot;: 40,
+        &quot;X&quot;: 0, &quot;Y&quot;: 0, &quot;Z&quot;: -1,
+        &quot;Yaw&quot;: 0, &quot;Pitch&quot;: 0, &quot;Roll&quot;: 0,
+        &quot;DrawDebugPoints&quot;: false
+    }
+},
+</code></pre>
+<h2 id="configuring-vehicle-specific-sensor-list">Configuring vehicle-specific sensor list</h2>
+<p>A vehicle can override a subset of the default sensors listed above. A Lidar and Distance sensor are
+not added to a vehicle by default, so those you need to add this way. Each sensor must have a valid
+"SensorType" and a subset of the properties can be defined that override the default values shown
+above and you can set Enabled to false to disable a specific type of sensor.</p>
+<pre><code>    &quot;Vehicles&quot;: {
+
+        &quot;Drone1&quot;: {
+            &quot;VehicleType&quot;: &quot;SimpleFlight&quot;,
+            &quot;AutoCreate&quot;: true,
+            ...
+            &quot;Sensors&quot;: {
+                &quot;MyLidar1&quot;: { 
+                    &quot;SensorType&quot;: 6,
+                    &quot;Enabled&quot; : true,
+                    &quot;NumberOfChannels&quot;: 16,
+                    &quot;PointsPerSecond&quot;: 10000,
+                    &quot;X&quot;: 0, &quot;Y&quot;: 0, &quot;Z&quot;: -1,
+                    &quot;DrawDebugPoints&quot;: true
+                },
+                &quot;MyLidar2&quot;: { 
+                    &quot;SensorType&quot;: 6,
+                    &quot;Enabled&quot; : true,
+                    &quot;NumberOfChannels&quot;: 4,
+                    &quot;PointsPerSecond&quot;: 10000,
+                    &quot;X&quot;: 0, &quot;Y&quot;: 0, &quot;Z&quot;: -1,
+                    &quot;DrawDebugPoints&quot;: true
+                }
+            }
+        }
+   }
+</code></pre>
+<h3 id="sensor-specific-settings">Sensor specific settings</h3>
+<p>Each sensor-type has its own set of settings as well. <br />
+Please see <a href="../lidar/">lidar</a> for example of Lidar specific settings.
+Please see <a href="../echo/">echo</a> for example of Echo specific settings.
+Please see <a href="../gpulidar/">GPU lidar</a> for example of GPU Lidar specific settings.</p>
+<h2 id="sensor-apis">Sensor APIs</h2>
+<h2 id="barometer">Barometer</h2>
+<pre><code class="language-cpp">msr::airlib::BarometerBase::Output getBarometerData(const std::string&amp; barometer_name, const std::string&amp; vehicle_name);
+</code></pre>
+<pre><code class="language-python">barometer_data = client.getBarometerData(barometer_name = &quot;&quot;, vehicle_name = &quot;&quot;)
+</code></pre>
+<h3 id="imu">IMU</h3>
+<pre><code class="language-cpp">msr::airlib::ImuBase::Output getImuData(const std::string&amp; imu_name = &quot;&quot;, const std::string&amp; vehicle_name = &quot;&quot;);
+</code></pre>
+<pre><code class="language-python">imu_data = client.getImuData(imu_name = &quot;&quot;, vehicle_name = &quot;&quot;)
+</code></pre>
+<h3 id="gps">GPS</h3>
+<pre><code class="language-cpp">msr::airlib::GpsBase::Output getGpsData(const std::string&amp; gps_name = &quot;&quot;, const std::string&amp; vehicle_name = &quot;&quot;);
+</code></pre>
+<pre><code class="language-python">gps_data = client.getGpsData(gps_name = &quot;&quot;, vehicle_name = &quot;&quot;)
+</code></pre>
+<h3 id="magnetometer">Magnetometer</h3>
+<pre><code class="language-cpp">msr::airlib::MagnetometerBase::Output getMagnetometerData(const std::string&amp; magnetometer_name = &quot;&quot;, const std::string&amp; vehicle_name = &quot;&quot;);
+</code></pre>
+<pre><code class="language-python">magnetometer_data = client.getMagnetometerData(magnetometer_name = &quot;&quot;, vehicle_name = &quot;&quot;)
+</code></pre>
+<h3 id="distance-sensor">Distance sensor</h3>
+<pre><code class="language-cpp">msr::airlib::DistanceSensorData getDistanceSensorData(const std::string&amp; distance_sensor_name = &quot;&quot;, const std::string&amp; vehicle_name = &quot;&quot;);
+</code></pre>
+<pre><code class="language-python">distance_sensor_data = client.getDistanceSensorData(distance_sensor_name = &quot;&quot;, vehicle_name = &quot;&quot;)
+</code></pre>
+<ul>
+<li>
+<p>Lidar <br />
+    See <a href="../lidar/">lidar</a> for Lidar API.</p>
+</li>
+<li>
+<p>Echo <br />
+    See <a href="../echo/">echo</a> for Echo API.</p>
+</li>
+<li>
+<p>GPU Lidar <br />
+    See <a href="../gpulidar/">GPU Lidar</a> for GPU Lidar API.</p>
+</li>
+<li>
+<p>UWB/Wi-Fi
+    These sensors are still experimental and are currently not documented. Please refer to the source code for more information.</p>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../lights/" class="btn btn-neutral float-left" title="Artificial Lights"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../lidar/" class="btn btn-neutral float-right" title="LIDAR">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../lights/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../lidar/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

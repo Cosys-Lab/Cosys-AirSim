@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Home - Cosys-AirSim</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "README.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Cosys-AirSim
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Home</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#associated-publications">Associated publications</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cosys-lab-modifications">Cosys-Lab Modifications</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-to-get-it">How to Get It</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#download-and-run-from-packaged-binary-windowslinux">Download and run from packaged binary - Windows/Linux</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#download-and-install-from-precompiled-plugin-windowslinux">Download and install from precompiled plugin - Windows/Linux</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#install-and-use-from-source-windows">Install and use from source - Windows</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#install-and-use-from-source-linux">Install and use from source - Linux</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-to-use-it">How to Use It</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#original-airsim-paper">Original AirSim Paper</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">Changelog</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Installing AirSim</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="run_packaged/">Download and run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="install_precompiled/">Download and install from precompiled plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="install_windows/">Install from Source on Windows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="install_linux/">Install from Source on Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="docker_ubuntu/">Using Docker on Ubuntu</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="unreal_custenv/">Custom Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="dynamic_objects/">Dynamic Objects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Using AirSim</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="apis/">Core APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="image_apis/">Image APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="apis_cpp/">C++ APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="instance_segmentation/">Instance Segmentation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="annotation/">Annotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="camera_views/">Camera Views</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="using_car/">Car Mode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="remote_control/">Remote Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="xbox_controller/">XBox Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="steering_wheel_installation/">Steering Wheel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="multi_vehicle/">Multiple Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="skid_steer_vehicle/">Skid Steer Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="gazebo_drone/">Import Gazebo models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="retexturing/">Domain Randomization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="meshes/">Mesh Vertex Buffers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="lights/">Artificial Lights</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sensors</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="sensors/">Sensors</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="lidar/">LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="gpulidar/">GPU LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="echo/">Pulse Echo</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="InfraredCamera/">Infrared Camera</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="distance_sensor/">Distance Sensor</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ROS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="ros_python/">ROS: AirSim ROS Python Wrapper</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="ros_cplusplus/">ROS2: AirSim ROS C++ Wrapper</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="matlab/">Matlab</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="playback/">Playing Logs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="voxel_grid/">Voxel Grid Generator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="event_sim/">Event camera</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Design</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="modify_recording_data/">Modifying Recording Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="flight_controller/">Flight Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="adding_new_apis/">Adding new APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="simple_flight/">Simple Flight</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">External Flight Controllers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">MavLink and PX4</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="px4_setup/">PX4 Setup for AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="px4_sitl/">PX4 in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="px4_sitl_wsl2/">PX4 SITL with WSL 2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="px4_lockstep/">PX4 Lockstep</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="px4_multi_vehicle/">PX4 Multi-vehicle in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/1oY8Qu5maQQ">AirSim with Pixhawk</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/HNWdYrtw3f0">PX4 Setup with AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be">Debugging Attitude Estimation</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages">Intercepting MavLink Messages</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones">Rapid Descent on PX4 Drones</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="px4_build/">Building PX4</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="px4_logging/">PX4/MavLink Logging</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="log_viewer/">MavLink LogViewer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="mavlinkcom/">MavLinkCom</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="mavlinkcom_mocap/">MavLink MoCap</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ArduPilot</a>
+    <ul>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/building-the-code.html">ArduPilot SITL Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/sitl-with-airsim.html">AirSim & ArduPilot</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Contributed Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://www.youtube.com/watch?v=y09VbdQWvQY">Using Environments from Marketplace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/simondlevy/AirSimTensorFlow">Simple Collision Avoidance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://aka.ms/AutonomousDrivingCookbook">Autonomous Driving on Azure</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building Hexacopter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo">Moving on Path Demo</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/Bp86WiLUC80">Importing a custom multirotor mesh</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="object_detection/">Object Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/ZonkdMcwXH4">AirSim with MAVROS and PX4</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Misc</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="custom_drone/">AirSim on Real Drones</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="pfm/">pfm format</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="unreal_proj/">Setting up Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="packaging/">Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="unreal_blocks/">Blocks Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="working_with_plugin_contents/">Working with UE Plugin Contents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/technion">Formula Student Technion Self-drive</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Cosys-AirSim</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Home &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/README.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="cosys-airsim">Cosys-AirSim</h1>
+<p>Cosys-AirSim is a simulator for drones, cars and more, with extensive API support, built on <a href="https://www.unrealengine.com/">Unreal Engine</a>. It is open-source, cross platform, and supports hardware-in-loop with popular flight controllers such as PX4 for physically and visually realistic simulations. It is developed as an Unreal plugin that can simply be dropped into any Unreal environment. </p>
+<p>This fork is based on last public AirSim release from Microsoft's GitHub.
+Cosys-Lab made extensive modifications to the AirSim platform to support multiple projects and research goals. 
+Please contact a Cosys-Lab researcher to get more in depth information on our work or if you wish to collaborate. 
+The <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE">original AirSim MIT license</a> applies to all native AirSim source files. 
+Please note that we use that same <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE">MIT license</a> as which applies to all changes made by Cosys-Lab in case you plan to do anything within this repository.
+Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
+Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.</p>
+<p>This documentation is for Unreal Version v5.5.0 on the <a href="https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.5">5.5 branch</a>. The documentation is best read from <a href="https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.5/docs">source</a>.</p>
+<h2 id="associated-publications">Associated publications</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2303.13381">Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications</a></li>
+</ul>
+<pre><code>@inproceedings{cosysairsim2023jansen,
+  author={Jansen, Wouter and Verreycken, Erik and Schenck, Anthony and Blanquart, Jean-Edouard and Verhulst, Connor and Huebel, Nico and Steckel, Jan},
+  booktitle={2023 Annual Modeling and Simulation Conference (ANNSIM)}, 
+  title={COSYS-AIRSIM: A Real-Time Simulation Framework Expanded for Complex Industrial Applications}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={37-48},
+  doi={}}
+</code></pre>
+<p>You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSIM '23 conference <a href="https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/annsim23_tutorial">here</a> together with the associated videos.</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2208.10295">Physical LiDAR Simulation in Real-Time Engine</a></li>
+</ul>
+<pre><code>@inproceedings{lidarsim2022jansen,
+  author={Jansen, Wouter and Huebel, Nico and Steckel, Jan},
+  booktitle={2022 IEEE Sensors}, 
+  title={Physical LiDAR Simulation in Real-Time Engine}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1-4},
+  doi={10.1109/SENSORS52175.2022.9967197}}
+}
+</code></pre>
+<ul>
+<li><a href="https://www.mdpi.com/1424-8220/21/2/523">Simulation of Pulse-Echo Radar for Vehicle Control and SLAM</a></li>
+</ul>
+<pre><code>@Article{echosim2021schouten,
+  author={Schouten, Girmi and Jansen, Wouter and Steckel, Jan},
+  title={Simulation of Pulse-Echo Radar for Vehicle Control and SLAM},
+  JOURNAL={Sensors},
+  volume={21},
+  year={2021},
+  number={2},
+  article-number={523},
+  doi={10.3390/s21020523}
+}
+</code></pre>
+<h2 id="cosys-lab-modifications">Cosys-Lab Modifications</h2>
+<ul>
+<li>Updated for Unreal 5.</li>
+<li>Added <a href="https://cosys-lab.github.io/annotation">multi-layer annotation</a> for groundtruth label generation with RGB, greyscale and texture options. Extensive API integration and available for camera and GPU-LiDAR sensors.</li>
+<li>Added <a href="https://cosys-lab.github.io/instance_segmentation">Instance Segmentation</a>. </li>
+<li>Added <a href="https://cosys-lab.github.io/echo">Echo sensor type</a> for simulation of sensors like sonar and radar.</li>
+<li>Added <a href="https://cosys-lab.github.io/gpulidar">GPU LIDAR sensor type</a>: Uses GPU acceleration to simulate a LiDAR sensor. Can support much higher point density then normal LiDAR and behaves more authentic and has realistic intensity generation.</li>
+<li>Added <a href="https://cosys-lab.github.io/skid_steer_vehicle">skid steering SimMode and vehicle type</a>. ClearPath Husky and Pioneer P3DX implemented as vehicle types using this new vehicle model. </li>
+<li>Added <a href="https://cosys-lab.github.io/matlab">Matlab API Client</a> implementation as an easy to install Matlab toolbox.</li>
+<li>Added various <a href="https://cosys-lab.github.io/dynamic_objects">random but deterministic dynamic object types and world configuration options</a>.</li>
+<li>Added <a href="https://cosys-lab.github.io/lights">Artificial Lights</a>. </li>
+<li>Added BoxCar vehicle model to the Car SimMode to have a smaller vehicle to use in indoor spaces.</li>
+<li>Added a new image type called <a href="https://cosys-lab.github.io/image_apis">Lighting</a> which only shows the light information and no materials.</li>
+<li>Updated <a href="https://cosys-lab.github.io/image_apis#computer-vision-mode-1">ComputerVision mode</a>: Now has full API and Simulation just like other vehicle types. It mostly means it can now have sensors attached (outside of IMU). Improved handling and camera operation.</li>
+<li>Updated <a href="https://cosys-lab.github.io/lidar">LIDAR sensor type</a>: Fixed not tracing correctly, added ground truth (point labels) generation, added range-noise generation. Improved API pointcloud delivery to be full scan instead of being frame-rate dependent and partial.</li>
+<li>Updated the camera, Echo and (GPU-)LiDAR sensors to be uncoupled from the vehicle and be placed as external world sensors.</li>
+<li>Updated sensors like cameras, Echo sensor and GPU-LiDAR to ignore certain objects with the <em>MarkedIgnore</em> Unreal tag and enabling the "IgnoreMarked" setting in <a href="https://cosys-lab.github.io/settings">the settings file</a>.</li>
+<li>Updated cameras sensor with more distortion features such as chromatic aberration, motion blur and lens distortion. </li>
+<li>Updated Python <a href="https://cosys-lab.github.io/ros_python">ROS implementation</a> with completely new implementation and feature set.</li>
+<li>Updated C++ <a href="https://cosys-lab.github.io/ros_cplusplus">ROS2 implementation</a> to support custom Cosys-AirSim features.</li>
+<li>Dropped support for Unity Environments.</li>
+</ul>
+<p>Some more details on our changes can be found in the <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">changelog</a>.</p>
+<h2 id="how-to-get-it">How to Get It</h2>
+<h4 id="download-and-run-from-packaged-binary-windowslinux">Download and run from packaged binary - Windows/Linux</h4>
+<ul>
+<li><a href="https://cosys-lab.github.io/run_packaged">Download and run it</a></li>
+</ul>
+<h4 id="download-and-install-from-precompiled-plugin-windowslinux">Download and install from precompiled plugin - Windows/Linux</h4>
+<ul>
+<li><a href="https://cosys-lab.github.io/install_precompiled">Download and install it</a></li>
+</ul>
+<h4 id="install-and-use-from-source-windows">Install and use from source - Windows</h4>
+<ul>
+<li><a href="https://cosys-lab.github.io/install_windows">Install/Build it</a></li>
+</ul>
+<h4 id="install-and-use-from-source-linux">Install and use from source - Linux</h4>
+<ul>
+<li><a href="https://cosys-lab.github.io/install_linux">Install/Build it</a></li>
+</ul>
+<h2 id="how-to-use-it">How to Use It</h2>
+<h3 id="documentation">Documentation</h3>
+<p>View our <a href="https://cosys-lab.github.io/">detailed documentation</a> on all aspects of Cosys-AirSim.</p>
+<h2 id="original-airsim-paper">Original AirSim Paper</h2>
+<p>More technical details are available in <a href="https://arxiv.org/abs/1705.05065">AirSim paper (FSR 2017 Conference)</a>. Please cite this as:</p>
+<pre><code>@inproceedings{airsim2017fsr,
+  author = {Shital Shah and Debadeepta Dey and Chris Lovett and Ashish Kapoor},
+  title = {AirSim: High-Fidelity Visual and Physical Simulation for Autonomous Vehicles},
+  year = {2017},
+  booktitle = {Field and Service Robotics},
+  eprint = {arXiv:1705.05065},
+  url = {https://arxiv.org/abs/1705.05065}
+}
+</code></pre>
+<h2 id="license">License</h2>
+<p>This project is released under the MIT License. Please review the <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE">License file</a> for more details.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="run_packaged/" class="btn btn-neutral float-right" title="Download and run">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="run_packaged/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Dynamic Objects - Cosys-AirSim</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Dynamic Objects";
+        var mkdocs_page_input_path = "dynamic_objects.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cosys-AirSim
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Home</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">Changelog</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Installing AirSim</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../run_packaged/">Download and run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_precompiled/">Download and install from precompiled plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_windows/">Install from Source on Windows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../install_linux/">Install from Source on Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../docker_ubuntu/">Using Docker on Ubuntu</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_custenv/">Custom Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Dynamic Objects</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#location">Location</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#features">Features</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#seed-world-dynamics-configuration">Seed &amp; World Dynamics Configuration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#start-point">Start Point</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dynamic-marked-objects">Dynamic Marked Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#launchfile">LaunchFile</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dynamic-static-spawners">Dynamic Static Spawners</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#grouped-ai">Grouped AI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#spline-animations">Spline Animations</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Using AirSim</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../apis/">Core APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../image_apis/">Image APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apis_cpp/">C++ APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../instance_segmentation/">Instance Segmentation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../annotation/">Annotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../camera_views/">Camera Views</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../using_car/">Car Mode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remote_control/">Remote Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../xbox_controller/">XBox Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../steering_wheel_installation/">Steering Wheel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../multi_vehicle/">Multiple Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../skid_steer_vehicle/">Skid Steer Vehicles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gazebo_drone/">Import Gazebo models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../retexturing/">Domain Randomization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../meshes/">Mesh Vertex Buffers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../lights/">Artificial Lights</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Sensors</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../sensors/">Sensors</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../lidar/">LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpulidar/">GPU LIDAR</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../echo/">Pulse Echo</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../InfraredCamera/">Infrared Camera</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../distance_sensor/">Distance Sensor</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ROS</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_python/">ROS: AirSim ROS Python Wrapper</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ros_cplusplus/">ROS2: AirSim ROS C++ Wrapper</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matlab/">Matlab</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playback/">Playing Logs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../voxel_grid/">Voxel Grid Generator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event_sim/">Event camera</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Design</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../modify_recording_data/">Modifying Recording Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flight_controller/">Flight Controller</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../adding_new_apis/">Adding new APIs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../simple_flight/">Simple Flight</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">External Flight Controllers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">MavLink and PX4</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_setup/">PX4 Setup for AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl/">PX4 in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl_wsl2/">PX4 SITL with WSL 2</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_lockstep/">PX4 Lockstep</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_multi_vehicle/">PX4 Multi-vehicle in SITL</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/1oY8Qu5maQQ">AirSim with Pixhawk</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://youtu.be/HNWdYrtw3f0">PX4 Setup with AirSim</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be">Debugging Attitude Estimation</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages">Intercepting MavLink Messages</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones">Rapid Descent on PX4 Drones</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_build/">Building PX4</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../px4_logging/">PX4/MavLink Logging</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../log_viewer/">MavLink LogViewer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom/">MavLinkCom</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom_mocap/">MavLink MoCap</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">ArduPilot</a>
+    <ul>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/building-the-code.html">ArduPilot SITL Setup</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/sitl-with-airsim.html">AirSim & ArduPilot</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Contributed Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://www.youtube.com/watch?v=y09VbdQWvQY">Using Environments from Marketplace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/simondlevy/AirSimTensorFlow">Simple Collision Avoidance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://aka.ms/AutonomousDrivingCookbook">Autonomous Driving on Azure</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building Hexacopter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo">Moving on Path Demo</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/Bp86WiLUC80">Importing a custom multirotor mesh</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object_detection/">Object Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://youtu.be/ZonkdMcwXH4">AirSim with MAVROS and PX4</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Misc</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom_drone/">AirSim on Real Drones</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pfm/">pfm format</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_proj/">Setting up Unreal Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../packaging/">Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../unreal_blocks/">Blocks Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../working_with_plugin_contents/">Working with UE Plugin Contents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/technion">Formula Student Technion Self-drive</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cosys-AirSim</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Installing AirSim &raquo;</li>
+      <li>Dynamic Objects</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/dynamic_objects.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="setup-dynamic-objects-for-scenario-environments-for-cosys-airsim">Setup Dynamic Objects for Scenario Environments for Cosys-AirSim</h1>
+<p>The available environments often feature some custom-made dynamic blueprints that can be used to create random but deterministic change in your environment. </p>
+<h2 id="location">Location</h2>
+<p>While these can be found in the environments available, they are also separately saved in <em>Unreal/Environments/DynamicObjects</em>.
+Copy the c++ files to your environments Source folder (<em>Environments/Source/levelname/</em>) and copy the uassets to your Contents folder.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Dynamic AI humans walking between waypoints</li>
+<li>Dynamic spawning stacked goods (pallets etc.)</li>
+<li>Dynamic static objects spawning (either always the same or pick from a set of options)</li>
+<li>Small dynamic changes such as random open doors.</li>
+<li>All randomization is controllable by a seed to make sure you can simulate the same setup again.</li>
+<li>Other animate objects such as modular conveyor belts and robotic arms are available as well.</li>
+<li>Some features can also be configured with a launchfile/launch parameters.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>There are several object types and settings to make the environment dynamic. Here follows some simple instructions to tweak and alter their behaviour using the created blueprints.</p>
+<h3 id="seed-world-dynamics-configuration">Seed &amp; World Dynamics Configuration</h3>
+<p>To control the randomisation functionally used in the dynamic objects, a controllable seed number is used. In every level using the dynamic objects an actor has to be present of the class <em>Dynamic World Master</em>.
+This object will visually show the chosen seed every time the simulation is started (it can be hidden as well with a toggle). There are few other toggles available as well.</p>
+<p>The seed and these other settings can be controlled both in standalone(build packages) and in the editor:
+- <strong>Editor</strong>: 
+  - To control the seed in the editor, change the <code>Editor Seed</code> setting of the <em>Dynamic World Master</em> actor in the level. If it is set to 0, it will generate a random seed number. But if set to anything else, it will use that number as seed for all dynamic objects. 
+  - To make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics) set the <code>Editor Is Static</code> boolean to true. Default is false. 
+  - Toggle the AI in the world on and off set the <code>Editor Spawn AI</code>. Default to true.
+- <strong>Standalone</strong>:
+  - To control the seed when using the simulator as standalone, use the launch parameter <code>-startSeed INT</code> with X being the chosen seed value. if not set it will chose a random one.
+  - To make the world static and turn off all dynamic changes throughout the simulation (conveyor belts, randomized changes to statics) add a launch parameter <code>-isStatic BOOL</code> with the boolean set to true. If not set it defaults to false.
+  - Toggle the AI in the world on and off with a launch parameter the <code>-spawnAI BOOL</code>. If not set it defaults to true.</p>
+<h3 id="start-point">Start Point</h3>
+<p>In order for your environment to have multiple starting points, the <em>Dynamic World Master</em> can be configured to teleport the AirSim vehicle after launch to one of several manually defined starting points.
+To define a new startpoint in your environment, place objects of the type <em>Target Point</em> in your environment. At launch these will be marked as potential staring points for the simulator.
+They are used in order that they appear in the World Outliner.</p>
+<p>To configure which starting point is used, you can configure the number:
+- <strong>Editor</strong>: To control the starting point in the editor, change the <code>Editor Start Point</code> setting of the <em>Dynamic World Master</em> actor in the level.
+- <strong>Standalone</strong>: To control the starting point in aa standalone build, use the launch parameter <code>-startPoint INT</code> with X being the chosen starting point.</p>
+<h3 id="dynamic-marked-objects">Dynamic Marked Objects</h3>
+<p>Objects in your environment can be marked to be 'dynamic'. It's mean purpose is to offer a simple setup with a configurable amount of dynamic objects that can move or be deleted.
+All dynamic objects (those that can be removed or moved) need to have their actor tag set to <em>DynamicObject</em>.</p>
+<p>To control the dynamic objects a few parameters are available:
+- <strong>Remove percentage</strong>: number of marked objects to remove randomly
+- <strong>Move percentage</strong>: number of marked objects to move and rotate slightly
+  - <strong>Move offset</strong>: maximum the object can move in cm
+  - <strong>Rotation offset</strong>: maximum rotation in degrees the object can rotate
+These are as well available in the editor with the <em>DynamicWorldMaster</em> actors settings. Or can be setup in the launch parameters.
+- <strong>Editor</strong>: Search for the settings <code>Editor Remove Percentage</code>, <code>Editor Move Percentage</code>, <code>Editor Move Offset Value</code> and <code>Editor Rotation Offset Value</code> to configure the dynamic marked objects system.
+- <strong>Standalone</strong>: Use the launch parameters <code>-removePercentage INT</code>, <code>-movePercentage INT</code>, <code>-moveOffsetValue INT</code> and <code>-moveRotationValue INT</code> to configure the dynamic marked objects system.</p>
+<p>Furthermore, you can mark an object as <em>Guide</em> with an actor tag. This will print out the horizontal distance of all marked dynamic objects to these Guide Objects for debugging or validation purposes.</p>
+<h3 id="launchfile">LaunchFile</h3>
+<p>You can also use a file to define the previous dynamic setting configurations line per line. Then by pressing a button (<kbd>O</kbd>) you can switch to the next configuration.
+This file has the following structure:</p>
+<pre><code>seed,removePercentage,movePercentage,moveOffsetValue,moveRotationValue
+</code></pre>
+<p>For example you can create <em>launchfile.ini</em>, each line defining a new configuration:</p>
+<pre><code>0,50,25,50,50
+450,10,10,50,50
+450,10,10,50,50
+500,10,10,50,50
+450,10,10,50,50
+</code></pre>
+<p>Do note that this only configures those 5 settings. The <strong>Starting point</strong>,<strong>Is Static</strong> and <strong>Spawn AI</strong> settings are not configured this way and are configured just as before.</p>
+<p>to make the environment load this file, you need to define it. Which similarly to before is different for the editor or standalone:
+- <strong>Editor</strong>: 
+  - To control the launchfile in the editor, enable the <code>Use Launch File</code> toggle and set the <code>Editor Launch File</code> field to the absolute filepath of the launchfile of the <em>DynamicWorldMaster</em> actor in the level. 
+- <strong>Standalone</strong>:
+  - To control the launchfile when using the simulator as standalone, use the launch parameter <code>-launchFile STRING</code> and set it to the absolute filepath of the launchfile.</p>
+<h3 id="dynamic-static-spawners">Dynamic Static Spawners</h3>
+<p>Some blueprints are also available to be used to spawn dynamic objects.
+Currently, there are 4 dynamic static object spawners blueprints available:
+- <em>RandomStackSpawner</em>: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. One can control it with the following settings:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Static</td>
+<td>The StaticMesh that needs to be stacked dynamically</td>
+</tr>
+<tr>
+<td>Min Width Count</td>
+<td>Minimum amount of statics to spawn in the Y direction</td>
+</tr>
+<tr>
+<td>Max Width Count</td>
+<td>Maximum amount of statics to spawn in the Y direction</td>
+</tr>
+<tr>
+<td>Min Length Count</td>
+<td>Minimum amount of statics to spawn in the X direction</td>
+</tr>
+<tr>
+<td>Max Length Count</td>
+<td>Maximum amount of statics to spawn in the X direction</td>
+</tr>
+<tr>
+<td>Min Height Count</td>
+<td>Minimum amount of statics to spawn in the Z direction</td>
+</tr>
+<tr>
+<td>Max Height Count</td>
+<td>Maximum amount of statics to spawn in the Z direction</td>
+</tr>
+<tr>
+<td>Random Rotation</td>
+<td>Boolean to toggle the application of a random rotation to the object ( for barrels and other cylinder objects)</td>
+</tr>
+<tr>
+<td>Random Position Offset</td>
+<td>Value in cm to apply a random offset in position in any direction</td>
+</tr>
+<tr>
+<td>Chance To Spawn</td>
+<td>Percentage of chance to spawn each object in the stack</td>
+</tr>
+<tr>
+<td>Chance to Change</td>
+<td>Percentage of chance to alter the stack configuration every so many seconds</td>
+</tr>
+<tr>
+<td>Average Time Between Changes</td>
+<td>Average time delta in seconds between changes</td>
+</tr>
+<tr>
+<td>Max Time Between Changes Offset</td>
+<td>Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)</td>
+</tr>
+<tr>
+<td>Nav Collision W/L/H</td>
+<td>This setting can be used to create a area around the object spawner of which the Dynamic AI pathfinding will stay away from.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><em>RandomStackSpawnerSwitcher</em>: This can be used to create a dynamic formed stacked set of goods. Like a pallet with boxes spawned on top. Difference with the one above is that this one can
+select from a Data Table object to select randomly a 'goods'/object type, and it's stacking settings. One can control it with the following settings:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data Table</td>
+<td>The Data Table object of the type <em>RandomStackSpawnerSwitcherStruct</em> to set the object types and their settings similar to the ones above for the normal <em>RandomStackSpawner</em></td>
+</tr>
+<tr>
+<td>Chance To Spawn</td>
+<td>Percentage of chance to spawn each object in the stack</td>
+</tr>
+<tr>
+<td>Chance to Change</td>
+<td>Percentage of chance to alter the stack configuration every so many seconds</td>
+</tr>
+<tr>
+<td>Chance To Switch</td>
+<td>Percentage of chance to switch to a different object type from Data Table</td>
+</tr>
+<tr>
+<td>Average Time Between Changes</td>
+<td>Average time delta in seconds between changes</td>
+</tr>
+<tr>
+<td>Max Time Between Changes Offset</td>
+<td>Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><em>RandomStaticModifier</em>: This can be used to spawn a singular static and alter it's spawn transform dynamically. One can control it with the following settings:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Static</td>
+<td>The StaticMesh that needs to be spawned</td>
+</tr>
+<tr>
+<td>Chance To Spawn</td>
+<td>Percentage of chance to spawn the object</td>
+</tr>
+<tr>
+<td>Max Rotation Offset</td>
+<td>Maximum rotation in degrees (both positive and negative) to alter the transform</td>
+</tr>
+<tr>
+<td>Max XPosition Offset</td>
+<td>Maximum position offset in cm (both positive and negative) to alter the transform in the X axis</td>
+</tr>
+<tr>
+<td>Max YPosition Offset</td>
+<td>Maximum position offset in cm (both positive and negative) to alter the transform in the Y axis</td>
+</tr>
+<tr>
+<td>Chance to Change</td>
+<td>Percentage of chance to alter the stack configuration every so many seconds</td>
+</tr>
+<tr>
+<td>Average Time Between Changes</td>
+<td>Average time delta in seconds between changes</td>
+</tr>
+<tr>
+<td>Max Time Between Changes Offset</td>
+<td>Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><em>RandomStaticPicker</em>: This can be used to spawn a singular randomly picked static out of list of chosen statics and alter it's spawn transform dynamically. One can control it with the following settings:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Statics</td>
+<td>The list of StaticMesh objects that can be picked from to spawn one</td>
+</tr>
+<tr>
+<td>Chance To Spawn</td>
+<td>Percentage of chance to spawn the object</td>
+</tr>
+<tr>
+<td>Max Rotation Offset</td>
+<td>Maximum rotation in degrees (both positive and negative) to alter the transform</td>
+</tr>
+<tr>
+<td>Max XPosition Offset</td>
+<td>Maximum position offset in cm (both positive and negative) to alter the transform in the X axis</td>
+</tr>
+<tr>
+<td>Max YPosition Offset</td>
+<td>Maximum position offset in cm (both positive and negative) to alter the transform in the Y axis</td>
+</tr>
+<tr>
+<td>Chance to Change</td>
+<td>Percentage of chance to alter the stack configuration every so many seconds</td>
+</tr>
+<tr>
+<td>Average Time Between Changes</td>
+<td>Average time delta in seconds between changes</td>
+</tr>
+<tr>
+<td>Max Time Between Changes Offset</td>
+<td>Maximum time delta offset in seconds between changes (to not have all objects change at same time a small random offset is used)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>There are some other more simple dynamic objects such as doors and conveyor belts that have self-explanatory settings very similar to those above. All are based on the seed randomisation.</li>
+</ul>
+<h3 id="grouped-ai">Grouped AI</h3>
+<p>A human looking AI is also available to walk dynamically between a set of self chosen waypoints. They are based on the DetourAIController of Unreal so will avoid each other and the user pretty well. 
+In order to have more control over them, some custom blueprints were created. Their main features are that the AI themselves, the waypoints and the spawners can be assigned a group ID number. So that all functionally is grouped. 
+They also use the Seed randomisation so that they can be spawned at the same waypoints and target the same waypoints each time if the same seed value is chosen. The following blueprints are available:
+- <em>GroupedTargetPoint</em>: These are the TargetPoints (waypoints) that the AI will walk between. Their only setting is the group ID number to decide which AI group will be able to pick this waypoint to spawn AI and be the target waypoint for them.
+- <em>GroupedAI</em>: One can manually spawn an AI by placing these in the world. They need to be assigned the Group ID manually to choose which waypoints to target.
+- <em>GroupedAISpawner</em>: To automate the spawner of AI, one can use this blueprint. It will spawn Ai at the waypoints of the same group. A setting is available to configure the fill percentage. This will set the percentage of waypoints to spawn AI upon. On also has to chose which Skeletal Meshes and their Animation Blueprints can be chosen from.                                                                      </p>
+<h3 id="spline-animations">Spline Animations</h3>
+<p>Making statics and skeletal meshes move along a spline path at a fixed speed. See the video below for more information on how it works:
+<a href="http://www.youtube.com/watch?v=JbPmS104ctg" title="Cosys-Lab Airsim Simulator - Spline Animation Tutorial"><img alt="Blinking LEDs" src="http://img.youtube.com/vi/JbPmS104ctg/0.jpg" /></a></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../unreal_custenv/" class="btn btn-neutral float-left" title="Custom Unreal Environment"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../apis/" class="btn btn-neutral float-right" title="Core APIs">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Cosys-Lab/Cosys-AirSim" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../unreal_custenv/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../apis/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
