@@ -10,7 +10,11 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
-This documentation is for Unreal Version v5.5.0 on the [5.5 branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.5). The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.5/docs).
+This documentation is for this particular branch only and is best read from the source documentation files. 
+For the latest stable versions see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main), 
+these are maintained for support, and is available for builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases). 
+The documentation for the latest stable version can be read online [here](https://cosys-lab.github.io/Cosys-AirSim/).
+
 
 ## Associated publications
 
