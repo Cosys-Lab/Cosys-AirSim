@@ -55,7 +55,7 @@ DrawSensor                 | Draw the physical sensor in the world on the vehicl
 e.g.,
 ```
 {
-    "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+    "SeeDocsAt": "https://cosys-lab.github.io/Cosys-AirSim/settings/",
     "SettingsVersion": 2.0,
     "SimMode": "SkidVehicle",
 	"Vehicles": {
@@ -129,7 +129,7 @@ DrawDebugDuration         | Duration in seconds that the debug points and lines 
 In the settings file this can look like this example : 
 ```
 {
-  "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+  "SeeDocsAt": "https://cosys-lab.github.io/Cosys-AirSim/settings/",
   "SettingsVersion": 2.0,
   "SimMode": "SkidVehicle",
   "ViewMode": "",
