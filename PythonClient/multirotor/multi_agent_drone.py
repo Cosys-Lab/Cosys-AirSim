@@ -9,7 +9,7 @@ import tempfile
 # Use below in settings.json with Blocks environment
 """
 {
-	"SeeDocsAt": "https://cosys-lab.github.io/settings/",
+	"SeeDocsAt": "https://cosys-lab.github.io/Cosys-AirSim/settings/",
 	"SettingsVersion": 1.2,
 	"SimMode": "Multirotor",
 	"ClockSpeed": 1,
