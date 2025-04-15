@@ -613,7 +613,8 @@ When enabling annotation layers, one can choose to render images as well from th
 </code></pre>
 <h3 id="lighting">Lighting</h3>
 <p>This layer only shows lighting information and as such does not include other material information (color, normal maps, PBR material parameters, ...) in the image. 
-It shows a neutral material only affected by lighting. It includes colored illumination when using <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/global-illumination-in-unreal-engine">Unreal's Global Illumination</a>.
+It shows a neutral material only affected by lighting. 
+Note that objects using transparent materials may still show their full diffuse color due to engine limitations. 
 This can be useful to indicate what parts of an image are in shadow or how much light is received on certain objects by artificial or natural light sources. </p>
 <h2 id="lumen-lightning-for-scene-camera">Lumen Lightning for Scene camera</h2>
 <p>Unreal 5 introduces Lumen lightning. Due to the cameras using scene capture components enabling Lumen for them can be costly on performance. Settings have been added specfically for the scene camera to customize the usage of Lumen for Global Illumination and Reflections. 

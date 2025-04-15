@@ -351,15 +351,15 @@ You can download it by running</li>
 <pre><code class="language-bash">$ cd Airsim/docker;
 $ python build_airsim_image.py \
    --source \
-   ----base_image ghcr.io/epicgames/unreal-engine:dev-5.X.X \
-   --target_image=airsim_source:dev-5.X.X
+   ----base_image ghcr.io/epicgames/unreal-engine:dev-5.5.X \
+   --target_image=airsim_source:dev-5.5.X
 </code></pre>
 <h4 id="running-cosys-airsim-container">Running Cosys-AirSim container</h4>
 <ul>
 <li>Run the airsim source image we built by:</li>
 </ul>
 <pre><code class="language-bash">xhost +local:docker
-./run_airsim_image_source.sh airsim_source:dev-5.X.X
+./run_airsim_image_source.sh airsim_source:dev-5.5.X
 </code></pre>
 <p>Syntax is <code>./run_airsim_image_source.sh DOCKER_IMAGE_NAME</code>
    Do not forget to run the xhost command first to bind the X11 to docker.</p>
