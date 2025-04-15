@@ -2015,10 +2015,7 @@ void ASimModeBase::setupVehiclesAndCamera()
                         rectLightComponent->SetBarnDoorAngle(world_light_settings.barn_door_angle);
                         rectLightComponent->SetBarnDoorLength(world_light_settings.barn_door_length);                
                         rectLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
-                        if (world_light_settings.intensity_unit == 2)
-                        {
-                            rectLightComponent->SetIntensityUnits(ELightUnits::EV);
-                        }else if (world_light_settings.intensity_unit == 1)
+                        if (world_light_settings.intensity_unit == 1)
                         {
                             rectLightComponent->SetIntensityUnits(ELightUnits::Lumens);
                         }else
@@ -2038,10 +2035,7 @@ void ASimModeBase::setupVehiclesAndCamera()
                         pointLightComponent->SetSourceRadius(world_light_settings.source_radius);
                         pointLightComponent->SetSoftSourceRadius(world_light_settings.source_soft_radius);
                         pointLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
-                        if (world_light_settings.intensity_unit == 2)
-                        {
-                            pointLightComponent->SetIntensityUnits(ELightUnits::EV);
-                        }else if (world_light_settings.intensity_unit == 1)
+                        if (world_light_settings.intensity_unit == 1)
                         {
                             pointLightComponent->SetIntensityUnits(ELightUnits::Lumens);
                         }else
@@ -2063,10 +2057,7 @@ void ASimModeBase::setupVehiclesAndCamera()
                         spotLightComponent->SetOuterConeAngle(world_light_settings.outer_cone_angle);
                         spotLightComponent->SetInnerConeAngle(world_light_settings.inner_cone_angle);
                         spotLightComponent->SetAttenuationRadius(world_light_settings.attenuation_radius);
-                        if (world_light_settings.intensity_unit == 2)
-                        {
-                            spotLightComponent->SetIntensityUnits(ELightUnits::EV);
-                        }else if (world_light_settings.intensity_unit == 1)
+                        if (world_light_settings.intensity_unit == 1)
                         {
                             spotLightComponent->SetIntensityUnits(ELightUnits::Lumens);
                         }else

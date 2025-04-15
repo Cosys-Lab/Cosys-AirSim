@@ -191,10 +191,7 @@ void PawnSimApi::createAndInitializeFromSettings()
                 rectLightComponent->SetBarnDoorAngle(setting.barn_door_angle);
                 rectLightComponent->SetBarnDoorLength(setting.barn_door_length);                
                 rectLightComponent->SetAttenuationRadius(setting.attenuation_radius);
-                if (setting.intensity_unit == 2)
-                {
-                    rectLightComponent->SetIntensityUnits(ELightUnits::EV);
-                }else if (setting.intensity_unit == 1)
+                if (setting.intensity_unit == 1)
                 {
                     rectLightComponent->SetIntensityUnits(ELightUnits::Lumens);
                 }else
@@ -214,10 +211,7 @@ void PawnSimApi::createAndInitializeFromSettings()
                 pointLightComponent->SetSourceRadius(setting.source_radius);
                 pointLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
                 pointLightComponent->SetAttenuationRadius(setting.attenuation_radius);
-                if (setting.intensity_unit == 2)
-                {
-                    pointLightComponent->SetIntensityUnits(ELightUnits::EV);
-                }else if (setting.intensity_unit == 1)
+                if (setting.intensity_unit == 1)
                 {
                     pointLightComponent->SetIntensityUnits(ELightUnits::Lumens);
                 }else
@@ -239,10 +233,7 @@ void PawnSimApi::createAndInitializeFromSettings()
                 spotLightComponent->SetAttenuationRadius(setting.attenuation_radius);                
                 spotLightComponent->SetOuterConeAngle(setting.outer_cone_angle);
                 spotLightComponent->SetInnerConeAngle(setting.inner_cone_angle);
-                if (setting.intensity_unit == 2)
-                {
-                    spotLightComponent->SetIntensityUnits(ELightUnits::EV);
-                }else if (setting.intensity_unit == 1)
+                if (setting.intensity_unit == 1)
                 {
                     spotLightComponent->SetIntensityUnits(ELightUnits::Lumens);
                 }else
