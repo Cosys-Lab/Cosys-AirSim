@@ -437,7 +437,7 @@ classdef AirSimClient < handle
 
             if cameraType == 1 || cameraType == 2 || cameraType == 3 || cameraType == 4
                 image_request = py.cosysairsim.ImageRequest(sensorName, int32(cameraType), true, false);
-            elseif cameraType == 10
+            elseif cameraType == 11
                 image_request = py.cosysairsim.ImageRequest(sensorName, int32(cameraType), false, false, annotationLayer);
             else
                 image_request = py.cosysairsim.ImageRequest(sensorName, int32(cameraType), false, false);
@@ -486,7 +486,7 @@ classdef AirSimClient < handle
             for i = 1: numel(cameraTypes)
                 if cameraTypes(i) == 1 || cameraTypes(i) == 2 || cameraTypes(i) == 3 || cameraTypes(i) == 4
                     image_requests{i} = py.cosysairsim.ImageRequest(sensorName, int32(cameraTypes(i)), true, false);
-                elseif cameraTypes(i) == 10
+                elseif cameraTypes(i) == 11
                     image_requests{i} = py.cosysairsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false, annotationLayers(i));
                 else
                     image_requests{i} = py.cosysairsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false);

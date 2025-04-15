@@ -135,7 +135,7 @@ void APIPCamera::PostInitializeComponents()
     captures_[Utils::toNumeric(ImageType::OpticalFlowVis)] =
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("OpticalFlowVisCaptureComponent"));
     captures_[Utils::toNumeric(ImageType::Lighting)] =
-        UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("LightningCaptureComponent"));
+        UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("LightingCaptureComponent"));
 
     for (unsigned int i = 0; i < imageTypeCount(); ++i) {
         detections_[i] = NewObject<UDetectionComponent>(this);
@@ -151,17 +151,9 @@ void APIPCamera::PostInitializeComponents()
     FObjectAnnotator::SetViewForAnnotationRender(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
     captures_[Utils::toNumeric(ImageType::Segmentation)]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetLighting(true);
     captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetMaterials(false);
     captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetPostProcessing(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetHMDDistortion(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetTonemapper(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetEyeAdaptation(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetFog(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetPaper2DSprites(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetBloom(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetMotionBlur(false);
-    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetVisualizeSkyAtmosphere(false);
-    //captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetAtmosphere(false);
 }
 
 void APIPCamera::BeginPlay()
@@ -180,7 +172,7 @@ void APIPCamera::BeginPlay()
 
     for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
         //use final color for all calculations
-        if(image_type == Utils::toNumeric(ImageType::Scene)) {
+        if(image_type == Utils::toNumeric(ImageType::Scene) || image_type == Utils::toNumeric(ImageType::Lighting)) {
             captures_[image_type]->CaptureSource = ESceneCaptureSource::SCS_FinalToneCurveHDR;
         }
         else {
@@ -547,6 +539,7 @@ void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPri
     APlayerController* controller = this->GetWorld()->GetFirstPlayerController();
     for(TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
         captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+        captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents.AddUnique(component);
         controller->HiddenPrimitiveComponents.AddUnique(component);
 	}
 }
@@ -561,6 +554,7 @@ void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& 
 
     for (TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
         captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+        captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents.AddUnique(component);
         controller->HiddenPrimitiveComponents.AddUnique(component);
     }
 }
@@ -623,7 +617,7 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
 
     setCaptureUpdate(captures_[render_index], true);    
 
-    if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)captures_[render_index]->HiddenActors = ignore_actors_;
+    if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)captures_[render_index]->HiddenActors.Append(ignore_actors_);
     
     captures_[render_index]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
@@ -689,7 +683,8 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
             case ImageType::Infrared:
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], false, pixel_format, capture_setting, ned_transform, false);
                 break;
-
+            case ImageType::Lighting:
+                updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], false, pixel_format, capture_setting, ned_transform, false);
             case ImageType::Segmentation:
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], false, pixel_format, capture_setting, ned_transform, false);
                 render_targets_[image_type]->TargetGamma = 1;
@@ -702,15 +697,14 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], true, pixel_format, capture_setting, ned_transform, false);
                 break;
             }
-            if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors = ignore_actors_;
+            if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors.Append(ignore_actors_);
             setDistortionMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings);
             setNoiseMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings, noise_setting);
             copyCameraSettingsToSceneCapture(camera_, captures_[image_type]); //CinemAirSim
-            if(image_type == Utils::toNumeric(ImageType::Scene)) {
+            if(image_type == Utils::toNumeric(ImageType::Scene) || image_type == Utils::toNumeric(ImageType::Lighting)) {
                 if (capture_setting.lumen_gi_enabled) {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
-                    captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;
-                    
+                    captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;                    
                 }
                 else {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
