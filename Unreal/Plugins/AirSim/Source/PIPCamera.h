@@ -122,6 +122,13 @@ private: //members
     UPROPERTY() UMaterial* lens_distortion_material_static_;
 	UPROPERTY() UMaterial* lens_distortion_invert_material_static_;
 	UPROPERTY() TArray<UMaterialInstanceDynamic*> lens_distortion_materials_;
+
+    UPROPERTY() UMaterial* motion_blur_material_static_;
+    UPROPERTY() UMaterial* radial_blur_material_static_;
+    UPROPERTY() UMaterial* guassian_blur_material_static_;
+
+    UPROPERTY() TArray<UMaterialInstanceDynamic*> blur_materials_;
+
     TMap<FString, int> annotator_name_to_index_map_;
     TMap<FString, TWeakObjectPtr<UPrimitiveComponent>> sphere_annotation_component_map_;
 

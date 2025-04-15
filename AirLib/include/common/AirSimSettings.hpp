@@ -262,6 +262,24 @@ namespace airlib
             float LensDistortionAreaRadius = 1.0f;
             float LensDistortionIntensity = 0.5f;
             bool LensDistortionInvert = false;
+
+            bool FakeMotionBlurEnable = false;
+            float FakeMotionBlurDirectionX = 0.0f;
+            float FakeMotionBlurDirectionY = 1.0f;
+            float FakeMotionBlurMovementSpeed = 1.0f;
+            float FakeMotionBlurShutterSpeed = 0.0167f;
+            float FakeMotionBlurFocalLength = 35.0f;
+            int FakeMotionBlurSamples = 50;
+
+            bool RadialBlurEnable = false;
+            float RadialBlurDistance = 1.0f;
+            float RadialBlurRadius = 1.0f;
+            float RadialBlurDensity = 4.0f;
+
+            bool GuassianBlurEnable = false;
+            float GuassianBlurDirections = 16.0f;
+            float GuassianBlurQuality = 3.0f;
+            float GuassianBlurSize = 8.0f;
         };
 
         struct PixelFormatOverrideSetting
@@ -1388,6 +1406,21 @@ namespace airlib
             noise_setting.LensDistortionAreaRadius = settings_json.getFloat("LensDistortionAreaRadius", noise_setting.LensDistortionAreaRadius);
             noise_setting.LensDistortionIntensity = settings_json.getFloat("LensDistortionIntensity", noise_setting.LensDistortionIntensity);
             noise_setting.LensDistortionInvert = settings_json.getBool("LensDistortionInvert", noise_setting.LensDistortionInvert);
+            noise_setting.FakeMotionBlurEnable = settings_json.getBool("FakeMotionBlurEnable", noise_setting.FakeMotionBlurEnable);
+            noise_setting.FakeMotionBlurDirectionX = settings_json.getFloat("FakeMotionBlurDirectionX", noise_setting.FakeMotionBlurDirectionX);
+            noise_setting.FakeMotionBlurDirectionY = settings_json.getFloat("FakeMotionBlurDirectionY", noise_setting.FakeMotionBlurDirectionY);
+            noise_setting.FakeMotionBlurMovementSpeed = settings_json.getFloat("FakeMotionBlurMovementSpeed", noise_setting.FakeMotionBlurMovementSpeed);
+            noise_setting.FakeMotionBlurShutterSpeed = settings_json.getFloat("FakeMotionBlurShutterSpeed", noise_setting.FakeMotionBlurShutterSpeed);
+            noise_setting.FakeMotionBlurFocalLength = settings_json.getFloat("FakeMotionBlurFocalLength", noise_setting.FakeMotionBlurFocalLength);
+            noise_setting.FakeMotionBlurSamples = settings_json.getInt("FakeMotionBlurSamples", noise_setting.FakeMotionBlurSamples);
+            noise_setting.RadialBlurEnable = settings_json.getBool("RadialBlurEnable", noise_setting.RadialBlurEnable);
+            noise_setting.RadialBlurDistance = settings_json.getFloat("RadialBlurDistance", noise_setting.RadialBlurDistance);
+            noise_setting.RadialBlurRadius = settings_json.getFloat("RadialBlurRadius", noise_setting.RadialBlurRadius);
+            noise_setting.RadialBlurDensity = settings_json.getFloat("RadialBlurDensity", noise_setting.RadialBlurDensity);
+            noise_setting.GuassianBlurEnable = settings_json.getBool("GuassianBlurEnable", noise_setting.GuassianBlurEnable);
+            noise_setting.GuassianBlurDirections = settings_json.getFloat("GuassianBlurDirections", noise_setting.GuassianBlurDirections);
+            noise_setting.GuassianBlurQuality = settings_json.getFloat("GuassianBlurQuality", noise_setting.GuassianBlurQuality);
+            noise_setting.GuassianBlurSize = settings_json.getFloat("GuassianBlurSize", noise_setting.GuassianBlurSize);
         }
 
         static GimbalSetting createGimbalSetting(const Settings& settings_json)
