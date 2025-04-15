@@ -73,7 +73,7 @@ The following parameters can be configured:
 | **Roll Pitch Yaw**    | Orientation of the light relative to the vehicle/world (in degrees, yaw-pitch-roll order relative to the front vector +X). |
 | **Enable**            | Boolean flag indicating whether the light is enabled by default.                                                           |
 | **Type**              | Specifies the type of light: `0` = Spot light (default), `1` = Point light, `2` = Rectangular area light                   |
-| **IntensityUnit**     | Defines the unit used for light intensity: , `0` = Candelas (default), `1` = Lumens, `2` = EV (Exposure Value)             |
+| **IntensityUnit**     | Defines the unit used for light intensity: , `0` = Candelas (default), `1` = Lumens                                        |
 | **Intensity**         | Specifies the brightness of the light, expressed in the selected **IntensityUnit**. Default is 8.                          |
 | **AttenuationRadius** | Defines the distance over which the light gradually fades out, measured in cm. Default is 1000.                            |
 | **InnerConeAngle**    | Applicable **only for spotlights**; specifies the inner angle of the spotlight’s cone (in degrees). Default is 0.          |

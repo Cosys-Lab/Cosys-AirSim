@@ -371,7 +371,6 @@ They are settings that are directly transferred to the post-processing settings 
 * **DepthOfFieldFocalDistance**: Distance at which the depth of field effect should be sharp, in centimeters.
 * **DepthOfFieldDepthBlurAmount**: Depth blur in kilometers for 50% (CircleDOF only).
 * **DepthOfFieldDepthBlurRadius**: Depth blur radius in pixels at 1920x resolution (CircleDOF only).
-* **DepthOfFieldUseHairDepth**: Whether to use hair depth for computing the circle of confusion size.
 
 #### Exposure
 * **AutoExposureMethod**: Luminance computation method. (0: Histogram, 1: Basic, 2: Manual)
