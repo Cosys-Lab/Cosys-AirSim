@@ -736,10 +736,9 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
         obj.bOverride_AutoExposureBias = 1;
         obj.AutoExposureBias = setting.auto_exposure_bias;
     }
-    if (!std::isnan(setting.auto_exposure_apply_physical_camera_exposure)) {
-        obj.bOverride_AutoExposureApplyPhysicalCameraExposure = 1;
-        obj.AutoExposureApplyPhysicalCameraExposure = setting.auto_exposure_apply_physical_camera_exposure ? 1 : 0;
-    }
+    obj.bOverride_AutoExposureApplyPhysicalCameraExposure = 1;
+    obj.AutoExposureApplyPhysicalCameraExposure = setting.auto_exposure_apply_physical_camera_exposure ? 1 : 0;
+
     if (!std::isnan(setting.auto_exposure_min_brightness)) {
         obj.bOverride_AutoExposureMinBrightness = 1;
         obj.AutoExposureMinBrightness = setting.auto_exposure_min_brightness;
