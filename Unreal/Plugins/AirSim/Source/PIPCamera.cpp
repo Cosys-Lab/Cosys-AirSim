@@ -845,11 +845,6 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
         obj.bOverride_DepthOfFieldDepthBlurRadius = 1;
         obj.DepthOfFieldDepthBlurRadius = setting.depth_of_field_depth_blur_radius;
     }
-    if (!std::isnan(setting.depth_of_field_use_hair_depth)) {
-        obj.bOverride_DepthOfFieldUseHairDepth = 1;
-        obj.DepthOfFieldUseHairDepth = setting.depth_of_field_use_hair_depth ? 1 : 0;
-    }
-
 }
 
 void APIPCamera::setDistortionMaterial(int image_type, UObject* outer, FPostProcessSettings& obj)
