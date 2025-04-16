@@ -669,7 +669,7 @@ namespace airlib
 
             Settings& settings_json = Settings::singleton();
             //write some settings_json in new file otherwise the string "null" is written if all settings_json are empty
-            settings_json.setString("SeeDocsAt", "https://cosys-lab.github.io/settings/");
+            settings_json.setString("SeeDocsAt", "https://cosys-lab.github.io/Cosys-AirSim/settings/");
             settings_json.setDouble("SettingsVersion", 2.0);
 
             std::string settings_filename = Settings::getUserDirectoryFullPath("settings.json");

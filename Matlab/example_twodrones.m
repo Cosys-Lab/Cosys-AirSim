@@ -3,7 +3,7 @@
 % This works well with the settings below:
 %
 % {
-%     "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+%     "SeeDocsAt": "https://cosys-lab.github.io/Cosys-AirSim/settings/",
 %     "SettingsVersion": 2,
 %     "ClockSpeed": 1,
 %     "LocalHostIp": "127.0.0.1",
