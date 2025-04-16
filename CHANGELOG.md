@@ -17,6 +17,7 @@
 * Fixed annotation names not always containing the static mesh name if available.
 * Fixed `getGpsData` not working in Matlab API Client.
 * Fixed `setKinematics` not working in Matlab API Client.
+* Fixed build scripts on Linux and some deprecation warnings [#81 by edowson](https://github.com/Cosys-Lab/Cosys-AirSim/pull/81).
 * Fixed some Python API test scripts as they were failing due to deprecated functions. [#73 by bsamadi](https://github.com/Cosys-Lab/Cosys-AirSim/pull/73).
 
 ### November/December 2024 (version 3.2)
