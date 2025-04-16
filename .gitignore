@@ -401,3 +401,4 @@ PythonClient/docs/_build
 /promo/
 /Unreal/Environments/BlocksComp/
 docker/LinuxBlocks/*
+/cosys-airsim-data-scripts/

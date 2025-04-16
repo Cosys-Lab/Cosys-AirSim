@@ -52,6 +52,8 @@ void PawnSimApi::initialize()
     setupCamerasFromSettings(params_.cameras);
     image_capture_.reset(new UnrealImageCapture(&cameras_));
 
+    setupLightsFromSettings(params_.lights);
+
     //add listener for pawn's collision event
     params_.pawn_events->getCollisionSignal().connect_member(this, &PawnSimApi::onCollision);
     params_.pawn_events->getPawnTickSignal().connect_member(this, &PawnSimApi::pawnTick);
@@ -116,6 +118,17 @@ void PawnSimApi::setupCamerasFromSettings(const common_utils::UniqueValueMap<std
     }
 }
 
+void PawnSimApi::setupLightsFromSettings(const common_utils::UniqueValueMap<std::string, ALight*>& lights)
+{
+    //add lights that already exists in pawn
+    lights_.clear();
+    for (const auto& p : lights.getMap())
+        lights_.insert_or_assign(p.first, p.second);
+
+    //create or replace lights specified in settings
+    createAndInitializeFromSettings();
+}
+
 void PawnSimApi::createCamerasFromSettings()
 {
     //UStaticMeshComponent* bodyMesh = UAirBlueprintLib::GetActorComponent<UStaticMeshComponent>(this, TEXT("BodyMesh"));
@@ -142,6 +155,125 @@ void PawnSimApi::createCamerasFromSettings()
         }
         //add on to our collection
         cameras_.insert_or_assign(camera_setting_pair.first, camera);
+    }
+}
+
+void PawnSimApi::createAndInitializeFromSettings()
+{
+    USceneComponent* bodyMesh = params_.pawn->GetRootComponent();
+    FActorSpawnParameters light_spawn_params;
+    light_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    light_spawn_params.bDeferConstruction = true;
+    const auto& transform = getNedTransform();
+
+    //for each light in settings
+    for (const auto& light_setting_pair : getVehicleSetting()->lights) {
+        const auto& setting = light_setting_pair.second;
+
+        light_spawn_params.Name = FName(setting.name.c_str());
+
+        //get pose
+        FVector position = transform.fromLocalNed(setting.position) - transform.fromLocalNed(Vector3r::Zero());
+        FRotator rotation = FRotator(setting.rotation.pitch, setting.rotation.yaw, setting.rotation.roll);
+        FTransform light_transform(rotation, position, FVector(1., 1., 1.));
+
+        //spawn the right type of light, set specific settings and attach to pawn
+        ALight* light = nullptr;
+        if (setting.type ==2) // Rect light
+        {
+            ARectLight* rectLight = params_.pawn->GetWorld()->SpawnActor<ARectLight>(position, rotation, light_spawn_params);
+            if (IsValid(rectLight))
+            {
+                rectLight->SetMobility(EComponentMobility::Movable);
+                URectLightComponent* rectLightComponent = rectLight->GetComponentByClass<URectLightComponent>();
+                rectLightComponent->SetSourceWidth(setting.source_width);
+                rectLightComponent->SetSourceHeight(setting.source_height);
+                rectLightComponent->SetBarnDoorAngle(setting.barn_door_angle);
+                rectLightComponent->SetBarnDoorLength(setting.barn_door_length);                
+                rectLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                if (setting.intensity_unit == 2)
+                {
+                    rectLightComponent->SetIntensityUnits(ELightUnits::EV);
+                }else if (setting.intensity_unit == 1)
+                {
+                    rectLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                }else
+                {
+                    rectLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                }
+                rectLight->FinishSpawning(light_transform);
+                light = static_cast<ALight*>(rectLight);
+            }           
+        }else if (setting.type == 1) // Point light
+        {
+            APointLight* pointLight = params_.pawn->GetWorld()->SpawnActor<APointLight>(position, rotation, light_spawn_params);
+            if (IsValid(pointLight))
+            {
+                pointLight->SetMobility(EComponentMobility::Movable);
+                UPointLightComponent* pointLightComponent = pointLight->GetComponentByClass<UPointLightComponent>();
+                pointLightComponent->SetSourceRadius(setting.source_radius);
+                pointLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
+                pointLightComponent->SetAttenuationRadius(setting.attenuation_radius);
+                if (setting.intensity_unit == 2)
+                {
+                    pointLightComponent->SetIntensityUnits(ELightUnits::EV);
+                }else if (setting.intensity_unit == 1)
+                {
+                    pointLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                }else
+                {
+                    pointLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                }
+                pointLight->FinishSpawning(light_transform);
+                light = static_cast<ALight*>(pointLight);
+            }
+        }else // Spot Light
+        {
+            ASpotLight* spotLight = params_.pawn->GetWorld()->SpawnActor<ASpotLight>(position, rotation, light_spawn_params);
+            if (IsValid(spotLight))
+            {
+                spotLight->SetMobility(EComponentMobility::Movable);
+                USpotLightComponent* spotLightComponent = spotLight->GetComponentByClass<USpotLightComponent>();
+                spotLightComponent->SetSourceRadius(setting.source_radius);
+                spotLightComponent->SetSoftSourceRadius(setting.source_soft_radius);
+                spotLightComponent->SetAttenuationRadius(setting.attenuation_radius);                
+                spotLightComponent->SetOuterConeAngle(setting.outer_cone_angle);
+                spotLightComponent->SetInnerConeAngle(setting.inner_cone_angle);
+                if (setting.intensity_unit == 2)
+                {
+                    spotLightComponent->SetIntensityUnits(ELightUnits::EV);
+                }else if (setting.intensity_unit == 1)
+                {
+                    spotLightComponent->SetIntensityUnits(ELightUnits::Lumens);
+                }else
+                {
+                    spotLightComponent->SetIntensityUnits(ELightUnits::Candelas);
+                }
+                spotLight->FinishSpawning(light_transform);
+                light = static_cast<ALight*>(spotLight);
+            }
+        }
+
+        if (IsValid(light))
+        {
+            // Set other common settings
+            ULightComponent* lightComponent = light->GetComponentByClass<ULightComponent>();
+            lightComponent->SetIntensity(setting.intensity);            
+            lightComponent->SetCastShadows(setting.cast_shadows);
+            if (setting.cast_shadows)
+            {
+                lightComponent->SetCastVolumetricShadow(true);                
+            }
+            lightComponent->SetUseTemperature(true);
+            lightComponent->SetTemperature(setting.temperature);            
+            lightComponent->SetVisibility(setting.enable);
+            lightComponent->SetLightColor(FColor(setting.color_r, setting.color_g, setting.color_b));
+            // Attach to pawn
+            light->AttachToComponent(bodyMesh, FAttachmentTransformRules::KeepRelativeTransform);
+            
+            //add on to our collection
+            lights_.insert_or_assign(light_setting_pair.first, light);
+        }      
     }
 }
 
@@ -254,6 +386,17 @@ APIPCamera* PawnSimApi::getCamera(const std::string& camera_name)
 {
     return const_cast<APIPCamera*>(
         static_cast<const PawnSimApi*>(this)->getCamera(camera_name));
+}
+
+const ALight* PawnSimApi::getLight(const std::string& light_name) const
+{
+    return lights_.findOrDefault(light_name, nullptr);
+}
+
+ALight* PawnSimApi::getLight(const std::string& light_name)
+{
+    return const_cast<ALight*>(
+        static_cast<const PawnSimApi*>(this)->getLight(light_name));
 }
 
 const UnrealImageCapture* PawnSimApi::getImageCapture() const
@@ -459,6 +602,24 @@ void PawnSimApi::setCameraOrientation(const std::string& camera_name, const msr:
         FQuat quat = ned_transform_.fromNed(orientation);
         camera->setCameraOrientation(quat.Rotator());
     }, true);
+}
+
+bool PawnSimApi::setLightVisibility(const std::string& light_name, bool is_visible)
+{
+    UAirBlueprintLib::RunCommandOnGameThread([this, light_name, is_visible]() {
+        ALight* light = getLight(light_name);
+        light->SetEnabled(is_visible);
+    }, true);
+    return true;
+}
+
+bool PawnSimApi::setLightIntensity(const std::string& light_name, float intensity)
+{
+    UAirBlueprintLib::RunCommandOnGameThread([this, light_name, intensity]() {
+        ALight* light = getLight(light_name);
+        light->SetBrightness(intensity);
+    }, true);
+    return true;
 }
 
 //parameters in NED frame

@@ -28,6 +28,7 @@ namespace airlib
             Infrared,
             OpticalFlow,
             OpticalFlowVis,
+            Lighting,
             Annotation,
             Count //must be last
         };

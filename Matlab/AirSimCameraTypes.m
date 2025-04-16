@@ -15,7 +15,8 @@ classdef AirSimCameraTypes < uint32
         Infrared            (7)
         OpticalFlow         (8)
         OpticalFlowVis      (9)
-        Annotation          (10)
+        Lighting            (10)
+        Annotation          (11)
     end
 
 end

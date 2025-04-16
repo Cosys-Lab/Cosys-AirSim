@@ -18,6 +18,13 @@
 #include "SimJoyStick/SimJoyStick.h"
 #include "api/VehicleApiBase.hpp"
 #include "api/VehicleSimApiBase.hpp"
+#include "Components/RectLightComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Engine/PointLight.h"
+#include "Engine/RectLight.h"
+#include "Engine/SpotLight.h"
+#include "Engine/Light.h"
+
 #include "common/common_utils/UniqueValueMap.hpp"
 
 #include "PawnEvents.h"
@@ -46,6 +53,7 @@ public: //types
         PawnEvents* pawn_events;
         common_utils::UniqueValueMap<std::string, APIPCamera*> cameras;
         UClass* pip_camera_class;
+        common_utils::UniqueValueMap<std::string, ALight*> lights;
         UParticleSystem* collision_display_template;
         msr::airlib::GeoPoint home_geopoint;
         std::string vehicle_name;
@@ -56,6 +64,7 @@ public: //types
 
         Params(APawn* pawn_val, const NedTransform* global_transform_val, PawnEvents* pawn_events_val,
                const common_utils::UniqueValueMap<std::string, APIPCamera*>& cameras_val, UClass* pip_camera_class_val,
+               const common_utils::UniqueValueMap<std::string, ALight*>& lights_val,
                UParticleSystem* collision_display_template_val, const msr::airlib::GeoPoint& home_geopoint_val,
                const std::string& vehicle_name_val)
             : pawn(pawn_val)
@@ -63,6 +72,7 @@ public: //types
             , pawn_events(pawn_events_val)
             , cameras(cameras_val)
             , pip_camera_class(pip_camera_class_val)
+            , lights(lights_val)
             , collision_display_template(collision_display_template_val)
             , home_geopoint(home_geopoint_val)
             , vehicle_name(vehicle_name_val)
@@ -117,6 +127,9 @@ public: //Unreal specific methods
     APIPCamera* getCamera(const std::string& camera_name);
     int getCameraCount();
 
+    const ALight* getLight(const std::string& light_name) const;
+    ALight* getLight(const std::string& light_name);
+    
     virtual bool testLineOfSightToPoint(const msr::airlib::GeoPoint& point) const;
 
     //if enabled, this would show some flares
@@ -134,6 +147,9 @@ public: //Unreal specific methods
 
     const NedTransform& getNedTransform() const;
 
+    bool setLightVisibility(const std::string& light_name, bool is_visible);
+    bool setLightIntensity(const std::string& light_name, float intensity);
+
     void possess();
     void setRCForceFeedback(float rumble_strength, float auto_center);
 
@@ -142,7 +158,9 @@ private: //methods
     void allowPassthroughToggleInput();
     void detectUsbRc();
     void setupCamerasFromSettings(const common_utils::UniqueValueMap<std::string, APIPCamera*>& cameras);
+    void setupLightsFromSettings(const common_utils::UniqueValueMap<std::string, ALight*>& lights);
     void createCamerasFromSettings();
+    void createAndInitializeFromSettings();
     //on collision, pawns should update this
     void onCollision(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp,
                      bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit);
@@ -159,6 +177,7 @@ private: //vars
 
     Params params_;
     common_utils::UniqueValueMap<std::string, APIPCamera*> cameras_;
+    common_utils::UniqueValueMap<std::string, ALight*> lights_;
     msr::airlib::GeoPoint home_geo_point_;
 
     std::string vehicle_name_;

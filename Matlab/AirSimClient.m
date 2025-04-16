@@ -212,7 +212,7 @@ classdef AirSimClient < handle
             geopoint.longitude = double(curGeoPointData{"longitude"});
             geopoint.altitude = double(curGeoPointData{"altitude"});
             gnssData.geo_point = geopoint;            
-            gnssData.fix_type = double(curGeoPointData{"fix_type"});
+            gnssData.fix_type = double(gnssDataRaw{"fix_type"});
             gnssData.time_utc = double(double(curGeoPointData{"time_utc"}))/1e9;   
             
             isValid = data{"is_valid"};
@@ -437,7 +437,7 @@ classdef AirSimClient < handle
 
             if cameraType == 1 || cameraType == 2 || cameraType == 3 || cameraType == 4
                 image_request = py.cosysairsim.ImageRequest(sensorName, int32(cameraType), true, false);
-            elseif cameraType == 10
+            elseif cameraType == 11
                 image_request = py.cosysairsim.ImageRequest(sensorName, int32(cameraType), false, false, annotationLayer);
             else
                 image_request = py.cosysairsim.ImageRequest(sensorName, int32(cameraType), false, false);
@@ -486,7 +486,7 @@ classdef AirSimClient < handle
             for i = 1: numel(cameraTypes)
                 if cameraTypes(i) == 1 || cameraTypes(i) == 2 || cameraTypes(i) == 3 || cameraTypes(i) == 4
                     image_requests{i} = py.cosysairsim.ImageRequest(sensorName, int32(cameraTypes(i)), true, false);
-                elseif cameraTypes(i) == 10
+                elseif cameraTypes(i) == 11
                     image_requests{i} = py.cosysairsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false, annotationLayers(i));
                 else
                     image_requests{i} = py.cosysairsim.ImageRequest(sensorName, int32(cameraTypes(i)), false, false);
@@ -986,8 +986,8 @@ classdef AirSimClient < handle
             kinematicsState.angular_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"angular_acceleration"})));
         end
 
-        function simSetKinematics(obj, position, orientation, linear_velocity, angular_velocity, linear_acceleration, angular_acceleration)
-            % SIMSETKINEMATICS Set the kinematic state of the vehicle.
+        function setKinematics(obj, position, orientation, linear_velocity, angular_velocity, linear_acceleration, angular_acceleration, ignore_collision, vehicleName)
+            % SETKINEMATICS Set the kinematic state of the vehicle.
             %
             % Description:
             %   Sets the kinematic state of the vehicle including position, orientation, linear and angular velocities, and accelerations.
@@ -999,6 +999,8 @@ classdef AirSimClient < handle
             %   angular_velocity(1x3) - The angular velocity of the vehicle in right-hand coordinates.
             %   linear_acceleration(1x3) - The linear acceleration of the vehicle in right-hand coordinates.
             %   angular_acceleration(1x3) - The angular acceleration of the vehicle in right-hand coordinates.
+            %   ignore_collision: Whether to ignore any collision or not.
+            %   vehicleName - name of the vehicle.
 
             kinematicsState.position.x_val = position(1);
             kinematicsState.position.y_val = -position(2);
@@ -1021,6 +1023,74 @@ classdef AirSimClient < handle
             kinematicsState.angular_acceleration.y_val = -angular_acceleration(2);
             kinematicsState.angular_acceleration.z_val = -angular_acceleration(3);
             obj.rpc_client.call("setKinematics", kinematicsState, ignore_collision, vehicleName);
+        end
+
+        function [kinematicsState] = getPhysicsRawKinematics(obj, vehicleName)
+            % GETPHYSICSRAWKINEMATICS Get Physics engine raw kinematics of the vehicle.
+            %
+            % Description:
+            %   The position inside the returned KinematicsState is physics engine coordinate system, not Airsim.
+            %   If you save it then you can load it back with simSetPhysicsRawKinematics.
+            %   Accelaration is not used.
+            %
+            % Inputs:
+            %   vehicleName - name of the vehicle.
+            %
+            % Outputs:
+            %   kinematicsState - A structure containing:
+            %     position(1x3) - The position of the vehicle in right-hand coordinates.
+            %     orientation(1x4) - The quaternion representing the orientation of the vehicle in right-hand coordinates.
+            %     linear_velocity(1x3) - The linear velocity of the vehicle in right-hand coordinates.
+            %     angular_velocity(1x3) - The angular velocity of the vehicle in right-hand coordinates.
+            %     linear_acceleration(1x3) - The linear acceleration of the vehicle in right-hand coordinates.
+            %     angular_acceleration(1x3) - The angular acceleration of the vehicle in right-hand coordinates.
+
+            vehicleStateAirSim = obj.rpc_client.call("simGetPhysicsRawKinematics", vehicleName);
+            kinematicsState.position = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"position"})));
+            kinematicsState.orientation = quatinv(struct2array(struct(vehicleStateAirSim{"orientation"})));
+            kinematicsState.linear_velocity = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"linear_velocity"})));
+            kinematicsState.angular_velocity = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"angular_velocity"})));
+            kinematicsState.linear_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"linear_acceleration"})));
+            kinematicsState.angular_acceleration = obj.nedToRightHandCoordinates(struct2array(struct(vehicleStateAirSim{"angular_acceleration"})));
+        end
+
+        function setPhysicsRawKinematics(obj, position, orientation, linear_velocity, angular_velocity, linear_acceleration, angular_acceleration, vehicleName)
+            % SETPHYSICSRAWKINEMATICS Set Physics engine raw kinematics of the vehicle.
+            %
+            % Description:
+            %   Need to be simGetPhysicsRawKinematics value or same coordinate system.
+            %   Accelaration is not used.
+            %
+            % Inputs:
+            %   position(1x3) - The position of the vehicle in right-hand coordinates.
+            %   orientation(1x4) - The quaternion representing the orientation of the vehicle in right-hand coordinates.
+            %   linear_velocity(1x3) - The linear velocity of the vehicle in right-hand coordinates.
+            %   angular_velocity(1x3) - The angular velocity of the vehicle in right-hand coordinates.
+            %   linear_acceleration(1x3) - The linear acceleration of the vehicle in right-hand coordinates.
+            %   angular_acceleration(1x3) - The angular acceleration of the vehicle in right-hand coordinates.
+            %   vehicleName - name of the vehicle.
+
+            kinematicsState.position.x_val = position(1);
+            kinematicsState.position.y_val = -position(2);
+            kinematicsState.position.z_val = -position(3);
+            orientation = quatinv(orientation);
+            kinematicsState.orientation.w_val = orientation(1);
+            kinematicsState.orientation.x_val = orientation(2);
+            kinematicsState.orientation.y_val = orientation(3);
+            kinematicsState.orientation.z_val = orientation(4);
+            kinematicsState.linear_velocity.x_val = linear_velocity(1);
+            kinematicsState.linear_velocity.y_val = -linear_velocity(2);
+            kinematicsState.linear_velocity.z_val = -linear_velocity(3);
+            kinematicsState.angular_velocity.x_val = angular_velocity(1);
+            kinematicsState.angular_velocity.y_val = -angular_velocity(2);
+            kinematicsState.angular_velocity.z_val = -angular_velocity(3);
+            kinematicsState.linear_acceleration.x_val = 0;
+            kinematicsState.linear_acceleration.y_val = 0;
+            kinematicsState.linear_acceleration.z_val = 0;
+            kinematicsState.angular_acceleration.x_val = 0;
+            kinematicsState.angular_acceleration.y_val = 0;
+            kinematicsState.angular_acceleration.z_val = 0;
+            obj.rpc_client.call("simSetPhysicsRawKinematics", kinematicsState, vehicleName);
         end
 
         function [EnvironmentState] = getGroundTruthEnvironment(obj, vehicleName)
@@ -1400,7 +1470,8 @@ classdef AirSimClient < handle
             %   light_name - Name of the light.
             %   intensity - Intensity value to set.            
 
-            obj.rpc_client.call("simSetLightIntensity", light_name, intensity);
+            warning("simSetLightIntensity is deprecated, use the new Artificial Light API instead");
+            obj.setWorldLightIntensity(light_name, intensity);
         end
 
         function swapTextures(obj, tags, tex_id, component_id, material_id)
@@ -1463,6 +1534,76 @@ classdef AirSimClient < handle
 
             obj.rpc_client.call("simSetTimeOfDay", is_enabled, start_datetime, is_start_datetime_dst, celestial_clock_speed,...
                                 update_interval_secs, move_sun);
+        end
+
+        function success = setVehicleLightIntensity(obj, vehicle_name, light_name, intensity)
+            % SETVEHICLELIGHTINTENSITY Set the intensity of a vehicle light
+            %
+            % Description:
+            %   Sets the intensity value of an artificial light associated with a specific vehicle.
+            %
+            % Inputs:
+            %   vehicle_name - Name of the vehicle (string).
+            %   light_name - Name of the light within the vehicle (string).
+            %   intensity - Intensity value for the light (float). The unit depends on the simulation's intensity unit setting.
+            %
+            % Outputs:
+            %   success - Logical value, true if the light intensity was changed successfully.
+            %
+
+            success = obj.rpc_client.call("simSetVehicleLightIntensity", vehicle_name, light_name, intensity);
+        end
+
+        function success = setWorldLightVisibility(obj, light_name, is_visible)
+            % SETWORLDLIGHTVISIBILITY Enable or disable a static world light
+            %
+            % Description:
+            %   Toggles the visibility of an artificial light set as a static world light.
+            %
+            % Inputs:
+            %   light_name - Name of the world light (string).
+            %   is_visible - Logical value to enable (true) or disable (false) the light.
+            %
+            % Outputs:
+            %   success - Logical value, true if the light visibility was toggled successfully.
+            %
+
+            success = obj.rpc_client.call("simSetWorldLightVisibility", light_name, is_visible);
+        end
+
+        function success = setWorldLightIntensity(obj, light_name, intensity)
+            % SETWORLDLIGHTINTENSITY Set the intensity of a static world light
+            %
+            % Description:
+            %   Sets the intensity value of an artificial light set as a static world light.
+            %
+            % Inputs:
+            %   light_name - Name of the world light (string).
+            %   intensity - Intensity value for the light (float). The unit depends on the simulation's intensity unit setting.
+            %
+            % Outputs:
+            %   success - Logical value, true if the light intensity was changed successfully.
+            %
+
+            success = obj.rpc_client.call("simSetWorldLightIntensity", light_name, intensity);
+        end
+
+        function success = setVehicleLightVisibility(obj, vehicle_name, light_name, is_visible)
+            % SETVEHICLELIGHTVISIBILITY Enable or disable a vehicle light
+            %
+            % Description:
+            %   Toggles the visibility of an artificial light set as a vehicle light.
+            %
+            % Inputs:
+            %   vehicle_name - Name of the vehicle associated with the light (string).
+            %   light_name - Name of the light within the vehicle (string).
+            %   is_visible - Logical value to enable (true) or disable (false) the light.
+            %
+            % Outputs:
+            %   success - Logical value, true if the vehicle light visibility was toggled successfully.
+            %
+
+            success = obj.rpc_client.call("simSetVehicleLightVisibility", vehicle_name, light_name, is_visible);
         end
 
         function flushPersistentMarkers(obj)
@@ -1609,8 +1750,8 @@ classdef AirSimClient < handle
             settings = string(obj.rpc_client.call('getSettingsString'));
         end
         
-        function simSetExtForce(obj, ext_force)
-            % SIMSETEXTFORCE Set an external force in the simulation
+        function setExtForce(obj, ext_force)
+            % SETEXTFORCE Set an external force in the simulation
             %
             % Description:
             %   Sets an external force in the simulation environment.
@@ -1768,6 +1909,26 @@ classdef AirSimClient < handle
             objectList = string(cell(obj.rpc_client.call("simListSceneObjects", name_regex)))';
         end
 
+        function [objectList] = listSceneObjectsTags(obj, name_regex)
+            % LISTSCENEOBJECTTAGS ists the objects present and the given tag matching the regular expression in the environment.
+            %
+            % Description:
+            % The default behavior is to list all objects with first tag. A regex can be used to return a smaller list
+            % of matching objects or actors.
+            %
+            % Inputs:
+            %   name_regex - String to match actor tags against, e.g., "Gate.*".
+            %
+            % Outputs:
+            %   objectList - String array containing names of scene objects matching the pattern.
+
+            arguments
+                obj AirSimClient
+                name_regex string = ".*"
+            end
+            objectList = string(cell(obj.rpc_client.call("simListSceneObjectsTags", name_regex)))';
+        end
+
         function success = loadLevel(obj, level_name)
             % LOADLEVEL Load a new level into the simulation
             %
@@ -1906,7 +2067,7 @@ classdef AirSimClient < handle
         end
 
         function [objectList] = listAnnotationObjects(obj, annotation_name)
-            % SIMLISTANNOTATIONOBJECTS List annotation objects for a specific annotation layer.
+            % LISTANNOTATIONOBJECTS List annotation objects for a specific annotation layer.
             %
             % Description:
             %   Retrieves a list of annotation objects matching for a specific annotation layer from the AirSim API.
@@ -1955,7 +2116,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectID(obj, annotation_name, mesh_name, object_id, is_name_regex)
-            % SIMSETANNOTATIONOBJECTID Set ID for an annotation object. This works only for RGB layers.
+            % SETANNOTATIONOBJECTID Set ID for an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Sets the ID for a specified annotation object in the simulation via the AirSim API.
@@ -1974,7 +2135,7 @@ classdef AirSimClient < handle
         end
 
         function objectID = getAnnotationObjectID(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTID Get ID of an annotation object. This works only for RGB layers.
+            % GETANNOTATIONOBJECTID Get ID of an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Retrieves the ID of a specified annotation object from the AirSim API.
@@ -1991,7 +2152,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectColor(obj, annotation_name, mesh_name, r, g, b, is_name_regex)
-            % SIMSETANNOTATIONOBJECTCOLOR Set color for an annotation object. This works only for RGB layers.
+            % SETANNOTATIONOBJECTCOLOR Set color for an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Sets the color for a specified annotation object in the simulation via the AirSim API.
@@ -2012,7 +2173,7 @@ classdef AirSimClient < handle
         end
 
         function objectColor = getAnnotationObjectColor(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTCOLOR Get color of an annotation object. This works only for RGB layers.
+            % GETANNOTATIONOBJECTCOLOR Get color of an annotation object. This works only for RGB layers.
             %
             % Description:
             %   Retrieves the color of a specified annotation object from the AirSim API. 
@@ -2029,7 +2190,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectValue(obj, annotation_name, mesh_name, greyscale_value, is_name_regex)
-            % SIMSETANNOTATIONOBJECTVALUE Set value for an annotation object. This only works for greyscale layers.
+            % SETANNOTATIONOBJECTVALUE Set value for an annotation object. This only works for greyscale layers.
             %
             % Description:
             %   Sets the greyscale value for a specified annotation object in the simulation via the AirSim API.
@@ -2048,7 +2209,7 @@ classdef AirSimClient < handle
         end
 
         function greyscaleValue = getAnnotationObjectValue(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTVALUE Get value of an annotation object. his only works for greyscale layers.
+            % GETANNOTATIONOBJECTVALUE Get value of an annotation object. his only works for greyscale layers.
             %
             % Description:
             %   Retrieves the greyscale value of a specified annotation object from the AirSim API.
@@ -2065,7 +2226,7 @@ classdef AirSimClient < handle
         end
 
         function success = setAnnotationObjectTextureByPath(obj, annotation_name, mesh_name, texture_path, is_name_regex)
-            % SIMSETANNOTATIONOBJECTTEXTUREBYPATH Set texture for an annotation object by path. This only works for texture layers.
+            % SETANNOTATIONOBJECTTEXTUREBYPATH Set texture for an annotation object by path. This only works for texture layers.
             %
             % Description:
             %   Sets the texture for a specified annotation object by specifying the texture path via the AirSim API.
@@ -2084,7 +2245,7 @@ classdef AirSimClient < handle
         end
 
         function success = enableAnnotationObjectTextureByPath(obj, annotation_name, mesh_name, is_name_regex)
-            % SIMENABLEANNOTATIONOBJECTTEXTUREBYPATH Enable texture for an annotation object by path. This only works for texture layers.
+            % ENABLEANNOTATIONOBJECTTEXTUREBYPATH Enable texture for an annotation object by path. This only works for texture layers.
             %
             % Description:
             %   Enables the texture for a specified annotation object by specifying the texture path via the AirSim API.
@@ -2102,7 +2263,7 @@ classdef AirSimClient < handle
         end
 
         function texturePath = getAnnotationObjectTexturePath(obj, mesh_name)
-            % SIMGETANNOTATIONOBJECTTEXTUREPATH Get texture path of an annotation object. This only works for texture layers.
+            % GETANNOTATIONOBJECTTEXTUREPATH Get texture path of an annotation object. This only works for texture layers.
             %
             % Description:
             %   Retrieves the texture path assigned to a specified annotation object from the AirSim API.
@@ -2188,8 +2349,8 @@ classdef AirSimClient < handle
             obj.rpc_client.call("simClearDetectionMeshNames", camera_name, image_type, vehicleName, annotation_name);
         end
 
-        function detectionInfo = simGetDetections(obj)
-            % SIMGETDETECTIONS Get detection information.
+        function detectionInfo = getDetections(obj)
+            % GETDETECTIONS Get detection information.
             %
             % Description:
             %   Retrieves information about detections from the AirSim API.
@@ -2283,8 +2444,8 @@ classdef AirSimClient < handle
             obj.rpc_client.call("simSetCameraPose", camera_name, newPose, vehicleName);
         end
 
-        function simSetCameraFov(obj, camera_name, fov_degrees, vehicleName)
-            % SIMSETCAMERAFOV Set camera field of view (FOV) via AirSim API.
+        function setCameraFov(obj, camera_name, fov_degrees, vehicleName)
+            % SETCAMERAFOV Set camera field of view (FOV) via AirSim API.
             %
             % Description:
             %   Sets the field of view (FOV) of a specified camera.
@@ -2294,7 +2455,7 @@ classdef AirSimClient < handle
             %   fov_degrees (double) - Field of view angle in degrees.
             %   vehicleName - name of the vehicle.   
 
-            obj.rpc_client.call("setCameraFov", camera_name, fov_degrees, vehicleName);
+            obj.rpc_client.call("simSetCameraFov", camera_name, fov_degrees, vehicleName);
         end
 
         function settings = getPresetLensSettings(obj, sensorName, vehicleName)

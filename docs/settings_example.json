@@ -6,7 +6,7 @@
     "ApiServerPort": 41451,
     "RecordUIVisible": true,
     "MoveWorldOrigin": false,
-    "InitialInstanceSegmentation": true,
+    "InitialInstanceSegmentation": false,
     "LogMessagesVisible": true,
     "ShowLosDebugLines": false,
     "ViewMode": "",
@@ -16,41 +16,6 @@
     "SpeedUnitFactor": 1,
     "SpeedUnitLabel": "m/s",
     "SimMode": "Car",
-    "Annotation": [
-        {
-            "Name": "RGBTestDirect",
-            "Type": 0,
-            "Default": true,
-            "SetDirect": true,
-            "ViewDistance": 10
-        },
-        {
-            "Name": "RGBTestIndex",
-            "Type": 0,
-            "Default": true,
-            "SetDirect": false
-        },
-        {
-            "Name": "GreyscaleTest",
-            "Type": 1,
-            "Default": true,
-            "ViewDistance": 5
-        },
-        {
-            "Name": "TextureTestDirect",
-            "Type": 2,
-            "Default": true,
-            "SetDirect": true
-        },
-        {
-            "Name": "TextureTestRelativePath",
-            "Type": 2,
-            "Default": false,
-            "SetDirect": false,
-            "TexturePath": "/Game/AnnotationTest",
-            "TexturePrefix": "Test1"
-        }
-    ],
     "Wind": {
         "X": 0,
         "Y": 0,
@@ -225,6 +190,16 @@
             },
             {
                 "ImageType": 10,
+                "Width": 960,
+                "Height": 540,
+                "FOV_Degrees": 90,
+                "TargetGamma": 1,
+                "ProjectionMode": "",
+                "OrthoWidth": 5.12,
+                "IgnoreMarked": false
+            },
+            {
+                "ImageType": 11,
                 "Width": 960,
                 "Height": 540,
                 "FOV_Degrees": 90,

@@ -58,7 +58,7 @@ while True:
             client.hoverAsync().join()
             airsim.wait_key("whoops - we are about to crash, so stopping!")
     
-        pitch, roll, yaw  = airsim.to_eularian_angles(client.simGetVehiclePose().orientation)
+        pitch, roll, yaw = airsim.quaternion_to_euler_angles(client.simGetVehiclePose().orientation)
 
         if (distance > current + 30):
         

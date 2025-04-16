@@ -89,7 +89,21 @@ void FObjectAnnotator::getPaintableComponentMeshes(AActor* actor, TMap<FString, 
 					}
 				}
 				else {
-					paintable_components_meshes->Emplace(actor->GetName(), component);
+					if (staticmesh_component->GetStaticMesh() != nullptr) {
+						FString component_name = staticmesh_component->GetStaticMesh()->GetName();
+						component_name.Append("_");
+						component_name.Append(FString::FromInt(0));
+						component_name.Append("_");
+						if (actor->GetRootComponent()->GetAttachParent()) {
+							component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							component_name.Append("_");
+						}
+						component_name.Append(actor->GetName());
+						paintable_components_meshes->Emplace(component_name, component);
+					}
+					else {
+						paintable_components_meshes->Emplace(actor->GetName(), component);
+					}					
 				}
 			}
 			if (USkinnedMeshComponent* SkinnedMeshComponent = Cast<USkinnedMeshComponent>(component)) {
@@ -150,11 +164,30 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 					}
 				}
 				else {
-					if (actor->Tags.Num() > 0)
-						paintable_components_tags->Emplace(actor->GetName(), actor->Tags);
-					else
-						paintable_components_tags->Emplace(actor->GetName(), staticmesh_component->ComponentTags);
-					paintable_components_meshes->Emplace(actor->GetName(), component);
+					if (staticmesh_component->GetStaticMesh() != nullptr) {
+						FString component_name = staticmesh_component->GetStaticMesh()->GetName();
+						component_name.Append("_");
+						component_name.Append(FString::FromInt(0));
+						component_name.Append("_");
+						if (actor->GetRootComponent()->GetAttachParent()) {
+							component_name.Append(actor->GetRootComponent()->GetAttachParent()->GetName());
+							component_name.Append("_");
+						}
+						component_name.Append(actor->GetName());
+						paintable_components_meshes->Emplace(component_name, component);
+						if (actor->Tags.Num() > 0)
+							paintable_components_tags->Emplace(component_name, actor->Tags);
+						else
+							paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
+					}
+					else {
+						paintable_components_meshes->Emplace(actor->GetName(), component);
+						if (actor->Tags.Num() > 0)
+							paintable_components_tags->Emplace(actor->GetName(), actor->Tags);
+						else
+							paintable_components_tags->Emplace(actor->GetName(), staticmesh_component->ComponentTags);
+					}
+			
 				}
 			}
 			if (USkinnedMeshComponent* SkinnedMeshComponent = Cast<USkinnedMeshComponent>(component)) {

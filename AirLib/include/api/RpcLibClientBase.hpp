@@ -99,6 +99,11 @@ namespace airlib
         void simClearDetectionMeshNames(const std::string& camera_name, ImageCaptureBase::ImageType type, const std::string& vehicle_name = "", const std::string& annotation_name = "");
         vector<DetectionInfo> simGetDetections(const std::string& camera_name, ImageCaptureBase::ImageType image_type, const std::string& vehicle_name = "", const std::string& annotation_name = "");
 
+        bool simSetWorldLightVisibility(const string& light_name, bool is_visible = true);
+        bool simSetWorldLightIntensity(const string& light_name, float intensity);
+        bool simSetVehicleLightVisibility(const string& vehicle_name, const string& light_name, bool is_visible = true);
+        bool simSetVehicleLightIntensity(const string& vehicle_name, const string& light_name, float intensity);
+
         void simFlushPersistentMarkers();
         void simPlotPoints(const vector<Vector3r>& points, const vector<float>& color_rgba, float size, float duration, bool is_persistent);
         void simPlotLineStrip(const vector<Vector3r>& points, const vector<float>& color_rgba, float thickness, float duration, bool is_persistent);

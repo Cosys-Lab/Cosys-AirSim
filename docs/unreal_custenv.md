@@ -22,7 +22,7 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
 
 4. Go to the `LandscapeMountains` project folder and create a new subfolder called `Plugins`. Now copy the precompiled AirSim Plugin folder into this newly created folder. This way now your own Unreal project has AirSim plugin.
 
-5. Edit the `LandscapeMountains.uproject` so that you add the AirSim plugin to the list of plugins to load.
+5. Edit the `LandscapeMountains.uproject` so that you add the AirSim plugin (and the required plugin ChaosVehiclesPlugin to avoid build issues) to the list of plugins to load.
 
     ```json
     {
@@ -31,6 +31,10 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
     		{
     			"Name": "AirSim",
     			"Enabled": true
+    		},
+       		{
+			"Name": "ChaosVehiclesPlugin",
+			"Enabled": true
     		}
     	]
         ...
@@ -114,6 +118,10 @@ There is no `Epic Games Launcher` for Linux which means that if you need to crea
     		{
     			"Name": "AirSim",
     			"Enabled": true
+    		},
+          	{
+			"Name": "ChaosVehiclesPlugin",
+			"Enabled": true
     		}
     	]
     }
@@ -230,6 +238,10 @@ and the `Plugins` section to the top level object:
     {
         "Name": "AirSim",
         "Enabled": true
+    },
+    {
+		"Name": "ChaosVehiclesPlugin",
+		"Enabled": true
     }
 ]
 ```

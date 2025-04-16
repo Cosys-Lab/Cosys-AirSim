@@ -51,7 +51,7 @@ MinNoiseStandardDeviation    | The standard deviation to generate the noise norm
 NoiseDistanceScale           | To scale the noise with distance, set this parameter. This way the minimal noise is scaled depending on the distance compared to total maximum range of the sensor
 ```
 {
-    "SeeDocsAt": "https://cosys-lab.github.io/settings/",
+    "SeeDocsAt": "https://cosys-lab.github.io/Cosys-AirSim/settings/",
     "SettingsVersion": 2.0,
     "SimMode": "SkidVehicle",
      "Vehicles": {

@@ -98,11 +98,11 @@ __pragma(warning(disable : 4239))
         }
         int RpcLibClientBase::getClientVersion() const
         {
-            return 3; //sync with Python client
+            return 4; //sync with Python client
         }
         int RpcLibClientBase::getMinRequiredServerVersion() const
         {
-            return 3; //sync with Python client
+            return 4; //sync with Python client
         }
         int RpcLibClientBase::getMinRequiredClientVersion() const
         {
@@ -141,7 +141,7 @@ __pragma(warning(disable : 4239))
             auto server_min_ver = getMinRequiredServerVersion();
             auto client_min_ver = getMinRequiredClientVersion();
 
-            std::string ver_info = Utils::stringf("Client Ver:%i (Min Req:%i), Server Ver:%i (Min Req:%i)",
+            std::string ver_info = Utils::stringf("API Client Ver:%i (Min Req:%i), API Server Ver:%i (Min Req:%i)",
                                                   client_ver,
                                                   client_min_ver,
                                                   server_ver,
@@ -151,13 +151,13 @@ __pragma(warning(disable : 4239))
                 std::cerr << std::endl
                           << ver_info << std::endl;
                 std::cerr << std::endl
-                          << "AirSim server is of older version and not supported by this client. Please upgrade!" << std::endl;
+                          << "Cosys-AirSim API server is of older version and not supported by this API client. Please upgrade!" << std::endl;
             }
             else if (client_ver < client_min_ver) {
                 std::cerr << std::endl
                           << ver_info << std::endl;
                 std::cerr << std::endl
-                          << "AirSim client is of older version and not supported by this server. Please upgrade!" << std::endl;
+                          << "Cosys-AirSim API client is of older version and not supported by this API server. Please upgrade!" << std::endl;
             }
         }
 
@@ -554,6 +554,26 @@ __pragma(warning(disable : 4239))
             pimpl_->client.call("simSetWeatherParameter", param, val);
         }
 
+        bool RpcLibClientBase::simSetWorldLightVisibility(const string& light_name, bool is_visible)
+        {
+            return pimpl_->client.call("simSetWorldLightVisibility", light_name, is_visible).as<bool>();
+        }
+
+        bool RpcLibClientBase::simSetWorldLightIntensity(const string& light_name, float intensity)
+        {
+            return pimpl_->client.call("simSetWorldLightIntensity", light_name, intensity).as<bool>();
+        }
+
+        bool RpcLibClientBase::simSetVehicleLightVisibility(const string& vehicle_name, const string& light_name, bool is_visible)
+        {
+            return pimpl_->client.call("simSetVehicleLightVisibility", vehicle_name, is_visible).as<bool>();
+        }
+
+        bool RpcLibClientBase::simSetVehicleLightIntensity(const string& vehicle_name, const string& light_name, float intensity)
+        {
+            return pimpl_->client.call("simSetVehicleLightIntensity", vehicle_name, intensity).as<bool>();
+        }
+
         void RpcLibClientBase::simSetTimeOfDay(bool is_enabled, const string& start_datetime, bool is_start_datetime_dst,
                                                float celestial_clock_speed, float update_interval_secs, bool move_sun)
         {
@@ -687,6 +707,7 @@ __pragma(warning(disable : 4239))
         {
             return pimpl_->client.call("simCreateVoxelGrid", RpcLibAdaptorsBase::Vector3r(position), x, y, z, res, output_file).as<bool>();
         }
+
 
         void RpcLibClientBase::cancelLastTask(const std::string& vehicle_name)
         {

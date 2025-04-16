@@ -41,7 +41,7 @@ class VehicleClient:
         Returns:
             int: Client version number
         """
-        return 3  # sync with C++ client
+        return 4  # sync with C++ client
 
     def getServerVersion(self):
         """
@@ -60,7 +60,7 @@ class VehicleClient:
         Returns:
             int: Minimum required server version number
         """
-        return 3  # sync with C++ client
+        return 4  # sync with C++ client
 
     def getMinRequiredClientVersion(self):
         """
@@ -195,7 +195,9 @@ class VehicleClient:
         Returns:
             bool: True if successful, otherwise False
         """
-        return self.client.call("simSetLightIntensity", light_name, intensity)
+
+        logging.warning("simSetLightIntensity is deprecated, use the new Artificial Light API instead")
+        return self.simSetWorldLightIntensity(light_name, intensity)
 
     def simSwapTextures(self, tags, tex_id=0, component_id=0, material_id=0):
         """
@@ -1030,6 +1032,61 @@ class VehicleClient:
         """
         return np.array([r, g, b]) in load_colormap()
 
+    def simSetWorldLightVisibility(self, light_name, is_visible=True):
+        """
+        Enable or disable an artificial light set as a static world light.
+
+        Args:
+            light_name (str): Name of the world light.
+            is_visible (bool, optional): Set to true to enable the light, false to disable it.
+
+        Returns:
+            bool: True if the light was toggled.
+        """
+        return self.client.call('simSetWorldLightVisibility', light_name, is_visible)
+
+    def simSetWorldLightIntensity(self, light_name, intensity):
+        """
+        Set the intensity value of an artificial light set as a static world light.
+
+        Args:
+            light_name (str): Name of the world light.
+            intensity (float): The intensity value of the light. Depends on the Intensity unit.
+
+        Returns:
+            bool: True if the light was changed.
+        """
+        return self.client.call('simSetWorldLightIntensity', light_name, intensity)
+
+    def simSetVehicleLightVisibility(self, vehicle_name, light_name, is_visible=True):
+        """
+        Enable or disable an artificial light set as a vehicle light.
+
+        Args:
+            vehicle_name (str): Vehicle which the light is associated with.
+            light_name (str): Name of the world light.
+            is_visible (bool, optional): Set to true to enable the light, false to disable it.
+
+        Returns:
+            bool: True if the light was toggled.
+        """
+        return self.client.call('simSetVehicleLightVisibility', vehicle_name, light_name, is_visible)
+
+    def simSetVehicleLightIntensity(self, vehicle_name, light_name, intensity):
+        """
+        Set the intensity value of an artificial light set as a vehicle light.
+
+        Args:
+            vehicle_name (str): Vehicle which the light is associated with.
+            light_name (str): Name of the world light.
+            intensity (float): The intensity value of the light. Depends on the Intensity unit.
+
+        Returns:
+            bool: True if the light was changed.
+        """
+        return self.client.call('simSetVehicleLightIntensity', vehicle_name, light_name, intensity)
+
+
     def simAddDetectionFilterMeshName(self, camera_name, image_type, mesh_name, vehicle_name='', annotation_name=""):
         """
         Add mesh name to detect in wild card format
@@ -1243,7 +1300,7 @@ class VehicleClient:
         Returns:
             KinematicsState: Physics engine raw kinematics
         """
-        kinematics_state = self.client.call('simGetGroundTruthKinematics', vehicle_name)
+        kinematics_state = self.client.call('simGetPhysicsRawKinematics', vehicle_name)
         return KinematicsState.from_msgpack(kinematics_state)
 
     simGetPhysicsRawKinematics.__annotations__ = {'return': KinematicsState}

@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
-  <configuration build-checksum="990249117" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
+  <configuration build-checksum="1964184424" file="D:\BigProjects\Cosys-AirSim-Public\Matlab\Cosys-AirSim Matlab API Client.prj" location="D:\BigProjects\Cosys-AirSim-Public\Matlab" name="Cosys-AirSim Matlab API Client" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Cosys-AirSim Matlab API Client</param.appname>
     <param.authnamewatermark>Wouter Jansen</param.authnamewatermark>
     <param.email>wouter.jansen@uantwerpen.be</param.email>
@@ -8,7 +8,7 @@
     <param.description>This a client implementation of the RPC API for Matlab for the Cosys-AirSim simulation framework. A main class AirSimClient is available which implements all API calls.
 Do note that at this point not all functions have been tested and most function documentation was auto-generated. This is still a WIP client.</param.description>
     <param.screenshot>D:\BigProjects\Cosys-AirSim-Public\promo\thumbnail_matlab.png</param.screenshot>
-    <param.version>3.2.0.0</param.version>
+    <param.version>3.3.0.0</param.version>
     <param.output>${PROJECT_ROOT}\Cosys-AirSim Matlab API Client.mltbx</param.output>
     <param.products.name>
       <item>Aerospace Toolbox</item>
@@ -57,8 +57,8 @@ Do note that at this point not all functions have been tested and most function 
     <param.required.addons />
     <param.matlab.project.id />
     <param.matlab.project.name />
-    <param.release.start>R2024a</param.release.start>
-    <param.release.end>latest</param.release.end>
+    <param.release.start />
+    <param.release.end />
     <param.release.current.only>false</param.release.current.only>
     <param.compatiblity.windows>true</param.compatiblity.windows>
     <param.compatiblity.macos>true</param.compatiblity.macos>

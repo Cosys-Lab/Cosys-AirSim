@@ -326,53 +326,152 @@ The `ImageType` element in JSON array determines which image type that settings 
 For example, `CaptureSettings` element is json array so you can add settings for multiple image types easily.
 
 ### CaptureSettings
-The `CaptureSettings` determines how different image types such as scene, depth, disparity, surface normals and segmentation views are rendered. The Width, Height and FOV settings should be self explanatory. The AutoExposureSpeed decides how fast eye adaptation works. We set to generally high value such as 100 to avoid artifacts in image capture. Similarly we set MotionBlurAmount to 0 by default to avoid artifacts in ground truth images. The `ProjectionMode` decides the projection used by the capture camera and can take value "perspective" (default) or "orthographic". If projection mode is "orthographic" then `OrthoWidth` determines width of projected area captured in meters.
-To disable the rendering of certain objects on specific cameras or all, use the `IgnoreMarked` boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_. You can also tweak the motion blur and chromatic Aberration here. 
+The `CaptureSettings` in the settings.json file for either the `CameraDefaults` or specific camera settings determines how different image types such as scene, depth, disparity, surface normals and segmentation views are rendered. 
+The Width, Height and FOV settings should be self-explanatory. The `ProjectionMode` decides the projection used by the capture camera and can take value "perspective" (default) or "orthographic". If projection mode is "orthographic" then `OrthoWidth` determines width of projected area captured in meters.
+
+To disable the rendering of certain objects on specific cameras or all, use the `IgnoreMarked` boolean setting. This requires to mark individual objects that have to be ignore using an Unreal Tag called _MarkedIgnore_.
 
 Unreal 5 introduces Lumen lightning. Due to the cameras using scene capture components enabling Lumen for them can be costly on performance. Settings have been added specfically for the scene camera to customize the usage of Lumen for Global Illumination and Reflections. 
 The `LumenGIEnable` and `LumenReflectionEnable` settings enable or disable Lumen for the camera. The `LumenFinalQuality`(0.25-2) setting determines the quality of the final image. The `LumenSceneDetail`(0.25-4) setting determines the quality of the scene. The `LumenSceneLightningDetail`(0.25-2) setting determines the quality of the lightning in the scene.
 
-For explanation of other settings, please see [this article](https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/AutomaticExposure/).
+`ForceUpdate` can be enabled to force a camera (only works for scene) to update the render target every frame. This is costly on performance but can solve issues with with exposure settings not applying for example. 
 
+Below you can find a list of all available settings and their purpose.
+They are settings that are directly transferred to the post-processing settings of cameras of which more documentation can be found [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/post-process-effects-in-unreal-engine). 
+
+
+#### General
+* **Width**: The width of the captured image in pixels. (Default: 256)
+* **Height**: The height of the captured image in pixels. (Default: 144)
+* **FOV_Degrees**: The horizontal field of view of the camera in degrees. 
+* **ImageType**: The type of image being captured (e.g., scene, depth, etc.). (Default: 0)
+* **TargetGamma**: The gamma value applied to the captured image.
+* **IgnoreMarked**: Whether to ignore objects marked for a specific purpose (e.g., segmentation). (Default: false)
+* **ProjectionMode**: The camera's projection mode ("Perspective" or "Orthographic"). (Default: "Perspective")
+* **OrthoWidth**: The width of the orthographic view frustum. 
+* **ForceUpdate**: Force a camera to update the render target every frame. Costly on performance! Only works for scene camera type. (Default: false)
+
+#### Lumen Global Illumination and Reflections
+* **LumenGIEnable**: Whether Lumen Global Illumination is enabled. (Default: false)
+* **LumenReflectionEnable**: Whether Lumen Reflections are enabled. (Default: false)
+* **LumenFinalQuality**: The quality of Lumen's final gather. 
+* **LumenSceneDetail**: Controls the size of instances that can be represented in the Lumen Scene.
+* **LumenSceneLightningDetail**: The quality of Lumen Scene lighting.
+
+#### Camera Settings
+* **CameraShutterSpeed**: The camera's shutter speed in seconds.
+* **CameraISO**: The camera's sensor sensitivity (ISO).
+* **CameraAperture**: The camera's aperture value (f-stop).
+* **CameraMaxAperture**: The camera's maximum aperture value (minimum f-stop).
+* **CameraNumBlades**: The number of blades in the camera's aperture diaphragm.
+
+#### Depth of Field
+* **DepthOfFieldSensorWidth**: Width of the camera sensor to assume, in millimeters.
+* **DepthOfFieldSqueezeFactor**: Squeeze factor for the depth of field, emulating anamorphic lenses.
+* **DepthOfFieldFocalDistance**: Distance at which the depth of field effect should be sharp, in centimeters.
+* **DepthOfFieldDepthBlurAmount**: Depth blur in kilometers for 50% (CircleDOF only).
+* **DepthOfFieldDepthBlurRadius**: Depth blur radius in pixels at 1920x resolution (CircleDOF only).
+* **DepthOfFieldUseHairDepth**: Whether to use hair depth for computing the circle of confusion size. *Not supported on UE5.2!*
+
+#### Exposure
+* **AutoExposureMethod**: Luminance computation method. (0: Histogram, 1: Basic, 2: Manual)
+* **AutoExposureCompensation**: Logarithmic adjustment for the exposure. 0: no adjustment, -1: 2x darker, -2: 4x darker, 1: 2x brighter, 2: 4x brighter, ...
+* **AutoExposureApplyPhysicalCameraExposure**: Enables physical camera exposure using Shutter Speed, ISO, and Aperture. (Only affects Manual exposure mode, default=: true)
+* **AutoExposureMinBrightness**: Minimum brightness for auto exposure adaptation.
+* **AutoExposureMaxBrightness**: Maximum brightness for auto exposure adaptation.
+* **AutoExposureSpeedUp**: Speed of exposure adaptation upwards (in f-stops per second).
+* **AutoExposureSpeedDown**: Speed of exposure adaptation downwards (in f-stops per second).
+* **AutoExposureLowPercent**: The lower percentage for the luminance histogram used in auto exposure.
+* **AutoExposureHighPercent**: The higher percentage for the luminance histogram used in auto exposure.
+* **AutoExposureHistogramLogMin**: Minimum value for the auto exposure histogram (expressed in Log2(Luminance) or EV100).
+* **AutoExposureHistogramLogMax**: Maximum value for the auto exposure histogram (expressed in Log2(Luminance) or EV100).
+
+#### Motion Blur
+* **MotionBlurAmount**: The strength of motion blur applied to the image. 0: off.
+* **MotionBlurMax**: The maximum distortion caused by motion blur, in percent of the screen width. 0: off.
+* **MotionBlurTargetFPS**: Defines the target FPS for motion blur. Makes motion blur independent of actual frame rate.
+
+#### Bloom
+* **BloomIntensity**: The intensity of the bloom effect.
+* **BloomThreshold**: The minimum brightness for pixels to contribute to the bloom effect.
+
+#### Chromatic Aberration
+* **ChromaticAberrationIntensity**: The intensity of chromatic aberration.
+* **ChromaticAberrationStartOffset**: A normalized distance to the center of the framebuffer where the chromatic aberration effect takes place.
+
+#### Lens Flare
+* **LensFlareIntensity**: Brightness scale of the image-based lens flares.
+* **LensFlareBokehSize**: Size of the lens blur (Bokeh) used for lens flares, as a percentage of the view width.
+* **LensFlareThreshold**: Minimum brightness for lens flares to take effect.
 
 ### NoiseSettings
-The `NoiseSettings` allows to add noise to the specified image type with a goal of simulating camera sensor noise, interference and other artifacts. By default no noise is added, i.e., `Enabled: false`. If you set `Enabled: true` then following different types of noise and interference artifacts are enabled, each can be further tuned using setting. The noise effects are implemented as shader created as post processing material in Unreal Engine called [CameraSensorNoise](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/HUDAssets/CameraSensorNoise.uasset).
-
+The `NoiseSettings` allows to add noise to the specified image type with a goal of simulating camera sensor noise, interference and other artifacts. By default no noise is added, i.e., `Enabled: false`. If you set `Enabled: true` then following different types of noise and interference artifacts are enabled, each can be further tuned using setting. 
 Demo of camera noise and interference simulation:
 
 [![AirSim Drone Demo Video](images/camera_noise_demo.png)](https://youtu.be/1BeCEZmQyp0)
 
-#### Random noise
-This adds random noise blobs with following parameters.
-* `RandContrib`: This determines blend ratio of noise pixel with image pixel, 0 means no noise and 1 means only noise.
-* `RandSpeed`: This determines how fast noise fluctuates, 1 means no fluctuation and higher values like 1E6 means full fluctuation.
-* `RandSize`: This determines how coarse noise is, 1 means every pixel has its own noise while higher value means more than 1 pixels share same noise value.
-* `RandDensity`: This determines how many pixels out of total will have noise, 1 means all pixels while higher value means lesser number of pixels (exponentially).
+#### Random Noise
+This adds random noise blobs with the following parameters:
 
-#### Horizontal bump distortion
-This adds horizontal bumps / flickering / ghosting effect.
-* `HorzWaveContrib`: This determines blend ratio of noise pixel with image pixel, 0 means no noise and 1 means only noise.
-* `HorzWaveStrength`: This determines overall strength of the effect.
-* `HorzWaveVertSize`: This determines how many vertical pixels would be effected by the effect.
-* `HorzWaveScreenSize`: This determines how much of the screen is effected by the effect.
+* **RandContrib** (float): Blend ratio of noise pixels with image pixels. 0 means no noise, and 1 means only noise. (Default: 0.2)
+* **RandSpeed** (float): How fast the noise fluctuates. 1 means no fluctuation, and higher values like 1E6 mean full fluctuation. (Default: 100000.0)
+* **RandSize** (float):  How coarse the noise is. 1 means every pixel has its own noise, while higher values mean more than one pixel shares the same noise value. (Default: 500.0)
+* **RandDensity** (float): How many pixels out of the total will have noise. 1 means all pixels, while higher values mean fewer pixels (exponentially). (Default: 2.0)
 
-#### Horizontal noise lines
-This adds regions of noise on horizontal lines.
-* `HorzNoiseLinesContrib`: This determines blend ratio of noise pixel with image pixel, 0 means no noise and 1 means only noise.
-* `HorzNoiseLinesDensityY`: This determines how many pixels in horizontal line gets affected.
-* `HorzNoiseLinesDensityXY`: This determines how many lines on screen gets affected.
+#### Horizontal Bump Distortion
+This adds horizontal bumps/flickering/ghosting effects:
 
-#### Horizontal line distortion
-This adds fluctuations on horizontal line.
-* `HorzDistortionContrib`: This determines blend ratio of noise pixel with image pixel, 0 means no noise and 1 means only noise.
-* `HorzDistortionStrength`: This determines how large is the distortion.
+* **HorzWaveContrib** (float): Blend ratio of distorted pixels with original image pixels. 0 means no distortion, and 1 means only distorted pixels. (Default: 0.03)
+* **HorzWaveStrength** (float): Overall strength of the distortion effect. (Default: 0.08)
+* **HorzWaveVertSize** (float): How many vertical pixels are affected by the effect. (Default: 1.0)
+* **HorzWaveScreenSize** (float): How much of the screen is affected by the effect. (Default: 1.0)
+
+#### Horizontal Noise Lines
+This adds regions of noise on horizontal lines:
+
+* **HorzNoiseLinesContrib** (float): Blend ratio of noise pixels with image pixels on the affected lines. 0 means no noise, and 1 means only noise. (Default: 1.0)
+* **HorzNoiseLinesDensityY** (float):  How many pixels in a horizontal line are affected by noise. (Default: 0.01)
+* **HorzNoiseLinesDensityXY** (float): How many lines on the screen are affected by noise. (Default: 0.5)
+
+
+#### Horizontal Line Distortion
+This adds fluctuations to horizontal lines:
+
+* **HorzDistortionContrib** (float): Blend ratio of distorted pixels with original image pixels on the affected lines. 0 means no distortion, and 1 means fully distorted. (Default: 1.0)
+* **HorzDistortionStrength** (float):  The magnitude of the distortion. (Default: 0.002)
+
 
 #### Radial Lens Distortion
-This adds radial lens distortion to the camera sensor.
-* `LensDistortionEnable`: Enable or disable this feature
-* `LensDistortionAreaFalloff`: The size of the area to distort
-* `LensDistortionAreaRadius`: The distortion radius
-* `LensDistortionInvert`: Set to true to invert and create 'pincushion distortion' or false for 'barrel distortion'
+This adds radial lens distortion to the camera sensor. Note this only applies to the scene image type, not other types like depth or segmentation.
+
+* **LensDistortionEnable** (bool):  Enable or disable lens distortion. (Default: false)
+* **LensDistortionAreaFalloff** (float):  Size of the area to distort. (Default: 1.0)
+* **LensDistortionAreaRadius** (float):  Radius of the distortion. (Default: 1.0)
+* **LensDistortionIntensity** (float): Intensity of the lens distortion. (Default: 0.5)
+* **LensDistortionInvert** (bool): Set to true to invert and create 'pincushion distortion' or false for 'barrel distortion'. (Default: false)
+
+
+#### Blur
+This can add various blur effects to the camera sensor. Note this only applies to the scene image type.
+
+The fake motion blur can be handy when the camera is static, and you want to simulate motion blur. The radial blur can simulate centered lenses.
+The Gaussian blur can simulate out-of-focus effects.
+
+* **FakeMotionBlurEnable** (bool): Whether fake motion blur is enabled. (Default: false)
+* **FakeMotionBlurDirectionX** (float): X-component of the motion blur direction vector. (Default: 0.0)
+* **FakeMotionBlurDirectionY** (float): Y-component of the motion blur direction vector. (Default: 1.0)
+* **FakeMotionBlurMovementSpeed** (float): Movement speed used for the fake motion blur effect. (Default: 1.0)
+* **FakeMotionBlurShutterSpeed** (float): Simulated shutter speed for the fake motion blur. (Default: 0.0167)
+* **FakeMotionBlurFocalLength** (float): Focal length used in the fake motion blur calculation. (Default: 35.0)
+* **FakeMotionBlurSamples** (int): Number of samples used in the fake motion blur effect. (Default: 50)
+* **RadialBlurEnable** (bool): Whether radial blur is enabled. (Default: false)
+* **RadialBlurDistance** (float): Distance parameter for the radial blur. (Default: 1.0)
+* **RadialBlurRadius** (float): Radius parameter for the radial blur. (Default: 1.0)
+* **RadialBlurDensity** (float): Density parameter for the radial blur. (Default: 4.0)
+* **GuassianBlurEnable** (bool): Whether Gaussian blur is enabled. (Default: false)
+* **GuassianBlurDirections** (float): Number of directions used in the Gaussian blur. (Default: 16.0)
+* **GuassianBlurQuality** (float): Quality level of the Gaussian blur. (Default: 3.0)
+* **GuassianBlurSize** (float): Size of the Gaussian blur kernel. (Default: 8.0)
 
 ### Gimbal
 The `Gimbal` element allows to freeze camera orientation for pitch, roll and/or yaw. This setting is ignored unless `ImageType` is -1. The `Stabilization` is defaulted to 0 meaning no gimbal i.e. camera orientation changes with body orientation on all axis. The value of 1 means full stabilization. The value between 0 to 1 acts as a weight for fixed angles specified (in degrees, in world-frame) in `Pitch`, `Roll` and `Yaw` elements and orientation of the vehicle body. When any of the angles is omitted from json or set to NaN, that angle is not stabilized (i.e. it moves along with vehicle body).
@@ -546,3 +645,9 @@ Unit conversion factor for speed related to `m/s`, default is 1. Used in conjunc
 
 ### SpeedUnitLabel
 Unit label for speed, default is `m/s`.  Used in conjunction with SpeedUnitFactor.
+
+### PassiveEchoBeacons
+For the [Echo Sensor](echo.md) one can define through the settings file passive sources directly. For more information see [here](echo.md#passive-echo-beacons).
+
+### WorldLights
+For the [Artificial Lights](lights.md) system, one can define static world lights through the settings file directly. For more information see [here](lights.md).

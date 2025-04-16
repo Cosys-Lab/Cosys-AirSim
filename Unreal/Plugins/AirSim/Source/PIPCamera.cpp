@@ -53,6 +53,33 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
 		UAirBlueprintLib::LogMessageString("Cannot create inverted lens distortion material for the PIPCamera",
 			"", LogDebugLevel::Failure);
 
+    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder4(TEXT("Material'/AirSim/HUDAssets/CameraSensorMotionBlur.CameraSensorMotionBlur'"));
+    if (mat_finder4.Succeeded())
+    {
+        motion_blur_material_static_ = mat_finder4.Object;
+    }
+    else
+        UAirBlueprintLib::LogMessageString("Cannot create fake motion blur material for the PIPCamera",
+            "", LogDebugLevel::Failure);
+
+    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder5(TEXT("Material'/AirSim/HUDAssets/CameraSensorRadialBlur.CameraSensorRadialBlur'"));
+    if (mat_finder5.Succeeded())
+    {
+        radial_blur_material_static_ = mat_finder5.Object;
+    }
+    else
+        UAirBlueprintLib::LogMessageString("Cannot create radial blur material for the PIPCamera",
+            "", LogDebugLevel::Failure);
+
+    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder6(TEXT("Material'/AirSim/HUDAssets/CameraSensorGuassianBlur.CameraSensorGuassianBlur'"));
+    if (mat_finder6.Succeeded())
+    {
+        guassian_blur_material_static_ = mat_finder6.Object;
+    }
+    else
+        UAirBlueprintLib::LogMessageString("Cannot create guassian blur material for the PIPCamera",
+            "", LogDebugLevel::Failure);
+
 
     PrimaryActorTick.bCanEverTick = true;
 
@@ -66,6 +93,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Infrared), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlow), EPixelFormat::PF_B8G8R8A8);
     image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::OpticalFlowVis), EPixelFormat::PF_B8G8R8A8);
+    image_type_to_pixel_format_map_.Add(Utils::toNumeric(ImageType::Lighting), EPixelFormat::PF_B8G8R8A8);
 
     object_filter_ = FObjectFilter();
 
@@ -106,6 +134,8 @@ void APIPCamera::PostInitializeComponents()
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("OpticalFlowCaptureComponent"));
     captures_[Utils::toNumeric(ImageType::OpticalFlowVis)] =
         UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("OpticalFlowVisCaptureComponent"));
+    captures_[Utils::toNumeric(ImageType::Lighting)] =
+        UAirBlueprintLib::GetActorComponent<USceneCaptureComponent2D>(this, TEXT("LightingCaptureComponent"));
 
     for (unsigned int i = 0; i < imageTypeCount(); ++i) {
         detections_[i] = NewObject<UDetectionComponent>(this);
@@ -120,6 +150,10 @@ void APIPCamera::PostInitializeComponents()
 
     FObjectAnnotator::SetViewForAnnotationRender(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
     captures_[Utils::toNumeric(ImageType::Segmentation)]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetLighting(true);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetMaterials(false);
+    captures_[Utils::toNumeric(ImageType::Lighting)]->ShowFlags.SetPostProcessing(false);
 }
 
 void APIPCamera::BeginPlay()
@@ -129,13 +163,16 @@ void APIPCamera::BeginPlay()
     noise_materials_.AddZeroed(imageTypeCount() + 1);
     distortion_materials_.AddZeroed(imageTypeCount() + 1);
 	lens_distortion_materials_.AddZeroed(imageTypeCount() + 1);
+    fake_motion_blur_materials_.AddZeroed(imageTypeCount() + 1);
+    radial_blur_materials_.AddZeroed(imageTypeCount() + 1);
+    guassian_blur_materials_.AddZeroed(imageTypeCount() + 1);
 
     //by default all image types are disabled
     camera_type_enabled_.assign(imageTypeCount(), false);
 
     for (unsigned int image_type = 0; image_type < imageTypeCount(); ++image_type) {
         //use final color for all calculations
-        if(image_type == Utils::toNumeric(ImageType::Scene)) {
+        if(image_type == Utils::toNumeric(ImageType::Scene) || image_type == Utils::toNumeric(ImageType::Lighting)) {
             captures_[image_type]->CaptureSource = ESceneCaptureSource::SCS_FinalToneCurveHDR;
         }
         else {
@@ -151,6 +188,7 @@ void APIPCamera::BeginPlay()
     gimbal_stabilization_ = 0;
     gimbald_rotator_ = this->GetActorRotation();
     this->SetActorTickEnabled(false);
+    
 
     if (distortion_param_collection_)
         distortion_param_instance_ = this->GetWorld()->GetParameterCollectionInstance(distortion_param_collection_);
@@ -288,17 +326,54 @@ void APIPCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			camera_->PostProcessSettings.RemoveBlendable(lens_distortion_materials_[0]);
 	}
 
+    if (radial_blur_materials_.Num()) {
+        for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
+            if (radial_blur_materials_[image_type + 1])
+                captures_[image_type]->PostProcessSettings.RemoveBlendable(radial_blur_materials_[image_type + 1]);
+        }
+        if (radial_blur_materials_[0])
+            camera_->PostProcessSettings.RemoveBlendable(radial_blur_materials_[0]);
+    }
+
+    if (guassian_blur_materials_.Num()) {
+        for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
+            if (guassian_blur_materials_[image_type + 1])
+                captures_[image_type]->PostProcessSettings.RemoveBlendable(guassian_blur_materials_[image_type + 1]);
+        }
+        if (guassian_blur_materials_[0])
+            camera_->PostProcessSettings.RemoveBlendable(guassian_blur_materials_[0]);
+    }
+
+    if (fake_motion_blur_materials_.Num()) {
+        for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
+            if (fake_motion_blur_materials_[image_type + 1])
+                captures_[image_type]->PostProcessSettings.RemoveBlendable(fake_motion_blur_materials_[image_type + 1]);
+        }
+        if (fake_motion_blur_materials_[0])
+            camera_->PostProcessSettings.RemoveBlendable(fake_motion_blur_materials_[0]);
+    }
+
     noise_material_static_ = nullptr;
 	lens_distortion_material_static_ = nullptr;
 	lens_distortion_invert_material_static_ = nullptr;
     annotation_sphere_static_ = nullptr;
+    guassian_blur_material_static_ = nullptr;
+    radial_blur_material_static_ = nullptr;
+    motion_blur_material_static_ = nullptr;
     noise_materials_.Empty();
 	lens_distortion_materials_.Empty();
+    radial_blur_materials_.Empty();
+    guassian_blur_materials_.Empty();
+    fake_motion_blur_materials_.Empty();
 
     if (distortion_materials_.Num()) {
         for (int image_type = 0; image_type < image_count_to_delete - 3; ++image_type) {
             if (distortion_materials_[image_type + 1])
-                captures_[image_type]->PostProcessSettings.RemoveBlendable(distortion_materials_[image_type + 1]);
+            {
+                if (captures_[image_type] != NULL) {
+                    captures_[image_type]->PostProcessSettings.RemoveBlendable(distortion_materials_[image_type + 1]);
+                }
+            }                
         }
         if (distortion_materials_[0])
             camera_->PostProcessSettings.RemoveBlendable(distortion_materials_[0]);
@@ -464,6 +539,7 @@ void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPri
     APlayerController* controller = this->GetWorld()->GetFirstPlayerController();
     for(TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
         captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+        captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents.AddUnique(component);
         controller->HiddenPrimitiveComponents.AddUnique(component);
 	}
 }
@@ -478,6 +554,7 @@ void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& 
 
     for (TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
         captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
+        captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents.AddUnique(component);
         controller->HiddenPrimitiveComponents.AddUnique(component);
     }
 }
@@ -540,7 +617,7 @@ void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorTy
 
     setCaptureUpdate(captures_[render_index], true);    
 
-    if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)captures_[render_index]->HiddenActors = ignore_actors_;
+    if (sensor_params_.capture_settings.at(Utils::toNumeric(ImageType::Annotation)).ignore_marked)captures_[render_index]->HiddenActors.Append(ignore_actors_);
     
     captures_[render_index]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 
@@ -606,7 +683,8 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
             case ImageType::Infrared:
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], false, pixel_format, capture_setting, ned_transform, false);
                 break;
-
+            case ImageType::Lighting:
+                updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], false, pixel_format, capture_setting, ned_transform, false);
             case ImageType::Segmentation:
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], false, pixel_format, capture_setting, ned_transform, false);
                 render_targets_[image_type]->TargetGamma = 1;
@@ -619,14 +697,14 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                 updateCaptureComponentSetting(captures_[image_type], render_targets_[image_type], true, pixel_format, capture_setting, ned_transform, false);
                 break;
             }
-            if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors = ignore_actors_;
+            if(capture_setting.ignore_marked)captures_[image_type]->HiddenActors.Append(ignore_actors_);
             setDistortionMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings);
             setNoiseMaterial(image_type, captures_[image_type], captures_[image_type]->PostProcessSettings, noise_setting);
             copyCameraSettingsToSceneCapture(camera_, captures_[image_type]); //CinemAirSim
-            if(image_type == Utils::toNumeric(ImageType::Scene)) {
+            if(image_type == Utils::toNumeric(ImageType::Scene) || image_type == Utils::toNumeric(ImageType::Lighting)) {
                 if (capture_setting.lumen_gi_enabled) {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
-                    captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;
+                    captures_[image_type]->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;                    
                 }
                 else {
                     captures_[image_type]->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = 1;
@@ -640,7 +718,7 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
                     captures_[image_type]->PostProcessSettings.bOverride_ReflectionMethod = 1;
 					captures_[image_type]->PostProcessSettings.ReflectionMethod = EReflectionMethod::None;
                 }
-
+                captures_[image_type]->PostProcessSettings.LumenSurfaceCacheResolution = 1;
                 captures_[image_type]->PostProcessSettings.LumenFinalGatherQuality = capture_setting.lumen_final_quality;
                 captures_[image_type]->PostProcessSettings.LumenSceneDetail = capture_setting.lumen_scene_detail;
                 captures_[image_type]->PostProcessSettings.LumenSceneLightingQuality = capture_setting.lumen_scene_lightning_quality;
@@ -653,6 +731,10 @@ void APIPCamera::setupCameraFromSettings(const APIPCamera::CameraSetting& camera
             setNoiseMaterial(image_type, camera_, camera_->PostProcessSettings, noise_setting);
             copyCameraSettingsToAllSceneCapture(camera_); //CinemAirSim
         }
+    }
+    if (camera_setting.capture_settings.at(Utils::toNumeric(ImageType::Scene)).force_update){
+        setCameraTypeEnabled(ImageType::Scene, true);
+        setCameraTypeUpdate(ImageType::Scene, false);
     }
 }
 
@@ -711,26 +793,40 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
 	{
 		obj.bOverride_MotionBlurMax = 1;
 		obj.MotionBlurMax = setting.motion_blur_max;
-	}
+	} 
+    if (!std::isnan(setting.motion_blur_target_fps))
+    {
+        obj.bOverride_MotionBlurTargetFPS = 1;
+        obj.MotionBlurTargetFPS = setting.motion_blur_target_fps;
+    }
+
     if (setting.auto_exposure_method >= 0) {
         obj.bOverride_AutoExposureMethod = 1;
         obj.AutoExposureMethod = Utils::toEnum<EAutoExposureMethod>(setting.auto_exposure_method);
     }
-    if (!std::isnan(setting.auto_exposure_speed)) {
-        obj.bOverride_AutoExposureSpeedDown = 1;
-        obj.AutoExposureSpeedDown = obj.AutoExposureSpeedUp = setting.auto_exposure_speed;
+    if (!std::isnan(setting.auto_exposure_bias)) {
+        obj.bOverride_AutoExposureBias = 1;
+        obj.AutoExposureBias = setting.auto_exposure_bias;
+    }
+    
+    obj.bOverride_AutoExposureApplyPhysicalCameraExposure = 1;
+    obj.AutoExposureApplyPhysicalCameraExposure = setting.auto_exposure_apply_physical_camera_exposure ? 1 : 0;
+    
+    if (!std::isnan(setting.auto_exposure_min_brightness)) {
+        obj.bOverride_AutoExposureMinBrightness = 1;
+        obj.AutoExposureMinBrightness = setting.auto_exposure_min_brightness;
     }
     if (!std::isnan(setting.auto_exposure_max_brightness)) {
         obj.bOverride_AutoExposureMaxBrightness = 1;
         obj.AutoExposureMaxBrightness = setting.auto_exposure_max_brightness;
     }
-    if (!std::isnan(setting.auto_exposure_min_brightness)) {
-        obj.bOverride_AutoExposureMinBrightness = 1;
-        obj.AutoExposureMinBrightness = setting.auto_exposure_min_brightness;
+    if (!std::isnan(setting.auto_exposure_speed_up)) {
+        obj.bOverride_AutoExposureSpeedUp = 1;
+        obj.AutoExposureSpeedUp = setting.auto_exposure_speed_up;
     }
-    if (!std::isnan(setting.auto_exposure_bias)) {
-        obj.bOverride_AutoExposureBias = 1;
-        obj.AutoExposureBias = setting.auto_exposure_bias;
+    if (!std::isnan(setting.auto_exposure_speed_down)) {
+        obj.bOverride_AutoExposureSpeedDown = 1;
+        obj.AutoExposureSpeedDown = setting.auto_exposure_speed_down;
     }
     if (!std::isnan(setting.auto_exposure_low_percent)) {
         obj.bOverride_AutoExposureLowPercent = 1;
@@ -748,11 +844,84 @@ void APIPCamera::updateCameraPostProcessingSetting(FPostProcessSettings& obj, co
         obj.bOverride_HistogramLogMax = 1;
         obj.HistogramLogMax = setting.auto_exposure_histogram_log_max;
     }
-	if (!std::isnan(setting.chromatic_aberration_scale))
-	{
-		obj.bOverride_SceneFringeIntensity = 1;
-		obj.SceneFringeIntensity = setting.chromatic_aberration_scale;
-	}
+
+    if (!std::isnan(setting.bloom_intensity)) {
+        obj.bOverride_BloomIntensity = 1;
+        obj.BloomIntensity = setting.bloom_intensity;
+    }
+    if (!std::isnan(setting.bloom_threshold)) {
+        obj.bOverride_BloomThreshold = 1;
+        obj.BloomThreshold = setting.bloom_threshold;
+    }
+
+    if (!std::isnan(setting.chromatic_aberration_intensity)) {
+        obj.bOverride_SceneFringeIntensity = 1;
+        obj.SceneFringeIntensity = setting.chromatic_aberration_intensity;
+    }
+    if (!std::isnan(setting.chromatic_aberration_start_offset)) {
+        obj.bOverride_ChromaticAberrationStartOffset = 1;
+        obj.ChromaticAberrationStartOffset = setting.chromatic_aberration_start_offset;
+    }
+
+    if (!std::isnan(setting.camera_shutter_speed)) {
+        obj.bOverride_CameraShutterSpeed = 1;
+        obj.CameraShutterSpeed = setting.camera_shutter_speed;
+    }
+    if (!std::isnan(setting.camera_iso)) {
+        obj.bOverride_CameraISO = 1;
+        obj.CameraISO = setting.camera_iso;
+    }
+    if (!std::isnan(setting.camera_aperture)) {
+        obj.bOverride_DepthOfFieldFstop = 1;
+        obj.DepthOfFieldFstop = setting.camera_aperture;
+    }
+    if (!std::isnan(setting.camera_max_aperture)) {
+        obj.bOverride_DepthOfFieldMinFstop = 1;
+        obj.DepthOfFieldMinFstop = setting.camera_max_aperture;
+    }
+    if (!std::isnan(setting.camera_num_blades)) {
+        obj.bOverride_DepthOfFieldBladeCount = 1;
+        obj.DepthOfFieldBladeCount = static_cast<int32>(setting.camera_num_blades);
+    }
+
+    if (!std::isnan(setting.lens_flare_intensity)) {
+        obj.bOverride_LensFlareIntensity = 1;
+        obj.LensFlareIntensity = setting.lens_flare_intensity;
+    }
+    if (!std::isnan(setting.lens_flare_bokeh_size)) {
+        obj.bOverride_LensFlareBokehSize = 1;
+        obj.LensFlareBokehSize = setting.lens_flare_bokeh_size;
+    }
+    if (!std::isnan(setting.lens_flare_threshold)) {
+        obj.bOverride_LensFlareThreshold = 1;
+        obj.LensFlareThreshold = setting.lens_flare_threshold;
+    }
+
+    if (!std::isnan(setting.depth_of_field_sensor_width)) {
+        obj.bOverride_DepthOfFieldSensorWidth = 1;
+        obj.DepthOfFieldSensorWidth = setting.depth_of_field_sensor_width;
+    }
+    if (!std::isnan(setting.depth_of_field_squeeze_factor)) {
+        obj.bOverride_DepthOfFieldSqueezeFactor = 1;
+        obj.DepthOfFieldSqueezeFactor = setting.depth_of_field_squeeze_factor;
+    }
+    if (!std::isnan(setting.depth_of_field_focal_distance)) {
+        obj.bOverride_DepthOfFieldFocalDistance = 1;
+        obj.DepthOfFieldFocalDistance = setting.depth_of_field_focal_distance;
+    }
+    if (!std::isnan(setting.depth_of_field_depth_blur_amount)) {
+        obj.bOverride_DepthOfFieldDepthBlurAmount = 1;
+        obj.DepthOfFieldDepthBlurAmount = setting.depth_of_field_depth_blur_amount;
+    }
+    if (!std::isnan(setting.depth_of_field_depth_blur_radius)) {
+        obj.bOverride_DepthOfFieldDepthBlurRadius = 1;
+        obj.DepthOfFieldDepthBlurRadius = setting.depth_of_field_depth_blur_radius;
+    }
+    if (!std::isnan(setting.depth_of_field_use_hair_depth)) {
+        obj.bOverride_DepthOfFieldUseHairDepth = 1;
+        obj.DepthOfFieldUseHairDepth = setting.depth_of_field_use_hair_depth ? 1 : 0;
+    }
+
 }
 
 void APIPCamera::setDistortionMaterial(int image_type, UObject* outer, FPostProcessSettings& obj)
@@ -807,6 +976,40 @@ void APIPCamera::setNoiseMaterial(int image_type, UObject* outer, FPostProcessSe
 
 		obj.AddBlendable(lens_distortion_material_, 1.0f);
 	}
+
+    if (settings.FakeMotionBlurEnable) {
+        UMaterialInstanceDynamic* motion_blur_material = UMaterialInstanceDynamic::Create(motion_blur_material_static_, outer);
+        fake_motion_blur_materials_[image_type + 1] = motion_blur_material;
+        
+        motion_blur_material->SetScalarParameterValue("MotionBlurDirectionX", settings.FakeMotionBlurDirectionX);
+        motion_blur_material->SetScalarParameterValue("MotionBlurDirectionY", settings.FakeMotionBlurDirectionY);
+        motion_blur_material->SetScalarParameterValue("MotionBlurMovementSpeed", settings.FakeMotionBlurMovementSpeed);
+        motion_blur_material->SetScalarParameterValue("MotionBlurShutterSpeed", settings.FakeMotionBlurShutterSpeed);
+        motion_blur_material->SetScalarParameterValue("MotionBlurFocalLength", settings.FakeMotionBlurFocalLength);
+        motion_blur_material->SetScalarParameterValue("MotionBlurMovementSpeed", settings.FakeMotionBlurSamples);
+
+        obj.AddBlendable(motion_blur_material, 1.0f);
+    }
+    if (settings.RadialBlurEnable) {
+        UMaterialInstanceDynamic* radial_blur_material = UMaterialInstanceDynamic::Create(radial_blur_material_static_, outer);
+        radial_blur_materials_[image_type + 1] = radial_blur_material;
+
+        radial_blur_material->SetScalarParameterValue("RadialBlurDistance", settings.RadialBlurDistance);
+        radial_blur_material->SetScalarParameterValue("RadialBlurRadius", settings.RadialBlurRadius);
+        radial_blur_material->SetScalarParameterValue("RadialBlurDensity", settings.RadialBlurDensity);
+
+        obj.AddBlendable(radial_blur_material, 1.0f);
+    }
+    if (settings.GuassianBlurEnable) {
+        UMaterialInstanceDynamic* guassian_blur_material = UMaterialInstanceDynamic::Create(guassian_blur_material_static_, outer);
+        guassian_blur_materials_[image_type + 1] = guassian_blur_material;
+
+        guassian_blur_material->SetScalarParameterValue("GuassianDirections", settings.GuassianBlurDirections);
+        guassian_blur_material->SetScalarParameterValue("GuassianQuality", settings.GuassianBlurQuality);
+        guassian_blur_material->SetScalarParameterValue("GuassianSize", settings.GuassianBlurSize);
+
+        obj.AddBlendable(guassian_blur_material, 1.0f);
+    }
 }
 
 void APIPCamera::enableCaptureComponent(const APIPCamera::ImageType type, bool is_enabled, std::string annotation_name)
@@ -924,12 +1127,16 @@ void APIPCamera::onViewModeChanged(bool nodisplay)
                 }
             }
         }
-        else {
-            USceneCaptureComponent2D* capture = getCaptureComponent(static_cast<ImageType>(image_type), false);
-            if (capture) {
-                setCaptureUpdate(capture, nodisplay);
-            }
-        }        
+        else
+        {
+            if (Utils::toEnum<ImageType>(image_type) != ImageType::Scene)
+            {
+                USceneCaptureComponent2D* capture = getCaptureComponent(static_cast<ImageType>(image_type), false);
+                if (capture) {
+                    setCaptureUpdate(capture, nodisplay);
+                }
+            }           
+        }                
     }
 }
 
