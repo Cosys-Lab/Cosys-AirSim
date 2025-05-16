@@ -110,11 +110,14 @@ void UAirBlueprintLib::DrawPoint(const UWorld* InWorld, FVector const& Position,
 	{
 		// this means foreground lines can't be persistent
 		ULineBatchComponent* const LineBatcher = GetLineBatcher(InWorld, bPersistentLines, LifeTime, (DepthPriority == SDPG_Foreground));
-		if (LineBatcher != NULL)
-		{
-			const float PointLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
-			LineBatcher->DrawPoint(Position, Color.ReinterpretAsLinear(), Size, DepthPriority, PointLifeTime);
-		}
+        AsyncTask(ENamedThreads::GameThread, [LineBatcher, Position, Color, Size, DepthPriority, LifeTime, bPersistentLines]()
+            {
+                if (LineBatcher != NULL)
+                {
+                    const float PointLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
+                    LineBatcher->DrawPoint(Position, Color.ReinterpretAsLinear(), Size, DepthPriority, PointLifeTime);
+                }
+            });
 	}
 }
 
