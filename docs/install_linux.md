@@ -12,10 +12,10 @@ sudo ./llvm.sh <version number>
 ```
 
 ## Install Unreal Engine
-Download the latest version of Unreal Engine 5.5 from the [official download page](https://www.unrealengine.com/en-US/linux). 
+Download the latest version of Unreal Engine 5.6 from the [official download page](https://www.unrealengine.com/en-US/linux). 
 This will require an Epic Games account. Once the zip archive is downloaded you can extract it to where you want to install the Unreal Engine.
 ```bash
-unzip Linux_Unreal_Engine_5.5.X.zip -d destination_folder
+unzip Linux_Unreal_Engine_5.6.X.zip -d destination_folder
 ```
 If you chose a folder such as for example `/opt/UnrealEngine` make sure to provide permissions and to set the owner, otherwise you might run into issues:
 ```bash
@@ -23,7 +23,7 @@ sudo chmod -R 777 /opt/UnrealEngine
 sudo chown -r yourusername /opt/UnrealEngine
 ```
 From where you install Unreal Engine, you can run `Engine/Binaries/Linux/UnrealEditor` from the terminal to launch Unreal Engine.
-For more information you can read the [quick start guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.5).
+For more information you can read the [quick start guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.6).
 
 You can alternatively install Unreal Engine from source if you do not use a Ubuntu distribution, see the documentation linked above for more information. 
 

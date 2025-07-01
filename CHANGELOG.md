@@ -1,4 +1,5 @@
 ### Development (version 3.4)
+* Added support for Unreal 5.6. This will become the next targeted stable Unreal Engine replacing 5.5 when Cosys-AirSim 3.4 releases.
 * Fixed duplicate indexes for annotation system causing meshes to not show up in annotation masks.
 
 ### April 2025 (version 3.3)
