@@ -93,6 +93,13 @@ public class AirSim : ModuleRules
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "deps", "eigen3"));
         AddOSLibDependencies(Target);
 
+        PrivateIncludePaths.AddRange(
+            new string[] {
+            Path.Combine(GetModuleDirectory("Renderer"), "Private"),
+            Path.Combine(GetModuleDirectory("Renderer"), "Internal"),
+            }
+        );
+
         SetupCompileMode(CompileMode.HeaderOnlyWithRpc, Target);
     }
 
