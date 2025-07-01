@@ -142,6 +142,7 @@ void ALidarCamera::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	render_target_2D_segmentation_ = nullptr;
 	capture_2D_intensity_ = nullptr;
 	render_target_2D_intensity_ = nullptr;
+	Super::EndPlay(EndPlayReason);
 }
 
 // Get all the settings from AirSim
