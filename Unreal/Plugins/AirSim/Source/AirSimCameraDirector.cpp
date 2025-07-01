@@ -207,6 +207,8 @@ void AAirSimCameraDirector::EndPlay(const EEndPlayReason::Type EndPlayReason)
     backup_camera_ = nullptr;
     front_camera_ = nullptr;
     follow_actor_ = nullptr;
+
+    Super::EndPlay(EndPlayReason);
 }
 
 APIPCamera* AAirSimCameraDirector::getFpvCamera() const

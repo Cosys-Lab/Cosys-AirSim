@@ -105,6 +105,9 @@ void AComputerVisionPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
     camera_back_center_base_ = nullptr;
 
     manual_pose_controller_ = nullptr;
+
+
+    Super::EndPlay(EndPlayReason);
 }
 
 void AComputerVisionPawn::Tick(float Delta)
