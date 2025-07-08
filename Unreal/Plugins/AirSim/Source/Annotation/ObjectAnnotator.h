@@ -88,7 +88,6 @@ public:
 
 	std::vector<std::string> GetAllComponentNames();
 	TMap<FString, UMeshComponent*> GetNameToComponentMap();
-	TMap<FString, FString> GetColorToComponentNameMap();
 	TMap<FString, float> GetComponentToValueMap();
 	TMap<UMeshComponent*, FString> GetComponentToNameMap();
 
@@ -120,8 +119,6 @@ private:
 	TMap<FString, FString> name_to_gammacorrected_color_map_;
 	TMap<FString, float> name_to_value_map_;
 	TMap<FString, FString> name_to_texture_path_map_;
-	TMap<FString, FString> color_to_name_map_;
-	TMap<FString, FString> gammacorrected_color_to_name_map_;
 	TMap<FString, UMeshComponent*> name_to_component_map_;
 	TMap<UMeshComponent*, FString> component_to_name_map_;
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> annotation_component_list_;
