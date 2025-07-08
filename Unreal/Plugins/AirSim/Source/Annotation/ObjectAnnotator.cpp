@@ -152,15 +152,17 @@ void FObjectAnnotator::getPaintableComponentMeshes(AActor* actor, TMap<FString, 
 					}
 					component_name.Append("_");
 					component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
+					paintable_components_meshes->Emplace(component_name, component);
+					index++;
 				}
 			}
 			if (USkinnedMeshComponent* skinnedmesh_component = Cast<USkinnedMeshComponent>(component)) {
 				component_name = actor->GetName();
 				component_name.Append("_");
 				component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
+				paintable_components_meshes->Emplace(component_name, component);
+				index++;
 			}
-			paintable_components_meshes->Emplace(component_name, component);
-			index++;
 		}
 	}
 }
@@ -262,19 +264,21 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 					else {
 						component_name.Append(actor->GetName());
 					}
+					component_name.Append("_");
+					component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
+					paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
+					paintable_components_meshes->Emplace(component_name, component);
+					index++;
 				}
-				component_name.Append("_");
-				component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
-				paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
 			}
 			if (USkinnedMeshComponent* skinnedmesh_component = Cast<USkinnedMeshComponent>(component)) {
 				component_name = actor->GetName();
 				component_name.Append("_");
 				component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
 				paintable_components_tags->Emplace(component_name, skinnedmesh_component->ComponentTags);
+				paintable_components_meshes->Emplace(component_name, component);
+				index++;
 			}
-			paintable_components_meshes->Emplace(component_name, component);
-			index++;
 		}
 	}
 }
@@ -289,18 +293,6 @@ bool FObjectAnnotator::SetComponentRGBColorByIndex(FString component_id, uint32 
 		{
 			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
 			FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.B));
-			const FString* found_index_color = color_to_name_map_.FindKey(component_id);
-
-			if (found_index_color != nullptr) {
-				color_to_name_map_.Remove(*found_index_color);
-			}
-			color_to_name_map_.Emplace(color_string, component_id);
-			const FString* found_index_color_gamma = gammacorrected_color_to_name_map_.FindKey(component_id);
-			if (found_index_color != nullptr) {
-				gammacorrected_color_to_name_map_.Remove(*found_index_color_gamma);
-			}
-			color_to_name_map_.Emplace(color_string, component_id);
-			gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, component_id);
 			name_to_color_index_map_[component_id] = color_index;
 			name_to_gammacorrected_color_map_[component_id] = color_string_gammacorrected;
 			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted RGB annotation of object %s to new ID # %s (RGB: %s)"), *name_, *component_id, *FString::FromInt(color_index), *color_string_gammacorrected);
@@ -328,18 +320,6 @@ bool FObjectAnnotator::SetComponentRGBColorByColor(FString component_id, FColor 
 		{
 			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
 			FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(color.B));
-			const FString* found_index_color = color_to_name_map_.FindKey(component_id);
-
-			if (found_index_color != nullptr) {
-				color_to_name_map_.Remove(*found_index_color);
-			}
-			color_to_name_map_.Emplace(color_string, component_id);
-			const FString* found_index_color_gamma = gammacorrected_color_to_name_map_.FindKey(component_id);
-			if (found_index_color != nullptr) {
-				gammacorrected_color_to_name_map_.Remove(*found_index_color_gamma);
-			}
-			color_to_name_map_.Emplace(color_string, component_id);
-			gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, component_id);
 			name_to_color_index_map_[component_id] = color_index;
 			name_to_gammacorrected_color_map_[component_id] = color_string_gammacorrected;
 			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted RGB annotation of object %s to new RGB color: %s (ID # %s)"), *name_, *component_id, *color_string_gammacorrected , *FString::FromInt(color_index));
@@ -373,18 +353,6 @@ bool FObjectAnnotator::SetComponentGreyScaleColorByValue(FString component_id, f
 		{
 			FString color_string = FString::FromInt(color.R) + "," + FString::FromInt(color.G) + "," + FString::FromInt(color.B);
 			FString color_string_gammacorrected = color_string;
-			const FString* found_index_color = color_to_name_map_.FindKey(component_id);
-
-			if (found_index_color != nullptr) {
-				color_to_name_map_.Remove(*found_index_color);
-			}
-			color_to_name_map_.Emplace(color_string, component_id);
-			const FString* found_index_color_gamma = gammacorrected_color_to_name_map_.FindKey(component_id);
-			if (found_index_color != nullptr) {
-				gammacorrected_color_to_name_map_.Remove(*found_index_color_gamma);
-			}
-			color_to_name_map_.Emplace(color_string, component_id);
-			gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, component_id);
 			name_to_gammacorrected_color_map_[component_id] = color_string_gammacorrected;
 			name_to_value_map_[component_id] = greyscale_value;
 			UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Adjusted greyscale annotation of object %s to new value %f (RGB: %s)"), *name_, *component_id, greyscale_value, *color_string_gammacorrected);
@@ -515,8 +483,6 @@ bool FObjectAnnotator::AnnotateNewActorInstanceSegmentation(AActor* actor) {
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 					FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new object %s with ID # %s (RGB: %s)"), *name_, *it.Key(), *FString::FromInt(ObjectIndex), *color_string_gammacorrected);
 				}else{
@@ -565,20 +531,10 @@ bool FObjectAnnotator::AnnotateNewActorRGB(AActor* actor) {
 				if (name_to_component_map_.Contains(it.Key())) {
 
 					name_to_color_index_map_[it.Key()] = color_index;
-					const FString* found_index_color = color_to_name_map_.FindKey(it.Key());
-					if (found_index_color != nullptr) {
-						color_to_name_map_.Remove(*found_index_color);
-					}
-					color_to_name_map_.Emplace(color_string, it.Key());
-					const FString* found_index_color_gamma = gammacorrected_color_to_name_map_.FindKey(it.Key());
-					if (found_index_color != nullptr) {
-						gammacorrected_color_to_name_map_.Remove(*found_index_color_gamma);
-					}
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					check(UpdatePaintRGBComponent(it.Value(), new_color, it.Key()));
 					if (set_direct_) {
-						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Updated RGB annotated object %s with direct RGB color: %s (ID # %s)"), *name_, *it.Key(), *color_string_gammacorrected, *FString::FromInt(color_index));
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Updated RGB annotated object %s with direct RGB color: %s"), *name_, *it.Key(), *color_string_gammacorrected);
 
 					}
 					else {
@@ -589,12 +545,10 @@ bool FObjectAnnotator::AnnotateNewActorRGB(AActor* actor) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 					component_to_name_map_.Emplace(it.Value(), it.Key());
 					name_to_color_index_map_.Emplace(it.Key(), color_index);
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					if (set_direct_) {
-						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with direct RGB color: %s (ID # %s)"), *name_, *it.Key(), *color_string_gammacorrected, *FString::FromInt(color_index));
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with direct RGB color: %s"), *name_, *it.Key(), *color_string_gammacorrected);
 
 					}
 					else {
@@ -608,8 +562,6 @@ bool FObjectAnnotator::AnnotateNewActorRGB(AActor* actor) {
 				name_to_color_index_map_.Emplace(it.Key(), 2744000 - 1);
 				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 				FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
-				color_to_name_map_.Emplace(color_string, it.Key());
-				gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 				name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 				check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged RGB annotated object %s with default color (RGB: %s)"), *name_, *it.Key(), *color_string_gammacorrected);
@@ -653,17 +605,7 @@ bool FObjectAnnotator::AnnotateNewActorGreyscale(AActor* actor) {
 
 
 				if (name_to_component_map_.Contains(it.Key())) {
-					const FString* found_index_color = color_to_name_map_.FindKey(it.Key());
-					if (found_index_color != nullptr) {
-						color_to_name_map_.Remove(*found_index_color);
-					}
-					color_to_name_map_.Emplace(color_string, it.Key());
-					const FString* found_index_color_gamma = gammacorrected_color_to_name_map_.FindKey(it.Key());
-					if (found_index_color != nullptr) {
-						gammacorrected_color_to_name_map_.Remove(*found_index_color_gamma);
-					}
 					name_to_value_map_[it.Key()] = greyscale_value;
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_[it.Key()] = color_string_gammacorrected;
 					check(UpdatePaintRGBComponent(it.Value(), new_color, it.Key()));
 
@@ -671,9 +613,7 @@ bool FObjectAnnotator::AnnotateNewActorGreyscale(AActor* actor) {
 			}
 				else {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
-					component_to_name_map_.Emplace(it.Value(), it.Key());
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
+					component_to_name_map_.Emplace(it.Value(), it.Key());					
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					name_to_value_map_.Emplace(it.Key(), greyscale_value);
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
@@ -685,8 +625,6 @@ bool FObjectAnnotator::AnnotateNewActorGreyscale(AActor* actor) {
 				FColor new_color = FColor(0, 0, 0);
 				FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 				FString color_string_gammacorrected = color_string;
-				color_to_name_map_.Emplace(color_string, it.Key());
-				gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 				name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 				name_to_value_map_.Emplace(it.Key(), 0);
 				check(PaintRGBComponent(it.Value(), new_color, it.Key()));
@@ -884,8 +822,6 @@ void FObjectAnnotator::InitializeInstanceSegmentation(ULevel* InLevel)
 					name_to_color_index_map_.Emplace(it.Key(), color_index);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 					FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new object %s with ID # %s (RGB: %s)"), *name_, *it.Key(), *FString::FromInt(color_index), *color_string_gammacorrected);
@@ -935,12 +871,10 @@ void FObjectAnnotator::InitializeRGB(ULevel* InLevel)
 					name_to_color_index_map_.Emplace(it.Key(), color_index);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 					FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					if (set_direct_) {
-						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with direct RGB color: %s (ID # %s)"), *name_, *it.Key(), *color_string_gammacorrected, *FString::FromInt(color_index));
+						UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added new RGB annotated object %s with direct RGB color: %s"), *name_, *it.Key(), *color_string_gammacorrected);
 
 					}
 					else {
@@ -954,8 +888,6 @@ void FObjectAnnotator::InitializeRGB(ULevel* InLevel)
 					name_to_color_index_map_.Emplace(it.Key(), 2744000 - 1);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 					FString color_string_gammacorrected = FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.R)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.G)) + "," + FString::FromInt(ColorGenerator_.GetGammaCorrectedColor(new_color.B));
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
 					UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged RGB annotated object %s with default color (RGB: %s)"), *name_, *it.Key(), *color_string_gammacorrected);
@@ -1004,8 +936,6 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 					FString color_string_gammacorrected = color_string;
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					name_to_value_map_.Emplace(it.Key(), greyscale_value);
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
@@ -1017,8 +947,6 @@ void FObjectAnnotator::InitializeGreyscale(ULevel* InLevel)
 					FColor new_color = FColor(0, 0, 0);
 					FString color_string = FString::FromInt(new_color.R) + "," + FString::FromInt(new_color.G) + "," + FString::FromInt(new_color.B);
 					FString color_string_gammacorrected = color_string;
-					color_to_name_map_.Emplace(color_string, it.Key());
-					gammacorrected_color_to_name_map_.Emplace(color_string_gammacorrected, it.Key());
 					name_to_gammacorrected_color_map_.Emplace(it.Key(), color_string_gammacorrected);
 					name_to_value_map_.Emplace(it.Key(), 0);
 					check(PaintRGBComponent(it.Value(), new_color, it.Key()));
@@ -1303,11 +1231,6 @@ TMap<UMeshComponent*, FString> FObjectAnnotator::GetComponentToNameMap() {
 	return component_to_name_map_;
 }
 
-
-TMap<FString, FString> FObjectAnnotator::GetColorToComponentNameMap() {
-	return gammacorrected_color_to_name_map_;
-}
-
 TMap<FString, float> FObjectAnnotator::GetComponentToValueMap() {
 	return name_to_value_map_;
 }
@@ -1337,8 +1260,6 @@ void FObjectAnnotator::EndPlay() {
 	}
 
 	name_to_color_index_map_.Empty();
-	color_to_name_map_.Empty();
-	gammacorrected_color_to_name_map_.Empty();
 	name_to_component_map_.Empty();
 	annotation_component_list_.Empty();
 	name_to_gammacorrected_color_map_.Empty();
