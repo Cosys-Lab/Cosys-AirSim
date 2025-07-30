@@ -219,8 +219,7 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 						paintable_components_meshes->Emplace(component_name, component);
 						if (actor->Tags.Num() > 0)
 							paintable_components_tags->Emplace(component_name, actor->Tags);
-						else
-							paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
+						paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
 					}
 					else {
 						FString component_name = actor->GetName();
@@ -229,8 +228,7 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 						paintable_components_meshes->Emplace(component_name, component);
 						if (actor->Tags.Num() > 0)
 							paintable_components_tags->Emplace(component_name, actor->Tags);
-						else
-							paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
+						paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
 					}
 			
 				}
@@ -241,8 +239,7 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 				component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
 				if (actor->Tags.Num() > 0)
 					paintable_components_tags->Emplace(component_name, actor->Tags);
-				else
-					paintable_components_tags->Emplace(component_name, SkinnedMeshComponent->ComponentTags);
+				paintable_components_tags->Emplace(component_name, SkinnedMeshComponent->ComponentTags);
 				paintable_components_meshes->Emplace(component_name, component);
 			}
 		}
