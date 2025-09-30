@@ -1448,8 +1448,8 @@ rclcpp::Time AirsimROSWrapper::update_state()
         vehicle_ros->env_msg_ = env_msg;
 
         // convert airsim drone state to ROS msgs
-        vehicle_ros->curr_odom_.header.frame_id = vehicle_ros->vehicle_name_;
-        vehicle_ros->curr_odom_.child_frame_id = vehicle_ros->odom_frame_id_;
+        vehicle_ros->curr_odom_.header.frame_id = vehicle_ros->odom_frame_id_;
+        vehicle_ros->curr_odom_.child_frame_id = vehicle_ros->vehicle_name_;
         vehicle_ros->curr_odom_.header.stamp = vehicle_time;
     }
 
@@ -1630,7 +1630,7 @@ void AirsimROSWrapper::append_static_vehicle_tf(VehicleROS* vehicle_ros, const V
     geometry_msgs::msg::TransformStamped vehicle_tf_msg;
     vehicle_tf_msg.header.frame_id = world_frame_id_;
     vehicle_tf_msg.header.stamp = nh_->now();
-    vehicle_tf_msg.child_frame_id = vehicle_ros->vehicle_name_;
+    vehicle_tf_msg.child_frame_id = vehicle_ros->odom_frame_id_;
     vehicle_tf_msg.transform = get_transform_msg_from_airsim(vehicle_setting.position, vehicle_setting.rotation);
 
     convert_tf_msg_to_ros(vehicle_tf_msg);
@@ -1644,7 +1644,7 @@ void AirsimROSWrapper::append_static_lidar_tf(VehicleROS* vehicle_ros, const std
     if(lidar_setting.external)
         lidar_tf_msg.header.frame_id = world_frame_id_;
     else
-        lidar_tf_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+        lidar_tf_msg.header.frame_id = vehicle_ros->vehicle_name_;
     lidar_tf_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + lidar_name;
     auto lidar_data  = airsim_client_lidar_.getLidarData(lidar_name, vehicle_ros->vehicle_name_);
 
@@ -1661,7 +1661,7 @@ void AirsimROSWrapper::append_static_gpulidar_tf(VehicleROS* vehicle_ros, const 
     if(gpulidar_setting.external)
         gpulidar_tf_msg.header.frame_id = world_frame_id_;
     else
-        gpulidar_tf_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+        gpulidar_tf_msg.header.frame_id = vehicle_ros->vehicle_name_;
     gpulidar_tf_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + gpulidar_name;
     auto gpulidar_data  = airsim_client_gpulidar_.getGPULidarData(gpulidar_name, vehicle_ros->vehicle_name_);
 
@@ -1678,7 +1678,7 @@ void AirsimROSWrapper::append_static_echo_tf(VehicleROS* vehicle_ros, const std:
     if(echo_setting.external)
         echo_tf_msg.header.frame_id = world_frame_id_;
     else
-        echo_tf_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+        echo_tf_msg.header.frame_id = vehicle_ros->vehicle_name_;
     echo_tf_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + echo_name;
     auto echo_data  = airsim_client_echo_.getEchoData(echo_name, vehicle_ros->vehicle_name_);
 
@@ -1695,7 +1695,7 @@ void AirsimROSWrapper::append_static_camera_tf(VehicleROS* vehicle_ros, const st
     if(camera_setting.external)
         static_cam_tf_body_msg.header.frame_id = world_frame_id_;
     else
-        static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+        static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_;
     static_cam_tf_body_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + camera_name + "_body";
 
     auto camera_info_data = airsim_client_images_.simGetCameraInfo(camera_name, vehicle_ros->vehicle_name_);
@@ -1707,7 +1707,7 @@ void AirsimROSWrapper::append_static_camera_tf(VehicleROS* vehicle_ros, const st
     if(camera_setting.external)
         static_cam_tf_body_msg.header.frame_id = world_frame_id_;
     else
-        static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_ + "/" + odom_frame_id_;
+        static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_;
     static_cam_tf_optical_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + camera_name + "_optical";
     static_cam_tf_optical_msg.transform = get_camera_optical_tf_from_body_tf(static_cam_tf_body_msg.transform);
 
