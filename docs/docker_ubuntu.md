@@ -1,7 +1,7 @@
 # Cosys-AirSim on Docker in Linux
 We've two options for docker. You can either build an image for running [Cosys-AirSim binaries](#runtime-binaries), or for compiling Cosys-AirSim [from source](#source).
 
-## Runtime Binaries
+## Packaged runtime Binaries
 
 #### Requirements:
  - [Follow this guide for preparing setting up your GitHub access, installing Docker and authenticating with the GitHub Container Registry.](https://dev.epicgames.com/documentation/en-us/unreal-engine/quick-start-guide-for-using-container-images-in-unreal-engine).
@@ -9,15 +9,15 @@ We've two options for docker. You can either build an image for running [Cosys-A
  
 #### Build the docker image
 - Below are the default arguments.
-  `--base_image`: This is image over which we'll run a runtime packaged binary. We've tested only the official Unreal Engine runtime container, more info can be found [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/overview-of-containers-in-unreal-engine). Change the base image at your own risk.
+  `--base_image`: This is image over which we'll run a the packaged binary. We've tested only the official Unreal Engine _dev-slim_ container, more info can be found [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/overview-of-containers-in-unreal-engine). Normally we would use the _runtime_ container but this does not currently contain the right drivers for Vulkan.  Change the base image at your own risk.
    `--target_image` is the desired name of your docker image.
    Defaults to `airsim_binary` with same tag as the base image.
 
 ```bash
 cd Airsim/docker;
 python build_airsim_image.py \
-   --base_image=ghcr.io/epicgames/unreal-engine:runtime \
-   --target_image=airsim_binary:runtime
+   --base_image=ghcr.io/epicgames/unreal-engine:dev-slim-5.5.4 \
+   --target_image=airsim_binary:dev-slim-5.5.4
 ```
 
 - Verify you have an image by:
@@ -44,10 +44,10 @@ xhost +local:docker
 ```
 
    Do not forget to run the xhost command first to bind the X11 to docker.
-   For Blocks, you can do a `./run_airsim_image_binary.sh airsim_binary:runtime LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720`
+   For Blocks, you can do a `./run_airsim_image_binary.sh airsim_binary: LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720`
 `
 
-   * `DOCKER_IMAGE_NAME`: Same as `target_image` parameter in previous step. By default, enter `airsim_binary:runtime`
+   * `DOCKER_IMAGE_NAME`: Same as `target_image` parameter in previous step. By default, enter `airsim_binary:dev-slim-.1`
    * `UNREAL_BINARY_SHELL_SCRIPT`: for Blocks enviroment, it will be `LinuxBlocks/Linux/Blocks.sh`
    * [`UNREAL_BINARY_ARGUMENTS`](https://docs.unrealengine.com/en-us/Programming/Basics/CommandLineArguments):
       For airsim, most relevant would be `-windowed`, `-ResX`, `-ResY`. Click on link to see all options.
@@ -69,8 +69,8 @@ xhost +local:docker
 $ cd Airsim/docker;
 $ python build_airsim_image.py \
    --source \
-   ----base_image ghcr.io/epicgames/unreal-engine:dev-5.5.X \
-   --target_image=airsim_source:dev-5.5.X
+   --base_image ghcr.io/epicgames/unreal-engine:dev-slim-5.5.4 \
+   --target_image=airsim_source:dev-slim-5.5.4
 ```
 
 #### Running Cosys-AirSim container
@@ -78,7 +78,7 @@ $ python build_airsim_image.py \
 
 ```bash
 xhost +local:docker
-./run_airsim_image_source.sh airsim_source:dev-5.5.X
+./run_airsim_image_source.sh airsim_source:dev-slim-5.5.4
 ```
 
    Syntax is `./run_airsim_image_source.sh DOCKER_IMAGE_NAME`
@@ -98,15 +98,14 @@ xhost +local:docker
 #### Packaging Unreal Environments in `airsim_source` containers
 * Let's take the Blocks environment as an example.
     In the following script, specify the full path to your unreal uproject file by `project` and the directory where you want the binaries to be placed by `archivedirectory`
-
+* If you have not run the environment once manually you still need to copy the plugin to the project folder first like with the first command below. 
 ```bash
-/home/ue4/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh BuildCookRun -platform=Linux -clientconfig=Development -serverconfig=Development -noP4 -cook -allmaps -build -stage -prereqs -pak -archive \
--archivedirectory=/home/ue4/Binaries/Blocks/ \
--project=/home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject
+/home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/update_from_git.sh
+/home/ue4/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh BuildCookRun -nop4 -utf8output -cook -project=/home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject -target=Blocks -platform=Linux -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory=/home/ue4/Binaries/Blocks/ -clientconfig=Development -nocompile -nocompileuat
 ```
 
 This would create a Blocks binary in `/home/ue4/Binaries/Blocks/`.
-You can test it by running `/home/ue4/Binaries/Blocks/LinuxNoEditor/Blocks.sh -windowed`
+You can test it by running `/home/ue4/Binaries/Blocks/Linux/Blocks.sh -windowed`
 
 ## Specifying settings.json
 #### `airsim_binary` docker image:

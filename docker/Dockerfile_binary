@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ghcr.io/epicgames/unreal-engine:runtime
+ARG BASE_IMAGE=ghcr.io/epicgames/unreal-engine:dev-slim-5.5.4
 FROM $BASE_IMAGE
 
 USER root

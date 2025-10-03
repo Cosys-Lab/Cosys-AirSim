@@ -432,7 +432,7 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy()
 	// }
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: The type of ParentMeshComponent : %s can not be supported."), *ParentComponent->GetClass()->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: The type of ParentMeshComponent : %s can not be supported."), *ParentComponent->GetClass()->GetName());
 		return nullptr;
 	}
 	// return nullptr;

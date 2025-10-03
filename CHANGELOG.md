@@ -1,3 +1,6 @@
+### Development (version 3.4)
+* Fixed duplicate indexes for annotation system causing meshes to not show up in annotation masks.
+
 ### April 2025 (version 3.3)
 * The latest available stable Unreal Engine version that is now targeted for release is 5.5. This means 5.4 will no longer be actively maintained. 
 * The documentation now is placed on a sub-URL page here: https://cosys-lab.github.io/Cosys-AirSim
