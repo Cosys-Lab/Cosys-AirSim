@@ -101,11 +101,11 @@ xhost +local:docker
 * If you have not run the environment once manually you still need to copy the plugin to the project folder first like with the first command below. 
 ```bash
 /home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/update_from_git.sh
-/home/ue4/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh BuildCookRun -nop4 -utf8output -nocompileeditor -skipbuildeditor -cook -project=/home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject -target=Blocks -platform=Linux -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory=/home/ue4/Binaries/Blocks/ -clientconfig=Development -nocompile -nocompileuat
+/home/ue4/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh BuildCookRun -nop4 -utf8output -cook -project=/home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject -target=Blocks -platform=Linux -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory=/home/ue4/Binaries/Blocks/ -clientconfig=Development -nocompile -nocompileuat
 ```
 
 This would create a Blocks binary in `/home/ue4/Binaries/Blocks/`.
-You can test it by running `/home/ue4/Binaries/Blocks/LinuxNoEditor/Blocks.sh -windowed`
+You can test it by running `/home/ue4/Binaries/Blocks/Linux/Blocks.sh -windowed`
 
 ## Specifying settings.json
 #### `airsim_binary` docker image:
