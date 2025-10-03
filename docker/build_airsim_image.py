@@ -13,7 +13,7 @@ def build_docker_image(args):
     dockerfile = 'Dockerfile_source'
     if args.source:
         if not args.base_image:
-            args.base_image = "ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1"
+            args.base_image = "ghcr.io/epicgames/unreal-engine:dev-slim-5.5.4"
         target_image_tag = args.base_image.split(":")[1] # take tag from base image
         if not args.target_image:
             args.target_image = 'airsim_source' + ':' + target_image_tag
@@ -21,7 +21,7 @@ def build_docker_image(args):
     else:
         dockerfile = 'Dockerfile_binary'
         if not args.base_image:
-            args.base_image = "ghcr.io/epicgames/unreal-engine:dev-slim-5.6.1"
+            args.base_image = "ghcr.io/epicgames/unreal-engine:dev-slim-5.5.4"
         target_image_tag = args.base_image.split(":")[1] # take tag from base image
         if not args.target_image:
             args.target_image = 'airsim_binary' + ':' + target_image_tag
