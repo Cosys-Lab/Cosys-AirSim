@@ -326,10 +326,10 @@ You can download it by running</li>
 ./run_airsim_image_binary.sh DOCKER_IMAGE_NAME UNREAL_BINARY_SHELL_SCRIPT UNREAL_BINARY_ARGUMENTS
 </code></pre>
 <p>Do not forget to run the xhost command first to bind the X11 to docker.
-   For Blocks, you can do a <code>./run_airsim_image_binary.sh airsim_binary: LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720</code>
+   For Blocks, you can do a <code>./run_airsim_image_binary.sh airsim_binary:dev-slim-5.5.4 LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720</code>
 `</p>
 <ul>
-<li><code>DOCKER_IMAGE_NAME</code>: Same as <code>target_image</code> parameter in previous step. By default, enter <code>airsim_binary:dev-slim-.1</code></li>
+<li><code>DOCKER_IMAGE_NAME</code>: Same as <code>target_image</code> parameter in previous step. By default, enter <code>airsim_binary:dev-slim-5.5.4</code></li>
 <li><code>UNREAL_BINARY_SHELL_SCRIPT</code>: for Blocks enviroment, it will be <code>LinuxBlocks/Linux/Blocks.sh</code></li>
 <li><a href="https://docs.unrealengine.com/en-us/Programming/Basics/CommandLineArguments"><code>UNREAL_BINARY_ARGUMENTS</code></a>:
       For airsim, most relevant would be <code>-windowed</code>, <code>-ResX</code>, <code>-ResY</code>. Click on link to see all options.</li>
