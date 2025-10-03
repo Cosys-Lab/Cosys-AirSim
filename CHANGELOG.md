@@ -4,6 +4,7 @@
 * Updated annotation system to add both actor and component tags to the annotation system for checking if both exist instead of old behaviour where actor tags took priority and component tags would be ignored if both existed.
 * Updated annotation system to stop printing everything to log.
 * Updated default camera to use auto-focus. Manual focus still available through API. 
+* Updated Docker tutorial to work better for recent Unreal versions. 
 * Fixed duplicate indexes for annotation system causing meshes to not show up in annotation masks.
 * Fixed several edge-cases and crashes in annotation system. 
 * Fixed common crash on ending play.

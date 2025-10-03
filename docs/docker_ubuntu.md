@@ -1,5 +1,5 @@
 # Cosys-AirSim on Docker in Linux
-We've two options for docker. You can either build an image for running [Cosys-AirSim binaries](#runtime-binaries), or for compiling Cosys-AirSim [from source](#source).
+We've two options for docker. You can either build an image for running [Cosys-AirSim binaries](#packaged-runtime-binaries), or for compiling Cosys-AirSim [from source](#source).
 
 ## Packaged runtime Binaries
 
