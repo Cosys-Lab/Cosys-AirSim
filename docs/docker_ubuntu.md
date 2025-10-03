@@ -44,8 +44,7 @@ xhost +local:docker
 ```
 
    Do not forget to run the xhost command first to bind the X11 to docker.
-   For Blocks, you can do a `./run_airsim_image_binary.sh airsim_binary: LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720`
-`
+   For Blocks, you can do a `./run_airsim_image_binary.sh airsim_binary:dev-slim-5.6.1 LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720`
 
    * `DOCKER_IMAGE_NAME`: Same as `target_image` parameter in previous step. By default, enter `airsim_binary:dev-slim-5.6.1`
    * `UNREAL_BINARY_SHELL_SCRIPT`: for Blocks enviroment, it will be `LinuxBlocks/Linux/Blocks.sh`
