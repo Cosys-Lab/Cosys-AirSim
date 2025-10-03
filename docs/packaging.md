@@ -57,7 +57,11 @@ On Windows:
 On Linux:
 
 * Open the Blocks project in Unreal Engine `cd Cosys-AirSim/Unreal/Environments/Blocks` and pull the latest plugin files by running `update_from_git.sh`.
+<<<<<<< HEAD
 * Go to your Unreal Engine installation folder, move to the subfolder `/Engine/Build/BatchFile`, and run the build script while pointing at the Blocks project: `./RunUAT.sh BuildCookRun -nop4 -utf8output -cook -project="..../Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject" -target=Blocks -platform=Linux -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory="..../blockslinux/" -clientconfig=Development -nocompile -nocompileuat`
+=======
+* Go to your Unreal Engine installation folder and run the build script while pointing at the Blocks project: `./RunUAT.sh BuildCookRun -nop4 -utf8output -cook -project="..../Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject" -target=Blocks -platform=Linux -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory="..../blockslinux/" -clientconfig=Development -nocompile -nocompileuat`
+>>>>>>> 74d6b95347a4b6b1d3dc2d7823dd1cbbc2160fdd
 
 
 
