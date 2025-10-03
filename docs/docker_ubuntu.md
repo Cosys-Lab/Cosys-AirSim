@@ -98,8 +98,9 @@ xhost +local:docker
 #### Packaging Unreal Environments in `airsim_source` containers
 * Let's take the Blocks environment as an example.
     In the following script, specify the full path to your unreal uproject file by `project` and the directory where you want the binaries to be placed by `archivedirectory`
-
+* If you have not run the environment once manually you still need to copy the plugin to the project folder first like with the first command below. 
 ```bash
+/home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/update_from_git.sh
 /home/ue4/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh BuildCookRun -nop4 -utf8output -nocompileeditor -skipbuildeditor -cook -project=/home/ue4/Cosys-AirSim/Unreal/Environments/Blocks/Blocks.uproject -target=Blocks -platform=Linux -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory=/home/ue4/Binaries/Blocks/ -clientconfig=Development -nocompile -nocompileuat
 ```
 
