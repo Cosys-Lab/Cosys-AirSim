@@ -184,6 +184,7 @@ private:
 
         /// All things ROS
         rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_local_pub_;
+        rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr gt_odom_local_pub_;
         rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr global_gps_pub_;
         rclcpp::Publisher<airsim_interfaces::msg::Environment>::SharedPtr env_pub_;
         rclcpp::Publisher<airsim_interfaces::msg::InstanceSegmentationList>::SharedPtr instance_segmentation_pub_;
@@ -343,6 +344,7 @@ private:
     sensor_msgs::msg::Range get_range_from_airsim(const msr::airlib::DistanceSensorData& dist_data) const;
     airsim_interfaces::msg::InstanceSegmentationList get_instance_segmentation_list_msg_from_airsim() const;
     airsim_interfaces::msg::ObjectTransformsList get_object_transforms_list_msg_from_airsim(rclcpp::Time timestamp) const;
+    geometry_msgs::msg::PoseStamped get_drone_pose(rclcpp::Time timestamp) const;
     sensor_msgs::msg::PointCloud2 get_lidar_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     airsim_interfaces::msg::StringArray get_lidar_labels_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     sensor_msgs::msg::PointCloud2 get_gpulidar_msg_from_airsim(const msr::airlib::GPULidarData& gpulidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
@@ -426,6 +428,9 @@ private:
     std::string world_frame_id_ = AIRSIM_FRAME_ID;
     const std::string AIRSIM_ODOM_FRAME_ID = "odom_local";
     std::string odom_frame_id_ = AIRSIM_ODOM_FRAME_ID;
+    bool enable_ground_truth_odometry_publisher_ = false;
+    std::string drone_object_name_ = "Body1_0_Drone";
+    std::string drone_object_frame_id_ = "drone";
     std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_pub_;
 

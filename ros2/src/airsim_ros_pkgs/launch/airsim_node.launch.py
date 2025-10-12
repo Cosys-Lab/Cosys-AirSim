@@ -55,7 +55,10 @@ def generate_launch_description():
                 'host_ip': LaunchConfiguration('host_ip'),
                 'host_port': LaunchConfiguration('host_port'),
                 'enable_api_control': LaunchConfiguration('enable_api_control'),
-                'enable_object_transforms_list': LaunchConfiguration('enable_object_transforms_list')
+                'enable_object_transforms_list': LaunchConfiguration('enable_object_transforms_list'),
+                'enable_ground_truth_odometry_publisher': True,
+                'drone_object_name': 'Body1_0_Drone',
+                'drone_object_frame_id': 'drone'
             }])
 
     # Create the launch description and populate
