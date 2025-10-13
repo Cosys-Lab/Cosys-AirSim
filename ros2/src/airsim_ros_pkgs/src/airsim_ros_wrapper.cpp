@@ -1403,7 +1403,7 @@ void AirsimROSWrapper::drone_state_timer_cb()
             auto& vehicle_ros = vehicle_name_ptr_pair->second;
 
 		    const auto drone_pose { get_drone_pose( vehicle_ros->stamp_)};
-            if(!drone_pose.has_value()) {
+            if(drone_pose.has_value()) {
                 nav_msgs::msg::Odometry drone_odom_msg;
                 drone_odom_msg.pose.pose = drone_pose.value().pose;
                 drone_odom_msg.header.stamp = drone_pose.value().header.stamp;
