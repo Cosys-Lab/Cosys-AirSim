@@ -1199,7 +1199,7 @@ airsim_interfaces::msg::ObjectTransformsList AirsimROSWrapper::get_object_transf
     return object_transforms_list_msg;
 }
 
-geometry_msgs::msg::PoseStamped AirsimROSWrapper::get_drone_pose(rclcpp::Time timestamp) const{
+std::optional<geometry_msgs::msg::PoseStamped> AirsimROSWrapper::get_drone_pose(const rclcpp::Time timestamp) const{
     geometry_msgs::msg::PoseStamped drone_pose;
     std::vector<std::string> object_name_list = airsim_client_->simListInstanceSegmentationObjects();
     std::vector<msr::airlib::Pose> poses = airsim_client_->simListInstanceSegmentationPoses();
@@ -1237,13 +1237,13 @@ geometry_msgs::msg::PoseStamped AirsimROSWrapper::get_drone_pose(rclcpp::Time ti
 			drone_pose.pose.orientation.y = q_enu_flu.y();
 			drone_pose.pose.orientation.z = q_enu_flu.z();
 			drone_pose.pose.orientation.w = q_enu_flu.w();
-                
+            drone_pose.header.stamp = timestamp;
+            drone_pose.header.frame_id = world_frame_id_;
+            return drone_pose;
             }        
         }
     }
-    drone_pose.header.stamp = timestamp;
-    drone_pose.header.frame_id = world_frame_id_;
-    return drone_pose;
+    return std::nullopt;
 }
 
 airsim_interfaces::msg::Altimeter AirsimROSWrapper::get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const
@@ -1400,22 +1400,23 @@ void AirsimROSWrapper::drone_state_timer_cb()
         if(enable_ground_truth_odometry_publisher_) {
             auto vehicle_name_ptr_pair = vehicle_name_ptr_map_.begin();
             auto& vehicle_ros = vehicle_name_ptr_pair->second;
-		    geometry_msgs::msg::PoseStamped drone_pose = get_drone_pose( vehicle_ros->stamp_);
 
-            nav_msgs::msg::Odometry drone_odom_msg;
-            drone_odom_msg.pose.pose = drone_pose.pose;
-            drone_odom_msg.header.stamp = drone_pose.header.stamp;
-            drone_odom_msg.header.frame_id=drone_pose.header.frame_id;
-            drone_odom_msg.child_frame_id=drone_object_frame_id_;
+		    const auto drone_pose { get_drone_pose( vehicle_ros->stamp_)};
+            if(!drone_pose.has_value()) {
+                nav_msgs::msg::Odometry drone_odom_msg;
+                drone_odom_msg.pose.pose = drone_pose.value().pose;
+                drone_odom_msg.header.stamp = drone_pose.value().header.stamp;
+                drone_odom_msg.header.frame_id=drone_pose.value().header.frame_id;
+                drone_odom_msg.child_frame_id=drone_object_frame_id_;
 
-            vehicle_ros->gt_odom_local_pub_->publish(drone_odom_msg);
+                vehicle_ros->gt_odom_local_pub_->publish(drone_odom_msg);
+            }else{
+                RCLCPP_ERROR(nh_->get_logger(), "No drone object found with drone_object_name %s", drone_object_name_.c_str());
+
+            }
+
         }
 
-        // publish vehicle state, odom, and all basic sensor types
-        publish_vehicle_state();
-
-        // send any commands out to the vehicles
-        update_commands();
     }
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();

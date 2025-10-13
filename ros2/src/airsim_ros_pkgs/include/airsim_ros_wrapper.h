@@ -344,7 +344,7 @@ private:
     sensor_msgs::msg::Range get_range_from_airsim(const msr::airlib::DistanceSensorData& dist_data) const;
     airsim_interfaces::msg::InstanceSegmentationList get_instance_segmentation_list_msg_from_airsim() const;
     airsim_interfaces::msg::ObjectTransformsList get_object_transforms_list_msg_from_airsim(rclcpp::Time timestamp) const;
-    geometry_msgs::msg::PoseStamped get_drone_pose(rclcpp::Time timestamp) const;
+    std::optional<geometry_msgs::msg::PoseStamped> get_drone_pose(const rclcpp::Time timestamp) const;
     sensor_msgs::msg::PointCloud2 get_lidar_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     airsim_interfaces::msg::StringArray get_lidar_labels_msg_from_airsim(const msr::airlib::LidarData& lidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
     sensor_msgs::msg::PointCloud2 get_gpulidar_msg_from_airsim(const msr::airlib::GPULidarData& gpulidar_data, const std::string& vehicle_name, const std::string& sensor_name) const;
