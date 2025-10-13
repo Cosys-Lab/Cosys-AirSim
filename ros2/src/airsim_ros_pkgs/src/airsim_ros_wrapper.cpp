@@ -1210,6 +1210,7 @@ std::optional<geometry_msgs::msg::PoseStamped> AirsimROSWrapper::get_drone_pose(
         msr::airlib::Pose cur_object_pose = poses[object_index]; 
         if(!std::isnan(cur_object_pose.position.x())){
             if(*it == drone_object_name_){
+                //the pose from airsim is given in NED but ROS expects it in ENU
                 drone_pose.pose.position.x = cur_object_pose.position.y();
                 drone_pose.pose.position.y = cur_object_pose.position.x();
                 drone_pose.pose.position.z = -cur_object_pose.position.z();
@@ -1223,14 +1224,14 @@ std::optional<geometry_msgs::msg::PoseStamped> AirsimROSWrapper::get_drone_pose(
 			);
 
 			// fixed world change: NED -> ENU  (w=0, x=√0.5, y=√0.5, z=0)
-			const double s = std::sqrt(0.5);
+			const double s {std::sqrt(0.5)};
 			tf2::Quaternion q_ENU_NED(s, s, 0.0, 0.0);
 
 			// fixed body change: FRD -> FLU  (180° about +X)  => (x=1, y=0, z=0, w=0)
 			tf2::Quaternion q_FRD2FLU(1.0, 0.0, 0.0, 0.0);
 
 			// compose
-			tf2::Quaternion q_enu_flu = (q_ENU_NED * q_ned) * q_FRD2FLU;
+			tf2::Quaternion q_enu_flu = {(q_ENU_NED * q_ned) * q_FRD2FLU};
 			q_enu_flu.normalize();
 
 			drone_pose.pose.orientation.x = q_enu_flu.x();
