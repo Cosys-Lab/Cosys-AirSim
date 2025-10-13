@@ -131,6 +131,9 @@ void AirsimROSWrapper::initialize_ros()
     nh_->get_parameter("publish_clock", publish_clock_);
     nh_->get_parameter_or("world_frame_id", world_frame_id_, world_frame_id_);
     nh_->get_parameter_or("odom_frame_id", odom_frame_id_, odom_frame_id_);
+    nh_->get_parameter("enable_ground_truth_odometry_publisher", enable_ground_truth_odometry_publisher_);
+	nh_->get_parameter_or("drone_object_name", drone_object_name_, drone_object_name_);
+	nh_->get_parameter_or("drone_object_frame_id", drone_object_frame_id_, drone_object_frame_id_);
     vel_cmd_duration_ = 0.05; // todo rosparam
     // todo enforce dynamics constraints in this node as well?
     // nh_->get_parameter("max_vert_vel_", max_vert_vel_);
@@ -186,6 +189,10 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
 
         const std::string topic_prefix = "~/" + curr_vehicle_name;
         vehicle_ros->odom_local_pub_ = nh_->create_publisher<nav_msgs::msg::Odometry>(topic_prefix + "/" + odom_frame_id_, 10);
+
+        if(enable_ground_truth_odometry_publisher_){
+            vehicle_ros->gt_odom_local_pub_ = nh_->create_publisher<nav_msgs::msg::Odometry>(topic_prefix +"/" + world_frame_id_, 10);
+        }
 
         vehicle_ros->env_pub_ = nh_->create_publisher<airsim_interfaces::msg::Environment>(topic_prefix + "/environment", 10);
 
@@ -1192,6 +1199,54 @@ airsim_interfaces::msg::ObjectTransformsList AirsimROSWrapper::get_object_transf
     return object_transforms_list_msg;
 }
 
+std::optional<geometry_msgs::msg::PoseStamped> AirsimROSWrapper::get_drone_pose(const rclcpp::Time timestamp) const{
+    geometry_msgs::msg::PoseStamped drone_pose;
+    std::vector<std::string> object_name_list = airsim_client_->simListInstanceSegmentationObjects();
+    std::vector<msr::airlib::Pose> poses = airsim_client_->simListInstanceSegmentationPoses();
+    int object_index = 0;
+    std::vector<std::string>::iterator it = object_name_list.begin();
+    for(; it < object_name_list.end(); it++, object_index++ )
+    {
+        msr::airlib::Pose cur_object_pose = poses[object_index]; 
+        if(!std::isnan(cur_object_pose.position.x())){
+            if(*it == drone_object_name_){
+                //the pose from airsim is given in NED but ROS expects it in ENU
+                drone_pose.pose.position.x = cur_object_pose.position.y();
+                drone_pose.pose.position.y = cur_object_pose.position.x();
+                drone_pose.pose.position.z = -cur_object_pose.position.z();
+
+		// --- orientation: q_enu_flu = (q_ENU_NED * q_ned) * q_FRD2FLU
+		tf2::Quaternion q_ned(
+    			cur_object_pose.orientation.x(),
+    			cur_object_pose.orientation.y(),
+    			cur_object_pose.orientation.z(),
+    			cur_object_pose.orientation.w()
+			);
+
+			// fixed world change: NED -> ENU  (w=0, x=√0.5, y=√0.5, z=0)
+			const double s {std::sqrt(0.5)};
+			tf2::Quaternion q_ENU_NED(s, s, 0.0, 0.0);
+
+			// fixed body change: FRD -> FLU  (180° about +X)  => (x=1, y=0, z=0, w=0)
+			tf2::Quaternion q_FRD2FLU(1.0, 0.0, 0.0, 0.0);
+
+			// compose
+			tf2::Quaternion q_enu_flu = {(q_ENU_NED * q_ned) * q_FRD2FLU};
+			q_enu_flu.normalize();
+
+			drone_pose.pose.orientation.x = q_enu_flu.x();
+			drone_pose.pose.orientation.y = q_enu_flu.y();
+			drone_pose.pose.orientation.z = q_enu_flu.z();
+			drone_pose.pose.orientation.w = q_enu_flu.w();
+            drone_pose.header.stamp = timestamp;
+            drone_pose.header.frame_id = world_frame_id_;
+            return drone_pose;
+            }        
+        }
+    }
+    return std::nullopt;
+}
+
 airsim_interfaces::msg::Altimeter AirsimROSWrapper::get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const
 {
     airsim_interfaces::msg::Altimeter alt_msg;
@@ -1343,12 +1398,26 @@ void AirsimROSWrapper::drone_state_timer_cb()
         if (publish_clock_) {
             clock_pub_->publish(ros_clock_);
         }
+        if(enable_ground_truth_odometry_publisher_) {
+            auto vehicle_name_ptr_pair = vehicle_name_ptr_map_.begin();
+            auto& vehicle_ros = vehicle_name_ptr_pair->second;
 
-        // publish vehicle state, odom, and all basic sensor types
-        publish_vehicle_state();
+		    const auto drone_pose { get_drone_pose( vehicle_ros->stamp_)};
+            if(!drone_pose.has_value()) {
+                nav_msgs::msg::Odometry drone_odom_msg;
+                drone_odom_msg.pose.pose = drone_pose.value().pose;
+                drone_odom_msg.header.stamp = drone_pose.value().header.stamp;
+                drone_odom_msg.header.frame_id=drone_pose.value().header.frame_id;
+                drone_odom_msg.child_frame_id=drone_object_frame_id_;
 
-        // send any commands out to the vehicles
-        update_commands();
+                vehicle_ros->gt_odom_local_pub_->publish(drone_odom_msg);
+            }else{
+                RCLCPP_ERROR(nh_->get_logger(), "No drone object found with drone_object_name %s", drone_object_name_.c_str());
+
+            }
+
+        }
+
     }
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
