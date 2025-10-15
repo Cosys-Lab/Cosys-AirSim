@@ -1692,22 +1692,20 @@ void AirsimROSWrapper::append_static_echo_tf(VehicleROS* vehicle_ros, const std:
 void AirsimROSWrapper::append_static_camera_tf(VehicleROS* vehicle_ros, const std::string& camera_name, const CameraSetting& camera_setting)
 {
     geometry_msgs::msg::TransformStamped static_cam_tf_body_msg;
-    if(camera_setting.external)
+    if(camera_setting.external){
         static_cam_tf_body_msg.header.frame_id = world_frame_id_;
-    else
+        auto camera_info_data = airsim_client_images_.simGetCameraInfo(camera_name, vehicle_ros->vehicle_name_);        
+        static_cam_tf_body_msg.transform = get_transform_msg_from_airsim(camera_info_data.pose.position, camera_info_data.pose.orientation);
+    }       
+    else{
         static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_;
+        static_cam_tf_body_msg.transform = get_transform_msg_from_airsim(camera_setting.position, camera_setting.rotation);
+    }
     static_cam_tf_body_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + camera_name + "_body";
-
-    auto camera_info_data = airsim_client_images_.simGetCameraInfo(camera_name, vehicle_ros->vehicle_name_);
-    static_cam_tf_body_msg.transform = get_transform_msg_from_airsim(camera_info_data.pose.position, camera_info_data.pose.orientation);
 
     convert_tf_msg_to_ros(static_cam_tf_body_msg);
 
     geometry_msgs::msg::TransformStamped static_cam_tf_optical_msg = static_cam_tf_body_msg;
-    if(camera_setting.external)
-        static_cam_tf_body_msg.header.frame_id = world_frame_id_;
-    else
-        static_cam_tf_body_msg.header.frame_id = vehicle_ros->vehicle_name_;
     static_cam_tf_optical_msg.child_frame_id = vehicle_ros->vehicle_name_ + "/" + camera_name + "_optical";
     static_cam_tf_optical_msg.transform = get_camera_optical_tf_from_body_tf(static_cam_tf_body_msg.transform);
 
