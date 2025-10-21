@@ -1417,7 +1417,11 @@ void AirsimROSWrapper::drone_state_timer_cb()
             }
 
         }
+        // publish vehicle state, odom, and all basic sensor types
+        publish_vehicle_state();
 
+        // send any commands out to the vehicles
+        update_commands();
     }
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
