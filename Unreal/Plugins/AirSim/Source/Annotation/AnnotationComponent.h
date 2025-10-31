@@ -46,6 +46,8 @@ public:
 
 	virtual void OnRegister() override;
 
+	void CreateAnnotationMaterial();
+
 	/** Force the component to update to capture changes from the parent */
 	void ForceUpdate();
 

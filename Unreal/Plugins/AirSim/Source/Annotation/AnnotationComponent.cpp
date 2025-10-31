@@ -19,6 +19,8 @@
 //different header files in UE
 #include "Runtime/Engine/Public/StaticMeshSceneProxy.h"
 #include "Runtime/Engine/Public/SkeletalMeshSceneProxy.h"
+#include "Runtime/Engine/Public/NaniteSceneProxy.h"
+#include "Runtime/Engine/Public/SkinnedMeshSceneProxyDesc.h"
 
 #endif
 #include "Runtime/Engine/Public/Rendering/SkeletalMeshRenderData.h"
@@ -181,6 +183,160 @@ FPrimitiveViewRelevance FSkeletalAnnotationSceneProxy::GetViewRelevance(const FS
 	}
 }
 
+//class FNaniteSkeletalAnnotationSceneProxy : public Nanite::FSkinnedSceneProxy
+//{
+//public:
+//	FNaniteSkeletalAnnotationSceneProxy(
+//		const USkinnedMeshComponent* InComponent,
+//		FSkeletalMeshRenderData* InRenderData,
+//		UMaterialInterface* AnnotationMID)
+//		: Nanite::FSkinnedSceneProxy(CreateMaterialAudit(InComponent, AnnotationMID), InComponent, InRenderData, true)
+//	{
+//		UE_LOG(LogTemp, Log, TEXT("AirSim Annotation: Created Nanite skeletal annotation proxy with %d material sections"), MaterialSections.Num());
+//	}
+//
+//private:
+//	// Create a custom material audit that replaces all materials with the annotation material
+//	static Nanite::FMaterialAudit CreateMaterialAudit(const USkinnedMeshComponent * InComponent, UMaterialInterface * AnnotationMID)
+//	{
+//		// Start with a standard material audit
+//		Nanite::FMaterialAudit Audit;
+//		Nanite::AuditMaterials(InComponent, Audit, false);
+//
+//		// Override all materials with the annotation material
+//		if (IsValid(AnnotationMID))
+//		{
+//			// Check if annotation material is compatible with Nanite
+//			bool bValidUsage = AnnotationMID->CheckMaterialUsage_Concurrent(MATUSAGE_SkeletalMesh) &&
+//				AnnotationMID->CheckMaterialUsage_Concurrent(MATUSAGE_Nanite);
+//
+//			if (bValidUsage)
+//			{
+//				// Replace all materials in the audit with our annotation material
+//				for (int32 MaterialIndex = 0; MaterialIndex < Audit.GetNumMaterials(); ++MaterialIndex)
+//				{
+//					Audit.SetMaterial(MaterialIndex, AnnotationMID);
+//				}
+//			}
+//			else
+//			{
+//				UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Annotation material not compatible with Nanite skeletal mesh"));
+//			}
+//		}
+//
+//		return Audit;
+//	}
+//
+//public:
+//	virtual FPrimitiveViewRelevance GetViewRelevance(const FSceneView* View) const override
+//	{
+//		if (View->Family->EngineShowFlags.Materials)
+//		{
+//			// Don't render in regular views - only in annotation views
+//			FPrimitiveViewRelevance ViewRelevance;
+//			ViewRelevance.bDrawRelevance = 0;
+//			return ViewRelevance;
+//		}
+//		else
+//		{
+//			// Use base class view relevance for annotation rendering
+//			return Nanite::FSkinnedSceneProxy::GetViewRelevance(View);
+//		}
+//	}
+//};
+
+
+class FNaniteSkeletalAnnotationSceneProxy : public Nanite::FSkinnedSceneProxy
+{
+public:
+	FNaniteSkeletalAnnotationSceneProxy(
+		const USkinnedMeshComponent* InComponent,
+		FSkeletalMeshRenderData* InRenderData,
+		UMaterialInterface* AnnotationMID)
+		: Nanite::FSkinnedSceneProxy(CreateMaterialAudit(InComponent), InComponent, InRenderData, true)
+		, AnnotationMaterial(AnnotationMID)
+	{
+		// Override the material sections after construction
+		OverrideMaterialSections();
+
+		// Recalculate material-dependent properties
+		OnMaterialsUpdated();
+	}
+	virtual FPrimitiveViewRelevance GetViewRelevance(const FSceneView* View) const override;
+
+	virtual void GetDynamicMeshElements(
+		const TArray<const FSceneView*>& Views,
+		const FSceneViewFamily& ViewFamily,
+		uint32 VisibilityMap,
+		FMeshElementCollector& Collector) const;
+
+private:
+	UMaterialInterface* AnnotationMaterial;
+
+	static Nanite::FMaterialAudit CreateMaterialAudit(const USkinnedMeshComponent* InComponent)
+	{
+		Nanite::FMaterialAudit Audit;
+		Nanite::AuditMaterials(InComponent, Audit, false);
+		return Audit;
+	}
+
+	void OverrideMaterialSections()
+	{
+		if (!IsValid(AnnotationMaterial))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Invalid annotation material"));
+			return;
+		}
+
+		// Check if annotation material is compatible with Nanite
+		bool bValidUsage = AnnotationMaterial->CheckMaterialUsage_Concurrent(MATUSAGE_Nanite);
+
+		UMaterialInterface* MaterialToUse = bValidUsage ? AnnotationMaterial : UMaterial::GetDefaultMaterial(MD_Surface);
+
+		// Override all material sections with the annotation material
+		for (FMaterialSection& MaterialSection : MaterialSections)
+		{
+			if (!MaterialSection.bHidden)
+			{
+				MaterialSection.ShadingMaterialProxy = MaterialToUse->GetRenderProxy();
+			}
+		}
+	}
+};
+
+void FNaniteSkeletalAnnotationSceneProxy::GetDynamicMeshElements(
+	const TArray<const FSceneView*>& Views,
+	const FSceneViewFamily& ViewFamily,
+	uint32 VisibilityMap,
+	FMeshElementCollector& Collector) const
+{
+	//if (LODSections.Num() > 0){
+	//	if (LODSections[0].SectionElements.Num() > 0) {
+	//		if (LODSections[0].SectionElements[0].Material->GetName().Contains("AnnotationMaterialMID")) {
+	//			FSkeletalMeshSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
+	//		}
+	//	}
+	//}
+	Nanite::FSkinnedSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
+}
+
+FPrimitiveViewRelevance FNaniteSkeletalAnnotationSceneProxy::GetViewRelevance(const FSceneView* View) const
+{
+	if (View->Family->EngineShowFlags.Materials)
+	{
+		// Don't render in regular views - only in annotation views
+		FPrimitiveViewRelevance ViewRelevance;
+		ViewRelevance.bDrawRelevance = 0;
+		return ViewRelevance;
+	}
+	else
+	{
+		// Use base class view relevance for annotation rendering
+		return Nanite::FSkinnedSceneProxy::GetViewRelevance(View);
+	}
+}
+
+
 // FString MeterialPath = TEXT("MaterialInstanceConstant'/UnrealCV/AnnotationColor_Inst.AnnotationColor_Inst'");
 // static ConstructorHelpers::FObjectFinder<UMaterialInstanceDynamic> AnnotationMaterialObject(*MaterialPath);
 UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectInitializer)
@@ -221,33 +377,80 @@ void UAnnotationComponent::OnRegister()
 {
 	Super::OnRegister();
 
-	if (this->GetFName().ToString().Contains("annotation_sphere")) {
-		AnnotationMID = UMaterialInstanceDynamic::Create(SphereMaterial, this, TEXT("AnnotationMaterialMID"));
-		if (!IsValid(AnnotationMID))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: SphereMaterial is not correctly initialized"));
-			return;
-		}
-		FLinearColor LinearAnnotationColor = FLinearColor(0, 0, 0, 1.0);
-		AnnotationMID->SetVectorParameterValue("AnnotationColor", LinearAnnotationColor);
+	// Safety check - don't proceed if we're in a bad state
+	if (!IsValid(this) || IsUnreachable() || HasAnyFlags(RF_BeginDestroyed | RF_FinishDestroyed))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Component is in invalid state during OnRegister"));
+		return;
 	}
-	else {
-		// Note: This can not be placed in the constructor, MID means material instance dynamic
-		AnnotationMID = UMaterialInstanceDynamic::Create(AnnotationMaterial, this, TEXT("AnnotationMaterialMID"));
-		if (!IsValid(AnnotationMID))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: ColorAnnotationMaterial is not correctly initialized"));
-			return;
-		}
-		const float OneOver255 = 1.0f / 255.0f;
-		FLinearColor LinearAnnotationColor = FLinearColor(
-			this->AnnotationColor.R * OneOver255,
-			this->AnnotationColor.G * OneOver255,
-			this->AnnotationColor.B * OneOver255,
-			1.0
-		);
-		AnnotationMID->SetVectorParameterValue("AnnotationColor", LinearAnnotationColor);
+
+	// Check if we have a valid world
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: No valid world during OnRegister"));
+		return;
 	}
+
+	// Defer material creation to avoid threading issues
+	if (IsInGameThread())
+	{
+		CreateAnnotationMaterial();
+	}
+	else
+	{
+		// If not on game thread, defer to next tick
+		FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
+			{
+				if (IsValid(this))
+				{
+					CreateAnnotationMaterial();
+				}
+			}, TStatId(), nullptr, ENamedThreads::GameThread);
+	}
+}
+
+// Add this new method to safely create materials
+void UAnnotationComponent::CreateAnnotationMaterial()
+{
+	if (!IsValid(this))
+		return;
+
+	UMaterial* BaseMaterial = nullptr;
+
+	if (this->GetFName().ToString().Contains("annotation_sphere"))
+	{
+		BaseMaterial = SphereMaterial;
+	}
+	else
+	{
+		BaseMaterial = AnnotationMaterial;
+	}
+
+	if (!IsValid(BaseMaterial))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Base material is invalid"));
+		return;
+	}
+
+	AnnotationMID = UMaterialInstanceDynamic::Create(BaseMaterial, this, TEXT("AnnotationMaterialMID"));
+
+	if (!IsValid(AnnotationMID))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: Failed to create material instance dynamic"));
+		return;
+	}
+
+	// Set initial color
+	const float OneOver255 = 1.0f / 255.0f;
+	FLinearColor LinearAnnotationColor = FLinearColor(
+		this->AnnotationColor.R * OneOver255,
+		this->AnnotationColor.G * OneOver255,
+		this->AnnotationColor.B * OneOver255,
+		1.0
+	);
+
+	AnnotationMID->SetVectorParameterValue("AnnotationColor", LinearAnnotationColor);
 }
 
 /** 
@@ -365,29 +568,33 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(UStaticMeshComponen
 	// This is not recommended, but I know what I am doing.
 }
 
-// See https://github.com/EpicGames/UnrealEngine/blob/release/Engine/Source/Runtime/Engine/Private/Components/SkinnedMeshComponent.cpp:417
 FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(USkeletalMeshComponent* SkeletalMeshComponent)
 {
-	UMaterialInterface* ProxyMaterial = AnnotationMID; // Material Instance Dynamic
-
+	UMaterialInterface* ProxyMaterial = AnnotationMID;
 	ERHIFeatureLevel::Type SceneFeatureLevel = GetWorld()->GetFeatureLevel();
-
-	// Ref: https://github.com/EpicGames/UnrealEngine/blob/4.19/Engine/Source/Runtime/Engine/Private/Components/SkinnedMeshComponent.cpp#L415
 	FSkeletalMeshRenderData* SkelMeshRenderData = SkeletalMeshComponent->GetSkeletalMeshRenderData();
 
-	// Only create a scene proxy for rendering if properly initialized
+	const USkeletalMesh* SkeletalMesh = SkeletalMeshComponent->GetSkeletalMeshAsset();
+	bool bIsNaniteEnabled = false;
+
+	if (SkeletalMesh && SkeletalMesh->IsNaniteEnabled())
+	{
+		bIsNaniteEnabled = true;
+	}
+
 	if (SkelMeshRenderData &&
 		SkelMeshRenderData->LODRenderData.IsValidIndex(SkeletalMeshComponent->GetPredictedLODLevel()) &&
-		SkeletalMeshComponent->MeshObject) // The risk of using MeshObject
+		SkeletalMeshComponent->MeshObject)
 	{
-		// Only create a scene proxy if the bone count being used is supported, or if we don't have a skeleton (this is the case with destructibles)
-		// int32 MaxBonesPerChunk = SkelMeshResource->GetMaxBonesPerSection();
-		// if (MaxBonesPerChunk <= GetFeatureLevelMaxNumberOfBones(SceneFeatureLevel))
-		// {
-		//	Result = ::new FSkeletalAnnotationSceneProxy(SkeletalMeshComponent, SkelMeshResource, AnnotationMID);
-		// }
-		// TODO: The SkeletalMeshComponent might need to be recreated
-		return new FSkeletalAnnotationSceneProxy(SkeletalMeshComponent, SkelMeshRenderData, ProxyMaterial);
+		if (bIsNaniteEnabled)
+		{
+			return new FNaniteSkeletalAnnotationSceneProxy(SkeletalMeshComponent, SkelMeshRenderData, AnnotationMID);
+		}
+		else
+		{
+			// Standard skeletal mesh proxy
+			return new FSkeletalAnnotationSceneProxy(SkeletalMeshComponent, SkelMeshRenderData, ProxyMaterial);
+		}
 	}
 	else
 	{
@@ -395,7 +602,6 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(USkeletalMeshCompon
 		return nullptr;
 	}
 }
-
 
 // TODO: This needs to be involked when the ParentComponent refresh its render state, otherwise it will crash the engine
 FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy()
@@ -426,10 +632,14 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy()
 		bSkeletalMesh = true;
 		return CreateSceneProxy(SkeletalMeshComponent);
 	}
-	// else if (IsValid(CableComponent))
-	// {
-	// 	return CreateSceneProxy(CableComponent);
-	// }
+	//else if (IsValid(InstancedStaticMeshComponent))
+	//{
+	//	return CreateSceneProxy(InstancedStaticMeshComponent);
+	//}
+	//else if (IsValid(SplineComponent))
+	//{
+	//	return CreateSceneProxy(SplineComponent);
+	//}
 	else
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("AirSim Annotation: The type of ParentMeshComponent : %s can not be supported."), *ParentComponent->GetClass()->GetName());
