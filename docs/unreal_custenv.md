@@ -6,6 +6,8 @@ Below we will use a freely downloadable environment from Unreal Marketplace call
 ## Note for Linux Users
 There is no `Epic Games Launcher` for Linux which means that if you need to create custom environment, you will need Windows machine to do that. Once you have Unreal project folder, just copy it over to your Linux machine.
 
+Alternatively, you can manage and download Epic Games assets on Linux using **[Epic Asset Manager](https://flathub.org/en/apps/io.github.achetagames.epic_asset_manager)**, a community-developed tool available on Flathub that provides access to Unreal Engine assets without requiring the official Epic Games Launcher.
+
 ## Step-by-Step Instructions when using Cosys-AirSim from Precompiled Binaries
 1. It is assumed you downloaded the right precompiled Cosys-AirSim plugin from the [GitHub releases page](https://github.com/Cosys-Lab/Cosys-AirSim/releases) for the right Unreal version.
 2. In `Epic Games Launcher` click the Samples tab then scroll down and find `Landscape Mountains`. Click the `Create Project` and download this content (~2GB download). 
