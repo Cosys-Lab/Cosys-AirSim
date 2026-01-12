@@ -188,10 +188,10 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
         append_static_vehicle_tf(vehicle_ros.get(), *vehicle_setting);
 
         const std::string topic_prefix = "~/" + curr_vehicle_name;
-        vehicle_ros->odom_local_pub_ = nh_->create_publisher<nav_msgs::msg::Odometry>(topic_prefix + "/" + odom_frame_id_, 10);
+        vehicle_ros->odom_local_pub_ = nh_->create_publisher<nav_msgs::msg::Odometry>(topic_prefix + "/est/" + odom_frame_id_, 10);
 
         if(enable_ground_truth_odometry_publisher_){
-            vehicle_ros->gt_odom_local_pub_ = nh_->create_publisher<nav_msgs::msg::Odometry>(topic_prefix +"/" + world_frame_id_, 10);
+            vehicle_ros->gt_odom_local_pub_ = nh_->create_publisher<nav_msgs::msg::Odometry>(topic_prefix +"/gt/" + odom_frame_id_, 10);
         }
 
         vehicle_ros->env_pub_ = nh_->create_publisher<airsim_interfaces::msg::Environment>(topic_prefix + "/environment", 10);
@@ -1199,54 +1199,102 @@ airsim_interfaces::msg::ObjectTransformsList AirsimROSWrapper::get_object_transf
     return object_transforms_list_msg;
 }
 
-std::optional<geometry_msgs::msg::PoseStamped> AirsimROSWrapper::get_drone_pose(const rclcpp::Time timestamp) const{
+std::optional<geometry_msgs::msg::PoseStamped>
+AirsimROSWrapper::get_drone_pose(const rclcpp::Time timestamp)
+{
     geometry_msgs::msg::PoseStamped drone_pose;
-    std::vector<std::string> object_name_list = airsim_client_->simListInstanceSegmentationObjects();
-    std::vector<msr::airlib::Pose> poses = airsim_client_->simListInstanceSegmentationPoses();
+
+    const auto object_name_list = airsim_client_->simListInstanceSegmentationObjects();
+    const auto poses            = airsim_client_->simListInstanceSegmentationPoses();
+
     int object_index = 0;
-    std::vector<std::string>::iterator it = object_name_list.begin();
-    for(; it < object_name_list.end(); it++, object_index++ )
-    {
-        msr::airlib::Pose cur_object_pose = poses[object_index]; 
-        if(!std::isnan(cur_object_pose.position.x())){
-            if(*it == drone_object_name_){
-                //the pose from airsim is given in NED but ROS expects it in ENU
-                drone_pose.pose.position.x = cur_object_pose.position.y();
-                drone_pose.pose.position.y = cur_object_pose.position.x();
-                drone_pose.pose.position.z = -cur_object_pose.position.z();
+    for (auto it = object_name_list.begin(); it != object_name_list.end(); ++it, ++object_index) {
+        const msr::airlib::Pose cur_object_pose = poses[object_index];
 
-		// --- orientation: q_enu_flu = (q_ENU_NED * q_ned) * q_FRD2FLU
-		tf2::Quaternion q_ned(
-    			cur_object_pose.orientation.x(),
-    			cur_object_pose.orientation.y(),
-    			cur_object_pose.orientation.z(),
-    			cur_object_pose.orientation.w()
-			);
-
-			// fixed world change: NED -> ENU  (w=0, x=√0.5, y=√0.5, z=0)
-			const double s {std::sqrt(0.5)};
-			tf2::Quaternion q_ENU_NED(s, s, 0.0, 0.0);
-
-			// fixed body change: FRD -> FLU  (180° about +X)  => (x=1, y=0, z=0, w=0)
-			tf2::Quaternion q_FRD2FLU(1.0, 0.0, 0.0, 0.0);
-
-			// compose
-			tf2::Quaternion q_enu_flu = {(q_ENU_NED * q_ned) * q_FRD2FLU};
-			q_enu_flu.normalize();
-
-			drone_pose.pose.orientation.x = q_enu_flu.x();
-			drone_pose.pose.orientation.y = q_enu_flu.y();
-			drone_pose.pose.orientation.z = q_enu_flu.z();
-			drone_pose.pose.orientation.w = q_enu_flu.w();
-            drone_pose.header.stamp = timestamp;
-            drone_pose.header.frame_id = world_frame_id_;
-            return drone_pose;
-            }        
+        if (std::isnan(cur_object_pose.position.x())) {
+            continue;
         }
+        if (*it != drone_object_name_) {
+            continue;
+        }
+
+        // ---------------- position: NED -> ENU ----------------
+        drone_pose.pose.position.x = cur_object_pose.position.y();
+        drone_pose.pose.position.y = cur_object_pose.position.x();
+        drone_pose.pose.position.z = -cur_object_pose.position.z();
+
+        // ---------------- orientation: NED/FRD -> ENU/FLU ----------------
+        tf2::Quaternion q_ned(
+            cur_object_pose.orientation.x(),
+            cur_object_pose.orientation.y(),
+            cur_object_pose.orientation.z(),
+            cur_object_pose.orientation.w());
+
+        const double s = std::sqrt(0.5);
+        const tf2::Quaternion q_ENU_NED(s, s, 0.0, 0.0);
+        const tf2::Quaternion q_FRD2FLU(1.0, 0.0, 0.0, 0.0);
+
+        tf2::Quaternion q_cur = (q_ENU_NED * q_ned) * q_FRD2FLU;
+        q_cur.normalize();
+
+        drone_pose.pose.orientation.x = q_cur.x();
+        drone_pose.pose.orientation.y = q_cur.y();
+        drone_pose.pose.orientation.z = q_cur.z();
+        drone_pose.pose.orientation.w = q_cur.w();
+
+        drone_pose.header.stamp = timestamp;
+        drone_pose.header.frame_id = world_frame_id_;
+
+		//initialize origin
+        if (!initial_pose_enu_flu_) {
+            initial_pose_enu_flu_ = drone_pose;
+
+            // Identity relative pose
+            geometry_msgs::msg::PoseStamped out = drone_pose;
+            out.pose.position.x = 0.0;
+            out.pose.position.y = 0.0;
+            out.pose.position.z = 0.0;
+            out.pose.orientation.x = 0.0;
+            out.pose.orientation.y = 0.0;
+            out.pose.orientation.z = 0.0;
+            out.pose.orientation.w = 1.0;
+            return out;
+        }
+
+        const auto& initial_position = initial_pose_enu_flu_->pose.position;
+        const auto& initial_orientation = initial_pose_enu_flu_->pose.orientation;
+
+        tf2::Vector3 p0(initial_position.x, initial_position.y, initial_position.z);
+        tf2::Vector3 pcur(drone_pose.pose.position.x,
+                          drone_pose.pose.position.y,
+                          drone_pose.pose.position.z);
+
+        tf2::Quaternion q0(initial_orientation.x, initial_orientation.y, initial_orientation.z, initial_orientation.w);
+        q0.normalize();
+
+        const tf2::Quaternion q0_inv = q0.inverse();
+
+        // rotation part
+        tf2::Quaternion q_rel = q0_inv * q_cur;
+        q_rel.normalize();
+
+        // translation part (expressed in initial drone frame)
+        tf2::Vector3 p_rel = tf2::quatRotate(q0_inv, (pcur - p0));
+
+        geometry_msgs::msg::PoseStamped out = drone_pose;
+        out.pose.position.x = p_rel.x();
+        out.pose.position.y = p_rel.y();
+        out.pose.position.z = p_rel.z();
+        out.pose.orientation.x = q_rel.x();
+        out.pose.orientation.y = q_rel.y();
+        out.pose.orientation.z = q_rel.z();
+        out.pose.orientation.w = q_rel.w();
+
+        out.header.frame_id = odom_frame_id_;
+        return out;
     }
     return std::nullopt;
 }
-
 airsim_interfaces::msg::Altimeter AirsimROSWrapper::get_altimeter_msg_from_airsim(const msr::airlib::BarometerBase::Output& alt_data) const
 {
     airsim_interfaces::msg::Altimeter alt_msg;
