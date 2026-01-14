@@ -25,7 +25,8 @@ Unreal [5.2.1](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is also ava
   volume={},
   number={},
   pages={37-48},
-  doi={}}
+  keywords={Industries;Simultaneous localization and mapping;Machine learning algorithms;Atmospheric modeling;Transfer learning;Sensor systems and applications;Real-time systems;sensors;procedural generation;digital twins;transfer learning;open-source},
+  doi={https://doi.org/10.48550/arXiv.2303.13381}}
 ```
 
 You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSIM '23 conference [here](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/annsim23_tutorial) together with the associated videos.
