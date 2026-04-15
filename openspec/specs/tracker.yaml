@@ -1,0 +1,315 @@
+version: 1
+project: Cosys-AirSim Drastic Improvements
+generated_on: 2026-04-15
+
+# ===== ML/AUTONOMY (SPEC-001 to SPEC-008) =====
+items:
+  - id: SPEC-001
+    title: Modern Reinforcement Learning Framework
+    category: ml-autonomy
+    status: backlog
+    priority: P0
+    effort: large
+    spec: specs/ml-autonomy/SPEC-001-modern-rl-framework.md
+    dependencies: [SPEC-002, SPEC-005]
+
+  - id: SPEC-002
+    title: Sensor Fusion Pipeline
+    category: ml-autonomy
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/ml-autonomy/SPEC-002-sensor-fusion-pipeline.md
+    dependencies: []
+
+  - id: SPEC-003
+    title: Programmatic Domain Randomization API
+    category: ml-autonomy
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/ml-autonomy/SPEC-003-domain-randomization-api.md
+    dependencies: []
+
+  - id: SPEC-004
+    title: Multi-Agent Reinforcement Learning Framework
+    category: ml-autonomy
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/ml-autonomy/SPEC-004-multi-agent-rl.md
+    dependencies: [SPEC-001]
+
+  - id: SPEC-005
+    title: Training Data Pipeline Modernization
+    category: ml-autonomy
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/ml-autonomy/SPEC-005-training-pipeline-modernization.md
+    dependencies: []
+
+  - id: SPEC-006
+    title: Standardized Benchmarking & Metrics Suite
+    category: ml-autonomy
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/ml-autonomy/SPEC-006-benchmarking-suite.md
+    dependencies: [SPEC-001]
+
+  - id: SPEC-007
+    title: Standard Dataset Export Formats (KITTI, COCO, PLY)
+    category: ml-autonomy
+    status: backlog
+    priority: P1
+    effort: small
+    spec: specs/ml-autonomy/SPEC-007-dataset-export-formats.md
+    dependencies: [SPEC-002]
+
+  - id: SPEC-008
+    title: MLOps & Experiment Lifecycle Integration
+    category: ml-autonomy
+    status: backlog
+    priority: P2
+    effort: small
+    spec: specs/ml-autonomy/SPEC-008-mlops-integration.md
+    dependencies: [SPEC-001, SPEC-005]
+
+# ===== PHYSICS SIMULATION (SPEC-009 to SPEC-016) =====
+  - id: SPEC-009
+    title: Advanced Multirotor Aerodynamics
+    category: physics
+    status: backlog
+    priority: P0
+    effort: large
+    spec: specs/physics/SPEC-009-advanced-aerodynamics.md
+    dependencies: []
+
+  - id: SPEC-010
+    title: Wind & Turbulence Model (Dryden, Wind Shear)
+    category: physics
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/physics/SPEC-010-wind-turbulence-model.md
+    dependencies: [SPEC-009]
+
+  - id: SPEC-011
+    title: Pacejka Tire Physics Model
+    category: physics
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/physics/SPEC-011-tire-physics-model.md
+    dependencies: []
+
+  - id: SPEC-012
+    title: Collision System Overhaul
+    category: physics
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/physics/SPEC-012-collision-system-overhaul.md
+    dependencies: []
+
+  - id: SPEC-013
+    title: Sensor-Material Interaction System
+    category: physics
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/physics/SPEC-013-material-interaction-system.md
+    dependencies: []
+
+  - id: SPEC-014
+    title: Comprehensive Sensor Noise Model Upgrade
+    category: physics
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/physics/SPEC-014-sensor-noise-upgrade.md
+    dependencies: []
+
+  - id: SPEC-015
+    title: Deformable Terrain & Soft Ground Interaction
+    category: physics
+    status: backlog
+    priority: P2
+    effort: large
+    spec: specs/physics/SPEC-015-deformable-terrain.md
+    dependencies: [SPEC-012]
+
+  - id: SPEC-016
+    title: Underwater Vehicle & Fluid Dynamics
+    category: physics
+    status: backlog
+    priority: P2
+    effort: large
+    spec: specs/physics/SPEC-016-underwater-simulation.md
+    dependencies: [SPEC-009, SPEC-010]
+
+# ===== PERFORMANCE (SPEC-017 to SPEC-022) =====
+  - id: SPEC-017
+    title: Zero-Copy Sensor Data Pipeline
+    category: performance
+    status: backlog
+    priority: P0
+    effort: large
+    spec: specs/performance/SPEC-017-zero-copy-sensor-pipeline.md
+    dependencies: [SPEC-029]
+
+  - id: SPEC-018
+    title: Render Target Pooling & GPU Memory Management
+    category: performance
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/performance/SPEC-018-render-target-pooling.md
+    dependencies: []
+
+  - id: SPEC-019
+    title: Multi-Vehicle Scalability
+    category: performance
+    status: backlog
+    priority: P0
+    effort: large
+    spec: specs/performance/SPEC-019-multi-vehicle-scalability.md
+    dependencies: [SPEC-017, SPEC-018]
+
+  - id: SPEC-020
+    title: Async GPU Readback Pipeline
+    category: performance
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/performance/SPEC-020-async-gpu-readback.md
+    dependencies: [SPEC-018]
+
+  - id: SPEC-021
+    title: RPC Protocol & Serialization Optimization
+    category: performance
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/performance/SPEC-021-rpc-protocol-optimization.md
+    dependencies: []
+
+  - id: SPEC-022
+    title: Decoupled Fixed Physics Timestep
+    category: performance
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/performance/SPEC-022-fixed-physics-timestep.md
+    dependencies: []
+
+# ===== ENGINEERING QUALITY (SPEC-023 to SPEC-028) =====
+  - id: SPEC-023
+    title: Comprehensive Test Suite
+    category: engineering
+    status: backlog
+    priority: P0
+    effort: large
+    spec: specs/engineering/SPEC-023-comprehensive-test-suite.md
+    dependencies: []
+
+  - id: SPEC-024
+    title: Error Handling & Resilience Overhaul
+    category: engineering
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/engineering/SPEC-024-error-handling-overhaul.md
+    dependencies: []
+
+  - id: SPEC-025
+    title: FiducialBeacon & Critical Code Duplication Refactor
+    category: engineering
+    status: backlog
+    priority: P0
+    effort: small
+    spec: specs/engineering/SPEC-025-fiducial-beacon-refactor.md
+    dependencies: []
+
+  - id: SPEC-026
+    title: API Type Safety & Interface Cleanup
+    category: engineering
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/engineering/SPEC-026-api-safety.md
+    dependencies: []
+
+  - id: SPEC-027
+    title: Type-Safe Settings with Schema Validation
+    category: engineering
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/engineering/SPEC-027-settings-schema-validation.md
+    dependencies: []
+
+  - id: SPEC-028
+    title: Technical Debt & Dead Code Cleanup
+    category: engineering
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/engineering/SPEC-028-technical-debt-cleanup.md
+    dependencies: []
+
+# ===== ARCHITECTURE (SPEC-029 to SPEC-034) =====
+  - id: SPEC-029
+    title: Plugin Registry Architecture
+    category: architecture
+    status: backlog
+    priority: P0
+    effort: large
+    spec: specs/architecture/SPEC-029-plugin-registry-architecture.md
+    dependencies: [SPEC-030]
+
+  - id: SPEC-030
+    title: Communication Abstraction Layer
+    category: architecture
+    status: backlog
+    priority: P1
+    effort: large
+    spec: specs/architecture/SPEC-030-communication-abstraction.md
+    dependencies: []
+
+  - id: SPEC-031
+    title: Event Bus & Pub/Sub System
+    category: architecture
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/architecture/SPEC-031-event-bus-system.md
+    dependencies: []
+
+  - id: SPEC-032
+    title: Sensor Pipeline Architecture
+    category: architecture
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/architecture/SPEC-032-sensor-pipeline-architecture.md
+    dependencies: [SPEC-029]
+
+  - id: SPEC-033
+    title: Centralized State Management
+    category: architecture
+    status: backlog
+    priority: P2
+    effort: medium
+    spec: specs/architecture/SPEC-033-state-management.md
+    dependencies: [SPEC-031]
+
+  - id: SPEC-034
+    title: AirSimSettings Decomposition
+    category: architecture
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/architecture/SPEC-034-airsim-settings-decomposition.md
+    dependencies: [SPEC-027]
