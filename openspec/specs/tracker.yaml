@@ -1,9 +1,13 @@
-version: 1
-project: Cosys-AirSim Drastic Improvements
+version: 2
+project: Cosys-AirSim Drastic Improvements (Second Pass)
 generated_on: 2026-04-15
+notes: |
+  Second-pass reorganization. Fixed dependency issues from first pass.
+  Added character system (SPEC-035 to SPEC-043), Cosys-specific features
+  (SPEC-044 to SPEC-051), and corrected dependency graph.
 
-# ===== ML/AUTONOMY (SPEC-001 to SPEC-008) =====
 items:
+# ===== ML/AUTONOMY (SPEC-001 to SPEC-008) =====
   - id: SPEC-001
     title: Modern Reinforcement Learning Framework
     category: ml-autonomy
@@ -76,7 +80,7 @@ items:
     spec: specs/ml-autonomy/SPEC-008-mlops-integration.md
     dependencies: [SPEC-001, SPEC-005]
 
-# ===== PHYSICS SIMULATION (SPEC-009 to SPEC-016) =====
+# ===== PHYSICS (SPEC-009 to SPEC-016) — fixed SPEC-022 dependency =====
   - id: SPEC-009
     title: Advanced Multirotor Aerodynamics
     category: physics
@@ -84,7 +88,7 @@ items:
     priority: P0
     effort: large
     spec: specs/physics/SPEC-009-advanced-aerodynamics.md
-    dependencies: []
+    dependencies: [SPEC-022]  # FIXED: needs fixed timestep first
 
   - id: SPEC-010
     title: Wind & Turbulence Model (Dryden, Wind Shear)
@@ -93,7 +97,7 @@ items:
     priority: P0
     effort: medium
     spec: specs/physics/SPEC-010-wind-turbulence-model.md
-    dependencies: [SPEC-009]
+    dependencies: [SPEC-009, SPEC-022]
 
   - id: SPEC-011
     title: Pacejka Tire Physics Model
@@ -149,7 +153,7 @@ items:
     spec: specs/physics/SPEC-016-underwater-simulation.md
     dependencies: [SPEC-009, SPEC-010]
 
-# ===== PERFORMANCE (SPEC-017 to SPEC-022) =====
+# ===== PERFORMANCE (SPEC-017 to SPEC-022) — fixed dependency chain =====
   - id: SPEC-017
     title: Zero-Copy Sensor Data Pipeline
     category: performance
@@ -157,7 +161,7 @@ items:
     priority: P0
     effort: large
     spec: specs/performance/SPEC-017-zero-copy-sensor-pipeline.md
-    dependencies: [SPEC-029]
+    dependencies: []  # FIXED: removed SPEC-029 dependency (independent)
 
   - id: SPEC-018
     title: Render Target Pooling & GPU Memory Management
@@ -199,12 +203,12 @@ items:
     title: Decoupled Fixed Physics Timestep
     category: performance
     status: backlog
-    priority: P1
+    priority: P0  # UPGRADED: foundation for all physics work
     effort: medium
     spec: specs/performance/SPEC-022-fixed-physics-timestep.md
     dependencies: []
 
-# ===== ENGINEERING QUALITY (SPEC-023 to SPEC-028) =====
+# ===== ENGINEERING (SPEC-023 to SPEC-028) — fixed ordering =====
   - id: SPEC-023
     title: Comprehensive Test Suite
     category: engineering
@@ -212,7 +216,7 @@ items:
     priority: P0
     effort: large
     spec: specs/engineering/SPEC-023-comprehensive-test-suite.md
-    dependencies: []
+    dependencies: [SPEC-028]  # FIXED: clean dead code before writing tests
 
   - id: SPEC-024
     title: Error Handling & Resilience Overhaul
@@ -254,12 +258,12 @@ items:
     title: Technical Debt & Dead Code Cleanup
     category: engineering
     status: backlog
-    priority: P1
+    priority: P0  # UPGRADED: prerequisite for SPEC-023
     effort: medium
     spec: specs/engineering/SPEC-028-technical-debt-cleanup.md
     dependencies: []
 
-# ===== ARCHITECTURE (SPEC-029 to SPEC-034) =====
+# ===== ARCHITECTURE (SPEC-029 to SPEC-034) — fixed dependency reversal =====
   - id: SPEC-029
     title: Plugin Registry Architecture
     category: architecture
@@ -267,7 +271,7 @@ items:
     priority: P0
     effort: large
     spec: specs/architecture/SPEC-029-plugin-registry-architecture.md
-    dependencies: [SPEC-030]
+    dependencies: []  # FIXED: removed reverse dependency on SPEC-030
 
   - id: SPEC-030
     title: Communication Abstraction Layer
@@ -294,7 +298,7 @@ items:
     priority: P1
     effort: medium
     spec: specs/architecture/SPEC-032-sensor-pipeline-architecture.md
-    dependencies: [SPEC-029]
+    dependencies: []  # FIXED: removed SPEC-029 dependency (independent)
 
   - id: SPEC-033
     title: Centralized State Management
@@ -313,3 +317,158 @@ items:
     effort: medium
     spec: specs/architecture/SPEC-034-airsim-settings-decomposition.md
     dependencies: [SPEC-027]
+
+# ===== CHARACTERS & MOTORBIKES (SPEC-035 to SPEC-043) — NEW =====
+  - id: SPEC-035
+    title: Character Pawn & API Foundation
+    category: characters
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/characters/SPEC-035-character-pawn-foundation.md
+    dependencies: []
+
+  - id: SPEC-036
+    title: Character Locomotion (Walk, Run, Crawl, Roll)
+    category: characters
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/characters/SPEC-036-character-locomotion.md
+    dependencies: [SPEC-035]
+
+  - id: SPEC-037
+    title: Character Animation System (Dance, Gestures, Idle)
+    category: characters
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/characters/SPEC-037-character-animations.md
+    dependencies: [SPEC-036]
+
+  - id: SPEC-038
+    title: Mixed SimMode (Characters + Vehicles)
+    category: characters
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/characters/SPEC-038-mixed-simmode.md
+    dependencies: [SPEC-035]
+
+  - id: SPEC-039
+    title: Character-Vehicle Interaction (Enter/Exit)
+    category: characters
+    status: backlog
+    priority: P0
+    effort: medium
+    spec: specs/characters/SPEC-039-vehicle-interaction.md
+    dependencies: [SPEC-035, SPEC-036, SPEC-038]
+
+  - id: SPEC-040
+    title: Character Hiding & Cover System
+    category: characters
+    status: backlog
+    priority: P1
+    effort: small
+    spec: specs/characters/SPEC-040-character-hiding-cover.md
+    dependencies: [SPEC-036, SPEC-037]
+
+  - id: SPEC-041
+    title: Motorbike Vehicle Type
+    category: characters
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/characters/SPEC-041-motorbike-vehicle.md
+    dependencies: [SPEC-038]
+
+  - id: SPEC-042
+    title: Autonomous Pedestrian AI & Crowd Simulation
+    category: characters
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/characters/SPEC-042-autonomous-pedestrians.md
+    dependencies: [SPEC-035, SPEC-036]
+
+  - id: SPEC-043
+    title: Character Detection, Annotation & Pose GT
+    category: characters
+    status: backlog
+    priority: P0
+    effort: small
+    spec: specs/characters/SPEC-043-character-detection-annotation.md
+    dependencies: [SPEC-035, SPEC-037]
+
+# ===== COSYS-SPECIFIC FEATURES (SPEC-044 to SPEC-051) — NEW =====
+  - id: SPEC-044
+    title: Annotation System Batch Operations
+    category: cosys-features
+    status: backlog
+    priority: P0
+    effort: small
+    spec: specs/cosys-features/SPEC-044-annotation-system-enhancement.md
+    dependencies: []
+
+  - id: SPEC-045
+    title: External World Sensor Management API
+    category: cosys-features
+    status: backlog
+    priority: P0
+    effort: small
+    spec: specs/cosys-features/SPEC-045-external-sensor-api.md
+    dependencies: []
+
+  - id: SPEC-046
+    title: Recording & Playback System Enhancement
+    category: cosys-features
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/cosys-features/SPEC-046-recording-playback.md
+    dependencies: []
+
+  - id: SPEC-047
+    title: Object Detection Pipeline Enhancement
+    category: cosys-features
+    status: backlog
+    priority: P1
+    effort: small
+    spec: specs/cosys-features/SPEC-047-detection-pipeline.md
+    dependencies: []
+
+  - id: SPEC-048
+    title: Procedural Generation & Dynamic World API
+    category: cosys-features
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/cosys-features/SPEC-048-procedural-generation-api.md
+    dependencies: []
+
+  - id: SPEC-049
+    title: Comprehensive Artificial Lighting API
+    category: cosys-features
+    status: backlog
+    priority: P1
+    effort: small
+    spec: specs/cosys-features/SPEC-049-lighting-api.md
+    dependencies: []
+
+  - id: SPEC-050
+    title: Physics Query & Raycast API
+    category: cosys-features
+    status: backlog
+    priority: P1
+    effort: small
+    spec: specs/cosys-features/SPEC-050-physics-query-api.md
+    dependencies: []
+
+  - id: SPEC-051
+    title: ROS2 Complete API Coverage
+    category: cosys-features
+    status: backlog
+    priority: P1
+    effort: medium
+    spec: specs/cosys-features/SPEC-051-ros2-api-coverage.md
+    dependencies: []
