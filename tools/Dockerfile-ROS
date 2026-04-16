@@ -1,11 +1,11 @@
 FROM ubuntu:18.04
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
-    apt-utils \
-    apt-transport-https \
-    software-properties-common \
-    sudo \
-    tzdata \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
+    apt-utils=1.4.11 \
+    apt-transport-https=1.4.11 \
+    software-properties-common=0.96.20.32.15 \
+    sudo=1.8.21p2-3ubuntu1.3 \
+    tzdata=2021a-0ubuntu0.18.04.1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* && \
     dpkg-reconfigure -f noninteractive tzdata
@@ -17,12 +17,12 @@ RUN adduser --disabled-password --gecos '' $UNAME
 # Add new user docker to sudo group
 RUN adduser $UNAME sudo
 
-# Ensure sudo group users are not 
-# asked for a password when using 
+# Ensure sudo group users are not
+# asked for a password when using
 # sudo command by ammending sudoers file
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-ADD install_ros_deps.sh /
+COPY install_ros_deps.sh /
 RUN chmod +x /install_ros_deps.sh
 RUN DEBIAN_FRONTEND=noninteractive /install_ros_deps.sh
 
