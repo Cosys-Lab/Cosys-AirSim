@@ -1,0 +1,58 @@
+name: Python
+
+on:
+  pull_request:
+    paths:
+      - 'PythonClient/**'
+      - '.github/workflows/python.yml'
+      - '.pre-commit-config.yaml'
+      - 'pyproject.toml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.12'
+      - run: uv pip install ruff
+      - run: ruff check PythonClient/
+      - run: ruff format --check PythonClient/
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.12'
+      - run: uv pip install mypy numpy msgpack-rpc-python
+      - run: mypy PythonClient/cosysairsim/
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.12'
+      - run: uv pip install pip-audit
+      - run: pip-audit || true
+
+  test:
+    strategy:
+      matrix:
+        python-version: ['3.12', '3.13', '3.14']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          uv pip install numpy msgpack-rpc-python pytest pytest-cov
+      - name: Run tests
+        run: |
+          cd PythonClient && pytest tests/ -v --tb=short

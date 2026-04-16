@@ -1,0 +1,9 @@
+.git
+build
+*.log
+*.tmp
+.vs
+.vscode
+__pycache__
+*.pyc
+node_modules

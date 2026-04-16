@@ -1,0 +1,36 @@
+name: Lint
+
+on:
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.sh'
+      - '**.cpp'
+      - '**.hpp'
+      - '**.cmake'
+      - '**CMakeLists.txt'
+      - 'Dockerfile*'
+      - '.pre-commit-config.yaml'
+      - '.github/workflows/lint.yml'
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.12'
+      - uses: pre-commit/action@v3.0.1
+
+  hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v2
+
+  shell-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ludeeus/action-shellcheck@master

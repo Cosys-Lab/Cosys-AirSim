@@ -1,0 +1,57 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly
+  workflow_dispatch:
+
+jobs:
+  update-pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install pre-commit
+        run: uv pip install pre-commit
+
+      - name: Update hooks
+        run: pre-commit autoupdate
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore: update pre-commit hooks'
+          branch: pre-commit-autoupdate
+          title: 'chore: update pre-commit hooks'
+          body: |
+            Auto-updated pre-commit hooks via `pre-commit autoupdate`.
+          delete-branch: true
+
+  update-pip-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.12'
+
+      - name: Check for outdated deps
+        run: |
+          uv pip install -e PythonClient
+          uv pip list --outdated
+
+      - name: Create PR
+        if: failure()
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore: update pip dependencies'
+          branch: pip-autoupdate
+          title: 'chore: update pip dependencies'
+          body: |
+            Auto-updated dependencies via `uv pip list --outdated`.
+          delete-branch: true

@@ -1,0 +1,63 @@
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb', '50000']
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-json
+      - id: check-toml
+      - id: check-added-git-ignore
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.4
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.17.0
+    hooks:
+      - id: pyupgrade
+        args: ['--py312-plus']
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.0
+    hooks:
+      - id: hadolint-dockerfile
+        args: ['--ignore', 'DL3002', '--ignore', 'DL3008', '--ignore', 'DL3013', '--ignore', 'DL3015', '--ignore', 'DL3018', '--ignore', 'DL3059', '--ignore', 'SC2086']
+
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+
+default_language_version:
+  python: python3.12
+
+exclude: |
+  (?x)^(
+    | build/
+    | .git/
+    | .cargo/
+    | node_modules/
+    | __pycache__/
+    | .vs/
+    | .vscode/
+    | build_release/
+    | Bin/
+    | Managed/
+    | intermediates/
+    | .deriveddataholds/
+  )$
+
+require Serial: false
+
+ci:
+  autofix_prs: true
+  autoupdate_branch: 'pre-commit-autoupdate'
