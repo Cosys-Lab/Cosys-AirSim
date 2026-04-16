@@ -17,7 +17,7 @@ import pyaudio
 
 class WavReader:
     def __init__(self, sample_rate=16000, channels=1, auto_scale=True):
-        """ Initialize the wav reader with the type of audio you want returned.
+        """Initialize the wav reader with the type of audio you want returned.
         sample_rate  Rate you want audio converted to (default 16 kHz)
         channels     Number of channels you want output (default 1)
         auto_scale   Whether to scale numbers to the range -1 to 1.
@@ -36,7 +36,7 @@ class WavReader:
         self.tail = None
 
     def open(self, filename, buffer_size, speaker=None):
-        """ open a wav file for reading
+        """open a wav file for reading
         buffersize   Number of audio samples to return on each read() call
         speaker      Optional output speaker to send converted audio to so you can hear it.
         """
@@ -73,7 +73,7 @@ class WavReader:
             speaker.open(audio_format, self.requested_channels, self.requested_rate)
 
     def read_raw(self):
-        """ Reads the next chunk of audio (returns buffer_size provided to open)
+        """Reads the next chunk of audio (returns buffer_size provided to open)
         It returns the raw data buffers converted to the target rate without any scaling.
         """
         if self.wav_file is None:
@@ -85,24 +85,31 @@ class WavReader:
 
         if self.actual_rate != self.requested_rate:
             # convert the audio to the desired recording rate
-            data, self.cvstate = audioop.ratecv(data, self.sample_width, self.actual_channels, self.actual_rate,
-                                                self.requested_rate, self.cvstate)
+            data, self.cvstate = audioop.ratecv(
+                data,
+                self.sample_width,
+                self.actual_channels,
+                self.actual_rate,
+                self.requested_rate,
+                self.cvstate,
+            )
 
         return self.get_requested_channels(data)
 
     def get_requested_channels(self, data):
         if self.requested_channels > self.actual_channels:
-            raise Exception("Cannot add channels, actual is {}, requested is {}".format(
-                self.actual_channels, self.requested_channels))
+            raise Exception(
+                f"Cannot add channels, actual is {self.actual_channels}, requested is {self.requested_channels}"
+            )
 
         if self.requested_channels < self.actual_channels:
             data = np.frombuffer(data, dtype=np.int16)
             channels = []
             # split into separate channels
             for i in range(self.actual_channels):
-                channels += [data[i::self.actual_channels]]
+                channels += [data[i :: self.actual_channels]]
             # drop the channels we don't want
-            channels = channels[0:self.requested_channels]
+            channels = channels[0 : self.requested_channels]
             # zip the resulting channels back up.
             data = np.array(list(zip(*channels))).flatten()
             # convert back to packed bytes in PCM 16 format
@@ -111,7 +118,7 @@ class WavReader:
         return data
 
     def read(self):
-        """ Reads the next chunk of audio (returns buffer_size provided to open)
+        """Reads the next chunk of audio (returns buffer_size provided to open)
         It returns the data converted to floating point numbers between -1 and 1, scaled by the range of
         values possible for the given audio format.
         """
@@ -119,8 +126,8 @@ class WavReader:
         # deal with any accumulation of tails, if the tail grows to a full
         # buffer then return it!
         if self.tail is not None and len(self.tail) >= self.read_size:
-            data = self.tail[0:self.read_size]
-            self.tail = self.tail[self.read_size:]
+            data = self.tail[0 : self.read_size]
+            self.tail = self.tail[self.read_size :]
             return data
 
         data = self.read_raw()
@@ -139,8 +146,8 @@ class WavReader:
         # rate conversion happens we can't be sure that 'data' is exactly that size.
         if len(data) > self.read_size:
             # usually one byte extra so add this to our accumulating tail
-            self.tail = data[self.read_size:]
-            data = data[0:self.read_size]
+            self.tail = data[self.read_size :]
+            data = data[0 : self.read_size]
 
         if len(data) < self.read_size:
             # might have reached the end of a file, so pad with zeros.

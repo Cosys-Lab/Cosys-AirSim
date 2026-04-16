@@ -1,10 +1,9 @@
-import numpy
 import random
 
 # requires Python 3.5.3 :: Anaconda 4.4.0
 # pip install opencv-python
 import cv2
-import pprint
+import numpy
 
 
 def generate_color_palette(numPixelsWide, outputFile):

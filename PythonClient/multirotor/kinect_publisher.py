@@ -1,11 +1,12 @@
-import rospy
-from sensor_msgs.msg import Image,CameraInfo
-from tf2_msgs.msg import TFMessage
-from geometry_msgs.msg import TransformStamped
-from cv_bridge import CvBridge
-import cosysairsim as airsim
 import cv2
 import numpy as np
+import rospy
+from cv_bridge import CvBridge
+from geometry_msgs.msg import TransformStamped
+from sensor_msgs.msg import CameraInfo, Image
+from tf2_msgs.msg import TFMessage
+
+import cosysairsim as airsim
 
 CLAHE_ENABLED = False  # when enabled, RGB image is enhanced using CLAHE
 
@@ -33,18 +34,18 @@ class KinectPublisher:
         self.msg_info = CameraInfo()
         self.msg_tf = TFMessage()
 
-    def getDepthImage(self,response_d):
+    def getDepthImage(self, response_d):
         img_depth = np.array(response_d.image_data_float, dtype=np.float32)
         img_depth = img_depth.reshape(response_d.height, response_d.width)
         return img_depth
 
-    def getRGBImage(self,response_rgb):
-        img1d = np.fromstring(response_rgb.image_data_uint8, dtype=np.uint8)
+    def getRGBImage(self, response_rgb):
+        img1d = np.frombuffer(response_rgb.image_data_uint8, dtype=np.uint8)
         img_rgb = img1d.reshape(response_rgb.height, response_rgb.width, 3)
         img_rgb = img_rgb[..., :3][..., ::-1]
         return img_rgb
 
-    def enhanceRGB(self,img_rgb):
+    def enhanceRGB(self, img_rgb):
         lab = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2LAB)
         lab_planes = cv2.split(lab)
         clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(10, 10))
@@ -56,7 +57,7 @@ class KinectPublisher:
     def GetCurrentTime(self):
         self.ros_time = rospy.Time.now()
 
-    def CreateRGBMessage(self,img_rgb):
+    def CreateRGBMessage(self, img_rgb):
         self.msg_rgb.header.stamp = self.ros_time
         self.msg_rgb.header.frame_id = "camera_rgb_optical_frame"
         self.msg_rgb.encoding = "bgr8"
@@ -67,7 +68,7 @@ class KinectPublisher:
         self.msg_rgb.step = self.msg_rgb.width * 3
         return self.msg_rgb
 
-    def CreateDMessage(self,img_depth):
+    def CreateDMessage(self, img_depth):
         self.msg_d.header.stamp = self.ros_time
         self.msg_d.header.frame_id = "camera_depth_optical_frame"
         self.msg_d.encoding = "32FC1"
@@ -124,7 +125,9 @@ class KinectPublisher:
         self.msg_info.P[11] = 0
 
         self.msg_info.binning_x = self.msg_info.binning_y = 0
-        self.msg_info.roi.x_offset = self.msg_info.roi.y_offset = self.msg_info.roi.height = self.msg_info.roi.width = 0
+        self.msg_info.roi.x_offset = self.msg_info.roi.y_offset = self.msg_info.roi.height = (
+            self.msg_info.roi.width
+        ) = 0
         self.msg_info.roi.do_rectify = False
         self.msg_info.header.stamp = self.msg_rgb.header.stamp
         return self.msg_info
@@ -185,17 +188,21 @@ if __name__ == "__main__":
     client.confirmConnection()
     client.enableApiControl(True)
     client.armDisarm(True)
-    rospy.init_node('airsim_publisher', anonymous=True)
-    publisher_d = rospy.Publisher('/camera/depth_registered/image_raw', Image, queue_size=1)
-    publisher_rgb = rospy.Publisher('/camera/rgb/image_rect_color', Image, queue_size=1)
-    publisher_info = rospy.Publisher('/camera/rgb/camera_info', CameraInfo, queue_size=1)
-    publisher_tf = rospy.Publisher('/tf', TFMessage, queue_size=1)
+    rospy.init_node("airsim_publisher", anonymous=True)
+    publisher_d = rospy.Publisher("/camera/depth_registered/image_raw", Image, queue_size=1)
+    publisher_rgb = rospy.Publisher("/camera/rgb/image_rect_color", Image, queue_size=1)
+    publisher_info = rospy.Publisher("/camera/rgb/camera_info", CameraInfo, queue_size=1)
+    publisher_tf = rospy.Publisher("/tf", TFMessage, queue_size=1)
     rate = rospy.Rate(30)  # 30hz
     pub = KinectPublisher()
 
     while not rospy.is_shutdown():
-        responses = client.simGetImages([airsim.ImageRequest(0, airsim.ImageType.DepthPlanar, True, False),
-                                         airsim.ImageRequest(0, airsim.ImageType.Scene, False, False)])
+        responses = client.simGetImages(
+            [
+                airsim.ImageRequest(0, airsim.ImageType.DepthPlanar, True, False),
+                airsim.ImageRequest(0, airsim.ImageType.Scene, False, False),
+            ]
+        )
         img_depth = pub.getDepthImage(responses[0])
         img_rgb = pub.getRGBImage(responses[1])
 
@@ -217,9 +224,3 @@ if __name__ == "__main__":
         del pub.msg_tf.transforms[:]
 
         rate.sleep()
-
-
-
-
-
-

@@ -1,7 +1,8 @@
-import cosysairsim as airsim
 import time
 
-'''
+import cosysairsim as airsim
+
+"""
 An example script showing usage of Distance sensor to measure distance between 2 Car vehicles
 Settings -
 
@@ -37,7 +38,7 @@ Settings -
 
 Car2 is placed in front of Car 1
 
-'''
+"""
 
 client = airsim.CarClient()
 client.confirmConnection()

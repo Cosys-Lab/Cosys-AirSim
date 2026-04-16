@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-import setup_path 
-import cosysairsim as airsim
 
-import sys
-import time
+import cosysairsim as airsim
 
 client = airsim.MultirotorClient()
 client.confirmConnection()
@@ -24,10 +21,16 @@ z = -30
 # see https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo
 
 # this method is async and we are not waiting for the result since we are passing timeout_sec=0.
-result = client.moveOnPathAsync([airsim.Vector3r(-80,-120,z),airsim.Vector3r(60,-120,z),airsim.Vector3r(120,-30,z)], 
-                        8, 120, 
-                        airsim.DrivetrainType.ForwardOnly, airsim.YawMode(False,0), 20, 1).join()
-client.moveToPositionAsync(120,-30,1,2).join()
+result = client.moveOnPathAsync(
+    [airsim.Vector3r(-80, -120, z), airsim.Vector3r(60, -120, z), airsim.Vector3r(120, -30, z)],
+    8,
+    120,
+    airsim.DrivetrainType.ForwardOnly,
+    airsim.YawMode(False, 0),
+    20,
+    1,
+).join()
+client.moveToPositionAsync(120, -30, 1, 2).join()
 print("moved")
 client.armDisarm(False)
 client.enableApiControl(False)

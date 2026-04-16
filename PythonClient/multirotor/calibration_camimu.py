@@ -1,7 +1,8 @@
-import setup_path 
-import cosysairsim as airsim
-import numpy as np
 import time
+
+import numpy as np
+
+import cosysairsim as airsim
 
 client = airsim.MultirotorClient()
 client.confirmConnection()

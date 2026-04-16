@@ -1,6 +1,7 @@
-import setup_path
-import cosysairsim as airsim
 import pprint
+
+import cosysairsim as airsim
+
 
 def print_state():
     print("===============================================================")

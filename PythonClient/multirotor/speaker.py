@@ -18,10 +18,9 @@ class Speaker:
 
     def open(self, audio_format, num_channels, rate):
         # open speakers so we can hear what it is processing...
-        self.output_stream = self.audio.open(format=audio_format,
-                                             channels=num_channels,
-                                             rate=rate,
-                                             output=True)
+        self.output_stream = self.audio.open(
+            format=audio_format, channels=num_channels, rate=rate, output=True
+        )
 
     def write(self, data):
         if self.output_stream:

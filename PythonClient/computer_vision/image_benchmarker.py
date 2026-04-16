@@ -1,13 +1,13 @@
-import setup_path
-import cosysairsim as airsim
-from argparse import ArgumentParser
-import time
-import threading
-import numpy as np
-import cv2
-import tempfile
 import os
+import tempfile
+import threading
+import time
+from argparse import ArgumentParser
 
+import cv2
+import numpy as np
+
+import cosysairsim as airsim
 
 cameraTypeMap = {
     "depth": airsim.ImageType.DepthVis,
@@ -15,11 +15,12 @@ cameraTypeMap = {
     "seg": airsim.ImageType.Segmentation,
     "scene": airsim.ImageType.Scene,
     "disparity": airsim.ImageType.DisparityNormalized,
-    "normals": airsim.ImageType.SurfaceNormals
+    "normals": airsim.ImageType.SurfaceNormals,
 }
 
 CAM_NAME = "front_center"
 DEBUG = False
+
 
 def saveImage(response, filename):
     if response.pixels_as_float:
@@ -28,22 +29,27 @@ def saveImage(response, filename):
         depth = depth.reshape((response.height, response.width, -1))
         depth = np.array(depth * 255, dtype=np.uint8)
         # save pic
-        cv2.imwrite(os.path.normpath(filename + '.png'), depth)
+        cv2.imwrite(os.path.normpath(filename + ".png"), depth)
 
-    elif response.compress: #png format
-        airsim.write_file(os.path.normpath(filename + '.png'), response.image_data_uint8)
+    elif response.compress:  # png format
+        airsim.write_file(os.path.normpath(filename + ".png"), response.image_data_uint8)
 
-    else: #uncompressed array
-        img1d = np.fromstring(response.image_data_uint8, dtype=np.uint8) # get numpy array
-        img_rgb = img1d.reshape(response.height, response.width, 3) # reshape array to 3 channel image array H X W X 3
-        cv2.imwrite(os.path.normpath(filename + '.png'), img_rgb) # write to png
+    else:  # uncompressed array
+        img1d = np.frombuffer(response.image_data_uint8.encode(), dtype=np.uint8)  # get numpy array
+        img_rgb = img1d.reshape(
+            response.height, response.width, 3
+        )  # reshape array to 3 channel image array H X W X 3
+        cv2.imwrite(os.path.normpath(filename + ".png"), img_rgb)  # write to png
 
-class ImageBenchmarker():
-    def __init__(self,
-            img_benchmark_type = 'simGetImages',
-            viz_image_cv2 = False,
-            save_images = False,
-            img_type = "scene"):
+
+class ImageBenchmarker:
+    def __init__(
+        self,
+        img_benchmark_type="simGetImages",
+        viz_image_cv2=False,
+        save_images=False,
+        img_type="scene",
+    ):
         self.airsim_client = airsim.VehicleClient()
         self.airsim_client.confirmConnection()
         self.image_benchmark_num_images = 0
@@ -56,9 +62,15 @@ class ImageBenchmarker():
         self.img_type = cameraTypeMap[img_type]
 
         if img_benchmark_type == "simGetImage":
-            self.image_callback_thread = threading.Thread(target=self.repeat_timer_img, args=(self.image_callback_benchmark_simGetImage, 0.001))
+            self.image_callback_thread = threading.Thread(
+                target=self.repeat_timer_img,
+                args=(self.image_callback_benchmark_simGetImage, 0.001),
+            )
         if img_benchmark_type == "simGetImages":
-            self.image_callback_thread = threading.Thread(target=self.repeat_timer_img, args=(self.image_callback_benchmark_simGetImages, 0.001))
+            self.image_callback_thread = threading.Thread(
+                target=self.repeat_timer_img,
+                args=(self.image_callback_benchmark_simGetImages, 0.001),
+            )
         self.is_image_thread_active = False
 
         if self.save_images:
@@ -118,11 +130,15 @@ class ImageBenchmarker():
 
         if DEBUG:
             if response.pixels_as_float:
-                print(f"Type {response.image_type}, size {len(response.image_data_float)},"
-                      f"height {response.height}, width {response.width}")
+                print(
+                    f"Type {response.image_type}, size {len(response.image_data_float)},"
+                    f"height {response.height}, width {response.width}"
+                )
             else:
-                print(f"Type {response.image_type}, size {len(response.image_data_uint8)},"
-                      f"height {response.height}, width {response.width}")
+                print(
+                    f"Type {response.image_type}, size {len(response.image_data_uint8)},"
+                    f"height {response.height}, width {response.width}"
+                )
 
         if self.viz_image_cv2:
             np_arr = np.frombuffer(response.image_data_uint8, dtype=np.uint8)
@@ -136,20 +152,37 @@ class ImageBenchmarker():
 
 
 def main(args):
-    image_benchmarker = ImageBenchmarker(img_benchmark_type=args.img_benchmark_type, viz_image_cv2=args.viz_image_cv2,
-                                      save_images=args.save_images, img_type=args.img_type)
+    image_benchmarker = ImageBenchmarker(
+        img_benchmark_type=args.img_benchmark_type,
+        viz_image_cv2=args.viz_image_cv2,
+        save_images=args.save_images,
+        img_type=args.img_type,
+    )
 
     image_benchmarker.start_img_benchmark_thread()
     time.sleep(args.time)
     image_benchmarker.stop_img_benchmark_thread()
 
+
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('--img_benchmark_type', type=str, choices=["simGetImage", "simGetImages"], default="simGetImages")
-    parser.add_argument('--enable_viz_image_cv2', dest='viz_image_cv2', action='store_true', default=False)
-    parser.add_argument('--save_images', dest='save_images', action='store_true', default=False)
-    parser.add_argument('--img_type', type=str, choices=cameraTypeMap.keys(), default="scene")
-    parser.add_argument('--time', help="Time in secs to run the benchmark for", type=int, default=30)
+    parser.add_argument(
+        "--img_benchmark_type",
+        type=str,
+        choices=["simGetImage", "simGetImages"],
+        default="simGetImages",
+    )
+    parser.add_argument(
+        "--enable_viz_image_cv2",
+        dest="viz_image_cv2",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument("--save_images", dest="save_images", action="store_true", default=False)
+    parser.add_argument("--img_type", type=str, choices=cameraTypeMap.keys(), default="scene")
+    parser.add_argument(
+        "--time", help="Time in secs to run the benchmark for", type=int, default=30
+    )
 
     args = parser.parse_args()
     main(args)

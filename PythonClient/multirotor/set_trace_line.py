@@ -11,9 +11,9 @@
 #     }
 # }
 
-import setup_path
-import cosysairsim as airsim
 import time
+
+import cosysairsim as airsim
 
 # connect to the AirSim simulator
 client = airsim.MultirotorClient()

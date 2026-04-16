@@ -1,6 +1,6 @@
-import setup_path
-import cosysairsim as airsim
 import time
+
+import cosysairsim as airsim
 
 client = airsim.MultirotorClient()
 client.confirmConnection()
@@ -8,7 +8,7 @@ client.enableApiControl(True)
 
 client.armDisarm(True)
 
-print("Setting wind to 10m/s in forward direction") # NED
+print("Setting wind to 10m/s in forward direction")  # NED
 wind = airsim.Vector3r(10, 0, 0)
 client.simSetWind(wind)
 
@@ -23,7 +23,7 @@ else:
 
 time.sleep(5)
 
-print("Setting wind to 15m/s towards right") # NED
+print("Setting wind to 15m/s towards right")  # NED
 wind = airsim.Vector3r(0, 15, 0)
 client.simSetWind(wind)
 

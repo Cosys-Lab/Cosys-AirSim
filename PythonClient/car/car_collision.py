@@ -1,10 +1,9 @@
-import setup_path 
-import cosysairsim as airsim
-
 import pprint
 import time
 
-# connect to the AirSim simulator 
+import cosysairsim as airsim
+
+# connect to the AirSim simulator
 client = airsim.CarClient()
 client.confirmConnection()
 client.enableApiControl(True)
@@ -27,11 +26,17 @@ while True:
     collision_info = client.simGetCollisionInfo()
 
     if collision_info.has_collided:
-        print("Collision at pos %s, normal %s, impact pt %s, penetration %f, name %s, obj id %d" % (
-            pprint.pformat(collision_info.position), 
-            pprint.pformat(collision_info.normal), 
-            pprint.pformat(collision_info.impact_point), 
-            collision_info.penetration_depth, collision_info.object_name, collision_info.object_id))
+        print(
+            "Collision at pos %s, normal %s, impact pt %s, penetration %f, name %s, obj id %d"
+            % (
+                pprint.pformat(collision_info.position),
+                pprint.pformat(collision_info.normal),
+                pprint.pformat(collision_info.impact_point),
+                collision_info.penetration_depth,
+                collision_info.object_name,
+                collision_info.object_id,
+            )
+        )
         break
 
     time.sleep(0.1)

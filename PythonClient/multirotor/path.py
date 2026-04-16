@@ -1,8 +1,7 @@
-import setup_path
-import cosysairsim as airsim
-
 import sys
 import time
+
+import cosysairsim as airsim
 
 print("""This script is designed to fly on the streets of the Neighborhood environment
 and assumes the unreal position of the drone is [160, -1500, 120].""")
@@ -31,7 +30,7 @@ if state.landed_state == airsim.LandedState.Landed:
 # AirSim uses NED coordinates so negative axis is up.
 # z of -5 is 5 meters above the original launch point.
 z = -5
-print("make sure we are hovering at {} meters...".format(-z))
+print(f"make sure we are hovering at {-z} meters...")
 client.moveToZAsync(z, 1).join()
 
 # see https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo
@@ -39,15 +38,23 @@ client.moveToZAsync(z, 1).join()
 # this method is async and we are not waiting for the result since we are passing timeout_sec=0.
 
 print("flying on path...")
-result = client.moveOnPathAsync([airsim.Vector3r(125,0,z),
-                                airsim.Vector3r(125,-130,z),
-                                airsim.Vector3r(0,-130,z),
-                                airsim.Vector3r(0,0,z)],
-                        12, 120,
-                        airsim.DrivetrainType.ForwardOnly, airsim.YawMode(False,0), 20, 1).join()
+result = client.moveOnPathAsync(
+    [
+        airsim.Vector3r(125, 0, z),
+        airsim.Vector3r(125, -130, z),
+        airsim.Vector3r(0, -130, z),
+        airsim.Vector3r(0, 0, z),
+    ],
+    12,
+    120,
+    airsim.DrivetrainType.ForwardOnly,
+    airsim.YawMode(False, 0),
+    20,
+    1,
+).join()
 
 # drone will over-shoot so we bring it back to the start point before landing.
-client.moveToPositionAsync(0,0,z,1).join()
+client.moveToPositionAsync(0, 0, z, 1).join()
 print("landing...")
 client.landAsync().join()
 print("disarming...")

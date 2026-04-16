@@ -1,7 +1,7 @@
-import setup_path
-import cosysairsim as airsim
 import sys
 import time
+
+import cosysairsim as airsim
 
 # For high speed ascent and descent on PX4 you may need to set these properties:
 # param set MPC_Z_VEL_MAX_UP 5
@@ -25,7 +25,7 @@ else:
     print("already flying...")
     client.hoverAsync().join()
 
-print("make sure we are hovering at {} meters...".format(z))
+print(f"make sure we are hovering at {z} meters...")
 
 if z > 5:
     # AirSim uses NED coordinates so negative axis is up.

@@ -1,8 +1,8 @@
-import setup_path
-import cosysairsim as airsim
-import time
 import sys
 import threading
+import time
+
+import cosysairsim as airsim
 
 
 def runSingleCar(id: int):
@@ -10,8 +10,7 @@ def runSingleCar(id: int):
     client.confirmConnection()
 
     vehicle_name = f"Car_{id}"
-    pose = airsim.Pose(airsim.Vector3r(0, 7*id, 0),
-                       airsim.Quaternionr(0, 0, 0, 0))
+    pose = airsim.Pose(airsim.Vector3r(0, 7 * id, 0), airsim.Quaternionr(0, 0, 0, 0))
 
     print(f"Creating {vehicle_name}")
     success = client.simAddVehicle(vehicle_name, "Physxcar", pose)
@@ -33,7 +32,7 @@ def runSingleCar(id: int):
     car_controls.throttle = 0.5
     car_controls.steering = 0
     client.setCarControls(car_controls, vehicle_name)
-    time.sleep(3)   # let car drive a bit
+    time.sleep(3)  # let car drive a bit
 
     # Go forward + steer right
     car_controls.throttle = 0.5

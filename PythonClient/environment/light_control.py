@@ -1,5 +1,6 @@
-import cosysairsim as airsim
 import time
+
+import cosysairsim as airsim
 
 client = airsim.VehicleClient()
 client.confirmConnection()

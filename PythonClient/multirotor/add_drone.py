@@ -1,10 +1,8 @@
-import setup_path 
-import cosysairsim as airsim
-import tempfile
 import os
-import numpy as np
-import cv2
 import pprint
+import tempfile
+
+import cosysairsim as airsim
 
 # connect to the AirSim simulator
 client = airsim.MultirotorClient()
@@ -19,16 +17,20 @@ client.enableApiControl(True, vehicle_name)
 client.armDisarm(True, vehicle_name)
 client.takeoffAsync(10.0, vehicle_name)
 
-requests = [airsim.ImageRequest("0", airsim.ImageType.DepthVis),  #depth visualization image
-            airsim.ImageRequest("1", airsim.ImageType.DepthPerspective, True), #depth in perspective projection
-            airsim.ImageRequest("1", airsim.ImageType.Scene), #scene vision image in png format
-            airsim.ImageRequest("1", airsim.ImageType.Scene, False, False)]  #scene vision image in uncompressed RGBA array
+requests = [
+    airsim.ImageRequest("0", airsim.ImageType.DepthVis),  # depth visualization image
+    airsim.ImageRequest(
+        "1", airsim.ImageType.DepthPerspective, True
+    ),  # depth in perspective projection
+    airsim.ImageRequest("1", airsim.ImageType.Scene),  # scene vision image in png format
+    airsim.ImageRequest("1", airsim.ImageType.Scene, False, False),
+]  # scene vision image in uncompressed RGBA array
 
 responses = client.simGetImages(requests, vehicle_name=vehicle_name)
-print('Retrieved images: %d' % len(responses))
+print("Retrieved images: %d" % len(responses))
 
 tmp_dir = os.path.join(tempfile.gettempdir(), "airsim_drone")
-print ("Saving images to %s" % tmp_dir)
+print("Saving images to %s" % tmp_dir)
 try:
     os.makedirs(tmp_dir)
 except OSError:
@@ -39,8 +41,22 @@ for idx, response in enumerate(responses):
     filename = os.path.join(tmp_dir, str(idx))
 
     if response.pixels_as_float:
-        print("Type %d, size %d, pos %s" % (response.image_type, len(response.image_data_float), pprint.pformat(response.camera_position)))
-        airsim.write_pfm(os.path.normpath(filename + '.pfm'), airsim.get_pfm_array(response))
+        print(
+            "Type %d, size %d, pos %s"
+            % (
+                response.image_type,
+                len(response.image_data_float),
+                pprint.pformat(response.camera_position),
+            )
+        )
+        airsim.write_pfm(os.path.normpath(filename + ".pfm"), airsim.get_pfm_array(response))
     else:
-        print("Type %d, size %d, pos %s" % (response.image_type, len(response.image_data_uint8), pprint.pformat(response.camera_position)))
-        airsim.write_file(os.path.normpath(filename + '.png'), response.image_data_uint8)
+        print(
+            "Type %d, size %d, pos %s"
+            % (
+                response.image_type,
+                len(response.image_data_uint8),
+                pprint.pformat(response.camera_position),
+            )
+        )
+        airsim.write_file(os.path.normpath(filename + ".png"), response.image_data_uint8)

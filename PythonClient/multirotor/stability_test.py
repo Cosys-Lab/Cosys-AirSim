@@ -1,9 +1,9 @@
 import os
-import setup_path 
-import cosysairsim as airsim
 import time
+
 import numpy as np
-import sys
+
+import cosysairsim as airsim
 
 script_dir = os.path.dirname(__file__)
 
@@ -11,15 +11,18 @@ client = airsim.MultirotorClient()
 client.confirmConnection()
 client.enableApiControl(True)
 
+
 def play_sound(wavfile):
     import speaker
     import wav_reader
+
     reader = wav_reader.WavReader()
     reader.open(wavfile, 512, speaker.Speaker())
     while True:
         buffer = reader.read()
         if buffer is None:
             break
+
 
 class Numbers:
     def __init__(self, name):
@@ -35,19 +38,20 @@ class Numbers:
         maximum = a.max()
         mean = np.mean(a)
         stddev = np.std(a)
-        print("{}: min={}, max={}, mean={}, stddev={}".format(self.name, minimum, maximum, mean, stddev))
+        print(f"{self.name}: min={minimum}, max={maximum}, mean={mean}, stddev={stddev}")
         return (maximum - minimum) > amount
+
 
 print("### TEST STARTED ###")
 print("This test takes 20 minutes.")
 
 iteration = 0
 while iteration < 10:
-    iteration  += 1
+    iteration += 1
     x = Numbers("x")
     y = Numbers("y")
     z = Numbers("z")
-        
+
     print("arming the drone...")
     client.armDisarm(True)
 
@@ -66,17 +70,17 @@ while iteration < 10:
         x.add(x_val)
         y.add(y_val)
         z.add(z_val)
-        print("x: {}, y: {}, z: {}".format(x_val, y_val, z_val))
+        print(f"x: {x_val}, y: {y_val}, z: {z_val}")
         time.sleep(1)
 
     print("landing...")
     client.landAsync().join()
-    
+
     print("disarming the drone...")
     client.armDisarm(False)
 
     # more than 50 centimeter drift is unacceptable.
-    print("Results for iteration {}".format(iteration))
+    print(f"Results for iteration {iteration}")
     a = x.is_unstable(0.5)
     b = y.is_unstable(0.5)
     c = z.is_unstable(0.5)
