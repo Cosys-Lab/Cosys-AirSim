@@ -1,4 +1,3 @@
-import logging
 import warnings
 from typing import cast
 
