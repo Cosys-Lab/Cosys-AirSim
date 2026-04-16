@@ -1,4 +1,5 @@
 import logging
+import warnings
 from typing import cast
 
 import msgpackrpc  # install as admin: pip install rpc-msgpack
@@ -211,9 +212,10 @@ class VehicleClient:
         Returns:
             bool: True if successful, otherwise False
         """
-
-        logging.warning(
-            "simSetLightIntensity is deprecated, use the new Artificial Light API instead"
+        warnings.warn(
+            "simSetLightIntensity is deprecated, use the new Artificial Light API instead",
+            DeprecationWarning,
+            stacklevel=2,
         )
         return self.simSetWorldLightIntensity(light_name, intensity)
 
@@ -1941,8 +1943,10 @@ class MultirotorClient(VehicleClient):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        logging.warning(
-            "moveByAngleZAsync API is deprecated, use moveByRollPitchYawZAsync() API instead"
+        warnings.warn(
+            "moveByAngleZAsync API is deprecated, use moveByRollPitchYawZAsync() API instead",
+            DeprecationWarning,
+            stacklevel=2,
         )
         return self.client.call_async(
             "moveByRollPitchYawZ", roll, -pitch, -yaw, z, duration, vehicle_name
@@ -1965,8 +1969,10 @@ class MultirotorClient(VehicleClient):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
-        logging.warning(
-            "moveByAngleThrottleAsync API is deprecated, use moveByRollPitchYawrateThrottleAsync() API instead"
+        warnings.warn(
+            "moveByAngleThrottleAsync API is deprecated, use moveByRollPitchYawrateThrottleAsync() API instead",
+            DeprecationWarning,
+            stacklevel=2,
         )
         return self.client.call_async(
             "moveByRollPitchYawrateThrottle",
