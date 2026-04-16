@@ -65,8 +65,14 @@ class LidarTest:
         return points
 
     def write_lidarData_to_disk(self, points):
-        # TODO
-        print("not yet implemented")
+        """Save LiDAR point cloud data to disk as ASCII file."""
+        import tempfile
+
+        output_file = tempfile.mktemp(suffix=".asc")
+        with open(output_file, "w") as f:
+            for point in points:
+                f.write(f"{point[0]:.6f} {point[1]:.6f} {point[2]:.6f}\n")
+        print(f"Saved {len(points)} points to {output_file}")
 
     def stop(self):
 

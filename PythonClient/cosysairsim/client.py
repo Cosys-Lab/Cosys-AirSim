@@ -338,7 +338,7 @@ class VehicleClient:
         Returns:
             bytes: Binary string literal of compressed png image
         """
-        # todo: in future remove below, it's only for compatibility to pre v1.2
+        # Compatibility shim for pre-v1.2 API
         camera_name = str(camera_name)
 
         # because this method returns std::vector < uint8>, msgpack decides to encode it as a string, unfortunately.
