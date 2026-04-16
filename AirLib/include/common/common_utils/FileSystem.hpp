@@ -4,7 +4,7 @@
 #ifndef common_utils_FileSystem_hpp
 #define common_utils_FileSystem_hpp
 
-#include <codecvt>
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include "Utils.hpp"
@@ -26,7 +26,6 @@ class FileSystem
     typedef unsigned int uint;
 
 public:
-    // please use the combine() method instead.
     static const char kPathSeparator =
 #ifdef _WIN32
         '\\';
@@ -34,23 +33,39 @@ public:
         '/';
 #endif
 
-    static std::string createDirectory(const std::string& fullPath);
+    static std::string createDirectory(const std::string& fullPath)
+    {
+        std::filesystem::path fs_path(fullPath);
+        if (!std::filesystem::exists(fs_path)) {
+            std::filesystem::create_directories(fs_path);
+        }
+        return fullPath;
+    }
 
     static std::string getUserHomeFolder()
     {
-//Windows uses USERPROFILE, Linux uses HOME
 #ifdef _WIN32
         std::wstring userProfile = _wgetenv(L"USERPROFILE");
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        return converter.to_bytes(userProfile);
+        return std::filesystem::path(userProfile).u8string();
 #else
         return std::getenv("HOME");
 #endif
     }
 
-    static std::string getUserDocumentsFolder();
+    static std::string getUserDocumentsFolder()
+    {
+#ifdef _WIN32
+        std::wstring userProfile = _wgetenv(L"USERPROFILE");
+        return (std::filesystem::path(userProfile) / "Documents").u8string();
+#else
+        return std::getenv("HOME");
+#endif
+    }
 
-    static std::string getExecutableFolder();
+    static std::string getExecutableFolder()
+    {
+        return std::filesystem::current_path().u8string();
+    }
 
     static std::string getAppDataFolder()
     {
@@ -59,13 +74,11 @@ public:
 
     static std::string ensureFolder(const std::string& fullpath)
     {
-        // make sure this directory exists.
         return createDirectory(fullpath);
     }
 
     static std::string ensureFolder(const std::string& parentFolder, const std::string& child)
     {
-        // make sure this directory exists.
         return createDirectory(combine(parentFolder, child));
     }
 
@@ -74,40 +87,26 @@ public:
         if (child.size() == 0)
             return parentFolder;
 
-        size_t len = parentFolder.size();
-        if (parentFolder.size() > 0 && parentFolder[len - 1] == kPathSeparator) {
-            // parent already ends with '/'
-            return parentFolder + child;
-        }
-        len = child.size();
-        if (len > 0 && child[0] == kPathSeparator) {
-            // child already starts with '/'
-            return parentFolder + child;
-        }
-        return parentFolder + kPathSeparator + child;
+        std::filesystem::path p(parentFolder);
+        p /= child;
+        return p.u8string();
     }
 
     static void removeLeaf(std::string& path)
     {
-        size_t size = path.size();
-        size_t pos = path.find_last_of('/');
-        if (pos != std::string::npos) {
-            path.erase(pos, size - pos);
+        std::filesystem::path p(path);
+        if (p.has_parent_path()) {
+            path = p.parent_path().u8string();
         }
     }
 
     static std::string getFileExtension(const std::string& str)
     {
-        // bugbug: this is not unicode safe.
-        int len = static_cast<int>(str.size());
-        const char* ptr = str.c_str();
-        int i = 0;
-        for (i = len - 1; i >= 0; i--) {
-            if (ptr[i] == '.')
-                break;
+        std::filesystem::path p(str);
+        if (p.has_extension()) {
+            return p.extension().u8string();
         }
-        if (i < 0) return "";
-        return str.substr(i, len - i);
+        return "";
     }
 
     static std::string getLogFolderPath(bool folder_timestamp, const std::string& parent = "")
@@ -121,11 +120,8 @@ public:
     }
 
     static std::string getLogFileNamePath(const std::string& fullPath, const std::string& prefix, const std::string& suffix, const std::string& extension,
-                                          bool file_timestamp)
+                                              bool file_timestamp)
     {
-        //TODO: because this bug we are using alternative code with stringstream
-        //https://answers.unrealengine.com/questions/664905/unreal-crashes-on-two-lines-of-extremely-simple-st.html
-
         std::string filename;
         filename.append(ensureFolder(fullPath))
             .push_back(kPathSeparator);
@@ -135,46 +131,24 @@ public:
             .append(extension);
 
         return filename;
-
-        //std::stringstream filename_ss;
-        //filename_ss << ensureFolder(fullPath) << kPathSeparator << prefix << suffix << timestamp << extension;
-        //return filename_ss.str();
     }
 
     static void openTextFile(const std::string& filepath, std::ifstream& file)
     {
-#ifdef _WIN32
-        // WIN32 will create the wrong file names if we don't first convert them to UTF-16.
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        file.open(wide_path, std::ios::in);
-#else
-        file.open(filepath, std::ios::in);
-#endif
+        std::filesystem::path fs_path(filepath);
+        file.open(fs_path, std::ios::in);
     }
 
     static void createBinaryFile(const std::string& filepath, std::ofstream& file)
     {
-#ifdef _WIN32
-        // WIN32 will create the wrong file names if we don't first convert them to UTF-16.
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        file.open(wide_path, std::ios::binary | std::ios::trunc);
-#else
-        file.open(filepath, std::ios::binary | std::ios::trunc);
-#endif
+        std::filesystem::path fs_path(filepath);
+        file.open(fs_path, std::ios::binary | std::ios::trunc);
     }
 
     static void createTextFile(const std::string& filepath, std::ofstream& file)
     {
-#ifdef _WIN32
-        // WIN32 will create the wrong file names if we don't first convert them to UTF-16.
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        file.open(wide_path, std::ios::out | std::ios::trunc);
-#else
-        file.open(filepath, std::ios::trunc);
-#endif
+        std::filesystem::path fs_path(filepath);
+        file.open(fs_path, std::ios::out | std::ios::trunc);
 
         if (file.fail())
             throw std::ios_base::failure(std::strerror(errno));
@@ -207,14 +181,8 @@ public:
     static void appendLineToFile(const std::string& filepath, const std::string& line)
     {
         std::ofstream file;
-#ifdef _WIN32
-        // WIN32 will create the wrong file names if we don't first convert them to UTF-16.
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        std::wstring wide_path = converter.from_bytes(filepath);
-        file.open(wide_path, std::ios::out | std::ios::app);
-#else
-        file.open(filepath, std::ios::out | std::ios::app);
-#endif
+        std::filesystem::path fs_path(filepath);
+        file.open(fs_path, std::ios::out | std::ios::app);
         if (file.fail())
             throw std::ios_base::failure(std::strerror(errno));
         file.exceptions(file.exceptions() | std::ios::failbit | std::ifstream::badbit);

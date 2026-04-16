@@ -7,10 +7,10 @@ public class BlocksTarget : TargetRules
 {
 	public BlocksTarget(TargetInfo Target) : base(Target)
 	{
-        DefaultBuildSettings = BuildSettingsVersion.V5;
+        DefaultBuildSettings = BuildSettingsVersion.V6;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
         Type = TargetType.Game;
 		ExtraModuleNames.AddRange(new string[] { "Blocks" });
-		//bUseUnityBuild = false;
 		if (Target.Platform == UnrealTargetPlatform.Linux)
 			bUsePCHFiles = false;
 	}

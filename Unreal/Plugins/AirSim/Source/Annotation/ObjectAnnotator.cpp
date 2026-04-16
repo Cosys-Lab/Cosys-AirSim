@@ -4,7 +4,7 @@
 #include "ObjectAnnotator.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 #include "SceneInterface.h"
-#include "../Private/ScenePrivate.h"
+#include "PrimitiveSceneInfo.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "AnnotationComponent.h"
 #include "AirBlueprintLib.h"

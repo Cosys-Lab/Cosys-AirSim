@@ -9,6 +9,7 @@
 #include "Settings.hpp"
 #include "common_utils/Utils.hpp"
 #include "sensors/SensorBase.hpp"
+#include "AirSimSettings_structs.hpp"
 #include <exception>
 #include <functional>
 #include <map>

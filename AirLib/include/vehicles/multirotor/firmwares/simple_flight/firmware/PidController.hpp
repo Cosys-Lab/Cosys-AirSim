@@ -105,16 +105,9 @@ public:
         output_ = config_.output_bias + pterm + integrator->getOutput() + dterm;
 
         //limit final output
-        output_ = clip(output_, config_.min_output, config_.max_output);
+        output_ = std::clamp(output_, config_.min_output, config_.max_output);
 
         last_time_ = clock_->millis();
-    }
-
-private:
-    //TODO: replace with std::clamp after moving to C++17
-    static T clip(T val, T min_value, T max_value)
-    {
-        return std::max(min_value, std::min(val, max_value));
     }
 
 private:

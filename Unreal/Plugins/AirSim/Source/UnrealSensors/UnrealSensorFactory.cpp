@@ -22,26 +22,26 @@ std::shared_ptr<msr::airlib::SensorBase> UnrealSensorFactory::createSensorFromSe
 
     switch (sensor_setting->sensor_type) {
     case SensorBase::SensorType::Distance:
-        return std::shared_ptr<UnrealDistanceSensor>(new UnrealDistanceSensor(
-            *static_cast<const AirSimSettings::DistanceSetting*>(sensor_setting), actor_, ned_transform_));
+        return std::make_shared<UnrealDistanceSensor>(
+            *static_cast<const AirSimSettings::DistanceSetting*>(sensor_setting), actor_, ned_transform_);
     case SensorBase::SensorType::Lidar:
-        return std::shared_ptr<UnrealLidarSensor>(new UnrealLidarSensor(
-            *static_cast<const AirSimSettings::LidarSetting*>(sensor_setting), actor_, ned_transform_));
+        return std::make_shared<UnrealLidarSensor>(
+            *static_cast<const AirSimSettings::LidarSetting*>(sensor_setting), actor_, ned_transform_);
 	case SensorBase::SensorType::GPULidar:
-		return std::shared_ptr<UnrealGPULidarSensor>(new UnrealGPULidarSensor(
-			*static_cast<const AirSimSettings::GPULidarSetting*>(sensor_setting), actor_, ned_transform_));
+		return std::make_shared<UnrealGPULidarSensor>(
+			*static_cast<const AirSimSettings::GPULidarSetting*>(sensor_setting), actor_, ned_transform_);
     case SensorBase::SensorType::Echo:
-        return std::shared_ptr<UnrealEchoSensor>(new UnrealEchoSensor(
-            *static_cast<const AirSimSettings::EchoSetting*>(sensor_setting), actor_, ned_transform_));
+        return std::make_shared<UnrealEchoSensor>(
+            *static_cast<const AirSimSettings::EchoSetting*>(sensor_setting), actor_, ned_transform_);
     case SensorBase::SensorType::SensorTemplate:
-        return std::shared_ptr<UnrealSensorTemplate>(new UnrealSensorTemplate(
-            *static_cast<const AirSimSettings::SensorTemplateSetting*>(sensor_setting), actor_, ned_transform_));
+        return std::make_shared<UnrealSensorTemplate>(
+            *static_cast<const AirSimSettings::SensorTemplateSetting*>(sensor_setting), actor_, ned_transform_);
     case SensorBase::SensorType::MarlocUwb:
-        return std::shared_ptr<UnrealMarLocUwbSensor>(new UnrealMarLocUwbSensor(
-            *static_cast<const AirSimSettings::MarLocUwbSetting*>(sensor_setting), actor_, ned_transform_));
+        return std::make_shared<UnrealMarLocUwbSensor>(
+            *static_cast<const AirSimSettings::MarLocUwbSetting*>(sensor_setting), actor_, ned_transform_);
     case SensorBase::SensorType::Wifi:
-        return std::shared_ptr<UnrealWifiSensor>(new UnrealWifiSensor(
-            *static_cast<const AirSimSettings::WifiSetting*>(sensor_setting), actor_, ned_transform_));
+        return std::make_shared<UnrealWifiSensor>(
+            *static_cast<const AirSimSettings::WifiSetting*>(sensor_setting), actor_, ned_transform_);
     default:
         return msr::airlib::SensorFactory::createSensorFromSettings(sensor_setting);
     }

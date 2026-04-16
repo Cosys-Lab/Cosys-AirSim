@@ -535,6 +535,19 @@ private:
     std::map<uint16_t, input_absinfo> absinfo_map;
 };
 
+#else
+// macOS stub — no joystick support
+struct SimJoyStick::impl
+{
+    void getJoyStickState(int /*index*/, SimJoyStick::State& state, const SimJoyStick::AxisMaps& /*maps*/)
+    {
+        state.is_initialized = false;
+        state.is_valid = false;
+    }
+    void setAutoCenter(int /*index*/, double /*strength*/) {}
+    void setWheelRumble(int /*index*/, double /*strength*/) {}
+    int getNumJoysticks() const { return 0; }
+};
 #endif
 
 SimJoyStick::SimJoyStick()

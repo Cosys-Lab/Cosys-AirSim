@@ -109,7 +109,7 @@ void RenderRequest::getScreenshot(std::shared_ptr<RenderParams> params[], std::v
         if (params[i]->render_target != nullptr && params[i]->render_component != nullptr) {
             if (!params[i]->pixels_as_float) {
                 if (results[i]->width != 0 && results[i]->height != 0) {
-                    results[i]->image_data_uint8.SetNumUninitialized(results[i]->width * results[i]->height * 3, false);
+                    results[i]->image_data_uint8.SetNumUninitialized(results[i]->width * results[i]->height * 3, EAllowShrinking::No);
                     if (params[i]->compress)
                         UAirBlueprintLib::CompressImageArray(results[i]->width, results[i]->height, results[i]->bmp, results[i]->image_data_uint8);
                     else {
@@ -123,7 +123,7 @@ void RenderRequest::getScreenshot(std::shared_ptr<RenderParams> params[], std::v
                 }
             }
             else {
-                results[i]->image_data_float.SetNumUninitialized(results[i]->width * results[i]->height);
+                results[i]->image_data_float.SetNumUninitialized(results[i]->width * results[i]->height, EAllowShrinking::No);
                 float* ptr = results[i]->image_data_float.GetData();
                 for (const auto& item : results[i]->bmp_float) {
                     *ptr++ = item.R.GetFloat();
@@ -152,7 +152,7 @@ void RenderRequest::ExecuteTask()
                 FRHICommandListImmediate& RHICmdList = GetImmediateCommandList_ForRenderCommand();
                 auto rt_resource = params_[i]->render_target->GetRenderTargetResource();
                 if (rt_resource != nullptr) {
-                    const FTexture2DRHIRef& rhi_texture = rt_resource->GetRenderTargetTexture();
+                    const FTextureRHIRef& rhi_texture = rt_resource->GetRenderTargetTexture();
                     FIntPoint size;
                     auto flags = setupRenderResource(rt_resource, params_[i].get(), results_[i].get(), size);
 

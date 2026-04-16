@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "interfaces/CommonStructs.hpp"
 
 namespace simple_flight
@@ -48,13 +49,7 @@ public:
 private:
     void clipIterm()
     {
-        yp[0] = clip(yp[0], config_.min_output, config_.max_output);
-    }
-
-    //TODO: replace with std::clamp after moving to C++17
-    static T clip(T val, T min_value, T max_value)
-    {
-        return std::max(min_value, std::min(val, max_value));
+        yp[0] = std::clamp(yp[0], config_.min_output, config_.max_output);
     }
 
     void model(float* y_val, float last_time_, float* y_out)
