@@ -535,14 +535,16 @@ namespace LogViewer.Model
                         {
                             string name = row.GetField<string>("Name");
                             float value = row.GetField<float>("Value");
-                            Debug.WriteLine("{0}={1}", name, value);
+                            System.Diagnostics.Debug.WriteLine($"{name}={value}");
                         }
                     }
                     if (log.CurrentTime != 0)
                     {
                         DateTime endTime = GetTime(log.CurrentTime + gpsAbsoluteOffset);
                         this.duration = endTime - startTime;
-                        Debug.WriteLine("StartTime={0}, EndTime={1}, Duration={2}", startTime.ToString(), endTime.ToString(), duration.ToString());
+                        System.Diagnostics.Debug.WriteLine(
+                            $"StartTime={startTime}, EndTime={endTime}, Duration={duration}"
+                        );
                     }
 
                     CreateSchema(log);

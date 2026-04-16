@@ -84,17 +84,13 @@ namespace LogViewer.Model
                             while (reader.Read())
                             {
                                 ReportProgress();
-                                //if (reader.TokenType == JsonToken.StartObject)
-                                //{
-                                //    ReadObject(reader);
-                                //}
                                 if (reader.Value != null)
                                 {
-                                    //Console.WriteLine("Token: {0}, Value: {1}", reader.TokenType, reader.Value);
+                                    // Token value available
                                 }
                                 else
                                 {
-                                   // Console.WriteLine("Token: {0}", reader.TokenType);
+                                    // Token processed without value
                                 }
                             }
 
@@ -137,21 +133,10 @@ namespace LogViewer.Model
 
                         //rows.Add(row);
 
-                        //if (row.Format.Name == "PARM")
-                        //{
-                        //    string name = row.GetField<string>("Name");
-                        //    float value = row.GetField<float>("Value");
-                        //    Debug.WriteLine("{0}={1}", name, value);
-                        //}
+                        // PARM rows handled in ReadLogData
                     }
-                    //if (log.CurrentTime != 0)
-                    //{
-                    //    DateTime endTime = GetTime(log.CurrentTime + gpsAbsoluteOffset);
-                    //    this.duration = endTime - startTime;
-                    //    Debug.WriteLine("StartTime={0}, EndTime={1}, Duration={2}", startTime.ToString(), endTime.ToString(), duration.ToString());
-                    //}
 
-                    //CreateSchema(log);                
+                    // Schema creation handled elsewhere
             });
 
             //this.data = rows;
