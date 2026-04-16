@@ -15,45 +15,21 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
-
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>message_runtime</build_depend>
-  <build_depend>mavros_msgs</build_depend>
-  <build_depend>nav_msgs</build_depend>
-  <build_depend>rclcpp</build_depend>
-  <build_depend>rclpy</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>geographic_msgs</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>tf2_sensor_msgs</build_depend>
-  
+  <depend>geometry_msgs</depend>
+  <depend>image_transport</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>geographic_msgs</depend>
+  <depend>tf2_sensor_msgs</depend>
   <depend>airsim_interfaces</depend>
   <depend>pcl_conversions</depend>
   <depend>pcl</depend>
-
-  <build_depend>builtin_interfaces</build_depend>
-  <exec_depend>builtin_interfaces</exec_depend>
-  <build_depend>rosidl_default_generators</build_depend>
-  
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>image_transport</exec_depend>
-  <exec_depend>message_generation</exec_depend>
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>nav_msgs</exec_depend>
-  <exec_depend>rclcpp</exec_depend>
-  <exec_depend>rclpy</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>joy</exec_depend>
-
-  <buildtool_depend>rosidl_default_generators</buildtool_depend>
-  <exec_depend>rosidl_default_runtime</exec_depend>
+  <depend>builtin_interfaces</depend>
+  <depend>rosidl_default_runtime</depend>
+  <depend>joy</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
   </export>
-
-  <buildtool_depend>ament_cmake</buildtool_depend>
 </package>

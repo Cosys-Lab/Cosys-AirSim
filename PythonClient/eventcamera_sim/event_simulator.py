@@ -1,7 +1,7 @@
-from numba.np.ufunc import parallel
-import numpy as np
 from types import SimpleNamespace
-from numba import njit, prange, set_num_threads
+
+import numpy as np
+from numba import njit, prange
 
 EVENT_TYPE = np.dtype(
     [("timestamp", "f8"), ("x", "u2"), ("y", "u2"), ("polarity", "b")], align=True
@@ -108,11 +108,9 @@ class EventSimulator:
 
         self.last_time = first_time
 
-        self.output_events = np.zeros(
-            (self.config.max_events_per_frame), dtype=EVENT_TYPE
-        )
+        self.output_events = np.zeros((self.config.max_events_per_frame), dtype=EVENT_TYPE)
         self.event_count = 0
-        self.spikes = np.zeros((self.npix))
+        self.spikes = np.zeros(self.npix)
 
     def image_callback(self, new_image, new_time):
         if self.last_image is None:
@@ -128,10 +126,8 @@ class EventSimulator:
         delta_time = new_time - self.last_time
 
         config = self.config
-        self.output_events = np.zeros(
-            (self.config.max_events_per_frame), dtype=EVENT_TYPE
-        )
-        self.spikes = np.zeros((self.npix))
+        self.output_events = np.zeros((self.config.max_events_per_frame), dtype=EVENT_TYPE)
+        self.spikes = np.zeros(self.npix)
 
         self.crossings = self.last_image.copy()
         self.event_count = esim(

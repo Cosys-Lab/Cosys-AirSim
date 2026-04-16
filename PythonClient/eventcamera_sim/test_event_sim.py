@@ -1,13 +1,15 @@
-import numpy as np
-import cosysairsim as airsim
+import argparse
+import pickle
+import signal
+import sys
 import time
+
 import cv2
 import matplotlib.pyplot as plt
-import argparse
-import sys, signal
-import pandas as pd
-import pickle
+import numpy as np
 from event_simulator import *
+
+import cosysairsim as airsim
 
 parser = argparse.ArgumentParser(description="Simulate event data from AirSim")
 parser.add_argument("--debug", action="store_true")
@@ -22,9 +24,7 @@ class AirSimEventGen:
         self.H = H
         self.W = W
 
-        self.image_request = airsim.ImageRequest(
-            "0", airsim.ImageType.Scene, False, False
-        )
+        self.image_request = airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)
 
         self.client = airsim.VehicleClient()
         self.client.confirmConnection()
@@ -77,9 +77,7 @@ if __name__ == "__main__":
 
         response = event_generator.client.simGetImages([event_generator.image_request])
         while response[0].height == 0 or response[0].width == 0:
-            response = event_generator.client.simGetImages(
-                [event_generator.image_request]
-            )
+            response = event_generator.client.simGetImages([event_generator.image_request])
 
         ts = time.time_ns()
 
@@ -88,7 +86,7 @@ if __name__ == "__main__":
             event_generator.init = False
 
         img = np.reshape(
-            np.fromstring(response[0].image_data_uint8, dtype=np.uint8),
+            np.frombuffer(response[0].image_data_uint8.encode(), dtype=np.uint8),
             event_generator.rgb_image_shape,
         )
 

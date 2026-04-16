@@ -1,12 +1,9 @@
-import setup_path
-import cosysairsim as airsim
-import numpy as np
 import math
-import time
-from argparse import ArgumentParser
 
-import gym
+import numpy as np
 from gym import spaces
+
+import cosysairsim as airsim
 from airgym.envs.airsim_env import AirSimEnv
 
 
@@ -26,9 +23,7 @@ class AirSimDroneEnv(AirSimEnv):
         self.action_space = spaces.Discrete(7)
         self._setup_flight()
 
-        self.image_request = airsim.ImageRequest(
-            3, airsim.ImageType.DepthPerspective, True, False
-        )
+        self.image_request = airsim.ImageRequest(3, airsim.ImageType.DepthPerspective, True, False)
 
     def __del__(self):
         self.drone.reset()
