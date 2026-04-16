@@ -1,0 +1,104 @@
+version: 1
+project: Cosys-AirSim Modernization
+generated_on: 2026-03-07
+items:
+  - id: PR-001
+    title: Remove polyfill.io from MkDocs
+    status: backlog
+    priority: P0
+    spec: prs/PR-001-remove-polyfill-io.md
+  - id: PR-002
+    title: Replace deprecated NumPy APIs
+    status: backlog
+    priority: P0
+    spec: prs/PR-002-numpy-modernization.md
+  - id: PR-003
+    title: Drop EOL Python and Ubuntu runner
+    status: backlog
+    priority: P0
+    spec: prs/PR-003-drop-eol-runtimes.md
+  - id: PR-004
+    title: Replace custom optional with std::optional
+    status: backlog
+    priority: P1
+    spec: prs/PR-004-std-optional.md
+  - id: PR-005
+    title: Migrate FileSystem to std::filesystem
+    status: backlog
+    priority: P1
+    spec: prs/PR-005-std-filesystem.md
+  - id: PR-006
+    title: Enforce C++ standard in CMake
+    status: backlog
+    priority: P1
+    spec: prs/PR-006-cmake-standard-enforcement.md
+  - id: PR-007
+    title: Replace typedef with using
+    status: backlog
+    priority: P2
+    spec: prs/PR-007-typedef-to-using.md
+  - id: PR-008
+    title: Apply make_unique and make_shared
+    status: backlog
+    priority: P1
+    spec: prs/PR-008-smart-pointer-factory.md
+  - id: PR-009
+    title: Generic sensor lookup in VehicleApiBase
+    status: backlog
+    priority: P1
+    spec: prs/PR-009-sensor-lookup-template.md
+  - id: PR-010
+    title: Split AirSimSettings god header
+    status: backlog
+    priority: P1
+    spec: prs/PR-010-split-airsimsettings.md
+  - id: PR-011
+    title: Adopt C++17 utility features
+    status: backlog
+    priority: P2
+    spec: prs/PR-011-cpp17-utility-features.md
+  - id: PR-012
+    title: Add Python type annotations to public API
+    status: backlog
+    priority: P1
+    spec: prs/PR-012-python-type-annotations.md
+  - id: PR-013
+    title: Replace wildcard imports and define __all__
+    status: backlog
+    priority: P1
+    spec: prs/PR-013-explicit-imports.md
+  - id: PR-014
+    title: Remove mutable Python defaults
+    status: backlog
+    priority: P1
+    spec: prs/PR-014-fix-mutable-defaults.md
+  - id: PR-015
+    title: Add Python CI workflow
+    status: backlog
+    priority: P0
+    spec: prs/PR-015-python-ci.md
+  - id: PR-016
+    title: Add pre-commit and formatting policy
+    status: backlog
+    priority: P1
+    spec: prs/PR-016-precommit-quality-gates.md
+  - id: PR-017
+    title: Modernize Dockerfiles
+    status: backlog
+    priority: P1
+    spec: prs/PR-017-docker-modernization.md
+  - id: PR-018
+    title: Add Dependabot and CodeQL
+    status: backlog
+    priority: P1
+    spec: prs/PR-018-security-automation.md
+  - id: PR-019
+    title: Clean ROS2 package metadata and CMake
+    status: backlog
+    priority: P1
+    spec: prs/PR-019-ros2-cleanup.md
+  - id: PR-020
+    title: Upgrade docs stack to Material + mkdocstrings
+    status: backlog
+    priority: P2
+    spec: prs/PR-020-docs-modernization.md
