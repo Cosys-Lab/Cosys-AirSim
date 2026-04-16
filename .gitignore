@@ -246,6 +246,35 @@ FakesAssemblies/
 
 # compiled python files
 *.pyc
+__pycache__/
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# uv package manager
+uv.lock
+.python-version
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ruff
+.ruff_cache/
+
+# type ignore
+*.pyi
 
 # LightSwitch generated files
 GeneratedArtifacts/
