@@ -16,10 +16,10 @@ namespace airlib
     class UpdatableContainer : public UpdatableObject
     {
     public: //limited container interface
-        typedef vector<TUpdatableObjectPtr> MembersContainer;
-        typedef typename MembersContainer::iterator iterator;
-        typedef typename MembersContainer::const_iterator const_iterator;
-        typedef typename MembersContainer::value_type value_type;
+        using MembersContainer = vector<TUpdatableObjectPtr>;
+        using iterator = typename MembersContainer::iterator;
+        using const_iterator = typename MembersContainer::const_iterator;
+        using value_type = typename MembersContainer::value_type;
         iterator begin() { return members_.begin(); }
         iterator end() { return members_.end(); }
         const_iterator begin() const { return members_.begin(); }

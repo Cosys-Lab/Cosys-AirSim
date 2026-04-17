@@ -94,7 +94,7 @@ namespace airlib
         }
 
     private:
-        typedef std::normal_distribution<> NormalDistribution;
+        using NormalDistribution = std::normal_distribution<>;
 
         GpsSimpleParams params_;
 
