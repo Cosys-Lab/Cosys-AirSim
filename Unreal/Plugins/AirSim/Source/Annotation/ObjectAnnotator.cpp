@@ -1186,7 +1186,9 @@ void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 
 	for (UObject* Object : UObjectList)
 	{
+		if (!IsValid(Object)) continue;
 		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Object);
+		if (!Component) continue;
 		FName componentFName = *Component->GetName();
 		FString componentName = componentFName.ToString();
 		if (Component->GetWorld() == World
@@ -1249,7 +1251,9 @@ void FObjectAnnotator::EndPlay() {
 	GetObjectsOfClass(UAnnotationComponent::StaticClass(), UObjectList, bIncludeDerivedClasses, ExclusionFlags, ExclusionInternalFlags);
 	for (UObject* Object : UObjectList)
 	{
+		if (!IsValid(Object)) continue;
 		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Object);
+		if (!Component) continue;
 		FName componentFName = *Component->GetName();
 		FString componentName = componentFName.ToString();
 		if (componentName.Contains(name_))
