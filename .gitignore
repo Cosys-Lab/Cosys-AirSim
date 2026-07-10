@@ -403,3 +403,5 @@ PythonClient/docs/_build
 docker/LinuxBlocks/*
 /cosys-airsim-data-scripts/
 CLAUDE.md
+*.claude
+*.idea
