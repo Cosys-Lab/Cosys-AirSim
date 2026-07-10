@@ -1,0 +1,39 @@
+# Copyright 2024-2025 The MathWorks, Inc.
+% TOOLBOX IGNORE FILE
+% Specify the files/folder to exclude from packaging.
+% Paths are relative to the toolbox root folder.
+% List only one exclusion per line.
+
+% EXAMPLES
+% folder/                - Exclude folder and all of its content
+% folder/*               - Exclude contents of folder 
+% folder/**              - Exclude all contents of folder and subfolders
+% *.extension            - Exclude files with extension in folder
+% **/*.extension         - Exclude all files with extension in folder and all subfolders
+% file.extension         - Exclude specific file
+% folder/file.extension  - Exclude specific file in a subfolder
+% **/file.extension      - Exclude specific file in all subfolders  
+
+% Notes:
+% - If a path starts with '%', include '\' before '%', for example, "\%examplefile.svn".
+% - This file, 'toolbox.ignore', is always excluded from the toolbox and including it is not supported.
+
+%% Recommended Exclusions (remove lines to re-include files):
+
+% Exclude source control files
+**/.git*
+**/.git/
+**/*.svn
+
+% Toolbox files and project files
+**/*.mltbx
+**/*.prj
+
+% Backup files
+**/*.asv
+**/*.m~
+**/*.prj.bak
+
+% Local MATLAB/Simulink tool caches
+**/slprj
+**/.buildtool/
