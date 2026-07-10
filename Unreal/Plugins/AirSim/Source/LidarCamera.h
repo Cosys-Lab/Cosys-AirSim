@@ -22,6 +22,7 @@
 #include "sensors/lidar/GPULidarSimple.hpp"
 #include "common/Common.hpp"
 #include <random>
+#include <atomic>
 
 #include "LidarCamera.generated.h"
 
@@ -132,6 +133,22 @@ private:
 	bool SampleRenders(float sensor_rotation_angle, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
 	//void ExecuteScanTask();
 	std::shared_ptr<msr::airlib::WorkerThreadSignal> wait_signal_;
+
+	bool async_capture_mode_ = false;
+	std::atomic<bool> async_capture_in_flight_{ false };
+	std::atomic<bool> async_capture_ready_{ false };
+	float pending_capture_rotation_ = 0;
+	int32 pending_capture_fov_ = 0;
+	bool pending_do_capture_ = false;
+	float async_job_rotation_angle_ = 0;
+	float async_job_fov_ = 0;
+	TArray<FColor> async_buffer_2D_depth_;
+	TArray<FColor> async_buffer_2D_segmentation_;
+	TArray<FColor> async_buffer_2D_intensity_;
+	bool UpdateAsync(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
+	void StartAsyncCapture(float capture_rotation, int32 cur_fov, bool do_capture);
+	void ServiceAsyncCapture();
+	bool ProcessCapturedBuffers(float sensor_rotation_angle, float fov, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<msr::airlib::real_T>& point_cloud_final);
 
 
 	UPROPERTY()

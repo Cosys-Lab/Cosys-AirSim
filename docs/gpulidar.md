@@ -5,7 +5,8 @@ Cosys-AirSim supports a GPU accelerated Lidar for multirotors and cars. It uses 
 The enablement of a GPU lidar and the other lidar settings can be configured via AirSimSettings json.
 Please see [general sensors](sensors.md) for information on configuration of general/shared sensor settings.
 
-Note that this sensor type is currently not supported for Multirotor mode. It only works for Car and Computervision.
+Note that on Multirotor simmode, the sensor capture is dispatched asynchronously to the Unreal game thread , so its measurements lag by roughly one game frame compared to other simmodes. Real-time debug point drawing (`DrawDebugPoints`) is not supported on Multirotor for this reason.
+
 ## Enabling GPU lidar on a vehicle
 * By default, GPU lidars are not enabled. To enable the sensor, set the SensorType and Enabled attributes in settings json.
 ```
@@ -105,7 +106,7 @@ asphalt,0.1
 This needs to be saved as 'materials.csv' in your documents folder where also your settings json file resides.
 
 ## Server side visualization for debugging
-By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. *This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
+By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. Note this does not work for Multirotor vehicles. *This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
 
 e.g.:
 ```
