@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Info/>
+<Info>
+    <Category UUID="Deployment_Category_29cfb86b-224b-4c65-bb70-abbed75b694c">
+        <Label UUID="Deployment_ToolboxImageFile_29cfb86b-224b-4c65-bb70-abbed75b694c"/>
+    </Category>
+</Info>

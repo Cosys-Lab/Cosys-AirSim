@@ -17,20 +17,20 @@ function plan = buildfile
 
     % Make the "release" task dependent on the others
     plan("release").Dependencies = ["check" "generatedocs"];
-    plan("release").Outputs = "release\sonotraceue.mltbx";
+    plan("release").Outputs = "release\Cosys-AirSim Matlab API Client.mltbx";
 end
 
 function releaseTask(~)
     % Create an MLTBX package
     releaseFolderName = "release";
     % Create a release and put it in the release directory
-    opts = matlab.addons.toolbox.ToolboxOptions("SonoTraceUE-Toolbox.prj");
+    opts = matlab.addons.toolbox.ToolboxOptions("Cosys-AirSimMatlabAPIClient.prj");
     
     % By default, the packaging GUI restricts the name of the getting started guide, so we fix that here.
     opts.ToolboxGettingStartedGuide = fullfile("toolbox", "doc", "gettingStarted.mlx");
     
     % GitHub releases don't allow spaces, so replace spaces with underscores
-    opts.OutputFile = fullfile(releaseFolderName, "sonotraceue.mltbx");
+    opts.OutputFile = fullfile(releaseFolderName, "Cosys-AirSim Matlab API Client.mltbx");
     
     % Create the release directory, if needed
     if ~exist(releaseFolderName,"dir")
