@@ -1,435 +1,4277 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Core APIs - Cosys-AirSim</title>
-    <link rel="stylesheet" href="../css/theme.css" />
-    <link rel="stylesheet" href="../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
     
-      <script>
-        // Current page data
-        var mkdocs_page_name = "Core APIs";
-        var mkdocs_page_input_path = "apis.md";
-        var mkdocs_page_url = null;
-      </script>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Cosys-AirSim is a simulator for drones, cars and more, built on Unreal Engine. We expand it with new implementations and sensor modalities.">
+      
+      
+        <meta name="author" content="Cosys-Lab">
+      
+      
+      
+        <link rel="prev" href="../dynamic_objects/">
+      
+      
+        <link rel="next" href="../image_apis/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
-    <script src="../js/jquery-3.6.0.min.js" defer></script>
-    <!--[if lt IE 9]>
-      <script src="../js/html5shiv.min.js"></script>
-    <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
-</head>
+    
+      
+        <title>Core APIs - Cosys-AirSim</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
 
-<body class="wy-body-for-nav" role="document">
 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-    <div class="wy-side-scroll">
-      <div class="wy-side-nav-search">
-          <a href=".." class="icon icon-home"> Cosys-AirSim
-        </a><div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
-  </form>
-</div>
-      </div>
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Home</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
-                  </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="" href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md">Changelog</a>
-                </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Installing AirSim</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../run_packaged/">Download and run</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../install_precompiled/">Download and install from precompiled plugin</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../install_windows/">Install from Source on Windows</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../install_linux/">Install from Source on Linux</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../docker_ubuntu/">Using Docker on Ubuntu</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../unreal_custenv/">Custom Unreal Environment</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../dynamic_objects/">Dynamic Objects</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Using AirSim</span></p>
-              <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Core APIs</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#python-quickstart">Python Quickstart</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#installing-airsim-package">Installing AirSim Package</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#c-users">C++ Users</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#hello-car">Hello Car</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#hello-drone">Hello Drone</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#common-apis">Common APIs</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#imagecomputer-visioninstance-segmentation-apis">Image/Computer Vision/Instance segmentation APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#pause-and-continue-apis">Pause and Continue APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#collision-api">Collision API</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#time-of-day-api">Time of Day API</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#line-of-sight-and-world-extent-apis">Line-of-sight and world extent APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#weather-apis">Weather APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#recording-apis">Recording APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#wind-api">Wind API</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#lidar-apis">Lidar APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#light-control-apis">Light Control APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#texture-apis">Texture APIs</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#multiple-vehicles">Multiple Vehicles</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#coordinate-system">Coordinate System</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#vehicle-specific-apis">Vehicle Specific APIs</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#apis-for-car">APIs for Car</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#apis-for-multirotor">APIs for Multirotor</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#getmultirotorstate">getMultirotorState</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#async-methods-duration-and-max_wait_seconds">Async methods, duration and max_wait_seconds</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#drivetrain">drivetrain</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#yaw_mode">yaw_mode</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#lookahead-and-adaptive_lookahead">lookahead and adaptive_lookahead</a>
-    </li>
-        </ul>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#using-apis-on-real-vehicles">Using APIs on Real Vehicles</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#adding-new-apis-to-airsim">Adding New APIs to AirSim</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#references-and-examples">References and Examples</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#unreal-is-slowed-down-dramatically-when-i-run-api">Unreal is slowed down dramatically when I run API</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#do-i-need-anything-else-on-windows">Do I need anything else on Windows?</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#which-version-of-python-should-i-use">Which version of Python should I use?</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#i-get-error-on-import-cv2">I get error on import cv2</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#typeerror-unsupported-operand-types-for-asyncioloop-and-float">TypeError: unsupported operand type(s) for *: 'AsyncIOLoop' and 'float'</a>
-    </li>
-        </ul>
-    </li>
-    </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../image_apis/">Image APIs</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../apis_cpp/">C++ APIs</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../instance_segmentation/">Instance Segmentation</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../annotation/">Annotation</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../camera_views/">Camera Views</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../using_car/">Car Mode</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../remote_control/">Remote Control</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../xbox_controller/">XBox Controller</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../steering_wheel_installation/">Steering Wheel</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../multi_vehicle/">Multiple Vehicles</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../skid_steer_vehicle/">Skid Steer Vehicles</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../gazebo_drone/">Import Gazebo models</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../retexturing/">Domain Randomization</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../meshes/">Mesh Vertex Buffers</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../lights/">Artificial Lights</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">Sensors</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../sensors/">Sensors</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../lidar/">LIDAR</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../gpulidar/">GPU LIDAR</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../echo/">Pulse Echo</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../InfraredCamera/">Infrared Camera</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../distance_sensor/">Distance Sensor</a>
-                </li>
-    </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">ROS</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../ros_python/">ROS: AirSim ROS Python Wrapper</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../ros_cplusplus/">ROS2: AirSim ROS C++ Wrapper</a>
-                </li>
-    </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../matlab/">Matlab</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../playback/">Playing Logs</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../voxel_grid/">Voxel Grid Generator</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../event_sim/">Event camera</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Design</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../modify_recording_data/">Modifying Recording Data</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../flight_controller/">Flight Controller</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../adding_new_apis/">Adding new APIs</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../simple_flight/">Simple Flight</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">External Flight Controllers</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="#">MavLink and PX4</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../px4_setup/">PX4 Setup for AirSim</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl/">PX4 in SITL</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../px4_sitl_wsl2/">PX4 SITL with WSL 2</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../px4_lockstep/">PX4 Lockstep</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../px4_multi_vehicle/">PX4 Multi-vehicle in SITL</a>
-                </li>
-                <li class="toctree-l2"><a class="" href="https://youtu.be/1oY8Qu5maQQ">AirSim with Pixhawk</a>
-                </li>
-                <li class="toctree-l2"><a class="" href="https://youtu.be/HNWdYrtw3f0">PX4 Setup with AirSim</a>
-                </li>
-                <li class="toctree-l2"><a class="" href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be">Debugging Attitude Estimation</a>
-                </li>
-                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages">Intercepting MavLink Messages</a>
-                </li>
-                <li class="toctree-l2"><a class="" href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones">Rapid Descent on PX4 Drones</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../px4_build/">Building PX4</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../px4_logging/">PX4/MavLink Logging</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../log_viewer/">MavLink LogViewer</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom/">MavLinkCom</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../mavlinkcom_mocap/">MavLink MoCap</a>
-                </li>
-    </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="#">ArduPilot</a>
-    <ul>
-                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/building-the-code.html">ArduPilot SITL Setup</a>
-                </li>
-                <li class="toctree-l2"><a class="" href="https://ardupilot.org/dev/docs/sitl-with-airsim.html">AirSim & ArduPilot</a>
-                </li>
-    </ul>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Contributed Tutorials</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="" href="https://www.youtube.com/watch?v=y09VbdQWvQY">Using Environments from Marketplace</a>
-                  </li>
-                  <li class="toctree-l1"><a class="" href="https://github.com/simondlevy/AirSimTensorFlow">Simple Collision Avoidance</a>
-                  </li>
-                  <li class="toctree-l1"><a class="" href="https://aka.ms/AutonomousDrivingCookbook">Autonomous Driving on Azure</a>
-                  </li>
-                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building Hexacopter</a>
-                  </li>
-                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo">Moving on Path Demo</a>
-                  </li>
-                  <li class="toctree-l1"><a class="" href="https://youtu.be/Bp86WiLUC80">Importing a custom multirotor mesh</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../object_detection/">Object Detection</a>
-                  </li>
-                  <li class="toctree-l1"><a class="" href="https://youtu.be/ZonkdMcwXH4">AirSim with MAVROS and PX4</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Misc</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../custom_drone/">AirSim on Real Drones</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../pfm/">pfm format</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../unreal_proj/">Setting up Unreal Environment</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../packaging/">Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../unreal_blocks/">Blocks Environment</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../working_with_plugin_contents/">Working with UE Plugin Contents</a>
-                  </li>
-                  <li class="toctree-l1"><a class="" href="https://github.com/Microsoft/AirSim/wiki/technion">Formula Student Technion Self-drive</a>
-                  </li>
-              </ul>
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#airsim-apis" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Cosys-AirSim" class="md-header__button md-logo" aria-label="Cosys-AirSim" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Cosys-AirSim
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core APIs
+            
+          </span>
+        </div>
       </div>
     </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="..">Cosys-AirSim</a>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
         
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
       </nav>
-      <div class="wy-nav-content">
-        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Using AirSim &raquo;</li>
-      <li>Core APIs</li>
-    <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/Cosys-Lab/Cosys-AirSim/edit/main/docs/apis.md" class="icon icon-github"> Edit on GitHub</a>
-    </li>
-  </ul>
-  <hr/>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-            <div class="section" itemprop="articleBody">
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Cosys-Lab/Cosys-AirSim" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Cosys-Lab/Cosys-AirSim
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../run_packaged/" class="md-tabs__link">
+          
+  
+  
+  Installing AirSim
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Using AirSim
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../modify_recording_data/" class="md-tabs__link">
+          
+  
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../px4_setup/" class="md-tabs__link">
+          
+  
+  
+  External Flight Controllers
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributed_tutorials/" class="md-tabs__link">
+          
+  
+  
+  Contributed Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../custom_drone/" class="md-tabs__link">
+          
+  
+  
+  Misc
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
               
-                <h1 id="airsim-apis">AirSim APIs</h1>
-<h2 id="introduction">Introduction</h2>
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Cosys-AirSim" class="md-nav__button md-logo" aria-label="Cosys-AirSim" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Cosys-AirSim
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Cosys-Lab/Cosys-AirSim" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Cosys-Lab/Cosys-AirSim
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installing AirSim
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Installing AirSim
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../run_packaged/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download and run
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install_precompiled/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download and install from precompiled plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install_windows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install from Source on Windows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install_linux/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install from Source on Linux
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker_ubuntu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using Docker on Ubuntu
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../unreal_custenv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Unreal Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dynamic_objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dynamic Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using AirSim
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Using AirSim
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core APIs
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core APIs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-quickstart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Quickstart
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python Quickstart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installing-airsim-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing AirSim Package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ Users
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hello-car" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hello Car
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hello-drone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hello Drone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common APIs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common APIs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imagecomputer-visioninstance-segmentation-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image/Computer Vision/Instance segmentation APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pause-and-continue-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pause and Continue APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collision-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collision API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-of-day-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time of Day API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#line-of-sight-and-world-extent-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Line-of-sight and world extent APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weather-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weather APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recording-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recording APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wind-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wind API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lidar-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lidar APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#light-control-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Light Control APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#texture-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Texture APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiple-vehicles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple Vehicles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coordinate-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinate System
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vehicle-specific-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vehicle Specific APIs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Vehicle Specific APIs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#apis-for-car" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        APIs for Car
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apis-for-multirotor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        APIs for Multirotor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="APIs for Multirotor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#getmultirotorstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getMultirotorState
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#async-methods-duration-and-max_wait_seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Async methods, duration and max_wait_seconds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#drivetrain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        drivetrain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yaw_mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        yaw_mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lookahead-and-adaptive_lookahead" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lookahead and adaptive_lookahead
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-apis-on-real-vehicles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using APIs on Real Vehicles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-new-apis-to-airsim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New APIs to AirSim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references-and-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References and Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FAQ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FAQ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreal-is-slowed-down-dramatically-when-i-run-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreal is slowed down dramatically when I run API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-i-need-anything-else-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do I need anything else on Windows?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#which-version-of-python-should-i-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which version of Python should I use?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-get-error-on-import-cv2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        I get error on import cv2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#typeerror-unsupported-operand-types-for-asyncioloop-and-float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypeError: unsupported operand type(s) for *: 'AsyncIOLoop' and 'float'
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../image_apis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image APIs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../apis_cpp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C++ APIs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../instance_segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Instance Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../annotation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Annotation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../camera_views/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Camera Views
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../using_car/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Car Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../remote_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Remote Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../xbox_controller/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XBox Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../steering_wheel_installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Steering Wheel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multi_vehicle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiple Vehicles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skid_steer_vehicle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skid Steer Vehicles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gazebo_drone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Import Gazebo models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retexturing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Domain Randomization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../meshes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mesh Vertex Buffers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Artificial Lights
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_18" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensors
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sensors
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sensors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lidar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LIDAR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gpulidar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU LIDAR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../echo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pulse Echo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../InfraredCamera/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Infrared Camera
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distance_sensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distance Sensor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_19" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ROS
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros_python/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS: AirSim ROS Python Wrapper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS2: AirSim ROS C++ Wrapper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../matlab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matlab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../playback/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Playing Logs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../voxel_grid/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Voxel Grid Generator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../event_sim/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event camera
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modify_recording_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modifying Recording Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flight_controller/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flight Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding_new_apis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding new APIs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simple_flight/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple Flight
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External Flight Controllers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    External Flight Controllers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MavLink and PX4
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MavLink and PX4
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../px4_setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PX4 Setup for AirSim
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../px4_sitl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PX4 in SITL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../px4_sitl_wsl2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PX4 SITL with WSL 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../px4_lockstep/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PX4 Lockstep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../px4_multi_vehicle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PX4 Multi-vehicle in SITL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://youtu.be/1oY8Qu5maQQ" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AirSim with Pixhawk
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://youtu.be/HNWdYrtw3f0" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PX4 Setup with AirSim
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.youtube.com/watch?v=d_FyjKDWQfc&feature=youtu.be" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging Attitude Estimation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Microsoft/AirSim/wiki/Intercepting-MavLink-messages" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intercepting MavLink Messages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Microsoft/AirSim/wiki/Rapid-Descent-on-PX4-drones" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid Descent on PX4 Drones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../px4_build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building PX4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../px4_logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PX4/MavLink Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../log_viewer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MavLink LogViewer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mavlinkcom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MavLinkCom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mavlinkcom_mocap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MavLink MoCap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ArduPilot
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ArduPilot
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://ardupilot.org/dev/docs/building-the-code.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ArduPilot SITL Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://ardupilot.org/dev/docs/sitl-with-airsim.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AirSim & ArduPilot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributed Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributed Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributed_tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.youtube.com/watch?v=y09VbdQWvQY" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using Environments from Marketplace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/simondlevy/AirSimTensorFlow" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple Collision Avoidance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://aka.ms/AutonomousDrivingCookbook" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Driving on Azure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Microsoft/AirSim/wiki/hexacopter" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building Hexacopter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Microsoft/AirSim/wiki/moveOnPath-demo" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Moving on Path Demo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://youtu.be/Bp86WiLUC80" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Importing a custom multirotor mesh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../object_detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object Detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://youtu.be/ZonkdMcwXH4" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AirSim with MAVROS and PX4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Misc
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Misc
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom_drone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AirSim on Real Drones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pfm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pfm format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../unreal_proj/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setting up Unreal Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packaging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building and Packaging Cosys-AirSim Plugin and/or Unreal Projects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../unreal_blocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blocks Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../working_with_plugin_contents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with UE Plugin Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/Microsoft/AirSim/wiki/technion" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formula Student Technion Self-drive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-quickstart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Quickstart
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python Quickstart">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installing-airsim-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing AirSim Package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ Users
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hello-car" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hello Car
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hello-drone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hello Drone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common APIs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common APIs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imagecomputer-visioninstance-segmentation-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image/Computer Vision/Instance segmentation APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pause-and-continue-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pause and Continue APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collision-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collision API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-of-day-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time of Day API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#line-of-sight-and-world-extent-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Line-of-sight and world extent APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weather-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weather APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recording-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recording APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wind-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wind API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lidar-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lidar APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#light-control-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Light Control APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#texture-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Texture APIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiple-vehicles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple Vehicles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coordinate-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coordinate System
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vehicle-specific-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vehicle Specific APIs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Vehicle Specific APIs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#apis-for-car" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        APIs for Car
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apis-for-multirotor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        APIs for Multirotor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="APIs for Multirotor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#getmultirotorstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getMultirotorState
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#async-methods-duration-and-max_wait_seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Async methods, duration and max_wait_seconds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#drivetrain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        drivetrain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yaw_mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        yaw_mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lookahead-and-adaptive_lookahead" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lookahead and adaptive_lookahead
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-apis-on-real-vehicles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using APIs on Real Vehicles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-new-apis-to-airsim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New APIs to AirSim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references-and-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References and Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FAQ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FAQ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreal-is-slowed-down-dramatically-when-i-run-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreal is slowed down dramatically when I run API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-i-need-anything-else-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do I need anything else on Windows?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#which-version-of-python-should-i-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which version of Python should I use?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-get-error-on-import-cv2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        I get error on import cv2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#typeerror-unsupported-operand-types-for-asyncioloop-and-float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypeError: unsupported operand type(s) for *: 'AsyncIOLoop' and 'float'
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="airsim-apis">AirSim APIs<a class="headerlink" href="#airsim-apis" title="Permanent link">&para;</a></h1>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
 <p>AirSim exposes APIs so you can interact with vehicle in the simulation programmatically. You can use these APIs to retrieve images, get state, control the vehicle and so on.</p>
-<h2 id="python-quickstart">Python Quickstart</h2>
+<h2 id="python-quickstart">Python Quickstart<a class="headerlink" href="#python-quickstart" title="Permanent link">&para;</a></h2>
 <p>If you want to use Python to call AirSim APIs, we recommend using Anaconda with Python 3.5 or later versions however some code may also work with Python 2.7.</p>
 <p>First install this package:</p>
-<pre><code>pip install rpc-msgpack
-</code></pre>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip install rpc-msgpack
+</span></code></pre></div>
 <p>Once you can run AirSim, choose Car as vehicle and then navigate to <code>PythonClient\car\</code> folder and run:</p>
-<pre><code>python hello_car.py
-</code></pre>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python hello_car.py
+</span></code></pre></div>
 <p>If you are using Visual Studio 2019 then just open AirSim.sln, set PythonClient as startup project and choose <code>car\hello_car.py</code> as your startup script.</p>
-<h3 id="installing-airsim-package">Installing AirSim Package</h3>
-<p>You can also install the AirSim python module to your Python environment to use anywhere by running  <code>pip install .</code> in the <em>PythonClient</em> folder. </p>
-<p><strong>Notes</strong>
-1. You may notice a file <code>setup_path.py</code> in our example folders. This file has simple code to detect if <code>airsim</code> package is available in parent folder and in that case we use that instead of pip installed package so you always use latest code.
-2. AirSim is still under heavy development which means you might frequently need to update the package to use new APIs.</p>
-<h2 id="c-users">C++ Users</h2>
+<h3 id="installing-airsim-package">Installing AirSim Package<a class="headerlink" href="#installing-airsim-package" title="Permanent link">&para;</a></h3>
+<p>You can install the Cosys-AirSim Python client from pip with <code>pip install cosysairsim</code>.
+You can also install the AirSim python module to your Python environment by running  <code>pip install .</code> in the <em>PythonClient</em> folder. </p>
+<h2 id="c-users">C++ Users<a class="headerlink" href="#c-users" title="Permanent link">&para;</a></h2>
 <p>If you want to use C++ APIs and examples, please see <a href="../apis_cpp/">C++ APIs Guide</a>.</p>
-<h2 id="hello-car">Hello Car</h2>
-<p>Here's how to use AirSim APIs using Python to control simulated car (see also <a href="../apis_cpp/#hello_car">C++ example</a>):</p>
-<pre><code class="language-python"># ready to run example: PythonClient/car/hello_car.py
-import cosysairsim as airsim
-import time
-
-# connect to the AirSim simulator 
-client = airsim.CarClient()
-client.confirmConnection()
-client.enableApiControl(True)
-car_controls = airsim.CarControls()
-
-while True:
-    # get state of the car
-    car_state = client.getCarState()
-    print(&quot;Speed %d, Gear %d&quot; % (car_state.speed, car_state.gear))
-
-    # set the controls for car
-    car_controls.throttle = 1
-    car_controls.steering = 1
-    client.setCarControls(car_controls)
-
-    # let car drive a bit
-    time.sleep(1)
-
-    # get camera images from the car
-    responses = client.simGetImages([
-        airsim.ImageRequest(0, airsim.ImageType.DepthVis),
-        airsim.ImageRequest(1, airsim.ImageType.DepthPlanar, True)])
-    print('Retrieved images: %d', len(responses))
-
-    # do something with images
-    for response in responses:
-        if response.pixels_as_float:
-            print(&quot;Type %d, size %d&quot; % (response.image_type, len(response.image_data_float)))
-            airsim.write_pfm('py1.pfm', airsim.get_pfm_array(response))
-        else:
-            print(&quot;Type %d, size %d&quot; % (response.image_type, len(response.image_data_uint8)))
-            airsim.write_file('py1.png', response.image_data_uint8)
-
-</code></pre>
-<h2 id="hello-drone">Hello Drone</h2>
-<p>Here's how to use AirSim APIs using Python to control simulated quadrotor (see also <a href="../apis_cpp/#hello_drone">C++ example</a>):</p>
-<pre><code class="language-python"># ready to run example: PythonClient/multirotor/hello_drone.py
-import cosysairsim as airsim
-import os
-
-# connect to the AirSim simulator
-client = airsim.MultirotorClient()
-client.confirmConnection()
-client.enableApiControl(True)
-client.armDisarm(True)
-
-# Async methods returns Future. Call join() to wait for task to complete.
-client.takeoffAsync().join()
-client.moveToPositionAsync(-10, 10, -10, 5).join()
-
-# take images
-responses = client.simGetImages([
-    airsim.ImageRequest(&quot;0&quot;, airsim.ImageType.DepthVis),
-    airsim.ImageRequest(&quot;1&quot;, airsim.ImageType.DepthPlanar, True)])
-print('Retrieved images: %d', len(responses))
-
-# do something with the images
-for response in responses:
-    if response.pixels_as_float:
-        print(&quot;Type %d, size %d&quot; % (response.image_type, len(response.image_data_float)))
-        airsim.write_pfm(os.path.normpath('/temp/py1.pfm'), airsim.get_pfm_array(response))
-    else:
-        print(&quot;Type %d, size %d&quot; % (response.image_type, len(response.image_data_uint8)))
-        airsim.write_file(os.path.normpath('/temp/py1.png'), response.image_data_uint8)
-</code></pre>
-<h2 id="common-apis">Common APIs</h2>
+<h2 id="hello-car">Hello Car<a class="headerlink" href="#hello-car" title="Permanent link">&para;</a></h2>
+<p>Here's how to use AirSim APIs using Python to control simulated car (see also <a href="../apis_cpp/#hello-car">C++ example</a>):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># ready to run example: PythonClient/car/hello_car.py</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">cosysairsim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">airsim</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># connect to the AirSim simulator </span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">client</span> <span class="o">=</span> <span class="n">airsim</span><span class="o">.</span><span class="n">CarClient</span><span class="p">()</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">client</span><span class="o">.</span><span class="n">confirmConnection</span><span class="p">()</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">client</span><span class="o">.</span><span class="n">enableApiControl</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">car_controls</span> <span class="o">=</span> <span class="n">airsim</span><span class="o">.</span><span class="n">CarControls</span><span class="p">()</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="c1"># get state of the car</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">car_state</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getCarState</span><span class="p">()</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Speed </span><span class="si">%d</span><span class="s2">, Gear </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">car_state</span><span class="o">.</span><span class="n">speed</span><span class="p">,</span> <span class="n">car_state</span><span class="o">.</span><span class="n">gear</span><span class="p">))</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="c1"># set the controls for car</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    <span class="n">car_controls</span><span class="o">.</span><span class="n">throttle</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="n">car_controls</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>    <span class="n">client</span><span class="o">.</span><span class="n">setCarControls</span><span class="p">(</span><span class="n">car_controls</span><span class="p">)</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    <span class="c1"># let car drive a bit</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>    <span class="c1"># get camera images from the car</span>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>    <span class="n">responses</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">simGetImages</span><span class="p">([</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>        <span class="n">airsim</span><span class="o">.</span><span class="n">ImageRequest</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">airsim</span><span class="o">.</span><span class="n">ImageType</span><span class="o">.</span><span class="n">DepthVis</span><span class="p">),</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>        <span class="n">airsim</span><span class="o">.</span><span class="n">ImageRequest</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">airsim</span><span class="o">.</span><span class="n">ImageType</span><span class="o">.</span><span class="n">DepthPlanar</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Retrieved images: </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">responses</span><span class="p">))</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>    <span class="c1"># do something with images</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>    <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">responses</span><span class="p">:</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">pixels_as_float</span><span class="p">:</span>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Type </span><span class="si">%d</span><span class="s2">, size </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_type</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_data_float</span><span class="p">)))</span>
+</span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a>            <span class="n">airsim</span><span class="o">.</span><span class="n">write_pfm</span><span class="p">(</span><span class="s1">&#39;py1.pfm&#39;</span><span class="p">,</span> <span class="n">airsim</span><span class="o">.</span><span class="n">get_pfm_array</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Type </span><span class="si">%d</span><span class="s2">, size </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_type</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_data_uint8</span><span class="p">)))</span>
+</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>            <span class="n">airsim</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="s1">&#39;py1.png&#39;</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">image_data_uint8</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="hello-drone">Hello Drone<a class="headerlink" href="#hello-drone" title="Permanent link">&para;</a></h2>
+<p>Here's how to use AirSim APIs using Python to control simulated quadrotor (see also <a href="../apis_cpp/#hello-drone">C++ example</a>):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># ready to run example: PythonClient/multirotor/hello_drone.py</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">cosysairsim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">airsim</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># connect to the AirSim simulator</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">client</span> <span class="o">=</span> <span class="n">airsim</span><span class="o">.</span><span class="n">MultirotorClient</span><span class="p">()</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">client</span><span class="o">.</span><span class="n">confirmConnection</span><span class="p">()</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">client</span><span class="o">.</span><span class="n">enableApiControl</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">client</span><span class="o">.</span><span class="n">armDisarm</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># Async methods returns Future. Call join() to wait for task to complete.</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">client</span><span class="o">.</span><span class="n">takeoffAsync</span><span class="p">()</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">client</span><span class="o">.</span><span class="n">moveToPositionAsync</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="c1"># take images</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="n">responses</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">simGetImages</span><span class="p">([</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="n">airsim</span><span class="o">.</span><span class="n">ImageRequest</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">airsim</span><span class="o">.</span><span class="n">ImageType</span><span class="o">.</span><span class="n">DepthVis</span><span class="p">),</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    <span class="n">airsim</span><span class="o">.</span><span class="n">ImageRequest</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">airsim</span><span class="o">.</span><span class="n">ImageType</span><span class="o">.</span><span class="n">DepthPlanar</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Retrieved images: </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">responses</span><span class="p">))</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="c1"># do something with the images</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">responses</span><span class="p">:</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">pixels_as_float</span><span class="p">:</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Type </span><span class="si">%d</span><span class="s2">, size </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_type</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_data_float</span><span class="p">)))</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>        <span class="n">airsim</span><span class="o">.</span><span class="n">write_pfm</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="s1">&#39;/temp/py1.pfm&#39;</span><span class="p">),</span> <span class="n">airsim</span><span class="o">.</span><span class="n">get_pfm_array</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Type </span><span class="si">%d</span><span class="s2">, size </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_type</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">image_data_uint8</span><span class="p">)))</span>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>        <span class="n">airsim</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="s1">&#39;/temp/py1.png&#39;</span><span class="p">),</span> <span class="n">response</span><span class="o">.</span><span class="n">image_data_uint8</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="common-apis">Common APIs<a class="headerlink" href="#common-apis" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>reset</code>: This resets the vehicle to its original starting state. Note that you must call <code>enableApiControl</code> and <code>armDisarm</code> again after the call to <code>reset</code>.</li>
 <li><code>confirmConnection</code>: Checks state of connection every 1 sec and reports it in Console so user can see the progress for connection.</li>
@@ -440,112 +4282,112 @@ for response in responses:
 <li><code>simGetObjectPose(ned=true)</code>, <code>simSetObjectPose</code>: Gets and sets the pose of specified object in Unreal environment. Here the object means "actor" in Unreal terminology. They are searched by tag as well as name. Please note that the names shown in UE Editor are <em>auto-generated</em> in each run and are not permanent. So if you want to refer to actor by name, you must change its auto-generated name in UE Editor. Alternatively you can add a tag to actor which can be done by clicking on that actor in Unreal Editor and then going to <a href="https://answers.unrealengine.com/questions/543807/whats-the-difference-between-tag-and-tag.html">Tags property</a>, click "+" sign and add some string value. If multiple actors have same tag then the first match is returned. If no matches are found then NaN pose is returned. The returned pose is in NED coordinates in SI units with its origin at Player Start by default or in Unreal NED frame if the <code>ned</code> boolean argument is set to <code>talse</code>. For <code>simSetObjectPose</code>, the specified actor must have <a href="https://docs.unrealengine.com/en-us/Engine/Actors/Mobility">Mobility</a> set to Movable or otherwise you will get undefined behavior. The <code>simSetObjectPose</code> has parameter <code>teleport</code> which means object is <a href="https://www.unrealengine.com/en-US/blog/moving-physical-objects">moved through other objects</a> in its way and it returns true if move was successful</li>
 <li><code>simListSceneObjects</code>:  Provides a list of all objects in the environment. You can also use regular expression to filter specific objects by name. For example, the code below sets all meshes which have names starting with "wall" you can use <code>simListSceneObjects("wall[\w]*")</code>.</li>
 </ul>
-<h3 id="imagecomputer-visioninstance-segmentation-apis">Image/Computer Vision/Instance segmentation APIs</h3>
+<h3 id="imagecomputer-visioninstance-segmentation-apis">Image/Computer Vision/Instance segmentation APIs<a class="headerlink" href="#imagecomputer-visioninstance-segmentation-apis" title="Permanent link">&para;</a></h3>
 <p>AirSim offers comprehensive images APIs to retrieve synchronized images from multiple cameras along with ground truth including depth, disparity, surface normals and vision. You can set the resolution, FOV, motion blur etc parameters in <a href="../settings/">settings.json</a>. There is also API for detecting collision state. See also <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Examples/DataCollection/StereoImageGenerator.hpp">complete code</a> that generates specified number of stereo images and ground truth depth with normalization to camera plan, computation of disparity image and saving it to <a href="../pfm/">pfm format</a>.
 Furthermore, the <a href="../instance_segmentation/">Instance Segmentation</a> system can also be manipulated through the API.</p>
 <p>More on <a href="../image_apis/">image APIs, Computer Vision mode and instance segmentation configuration</a>.</p>
-<h3 id="pause-and-continue-apis">Pause and Continue APIs</h3>
+<h3 id="pause-and-continue-apis">Pause and Continue APIs<a class="headerlink" href="#pause-and-continue-apis" title="Permanent link">&para;</a></h3>
 <p>AirSim allows to pause and continue the simulation through <code>pause(is_paused)</code> API. To pause the simulation call <code>pause(True)</code> and to continue the simulation call <code>pause(False)</code>. You may have scenario, especially while using reinforcement learning, to run the simulation for specified amount of time and then automatically pause. While simulation is paused, you may then do some expensive computation, send a new command and then again run the simulation for specified amount of time. This can be achieved by API <code>continueForTime(seconds)</code>. This API runs the simulation for the specified number of seconds and then pauses the simulation. For example usage, please see <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/car/pause_continue_car.py">pause_continue_car.py</a> and <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/multirotor/pause_continue_drone.py">pause_continue_drone.py</a>.</p>
-<h3 id="collision-api">Collision API</h3>
+<h3 id="collision-api">Collision API<a class="headerlink" href="#collision-api" title="Permanent link">&para;</a></h3>
 <p>The collision information can be obtained using <code>simGetCollisionInfo</code> API. This call returns a struct that has information not only whether collision occurred but also collision position, surface normal, penetration depth and so on.</p>
-<h3 id="time-of-day-api">Time of Day API</h3>
+<h3 id="time-of-day-api">Time of Day API<a class="headerlink" href="#time-of-day-api" title="Permanent link">&para;</a></h3>
 <p>AirSim assumes there exist sky sphere of class <code>EngineSky/BP_Sky_Sphere</code> in your environment with ADirectionalLight actor. By default, the position of the sun in the scene doesn't move with time. You can use <a href="../settings/#timeofday">settings</a> to set up latitude, longitude, date and time which AirSim uses to compute the position of sun in the scene.</p>
 <p>You can also use following API call to set the sun position according to given date time:</p>
-<pre><code>simSetTimeOfDay(self, is_enabled, start_datetime = &quot;&quot;, is_start_datetime_dst = False, celestial_clock_speed = 1, update_interval_secs = 60, move_sun = True)
-</code></pre>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>simSetTimeOfDay(self, is_enabled, start_datetime = &quot;&quot;, is_start_datetime_dst = False, celestial_clock_speed = 1, update_interval_secs = 60, move_sun = True)
+</span></code></pre></div>
 <p>The <code>is_enabled</code> parameter must be <code>True</code> to enable time of day effect. If it is <code>False</code> then sun position is reset to its original in the environment.</p>
 <p>Other parameters are same as in <a href="../settings/#timeofday">settings</a>.</p>
-<h3 id="line-of-sight-and-world-extent-apis">Line-of-sight and world extent APIs</h3>
+<h3 id="line-of-sight-and-world-extent-apis">Line-of-sight and world extent APIs<a class="headerlink" href="#line-of-sight-and-world-extent-apis" title="Permanent link">&para;</a></h3>
 <p>To test line-of-sight in the sim from a vehicle to a point or between two points, see simTestLineOfSightToPoint(point, vehicle_name) and simTestLineOfSightBetweenPoints(point1, point2), respectively.
 Sim world extent, in the form of a vector of two GeoPoints, can be retrieved using simGetWorldExtents().</p>
-<h3 id="weather-apis">Weather APIs</h3>
+<h3 id="weather-apis">Weather APIs<a class="headerlink" href="#weather-apis" title="Permanent link">&para;</a></h3>
 <p>By default all weather effects are disabled. To enable weather effect, first call:</p>
-<pre><code>simEnableWeather(True)
-</code></pre>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>simEnableWeather(True)
+</span></code></pre></div>
 <p>Various weather effects can be enabled by using <code>simSetWeatherParameter</code> method which takes <code>WeatherParameter</code>, for example,</p>
-<pre><code>client.simSetWeatherParameter(airsim.WeatherParameter.Rain, 0.25);
-</code></pre>
-<p>The second parameter value is from 0 to 1. The first parameter provides following options:</p>
-<pre><code>class WeatherParameter:
-    Rain = 0
-    Roadwetness = 1
-    Snow = 2
-    RoadSnow = 3
-    MapleLeaf = 4
-    RoadLeaf = 5
-    Dust = 6
-    Fog = 7
-</code></pre>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>client.simSetWeatherParameter(airsim.WeatherParameter.Rain, 0.25);
+</span></code></pre></div>
+The second parameter value is from 0 to 1. The first parameter provides following options:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>class WeatherParameter:
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    Rain = 0
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    Roadwetness = 1
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    Snow = 2
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    RoadSnow = 3
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    MapleLeaf = 4
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    RoadLeaf = 5
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    Dust = 6
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    Fog = 7
+</span></code></pre></div>
 <p>Please note that <code>Roadwetness</code>, <code>RoadSnow</code> and <code>RoadLeaf</code> effects requires adding <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/Weather/WeatherFX">materials</a> to your scene.</p>
 <p>Please see <a href="https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/environment/weather.py">example code</a> for more details.</p>
-<h3 id="recording-apis">Recording APIs</h3>
+<h3 id="recording-apis">Recording APIs<a class="headerlink" href="#recording-apis" title="Permanent link">&para;</a></h3>
 <p>Recording APIs can be used to start recording data through APIs. Data to be recorded can be specified using <a href="../settings/#recording">settings</a>. To start recording, use -</p>
-<pre><code>client.startRecording()
-</code></pre>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>client.startRecording()
+</span></code></pre></div>
 <p>Similarly, to stop recording, use <code>client.stopRecording()</code>. To check whether Recording is running, call <code>client.isRecording()</code>, returns a <code>bool</code>.</p>
 <p>This API works alongwith toggling Recording using R button, therefore if it's enabled using R key, <code>isRecording()</code> will return <code>True</code>, and recording can be stopped via API using <code>stopRecording()</code>. Similarly, recording started using API will be stopped if R key is pressed in Viewport. LogMessage will also appear in the top-left of the viewport if recording is started or stopped using API.</p>
 <p>Note that this will only save the data as specfied in the settings. For full freedom in storing data such as certain sensor information, or in a different format or layout, use the other APIs to fetch the data and save as desired. Check out <a href="../modify_recording_data/">Modifying Recording Data</a> for details on how to modify the kinematics data being recorded.</p>
-<h3 id="wind-api">Wind API</h3>
+<h3 id="wind-api">Wind API<a class="headerlink" href="#wind-api" title="Permanent link">&para;</a></h3>
 <p>Wind can be changed during simulation using <code>simSetWind()</code>. Wind is specified in World frame, NED direction and m/s values</p>
 <p>E.g. To set 20m/s wind in North (forward) direction -</p>
-<pre><code class="language-python"># Set wind to (20,0,0) in NED (forward direction)
-wind = airsim.Vector3r(20, 0, 0)
-client.simSetWind(wind)
-</code></pre>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Set wind to (20,0,0) in NED (forward direction)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">wind</span> <span class="o">=</span> <span class="n">airsim</span><span class="o">.</span><span class="n">Vector3r</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">client</span><span class="o">.</span><span class="n">simSetWind</span><span class="p">(</span><span class="n">wind</span><span class="p">)</span>
+</span></code></pre></div>
 <p>Also see example script in <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/multirotor/set_wind.py">set_wind.py</a></p>
-<h3 id="lidar-apis">Lidar APIs</h3>
+<h3 id="lidar-apis">Lidar APIs<a class="headerlink" href="#lidar-apis" title="Permanent link">&para;</a></h3>
 <p>AirSim offers API to retrieve point cloud data from (GPU)Lidar sensors on vehicles. You can set the number of channels, points per second, horizontal and vertical FOV, etc parameters in <a href="../settings/">settings.json</a>. </p>
 <p>More on <a href="../lidar/">lidar APIs and settings</a>, <a href="../gpulidar/">GPUlidar APIs and settings</a> and <a href="../sensors/">sensor settings</a></p>
-<h3 id="light-control-apis">Light Control APIs</h3>
+<h3 id="light-control-apis">Light Control APIs<a class="headerlink" href="#light-control-apis" title="Permanent link">&para;</a></h3>
 <p>Lights that can be manipulated inside Cosys-AirSim can be created via the <a href="../lights/">Artificial Lights system</a>. The original AirSim Lights API is deprecated. </p>
-<h3 id="texture-apis">Texture APIs</h3>
+<h3 id="texture-apis">Texture APIs<a class="headerlink" href="#texture-apis" title="Permanent link">&para;</a></h3>
 <p>Textures can be dynamically set on objects via these APIs:</p>
 <ul>
 <li><code>simSetObjectMaterial</code>: This sets an object's material using an existing Unreal material asset. It takes two string parameters, <code>object_name</code> and <code>material_name</code>.</li>
 <li><code>simSetObjectMaterialFromTexture</code>: This sets an object's material using a path to a texture. It takes two string parameters, <code>object_name</code> and <code>texture_path</code>.</li>
 </ul>
-<h3 id="multiple-vehicles">Multiple Vehicles</h3>
+<h3 id="multiple-vehicles">Multiple Vehicles<a class="headerlink" href="#multiple-vehicles" title="Permanent link">&para;</a></h3>
 <p>AirSim supports multiple vehicles and control them through APIs. Please <a href="../multi_vehicle/">Multiple Vehicles</a> doc.</p>
-<h3 id="coordinate-system">Coordinate System</h3>
+<h3 id="coordinate-system">Coordinate System<a class="headerlink" href="#coordinate-system" title="Permanent link">&para;</a></h3>
 <p>All AirSim API uses NED coordinate system, i.e., +X is North, +Y is East and +Z is Down. All units are in SI system. Please note that this is different from coordinate system used internally by Unreal Engine. In Unreal Engine, +Z is up instead of down and length unit is in centimeters instead of meters. AirSim APIs takes care of the appropriate conversions. The starting point of the vehicle is always coordinates (0, 0, 0) in NED system. Thus when converting from Unreal coordinates to NED, we first subtract the starting offset and then scale by 100 for cm to m conversion. The vehicle is spawned in Unreal environment where the Player Start component is placed. There is a setting called <code>OriginGeopoint</code> in <a href="../settings/">settings.json</a> which assigns geographic longitude, longitude and altitude to the Player Start component.
 If wanted, one can move the Unreal origin to the same location as the AirSim origin player start position by setting the <code>MoveWorldOrigin</code> in the settings.json to <code>true</code>.</p>
-<h2 id="vehicle-specific-apis">Vehicle Specific APIs</h2>
-<h3 id="apis-for-car">APIs for Car</h3>
+<h2 id="vehicle-specific-apis">Vehicle Specific APIs<a class="headerlink" href="#vehicle-specific-apis" title="Permanent link">&para;</a></h2>
+<h3 id="apis-for-car">APIs for Car<a class="headerlink" href="#apis-for-car" title="Permanent link">&para;</a></h3>
 <p>Car has followings APIs available:</p>
 <ul>
 <li><code>setCarControls</code>: This allows you to set throttle, steering, handbrake and auto or manual gear.</li>
 <li><code>getCarState</code>: This retrieves the state information including speed, current gear and 6 kinematics quantities: position, orientation, linear and angular velocity, linear and angular acceleration. All quantities are in NED coordinate system, SI units in world frame except for angular velocity and accelerations which are in body frame.</li>
 <li><a href="../image_apis/">Image APIs</a>.</li>
 </ul>
-<h3 id="apis-for-multirotor">APIs for Multirotor</h3>
+<h3 id="apis-for-multirotor">APIs for Multirotor<a class="headerlink" href="#apis-for-multirotor" title="Permanent link">&para;</a></h3>
 <p>Multirotor can be controlled by specifying angles, velocity vector, destination position or some combination of these. There are corresponding <code>move*</code> APIs for this purpose. When doing position control, we need to use some path following algorithm. By default AirSim uses carrot following algorithm. This is often referred to as "high level control" because you just need to specify high level goal and the firmware takes care of the rest. Currently lowest level control available in AirSim is <code>moveByAngleThrottleAsync</code> API.</p>
-<h4 id="getmultirotorstate">getMultirotorState</h4>
+<h4 id="getmultirotorstate">getMultirotorState<a class="headerlink" href="#getmultirotorstate" title="Permanent link">&para;</a></h4>
 <p>This API returns the state of the vehicle in one call. The state includes, collision, estimated kinematics (i.e. kinematics computed by fusing sensors), and timestamp (nano seconds since epoch). The kinematics here means 6 quantities: position, orientation, linear and angular velocity, linear and angular acceleration. Please note that simple_slight currently doesn't support state estimator which means estimated and ground truth kinematics values would be same for simple_flight. Estimated kinematics are however available for PX4 except for angular acceleration. All quantities are in NED coordinate system, SI units in world frame except for angular velocity and accelerations which are in body frame.</p>
-<h4 id="async-methods-duration-and-max_wait_seconds">Async methods, duration and max_wait_seconds</h4>
+<h4 id="async-methods-duration-and-max_wait_seconds">Async methods, duration and max_wait_seconds<a class="headerlink" href="#async-methods-duration-and-max_wait_seconds" title="Permanent link">&para;</a></h4>
 <p>Many API methods has parameters named <code>duration</code> or <code>max_wait_seconds</code> and they have <em>Async</em> as suffix, for example, <code>takeoffAsync</code>. These methods will return immediately after starting the task in AirSim so that your client code can do something else while that task is being executed. If you want to wait for this task to complete then you can call <code>waitOnLastTask</code> like this:</p>
-<pre><code class="language-cpp">//C++
-client.takeoffAsync()-&gt;waitOnLastTask();
-</code></pre>
-<pre><code class="language-cpp"># Python
-client.takeoffAsync().join()
-</code></pre>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">//C++</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">client</span><span class="p">.</span><span class="n">takeoffAsync</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">waitOnLastTask</span><span class="p">();</span>
+</span></code></pre></div>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="cp"># Python</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">client</span><span class="p">.</span><span class="n">takeoffAsync</span><span class="p">().</span><span class="n">join</span><span class="p">()</span>
+</span></code></pre></div>
 <p>If you start another command then it automatically cancels the previous task and starts new command. This allows to use pattern where your coded continuously does the sensing, computes a new trajectory to follow and issues that path to vehicle in AirSim. Each newly issued trajectory cancels the previous trajectory allowing your code to continuously do the update as new sensor data arrives.</p>
 <p>All <em>Async</em> method returns <code>concurrent.futures.Future</code> in Python (<code>std::future</code> in C++). Please note that these future classes currently do not allow to check status or cancel the task; they only allow to wait for task to complete. AirSim does provide API <code>cancelLastTask</code>, however.</p>
-<h4 id="drivetrain">drivetrain</h4>
+<h4 id="drivetrain">drivetrain<a class="headerlink" href="#drivetrain" title="Permanent link">&para;</a></h4>
 <p>There are two modes you can fly vehicle: <code>drivetrain</code> parameter is set to <code>airsim.DrivetrainType.ForwardOnly</code> or <code>airsim.DrivetrainType.MaxDegreeOfFreedom</code>. When you specify ForwardOnly, you are saying that vehicle's front should always point in the direction of travel. So if you want drone to take left turn then it would first rotate so front points to left. This mode is useful when you have only front camera and you are operating vehicle using FPV view. This is more or less like travelling in car where you always have front view. The MaxDegreeOfFreedom means you don't care where the front points to. So when you take left turn, you just start going left like crab. Quadrotors can go in any direction regardless of where front points to. The MaxDegreeOfFreedom enables this mode.</p>
-<h4 id="yaw_mode">yaw_mode</h4>
+<h4 id="yaw_mode">yaw_mode<a class="headerlink" href="#yaw_mode" title="Permanent link">&para;</a></h4>
 <p><code>yaw_mode</code> is a struct <code>YawMode</code> with two fields, <code>yaw_or_rate</code> and <code>is_rate</code>. If <code>is_rate</code> field is True then <code>yaw_or_rate</code> field is interpreted as angular velocity in degrees/sec which means you want vehicle to rotate continuously around its axis at that angular velocity while moving. If <code>is_rate</code> is False then <code>yaw_or_rate</code> is interpreted as angle in degrees which means you want vehicle to rotate to specific angle (i.e. yaw) and keep that angle while moving.</p>
 <p>You can probably see that when <code>yaw_mode.is_rate == true</code>, the <code>drivetrain</code> parameter shouldn't be set to <code>ForwardOnly</code> because you are contradicting by saying that keep front pointing ahead but also rotate continuously. However if you have <code>yaw_mode.is_rate = false</code> in <code>ForwardOnly</code> mode then you can do some funky stuff. For example, you can have drone do circles and have yaw_or_rate set to 90 so camera is always pointed to center ("super cool selfie mode"). In <code>MaxDegreeofFreedom</code> also you can get some funky stuff by setting <code>yaw_mode.is_rate = true</code> and say <code>yaw_mode.yaw_or_rate = 20</code>. This will cause drone to go in its path while rotating which may allow to do 360 scanning.</p>
 <p>In most cases, you just don't want yaw to change which you can do by setting yaw rate of 0. The shorthand for this is <code>airsim.YawMode.Zero()</code> (or in C++: <code>YawMode::Zero()</code>).</p>
-<h4 id="lookahead-and-adaptive_lookahead">lookahead and adaptive_lookahead</h4>
+<h4 id="lookahead-and-adaptive_lookahead">lookahead and adaptive_lookahead<a class="headerlink" href="#lookahead-and-adaptive_lookahead" title="Permanent link">&para;</a></h4>
 <p>When you ask vehicle to follow a path, AirSim uses "carrot following" algorithm. This algorithm operates by looking ahead on path and adjusting its velocity vector. The parameters for this algorithm is specified by <code>lookahead</code> and <code>adaptive_lookahead</code>. For most of the time you want algorithm to auto-decide the values by simply setting <code>lookahead = -1</code> and <code>adaptive_lookahead = 0</code>.</p>
-<h2 id="using-apis-on-real-vehicles">Using APIs on Real Vehicles</h2>
+<h2 id="using-apis-on-real-vehicles">Using APIs on Real Vehicles<a class="headerlink" href="#using-apis-on-real-vehicles" title="Permanent link">&para;</a></h2>
 <p>We want to be able to run <em>same code</em> that runs in simulation as on real vehicle. This allows you to test your code in simulator and deploy to real vehicle.</p>
 <p>Generally speaking, APIs therefore shouldn't allow you to do something that cannot be done on real vehicle (for example, getting the ground truth). But, of course, simulator has much more information and it would be useful in applications that may not care about running things on real vehicle. For this reason, we clearly delineate between sim-only APIs by attaching <code>sim</code> prefix, for example, <code>simGetGroundTruthKinematics</code>. This way you can avoid using these simulation-only APIs if you care about running your code on real vehicles.</p>
 <p>The AirLib is self-contained library that you can put on an offboard computing module such as the Gigabyte barebone Mini PC. This module then can talk to the flight controllers such as PX4 using exact same code and flight controller protocol. The code you write for testing in the simulator remains unchanged. See <a href="../custom_drone/">AirLib on custom drones</a>.</p>
-<h2 id="adding-new-apis-to-airsim">Adding New APIs to AirSim</h2>
+<h2 id="adding-new-apis-to-airsim">Adding New APIs to AirSim<a class="headerlink" href="#adding-new-apis-to-airsim" title="Permanent link">&para;</a></h2>
 <p>See the <a href="../adding_new_apis/">Adding New APIs</a> page</p>
-<h2 id="references-and-examples">References and Examples</h2>
+<h2 id="references-and-examples">References and Examples<a class="headerlink" href="#references-and-examples" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../apis_cpp/">C++ API Examples</a></li>
 <li><a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/car">Car Examples</a></li>
@@ -555,71 +4397,103 @@ client.takeoffAsync().join()
 <li><a href="https://github.com/Microsoft/AirSim/wiki/hexacopter">Building a Hexacopter</a></li>
 <li><a href="https://github.com/Microsoft/AirSim/wiki/Point-Clouds">Building Point Clouds</a></li>
 </ul>
-<h2 id="faq">FAQ</h2>
-<h4 id="unreal-is-slowed-down-dramatically-when-i-run-api">Unreal is slowed down dramatically when I run API</h4>
+<h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
+<h4 id="unreal-is-slowed-down-dramatically-when-i-run-api">Unreal is slowed down dramatically when I run API<a class="headerlink" href="#unreal-is-slowed-down-dramatically-when-i-run-api" title="Permanent link">&para;</a></h4>
 <p>If you see Unreal getting slowed down dramatically when Unreal Engine window loses focus then go to 'Edit-&gt;Editor Preferences' in Unreal Editor, in the 'Search' box type 'CPU' and ensure that the 'Use Less CPU when in Background' is unchecked.</p>
-<h4 id="do-i-need-anything-else-on-windows">Do I need anything else on Windows?</h4>
+<h4 id="do-i-need-anything-else-on-windows">Do I need anything else on Windows?<a class="headerlink" href="#do-i-need-anything-else-on-windows" title="Permanent link">&para;</a></h4>
 <p>You should install VS2019 with VC++, Windows SDK 10.0 and Python. To use Python APIs you will need Python 3.5 or later (install it using Anaconda).</p>
-<h4 id="which-version-of-python-should-i-use">Which version of Python should I use?</h4>
+<h4 id="which-version-of-python-should-i-use">Which version of Python should I use?<a class="headerlink" href="#which-version-of-python-should-i-use" title="Permanent link">&para;</a></h4>
 <p>We recommend <a href="https://www.anaconda.com/download/">Anaconda</a> to get Python tools and libraries. Our code is tested with Python 3.5.3 :: Anaconda 4.4.0. This is important because older version have been known to have <a href="https://stackoverflow.com/a/45934992/207661">problems</a>.</p>
-<h4 id="i-get-error-on-import-cv2">I get error on <code>import cv2</code></h4>
-<p>You can install OpenCV using:</p>
-<pre><code>conda install opencv
-pip install opencv-python
-</code></pre>
-<h4 id="typeerror-unsupported-operand-types-for-asyncioloop-and-float">TypeError: unsupported operand type(s) for *: 'AsyncIOLoop' and 'float'</h4>
+<h4 id="i-get-error-on-import-cv2">I get error on <code>import cv2</code><a class="headerlink" href="#i-get-error-on-import-cv2" title="Permanent link">&para;</a></h4>
+<p>You can install OpenCV using:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>conda install opencv
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>pip install opencv-python
+</span></code></pre></div></p>
+<h4 id="typeerror-unsupported-operand-types-for-asyncioloop-and-float">TypeError: unsupported operand type(s) for *: 'AsyncIOLoop' and 'float'<a class="headerlink" href="#typeerror-unsupported-operand-types-for-asyncioloop-and-float" title="Permanent link">&para;</a></h4>
 <p>This error happens if you install Jupyter, which somehow breaks the msgpackrpc library.  Create a new python environment
 which the minimal required packages.</p>
-              
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
             </div>
-          </div><footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../dynamic_objects/" class="btn btn-neutral float-left" title="Dynamic Objects"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../image_apis/" class="btn btn-neutral float-right" title="Image APIs">Next <span class="icon icon-circle-arrow-right"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-  </div>
-
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
           
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
-      </div>
-
-    </section>
-
-  </div>
-
-  <div class="rst-versions" role="note" aria-label="Versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    
-        <span>
-          <a href="https://github.com/Cosys-Lab/Cosys-AirSim" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
-        </span>
-    
-    
-      <span><a href="../dynamic_objects/" style="color: #fcfcfc">&laquo; Previous</a></span>
-    
-    
-      <span><a href="../image_apis/" style="color: #fcfcfc">Next &raquo;</a></span>
-    
-  </span>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
 </div>
-    <script>var base_url = '..';</script>
-    <script src="../js/theme_extra.js" defer></script>
-    <script src="../js/theme.js" defer></script>
-      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
-      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
-      <script src="../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
-            SphinxRtdTheme.Navigation.enable(true);
-        };
-    </script>
-
-</body>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Cosys-Lab/Cosys-AirSim" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
 </html>

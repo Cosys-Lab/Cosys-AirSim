@@ -1,0 +1,55 @@
+/*
+  Faculty brand palette override for mkdocs-material.
+  Primary (header/nav bar): dark blue  #002e65
+  Accent  (links/buttons):  magenta    #b10097
+  Secondary (subtle highlights): lilac #e4c1db
+  Material's named palettes (theme.palette.primary/accent in mkdocs.yml) don't support
+  arbitrary hex values, so the brand colors are applied here via Material's CSS custom
+  properties instead, which take effect regardless of the named palette configured in
+  mkdocs.yml.
+*/
+
+[data-md-color-scheme="default"],
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:              #002e65;
+  --md-primary-fg-color--light:       #33578c;
+  --md-primary-fg-color--dark:        #001d40;
+  --md-primary-bg-color:              #ffffff;
+  --md-primary-bg-color--light:       #ffffffb3;
+
+  --md-accent-fg-color:               #b10097;
+  --md-accent-fg-color--transparent:  #b1009733;
+  --md-accent-bg-color:               #ffffff;
+  --md-accent-bg-color--light:        #ffffffb3;
+
+  --md-typeset-a-color:               #b10097;
+}
+
+/* Secondary/lilac brand color as a subtle highlight - table header tint, marked/highlighted
+   text, and text selection - rather than a primary UI color. */
+.md-typeset table:not([class]) th {
+  background-color: #e4c1db;
+}
+.md-typeset mark {
+  background-color: #e4c1db66;
+}
+::selection {
+  background-color: #e4c1db;
+}
+
+/* Faculty uses Calibri. It's a proprietary Microsoft font we can't legally bundle/serve, so it
+   is only guaranteed to render as Calibri for visitors who have it installed (e.g. via Windows
+   or Microsoft Office); everyone else falls back to Carlito (an open metric-compatible
+   substitute, present on many Linux systems/LibreOffice) and finally the system sans-serif. */
+:root {
+  --md-text-font: "Calibri", "Carlito", -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Code/monospace blocks intentionally keep Material's default monospace font rather than
+   Calibri (not a monospace typeface), so code samples stay readable/aligned. */
+
+/* This site has no faculty/project logo yet, so hide the default Material placeholder icon
+   shown at the top-left of the header (and in the mobile drawer). */
+.md-logo {
+  display: none !important;
+}
