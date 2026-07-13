@@ -10,9 +10,8 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
-This [5.2.1 dev branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1dev) is for the development of Cosys-AirSim on Unreal Engine v5.2.1. The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1dev/docs).
+This [5.2.1 branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is for the development of Cosys-AirSim on Unreal Engine v5.2.1. The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1/docs).
 For the latest stable and maintained build for a recent Unreal Engine see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) and associated builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
-Unreal [5.2.1](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is also available for long term support.
 ## Associated publications
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
