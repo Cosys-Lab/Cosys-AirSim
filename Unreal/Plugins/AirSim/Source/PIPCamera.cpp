@@ -224,7 +224,6 @@ msr::airlib::ProjectionMatrix APIPCamera::getProjectionMatrix() const
         }
 
         if (capture->ProjectionType == ECameraProjectionMode::Orthographic) {
-            check((int32)ERHIZBuffer::IsInverted);
             const float OrthoWidth = capture->OrthoWidth / 2.0f;
             const float OrthoHeight = capture->OrthoWidth / 2.0f * x_axis_multiplier / y_axis_multiplier;
 
@@ -242,25 +241,13 @@ msr::airlib::ProjectionMatrix APIPCamera::getProjectionMatrix() const
         }
         else {
             float halfFov = Utils::degreesToRadians(capture->FOVAngle) / 2;
-            if ((int32)ERHIZBuffer::IsInverted) {
-                proj_mat_transpose = FReversedZPerspectiveMatrix(
-                    halfFov,
-                    halfFov,
-                    x_axis_multiplier,
-                    y_axis_multiplier,
-                    GNearClippingPlane,
-                    GNearClippingPlane);
-            }
-            else {
-                //The FPerspectiveMatrix() constructor actually returns the transpose of the perspective matrix.
-                proj_mat_transpose = FPerspectiveMatrix(
-                    halfFov,
-                    halfFov,
-                    x_axis_multiplier,
-                    y_axis_multiplier,
-                    GNearClippingPlane,
-                    GNearClippingPlane);
-            }
+            proj_mat_transpose = FReversedZPerspectiveMatrix(
+                halfFov,
+                halfFov,
+                x_axis_multiplier,
+                y_axis_multiplier,
+                GNearClippingPlane,
+                GNearClippingPlane);
         }
 
         //Takes a vector from NORTH-EAST-DOWN coordinates (AirSim) to EAST-UP-SOUTH coordinates (Unreal). Leaves W coordinate unchanged.

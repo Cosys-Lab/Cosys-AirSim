@@ -54,7 +54,6 @@ int32 getIndexLowerClosest(TArray<float> range, float value) {
 	else {
 		return GetNum(range) - 1;
 	}
-	return 0;
 }
 
 // Constructor
