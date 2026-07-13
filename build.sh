@@ -139,9 +139,9 @@ set +x
 
 echo ""
 echo ""
-echo "==============================="
-echo " Cosys-AirSim plugin is built! "
-echo "==============================="
+echo "=========================================="
+echo " Cosys-AirSim airlib c++ plugin is built!."
+echo "=========================================="
 echo ""
 echo "For further info see for installation see:"
 echo "https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/install_linux.md"
