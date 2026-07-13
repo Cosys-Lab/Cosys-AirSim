@@ -42,7 +42,7 @@ Alternatively you can also simply open the Unreal Engine project by double click
 
 
 #### I get an error `Il ‘P1’, version ‘X’, does not match ‘P2’, version ‘X’`
-This is caused by multiple versions of Visual Studio installed on the machine. The build script of Cosys-AirSim will use the latest versions it can find so need to make Unreal does the same.
+This is caused by having multiple MSVC toolset versions installed, where Unreal and the prebuilt AirLib/MavLinkCom libraries were compiled with different ones. The build script of Cosys-AirSim will use the latest MSVC toolset it can find, so you need to make Unreal do the same (or vice versa, see below).
 Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppData\Roaming\Unreal Engine\UnrealBuildTool_ and add the following:
 
 ```xml
@@ -53,6 +53,19 @@ Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppD
 </WindowsPlatform>
 </Configuration>
 ```
+
+#### I get `error C4668: '__has_feature' is not defined as a preprocessor macro` (or "Detected compiler newer than Visual Studio 2022, please update min version checking...") when building with UE 5.2
+This means Visual Studio has auto-updated to an MSVC toolset that is newer than what UE was built to support.
+
+To fix it:
+1. Open the Visual Studio Installer and, under "Individual components", install an older MSVC v143 toolset that UE supports alongside your current one. Multiple toolset versions can be installed side by side.
+2. In `BuildConfiguration.xml` (see above), pin `CompilerVersion` to that exact installed version instead of `Latest`, e.g.:
+```xml
+<WindowsPlatform>
+<CompilerVersion>14.38.33130</CompilerVersion>
+</WindowsPlatform>
+```
+3. Since the prebuilt `AirLib` libraries were likely compiled with the newer (too-new) toolset, rebuild them with the same pinned toolset to avoid the IL mismatch error above: open **Developer Command Prompt for VS 202X**, run `set VCToolsVersion=14.38.33130` (matching what you pinned), `cd` into the repo, and re-run `build.cmd`.
 
 #### I get `error C100 : An internal error has occurred in the compiler` when running build.cmd
 We have noticed this happening with VS version `15.9.0` and have checked-in a workaround in Cosys-AirSim code. If you have this VS version, please make sure to pull the latest Cosys-AirSim code.
