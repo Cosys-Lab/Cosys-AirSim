@@ -852,8 +852,6 @@ void FObjectAnnotator::InitializeRGB(ULevel* InLevel)
 					FString tag = found_tag->ToString();
 					TArray<FString> splitTag;
 					tag.ParseIntoArray(splitTag, TEXT("_"), true);
-					name_to_component_map_.Emplace(it.Key(), it.Value());
-					component_to_name_map_.Emplace(it.Value(), it.Key());
 
 					FColor new_color;
 					uint32 color_index;
@@ -1207,6 +1205,10 @@ void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 }
 
 TArray<TWeakObjectPtr<UPrimitiveComponent>>  FObjectAnnotator::GetAnnotationComponents() {
+	annotation_component_list_.RemoveAll([](const TWeakObjectPtr<UPrimitiveComponent>& Component)
+	{
+		return !Component.IsValid();
+	});
 	return annotation_component_list_;
 }
 
