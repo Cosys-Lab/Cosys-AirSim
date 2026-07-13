@@ -3685,6 +3685,7 @@ You can download it by running</li>
 <li>Inside the container, you can see <code>UnrealEngine</code> and <code>Cosys-AirSim</code> under <code>/home/ue4</code>.</li>
 <li>Start unreal engine inside the container:
    <code>/home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor</code></li>
+<li>The image builds AirLib with <code>./build.sh --ue-root /home/ue4/UnrealEngine</code> (see <a href="../install_linux/#build-cosys-airsim">Linux build docs</a>) so that AirLib is linked with Unreal's own bundled Clang toolchain instead of the container's system compiler, avoiding ABI mismatches when building the Unreal plugin. The image also sets the <code>UE_ROOT</code> environment variable to <code>/home/ue4/UnrealEngine</code>, so if you make code changes and re-run <code>./build.sh</code> manually inside the container it will keep using the correct toolchain automatically.</li>
 <li><a href="#specifying-settingsjson">Specifying an airsim settings.json</a></li>
 <li>Continue with <a href="../install_linux/#build-unreal-environment">Cosys-AirSims's Linux docs</a>.
   For example start the Blocks environment in the container run (This will first copy the plugin and afterwards start open the project with the Unreal Editor):
