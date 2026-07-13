@@ -134,7 +134,7 @@ void UnitTests::SerialPx4Test()
     int count = 0;
     Semaphore received;
 
-    auto id = connection->subscribe([&](std::shared_ptr<MavLinkConnection> con, const MavLinkMessage& msg) {
+    auto id = connection->subscribe([&](std::shared_ptr<MavLinkConnection> /*con*/, const MavLinkMessage& msg) {
         //printf("    Received message %d\n", static_cast<int>(msg.msgid));
         count++;
         if (msg.msgid == 0) {
@@ -411,7 +411,7 @@ void UnitTests::JSonLogTest()
     int count = 0;
     Semaphore received;
 
-    auto id = connection->subscribe([&](std::shared_ptr<MavLinkConnection> con, const MavLinkMessage& msg) {
+    auto id = connection->subscribe([&](std::shared_ptr<MavLinkConnection> /*con*/, const MavLinkMessage& msg) {
         count++;
         log.write(msg);
         if (count > 50) {

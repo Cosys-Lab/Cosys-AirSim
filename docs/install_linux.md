@@ -4,11 +4,11 @@ The current recommended and tested environment is **Ubuntu 24.04 LTS**. Theoreti
 
 ## Install Compiler Toolchain
 You will need the following dependencies. Newer versions may also work but are not tested:
-- clang 18
-- clang++-18
-- libc++-18-dev
-- libc++abi-18-dev 
-- libstdc++-18-dev
+- clang 20
+- clang++-20
+- libc++-20-dev
+- libc++abi-20-dev 
+- libstdc++-20-dev
 - cmake 2.28
 - glib 2.28
 - build-essential
@@ -43,14 +43,31 @@ For more information you can read the [quick start guide](https://dev.epicgames.
 You can alternatively install Unreal Engine from source if you do not use a Ubuntu distribution, see the documentation linked above for more information. 
 
 ## Build Cosys-Airsim
-- Clone Cosys-AirSim and build it:
+- Clone Cosys-AirSim and build it, passing the path to your Unreal Engine install with `--ue-root`:
    ```bash
-   # go to the folder where you clone GitHub projects
    git clone https://github.com/Cosys-Lab/Cosys-AirSim.git
    cd Cosys-AirSim
    ./setup.sh
+   ./build.sh --ue-root /path/to/UnrealEngine
+   ```
+
+  Instead of passing `--ue-root` on every invocation, you can instead export the `UE_ROOT`
+  environment variable once (e.g. in your `~/.bashrc`) and just run `./build.sh`:
+   ```bash
+   export UE_ROOT=/path/to/UnrealEngine
    ./build.sh
    ```
+  `--ue-root` takes precedence if both are set. `/path/to/UnrealEngine` is the folder containing
+  `Engine/`, i.e. the same folder from which you run `Engine/Binaries/Linux/UnrealEditor`.
+
+  Unreal Engine links its Linux targets using its own bundled Clang compiler, not your system compiler/libc. If you build AirLib with the plain system `clang` the resulting built library can end up incompatible with UE's linker, and building the Unreal plugin will fail.
+  
+  `--ue-root`/`UE_ROOT` avoids this by locating Unreal's bundled Linux toolchain (under
+  `Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/`) and building AirLib with that exact
+  compiler and `--sysroot`, so the produced static libraries are always ABI-compatible with the
+  engine install you point it at. Omitting `--ue-root` still works and falls back to the system
+  `clang`/`clang++` (or `gcc`/`g++` with `--gcc`), but is only recommended if you hit no link
+  errors when building the Unreal plugin.
 
 ## Build Unreal Environment
 
