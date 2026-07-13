@@ -17,11 +17,12 @@ RUN python3 -m pip install --upgrade pip && \
 pip3 install cosysairsim
 
 USER ue4
+ENV UE_ROOT=/home/ue4/UnrealEngine
 RUN cd /home/ue4 && \
 	git clone --progress https://github.com/Cosys-Lab/Cosys-AirSim.git && \
     git checkout 5.2.1 && \
 	cd Cosys-AirSim && \
 	./setup.sh && \
-	./build.sh
+	./build.sh --ue-root $UE_ROOT
 
 WORKDIR /home/ue4

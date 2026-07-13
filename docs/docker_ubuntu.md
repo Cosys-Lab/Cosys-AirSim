@@ -86,6 +86,7 @@ xhost +local:docker
 * Inside the container, you can see `UnrealEngine` and `Cosys-AirSim` under `/home/ue4`.
 * Start unreal engine inside the container:
    `/home/ue4/UnrealEngine/Engine/Binaries/Linux/UnrealEditor`
+* The image builds AirLib with `./build.sh --ue-root /home/ue4/UnrealEngine` (see [Linux build docs](install_linux.md#build-cosys-airsim)) so that AirLib is linked with Unreal's own bundled Clang toolchain instead of the container's system compiler, avoiding ABI mismatches when building the Unreal plugin. The image also sets the `UE_ROOT` environment variable to `/home/ue4/UnrealEngine`, so if you make code changes and re-run `./build.sh` manually inside the container it will keep using the correct toolchain automatically.
 * [Specifying an airsim settings.json](#specifying-settingsjson)
 * Continue with [Cosys-AirSims's Linux docs](install_linux.md#build-unreal-environment).
   For example start the Blocks environment in the container run (This will first copy the plugin and afterwards start open the project with the Unreal Editor):
