@@ -1,4 +1,4 @@
-# Download and run Packaged Binary
+# Download and run Packaged Demo
 
 If you wish to test the Cosys-AirSim plugin a simple environment without having to install Unreal Engine, you can download the prepackaged binary for the Blocks test environment from the [releases page](https://github.com/Cosys-Lab/Cosys-AirSim/releases) and run it as a binary executable on Windows (_Blocks.exe_) or start it with a shell script (_./Blocks.sh_) on Linux systems.
 They support multiple launch arguments. More info can be found [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/command-line-arguments-in-unreal-engine?application_version=5.2).

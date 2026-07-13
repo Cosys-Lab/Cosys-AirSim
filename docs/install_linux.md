@@ -1,8 +1,23 @@
-# Intall or Build Cosys-AirSim on Linux
+# Build Cosys-AirSim on Linux from Source
 
-The current recommended and tested environment is **Ubuntu 22.04 LTS**. Theoretically, you can build on other distros as well, but we haven't tested it.
+The current recommended and tested environment is **Ubuntu 24.04 LTS**. Theoretically, you can build on other distros as well, but we haven't tested it.
 
 ## Install Compiler Toolchain
+You will need the following dependencies. Newer versions may also work but are not tested:
+- clang 18
+- clang++-18
+- libc++-18-dev
+- libc++abi-18-dev 
+- libstdc++-18-dev
+- cmake 2.28
+- glib 2.28
+- build-essential
+- lsb-release
+- rsync
+- software-properties-common
+- wget
+- unzip
+
 Unreal Engine requires a correct version of the compiler toolchain clang. You can find the right version on [this page](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-requirements-for-unreal-engine#gettingthetoolchain) for the Unreal version you wish to install.
 To easily install this version on your machine, you can use the following script:
 ```bash
@@ -58,6 +73,6 @@ Go to 'Edit->Editor Preferences', in the 'Search' box type 'CPU' and ensure that
 
 ### [Optional] Setup Remote Control (Multirotor Only)
 
-A remote control is required if you want to fly manually. See the [remote control setup](remote_control.md) for more details.
+A remote control is required if you want to fly the drones manually. See the [remote control setup](remote_control.md) for more details.
 
 Alternatively, you can use [APIs](apis.md) for programmatic control or use the so-called [Computer Vision mode](image_apis.md) to move around using the keyboard.

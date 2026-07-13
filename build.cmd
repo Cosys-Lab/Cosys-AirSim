@@ -10,7 +10,7 @@ set "buildMode="
 REM //check VS version
 if "%VisualStudioVersion%" == "" (
     echo(
-    echo oh oh... You need to run this command from x64 Native Tools Command Prompt for VS 2022.
+    echo oh oh... You need to run this command from x64 Native Tools Command Prompt for VS 2026.
     goto :buildfailed_nomsg
 )
 if "%VisualStudioVersion%" lss "17.0" (
