@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#intall-or-build-cosys-airsim-on-linux" class="md-skip">
+        <a href="#build-cosys-airsim-on-linux-from-source" class="md-skip">
           Skip to content
         </a>
       
@@ -3447,37 +3447,61 @@
   
 
 
-<h1 id="intall-or-build-cosys-airsim-on-linux">Intall or Build Cosys-AirSim on Linux<a class="headerlink" href="#intall-or-build-cosys-airsim-on-linux" title="Permanent link">&para;</a></h1>
-<p>The current recommended and tested environment is <strong>Ubuntu 22.04 LTS</strong>. Theoretically, you can build on other distros as well, but we haven't tested it.</p>
+<h1 id="build-cosys-airsim-on-linux-from-source">Build Cosys-AirSim on Linux from Source<a class="headerlink" href="#build-cosys-airsim-on-linux-from-source" title="Permanent link">&para;</a></h1>
+<p>The current recommended and tested environment is <strong>Ubuntu 24.04 LTS</strong>. Theoretically, you can build on other distros as well, but we haven't tested it.</p>
 <h2 id="install-compiler-toolchain">Install Compiler Toolchain<a class="headerlink" href="#install-compiler-toolchain" title="Permanent link">&para;</a></h2>
-<p>Unreal Engine requires a correct version of the compiler toolchain clang. You can find the right version on <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-requirements-for-unreal-engine#gettingthetoolchain">this page</a> for the Unreal version you wish to install.
-To easily install this version on your machine, you can use the following script:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>wget<span class="w"> </span>https://apt.llvm.org/llvm.sh
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>chmod<span class="w"> </span>+x<span class="w"> </span>llvm.sh
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>sudo<span class="w"> </span>./llvm.sh<span class="w"> </span>&lt;version<span class="w"> </span>number&gt;
-</span></code></pre></div></p>
+<p>You will need the following dependencies. Newer versions may also work but are not tested:
+- clang 20
+- clang++-20
+- libc++-20-dev
+- libc++abi-20-dev 
+- libstdc++-20-dev
+- cmake 2.28
+- glib 2.28
+- build-essential
+- lsb-release
+- rsync
+- software-properties-common
+- wget
+- unzip</p>
+<p><code>clang 18</code> above is only needed for <code>setup.sh</code>'s own tooling (and as a fallback compiler). The actual
+AirLib/rpclib build should use Unreal Engine's own bundled Clang toolchain instead of the system
+compiler, see the note in the next section.</p>
 <h2 id="install-unreal-engine">Install Unreal Engine<a class="headerlink" href="#install-unreal-engine" title="Permanent link">&para;</a></h2>
-<p>Download the latest version of Unreal Engine 5.8 from the <a href="https://www.unrealengine.com/en-US/linux">official download page</a>. 
+<p>Download the latest version of Unreal Engine 5.8.X from the <a href="https://www.unrealengine.com/en-US/linux">official download page</a>. 
 This will require an Epic Games account. Once the zip archive is downloaded you can extract it to where you want to install the Unreal Engine.
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>unzip<span class="w"> </span>Linux_Unreal_Engine_5.8.X.zip<span class="w"> </span>-d<span class="w"> </span>destination_folder
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>unzip<span class="w"> </span>-o<span class="w"> </span>Linux_Unreal_Engine_5.8.X.zip<span class="w"> </span>-d<span class="w"> </span>destination_folder
 </span></code></pre></div>
 If you chose a folder such as for example <code>/opt/UnrealEngine</code> make sure to provide permissions and to set the owner, otherwise you might run into issues:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>chmod<span class="w"> </span>-R<span class="w"> </span><span class="m">777</span><span class="w"> </span>/opt/UnrealEngine
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>chown<span class="w"> </span>-r<span class="w"> </span>yourusername<span class="w"> </span>/opt/UnrealEngine
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>chmod<span class="w"> </span>-R<span class="w"> </span><span class="m">777</span><span class="w"> </span>/opt/UnrealEngine
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>chown<span class="w"> </span>-r<span class="w"> </span>yourusername<span class="w"> </span>/opt/UnrealEngine
 </span></code></pre></div>
 From where you install Unreal Engine, you can run <code>Engine/Binaries/Linux/UnrealEditor</code> from the terminal to launch Unreal Engine.
 For more information you can read the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.8">quick start guide</a>.</p>
 <p>You can alternatively install Unreal Engine from source if you do not use a Ubuntu distribution, see the documentation linked above for more information. </p>
 <h2 id="build-cosys-airsim">Build Cosys-Airsim<a class="headerlink" href="#build-cosys-airsim" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Clone Cosys-AirSim and build it:
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># go to the folder where you clone GitHub projects</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Cosys-Lab/Cosys-AirSim.git
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nb">cd</span><span class="w"> </span>Cosys-AirSim
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>./setup.sh
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>./build.sh
+<li>Clone Cosys-AirSim and build it, passing the path to your Unreal Engine install with <code>--ue-root</code>:
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Cosys-Lab/Cosys-AirSim.git
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>Cosys-AirSim
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>./setup.sh
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>./build.sh<span class="w"> </span>--ue-root<span class="w"> </span>/path/to/UnrealEngine
 </span></code></pre></div></li>
 </ul>
+<p>Instead of passing <code>--ue-root</code> on every invocation, you can instead export the <code>UE_ROOT</code>
+  environment variable once (e.g. in your <code>~/.bashrc</code>) and just run <code>./build.sh</code>:
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">UE_ROOT</span><span class="o">=</span>/path/to/UnrealEngine
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>./build.sh
+</span></code></pre></div>
+  <code>--ue-root</code> takes precedence if both are set. <code>/path/to/UnrealEngine</code> is the folder containing
+  <code>Engine/</code>, i.e. the same folder from which you run <code>Engine/Binaries/Linux/UnrealEditor</code>.</p>
+<p>Unreal Engine links its Linux targets using its own bundled Clang compiler, not your system compiler/libc. If you build AirLib with the plain system <code>clang</code> the resulting built library can end up incompatible with UE's linker, and building the Unreal plugin will fail.</p>
+<p><code>--ue-root</code>/<code>UE_ROOT</code> avoids this by locating Unreal's bundled Linux toolchain (under
+  <code>Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/</code>) and building AirLib with that exact
+  compiler and <code>--sysroot</code>, so the produced static libraries are always ABI-compatible with the
+  engine install you point it at. Omitting <code>--ue-root</code> still works and falls back to the system
+  <code>clang</code>/<code>clang++</code> (or <code>gcc</code>/<code>g++</code> with <code>--gcc</code>), but is only recommended if you hit no link
+  errors when building the Unreal plugin.</p>
 <h2 id="build-unreal-environment">Build Unreal Environment<a class="headerlink" href="#build-unreal-environment" title="Permanent link">&para;</a></h2>
 <p>Finally, you will need an Unreal project that hosts the environment for your vehicles. Cosys-AirSim comes with a built-in "Blocks Environment" which you can use, or you can create your own. Please see <a href="../unreal_proj/">setting up Unreal Environment</a> if you'd like to setup your own environment.</p>
 <h2 id="how-to-use-cosys-airsim">How to Use Cosys-AirSim<a class="headerlink" href="#how-to-use-cosys-airsim" title="Permanent link">&para;</a></h2>
@@ -3495,7 +3519,7 @@ See <a href="../apis/">Using APIs</a> and <a href="../settings/">settings.json</
 </div>
 <p>Go to 'Edit-&gt;Editor Preferences', in the 'Search' box type 'CPU' and ensure that the 'Use Less CPU when in Background' is unchecked.</p>
 <h3 id="optional-setup-remote-control-multirotor-only">[Optional] Setup Remote Control (Multirotor Only)<a class="headerlink" href="#optional-setup-remote-control-multirotor-only" title="Permanent link">&para;</a></h3>
-<p>A remote control is required if you want to fly manually. See the <a href="../remote_control/">remote control setup</a> for more details.</p>
+<p>A remote control is required if you want to fly the drones manually. See the <a href="../remote_control/">remote control setup</a> for more details.</p>
 <p>Alternatively, you can use <a href="../apis/">APIs</a> for programmatic control or use the so-called <a href="../image_apis/">Computer Vision mode</a> to move around using the keyboard.</p>
 
 

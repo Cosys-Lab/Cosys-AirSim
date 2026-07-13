@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#install-or-build-cosys-airsim-on-windows" class="md-skip">
+        <a href="#build-cosys-airsim-on-windows-from-source" class="md-skip">
           Skip to content
         </a>
       
@@ -3413,7 +3413,7 @@
   
 
 
-<h1 id="install-or-build-cosys-airsim-on-windows">Install or Build Cosys-AirSim on Windows<a class="headerlink" href="#install-or-build-cosys-airsim-on-windows" title="Permanent link">&para;</a></h1>
+<h1 id="build-cosys-airsim-on-windows-from-source">Build Cosys-AirSim on Windows from Source<a class="headerlink" href="#build-cosys-airsim-on-windows-from-source" title="Permanent link">&para;</a></h1>
 <h2 id="install-unreal-engine">Install Unreal Engine<a class="headerlink" href="#install-unreal-engine" title="Permanent link">&para;</a></h2>
 <ol>
 <li><a href="https://www.unrealengine.com/download">Download</a> the Epic Games Launcher. While the Unreal Engine is open source and free to download, registration is still required.</li>
@@ -3424,18 +3424,18 @@ Click on the <code>Install</code> button on the top right, which should show the
 </ol>
 <h2 id="build-cosys-airsim">Build Cosys-AirSim<a class="headerlink" href="#build-cosys-airsim" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Install Visual Studio 2022. Make sure to select Desktop Development with C++ and Windows 10/11 SDK <strong>10.0.X (choose latest)</strong> and select the latest .NET Framework SDK under the 'Individual Components' tab while installing VS 2022. More info <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/setting-up-visual-studio-development-environment-for-cplusplus-projects-in-unreal-engine?application_version=5.8">here</a>.</li>
-<li>Start <code>Developer Command Prompt for VS 2022</code>. </li>
+<li>Install Visual Studio 2026. Make sure to select Desktop Development with C++ and Windows 10/11 SDK <strong>10.0.X (choose latest)</strong> and select the latest .NET Framework SDK under the 'Individual Components' tab while installing VS 2026. More info <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/setting-up-visual-studio-development-environment-for-cplusplus-projects-in-unreal-engine?application_version=5.8">here</a>.</li>
+<li>Start <code>Developer Command Prompt for VS 2026</code>. </li>
 <li>Clone the repo: <code>git clone https://github.com/Cosys-Lab/Cosys-AirSim.git</code>, and go the AirSim directory by <code>cd Cosys-AirSim</code>. </li>
 <li>Run <code>build.cmd</code> from the command line. This will create ready to use plugin bits in the <code>Unreal\Plugins</code> folder that can be dropped into any Unreal project.</li>
 </ul>
 <h2 id="build-unreal-project">Build Unreal Project<a class="headerlink" href="#build-unreal-project" title="Permanent link">&para;</a></h2>
 <p>Finally, you will need an Unreal project that hosts the environment for your vehicles. Make sure to close and re-open the Unreal Engine and the Epic Games Launcher before building your first environment if you haven't done so already. After restarting the Epic Games Launcher it will ask you to associate project file extensions with Unreal Engine, click on 'fix now' to fix it. Cosys-AirSim comes with a built-in "Blocks Environment" which you can use, or you can create your own. Please see <a href="../unreal_proj/">setting up Unreal Environment</a>.</p>
 <h2 id="setup-remote-control-multirotor-only">Setup Remote Control (Multirotor only)<a class="headerlink" href="#setup-remote-control-multirotor-only" title="Permanent link">&para;</a></h2>
-<p>A remote control is required if you want to fly manually. See the <a href="../remote_control/">remote control setup</a> for more details.</p>
-<p>Alternatively, you can use <a href="../apis/">APIs</a> for programmatic control or use the so-called <a href="../image_apis/">Computer Vision mode</a> to move around using the keyboard.</p>
+<p>A remote control is required if you want to fly the drone manually. See the <a href="../remote_control/">remote control setup</a> for more details.
+Alternatively, you can use <a href="../apis/">APIs</a> for programmatic control or use the so-called <a href="../image_apis/">Computer Vision mode</a> to move around using the keyboard.</p>
 <h2 id="how-to-use-cosys-airsim">How to Use Cosys-AirSim<a class="headerlink" href="#how-to-use-cosys-airsim" title="Permanent link">&para;</a></h2>
-<p>Once Cosys-AirSim is set up by following above steps, you can,
+<p>Once Cosys-AirSim is set up by following above steps, for launching and building it through Visual Studio you can,
 1. Navigate to folder <code>Unreal\Environments\Blocks</code> and run <code>update_from_git.bat</code>.
 2. Double click on .sln file to load the Blocks project in <code>Unreal\Environments\Blocks</code> (or .sln file in your own <a href="../unreal_custenv/">custom</a> Unreal project). If you don't see .sln file then you probably haven't completed steps in Build Unreal Project section above.
 3. Select your Unreal project as Start Up project (for example, Blocks project) and make sure Build config is set to "Develop Editor" and x64.
@@ -3446,6 +3446,7 @@ Click on the <code>Install</code> button on the top right, which should show the
 </div>
 <p>You can install the Cosys-AirSim Python client from pip with <code>pip install cosysairsim</code>.
 See <a href="../apis/">Using APIs</a> and <a href="../settings/">settings.json</a> for various options available.</p>
+<p>Alternatively you can also simply open the Unreal Engine project by double clicking the <em>Blocks.uproject</em> file.</p>
 <h1 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h1>
 <h4 id="i-get-an-error-il-p1-version-x-does-not-match-p2-version-x">I get an error <code>Il ‘P1’, version ‘X’, does not match ‘P2’, version ‘X’</code><a class="headerlink" href="#i-get-an-error-il-p1-version-x-does-not-match-p2-version-x" title="Permanent link">&para;</a></h4>
 <p>This is caused by multiple versions of Visual Studio installed on the machine. The build script of Cosys-AirSim will use the latest versions it can find so need to make Unreal does the same.
