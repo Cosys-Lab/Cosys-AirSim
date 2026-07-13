@@ -96,10 +96,19 @@ IF NOT EXIST external\rpclib\%RPC_VERSION_FOLDER% (
 )
 
 REM //---------- Build rpclib ------------
+REM //optionally pin the exact MSVC toolset (e.g. if the latest installed one is newer than UE supports)
+REM //set AIRSIM_VCTOOLSVERSION=14.38.33130 before running this script, or see docs/install_windows.md FAQ
+set "CMAKE_TOOLSET_ARG="
+set "MSBUILD_TOOLSET_ARG="
+if NOT "%AIRSIM_VCTOOLSVERSION%" == "" (
+    set "CMAKE_TOOLSET_ARG=-T version=%AIRSIM_VCTOOLSVERSION%"
+    set "MSBUILD_TOOLSET_ARG=/p:VCToolsVersion=%AIRSIM_VCTOOLSVERSION%"
+)
+
 ECHO Starting cmake to build rpclib...
 IF NOT EXIST external\rpclib\%RPC_VERSION_FOLDER%\build mkdir external\rpclib\%RPC_VERSION_FOLDER%\build
 cd external\rpclib\%RPC_VERSION_FOLDER%\build
-cmake -G"Visual Studio 17 2022" ..
+cmake -G"Visual Studio 17 2022" %CMAKE_TOOLSET_ARG% ..
 
 if "%buildMode%" == "" (
 cmake --build . 
@@ -182,12 +191,12 @@ IF NOT EXIST AirLib\deps\eigen3 goto :buildfailed
 
 REM //---------- now we have all dependencies to compile AirSim.sln which will also compile MavLinkCom ----------
 if "%buildMode%" == "" (
-msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=Debug AirSim.sln
+msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=Debug %MSBUILD_TOOLSET_ARG% AirSim.sln
 if ERRORLEVEL 1 goto :buildfailed
-msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=Release AirSim.sln 
+msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=Release %MSBUILD_TOOLSET_ARG% AirSim.sln
 if ERRORLEVEL 1 goto :buildfailed
 ) else (
-msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=%buildMode% AirSim.sln
+msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=%buildMode% %MSBUILD_TOOLSET_ARG% AirSim.sln
 if ERRORLEVEL 1 goto :buildfailed
 )
 

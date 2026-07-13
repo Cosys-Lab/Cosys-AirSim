@@ -58,14 +58,18 @@ Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppD
 This means Visual Studio has auto-updated to an MSVC toolset that is newer than what UE was built to support.
 
 To fix it:
-1. Open the Visual Studio Installer and, under "Individual components", install an older MSVC v143 toolset that UE supports alongside your current one. Multiple toolset versions can be installed side by side.
+1. Open the Visual Studio Installer and, under "Individual components", install an older MSVC toolset that UE supports alongside your current one (multiple toolset versions can be installed side by side). Note the exact version number of the folder it installs, e.g. `14.38.33130`, under `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\`.
 2. In `BuildConfiguration.xml` (see above), pin `CompilerVersion` to that exact installed version instead of `Latest`, e.g.:
 ```xml
 <WindowsPlatform>
 <CompilerVersion>14.38.33130</CompilerVersion>
 </WindowsPlatform>
 ```
-3. Since the prebuilt `AirLib` libraries were likely compiled with the newer (too-new) toolset, rebuild them with the same pinned toolset to avoid the IL mismatch error above: open **Developer Command Prompt for VS 202X**, run `set VCToolsVersion=14.38.33130` (matching what you pinned), `cd` into the repo, and re-run `build.cmd`.
+3. Since the prebuilt `AirLib`/`MavLinkCom`/rpclib libraries were likely compiled with the newer (too-new) toolset, rebuild them with the same pinned toolset to avoid the IL mismatch error above. Simply setting `VCToolsVersion` or running from a specific Developer Command Prompt is **not** enough by itself. `build.cmd` reads an optional `AIRSIM_VCTOOLSVERSION` environment variable and passes it through correctly to both. From **Developer Command Prompt for VS 202X**, run `clean.cmd` followed by:
+```bat
+set AIRSIM_VCTOOLSVERSION=14.38.33130
+build.cmd
+```
 
 #### I get `error C100 : An internal error has occurred in the compiler` when running build.cmd
 We have noticed this happening with VS version `15.9.0` and have checked-in a workaround in Cosys-AirSim code. If you have this VS version, please make sure to pull the latest Cosys-AirSim code.
