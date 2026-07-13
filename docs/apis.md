@@ -22,18 +22,16 @@ If you are using Visual Studio 2019 then just open AirSim.sln, set PythonClient 
 
 ### Installing AirSim Package
 
-You can also install the AirSim python module to your Python environment to use anywhere by running  `pip install .` in the _PythonClient_ folder. 
+You can install the Cosys-AirSim Python client from pip with `pip install cosysairsim`.
+You can also install the AirSim python module to your Python environment by running  `pip install .` in the _PythonClient_ folder. 
 
-**Notes**
-1. You may notice a file `setup_path.py` in our example folders. This file has simple code to detect if `airsim` package is available in parent folder and in that case we use that instead of pip installed package so you always use latest code.
-2. AirSim is still under heavy development which means you might frequently need to update the package to use new APIs.
 
 ## C++ Users
 If you want to use C++ APIs and examples, please see [C++ APIs Guide](apis_cpp.md).
 
 
 ## Hello Car
-Here's how to use AirSim APIs using Python to control simulated car (see also [C++ example](apis_cpp.md#hello_car)):
+Here's how to use AirSim APIs using Python to control simulated car (see also [C++ example](apis_cpp.md#hello-car)):
 
 ```python
 # ready to run example: PythonClient/car/hello_car.py
@@ -77,7 +75,7 @@ while True:
 ```
 
 ## Hello Drone
-Here's how to use AirSim APIs using Python to control simulated quadrotor (see also [C++ example](apis_cpp.md#hello_drone)):
+Here's how to use AirSim APIs using Python to control simulated quadrotor (see also [C++ example](apis_cpp.md#hello-drone)):
 
 ```python
 # ready to run example: PythonClient/multirotor/hello_drone.py

@@ -1,4 +1,4 @@
-# How to use AirSim with Robot Operating System (ROS)
+# ROS1 Python Node
 
 AirSim and ROS can be integrated using Python. Some example ROS node are provided demonstrating how to publish data from AirSim as ROS topics.
 

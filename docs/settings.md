@@ -280,7 +280,7 @@ The recording feature allows you to record data such as position, orientation, v
 * `RecordOnMove`: specifies that do not record frame if there was vehicle's position or orientation hasn't changed.
 * `Folder`: Parent folder where timestamped subfolder with recordings are created. Absolute path of the directory must be specified. If not used, then `Documents/AirSim` folder will be used. E.g. `"Folder": "/home/<user>/Documents"`
 * `Enabled`: Whether Recording should start from the beginning itself, setting to `true` will start recording automatically when the simulation starts. By default, it's set to `false`
-* `Cameras`: this element controls which cameras are used to capture images. By default scene image from camera 0 is recorded as compressed png format. This setting is json array so you can specify multiple cameras to capture images, each with potentially different [image types](settings.md#image-capture-settings). 
+* `Cameras`: this element controls which cameras are used to capture images. By default scene image from camera 0 is recorded as compressed png format. This setting is json array so you can specify multiple cameras to capture images, each with potentially different [image types](settings.md#capturesettings). 
     * When `PixelsAsFloat` is true, image is saved as [pfm](pfm.md) file instead of png file.
     * `VehicleName` option allows you to specify separate cameras for individual vehicles. If the `Cameras` element isn't present, `Scene` image from the default camera of each vehicle will be recorded.
     * If you don't want to record any images and just the vehicle's physics data, then specify the `Cameras` element but leave it empty, like this: `"Cameras": []`
@@ -321,7 +321,7 @@ Furthermore there are some other settings available:
 * `ExternalLocal`: When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default. Note that if `MoveWorldOrigin` in the settings.json is set to `true` the Unreal coordinates will be moved to be the same origin as the player start location and as such this may effect what coordinates are returned if set to `false`. 
 
 ### Note on ImageType element
-The `ImageType` element in JSON array determines which image type that settings applies to. The valid values are described in [ImageType section](image_apis.md#available-imagetype).
+The `ImageType` element in JSON array determines which image type that settings applies to. The valid values are described in [ImageType section](image_apis.md#available-imagetype-values).
 
 For example, `CaptureSettings` element is json array so you can add settings for multiple image types easily.
 
@@ -371,6 +371,7 @@ They are settings that are directly transferred to the post-processing settings 
 * **DepthOfFieldFocalDistance**: Distance at which the depth of field effect should be sharp, in centimeters.
 * **DepthOfFieldDepthBlurAmount**: Depth blur in kilometers for 50% (CircleDOF only).
 * **DepthOfFieldDepthBlurRadius**: Depth blur radius in pixels at 1920x resolution (CircleDOF only).
+* **DepthOfFieldUseHairDepth**: Whether to use hair depth for computing the circle of confusion size. *Not supported on UE5.2!*
 
 #### Exposure
 * **AutoExposureMethod**: Luminance computation method. (0: Histogram, 1: Basic, 2: Manual)
@@ -484,7 +485,7 @@ Each simulation mode will go through the list of vehicles specified in this sett
 
 ### Common Vehicle Setting
 - `VehicleType`: This could be either `PhysXCar`, `ArduRover` or `BoxCar` for the Car SimMode, `SimpleFlight`, `ArduCopter` or `PX4Multirotor` for the MultiRotor SimMode, `ComputerVision` for the ComputerVision SimMode and `CPHusky` or `Pioneer` for SkidVehicle SimMode. you can use There is no default value therefore this element must be specified.
-- `PawnPath`: This allows to override the pawn blueprint to use for the vehicle. For example, you may create new pawn blueprint derived from ACarPawn for a warehouse robot in your own project outside the Cosys-AirSim code and then specify its path here. See also [PawnPaths](settings.md#PawnPaths). Note that you have to specify your custom pawn blueprint class path inside the global `PawnPaths` object using your proprietarily defined object name, and quote that name inside the `Vehicles` setting. For example,
+- `PawnPath`: This allows to override the pawn blueprint to use for the vehicle. For example, you may create new pawn blueprint derived from ACarPawn for a warehouse robot in your own project outside the Cosys-AirSim code and then specify its path here. See also [PawnPaths](settings.md#pawnpaths). Note that you have to specify your custom pawn blueprint class path inside the global `PawnPaths` object using your proprietarily defined object name, and quote that name inside the `Vehicles` setting. For example,
 ```json
     {
       ...
@@ -506,7 +507,7 @@ Each simulation mode will go through the list of vehicles specified in this sett
 - `X, Y, Z, Yaw, Roll, Pitch`: These elements allows you to specify the initial position and orientation of the vehicle. Position is in NED coordinates in SI units with origin set to Player Start location in Unreal environment. The orientation is specified in degrees.
 - `Sensors`: This element specifies the sensors associated with the vehicle, see [Sensors](sensors.md) page for details.
 - `IsFpvVehicle`: This setting allows to specify which vehicle camera will follow and the view that will be shown when ViewMode is set to Fpv. By default, Cosys-AirSim selects the first vehicle in settings as FPV vehicle.
-- `Cameras`: This element specifies camera settings for vehicle. The key in this element is name of the [available camera](image_apis.md#available_cameras) and the value is same as `CameraDefaults` as described above. For example, to change FOV for the front center camera to 120 degrees, you can use this for `Vehicles` setting:
+- `Cameras`: This element specifies camera settings for vehicle. The key in this element is name of the [available camera](image_apis.md#available-cameras) and the value is same as `CameraDefaults` as described above. For example, to change FOV for the front center camera to 120 degrees, you can use this for `Vehicles` setting:
 
 ```json
 "Vehicles": {

@@ -33,6 +33,7 @@ Once Cosys-AirSim is set up by following above steps, for launching and building
 !!! tip
     Go to 'Edit->Editor Preferences', in the 'Search' box type 'CPU' and ensure that the 'Use Less CPU when in Background' is unchecked.
 
+You can install the Cosys-AirSim Python client from pip with `pip install cosysairsim`.
 See [Using APIs](apis.md) and [settings.json](settings.md) for various options available.
 
 Alternatively you can also simply open the Unreal Engine project by double clicking the _Blocks.uproject_ file.

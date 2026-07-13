@@ -1,7 +1,7 @@
-# airsim_ros_pkgs
+# ROS2 Node
 
 A ROS2 wrapper over the Cosys-AirSim C++ client library. All coordinates and data are in the right-handed coordinate frame of the ROS standard and not in NED except for geo points.
-The following was tested on Ubuntu 22.04 with ROS2 Iron.
+The following was tested with ROS2 Jazzy.
 
 ## Build
 

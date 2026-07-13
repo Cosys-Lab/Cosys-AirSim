@@ -18,19 +18,15 @@ You will need the following dependencies. Newer versions may also work but are n
 - wget
 - unzip
 
-Unreal Engine requires a correct version of the compiler toolchain clang. You can find the right version on [this page](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-requirements-for-unreal-engine#gettingthetoolchain) for the Unreal version you wish to install.
-To easily install this version on your machine, you can use the following script:
-```bash
-wget https://apt.llvm.org/llvm.sh
-chmod +x llvm.sh
-sudo ./llvm.sh <version number>
-```
+`clang 18` above is only needed for `setup.sh`'s own tooling (and as a fallback compiler). The actual
+AirLib/rpclib build should use Unreal Engine's own bundled Clang toolchain instead of the system
+compiler, see the note in the next section.
 
 ## Install Unreal Engine
-Download Unreal Engine 5.2.1 from the [official download page](https://www.unrealengine.com/en-US/linux). 
+Download the latest version of Unreal Engine 5.2.1 from the [official download page](https://www.unrealengine.com/en-US/linux). 
 This will require an Epic Games account. Once the zip archive is downloaded you can extract it to where you want to install the Unreal Engine.
 ```bash
-unzip Linux_Unreal_Engine_5.2.1.zip -d destination_folder
+unzip -o Linux_Unreal_Engine_5.2.1.zip -d destination_folder
 ```
 If you chose a folder such as for example `/opt/UnrealEngine` make sure to provide permissions and to set the owner, otherwise you might run into issues:
 ```bash
@@ -83,6 +79,7 @@ Once Cosys-AirSim is setup:
 - If you get prompts to convert project, look for More Options or Convert-In-Place option. If you get prompted to build, choose Yes. If you get prompted to disable Cosys-AirSim plugin, choose No.
 - After Unreal Editor loads, press Play button.
 
+You can install the Cosys-AirSim Python client from pip with `pip install cosysairsim`.
 See [Using APIs](apis.md) and [settings.json](settings.md) for various options available for Cosys-AirSim usage.
 
 !!! tip

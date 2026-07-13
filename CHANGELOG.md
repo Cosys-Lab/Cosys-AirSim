@@ -1,5 +1,23 @@
-### Development (version 3.4)
+### July 2026 (version 3.4)
+* The latest available stable Unreal Engine version that is now targeted for release is 5.8. This means the previous 5.5 branch will no longer be receive updates or be actively maintained. 
+* Removed prebuild versions of 5.2.1 LTS version. This branch is still updated and maintained but has to be used from source. 
+* Added unique index to each object name in the annotation system to avoid duplicate name overrides. 
+* Added support with annotation system for (instanced) skeletal nanite meshes. 
+* Updated annotation system to add both actor and component tags to the annotation system for checking if both exist instead of old behaviour where actor tags took priority and component tags would be ignored if both existed.
+* Updated annotation system to stop printing everything to log.
+* Updated default camera to use auto-focus. Manual focus still available through API. 
+* Updated Docker tutorial to work better for recent Unreal versions. 
+* Updated Matlab Toolbox for new toolbox project file structure. 
+* Updated Linux installation from source to more easily target against the Clang shipped with Unreal Engine itself. 
+* Updated documentation pages to Material theme of MkDocs for better navigation and readibility. 
 * Fixed duplicate indexes for annotation system causing meshes to not show up in annotation masks.
+* Fixed several edge-cases and crashes in annotation system. 
+* Fixed GPU LiDAR crashing on Multirotor vehicles by dispatching its scene capture/readback asynchronously to the game thread. GPU LiDAR + Multirotor is allowed in settings.json again as a result. 
+* Fixed common crash on ending play.
+* Fixed incorrect TF-coordinate system for cameras for ROS2 node. 
+* Fixed incorrect TF hierarchy order to world->odom->vehicle->sensors for ROS2 node.
+* Fixed ROS2 header imports to support newer ROS2 distros such as Jazzy.
+
 
 ### April 2025 (version 3.3)
 * The latest available stable Unreal Engine version that is now targeted for release is 5.5. This means 5.4 will no longer be actively maintained. 
@@ -58,7 +76,7 @@
 * Updated to be compatible with Unreal 5.3. 
     * Note that 5.3 breaks debug rendering! Disable it to avoid issues in editor. [Fixed in 5.4](https://issues.unrealengine.com/issue/UE-199454)
     * Note that 5.3 and higher requires _r.DetailMode 2_ console command or scalability settings to be set to Epic to avoid issues with rendering the RGB scene camera sensor. More info [here](docs/unreal_custenv.md#unreal-scene-camera-bug).
-* Updated [ROS2 wrapper](docs/ros_cplusplus.md) to support Cosys-AirSim features and fix several issues:
+* Updated [ROS2 wrapper](docs/ros2.md) to support Cosys-AirSim features and fix several issues:
     * Added support for annotation cameras.
     * Added support for GPU-Lidar and Echos sensors.
     * Added support for ground truth labels of Lidar sensor.
