@@ -9,6 +9,7 @@ set -x
 
 debug=false
 gcc=false
+ue_root="${UE_ROOT:-}"
 # Parse command line arguments
 while [[ $# -gt 0 ]]
 do
@@ -23,9 +24,19 @@ do
         gcc=true
         shift # past argument
         ;;
+    --ue-root)
+        ue_root="$2"
+        shift # past argument
+        shift # past value
+        ;;
     esac
 
 done
+
+if [[ -n "$ue_root" && $gcc == true ]]; then
+    echo "ERROR: --ue-root and --gcc are mutually exclusive (Unreal Engine's bundled toolchain is Clang-only)."
+    exit 1
+fi
 
 function version_less_than_equal_to() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" = "$1"; }
 
@@ -62,6 +73,32 @@ if [ "$(uname)" == "Darwin" ]; then
     #now pick up whatever setup.sh installs
     export CC="$(brew --prefix)/opt/llvm/bin/clang"
     export CXX="$(brew --prefix)/opt/llvm/bin/clang++"
+elif [[ -n "$ue_root" ]]; then
+    # Unreal Engine links its Linux targets with its own bundled Clang + sysroot, not the
+    # system compiler/libc. Building AirLib/rpclib with the matching toolchain here avoids
+    # ABI mismatches (e.g. "undefined symbol: __isoc23_strtol") that show up when a host with
+    # a newer glibc (Ubuntu 24.04+, glibc >= 2.38) builds against UE's older bundled sysroot.
+    ue_toolchain_dirs=("$ue_root"/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/*/x86_64-unknown-linux-gnu)
+    if [[ ! -e "${ue_toolchain_dirs[0]}" ]]; then
+        echo "ERROR: could not find Unreal Engine's bundled Linux toolchain under:"
+        echo "  $ue_root/Engine/Extras/ThirdPartyNotUE/SDKs/HostLinux/Linux_x64/*/x86_64-unknown-linux-gnu"
+        echo "Check that --ue-root points at a valid Unreal Engine install root."
+        exit 1
+    fi
+    if [[ ${#ue_toolchain_dirs[@]} -gt 1 ]]; then
+        echo "ERROR: found multiple Unreal Engine bundled Linux toolchains under $ue_root, expected one:"
+        printf '  %s\n' "${ue_toolchain_dirs[@]}"
+        exit 1
+    fi
+    UE_TOOLCHAIN_DIR="${ue_toolchain_dirs[0]}"
+    if [[ ! -x "$UE_TOOLCHAIN_DIR/bin/clang++" ]]; then
+        echo "ERROR: $UE_TOOLCHAIN_DIR/bin/clang++ not found or not executable."
+        exit 1
+    fi
+    echo "Using Unreal Engine's bundled Linux toolchain at $UE_TOOLCHAIN_DIR"
+    export CC="$UE_TOOLCHAIN_DIR/bin/clang"
+    export CXX="$UE_TOOLCHAIN_DIR/bin/clang++"
+    CMAKE_VARS="$CMAKE_VARS -DUSING_UE_TOOLCHAIN=ON -DCMAKE_CXX_FLAGS=--sysroot=$UE_TOOLCHAIN_DIR -DCMAKE_C_FLAGS=--sysroot=$UE_TOOLCHAIN_DIR -DCMAKE_EXE_LINKER_FLAGS=--sysroot=$UE_TOOLCHAIN_DIR -DCMAKE_SHARED_LINKER_FLAGS=--sysroot=$UE_TOOLCHAIN_DIR"
 else
     VERSION=$(lsb_release -rs | cut -d. -f1)
     if $gcc; then
@@ -139,9 +176,9 @@ set +x
 
 echo ""
 echo ""
-echo "==============================="
-echo " Cosys-AirSim plugin is built! "
-echo "==============================="
+echo "=========================================="
+echo " Cosys-AirSim airlib c++ plugin is built!."
+echo "=========================================="
 echo ""
 echo "For further info see for installation see:"
 echo "https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/docs/install_linux.md"

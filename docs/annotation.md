@@ -16,6 +16,7 @@ The annotation system uses actor and/or component tags to set these values for t
   * Foliage objects aren't supported. This is the special object type in Unreal to place trees, grass and other plants that move with the wind. As a work-around, StaticMesh objects must be used.
   * Brush objects aren't supported. This is a special object type in Unreal to create your own meshes with. As a work-around, you can convert them to a StaticMesh.
   * These and other unsupported object types that are less common that either will not be rendered (decals, text, foliage, ...) or will by default be given the RGB color value of [149,149,149] or [0,0,0]. (brush objects, landscape,...).
+  * Skeletal meshes are not well supported on UE 5.2.1. On UE 5.8 (Cosys-AirSim v3.4 or higher) (nanite) skeletal meshes work but may still face limitations such as skeletal meshes consisisting of multiple meshes. 
 
 ## Usage
 

@@ -1,4 +1,4 @@
-# Install or Build Cosys-AirSim on Windows
+# Build Cosys-AirSim on Windows from Source
 
 ## Install Unreal Engine
 1. [Download](https://www.unrealengine.com/download) the Epic Games Launcher. While the Unreal Engine is open source and free to download, registration is still required.
@@ -19,13 +19,12 @@ Finally, you will need an Unreal project that hosts the environment for your veh
 
 ## Setup Remote Control (Multirotor only)
 
-A remote control is required if you want to fly manually. See the [remote control setup](remote_control.md) for more details.
-
+A remote control is required if you want to fly the drone manually. See the [remote control setup](remote_control.md) for more details.
 Alternatively, you can use [APIs](apis.md) for programmatic control or use the so-called [Computer Vision mode](image_apis.md) to move around using the keyboard.
 
 ## How to Use Cosys-AirSim
 
-Once Cosys-AirSim is set up by following above steps, you can,
+Once Cosys-AirSim is set up by following above steps, for launching and building it through Visual Studio you can,
 1. Navigate to folder `Unreal\Environments\Blocks` and run `update_from_git.bat`.
 2. Double click on .sln file to load the Blocks project in `Unreal\Environments\Blocks` (or .sln file in your own [custom](unreal_custenv.md) Unreal project). If you don't see .sln file then you probably haven't completed steps in Build Unreal Project section above.
 3. Select your Unreal project as Start Up project (for example, Blocks project) and make sure Build config is set to "Develop Editor" and x64.
@@ -34,13 +33,16 @@ Once Cosys-AirSim is set up by following above steps, you can,
 !!! tip
     Go to 'Edit->Editor Preferences', in the 'Search' box type 'CPU' and ensure that the 'Use Less CPU when in Background' is unchecked.
 
+You can install the Cosys-AirSim Python client from pip with `pip install cosysairsim`.
 See [Using APIs](apis.md) and [settings.json](settings.md) for various options available.
+
+Alternatively you can also simply open the Unreal Engine project by double clicking the _Blocks.uproject_ file.
 
 # FAQ
 
 
 #### I get an error `Il ‘P1’, version ‘X’, does not match ‘P2’, version ‘X’`
-This is caused by multiple versions of Visual Studio installed on the machine. The build script of Cosys-AirSim will use the latest versions it can find so need to make Unreal does the same.
+This is caused by having multiple MSVC toolset versions installed, where Unreal and the prebuilt AirLib/MavLinkCom libraries were compiled with different ones. The build script of Cosys-AirSim will use the latest MSVC toolset it can find, so you need to make Unreal do the same (or vice versa, see below).
 Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppData\Roaming\Unreal Engine\UnrealBuildTool_ and add the following:
 
 ```xml
@@ -52,6 +54,22 @@ Open or create a file called `BuildConfiguration.xml` in _C:\Users\USERNAME\AppD
 </Configuration>
 ```
 
+#### I get `error C4668: '__has_feature' is not defined as a preprocessor macro` (or "Detected compiler newer than Visual Studio 2022, please update min version checking...") when building with UE 5.2
+This means Visual Studio has auto-updated to an MSVC toolset that is newer than what UE was built to support.
+
+To fix it:
+1. Open the Visual Studio Installer and, under "Individual components", install an older MSVC toolset that UE supports alongside your current one (multiple toolset versions can be installed side by side). Note the exact version number of the folder it installs, e.g. `14.38.33130`, under `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\`.
+2. In `BuildConfiguration.xml` (see above), pin `CompilerVersion` to that exact installed version instead of `Latest`, e.g.:
+```xml
+<WindowsPlatform>
+<CompilerVersion>14.38.33130</CompilerVersion>
+</WindowsPlatform>
+```
+3. Since the prebuilt `AirLib`/`MavLinkCom`/rpclib libraries were likely compiled with the newer (too-new) toolset, rebuild them with the same pinned toolset to avoid the IL mismatch error above. Simply setting `VCToolsVersion` or running from a specific Developer Command Prompt is **not** enough by itself. `build.cmd` reads an optional `AIRSIM_VCTOOLSVERSION` environment variable and passes it through correctly to both. From **Developer Command Prompt for VS 202X**, run `clean.cmd` followed by:
+```bat
+set AIRSIM_VCTOOLSVERSION=14.38.33130
+build.cmd
+```
 
 #### I get `error C100 : An internal error has occurred in the compiler` when running build.cmd
 We have noticed this happening with VS version `15.9.0` and have checked-in a workaround in Cosys-AirSim code. If you have this VS version, please make sure to pull the latest Cosys-AirSim code.

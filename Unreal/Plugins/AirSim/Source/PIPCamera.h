@@ -73,6 +73,7 @@ public:
     void updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, bool only_hide=false);
     bool GetAnnotationNameExist(std::string annotation_name);
     void updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name, bool only_hide = false);
+    void updateAnnotationComponentsFromObjectAnnotator(FObjectAnnotator& annotator, const FString& annotator_name = TEXT("InstanceSegmentation"));
     void addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance = -1.0f);
     void setupCameraFromSettings(const APIPCamera::CameraSetting& camera_setting, const NedTransform& ned_transform);
     void setCameraPose(const msr::airlib::Pose& relative_pose);

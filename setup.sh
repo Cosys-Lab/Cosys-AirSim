@@ -30,31 +30,6 @@ if [ "$(uname)" == "Darwin" ]; then # osx
     brew update
     # Update below line for newer versions
     brew install llvm@8
-else # linux
-    sudo apt-get update
-    sudo apt-get -y install --no-install-recommends \
-        lsb-release \
-        rsync \
-        software-properties-common \
-        wget \
-        libvulkan1 \
-        vulkan-tools
-
-    # install clang and build tools
-    VERSION=$(lsb_release -rs | cut -d. -f1)
-    if [ "$VERSION" -ge "20" ]; then
-        clang_version='12'
-        cpp_version='12'
-    else
-        clang_version='12'
-        cpp_version='10'
-    fi
-    sudo apt-get install -y \
-        clang-$clang_version \
-        clang++-$clang_version \
-        libc++-$clang_version-dev \
-        libc++abi-$clang_version-dev \
-        libstdc++-$cpp_version-dev
 fi
 
 if ! which cmake; then
@@ -94,43 +69,7 @@ else #linux
     # install additional tools
     sudo apt-get install -y build-essential unzip libunwind-dev
 
-    if version_less_than_equal_to $cmake_ver $MIN_CMAKE_VERSION; then
-        VERSION=$(lsb_release -rs | cut -d. -f1)
-        # For Ubuntu 18 and up, avoid building cmake from scratch to save time
-        # ref: https://apt.kitware.com
-        if [ "$VERSION" -ge "18" ]; then
-            sudo apt-get -y install \
-                apt-transport-https \
-                ca-certificates \
-                gnupg
-            wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-            sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-            sudo apt-get -y install --no-install-recommends \
-                make \
-                cmake
-
-        else
-            # For Ubuntu 16.04, or anything else, build CMake 3.10.2 from source
-            if [[ ! -d "cmake_build/bin" ]]; then
-                echo "Downloading cmake..."
-                wget https://cmake.org/files/v3.10/cmake-3.10.2.tar.gz \
-                    -O cmake.tar.gz
-                tar -xzf cmake.tar.gz
-                rm cmake.tar.gz
-                rm -rf ./cmake_build
-                mv ./cmake-3.10.2 ./cmake_build
-                pushd cmake_build
-                ./bootstrap
-                make
-                popd
-            fi
-        fi
-
-    else
-        echo "Already have good version of cmake: $cmake_ver"
-    fi
-
-fi # End USB setup, CMake install
+fi # End USB setup
 
 
 # Download rpclib

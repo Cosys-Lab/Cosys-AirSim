@@ -48,6 +48,8 @@ namespace msr {
 			uint draw_mode = 0;							 // 0 = no coloring, 1 = instance segmentation, 2 = material, 3 = impact angle, 4 = intensity
 			bool draw_sensor = false;						     // Draw the physical sensor in the world on the vehicle with a 3d colored axis
 
+			bool async_capture_mode = false;
+
 			real_T update_frequency = 10;                // Frequency to update the sensor at in Hz
 			real_T startup_delay = 1;                    // Delay until sensor is enabled in seconds
 
@@ -57,6 +59,7 @@ namespace msr {
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
 			{
 				std::string simmode_name = AirSimSettings::singleton().simmode_name;
+				async_capture_mode = (simmode_name == AirSimSettings::kSimModeTypeMultirotor);
 
 
                 const auto& settings_json = settings.settings;

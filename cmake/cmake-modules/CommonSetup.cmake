@@ -1,8 +1,7 @@
 # Common setup instructions shared by all AirSim CMakeLists.
 
 macro(CommonTargetLink)
-    target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
-    #target_link_libraries(c++abi)
+    target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${CXX_EXP_LIB})
 endmacro(CommonTargetLink)
 
 macro(IncludeEigen)
@@ -58,8 +57,20 @@ macro(CommonSetup)
 
             if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
                 set(CMAKE_CXX_FLAGS "-stdlib=libc++ -Wno-documentation -Wno-unknown-warning-option ${CMAKE_CXX_FLAGS}")
-                find_package(LLVM REQUIRED CONFIG)
-                set(CXX_EXP_LIB "-L${LLVM_LIBRARY_DIRS} -ferror-limit=10")
+                if (USING_UE_TOOLCHAIN)
+                    # Unreal Engine's bundled Clang ships its own libc++/libc++abi under its sysroot.
+                    # Linking against the system LLVM's libc++ here (via -L) pulls in newer glibc
+                    # symbols (e.g. pthread_once@GLIBC_2.34) that aren't present in UE's older
+                    # bundled sysroot, causing undefined reference errors at link time.
+                    # UE only ships static libc++.a/libc++abi.a (no .so), so unlike the dynamic-linked
+                    # system libc++ (which auto-resolves libc++abi via DT_NEEDED), the static libc++abi
+                    # must be linked explicitly. --start-group/--end-group lets ld resolve the mutual
+                    # libc++ <-> libc++abi symbol dependencies regardless of scan order.
+                    set(CXX_EXP_LIB "-Wl,--start-group -lc++ -lc++abi -Wl,--end-group -ferror-limit=10")
+                else()
+                    find_package(LLVM REQUIRED CONFIG)
+                    set(CXX_EXP_LIB "-L${LLVM_LIBRARY_DIRS} -ferror-limit=10")
+                endif()
             else()
                 set(CXX_EXP_LIB "-fmax-errors=10 -Wnoexcept -Wstrict-null-sentinel")
             endif ()
