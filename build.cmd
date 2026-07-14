@@ -209,9 +209,9 @@ robocopy /MIR MavLinkCom\include %MAVLINK_TARGET_INCLUDE%
 robocopy /MIR MavLinkCom\lib %MAVLINK_TARGET_LIB%
 
 REM //---------- all our output goes to Unreal/Plugin folder ----------
-if NOT exist Unreal\Plugins\AirSim\Source\AirLib mkdir Unreal\Plugins\AirSim\Source\AirLib
-robocopy /MIR AirLib Unreal\Plugins\AirSim\Source\AirLib  /XD temp *. /njh /njs /ndl /np
-copy /y AirSim.props Unreal\Plugins\AirSim\Source\AirLib
+if NOT exist Unreal\Plugins\AirSim\Source\Private\AirLib mkdir Unreal\Plugins\AirSim\Source\Private\AirLib
+robocopy /MIR AirLib Unreal\Plugins\AirSim\Source\Private\AirLib  /XD temp *. /njh /njs /ndl /np
+copy /y AirSim.props Unreal\Plugins\AirSim\Source\Private\AirLib
 
 REM //---------- done building ----------
 exit /b 0
