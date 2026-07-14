@@ -14,7 +14,7 @@ public class AirSim : ModuleRules
 
     private string AirLibPath
     {
-        get { return Path.Combine(ModulePath, "AirLib"); }
+        get { return Path.Combine(Path.Combine(ModulePath, "Private"), "AirLib"); }
     }
     private string AirSimPluginPath
     {
