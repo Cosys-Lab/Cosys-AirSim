@@ -1,5 +1,6 @@
 ### version 3.4.1
 * Fixed crash in annotation system. 
+* Fixed ROS2 node publishing the same (GPU)Lidar messages multiple times.
 * Added compatibility with our acoustic simulation plugin SonoTraceUE (https://github.com/Cosys-Lab/SonoTraceUE).
 
 ### July 2026 (version 3.4)

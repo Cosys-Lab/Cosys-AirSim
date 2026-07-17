@@ -447,6 +447,10 @@ private:
     std::unordered_map<std::string, bool> sensor_name_to_passive_enable_map_;
     std::unordered_map<std::string, bool> sensor_name_to_active_enable_map_;
 
+    std::unordered_map<std::string, msr::airlib::TTimePoint> lidar_last_timestamps_;
+    std::unordered_map<std::string, msr::airlib::TTimePoint> lidar_labels_last_timestamps_;
+    std::unordered_map<std::string, msr::airlib::TTimePoint> gpulidar_last_timestamps_;
+
     std::vector<sensor_msgs::msg::CameraInfo> camera_info_msg_vec_;
 
     /// ROS other publishers

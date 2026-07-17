@@ -405,3 +405,7 @@ docker/LinuxBlocks/*
 CLAUDE.md
 *.claude
 *.idea
+Unreal/Environments/Blocks/Automation_Blocks.slnx
+Unreal/Environments/Blocks/Blocks.slnx
+Unreal/Environments/Blocks/Blocks.code-workspace
+Unreal/Environments/Blocks/.ignore
