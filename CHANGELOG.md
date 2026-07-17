@@ -1,3 +1,7 @@
+### version 3.4.1
+* Fixed crash in annotation system. 
+* Addec compatibility with our acoustic simulation plugin SonoTraceUE (https://github.com/Cosys-Lab/SonoTraceUE).
+
 ### July 2026 (version 3.4)
 * The latest available stable Unreal Engine version that is now targeted for release is 5.8. This means the previous 5.5 branch will no longer be receive updates or be actively maintained. 
 * Removed prebuild versions of 5.2.1 LTS version. This branch is still updated and maintained but has to be used from source. 
