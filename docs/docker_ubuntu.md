@@ -32,6 +32,7 @@ You can download it by running
 cd Airsim/docker;
 ./download_blocks_env_binary.sh
 ```
+Note that Cosys-AirSim Unreal Engine 5.2.1 no longer gets packaged builds for Cosys-AirSim as such the latest packaged release to download is Cosys-AirSim v3.3 in this script.
 
 Modify it to fetch the specific binary required.
 

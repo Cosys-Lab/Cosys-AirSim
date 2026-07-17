@@ -1742,6 +1742,14 @@ void AirsimROSWrapper::lidar_timer_cb()
                 for (auto& lidar_publisher : vehicle_name_ptr_pair.second->lidar_pubs_) {
                     auto lidar_data = airsim_client_lidar_.getLidarData(lidar_publisher.sensor_name, vehicle_name_ptr_pair.first);
                     sensor_names_to_lidar_data_map[lidar_publisher.sensor_name] = lidar_data;
+
+                    const std::string key = vehicle_name_ptr_pair.first + "/" + lidar_publisher.sensor_name;
+                    auto last_timestamp_it = lidar_last_timestamps_.find(key);
+                    if (last_timestamp_it != lidar_last_timestamps_.end() && last_timestamp_it->second == lidar_data.time_stamp) {
+                        continue;
+                    }
+                    lidar_last_timestamps_[key] = lidar_data.time_stamp;
+
                     sensor_msgs::msg::PointCloud2 lidar_msg = get_lidar_msg_from_airsim(lidar_data, vehicle_name_ptr_pair.first, lidar_publisher.sensor_name);
                     lidar_publisher.publisher->publish(lidar_msg);
                 }
@@ -1754,6 +1762,14 @@ void AirsimROSWrapper::lidar_timer_cb()
                     else {
                         lidar_data = airsim_client_echo_.getLidarData(lidar_labels_publisher.sensor_name, vehicle_name_ptr_pair.first);
                     }
+
+                    const std::string key = vehicle_name_ptr_pair.first + "/" + lidar_labels_publisher.sensor_name;
+                    auto last_timestamp_it = lidar_labels_last_timestamps_.find(key);
+                    if (last_timestamp_it != lidar_labels_last_timestamps_.end() && last_timestamp_it->second == lidar_data.time_stamp) {
+                        continue;
+                    }
+                    lidar_labels_last_timestamps_[key] = lidar_data.time_stamp;
+
                     airsim_interfaces::msg::StringArray lidar_label_msg = get_lidar_labels_msg_from_airsim(lidar_data, vehicle_name_ptr_pair.first, lidar_labels_publisher.sensor_name);
                     lidar_labels_publisher.publisher->publish(lidar_label_msg);
                 }
@@ -1773,6 +1789,15 @@ void AirsimROSWrapper::gpulidar_timer_cb()
             if (!vehicle_name_ptr_pair.second->gpulidar_pubs_.empty()) {
                 for (auto& gpulidar_publisher : vehicle_name_ptr_pair.second->gpulidar_pubs_) {
                     auto gpulidar_data = airsim_client_gpulidar_.getGPULidarData(gpulidar_publisher.sensor_name, vehicle_name_ptr_pair.first);
+
+                
+                    const std::string key = vehicle_name_ptr_pair.first + "/" + gpulidar_publisher.sensor_name;
+                    auto last_timestamp_it = gpulidar_last_timestamps_.find(key);
+                    if (last_timestamp_it != gpulidar_last_timestamps_.end() && last_timestamp_it->second == gpulidar_data.time_stamp) {
+                        continue;
+                    }
+                    gpulidar_last_timestamps_[key] = gpulidar_data.time_stamp;
+
                     sensor_msgs::msg::PointCloud2 gpulidar_msg = get_gpulidar_msg_from_airsim(gpulidar_data, vehicle_name_ptr_pair.first, gpulidar_publisher.sensor_name);
                     gpulidar_publisher.publisher->publish(gpulidar_msg);
                 }
