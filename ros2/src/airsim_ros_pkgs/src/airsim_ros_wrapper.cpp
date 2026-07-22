@@ -896,7 +896,10 @@ airsim_interfaces::msg::StringArray AirsimROSWrapper::get_lidar_labels_msg_from_
     lidar_labels_msg.header.frame_id = vehicle_name + "/" + sensor_name;
 
     if (lidar_data.point_cloud.size() > 3) {
-        lidar_labels_msg.data = std::move(lidar_data.groundtruth);           
+        lidar_labels_msg.data.reserve(lidar_data.groundtruth.size());
+        for (const auto& label : lidar_data.groundtruth) {
+            lidar_labels_msg.data.push_back(sanitize_string(label));
+        }
     }
     else {
         // msg = []
@@ -1011,7 +1014,10 @@ airsim_interfaces::msg::StringArray AirsimROSWrapper::get_active_echo_labels_msg
     echo_active_labels_msg.header.frame_id = vehicle_name + "/" + sensor_name;
 
     if (echo_data.point_cloud.size() > 6) {
-        echo_active_labels_msg.data = std::move(echo_data.groundtruth);           
+        echo_active_labels_msg.data.reserve(echo_data.groundtruth.size());
+        for (const auto& label : echo_data.groundtruth) {
+            echo_active_labels_msg.data.push_back(sanitize_string(label));
+        }
     }
     else {
         // msg = []
@@ -1075,7 +1081,10 @@ airsim_interfaces::msg::StringArray AirsimROSWrapper::get_passive_echo_labels_ms
     echo_passive_labels_msg.header.frame_id = vehicle_name + "/" + sensor_name;
 
     if (echo_data.point_cloud.size() > 9) {
-        echo_passive_labels_msg.data = std::move(echo_data.passive_beacons_groundtruth);           
+        echo_passive_labels_msg.data.reserve(echo_data.passive_beacons_groundtruth.size());
+        for (const auto& label : echo_data.passive_beacons_groundtruth) {
+            echo_passive_labels_msg.data.push_back(sanitize_string(label));
+        }
     }
     else {
         // msg = []
@@ -1154,7 +1163,7 @@ airsim_interfaces::msg::InstanceSegmentationList AirsimROSWrapper::get_instance_
     for(; it < object_name_list.end(); it++, object_index++ )
     {
         airsim_interfaces::msg::InstanceSegmentationLabel instance_segmentation_label_msg;
-        instance_segmentation_label_msg.name = *it;
+        instance_segmentation_label_msg.name = sanitize_string(*it);
         instance_segmentation_label_msg.r = color_map[object_index].x();
         instance_segmentation_label_msg.g = color_map[object_index].y();
         instance_segmentation_label_msg.b = color_map[object_index].z();
@@ -1175,7 +1184,7 @@ airsim_interfaces::msg::ObjectTransformsList AirsimROSWrapper::get_object_transf
         msr::airlib::Pose cur_object_pose = poses[object_index]; 
         if(!std::isnan(cur_object_pose.position.x())){
             geometry_msgs::msg::TransformStamped object_transform_msg;
-            object_transform_msg.child_frame_id = *it;
+            object_transform_msg.child_frame_id = sanitize_string(*it);
             object_transform_msg.transform.translation.x = cur_object_pose.position.x();
             object_transform_msg.transform.translation.y = -cur_object_pose.position.y();
             object_transform_msg.transform.translation.z = -cur_object_pose.position.z();
@@ -1353,6 +1362,9 @@ void AirsimROSWrapper::drone_state_timer_cb()
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
         RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API:\n%s", msg.c_str());
+    }
+    catch (std::exception& e) {
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised while publishing vehicle state, skipping this cycle:\n%s", e.what());
     }
 }
 
@@ -1553,6 +1565,18 @@ void AirsimROSWrapper::update_commands()
     has_gimbal_cmd_ = false;
 }
 
+// strips any embedded '\0' characters (and everything after the first one) from a string coming
+// from AirSim/Unreal. A ROS2 string field containing an embedded null character makes fastcdr
+// throw a BadParamException on publish, which is not caught by rclcpp and crashes the whole node.
+std::string AirsimROSWrapper::sanitize_string(const std::string& str)
+{
+    std::size_t null_pos = str.find('\0');
+    if (null_pos == std::string::npos) {
+        return str;
+    }
+    return str.substr(0, null_pos);
+}
+
 // airsim uses nans for zeros in settings.json. we set them to zeros here for handling tfs in ROS
 void AirsimROSWrapper::set_nans_to_zeros_in_pose(VehicleSetting& vehicle_setting) const
 {
@@ -1731,6 +1755,9 @@ void AirsimROSWrapper::img_response_timer_cb()
         std::string msg = e.get_error().as<std::string>();
         RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get image response.\n%s", msg.c_str());
     }
+    catch (std::exception& e) {
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised while publishing image response, skipping this cycle:\n%s", e.what());
+    }
 }
 
 void AirsimROSWrapper::lidar_timer_cb()
@@ -1780,6 +1807,9 @@ void AirsimROSWrapper::lidar_timer_cb()
         std::string msg = e.get_error().as<std::string>();
         RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get lidar response.\n%s", msg.c_str());
     }
+    catch (std::exception& e) {
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised while publishing lidar response, skipping this cycle:\n%s", e.what());
+    }
 }
 
 void AirsimROSWrapper::gpulidar_timer_cb()
@@ -1807,6 +1837,9 @@ void AirsimROSWrapper::gpulidar_timer_cb()
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
         RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get gpulidar response.\n%s", msg.c_str());
+    }
+    catch (std::exception& e) {
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised while publishing gpulidar response, skipping this cycle:\n%s", e.what());
     }
 }
 
@@ -1866,6 +1899,9 @@ void AirsimROSWrapper::echo_timer_cb()
     catch (rpc::rpc_error& e) {
         std::string msg = e.get_error().as<std::string>();
         RCLCPP_ERROR(nh_->get_logger(), "Exception raised by the API, didn't get echo response.\n%s", msg.c_str());
+    }
+    catch (std::exception& e) {
+        RCLCPP_ERROR(nh_->get_logger(), "Exception raised while publishing echo response, skipping this cycle:\n%s", e.what());
     }
 }
 

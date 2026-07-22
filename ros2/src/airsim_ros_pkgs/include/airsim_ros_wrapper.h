@@ -320,6 +320,10 @@ private:
     void append_static_vehicle_tf(VehicleROS* vehicle_ros, const VehicleSetting& vehicle_setting);
     void set_nans_to_zeros_in_pose(VehicleSetting& vehicle_setting) const;
     void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, CameraSetting& camera_setting) const;
+    // strips any embedded '\0' characters (and everything after the first one) from a string
+    // coming from AirSim/Unreal, since a ROS2 string field containing an embedded null character
+    // will make fastcdr throw a BadParamException and crash the node on publish
+    static std::string sanitize_string(const std::string& str);
     void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, LidarSetting& lidar_setting) const;
     void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, GPULidarSetting& gpulidar_setting) const;
     void set_nans_to_zeros_in_pose(const VehicleSetting& vehicle_setting, EchoSetting& echo_setting) const;
