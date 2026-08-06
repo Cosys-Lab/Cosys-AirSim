@@ -14,7 +14,7 @@ namespace airlib
     public:
         virtual void run() override
         {
-            auto t = static_cast<uint64_t>(Utils::to_time_t("2018-February-22 15:24:00"));
+            auto t = static_cast<uint64_t>(Utils::to_time_t("2018-February-22 15:24:00", false, "%Y-%B-%d %H:%M:%S"));
             auto c_sun = EarthCelestial::getSunCoordinates(t, 47.673988, -122.121513);
             auto c_moon = EarthCelestial::getMoonCoordinates(t, 47.673988, -122.121513);
             auto c_moon_phase = EarthCelestial::getMoonPhase(t);
