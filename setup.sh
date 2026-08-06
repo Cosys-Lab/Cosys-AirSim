@@ -29,7 +29,7 @@ done
 if [ "$(uname)" == "Darwin" ]; then # osx
     brew update
     # Update below line for newer versions
-    brew install llvm@8
+    brew install llvm
 fi
 
 if ! which cmake; then
