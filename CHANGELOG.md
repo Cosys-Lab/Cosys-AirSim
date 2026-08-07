@@ -1,3 +1,6 @@
+### Unreleased changes
+* Fixed multiple build issues for MacOS. [#143](https://github.com/Cosys-Lab/Cosys-AirSim/pull/143), [#144](https://github.com/Cosys-Lab/Cosys-AirSim/pull/144), and [#145](https://github.com/Cosys-Lab/Cosys-AirSim/pull/145) by v3g42. 
+
 ### version 3.4.1
 * Fixed crash in annotation system. 
 * Fixed ROS2 node publishing the same (GPU)Lidar messages multiple times.
