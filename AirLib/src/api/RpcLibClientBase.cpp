@@ -630,7 +630,7 @@ __pragma(warning(disable : 4239))
         std::string RpcLibClientBase::simSpawnObject(const std::string& object_name, const std::string& load_component, const Pose& pose,
                                                      const Vector3r& scale, bool physics_enabled)
         {
-            return pimpl_->client.call("simSpawnObject", object_name, load_component, RpcLibAdaptorsBase::Pose(pose), RpcLibAdaptorsBase::Vector3r(scale), physics_enabled).as<std::string>();
+            return pimpl_->client.call("simSpawnObject", object_name, load_component, RpcLibAdaptorsBase::Pose(pose), RpcLibAdaptorsBase::Vector3r(scale), physics_enabled, false).as<std::string>();
         }
 
         bool RpcLibClientBase::simDestroyObject(const std::string& object_name)
