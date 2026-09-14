@@ -8,6 +8,7 @@
 #include "Runtime/Engine/Classes/Components/LineBatchComponent.h"
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Misc/OutputDeviceNull.h"
+#include "Misc/FileHelper.h"
 #include "ImageUtils.h"
 #include <cstdlib>
 #include <ctime>
@@ -133,6 +134,18 @@ std::string WorldSimApi::spawnObject(const std::string& object_name, const std::
         if (IsValid(NewActor)) {
             spawned_object = true;
             simmode_->scene_object_map.Add(FString(final_object_name.c_str()), NewActor);
+            // Dynamically spawned actors were missing UnrealCV RGB888 instance paint and
+            // materials.csv custom-depth stencil (needed for GPU LiDAR intensity / GT).
+            // Docs already require AddNewActorToSegmentation for runtime spawns.
+            simmode_->AddNewActorToInstanceSegmentation(NewActor, true);
+            FString materialListContent;
+            const auto& material_list_file =
+                msr::airlib::AirSimSettings::singleton().material_list_file;
+            if (FFileHelper::LoadFileToString(
+                    materialListContent,
+                    UTF8_TO_TCHAR(material_list_file.c_str()))) {
+                UAirBlueprintLib::InitializeMeshStencilIDs(true, materialListContent);
+            }
         }
 
         UAirBlueprintLib::setSimulatePhysics(NewActor, physics_enabled);
