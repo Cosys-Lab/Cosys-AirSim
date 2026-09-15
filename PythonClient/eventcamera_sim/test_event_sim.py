@@ -88,7 +88,7 @@ if __name__ == "__main__":
             event_generator.init = False
 
         img = np.reshape(
-            np.fromstring(response[0].image_data_uint8, dtype=np.uint8),
+            np.frombuffer(response[0].image_data_uint8, dtype=np.uint8),
             event_generator.rgb_image_shape,
         )
 
