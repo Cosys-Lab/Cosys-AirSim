@@ -39,7 +39,7 @@ class KinectPublisher:
         return img_depth
 
     def getRGBImage(self,response_rgb):
-        img1d = np.fromstring(response_rgb.image_data_uint8, dtype=np.uint8)
+        img1d = np.frombuffer(response_rgb.image_data_uint8, dtype=np.uint8)
         img_rgb = img1d.reshape(response_rgb.height, response_rgb.width, 3)
         img_rgb = img_rgb[..., :3][..., ::-1]
         return img_rgb
