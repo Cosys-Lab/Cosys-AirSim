@@ -105,3 +105,9 @@ Use `getLidarData(sensor name, vehicle name)` API to retrieve the Lidar data. Th
 * **Point-Cloud:** The floats represent [x,y,z] coordinate for each point hit within the range in the last scan in NED format. It will be [0,0,0] for a laser that didn't get any reflection (out of range).
 * **Pose:** Default: Sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 * **Groundtruth:** For each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to a laser that didn't reflect anything will have label _out_of_range_.
+
+The `simSetLidarPose` API allows changing the pose of a lidar sensor at runtime, taking an input pose as a combination of relative position and a quaternion in NED frame (relative to the vehicle, or absolute NED/local-NED per `ExternalLocal` if the lidar is configured as `External`). For example:
+```
+lidar_pose = airsim.Pose(airsim.Vector3r(0, 0, -1), airsim.to_quaternion(0.261799, 0, 0))  #PRY in radians
+client.simSetLidarPose("LidarSensor1", lidar_pose)
+```

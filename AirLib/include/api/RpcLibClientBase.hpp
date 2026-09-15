@@ -134,6 +134,10 @@ namespace airlib
         msr::airlib::GpsBase::Output getGpsData(const std::string& gps_name = "", const std::string& vehicle_name = "") const;
         msr::airlib::DistanceSensorData getDistanceSensorData(const std::string& distance_sensor_name = "", const std::string& vehicle_name = "") const;
 
+        void simSetLidarPose(const std::string& lidar_name, const Pose& pose, const std::string& vehicle_name = "");
+        void simSetGPULidarPose(const std::string& lidar_name, const Pose& pose, const std::string& vehicle_name = "");
+        void simSetEchoPose(const std::string& echo_name, const Pose& pose, const std::string& vehicle_name = "");
+        void simSetDistanceSensorPose(const std::string& distance_sensor_name, const Pose& pose, const std::string& vehicle_name = "");
         Pose simGetVehiclePose(const std::string& vehicle_name = "") const;
         void simSetVehiclePose(const Pose& pose, bool ignore_collision, const std::string& vehicle_name = "");
         void simSetTraceLine(const std::vector<float>& color_rgba, float thickness = 3.0f, const std::string& vehicle_name = "");

@@ -1393,6 +1393,17 @@ class VehicleClient:
         return DistanceSensorData.from_msgpack(
             self.client.call('getDistanceSensorData', distance_sensor_name, vehicle_name))
 
+    def simSetDistanceSensorPose(self, distance_sensor_name, pose, vehicle_name=''):
+        """
+        - Control the pose of a selected distance sensor
+
+        Args:
+            distance_sensor_name (str): Name of the distance sensor to be controlled, specified in settings.json
+            pose (Pose): Pose representing the desired position and orientation of the sensor, relative to the vehicle
+            vehicle_name (str, optional): Name of vehicle which the sensor corresponds to
+        """
+        self.client.call('simSetDistanceSensorPose', distance_sensor_name, pose, vehicle_name)
+
     def getLidarData(self, lidar_name='', vehicle_name=''):
         """
         Args:
@@ -1403,6 +1414,18 @@ class VehicleClient:
             LidarData:
         """
         return LidarData.from_msgpack(self.client.call('getLidarData', lidar_name, vehicle_name))
+
+    def simSetLidarPose(self, lidar_name, pose, vehicle_name=''):
+        """
+        - Control the pose of a selected lidar sensor
+
+        Args:
+            lidar_name (str): Name of the lidar to be controlled, specified in settings.json
+            pose (Pose): Pose representing the desired position and orientation of the sensor. Relative to the
+                vehicle, or absolute NED/local-NED if the lidar is configured as External in settings.json
+            vehicle_name (str, optional): Name of vehicle which the lidar corresponds to
+        """
+        self.client.call('simSetLidarPose', lidar_name, pose, vehicle_name)
 
     def getGPULidarData(self, lidar_name='', vehicle_name=''):
         """
@@ -1417,6 +1440,18 @@ class VehicleClient:
         """
         return GPULidarData.from_msgpack(self.client.call('getGPULidarData', lidar_name, vehicle_name))
 
+    def simSetGPULidarPose(self, lidar_name, pose, vehicle_name=''):
+        """
+        - Control the pose of a selected GPU lidar sensor
+
+        Args:
+            lidar_name (str): Name of the GPU lidar to be controlled, specified in settings.json
+            pose (Pose): Pose representing the desired position and orientation of the sensor. Relative to the
+                vehicle, or absolute NED/local-NED if the lidar is configured as External in settings.json
+            vehicle_name (str, optional): Name of vehicle which the lidar corresponds to
+        """
+        self.client.call('simSetGPULidarPose', lidar_name, pose, vehicle_name)
+
     def getEchoData(self, echo_name='', vehicle_name=''):
         """
         Retrieves data from the specified Echo sensor.
@@ -1429,6 +1464,18 @@ class VehicleClient:
             EchoData: Data from the specified Echo sensor.
         """
         return EchoData.from_msgpack(self.client.call('getEchoData', echo_name, vehicle_name))
+
+    def simSetEchoPose(self, echo_name, pose, vehicle_name=''):
+        """
+        - Control the pose of a selected echo sensor
+
+        Args:
+            echo_name (str): Name of the echo sensor to be controlled, specified in settings.json
+            pose (Pose): Pose representing the desired position and orientation of the sensor. Relative to the
+                vehicle, or absolute NED/local-NED if the echo sensor is configured as External in settings.json
+            vehicle_name (str, optional): Name of vehicle which the echo sensor corresponds to
+        """
+        self.client.call('simSetEchoPose', echo_name, pose, vehicle_name)
 
     def getUWBData(self, uwb_name='', vehicle_name=''):
         """
