@@ -73,6 +73,12 @@ public:
         return params_;
     }
 
+    virtual bool setPose(const Pose& pose) const override
+    {
+        params_.relative_pose = pose;
+        return true;
+    }
+
 protected:
     virtual void getPointCloud(const Pose& echo_pose, const Pose& vehicle_pose, vector<real_T>& point_cloud, vector<std::string>& groundtruth,
 		                       vector<real_T>& passive_beacons_point_cloud, vector<std::string>& passive_beacons_groundtruth) = 0;
@@ -118,7 +124,7 @@ private:
 		setPointCloud(input.pose, input.point_cloud, input.time_stamp);
 	}
 private:
-    EchoSimpleParams params_;
+    mutable EchoSimpleParams params_;
     vector<real_T> point_cloud_;
 	vector<std::string> groundtruth_;
 	vector<real_T> passive_beacons_point_cloud_;

@@ -192,3 +192,9 @@ Use `getEchoData(sensor name, vehicle name)` API to retrieve the echo sensor dat
 * **Passive Groundtruth:** For each point two strings are kept of the Passive Point-Cloud. The first a label string representing the object of the reflection and second the name of the Passive Echo Beacon that was the source of this reflection. 
 
 Use `setEchoData(sensor name, vehicle name, echo data)` API to render an external pointcloud back to the simulation. It expects it to be [x,y,z] as a flat array of floats.
+
+The `simSetEchoPose` API allows changing the pose of an echo sensor at runtime, taking an input pose as a combination of relative position and a quaternion in NED frame (relative to the vehicle, or absolute NED/local-NED per `ExternalLocal` if the sensor is configured as `External`). For example:
+```python
+echo_pose = airsim.Pose(airsim.Vector3r(0, 0, -1), airsim.to_quaternion(0.261799, 0, 0))  #PRY in radians
+client.simSetEchoPose("echo", echo_pose, "vehicle")
+```

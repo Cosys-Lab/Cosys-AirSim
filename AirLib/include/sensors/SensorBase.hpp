@@ -67,6 +67,15 @@ namespace airlib
             return name_;
         }
 
+        //Set the sensor's pose (relative to vehicle, or absolute if the sensor is external) at
+        //runtime. Returns false for sensor types that don't support a repositionable pose
+        //(e.g. Imu, Gps, Barometer, Magnetometer, whose output is rigidly tied to the vehicle body).
+        virtual bool setPose(const Pose& pose) const
+        {
+            unused(pose);
+            return false;
+        }
+
         virtual ~SensorBase() = default;
 
     private:
