@@ -70,6 +70,12 @@ namespace airlib
             return params_;
         }
 
+        virtual bool setPose(const Pose& pose) const override
+        {
+            params_.relative_pose = pose;
+            return true;
+        }
+
     protected:
         virtual real_T getRayLength(const Pose& pose) = 0;
 
@@ -95,7 +101,7 @@ namespace airlib
         }
 
     private:
-        DistanceSimpleParams params_;
+        mutable DistanceSimpleParams params_;
 
         //GaussianMarkov correlated_noise_;
         RandomGeneratorGausianR uncorrelated_noise_;

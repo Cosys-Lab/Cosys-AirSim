@@ -23,3 +23,13 @@ For example, to make the sensor point towards the ground (for altitude measureme
 ```
 
 **Note:** For Cars, the sensor is placed 1 meter above the vehicle center by default. This is required since otherwise the sensor gives strange data due it being inside the vehicle. This doesn't affect the sensor values say when measuring the distance between 2 cars. See [`PythonClient/car/distance_sensor_multi.py`](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/car/distance_sensor_multi.py) for an example usage.
+
+## Client API
+
+Use `getDistanceSensorData(sensor name, vehicle name)` API to retrieve the current distance measurement and sensor pose.
+
+The `simSetDistanceSensorPose` API allows changing the pose of a distance sensor at runtime, taking an input pose as a combination of position and a quaternion, always relative to the vehicle (unlike Lidar/GPU Lidar/Echo, the distance sensor does not currently support an `External` world-relative mode). For example:
+```python
+distance_sensor_pose = airsim.Pose(airsim.Vector3r(0, 0, 0), airsim.to_quaternion(-1.5708, 0, 0))  #PRY in radians
+client.simSetDistanceSensorPose("Distance", distance_sensor_pose)
+```

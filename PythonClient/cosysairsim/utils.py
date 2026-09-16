@@ -8,10 +8,10 @@ from .types import *
 
 
 def string_to_uint8_array(bstr):
-    return np.fromstring(bstr, np.uint8)
-    
+    return np.frombuffer(bstr, np.uint8)
+
 def string_to_float_array(bstr):
-    return np.fromstring(bstr, np.float32)
+    return np.frombuffer(bstr, np.float32)
     
 def list_to_2d_float_array(flst, width, height):
     return np.reshape(np.asarray(flst, np.float32), (height, width))

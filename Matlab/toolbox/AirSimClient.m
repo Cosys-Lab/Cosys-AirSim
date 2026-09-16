@@ -243,6 +243,32 @@ classdef AirSimClient < handle
             DistanceSensorData.min_distance = double(data{"min_distance"});
         end
 
+        function setDistanceSensorPose(obj, sensorName, position, orientation, vehicleName)
+            % SETDISTANCESENSORPOSE Set distance sensor pose via AirSim API.
+            %
+            % Description:
+            %   Sets the runtime pose (position and orientation) of a specified distance sensor,
+            %   relative to the vehicle (the distance sensor does not currently support an
+            %   External/world-relative mode).
+            %
+            % Inputs:
+            %   sensorName (string) - Name of the distance sensor to set pose for.
+            %   position (double array) - Position coordinates [x, y, z] of the sensor.
+            %   orientation (quaternion array) - Orientation quaternion [w, x, y, z] of the sensor.
+            %   vehicleName - name of the vehicle.
+
+            newPose.position.x_val = position(1);
+            newPose.position.y_val = -position(2);
+            newPose.position.z_val = -position(3);
+            orientation = quatinv(orientation);
+
+            newPose.orientation.w_val = orientation(1);
+            newPose.orientation.x_val = orientation(2);
+            newPose.orientation.y_val = orientation(3);
+            newPose.orientation.z_val = orientation(4);
+            obj.rpc_client.call("simSetDistanceSensorPose", sensorName, newPose, vehicleName);
+        end
+
         function [activePointCloud, activeData, passivePointCloud, passiveData, timestamp, sensorPose] = getEchoData(obj, sensorName, enablePassive, vehicleName)
             % GETECHODATA Get sensor data from an echo sensor
             %
@@ -301,8 +327,33 @@ classdef AirSimClient < handle
                 normalData = reflectorPointcloudPassiveRaw(:, 7:9);
                 normalData(:,2:3) = -normalData(:, 2:3);
                 passivePointCloud = pointCloud(reflectorPointcloudPassiveRaw(:, 1:3), Normal=normalData);
-            end               
-        end   
+            end
+        end
+
+        function setEchoPose(obj, sensorName, position, orientation, vehicleName)
+            % SETECHOPOSE Set echo sensor pose via AirSim API.
+            %
+            % Description:
+            %   Sets the runtime pose (position and orientation) of a specified echo sensor.
+            %
+            % Inputs:
+            %   sensorName (string) - Name of the echo sensor to set pose for.
+            %   position (double array) - Position coordinates [x, y, z] of the sensor. Relative to the
+            %       vehicle, or absolute NED/local-NED if the sensor is configured as External in settings.json.
+            %   orientation (quaternion array) - Orientation quaternion [w, x, y, z] of the sensor.
+            %   vehicleName - name of the vehicle.
+
+            newPose.position.x_val = position(1);
+            newPose.position.y_val = -position(2);
+            newPose.position.z_val = -position(3);
+            orientation = quatinv(orientation);
+
+            newPose.orientation.w_val = orientation(1);
+            newPose.orientation.x_val = orientation(2);
+            newPose.orientation.y_val = orientation(3);
+            newPose.orientation.z_val = orientation(4);
+            obj.rpc_client.call("simSetEchoPose", sensorName, newPose, vehicleName);
+        end
 
         function [] = pointcloudFeedback(obj, echoData, sensorName, pointCloud, vehicleName)
             % POINTCLOUDFEEDBACK Send point cloud data as feedback to the
@@ -362,9 +413,34 @@ classdef AirSimClient < handle
                 end
                 lidarPointcloudRaw = reshape(lidarPointcloudRaw, 3, []).';
                 lidarPointcloudRaw = obj.nedToRightHandCoordinates(lidarPointcloudRaw);
-                lidarPointCloud = pointCloud(lidarPointcloudRaw); 
-            end    
-        end   
+                lidarPointCloud = pointCloud(lidarPointcloudRaw);
+            end
+        end
+
+        function setLidarPose(obj, sensorName, position, orientation, vehicleName)
+            % SETLIDARPOSE Set lidar sensor pose via AirSim API.
+            %
+            % Description:
+            %   Sets the runtime pose (position and orientation) of a specified lidar sensor.
+            %
+            % Inputs:
+            %   sensorName (string) - Name of the lidar sensor to set pose for.
+            %   position (double array) - Position coordinates [x, y, z] of the sensor. Relative to the
+            %       vehicle, or absolute NED/local-NED if the sensor is configured as External in settings.json.
+            %   orientation (quaternion array) - Orientation quaternion [w, x, y, z] of the sensor.
+            %   vehicleName - name of the vehicle.
+
+            newPose.position.x_val = position(1);
+            newPose.position.y_val = -position(2);
+            newPose.position.z_val = -position(3);
+            orientation = quatinv(orientation);
+
+            newPose.orientation.w_val = orientation(1);
+            newPose.orientation.x_val = orientation(2);
+            newPose.orientation.y_val = orientation(3);
+            newPose.orientation.z_val = orientation(4);
+            obj.rpc_client.call("simSetLidarPose", sensorName, newPose, vehicleName);
+        end
 
         function [lidarPointCloud, timestamp, sensorPose] = getGPULidarData(obj, sensorName, vehicleName)
             % GETGPULIDARDATA Get sensor data from a GPU lidar sensor
@@ -407,9 +483,34 @@ classdef AirSimClient < handle
                 %     lidarLabelColors(index, 2) = bitshift(bitand(colorValues(index), hex2dec('00FF00')), -8);
                 %     lidarLabelColors(index, 3) = bitand(colorValues(index), hex2dec('0000FF'));
                 % end
-                lidarPointCloud = pointCloud(lidarPointcloudRaw(:,1:3), Color=lidarLabelColors, Intensity=lidarPointcloudRaw(:, 5)); 
-            end    
-        end    
+                lidarPointCloud = pointCloud(lidarPointcloudRaw(:,1:3), Color=lidarLabelColors, Intensity=lidarPointcloudRaw(:, 5));
+            end
+        end
+
+        function setGPULidarPose(obj, sensorName, position, orientation, vehicleName)
+            % SETGPULIDARPOSE Set GPU lidar sensor pose via AirSim API.
+            %
+            % Description:
+            %   Sets the runtime pose (position and orientation) of a specified GPU lidar sensor.
+            %
+            % Inputs:
+            %   sensorName (string) - Name of the GPU lidar sensor to set pose for.
+            %   position (double array) - Position coordinates [x, y, z] of the sensor. Relative to the
+            %       vehicle, or absolute NED/local-NED if the sensor is configured as External in settings.json.
+            %   orientation (quaternion array) - Orientation quaternion [w, x, y, z] of the sensor.
+            %   vehicleName - name of the vehicle.
+
+            newPose.position.x_val = position(1);
+            newPose.position.y_val = -position(2);
+            newPose.position.z_val = -position(3);
+            orientation = quatinv(orientation);
+
+            newPose.orientation.w_val = orientation(1);
+            newPose.orientation.x_val = orientation(2);
+            newPose.orientation.y_val = orientation(3);
+            newPose.orientation.z_val = orientation(4);
+            obj.rpc_client.call("simSetGPULidarPose", sensorName, newPose, vehicleName);
+        end
 
         function [image, timestamp] = getCameraImage(obj, sensorName, cameraType, vehicleName, annotationLayer)
             % GETCAMERAIMAGE Get camera data from a camera sensor

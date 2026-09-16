@@ -105,7 +105,7 @@ bool FObjectFilter::matchesComponent(UActorComponent* actor_component) const
                 bMatchesStaticMesh = true;
             }
             if (wildcard_mesh_names_.Num() != 0 &&
-                StaticMeshComponent->GetStaticMesh()->IsValidLowLevel() &&
+                StaticMeshComponent->GetStaticMesh() != nullptr &&
                 isMatchAnyWildcard(StaticMeshComponent->GetStaticMesh()->GetName())) {
                 bMatchesWildcardMeshName = true;
             }
@@ -118,6 +118,7 @@ bool FObjectFilter::matchesComponent(UActorComponent* actor_component) const
                 bMatchesSkeletalMesh = true;
             }
             if (wildcard_mesh_names_.Num() != 0 &&
+                SkeletalMeshComponent->GetSkeletalMeshAsset() != nullptr &&
                 isMatchAnyWildcard(SkeletalMeshComponent->GetSkeletalMeshAsset()->GetName())) {
                 bMatchesWildcardMeshName = true;
             }

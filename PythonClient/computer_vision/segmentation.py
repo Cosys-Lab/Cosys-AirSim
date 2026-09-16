@@ -53,7 +53,7 @@ for idx, response in enumerate(responses):
         #airsim.write_file(os.path.normpath(filename + '.png'), response.image_data_uint8)
     else: #uncompressed array - numpy demo
         print("Type %d, size %d" % (response.image_type, len(response.image_data_uint8)))
-        img1d = np.fromstring(response.image_data_uint8, dtype=np.uint8) #get numpy array
+        img1d = np.frombuffer(response.image_data_uint8, dtype=np.uint8) #get numpy array
         img_rgb = img1d.reshape(response.height, response.width, 3) #reshape array to 3 channel image array H X W X 3
         # cv2.imwrite(os.path.normpath(filename + '.png'), img_rgb) # write to png
 

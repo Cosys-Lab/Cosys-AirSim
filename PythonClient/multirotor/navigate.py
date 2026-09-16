@@ -35,7 +35,7 @@ while True:
             help = True
             print("Please press '1' in the AirSim view to enable the Depth camera view")
     else:    
-        rawImage = np.fromstring(result, np.int8)
+        rawImage = np.frombuffer(result, np.int8)
         png = cv2.imdecode(rawImage, cv2.IMREAD_UNCHANGED)
         gray = cv2.cvtColor(png, cv2.COLOR_BGR2GRAY)
 

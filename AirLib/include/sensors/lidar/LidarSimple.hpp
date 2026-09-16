@@ -73,6 +73,12 @@ namespace airlib
             return params_;
         }
 
+        virtual bool setPose(const Pose& pose) const override
+        {
+            params_.relative_pose = pose;
+            return true;
+        }
+
     protected:
         virtual bool getPointCloud(const Pose& lidar_pose, const Pose& vehicle_pose,
             TTimeDelta delta_time, vector<real_T>& point_cloud_temp, vector<std::string>& groundtruth_temp, vector<real_T>& point_cloud, vector<std::string>& groundtruth) = 0;
@@ -117,7 +123,7 @@ namespace airlib
 	    }
 
     private:
-        LidarSimpleParams params_;
+        mutable LidarSimpleParams params_;
         vector<real_T> point_cloud_;
         vector<std::string> groundtruth_;
 
