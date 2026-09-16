@@ -3468,16 +3468,16 @@
 AirLib/rpclib build should use Unreal Engine's own bundled Clang toolchain instead of the system
 compiler, see the note in the next section.</p>
 <h2 id="install-unreal-engine">Install Unreal Engine<a class="headerlink" href="#install-unreal-engine" title="Permanent link">&para;</a></h2>
-<p>Download the latest version of Unreal Engine 5.2.1 from the <a href="https://www.unrealengine.com/en-US/linux">official download page</a>. 
+<p>Download the latest version of Unreal Engine 5.8.X from the <a href="https://www.unrealengine.com/en-US/linux">official download page</a>. 
 This will require an Epic Games account. Once the zip archive is downloaded you can extract it to where you want to install the Unreal Engine.
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>unzip<span class="w"> </span>-o<span class="w"> </span>Linux_Unreal_Engine_5.2.1.zip<span class="w"> </span>-d<span class="w"> </span>destination_folder
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>unzip<span class="w"> </span>-o<span class="w"> </span>Linux_Unreal_Engine_5.8.X.zip<span class="w"> </span>-d<span class="w"> </span>destination_folder
 </span></code></pre></div>
 If you chose a folder such as for example <code>/opt/UnrealEngine</code> make sure to provide permissions and to set the owner, otherwise you might run into issues:
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>chmod<span class="w"> </span>-R<span class="w"> </span><span class="m">777</span><span class="w"> </span>/opt/UnrealEngine
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>chown<span class="w"> </span>-R<span class="w"> </span>yourusername<span class="w"> </span>/opt/UnrealEngine
 </span></code></pre></div>
 From where you install Unreal Engine, you can run <code>Engine/Binaries/Linux/UnrealEditor</code> from the terminal to launch Unreal Engine.
-For more information you can read the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.2">quick start guide</a>.</p>
+For more information you can read the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.8">quick start guide</a>.</p>
 <p>You can alternatively install Unreal Engine from source if you do not use a Ubuntu distribution, see the documentation linked above for more information. </p>
 <h2 id="build-cosys-airsim">Build Cosys-Airsim<a class="headerlink" href="#build-cosys-airsim" title="Permanent link">&para;</a></h2>
 <ul>

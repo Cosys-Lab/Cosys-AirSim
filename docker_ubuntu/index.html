@@ -3620,8 +3620,8 @@
 </ul>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>Airsim/docker<span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>build_airsim_image.py<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">   </span>--base_image<span class="o">=</span>ghcr.io/epicgames/unreal-engine:dev-slim-5.2.1<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">   </span>--target_image<span class="o">=</span>airsim_binary:dev-slim-5.2.1
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">   </span>--base_image<span class="o">=</span>ghcr.io/epicgames/unreal-engine:dev-slim-5.8.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">   </span>--target_image<span class="o">=</span>airsim_binary:dev-slim-5.8.0
 </span></code></pre></div>
 <ul>
 <li>Verify you have an image by:
@@ -3633,10 +3633,9 @@
 Let's take the Blocks project binary as an example.
 You can download it by running</li>
 </ul>
-<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>Airsim/docker<span class="p">;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>Airsim/docker<span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>./download_blocks_env_binary.sh
 </span></code></pre></div>
-Note that Cosys-AirSim Unreal Engine 5.2.1 no longer gets packaged builds for Cosys-AirSim as such the latest packaged release to download is Cosys-AirSim v3.3 in this script.</p>
 <p>Modify it to fetch the specific binary required.</p>
 <ul>
 <li>Running an unreal binary inside a docker container with display output:
@@ -3646,9 +3645,9 @@ Note that Cosys-AirSim Unreal Engine 5.2.1 no longer gets packaged builds for Co
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>./run_airsim_image_binary.sh<span class="w"> </span>DOCKER_IMAGE_NAME<span class="w"> </span>UNREAL_BINARY_SHELL_SCRIPT<span class="w"> </span>UNREAL_BINARY_ARGUMENTS
 </span></code></pre></div>
 <p>Do not forget to run the xhost command first to bind the X11 to docker.
-   For Blocks, you can do a <code>./run_airsim_image_binary.sh airsim_binary:dev-slim-5.2.1 LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720</code></p>
+   For Blocks, you can do a <code>./run_airsim_image_binary.sh airsim_binary:dev-slim-5.8.0 LinuxBlocks/Linux/Blocks.sh -windowed -ResX=1080 -ResY=720</code></p>
 <ul>
-<li><code>DOCKER_IMAGE_NAME</code>: Same as <code>target_image</code> parameter in previous step. By default, enter <code>airsim_binary:dev-slim-5.2.1</code></li>
+<li><code>DOCKER_IMAGE_NAME</code>: Same as <code>target_image</code> parameter in previous step. By default, enter <code>airsim_binary:dev-slim-5.8.0</code></li>
 <li><code>UNREAL_BINARY_SHELL_SCRIPT</code>: for Blocks enviroment, it will be <code>LinuxBlocks/Linux/Blocks.sh</code></li>
 <li><a href="https://docs.unrealengine.com/en-us/Programming/Basics/CommandLineArguments"><code>UNREAL_BINARY_ARGUMENTS</code></a>:
       For airsim, most relevant would be <code>-windowed</code>, <code>-ResX</code>, <code>-ResY</code>. Click on link to see all options.</li>
@@ -3670,15 +3669,15 @@ Note that Cosys-AirSim Unreal Engine 5.2.1 no longer gets packaged builds for Co
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>Airsim/docker<span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>$<span class="w"> </span>python<span class="w"> </span>build_airsim_image.py<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">   </span>--source<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">   </span>--base_image<span class="w"> </span>ghcr.io/epicgames/unreal-engine:dev-slim-5.2.1<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">   </span>--target_image<span class="o">=</span>airsim_source:dev-slim-5.2.1
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">   </span>--base_image<span class="w"> </span>ghcr.io/epicgames/unreal-engine:dev-slim-5.8.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">   </span>--target_image<span class="o">=</span>airsim_source:dev-slim-5.8.0
 </span></code></pre></div>
 <h4 id="running-cosys-airsim-container">Running Cosys-AirSim container<a class="headerlink" href="#running-cosys-airsim-container" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Run the airsim source image we built by:</li>
 </ul>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>xhost<span class="w"> </span>+local:docker
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>./run_airsim_image_source.sh<span class="w"> </span>airsim_source:dev-slim-5.2.1
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>./run_airsim_image_source.sh<span class="w"> </span>airsim_source:dev-slim-5.8.0
 </span></code></pre></div>
 <p>Syntax is <code>./run_airsim_image_source.sh DOCKER_IMAGE_NAME</code>
    Do not forget to run the xhost command first to bind the X11 to docker.</p>
