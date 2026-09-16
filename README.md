@@ -108,3 +108,5 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
 ## License
 
 This project is released under the MIT License. Please review the [License file](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE) for more details.
+
+Cosys-AirSim also bundles a number of third-party open-source components. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for the full list and their licenses.
