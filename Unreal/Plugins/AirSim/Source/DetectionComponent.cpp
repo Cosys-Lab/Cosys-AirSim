@@ -139,7 +139,7 @@ const TArray<FDetectionInfo> &UDetectionComponent::getDetections(TMap<UMeshCompo
                                     detection.DetectionName = component_name;
                                     index++;
                                 }
-							}                            
+							}
 
                             FBox box_3D = component->Bounds.GetBox();
                             detection.Box3D = FBox(getRelativeLocation(box_3D.Min), getRelativeLocation(box_3D.Max));
@@ -235,18 +235,17 @@ bool UDetectionComponent::calcBoundingFromViewInfo(AActor *actor, FBox2D &box_ou
     bool is_visible = false;
     if (is_in_camera_view)
     {
+        FCollisionQueryParams trace_params;
+        trace_params.AddIgnoredActor(actor);
         FHitResult result;
-        bool is_world_hit;
+        bool is_blocked;
         for (FVector &point : points)
         {
-            is_world_hit = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_WorldStatic);
-            if (is_world_hit)
+            is_blocked = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_Visibility, trace_params);
+            if (!is_blocked)
             {
-                if (result.GetActor() == actor)
-                {
-                    is_visible = true;
-                    break;
-                }
+                is_visible = true;
+                break;
             }
         }
 
@@ -257,14 +256,11 @@ bool UDetectionComponent::calcBoundingFromViewInfo(AActor *actor, FBox2D &box_ou
             for (int i = 0; i < 10; i++)
             {
                 FVector point = UKismetMathLibrary::RandomPointInBoundingBox(origin, extend);
-                is_world_hit = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_WorldStatic);
-                if (is_world_hit)
+                is_blocked = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_Visibility, trace_params);
+                if (!is_blocked)
                 {
-                    if (result.GetActor() == actor)
-                    {
-                        is_visible = true;
-                        break;
-                    }
+                    is_visible = true;
+                    break;
                 }
             }
         }
@@ -358,18 +354,17 @@ bool UDetectionComponent::calcBoundingFromViewInfoComponent(UMeshComponent *comp
     bool is_visible = false;
     if (is_in_camera_view)
     {
+        FCollisionQueryParams trace_params;
+        trace_params.AddIgnoredComponent(component);
         FHitResult result;
-        bool is_world_hit;
+        bool is_blocked;
         for (FVector &point : points)
         {
-            is_world_hit = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_WorldStatic);
-            if (is_world_hit)
+            is_blocked = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_Visibility, trace_params);
+            if (!is_blocked)
             {
-                if (result.GetComponent() == component)
-                {
-                    is_visible = true;
-                    break;
-                }
+                is_visible = true;
+                break;
             }
         }
 
@@ -380,14 +375,11 @@ bool UDetectionComponent::calcBoundingFromViewInfoComponent(UMeshComponent *comp
             for (int i = 0; i < 10; i++)
             {
                 FVector point = UKismetMathLibrary::RandomPointInBoundingBox(origin, extend);
-                is_world_hit = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_WorldStatic);
-                if (is_world_hit)
+                is_blocked = GetWorld()->LineTraceSingleByChannel(result, GetComponentLocation(), point, ECC_Visibility, trace_params);
+                if (!is_blocked)
                 {
-                    if (result.GetComponent() == component)
-                    {
-                        is_visible = true;
-                        break;
-                    }
+                    is_visible = true;
+                    break;
                 }
             }
         }

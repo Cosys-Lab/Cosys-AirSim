@@ -27,7 +27,7 @@ state_buf = np.zeros((1,4))
 
 def get_image():
     image = client.simGetImages([airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)])[0]
-    image1d = np.fromstring(image.image_data_uint8, dtype=np.uint8)
+    image1d = np.frombuffer(image.image_data_uint8, dtype=np.uint8)
     image_rgb = image1d.reshape(image.height, image.width, 3)
     return image_rgb
 

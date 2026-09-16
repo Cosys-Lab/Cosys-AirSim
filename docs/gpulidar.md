@@ -137,6 +137,12 @@ Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar d
 * **Point-Cloud:** The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan in NED format.
 * **Lidar Pose:** Default: sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 
+The `simSetGPULidarPose` API allows changing the pose of a GPU lidar sensor at runtime, taking an input pose as a combination of relative position and a quaternion in NED frame (relative to the vehicle, or absolute NED/local-NED per `ExternalLocal` if the lidar is configured as `External`). For example:
+```python
+lidar_pose = airsim.Pose(airsim.Vector3r(0, 0, -1), airsim.to_quaternion(0.261799, 0, 0))  #PRY in radians
+client.simSetGPULidarPose("lidar", lidar_pose, "vehicle")
+```
+
 Rgb represents a float32 representation of the RGB8 value that is linked either the instance segmentation system or a different annotation label. See the [Image API documentation](image_apis.md#segmentation), [Annotation documentation](annotation.md) and the [instance segmentation documentation](instance_segmentation.md).
 The float32 comes from binary concatenation of the RGB8 values :`rgb = value_segmentation.R << 16 | value_segmentation.G << 8 | value_segmentation.B`\\
 It can be retrieved from the API and converted back to RGB8 with for example the following Python code:

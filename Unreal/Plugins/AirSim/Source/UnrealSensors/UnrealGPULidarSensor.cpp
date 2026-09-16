@@ -55,3 +55,16 @@ void UnrealGPULidarSensor::getLocalPose(msr::airlib::Pose& sensor_pose)
 	sensor_pose = ned_transform_->toLocalNed(lidar_camera_->GetActorTransform());
 }
 
+// Physically move the lidar camera actor to a newly requested runtime pose
+void UnrealGPULidarSensor::applyPoseToActor(const msr::airlib::Pose& pose) const
+{
+	ALidarCamera* lidar_camera = lidar_camera_;
+	const NedTransform* ned_transform = ned_transform_;
+	UAirBlueprintLib::RunCommandOnGameThread([lidar_camera, ned_transform, pose]() {
+		FTransform transform = ned_transform->fromRelativeNed(pose);
+		lidar_camera->SetActorRelativeLocation(transform.GetLocation());
+		lidar_camera->SetActorRelativeRotation(transform.GetRotation().Rotator());
+	},
+                                             true);
+}
+

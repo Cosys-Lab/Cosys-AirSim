@@ -370,6 +370,10 @@ namespace airlib
             return RpcLibAdaptorsBase::LidarData(lidar_data);
         });
 
+        pimpl_->server.bind("simSetLidarPose", [&](const std::string& lidar_name, const RpcLibAdaptorsBase::Pose& pose, const std::string& vehicle_name) -> void {
+            getVehicleApi(vehicle_name)->simSetLidarPose(lidar_name, pose.to());
+        });
+
         pimpl_->server.bind("getImuData", [&](const std::string& imu_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::ImuData {
             const auto& imu_data = getVehicleApi(vehicle_name)->getImuData(imu_name);
             return RpcLibAdaptorsBase::ImuData(imu_data);
@@ -378,6 +382,10 @@ namespace airlib
         pimpl_->server.bind("getGPULidarData", [&](const std::string& lidar_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::GPULidarData {
 		const auto& lidar_data = getVehicleApi(vehicle_name)->getGPULidarData(lidar_name);
 		return RpcLibAdaptorsBase::GPULidarData(lidar_data);
+        });
+
+        pimpl_->server.bind("simSetGPULidarPose", [&](const std::string& lidar_name, const RpcLibAdaptorsBase::Pose& pose, const std::string& vehicle_name) -> void {
+            getVehicleApi(vehicle_name)->simSetGPULidarPose(lidar_name, pose.to());
         });
 
         pimpl_->server.bind("getEchoData", [&](const std::string& echo_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::EchoData {
@@ -389,6 +397,9 @@ namespace airlib
             getVehicleApi(vehicle_name)->setEchoData(echo_name, echo_data.to());
         });
 
+        pimpl_->server.bind("simSetEchoPose", [&](const std::string& echo_name, const RpcLibAdaptorsBase::Pose& pose, const std::string& vehicle_name) -> void {
+            getVehicleApi(vehicle_name)->simSetEchoPose(echo_name, pose.to());
+        });
 
         pimpl_->server.bind("getBarometerData", [&](const std::string& barometer_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::BarometerData {
             const auto& barometer_data = getVehicleApi(vehicle_name)->getBarometerData(barometer_name);
@@ -408,6 +419,10 @@ namespace airlib
         pimpl_->server.bind("getDistanceSensorData", [&](const std::string& distance_sensor_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::DistanceSensorData {
             const auto& distance_sensor_data = getVehicleApi(vehicle_name)->getDistanceSensorData(distance_sensor_name);
             return RpcLibAdaptorsBase::DistanceSensorData(distance_sensor_data);
+        });
+
+        pimpl_->server.bind("simSetDistanceSensorPose", [&](const std::string& distance_sensor_name, const RpcLibAdaptorsBase::Pose& pose, const std::string& vehicle_name) -> void {
+            getVehicleApi(vehicle_name)->simSetDistanceSensorPose(distance_sensor_name, pose.to());
         });
 
         pimpl_->server.bind("simGetCameraInfo", [&](const std::string& camera_name, const std::string& vehicle_name) -> RpcLibAdaptorsBase::CameraInfo {

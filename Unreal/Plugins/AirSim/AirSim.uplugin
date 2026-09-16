@@ -1,7 +1,7 @@
 {
   "FileVersion" : 3,
-  "Version" : "3.4.1",
-  "VersionName": "3.4.1",
+  "Version" : "3.5.0",
+  "VersionName": "3.5.0",
   "FriendlyName": "Cosys-AirSim",
   "Description": "Cosys-AirSim - Simulator Plugin",
   "Category" : "Science",
