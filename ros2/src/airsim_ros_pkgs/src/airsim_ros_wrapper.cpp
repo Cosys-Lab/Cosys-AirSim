@@ -1440,6 +1440,9 @@ rclcpp::Time AirsimROSWrapper::update_state()
             computer_vision->computer_vision_state_msg_ = state_msg;
         }
 
+        // The state RPC is polled faster than the underlying sim state actually changes, so track
+        // whether this tick produced a genuinely new sample before overwriting the cached stamp.
+        vehicle_ros->state_updated_ = (vehicle_ros->stamp_.nanoseconds() != vehicle_time.nanoseconds());
         vehicle_ros->stamp_ = vehicle_time;
 
         airsim_interfaces::msg::Environment env_msg = get_environment_msg_from_airsim(env_data);
@@ -1461,27 +1464,38 @@ void AirsimROSWrapper::publish_vehicle_state()
     for (auto& vehicle_name_ptr_pair : vehicle_name_ptr_map_) {
         auto& vehicle_ros = vehicle_name_ptr_pair.second;
 
-        // simulation environment truth
-        vehicle_ros->env_pub_->publish(vehicle_ros->env_msg_);
+        // Everything below derives from the same per-tick state RPC, so only republish it when
+        // update_state() actually observed a new timestamp for this vehicle.
+        if (vehicle_ros->state_updated_) {
+            // simulation environment truth
+            vehicle_ros->env_pub_->publish(vehicle_ros->env_msg_);
 
-        if (airsim_mode_ == AIRSIM_MODE::CAR) {
-            // dashboard reading from car, RPM, gear, etc
-            auto car = static_cast<CarROS*>(vehicle_ros.get());
-            car->car_state_pub_->publish(car->car_state_msg_);
-        }else if(airsim_mode_ == AIRSIM_MODE::COMPUTERVISION){
-            auto computer_vision = static_cast<ComputerVisionROS*>(vehicle_ros.get());
-            computer_vision->computer_vision_state_pub_->publish(computer_vision->computer_vision_state_msg_);
+            if (airsim_mode_ == AIRSIM_MODE::CAR) {
+                // dashboard reading from car, RPM, gear, etc
+                auto car = static_cast<CarROS*>(vehicle_ros.get());
+                car->car_state_pub_->publish(car->car_state_msg_);
+            }else if(airsim_mode_ == AIRSIM_MODE::COMPUTERVISION){
+                auto computer_vision = static_cast<ComputerVisionROS*>(vehicle_ros.get());
+                computer_vision->computer_vision_state_pub_->publish(computer_vision->computer_vision_state_msg_);
+            }
+
+            // odom and transforms
+            vehicle_ros->odom_local_pub_->publish(vehicle_ros->curr_odom_);
+            publish_odom_tf(vehicle_ros->curr_odom_);
+
+            // ground truth GPS position from sim/HITL
+            vehicle_ros->global_gps_pub_->publish(vehicle_ros->gps_sensor_msg_);
         }
-
-        // odom and transforms
-        vehicle_ros->odom_local_pub_->publish(vehicle_ros->curr_odom_);
-        publish_odom_tf(vehicle_ros->curr_odom_);
-
-        // ground truth GPS position from sim/HITL
-        vehicle_ros->global_gps_pub_->publish(vehicle_ros->gps_sensor_msg_);
 
         for (auto& sensor_publisher : vehicle_ros->barometer_pubs_) {
             auto baro_data = airsim_client_->getBarometerData(sensor_publisher.sensor_name, vehicle_ros->vehicle_name_);
+            const std::string key = vehicle_ros->vehicle_name_ + "/" + sensor_publisher.sensor_name;
+            auto last_timestamp_it = barometer_last_timestamps_.find(key);
+            if (last_timestamp_it != barometer_last_timestamps_.end() && last_timestamp_it->second == baro_data.time_stamp) {
+                continue;
+            }
+            barometer_last_timestamps_[key] = baro_data.time_stamp;
+
             airsim_interfaces::msg::Altimeter alt_msg = get_altimeter_msg_from_airsim(baro_data);
             alt_msg.header.frame_id = vehicle_ros->vehicle_name_;
             sensor_publisher.publisher->publish(alt_msg);
@@ -1489,30 +1503,63 @@ void AirsimROSWrapper::publish_vehicle_state()
 
         for (auto& sensor_publisher : vehicle_ros->imu_pubs_) {
             auto imu_data = airsim_client_->getImuData(sensor_publisher.sensor_name, vehicle_ros->vehicle_name_);
+            const std::string key = vehicle_ros->vehicle_name_ + "/" + sensor_publisher.sensor_name;
+            auto last_timestamp_it = imu_last_timestamps_.find(key);
+            if (last_timestamp_it != imu_last_timestamps_.end() && last_timestamp_it->second == imu_data.time_stamp) {
+                continue;
+            }
+            imu_last_timestamps_[key] = imu_data.time_stamp;
+
             sensor_msgs::msg::Imu imu_msg = get_imu_msg_from_airsim(imu_data);
             imu_msg.header.frame_id = vehicle_ros->vehicle_name_;
             sensor_publisher.publisher->publish(imu_msg);
         }
         for (auto& sensor_publisher : vehicle_ros->distance_pubs_) {
             auto distance_data = airsim_client_->getDistanceSensorData(sensor_publisher.sensor_name, vehicle_ros->vehicle_name_);
+            const std::string key = vehicle_ros->vehicle_name_ + "/" + sensor_publisher.sensor_name;
+            auto last_timestamp_it = distance_last_timestamps_.find(key);
+            if (last_timestamp_it != distance_last_timestamps_.end() && last_timestamp_it->second == distance_data.time_stamp) {
+                continue;
+            }
+            distance_last_timestamps_[key] = distance_data.time_stamp;
+
             sensor_msgs::msg::Range dist_msg = get_range_from_airsim(distance_data);
             dist_msg.header.frame_id = vehicle_ros->vehicle_name_;
             sensor_publisher.publisher->publish(dist_msg);
         }
         for (auto& sensor_publisher : vehicle_ros->gps_pubs_) {
             auto gps_data = airsim_client_->getGpsData(sensor_publisher.sensor_name, vehicle_ros->vehicle_name_);
+            const std::string key = vehicle_ros->vehicle_name_ + "/" + sensor_publisher.sensor_name;
+            auto last_timestamp_it = gps_last_timestamps_.find(key);
+            if (last_timestamp_it != gps_last_timestamps_.end() && last_timestamp_it->second == gps_data.time_stamp) {
+                continue;
+            }
+            gps_last_timestamps_[key] = gps_data.time_stamp;
+
             sensor_msgs::msg::NavSatFix gps_msg = get_gps_msg_from_airsim(gps_data);
             gps_msg.header.frame_id = vehicle_ros->vehicle_name_;
             sensor_publisher.publisher->publish(gps_msg);
         }
         for (auto& sensor_publisher : vehicle_ros->magnetometer_pubs_) {
             auto mag_data = airsim_client_->getMagnetometerData(sensor_publisher.sensor_name, vehicle_ros->vehicle_name_);
+            const std::string key = vehicle_ros->vehicle_name_ + "/" + sensor_publisher.sensor_name;
+            auto last_timestamp_it = magnetometer_last_timestamps_.find(key);
+            if (last_timestamp_it != magnetometer_last_timestamps_.end() && last_timestamp_it->second == mag_data.time_stamp) {
+                continue;
+            }
+            magnetometer_last_timestamps_[key] = mag_data.time_stamp;
+
             sensor_msgs::msg::MagneticField mag_msg = get_mag_msg_from_airsim(mag_data);
             mag_msg.header.frame_id = vehicle_ros->vehicle_name_;
             sensor_publisher.publisher->publish(mag_msg);
         }
 
-        update_and_publish_static_transforms(vehicle_ros.get());
+        // Static offsets never change, and static_tf_pub_ is a latched StaticTransformBroadcaster,
+        // so a single publish (once stamp_ is valid) is enough for late-joining subscribers too.
+        if (!vehicle_ros->static_tf_published_) {
+            update_and_publish_static_transforms(vehicle_ros.get());
+            vehicle_ros->static_tf_published_ = true;
+        }
     }
 }
 

@@ -1,3 +1,12 @@
+### September 2026 (version 3.5)
+* Added API functionality to change pose of several sensor types (LiDAR, GPULiDAR, Echo & DistanceSensor).
+* Updated simSpawnObject to automatically add it to instance segmentation and refresh material stencils. [#153 by BeiZi6](https://github.com/Cosys-Lab/Cosys-AirSim/pull/153).
+* Fixed multiple build issues for MacOS. [#143](https://github.com/Cosys-Lab/Cosys-AirSim/pull/143), [#144](https://github.com/Cosys-Lab/Cosys-AirSim/pull/144), and [#145](https://github.com/Cosys-Lab/Cosys-AirSim/pull/145) by v3g42. Only for 5.8 build. 
+* Fixed fromstring error for Python client and replaced with frombuffer.
+* Fixed issues related to object detection.
+* Fixed ROS2 node publishing the same duplicate messages (same timestamp and data) multiple times.
+* Fixed simSpawnObject argument count in the C++ client. [#151 by megavedl](https://github.com/Cosys-Lab/Cosys-AirSim/pull/151).
+
 ### version 3.4.1
 * Fixed crash in annotation system. 
 * Fixed ROS2 node publishing the same (GPU)Lidar messages multiple times.

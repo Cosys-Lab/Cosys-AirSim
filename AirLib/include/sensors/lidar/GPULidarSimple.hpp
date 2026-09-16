@@ -66,12 +66,37 @@ namespace msr {
 				return params_;
 			}
 
+			virtual bool setPose(const Pose& pose) const override
+			{
+				params_.relative_pose = pose;
+				// pitch/roll/yaw are kept as a redundant degrees representation of the same
+				// rotation (see GPULidarSimpleParams::initializeFromSettings), used directly by
+				// the Unreal-side actor rotation - keep them in sync with the new orientation.
+				float pitch, roll, yaw;
+				VectorMath::toEulerianAngle(pose.orientation, pitch, roll, yaw);
+				params_.pitch = Utils::radiansToDegrees(pitch);
+				params_.roll = Utils::radiansToDegrees(roll);
+				params_.yaw = Utils::radiansToDegrees(yaw);
+
+				// Unlike CPU Lidar/Echo/Distance, the GPU Lidar's raycasting is driven by a real
+				// Unreal actor whose transform is otherwise only set once at construction - move it.
+				applyPoseToActor(pose);
+				return true;
+			}
+
 		protected:
 			virtual bool getPointCloud(float delta_time, vector<real_T>& point_cloud, vector<real_T>& point_cloud_final) = 0;
 
 			virtual void pause(const bool is_paused) = 0;
 
 			virtual void getLocalPose(Pose& sensor_pose) = 0;
+
+			// Optional hook for implementations backed by a real Unreal actor (e.g. UnrealGPULidarSensor)
+			// to physically move that actor. No-op by default.
+			virtual void applyPoseToActor(const Pose& pose) const
+			{
+				unused(pose);
+			}
 
 		private: //methods
 			void updateOutput()
@@ -102,7 +127,7 @@ namespace msr {
 			}
 
 		private:
-			GPULidarSimpleParams params_;
+			mutable GPULidarSimpleParams params_;
 			vector<real_T> point_cloud_;
 			vector<real_T> point_cloud_temp_;
 			FrequencyLimiter freq_limiter_;

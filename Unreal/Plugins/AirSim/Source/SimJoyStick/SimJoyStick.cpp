@@ -535,6 +535,46 @@ private:
     std::map<uint16_t, input_absinfo> absinfo_map;
 };
 
+#else // macOS and anything else without a joystick backend
+
+// AirSim's pimpl is defined only for Windows (DirectInput) and Linux (evdev).
+// On macOS neither branch is taken, so `SimJoyStick::impl` stayed an INCOMPLETE
+// TYPE while the constructor below still did `new impl()` -- five compile errors,
+// the last of them `sizeof` on an incomplete type inside unique_ptr.
+//
+// A no-op backend is the honest implementation, not a workaround: there is no
+// joystick support on this platform, and the caller's contract already covers
+// that case. `is_initialized = false` is what every consumer checks, so a
+// simulator on macOS behaves as though no stick is plugged in rather than
+// pretending one is present and reporting centred axes forever.
+struct SimJoyStick::impl
+{
+public:
+    void getJoyStickState(int index, SimJoyStick::State& state, const AxisMaps& maps)
+    {
+        unused(index);
+        unused(maps);
+        state.is_initialized = false;
+        state.is_valid = false;
+    }
+
+    void setAutoCenter(int index, double strength)
+    {
+        unused(index);
+        unused(strength);
+    }
+
+    void setWheelRumble(int index, double strength)
+    {
+        unused(index);
+        unused(strength);
+    }
+
+private:
+    template <typename T>
+    static void unused(const T&) {}
+};
+
 #endif
 
 SimJoyStick::SimJoyStick()

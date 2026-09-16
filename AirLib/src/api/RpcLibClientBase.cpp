@@ -226,6 +226,26 @@ __pragma(warning(disable : 4239))
             return pimpl_->client.call("getDistanceSensorData", distance_sensor_name, vehicle_name).as<RpcLibAdaptorsBase::DistanceSensorData>().to();
         }
 
+        void RpcLibClientBase::simSetLidarPose(const std::string& lidar_name, const Pose& pose, const std::string& vehicle_name)
+        {
+            pimpl_->client.call("simSetLidarPose", lidar_name, RpcLibAdaptorsBase::Pose(pose), vehicle_name);
+        }
+
+        void RpcLibClientBase::simSetGPULidarPose(const std::string& lidar_name, const Pose& pose, const std::string& vehicle_name)
+        {
+            pimpl_->client.call("simSetGPULidarPose", lidar_name, RpcLibAdaptorsBase::Pose(pose), vehicle_name);
+        }
+
+        void RpcLibClientBase::simSetEchoPose(const std::string& echo_name, const Pose& pose, const std::string& vehicle_name)
+        {
+            pimpl_->client.call("simSetEchoPose", echo_name, RpcLibAdaptorsBase::Pose(pose), vehicle_name);
+        }
+
+        void RpcLibClientBase::simSetDistanceSensorPose(const std::string& distance_sensor_name, const Pose& pose, const std::string& vehicle_name)
+        {
+            pimpl_->client.call("simSetDistanceSensorPose", distance_sensor_name, RpcLibAdaptorsBase::Pose(pose), vehicle_name);
+        }
+
         bool RpcLibClientBase::simSetSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex)
         {
             return pimpl_->client.call("simSetSegmentationObjectID", mesh_name, object_id, is_name_regex).as<bool>();
@@ -630,7 +650,7 @@ __pragma(warning(disable : 4239))
         std::string RpcLibClientBase::simSpawnObject(const std::string& object_name, const std::string& load_component, const Pose& pose,
                                                      const Vector3r& scale, bool physics_enabled)
         {
-            return pimpl_->client.call("simSpawnObject", object_name, load_component, RpcLibAdaptorsBase::Pose(pose), RpcLibAdaptorsBase::Vector3r(scale), physics_enabled).as<std::string>();
+            return pimpl_->client.call("simSpawnObject", object_name, load_component, RpcLibAdaptorsBase::Pose(pose), RpcLibAdaptorsBase::Vector3r(scale), physics_enabled, false).as<std::string>();
         }
 
         bool RpcLibClientBase::simDestroyObject(const std::string& object_name)

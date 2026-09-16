@@ -125,6 +125,16 @@ Some methods may not be applicable to specific vehicle in which case an exceptio
             return lidar->getOutput();
         }
 
+        // Sets the runtime pose of the named lidar
+        virtual void simSetLidarPose(const std::string& lidar_name, const Pose& pose) const
+        {
+            auto* lidar = findSensorByName(lidar_name, SensorBase::SensorType::Lidar);
+            if (lidar == nullptr)
+                throw VehicleControllerException(Utils::stringf("No lidar with name %s exist on vehicle", lidar_name.c_str()));
+
+            lidar->setPose(pose);
+        }
+
       	virtual GPULidarData getGPULidarData(const std::string& lidar_name) const
         {
             const GPULidarBase* lidar = nullptr;
@@ -145,6 +155,27 @@ Some methods may not be applicable to specific vehicle in which case an exceptio
                 throw VehicleControllerException(Utils::stringf("No GPU lidar with name %s exist on vehicle", lidar_name.c_str()));
 
             return lidar->getOutput();
+        }
+
+        // Sets the runtime pose of the named GPU lidar
+        virtual void simSetGPULidarPose(const std::string& lidar_name, const Pose& pose) const
+        {
+            const SensorBase* lidar = nullptr;
+
+            uint count_lidars = getSensors().size(SensorBase::SensorType::GPULidar);
+            for (uint i = 0; i < count_lidars; i++)
+            {
+                const SensorBase* current_lidar = getSensors().getByType(SensorBase::SensorType::GPULidar, i);
+                if (current_lidar != nullptr && (current_lidar->getName() == lidar_name || lidar_name == ""))
+                {
+                    lidar = current_lidar;
+                    break;
+                }
+            }
+            if (lidar == nullptr)
+                throw VehicleControllerException(Utils::stringf("No GPU lidar with name %s exist on vehicle", lidar_name.c_str()));
+
+            lidar->setPose(pose);
         }
 
         // Echo APIs
@@ -190,6 +221,16 @@ Some methods may not be applicable to specific vehicle in which case an exceptio
                 throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", echo_name.c_str()));
 
             echo->setInput(input);
+        }
+
+        // Sets the runtime pose of the named echo sensor 
+        virtual void simSetEchoPose(const std::string& echo_name, const Pose& pose) const
+        {
+            auto* echo = findSensorByName(echo_name, SensorBase::SensorType::Echo);
+            if (echo == nullptr)
+                throw VehicleControllerException(Utils::stringf("No echo with name %s exist on vehicle", echo_name.c_str()));
+
+            echo->setPose(pose);
         }
 
         // Echo APIs
@@ -432,6 +473,16 @@ Some methods may not be applicable to specific vehicle in which case an exceptio
                 throw VehicleControllerException(Utils::stringf("No distance sensor with name %s exist on vehicle", distance_sensor_name.c_str()));
 
             return distance_sensor->getOutput();
+        }
+
+        // Sets the runtime pose of the named distance sensor
+        virtual void simSetDistanceSensorPose(const std::string& distance_sensor_name, const Pose& pose) const
+        {
+            auto* distance_sensor = findSensorByName(distance_sensor_name, SensorBase::SensorType::Distance);
+            if (distance_sensor == nullptr)
+                throw VehicleControllerException(Utils::stringf("No distance sensor with name %s exist on vehicle", distance_sensor_name.c_str()));
+
+            distance_sensor->setPose(pose);
         }
 
         virtual ~VehicleApiBase() = default;

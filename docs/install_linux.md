@@ -31,7 +31,7 @@ unzip -o Linux_Unreal_Engine_5.2.1.zip -d destination_folder
 If you chose a folder such as for example `/opt/UnrealEngine` make sure to provide permissions and to set the owner, otherwise you might run into issues:
 ```bash
 sudo chmod -R 777 /opt/UnrealEngine
-sudo chown -r yourusername /opt/UnrealEngine
+sudo chown -R yourusername /opt/UnrealEngine
 ```
 From where you install Unreal Engine, you can run `Engine/Binaries/Linux/UnrealEditor` from the terminal to launch Unreal Engine.
 For more information you can read the [quick start guide](https://dev.epicgames.com/documentation/en-us/unreal-engine/linux-development-quickstart-for-unreal-engine?application_version=5.2).

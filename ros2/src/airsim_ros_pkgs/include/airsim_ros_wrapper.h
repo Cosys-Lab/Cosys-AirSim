@@ -216,6 +216,9 @@ private:
         rclcpp::Time stamp_;
 
         std::string odom_frame_id_;
+
+        bool state_updated_ = true;
+        bool static_tf_published_ = false;
     };
 
     class CarROS : public VehicleROS
@@ -450,6 +453,11 @@ private:
     std::unordered_map<std::string, msr::airlib::TTimePoint> lidar_last_timestamps_;
     std::unordered_map<std::string, msr::airlib::TTimePoint> lidar_labels_last_timestamps_;
     std::unordered_map<std::string, msr::airlib::TTimePoint> gpulidar_last_timestamps_;
+    std::unordered_map<std::string, msr::airlib::TTimePoint> barometer_last_timestamps_;
+    std::unordered_map<std::string, msr::airlib::TTimePoint> imu_last_timestamps_;
+    std::unordered_map<std::string, msr::airlib::TTimePoint> distance_last_timestamps_;
+    std::unordered_map<std::string, msr::airlib::TTimePoint> gps_last_timestamps_;
+    std::unordered_map<std::string, msr::airlib::TTimePoint> magnetometer_last_timestamps_;
 
     std::vector<sensor_msgs::msg::CameraInfo> camera_info_msg_vec_;
 
