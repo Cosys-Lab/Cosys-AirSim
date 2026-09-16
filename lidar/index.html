@@ -3580,6 +3580,10 @@ Please see <a href="../sensors/">general sensors</a> for information on configru
 <li><strong>Pose:</strong> Default: Sensor pose in the vehicle frame / External: If set to <code>External</code>(see table) the coordinates will be in either Unreal NED when <code>ExternalLocal</code> is <code>false</code> or Local NED (from starting position from vehicle) when <code>ExternalLocal</code> is <code>true</code>.</li>
 <li><strong>Groundtruth:</strong> For each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to a laser that didn't reflect anything will have label <em>out_of_range</em>.</li>
 </ul>
+<p>The <code>simSetLidarPose</code> API allows changing the pose of a lidar sensor at runtime, taking an input pose as a combination of relative position and a quaternion in NED frame (relative to the vehicle, or absolute NED/local-NED per <code>ExternalLocal</code> if the lidar is configured as <code>External</code>). For example:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>lidar_pose = airsim.Pose(airsim.Vector3r(0, 0, -1), airsim.to_quaternion(0.261799, 0, 0))  #PRY in radians
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>client.simSetLidarPose(&quot;LidarSensor1&quot;, lidar_pose)
+</span></code></pre></div></p>
 
 
 

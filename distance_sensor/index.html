@@ -1609,6 +1609,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#client-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client API
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3305,6 +3316,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#client-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client API
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3368,6 +3390,12 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><strong>Note:</strong> For Cars, the sensor is placed 1 meter above the vehicle center by default. This is required since otherwise the sensor gives strange data due it being inside the vehicle. This doesn't affect the sensor values say when measuring the distance between 2 cars. See <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/PythonClient/car/distance_sensor_multi.py"><code>PythonClient/car/distance_sensor_multi.py</code></a> for an example usage.</p>
+<h2 id="client-api">Client API<a class="headerlink" href="#client-api" title="Permanent link">&para;</a></h2>
+<p>Use <code>getDistanceSensorData(sensor name, vehicle name)</code> API to retrieve the current distance measurement and sensor pose.</p>
+<p>The <code>simSetDistanceSensorPose</code> API allows changing the pose of a distance sensor at runtime, taking an input pose as a combination of position and a quaternion, always relative to the vehicle (unlike Lidar/GPU Lidar/Echo, the distance sensor does not currently support an <code>External</code> world-relative mode). For example:
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">distance_sensor_pose</span> <span class="o">=</span> <span class="n">airsim</span><span class="o">.</span><span class="n">Pose</span><span class="p">(</span><span class="n">airsim</span><span class="o">.</span><span class="n">Vector3r</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">airsim</span><span class="o">.</span><span class="n">to_quaternion</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5708</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>  <span class="c1">#PRY in radians</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">client</span><span class="o">.</span><span class="n">simSetDistanceSensorPose</span><span class="p">(</span><span class="s2">&quot;Distance&quot;</span><span class="p">,</span> <span class="n">distance_sensor_pose</span><span class="p">)</span>
+</span></code></pre></div></p>
 
 
 
