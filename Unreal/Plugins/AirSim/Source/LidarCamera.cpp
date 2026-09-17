@@ -177,7 +177,7 @@ void ALidarCamera::InitializeSettingsFromAirSim(const msr::airlib::GPULidarSimpl
 	generate_distance_noise_ = settings.generate_noise;
 	async_capture_mode_ = settings.async_capture_mode;
 	if (async_capture_mode_ && draw_debug_) {
-		UAirBlueprintLib::LogMessageString("LidarCamera", "draw_debug_ is not supported in multirotor's async GPU LiDAR capture mode and will be ignored.", LogDebugLevel::Failure);
+		UAirBlueprintLib::LogMessageString("LidarCamera", "draw_debug_ is not supported when async GPU LiDAR capture mode (AsyncCaptureMode) is enabled and will be ignored.", LogDebugLevel::Failure);
 	}
 
 	// Load materials.csv file holding the lambertian reflectance coefficients for certain material types and save tem into a map

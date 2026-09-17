@@ -59,10 +59,17 @@ namespace msr {
 			void initializeFromSettings(const AirSimSettings::GPULidarSetting& settings)
 			{
 				std::string simmode_name = AirSimSettings::singleton().simmode_name;
-				async_capture_mode = (simmode_name == AirSimSettings::kSimModeTypeMultirotor);
-
 
                 const auto& settings_json = settings.settings;
+
+                // Async GPU capture defers the render-target readback by one tick instead of
+                // reading it back in the same tick the capture was issued (see
+                // ALidarCamera::ServiceAsyncCapture), which avoids a synchronous CPU/GPU
+                // pipeline stall on every capture chunk. This is much faster, especially on
+                // heavier scenes, but does not support draw_debug_points (see LidarCamera.cpp,
+                // ALidarCamera::Update). Defaults on for Multirotor as before, but can now be
+                // forced on or off for any vehicle type via "AsyncCaptureMode" in settings.json.
+                async_capture_mode = settings_json.getBool("AsyncCaptureMode", simmode_name == AirSimSettings::kSimModeTypeMultirotor);
 
                 number_of_channels = settings_json.getInt("NumberOfChannels", number_of_channels);
                 range = settings_json.getFloat("Range", range);
