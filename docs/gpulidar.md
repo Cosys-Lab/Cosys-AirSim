@@ -5,7 +5,7 @@ Cosys-AirSim supports a GPU accelerated Lidar for multirotors and cars. It uses 
 The enablement of a GPU lidar and the other lidar settings can be configured via AirSimSettings json.
 Please see [general sensors](sensors.md) for information on configuration of general/shared sensor settings.
 
-Note that on Multirotor simmode, the sensor capture is dispatched asynchronously to the Unreal game thread , so its measurements lag by roughly one game frame compared to other simmodes. Real-time debug point drawing (`DrawDebugPoints`) is not supported on Multirotor for this reason.
+The sensor capture can optionally be dispatched asynchronously to the Unreal game thread by enabling `AsyncCaptureMode` (see the parameter table below). This defers reading the capture back by roughly one game frame instead of reading it back in the same frame it was requested, which avoids a synchronous CPU/GPU pipeline stall on every capture and can meaningfully speed up scan completion, especially on heavier scenes. `AsyncCaptureMode` defaults to enabled for Multirotor vehicles and disabled for all other vehicle types, but can be explicitly set either way for any vehicle type. Real-time debug point drawing (`DrawDebugPoints`) is not supported while `AsyncCaptureMode` is enabled, for any vehicle type.
 
 ## Enabling GPU lidar on a vehicle
 * By default, GPU lidars are not enabled. To enable the sensor, set the SensorType and Enabled attributes in settings json.
@@ -40,6 +40,7 @@ GroundTruth                  | Generate ground truth labeling color values
 InstanceSegmentation         | Enable to set the generated ground truth to the instance segmentation labeling. Set to false to choose a different annotation label
 Annotation                   | If GroundTruth is enabled and InstanceSegmentation is disabled, you can set this value to the name of the annotation you want to use. This will be used for the ground truth color labels.
 DrawSensor                   | Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is
+AsyncCaptureMode             | Defer the GPU capture readback by roughly one game frame instead of reading it back the same frame it was requested, avoiding a synchronous CPU/GPU pipeline stall on every capture. Noticeably faster, especially on heavier scenes, but disables `DrawDebugPoints`. Defaults to `true` for Multirotor vehicles and `false` for all other vehicle types; can be set explicitly for any vehicle type.
 External                     | Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.
 ExternalLocal                | When in external mode, if this is enabled the retrieved pose of the sensor will be in Local NED coordinates(from starting position from vehicle) and not converted Unreal NED coordinates which is default
 GenerateIntensity            | Toggle intensity calculation on or off. This requires a surface material map to be available. See below for more information.
@@ -75,7 +76,7 @@ NoiseDistanceScale           | To scale the noise with distance, set this parame
 					"VerticalFOVLower": -20,
 					"HorizontalFOVStart": 0,
 					"HorizontalFOVEnd": 360,
-					"DrawDebugPoints": true,
+					"DrawDebugPoints": false,
 					"DrawMode": 1,
 					"Resolution": 1024,
 					"IgnoreMarked": true,
@@ -87,7 +88,8 @@ NoiseDistanceScale           | To scale the noise with distance, set this parame
 					"rainMaxIntensity": 70,
 					"rainConstantA": 0.01,
 					"rainConstantB": 0.6,
-                    "DrawSensor": false
+                    "DrawSensor": false,
+                    "AsyncCaptureMode": true
 				}
 			}
 		}
@@ -106,7 +108,7 @@ asphalt,0.1
 This needs to be saved as 'materials.csv' in your documents folder where also your settings json file resides.
 
 ## Server side visualization for debugging
-By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. Note this does not work for Multirotor vehicles. *This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
+By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. Note this does not work while `AsyncCaptureMode` is enabled (which is the default for Multirotor vehicles, see above) for any vehicle type. *This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!*
 
 e.g.:
 ```
