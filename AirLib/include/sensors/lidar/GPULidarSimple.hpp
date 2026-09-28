@@ -119,10 +119,14 @@ namespace msr {
 						output.pose = params_.relative_pose;
 					}
 					setOutput(output);
-					last_time_ = output.time_stamp;
-				} else {
-					last_time_ = clock()->nowNanos();
 				}
+				// NOTE: last_time_ is deliberately NOT reassigned here. updateSince() above already
+				// advanced it to the instant the delta was taken, i.e. before getPointCloud() ran.
+				// Re-stamping it to "now" afterwards threw away all the wall time spent capturing,
+				// so the sweep stopped rotating while the sensor was busy and the configured
+				// RotationsPerSecond could never be reached - the shortfall was proportional to the
+				// capture duty cycle (achieved = r / (1 + r * captures_per_sweep * time_per_capture)),
+				// which is why even a modest 1-2 rps only ever delivered ~70% of what was asked.
 
 			}
 
