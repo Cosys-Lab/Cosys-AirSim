@@ -37,6 +37,7 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float Delta) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+    virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
     virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation,
                            FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
@@ -52,6 +53,11 @@ public:
     {
         return keyboard_controls_;
     }
+
+private:
+    void respawnIfFellOutOfWorld();
+    FTransform start_transform_;
+    bool fell_out_of_world_ = false;
 
 private:
     void updateHUDStrings();

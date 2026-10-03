@@ -240,9 +240,34 @@ void ACarPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
     Super::EndPlay(EndPlayReason);
 }
 
+void ACarPawn::FellOutOfWorld(const UDamageType& dmgType)
+{
+    // The engine destroys actors that drop below the level's KillZ, but AirSim keeps using its
+    // vehicle pawns and crashes on a destroyed one. Keep the vehicle and put it back at its start
+    // pose on the next tick: this is called from the physics sync, which overrides a teleport here.
+    if (!fell_out_of_world_) {
+        UE_LOG(LogTemp, Warning, TEXT("%s fell out of the world; moving it back to its start pose"), *GetName());
+        UAirBlueprintLib::LogMessage(GetName(), TEXT("fell out of the world and was moved back to its start pose"), LogDebugLevel::Failure);
+    }
+    fell_out_of_world_ = true;
+}
+
+void ACarPawn::respawnIfFellOutOfWorld()
+{
+    if (!fell_out_of_world_)
+        return;
+    fell_out_of_world_ = false;
+    for (UPrimitiveComponent* phys_comp : UAirBlueprintLib::getPhysicsComponents(this)) {
+        phys_comp->SetPhysicsLinearVelocity(FVector::ZeroVector);
+        phys_comp->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+    }
+    SetActorTransform(start_transform_, false, nullptr, ETeleportType::TeleportPhysics);
+}
+
 void ACarPawn::Tick(float Delta)
 {
     Super::Tick(Delta);
+    respawnIfFellOutOfWorld();
 
     // update physics material
     updatePhysicsMaterial();
@@ -264,6 +289,7 @@ void ACarPawn::Tick(float Delta)
 void ACarPawn::BeginPlay()
 {
     Super::BeginPlay();
+    start_transform_ = GetActorTransform();
 
     // Start an engine sound playing
     engine_sound_audio_->Play();
