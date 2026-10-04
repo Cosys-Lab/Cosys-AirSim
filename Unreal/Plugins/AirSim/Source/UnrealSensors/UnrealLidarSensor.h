@@ -38,7 +38,7 @@ private:
     void createLasers();
     bool shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
         const uint32 channel, const float horizontal_angle, const float vertical_angle, 
-        const msr::airlib::LidarSimpleParams params, Vector3r &point, std::string &label, FVector& raw_point);
+        const msr::airlib::LidarSimpleParams& params, const float noise_sample, Vector3r& point, std::string& label, FVector& raw_point);
     FVector Vector3rToFVector(const Vector3r& input_vector);
 
 private:
