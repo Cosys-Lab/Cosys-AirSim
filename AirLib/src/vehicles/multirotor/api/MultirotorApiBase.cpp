@@ -446,7 +446,10 @@ namespace airlib
             overshoot = setNextPathPosition(path3d, path_segs, cur_path_loc, lookahead + lookahead_error, next_path_loc);
         }
 
-        return waiter.isComplete();
+        //the loop also ends when the drone has stopped at the end of the path without its position
+        //on the path reaching the end exactly (moveToPathPosition stops within getDistanceAccuracy());
+        //that is success too, so judge by the distance left, allowing for the drone still settling
+        return waiter.isComplete() || (getPosition() - path3d.back()).norm() <= 2 * getDistanceAccuracy();
     }
 
     bool MultirotorApiBase::moveToGPS(float latitude, float longitude, float altitude, float velocity, float timeout_sec, DrivetrainType drivetrain,
