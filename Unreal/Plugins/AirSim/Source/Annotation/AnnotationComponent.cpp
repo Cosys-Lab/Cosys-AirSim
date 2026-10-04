@@ -728,6 +728,12 @@ void UAnnotationComponent::TickComponent(
 			MarkRenderStateDirty();
 		}
 	}
+	else if (SceneProxy != nullptr)
+	{
+		// The annotation of a static mesh needs no per-tick updates once its proxy exists; stop
+		// ticking, as thousands of them cost milliseconds every frame
+		SetComponentTickEnabled(false);
+	}
 }
 
 
