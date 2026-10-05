@@ -76,8 +76,6 @@ public:
 
 	void UpdateAnnotationComponents(UWorld* World);
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> GetAnnotationComponents();
-	// The annotation components added since the previous call, so cameras can hide them without going over all of them
-	TArray<TWeakObjectPtr<UPrimitiveComponent>> TakeNewAnnotationComponents();
 
 	static void SetViewForAnnotationRender(FEngineShowFlags& show_flags);
 
@@ -124,6 +122,5 @@ private:
 	TMap<FString, UMeshComponent*> name_to_component_map_;
 	TMap<UMeshComponent*, FString> component_to_name_map_;
 	TArray<TWeakObjectPtr<UPrimitiveComponent>> annotation_component_list_;
-	TArray<TWeakObjectPtr<UPrimitiveComponent>> new_annotation_components_; // added since TakeNewAnnotationComponents
 };
 

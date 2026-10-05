@@ -1049,7 +1049,6 @@ bool FObjectAnnotator::PaintRGBComponent(UMeshComponent* component, const FColor
 	AnnotationComponent->MarkRenderStateDirty();
 	UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
 	annotation_component_list_.Add(PrimitiveComponent);
-	new_annotation_components_.Add(PrimitiveComponent);
 	return true;
 }
 
@@ -1094,8 +1093,7 @@ bool FObjectAnnotator::PaintTextureComponent(UMeshComponent* component, const FS
 	AnnotationComponent->bVisibleInRealTimeSkyCaptures = false;
 	AnnotationComponent->MarkRenderStateDirty();
 	UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(AnnotationComponent);
-	annotation_component_list_.Add(PrimitiveComponent);
-	new_annotation_components_.Add(PrimitiveComponent);
+	annotation_component_list_.Add(PrimitiveComponent);	
 	return true;
 }
 
@@ -1185,7 +1183,6 @@ void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 	EInternalObjectFlags ExclusionInternalFlags = EInternalObjectFlags::None;
 	GetObjectsOfClass(UAnnotationComponent::StaticClass(), UObjectList, bIncludeDerivedClasses, ExclusionFlags, ExclusionInternalFlags);
 
-	TSet<TWeakObjectPtr<UPrimitiveComponent>> listed(annotation_component_list_); // Contains on the list was quadratic
 	for (UObject* Object : UObjectList)
 	{
 		if (!IsValid(Object)) continue;
@@ -1194,13 +1191,11 @@ void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 		FName componentFName = *Component->GetName();
 		FString componentName = componentFName.ToString();
 		if (Component->GetWorld() == World
-			&& !listed.Contains(Component)
+			&& !annotation_component_list_.Contains(Component)
 			&& componentName.Contains(name_)
 			&& !componentName.Contains("annotation_sphere"))
 		{
 			annotation_component_list_.Add(Component);
-			new_annotation_components_.Add(Component);
-			listed.Add(Component);
 		}
 	}
 
@@ -1216,10 +1211,6 @@ TArray<TWeakObjectPtr<UPrimitiveComponent>>  FObjectAnnotator::GetAnnotationComp
 		return !Component.IsValid();
 	});
 	return annotation_component_list_;
-}
-
-TArray<TWeakObjectPtr<UPrimitiveComponent>> FObjectAnnotator::TakeNewAnnotationComponents() {
-	return MoveTemp(new_annotation_components_);
 }
 
 std::vector<std::string> FObjectAnnotator::GetAllComponentNames() {
@@ -1273,7 +1264,6 @@ void FObjectAnnotator::EndPlay() {
 	name_to_color_index_map_.Empty();
 	name_to_component_map_.Empty();
 	annotation_component_list_.Empty();
-	new_annotation_components_.Empty();
 	name_to_gammacorrected_color_map_.Empty();
 	name_to_value_map_.Empty();
 	name_to_texture_path_map_.Empty();

@@ -5,7 +5,6 @@
 #include "Runtime/Launch/Resources/Version.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/PlayerController.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Engine/World.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
@@ -1250,28 +1249,6 @@ void ASimModeBase::ForceUpdateAnnotation(FString annotation_name) {
 void ASimModeBase::updateInstanceSegmentationAnnotation() {
 	instance_segmentation_annotator_.UpdateAnnotationComponents(this->GetWorld());
     TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = instance_segmentation_annotator_.GetAnnotationComponents();
-    // Cameras hide only the components added since the previous refresh: hiding all of them in every
-    // camera at each refresh stalls the game once thousands are annotated
-    const TArray<TWeakObjectPtr<UPrimitiveComponent>> new_segmentation_components = instance_segmentation_annotator_.TakeNewAnnotationComponents();
-    const uint64 refresh_serial = ++instance_segmentation_refresh_serial_;
-    if (APlayerController* controller = GetWorld()->GetFirstPlayerController()) {
-        if (instance_segmentation_hidden_controller_ != controller) {
-            instance_segmentation_hidden_controller_ = controller;
-            instance_segmentation_controller_serial_ = 0;
-        }
-        TArray<TWeakObjectPtr<UPrimitiveComponent>>& hidden = controller->HiddenPrimitiveComponents;
-        if (instance_segmentation_controller_serial_ != 0 && instance_segmentation_controller_serial_ + 1 == refresh_serial)
-            hidden.Append(new_segmentation_components);
-        else {
-            TSet<TWeakObjectPtr<UPrimitiveComponent>> present(hidden);
-            for (const TWeakObjectPtr<UPrimitiveComponent>& component : current_segmentation_components)
-                if (!present.Contains(component))
-                    hidden.Add(component);
-        }
-        instance_segmentation_controller_serial_ = refresh_serial;
-        if (hidden.Num() > 2 * current_segmentation_components.Num() + 1024)
-            hidden.RemoveAll([](const TWeakObjectPtr<UPrimitiveComponent>& component) { return !component.IsValid(); });
-    }
 
     TArray<AActor*> cameras_found;
     UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
@@ -1280,7 +1257,7 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
     if (cameras_found.Num() >= 0) {
         for (auto camera_actor : cameras_found) {
             APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
-            cur_camera->updateInstanceSegmentationAnnotation(current_segmentation_components, new_segmentation_components, refresh_serial);
+            cur_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
         }
     }
     TArray<AActor*> lidar_cameras_found;
@@ -1296,13 +1273,13 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
     }
     if (CameraDirector != nullptr) {
         if(CameraDirector->getFpvCamera() != nullptr)
-			CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, new_segmentation_components, refresh_serial, true);
+			CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
         if (CameraDirector->getExternalCamera() != nullptr)
-            CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, new_segmentation_components, refresh_serial, true);
+            CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
         if (CameraDirector->getBackupCamera() != nullptr)
-            CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, new_segmentation_components, refresh_serial, true);
+            CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
         if (CameraDirector->getFrontCamera() != nullptr)
-            CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, new_segmentation_components, refresh_serial, true);
+            CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
     }
 }
 
