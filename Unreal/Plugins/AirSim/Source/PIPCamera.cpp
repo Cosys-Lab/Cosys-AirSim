@@ -11,6 +11,24 @@
 #include <exception>
 #include "AirBlueprintLib.h"
 
+//adds the annotation components missing from a list of hidden components, and drops the entries of
+//components that no longer exist; a set keeps this linear in the number of components (AddUnique for
+//each one was quadratic, which stalls the game thread once thousands are annotated, and the stale
+//entries made the lists grow without bound)
+static void hideComponents(TArray<TWeakObjectPtr<UPrimitiveComponent>>& hidden, const TArray<TWeakObjectPtr<UPrimitiveComponent>>& components)
+{
+    hidden.RemoveAll([](const TWeakObjectPtr<UPrimitiveComponent>& component) { return !component.IsValid(); });
+    TSet<TWeakObjectPtr<UPrimitiveComponent>> present;
+    present.Reserve(hidden.Num() + components.Num());
+    present.Append(hidden);
+    for (const TWeakObjectPtr<UPrimitiveComponent>& component : components) {
+        bool already_hidden;
+        present.Add(component, &already_hidden);
+        if (!already_hidden)
+            hidden.Add(component);
+    }
+}
+
 //CinemAirSim
 APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer
@@ -529,11 +547,28 @@ void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPri
     if(!only_hide)
         captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowOnlyComponents = ComponentList;
     APlayerController* controller = this->GetWorld()->GetFirstPlayerController();
-    for(TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
-        captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
-        captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents.AddUnique(component);
-        controller->HiddenPrimitiveComponents.AddUnique(component);
-	}
+    hideComponents(captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents, ComponentList);
+    hideComponents(captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents, ComponentList);
+    hideComponents(controller->HiddenPrimitiveComponents, ComponentList);
+}
+
+void APIPCamera::updateInstanceSegmentationAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList,
+    const TArray<TWeakObjectPtr<UPrimitiveComponent> >& NewComponents, uint64 RefreshSerial, bool only_hide) {
+    if(!only_hide)
+        captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowOnlyComponents = ComponentList;
+    if (instance_segmentation_serial_ == RefreshSerial)
+        return;
+    const bool has_previous = instance_segmentation_serial_ != 0 && instance_segmentation_serial_ + 1 == RefreshSerial;
+    for (ImageType type : {ImageType::Scene, ImageType::Lighting}) {
+        TArray<TWeakObjectPtr<UPrimitiveComponent>>& hidden = captures_[Utils::toNumeric(type)]->HiddenComponents;
+        if (has_previous)
+            hidden.Append(NewComponents);
+        else
+            hideComponents(hidden, ComponentList);
+        if (hidden.Num() > 2 * ComponentList.Num() + 1024)
+            hidden.RemoveAll([](const TWeakObjectPtr<UPrimitiveComponent>& component) { return !component.IsValid(); });
+    }
+    instance_segmentation_serial_ = RefreshSerial;
 }
 
 void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& ComponentList, FString annotation_name, bool only_hide) {
@@ -547,11 +582,9 @@ void APIPCamera::updateAnnotation(TArray<TWeakObjectPtr<UPrimitiveComponent> >& 
             captures_[annotator_name_to_index_map_[annotation_name]]->ShowOnlyComponents.Add(sphere_annotation_component_map_[annotation_name]);
     }
     APlayerController* controller = this->GetWorld()->GetFirstPlayerController();
-    for (TWeakObjectPtr<UPrimitiveComponent> component : ComponentList) {
-        captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents.AddUnique(component);
-        captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents.AddUnique(component);
-        controller->HiddenPrimitiveComponents.AddUnique(component);
-    }
+    hideComponents(captures_[Utils::toNumeric(ImageType::Scene)]->HiddenComponents, ComponentList);
+    hideComponents(captures_[Utils::toNumeric(ImageType::Lighting)]->HiddenComponents, ComponentList);
+    hideComponents(controller->HiddenPrimitiveComponents, ComponentList);
 }
 
 void APIPCamera::addAnnotationCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance)

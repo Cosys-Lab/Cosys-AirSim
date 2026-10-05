@@ -334,6 +334,10 @@ private:
     TMap<FString, ALight*> world_lights_;
 
 private:
+    // Instance segmentation refreshes (see updateInstanceSegmentationAnnotation)
+    uint64 instance_segmentation_refresh_serial_ = 0;
+    TWeakObjectPtr<APlayerController> instance_segmentation_hidden_controller_;
+    uint64 instance_segmentation_controller_serial_ = 0;
     void InitializeInstanceSegmentation();
     void InitializeAnnotation();
     void AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance = -1.0f);
