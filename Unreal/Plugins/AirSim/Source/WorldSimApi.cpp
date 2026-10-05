@@ -66,6 +66,7 @@ bool WorldSimApi::destroyObject(const std::string& object_name)
     UAirBlueprintLib::RunCommandOnGameThread([this, &object_name, &result]() {
         AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
         if (actor) {
+            simmode_->DeleteActorFromInstanceSegmentation(actor, true);
             actor->Destroy();
             result = !IsValid(actor);
         }
