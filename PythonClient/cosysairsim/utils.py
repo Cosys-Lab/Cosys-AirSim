@@ -219,21 +219,22 @@ def euler_to_quaternion(roll, pitch, yaw):
 
 
 def euler_to_rotation_matrix(roll, pitch, yaw):
-    cx = math.cos(roll * 0.5)
-    sx = math.sin(roll * 0.5)
-    cy = math.cos(pitch * 0.5)
-    sy = math.sin(pitch * 0.5)
-    cz = math.cos(yaw * 0.5)
-    sz = math.sin(yaw * 0.5)
+    cx = math.cos(roll)
+    sx = math.sin(roll)
+    cy = math.cos(pitch)
+    sy = math.sin(pitch)
+    cz = math.cos(yaw)
+    sz = math.sin(yaw)
 
+    # Match euler_to_quaternion: Rz(yaw) @ Ry(pitch) @ Rx(roll).
     r11 = cy*cz
-    r12 = -cy*sz
-    r13 = sy
-    r21 = cx*sz + cz*sx*sy
-    r22 = cx*cz - sx*sy*sz
-    r23 = -cy*sx
-    r31 = sx*sz - cx*cz*sy
-    r32 = cz*sx + cx*sy*sz
+    r12 = sx*sy*cz - cx*sz
+    r13 = cx*sy*cz + sx*sz
+    r21 = cy*sz
+    r22 = sx*sy*sz + cx*cz
+    r23 = cx*sy*sz - sx*cz
+    r31 = -sy
+    r32 = sx*cy
     r33 = cx*cy
 
     R = [[r11, r12, r13], [r21, r22, r23], [r31, r32, r33]]
