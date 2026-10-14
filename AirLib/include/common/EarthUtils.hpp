@@ -8,6 +8,7 @@
 #include <exception>
 #include "common/CommonStructs.hpp"
 #include "common/Common.hpp"
+#include "common/WorldMagneticModel.hpp"
 
 namespace msr
 {
@@ -209,7 +210,23 @@ namespace airlib
 
         static Vector3r getMagField(const GeoPoint& geo_point, double& declination, double& inclination) //return Tesla
         {
-            /*
+            // Keep AirSim's NED output aligned with PX4's WMM-2020 lookup.
+            declination = Utils::degreesToRadians(
+                wmm2020::getDeclinationDegrees(static_cast<float>(geo_point.latitude),
+                                               static_cast<float>(geo_point.longitude)));
+            inclination = Utils::degreesToRadians(
+                wmm2020::getInclinationDegrees(static_cast<float>(geo_point.latitude),
+                                               static_cast<float>(geo_point.longitude)));
+            const double field_strength = wmm2020::getStrengthTesla(
+                static_cast<float>(geo_point.latitude), static_cast<float>(geo_point.longitude));
+            const double horizontal_field = field_strength * cos(inclination);
+
+            // Positive Z is down in the NED frame expected by PX4 HIL_SENSOR.
+            return Vector3r(static_cast<real_T>(horizontal_field * cos(declination)),
+                            static_cast<real_T>(horizontal_field * sin(declination)),
+                            static_cast<real_T>(field_strength * sin(inclination)));
+
+            /* Legacy dipole implementation retained for reference.
         We calculate magnetic field using simple dipol model of Earth, i.e., assume
         earth as perfect dipole sphere and ignoring all but first order terms.
         This obviously is inaccurate because of huge amount of irregularities, magnetic pole that is
@@ -237,7 +254,6 @@ namespace airlib
             Dipole Model:   2.5047e-05      3.41024e-06     3.65953e-05 (dec: 7.7536, inc: 55.36532)
             WMM2015 Model:  1.8353e-05		5.203e-06		5.0191e-05  (dec: 15.8278, inc: 69.1897)
             geo:            47.646  -122.134    -378
-        */
 
             //ref: The Earth's Magnetism: An Introduction for Geologists, Roberto Lanza, Antonio Meloni
             //Sec 1.2.5, pg 27-30 https://goo.gl/bRm7wt
@@ -286,6 +302,7 @@ namespace airlib
                 static_cast<real_T>(field_xy * cos(declination)),
                 static_cast<real_T>(field_xy * sin(declination)),
                 static_cast<real_T>(field_mag * sin(inclination)));
+            */
         }
 
         static GeoPoint nedToGeodetic(const Vector3r& v, const HomeGeoPoint& home_geo_point)
