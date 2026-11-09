@@ -208,12 +208,12 @@ void ASimHUD::setUnrealEngineSettings()
     //avoid motion blur so capture images don't get
     //GetWorld()->GetGameViewport()->GetEngineShowFlags()->SetMotionBlur(false);
 
-    //use two different methods to set console var because sometime it doesn't seem to work
+    //Equivalent to enabling Custom Stencil in Project > Settings > Rendering > Postprocessing.
+    //Set with console priority (same as the "r.CustomDepth 3" console command) so it overrides project
+    //settings; skip when already 3, otherwise a later lower-priority set logs a "was ignored" warning.
     static const auto custom_depth_var = IConsoleManager::Get().FindConsoleVariable(TEXT("r.CustomDepth"));
-    custom_depth_var->Set(3);
-
-    //Equivalent to enabling Custom Stencil in Project > Settings > Rendering > Postprocessing
-    UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), FString("r.CustomDepth 3"));
+    if (custom_depth_var && custom_depth_var->GetInt() != 3)
+        custom_depth_var->Set(3, ECVF_SetByConsole);
 
     //during startup we init stencil IDs to random hash and it takes long time for large environments
     //we get error that GameThread has timed out after 30 sec waiting on render thread
