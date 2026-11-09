@@ -51,22 +51,23 @@ Note this does not include most sensor types.
   "SimMode": "",
   "ClockType": "",
   "ClockSpeed": 1,
-  "LocalHostIp": "127.0.0.1",
+  "LocalHostIp": "",
   "ApiServerPort": 41451,
+  "EnableRpc": true,
   "RecordUIVisible": true,
   "MoveWorldOrigin": false,
   "InitialInstanceSegmentation": true,
   "LogMessagesVisible": true,
   "ShowLosDebugLines": false,
   "ViewMode": "",
-  "RpcEnabled": true,
-  "EngineSound": true,
+  "EngineSound": false,
   "PhysicsEngineName": "",
   "SpeedUnitFactor": 1.0,
   "SpeedUnitLabel": "m/s",
   "Wind": { "X": 0, "Y": 0, "Z": 0 },
+  "ExternalForce": { "X": 0, "Y": 0, "Z": 0 },
   "CameraDirector": {
-    "FollowDistance": -3,
+    "FollowDistance": NaN, // -8 for cars, -3 for other vehicles
     "X": NaN, "Y": NaN, "Z": NaN,
     "Pitch": NaN, "Roll": NaN, "Yaw": NaN
   },
@@ -76,7 +77,7 @@ Note this does not include most sensor types.
     "Folder": "",
     "Enabled": false,
     "Cameras": [
-        { "CameraName": "0", "ImageType": 0, "PixelsAsFloat": false,  "VehicleName": "", "Compress": true }
+        { "CameraName": "0", "ImageType": 0, "PixelsAsFloat": false, "VehicleName": "", "Compress": true, "Annotation": "" }
     ]
   },
   "CameraDefaults": {
@@ -86,23 +87,21 @@ Note this does not include most sensor types.
         "Width": 256,
         "Height": 144,
         "FOV_Degrees": 90,
-        "AutoExposureSpeed": 100,
-        "AutoExposureBias": 0,
-        "AutoExposureMaxBrightness": 0.64,
-        "AutoExposureMinBrightness": 0.03,
-        "MotionBlurAmount": 0,
-        "TargetGamma": 1.0,
+        "TargetGamma": 1.4, // for the scene image type; other image types keep the Unreal default
         "ProjectionMode": "",
         "OrthoWidth": 5.12,
-        "MotionBlurAmount": 1,
-        "MotionBlurMax": 10,
-        "ChromaticAberrationScale": 2,
         "IgnoreMarked": false,
-        "LumenGIEnable": true,
-        "LumenReflectionEnable": true,
-        "LumenFinalQuality": 1, 
+        "ForceUpdate": false,
+        "AutoExposureMethod": -1,
+        "AutoExposureApplyPhysicalCameraExposure": true,
+        "LumenGIEnable": false,
+        "LumenReflectionEnable": false,
+        "LumenFinalQuality": 1,
         "LumenSceneDetail": 1,
         "LumenSceneLightningDetail": 1
+        // All other capture settings (exposure, motion blur, bloom, chromatic aberration, camera,
+        // lens flare and depth of field, see "CaptureSettings" below) default to NaN, which keeps
+        // the Unreal Engine default.
       }
     ],
     "NoiseSettings": [
@@ -115,7 +114,7 @@ Note this does not include most sensor types.
         "RandSize": 500.0,
         "RandDensity": 2,
 
-        "HorzWaveContrib":0.03,
+        "HorzWaveContrib": 0.03,
         "HorzWaveStrength": 0.08,
         "HorzWaveVertSize": 1.0,
         "HorzWaveScreenSize": 1.0,
@@ -127,10 +126,29 @@ Note this does not include most sensor types.
         "HorzDistortionContrib": 1.0,
         "HorzDistortionStrength": 0.002,
 
-        "LensDistortionEnable": true,
-        "LensDistortionAreaFalloff": 2,
-        "LensDistortionAreaRadius": 1,
-        "LensDistortionInvert": false
+        "LensDistortionEnable": false,
+        "LensDistortionAreaFalloff": 1.0,
+        "LensDistortionAreaRadius": 1.0,
+        "LensDistortionIntensity": 0.5,
+        "LensDistortionInvert": false,
+
+        "FakeMotionBlurEnable": false,
+        "FakeMotionBlurDirectionX": 0.0,
+        "FakeMotionBlurDirectionY": 0.1,
+        "FakeMotionBlurMovementSpeed": 1.0,
+        "FakeMotionBlurShutterSpeed": 0.0167,
+        "FakeMotionBlurFocalLength": 35.0,
+        "FakeMotionBlurSamples": 50,
+
+        "RadialBlurEnable": false,
+        "RadialBlurDistance": 1.0,
+        "RadialBlurRadius": 1.0,
+        "RadialBlurDensity": 4.0,
+
+        "GuassianBlurEnable": false,
+        "GuassianBlurDirections": 16.0,
+        "GuassianBlurQuality": 3.0,
+        "GuassianBlurSize": 8.0
       }
     ],
     "Gimbal": {
@@ -139,6 +157,9 @@ Note this does not include most sensor types.
     },
     "X": NaN, "Y": NaN, "Z": NaN,
     "Pitch": NaN, "Roll": NaN, "Yaw": NaN,
+    "External": false,
+    "ExternalLocal": true,
+    "DrawSensor": false,
     "UnrealEngine": {
       "PixelFormatOverride": [
         {
@@ -158,17 +179,39 @@ Note this does not include most sensor types.
     "StartDateTime": "",
     "CelestialClockSpeed": 1,
     "StartDateTimeDst": false,
-    "UpdateIntervalSecs": 60
+    "UpdateIntervalSecs": 60,
+    "MoveSun": true
   },
   "SubWindows": [
-    {"WindowID": 0, "CameraName": "0", "ImageType": 3, "VehicleName": "", "Visible": false},
-    {"WindowID": 1, "CameraName": "0", "ImageType": 5, "VehicleName": "", "Visible": false},
-    {"WindowID": 2, "CameraName": "0", "ImageType": 0, "VehicleName": "", "Visible": false}
+    {"WindowID": 0, "CameraName": "0", "ImageType": 3, "VehicleName": "", "Visible": false, "Annotation": ""},
+    {"WindowID": 1, "CameraName": "0", "ImageType": 5, "VehicleName": "", "Visible": false, "Annotation": ""},
+    {"WindowID": 2, "CameraName": "0", "ImageType": 0, "VehicleName": "", "Visible": false, "Annotation": ""}
+  ],
+  "Annotation": [
+    // no annotation layers by default, see annotation.md; each layer has these settings:
+    { "Name": "", "Type": 0, "Default": true, "SetDirect": false, "TexturePath": "", "TexturePrefix": "", "ViewDistance": -1 }
   ],
   "PawnPaths": {
     "DefaultCar": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/SUV/BP_SuvCarPawn.BP_SuvCarPawn_C'"},
+    "DefaultSkidVehicle": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/CPHusky/BP_CPHuskyPawn.BP_CPHuskyPawn_C'"},
     "DefaultQuadrotor": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/Multirotor/BP_FlyingPawn.BP_FlyingPawn_C'"},
+    "Pioneer": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/Pioneer/BP_PioneerPawn.BP_PioneerPawn_C'"},
+    "BoxCar": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/BoxCar/BP_BoxCarPawn.BP_BoxCarPawn_C'"},
     "DefaultComputerVision": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/ComputerVision/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"}
+    // each entry can also set "SlipperyMat" and "NonSlipperyMat" (physical material paths)
+  },
+  "WorldLights": {
+    // none by default, see lights.md
+  },
+  "PassiveEchoBeacons": {
+    // none by default, see echo.md
+  },
+  "Beacons": {
+    // none by default; each beacon, key as name:
+    "MyBeacon": { "BeaconType": "", "BeaconPawnName": "", "Scale": 1.0, "PawnPath": "", "X": NaN, "Y": NaN, "Z": NaN, "Pitch": NaN, "Roll": NaN, "Yaw": NaN }
+  },
+  "DefaultSensors": {
+    // see sensors.md
   },
   "Vehicles": {
     "SimpleFlight": {
@@ -180,12 +223,16 @@ Note this does not include most sensor types.
       "EnableCollisions": true,
       "AllowAPIAlways": true,
       "EnableTrace": false,
+      "IsFpvVehicle": false,
       "RC": {
         "RemoteControlID": 0,
         "AllowAPIWhenDisconnected": false
       },
       "Cameras": {
         //same elements as CameraDefaults above, key as name
+      },
+      "Sensors": {
+        // see sensors.md
       },
       "X": NaN, "Y": NaN, "Z": NaN,
       "Pitch": NaN, "Roll": NaN, "Yaw": NaN
@@ -197,6 +244,7 @@ Note this does not include most sensor types.
       "PawnPath": "",
       "EnableCollisionPassthrough": false,
       "EnableCollisions": true,
+      "IsFpvVehicle": false,
       "RC": {
         "RemoteControlID": -1
       },
@@ -207,6 +255,9 @@ Note this does not include most sensor types.
         "MyCamera2": {
           //same elements as elements inside CameraDefaults above
         },
+      },
+      "Lights": {
+        // see lights.md
       },
       "X": NaN, "Y": NaN, "Z": NaN,
       "Pitch": NaN, "Roll": NaN, "Yaw": NaN
@@ -458,7 +509,7 @@ The Gaussian blur can simulate out-of-focus effects.
 
 * **FakeMotionBlurEnable** (bool): Whether fake motion blur is enabled. (Default: false)
 * **FakeMotionBlurDirectionX** (float): X-component of the motion blur direction vector. (Default: 0.0)
-* **FakeMotionBlurDirectionY** (float): Y-component of the motion blur direction vector. (Default: 1.0)
+* **FakeMotionBlurDirectionY** (float): Y-component of the motion blur direction vector. (Default: 0.1)
 * **FakeMotionBlurMovementSpeed** (float): Movement speed used for the fake motion blur effect. (Default: 1.0)
 * **FakeMotionBlurShutterSpeed** (float): Simulated shutter speed for the fake motion blur. (Default: 0.0167)
 * **FakeMotionBlurFocalLength** (float): Focal length used in the fake motion blur calculation. (Default: 35.0)
@@ -632,7 +683,7 @@ Now when connecting to remote machines you may need to pick a specific Ethernet 
 over Ethernet or over Wi-Fi, or some other special virtual adapter or a VPN.  Your PC may have multiple networks, and those networks might not
 be allowed to talk to each other, in which case the UDP messages from one network will not get through to the others.
 
-So the LocalHostIp allows you to configure how you are reaching those machines.  The default of 127.0.0.1 is not able to reach external machines,
+So the LocalHostIp allows you to configure how you are reaching those machines. At the top level of settings.json, `LocalHostIp` is the address the API server listens on; the default `""` listens on all network interfaces. Inside a PX4/ArduPilot vehicle setting it selects the local adapter for MAVLink.  The default of 127.0.0.1 is not able to reach external machines,
 this default is only used when everything you are talking to is contained on a single PC.
 
 ### ApiServerPort

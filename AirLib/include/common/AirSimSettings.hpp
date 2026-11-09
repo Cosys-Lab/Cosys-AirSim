@@ -606,7 +606,7 @@ namespace airlib
         std::map<std::string, std::unique_ptr<PassiveEchoBeaconSetting>> passive_echo_beacons;
         std::map<std::string, std::unique_ptr<LightSetting>> world_lights;
         float speed_unit_factor = 1.0f;
-        std::string speed_unit_label = "m\\s";
+        std::string speed_unit_label = "m/s";
         std::map<std::string, std::shared_ptr<SensorSetting>> sensor_defaults;
         Vector3r wind = Vector3r::Zero();
         Vector3r ext_force = Vector3r::Zero();
@@ -1655,7 +1655,7 @@ namespace airlib
             engine_sound = settings_json.getBool("EngineSound", false);
             enable_rpc = settings_json.getBool("EnableRpc", enable_rpc);
             speed_unit_factor = settings_json.getFloat("SpeedUnitFactor", 1.0f);
-            speed_unit_label = settings_json.getString("SpeedUnitLabel", "m\\s");
+            speed_unit_label = settings_json.getString("SpeedUnitLabel", "m/s");
             move_world_origin = settings_json.getBool("MoveWorldOrigin", false);
             initial_instance_segmentation = settings_json.getBool("InitialInstanceSegmentation", true);
             log_messages_visible = settings_json.getBool("LogMessagesVisible", true);
