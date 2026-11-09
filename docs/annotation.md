@@ -203,7 +203,7 @@ For example:
         {
             "WindowID": 0,
             "CameraName": "front_center",
-            "ImageType": 10,
+            "ImageType": 11,
             "VehicleName": "robot1",
             "Annotation": "GreyscaleTest",
             "Visible": false
