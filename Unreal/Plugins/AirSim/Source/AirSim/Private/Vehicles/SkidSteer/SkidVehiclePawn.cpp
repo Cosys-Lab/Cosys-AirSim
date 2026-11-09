@@ -129,7 +129,7 @@ void ASkidVehiclePawn::setupVehicleMovementComponent()
 	movement->DifferentialSetup.DifferentialType = EVehicleDifferential::RearWheelDrive;
 
 	// Drive the front wheels a little more than the rear
-	movement->DifferentialSetup.FrontRearSplit = 0.65;
+	movement->DifferentialSetup.FrontRearSplit = 0.65f;
 
 	// Automatic gearbox
 	movement->TransmissionSetup.bUseAutomaticGears = true;

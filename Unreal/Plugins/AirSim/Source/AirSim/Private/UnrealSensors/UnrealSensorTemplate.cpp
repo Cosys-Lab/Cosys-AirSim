@@ -30,9 +30,9 @@ void UnrealSensorTemplate::updatePose(const msr::airlib::Pose& sensor_pose, cons
 		else {
 			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 		}
-		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3);
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3f);
 		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
-		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3, 10);
+		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3f, 10);
 	}
 }
 

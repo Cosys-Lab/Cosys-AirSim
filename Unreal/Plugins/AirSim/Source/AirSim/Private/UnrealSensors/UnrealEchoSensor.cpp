@@ -222,7 +222,7 @@ void UnrealEchoSensor::getPointCloud(const msr::airlib::Pose& sensor_pose, const
 
 					Vector3r point_sensor_frame;
 					if (external_) {
-						point_sensor_frame = ned_transform_->toVector3r(passive_point_allowed.point, 0.01, true);
+						point_sensor_frame = ned_transform_->toVector3r(passive_point_allowed.point, 0.01f, true);
 					}
 					else {
 						point_sensor_frame = ned_transform_->toLocalNed(passive_point_allowed.point);

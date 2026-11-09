@@ -2260,7 +2260,7 @@ void ASimModeBase::drawDistanceSensorDebugPoints()
                         10, // size
                         FColor::Green,
                         false, // persistent (never goes away)
-                        0.03 // LifeTime: point leaves a trail on moving object
+                        0.03f // LifeTime: point leaves a trail on moving object
                     );
                 }
             }

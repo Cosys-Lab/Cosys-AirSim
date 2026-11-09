@@ -28,7 +28,7 @@ UnrealWifiSensor::UnrealWifiSensor(const AirSimSettings::WifiSetting& setting, A
 
 	traceRayMaxDistance = 200;
 	traceRayMaxBounces = 5;
-	traceRayMinSignalStrength = 0.001;
+	traceRayMinSignalStrength = 0.001f;
 
 	for (TActorIterator<AWifiBeacon> It(actor_->GetWorld()); It; ++It)
 	{
@@ -57,9 +57,9 @@ void UnrealWifiSensor::updatePose(const msr::airlib::Pose& sensor_pose, const ms
 		else {
 			sensor_position = ned_transform_->fromLocalNed(sensor_reference_frame_.position);
 		}
-		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3);
+		UAirBlueprintLib::DrawPoint(actor_->GetWorld(), sensor_position, 5, FColor::Black, false, 0.3f);
 		FVector sensor_direction = Vector3rToFVector(VectorMath::rotateVector(VectorMath::front(), sensor_reference_frame_.orientation, 1));
-		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3, 10);
+		UAirBlueprintLib::DrawCoordinateSystem(actor_->GetWorld(), sensor_position, sensor_direction.Rotation(), 25, false, 0.3f, 10);
 	}
 }
 
@@ -189,7 +189,7 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 				// Stop if nothing was hit to reflect off
 				if (!trace_hit) {
 					if (drawDebug) {
-						UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_position, trace_end_position, FColor::Red, false, 0.1);
+						UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_position, trace_end_position, FColor::Red, false, 0.1f);
 					}
 					return 1;
 				}
@@ -227,7 +227,7 @@ int UnrealWifiSensor::traceDirection(FVector trace_start_position, FVector trace
 				}
 
 				if (drawDebug) {
-					UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1);
+					UAirBlueprintLib::DrawLine(actor_->GetWorld(), trace_start_original, trace_start_position, FColor::Red, false, 0.1f);
 				}
 
 				return(traceDirection(trace_start_position, trace_end_position, WifiHitLog, traceRayCurrentDistance, traceRayCurrentbounces, traceRayCurrentSignalStrength, drawDebug, trace_origin));
@@ -271,7 +271,7 @@ float UnrealWifiSensor::getFreeSpaceLoss(float previous_distance, float added_di
 	float total_distance = previous_distance + added_distance;
 
 	//TMP
-	float wavelength_ = 0.1;
+	float wavelength_ = 0.1f;
 
 	float attenuation_previous = -20 * FMath::LogX(10, 4 * M_PI * previous_distance / wavelength_);
 	attenuation_previous = (attenuation_previous > 0) ? 0 : attenuation_previous;

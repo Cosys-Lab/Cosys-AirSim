@@ -326,7 +326,7 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 
 		Vector3r point_v_i;
 		if (params.external) {
-			point_v_i = ned_transform_->toVector3r(impact_point, 0.01, true);
+			point_v_i = ned_transform_->toVector3r(impact_point, 0.01f, true);
 		}
 		else {
 			point_v_i = ned_transform_->toLocalNed(impact_point);

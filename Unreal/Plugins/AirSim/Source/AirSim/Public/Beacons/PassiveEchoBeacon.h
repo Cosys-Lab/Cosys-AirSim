@@ -55,7 +55,7 @@ public:
 
 	/** Maximum distance between two reflections (meters) */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")
-		float reflection_distance_limit_ = 0.4;
+		float reflection_distance_limit_ = 0.4f;
 
 	/** Only save the final reflection along a trace. This will ignore all other reflections that happen along the trace in the data */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PassiveEchoBeacon|General")

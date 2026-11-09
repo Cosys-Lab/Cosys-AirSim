@@ -259,7 +259,7 @@ void UnrealEchoCommon::SavePoint(uint32 current_sample_index, bool use_indexing,
 	else {
 		Vector3r point_sensor_frame;
 		if (external) {
-			point_sensor_frame = ned_transform->toVector3r(trace_hit_result.ImpactPoint, 0.01, true);
+			point_sensor_frame = ned_transform->toVector3r(trace_hit_result.ImpactPoint, 0.01f, true);
 		}
 		else {
 			point_sensor_frame = ned_transform->toLocalNed(trace_hit_result.ImpactPoint);

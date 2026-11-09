@@ -61,7 +61,7 @@ public:
 
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkidVehicle|General")
-    float fixed_turn_rate_ = 0.1;
+    float fixed_turn_rate_ = 0.1f;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkidVehicle|General")
     bool stop_turn_ = false;
