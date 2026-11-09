@@ -498,6 +498,30 @@ rpclib itself bundles the three further third-party components below.
 
 ---
 
+## PX4 World Magnetic Model lookup
+
+- **Used for:** The magnetometer's World Magnetic Model reference field
+  (`AirLib/include/common/WorldMagneticModel.hpp`): the bilinear table lookup is
+  ported from PX4 (`src/lib/world_magnetic_model/geo_mag_declination.cpp`) so the
+  simulated field matches what PX4's EKF expects.
+- **Upstream project:** https://github.com/PX4/PX4-Autopilot
+- **License:** BSD 3-Clause License, Copyright (c) 2020-2024 PX4 Development Team.
+  The full license text is reproduced in the header of `WorldMagneticModel.hpp`.
+
+---
+
+## World Magnetic Model (WMM) coefficients
+
+- **Used for:** Generating the magnetic declination/inclination/intensity tables in
+  `AirLib/include/common/WorldMagneticModelTables.hpp` (generator and coefficient
+  file in `scripts/wmm/`).
+- **Upstream project:** https://www.ncei.noaa.gov/products/world-magnetic-model
+  (NOAA NCEI and the British Geological Survey)
+- **License:** Public domain (a work of the United States Government); no license
+  restrictions apply.
+
+---
+
 ## Boost Software License 1.0
 
 The following components above are licensed under the Boost Software License,

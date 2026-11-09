@@ -77,6 +77,9 @@ namespace airlib
             case MagnetometerSimpleParams::ReferenceSource::ReferenceSource_DipoleModel:
                 magnetic_field_true_ = EarthUtils::getMagField(ground_truth.environment->getState().geo_point) * 1E4f; //Tesla to Gauss
                 break;
+            case MagnetometerSimpleParams::ReferenceSource::ReferenceSource_WMM:
+                magnetic_field_true_ = EarthUtils::getMagFieldWMM(ground_truth.environment->getState().geo_point) * 1E4f; //Tesla to Gauss
+                break;
             default:
                 throw std::invalid_argument("magnetic reference source type is not recognized");
             }
