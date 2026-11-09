@@ -5,7 +5,7 @@
 
 AComputerVisionPawn::AComputerVisionPawn()
 {
-    static ConstructorHelpers::FClassFinder<APIPCamera> pip_camera_class(TEXT("Blueprint'/AirSim/Blueprints/BP_PIPCamera'"));
+    static ConstructorHelpers::FClassFinder<APIPCamera> pip_camera_class(TEXT("Blueprint'/AirSim/CosysAirSim/Blueprints/Camera/BP_PIPCamera'"));
     pip_camera_class_ = pip_camera_class.Succeeded() ? pip_camera_class.Class : nullptr;
 
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));

@@ -166,9 +166,9 @@ Note this does not include most sensor types.
     {"WindowID": 2, "CameraName": "0", "ImageType": 0, "VehicleName": "", "Visible": false}
   ],
   "PawnPaths": {
-    "DefaultCar": {"PawnBP": "Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"},
-    "DefaultQuadrotor": {"PawnBP": "Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"},
-    "DefaultComputerVision": {"PawnBP": "Class'/AirSim/Blueprints/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"}
+    "DefaultCar": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/SUV/BP_SuvCarPawn.BP_SuvCarPawn_C'"},
+    "DefaultQuadrotor": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/Multirotor/BP_FlyingPawn.BP_FlyingPawn_C'"},
+    "DefaultComputerVision": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/ComputerVision/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"}
   },
   "Vehicles": {
     "SimpleFlight": {

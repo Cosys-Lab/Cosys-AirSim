@@ -18,7 +18,7 @@ AUWBBeacon::AUWBBeacon()
 	//Mesh->SetupAttachment(GetRootComponent());
 	// set path for static mesh
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/uwbBeacon.uwbBeacon'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/CosysAirSim/Meshes/Beacons/SM_UwbBeacon.SM_UwbBeacon'"));
 	// check if path is valid
 	if (loadedMesh.Succeeded())
 	{

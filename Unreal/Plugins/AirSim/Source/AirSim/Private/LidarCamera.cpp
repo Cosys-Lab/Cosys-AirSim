@@ -73,7 +73,7 @@ ALidarCamera::ALidarCamera()
 	capture_2D_intensity_ = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Lidar2DIntensity"));
 
 	// Find materials in Plugin content and assign to post process settings of the capture components
-	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder(TEXT("Material'/AirSim/HUDAssets/LidarDepthMaterial.LidarDepthMaterial'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder(TEXT("Material'/AirSim/CosysAirSim/Materials/Lidar/M_LidarDepth.M_LidarDepth'"));
 	if (mat_finder.Succeeded())
 	{
 		UMaterialInstanceDynamic* depth_material = UMaterialInstanceDynamic::Create(mat_finder.Object, capture_2D_depth_);
@@ -81,7 +81,7 @@ ALidarCamera::ALidarCamera()
 	}
 	else
 		UAirBlueprintLib::LogMessageString("Cannot create depth material for the LidarCamera", "", LogDebugLevel::Failure);
-	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder_intensity(TEXT("Material'/AirSim/HUDAssets/LidarImpactNormalMaterial.LidarImpactNormalMaterial'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder_intensity(TEXT("Material'/AirSim/CosysAirSim/Materials/Lidar/M_LidarImpactNormal.M_LidarImpactNormal'"));
 	if (mat_finder_intensity.Succeeded())
 	{
 		UMaterialInstanceDynamic* intensity_material = UMaterialInstanceDynamic::Create(mat_finder_intensity.Object, capture_2D_intensity_);

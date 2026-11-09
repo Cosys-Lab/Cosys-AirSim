@@ -175,7 +175,7 @@ class WeatherParameter:
     Fog = 7
 ```
 
-Please note that `Roadwetness`, `RoadSnow` and `RoadLeaf` effects requires adding [materials](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/Weather/WeatherFX) to your scene.
+Please note that `Roadwetness`, `RoadSnow` and `RoadLeaf` effects requires adding [materials](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/CosysAirSim/Materials/Weather) to your scene.
 
 Please see [example code](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/environment/weather.py) for more details.
 

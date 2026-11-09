@@ -35,7 +35,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer
                 .SetDefaultSubobjectClass<UCineCameraComponent>(TEXT("CameraComponent")))
 {
-    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder(TEXT("Material'/AirSim/HUDAssets/CameraSensorNoise.CameraSensorNoise'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_CameraSensorNoise.M_CameraSensorNoise'"));
     if (mat_finder.Succeeded()) {
         noise_material_static_ = mat_finder.Object;
     }
@@ -44,17 +44,17 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
                                            "",
                                            LogDebugLevel::Failure);
 
-    static ConstructorHelpers::FObjectFinder<UMaterial> dist_mat_finder(TEXT("Material'/AirSim/HUDAssets/CameraDistortion.CameraDistortion'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> dist_mat_finder(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_CameraDistortion.M_CameraDistortion'"));
     if (dist_mat_finder.Succeeded()) {
         distortion_material_static_ = dist_mat_finder.Object;
-        distortion_param_collection_ = Cast<UMaterialParameterCollection>(StaticLoadObject(UMaterialParameterCollection::StaticClass(), NULL, TEXT("'/AirSim/HUDAssets/DistortionParams.DistortionParams'")));
+        distortion_param_collection_ = Cast<UMaterialParameterCollection>(StaticLoadObject(UMaterialParameterCollection::StaticClass(), NULL, TEXT("'/AirSim/CosysAirSim/MaterialParameterCollections/Camera/MPC_DistortionParams.MPC_DistortionParams'")));
     }
     else{
         UAirBlueprintLib::LogMessageString("Cannot create distortion material for the PIPCamera",
                                            "", LogDebugLevel::Failure);
     }
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder2(TEXT("Material'/AirSim/HUDAssets/CameraSensorLensDistortion.CameraSensorLensDistortion'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder2(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_CameraSensorLensDistortion.M_CameraSensorLensDistortion'"));
 	if (mat_finder2.Succeeded())
 	{
 		lens_distortion_material_static_ = mat_finder2.Object;
@@ -63,7 +63,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
 		UAirBlueprintLib::LogMessageString("Cannot create lens distortion material for the PIPCamera", "", LogDebugLevel::Failure);
     }
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder3(TEXT("Material'/AirSim/HUDAssets/CameraSensorLensDistortionInvert.CameraSensorLensDistortionInvert'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder3(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_CameraSensorLensDistortionInvert.M_CameraSensorLensDistortionInvert'"));
 	if (mat_finder3.Succeeded())
 	{
 		lens_distortion_invert_material_static_ = mat_finder3.Object;
@@ -72,7 +72,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
 		UAirBlueprintLib::LogMessageString("Cannot create inverted lens distortion material for the PIPCamera",
 			"", LogDebugLevel::Failure);
 
-    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder4(TEXT("Material'/AirSim/HUDAssets/CameraSensorMotionBlur.CameraSensorMotionBlur'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder4(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_CameraSensorMotionBlur.M_CameraSensorMotionBlur'"));
     if (mat_finder4.Succeeded())
     {
         motion_blur_material_static_ = mat_finder4.Object;
@@ -81,7 +81,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
         UAirBlueprintLib::LogMessageString("Cannot create fake motion blur material for the PIPCamera",
             "", LogDebugLevel::Failure);
 
-    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder5(TEXT("Material'/AirSim/HUDAssets/CameraSensorRadialBlur.CameraSensorRadialBlur'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder5(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_CameraSensorRadialBlur.M_CameraSensorRadialBlur'"));
     if (mat_finder5.Succeeded())
     {
         radial_blur_material_static_ = mat_finder5.Object;
@@ -90,7 +90,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
         UAirBlueprintLib::LogMessageString("Cannot create radial blur material for the PIPCamera",
             "", LogDebugLevel::Failure);
 
-    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder6(TEXT("Material'/AirSim/HUDAssets/CameraSensorGuassianBlur.CameraSensorGuassianBlur'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> mat_finder6(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_CameraSensorGaussianBlur.M_CameraSensorGaussianBlur'"));
     if (mat_finder6.Succeeded())
     {
         guassian_blur_material_static_ = mat_finder6.Object;
@@ -116,7 +116,7 @@ APIPCamera::APIPCamera(const FObjectInitializer& ObjectInitializer)
 
     object_filter_ = FObjectFilter();
 
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Models/AnnotationSphere.AnnotationSphere'"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/CosysAirSim/Meshes/Annotation/SM_AnnotationSphere.SM_AnnotationSphere'"));
     if (loadedMesh.Succeeded())
     {
         annotation_sphere_static_ = loadedMesh.Object;

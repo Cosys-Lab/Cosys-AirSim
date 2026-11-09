@@ -45,21 +45,21 @@ class AIRSIM_API UWeatherLib : public UBlueprintFunctionLibrary
     // location of the weather UMaterialParameterCollection, params for rain snow wind etc
     static const TCHAR* getWeatherParamsObjectPath()
     {
-        return TEXT("/AirSim/Weather/WeatherFX/WeatherGlobalParams");
+        return TEXT("/AirSim/CosysAirSim/MaterialParameterCollections/Weather/MPC_WeatherGlobalParams");
     }
     static const FSoftClassPath getWeatherMenuObjectPath()
     {
-        return FSoftClassPath(TEXT("AActor'/AirSim/Weather/UI/MenuActor.MenuActor_C'"));
+        return FSoftClassPath(TEXT("AActor'/AirSim/CosysAirSim/Blueprints/Weather/BP_MenuActor.BP_MenuActor_C'"));
     }
 
     static const FSoftClassPath getWeatherActorPath()
     {
-        return FSoftClassPath(TEXT("AActor'/AirSim/Weather/WeatherFX/WeatherActor.WeatherActor_C'"));
+        return FSoftClassPath(TEXT("AActor'/AirSim/CosysAirSim/Blueprints/Weather/BP_WeatherActor.BP_WeatherActor_C'"));
     }
 
     static const FSoftClassPath getWeatherMenuWidgetClass()
     {
-        return FSoftClassPath(TEXT("UUserWidget'/AirSim/HUDAssets/OptionsMenu.OptionsMenu_C'"));
+        return FSoftClassPath(TEXT("UUserWidget'/AirSim/CosysAirSim/Widgets/HUD/WBP_OptionsMenu.WBP_OptionsMenu_C'"));
     }
     // menu class name for finding and closing it
     static const FString getWeatherMenuClassName()

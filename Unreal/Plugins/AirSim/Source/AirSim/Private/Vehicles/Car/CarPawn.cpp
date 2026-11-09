@@ -18,7 +18,7 @@
 
 ACarPawn::ACarPawn()
 {
-    static ConstructorHelpers::FClassFinder<APIPCamera> pip_camera_class(TEXT("Blueprint'/AirSim/Blueprints/BP_PIPCamera'"));
+    static ConstructorHelpers::FClassFinder<APIPCamera> pip_camera_class(TEXT("Blueprint'/AirSim/CosysAirSim/Blueprints/Camera/BP_PIPCamera'"));
     pip_camera_class_ = pip_camera_class.Succeeded() ? pip_camera_class.Class : nullptr;
 
     const auto& car_mesh_paths = AirSimSettings::singleton().pawn_paths["DefaultCar"];
@@ -72,7 +72,7 @@ ACarPawn::ACarPawn()
     gear_text_render_->SetVisibility(true);
 
     // Setup the audio component and allocate it a sound cue
-    ConstructorHelpers::FObjectFinder<USoundCue> SoundCue(TEXT("/AirSim/VehicleAdv/Sound/Engine_Loop_Cue.Engine_Loop_Cue"));
+    ConstructorHelpers::FObjectFinder<USoundCue> SoundCue(TEXT("/AirSim/CosysAirSim/Sounds/Vehicles/SC_EngineLoop.SC_EngineLoop"));
     engine_sound_audio_ = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSound"));
     engine_sound_audio_->SetSound(SoundCue.Object);
     engine_sound_audio_->SetupAttachment(GetMesh());

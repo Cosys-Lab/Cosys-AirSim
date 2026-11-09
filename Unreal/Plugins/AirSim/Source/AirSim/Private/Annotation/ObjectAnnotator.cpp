@@ -698,7 +698,7 @@ bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
 			}else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 				name_to_component_map_.Emplace(it.Key(), it.Value());
 				component_to_name_map_.Emplace(it.Value(), it.Key());
-				FString new_texture = "/AirSim/HUDAssets/k";
+				FString new_texture = "/AirSim/CosysAirSim/Textures/HUD/T_Solid_Black";
 				name_to_texture_path_map_.Emplace(it.Key(), new_texture);
 				check(PaintTextureComponent(it.Value(), new_texture, it.Key()));
 				//UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged texture annotated object %s with default texture"), *name_, *it.Key());
@@ -1009,7 +1009,7 @@ void FObjectAnnotator::InitializeTexture(ULevel* InLevel)
 				else if (show_by_default_ && !it.Key().Contains("hidden_sphere") && !it.Key().Contains("AnnotationSphere")) {
 					name_to_component_map_.Emplace(it.Key(), it.Value());
 					component_to_name_map_.Emplace(it.Value(), it.Key());
-					FString new_texture = "/AirSim/HUDAssets/k";
+					FString new_texture = "/AirSim/CosysAirSim/Textures/HUD/T_Solid_Black";
 					name_to_texture_path_map_.Emplace(it.Key(), new_texture);
 					check(PaintTextureComponent(it.Value(), new_texture, it.Key()));
 					//UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Added untagged texture annotated object %s with default texture"), *name_, *it.Key());

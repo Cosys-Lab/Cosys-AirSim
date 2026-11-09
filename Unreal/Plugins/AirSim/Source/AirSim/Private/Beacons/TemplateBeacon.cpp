@@ -19,7 +19,7 @@ ATemplateBeacon::ATemplateBeacon()
 	//Mesh->SetupAttachment(GetRootComponent());
 	// set path for static mesh
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/templateBeacon.templateBeacon'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/CosysAirSim/Meshes/Beacons/SM_TemplateBeacon.SM_TemplateBeacon'"));
 	// check if path is valid
 	if (loadedMesh.Succeeded())
 	{

@@ -52,18 +52,18 @@ ASimModeBase::ASimModeBase()
 {
     SIMMODE = this;
 
-    static ConstructorHelpers::FClassFinder<APIPCamera> external_camera_class(TEXT("Blueprint'/AirSim/Blueprints/BP_PIPCamera'"));
+    static ConstructorHelpers::FClassFinder<APIPCamera> external_camera_class(TEXT("Blueprint'/AirSim/CosysAirSim/Blueprints/Camera/BP_PIPCamera'"));
     external_camera_class_ = external_camera_class.Succeeded() ? external_camera_class.Class : nullptr;
-    static ConstructorHelpers::FClassFinder<AAirSimCameraDirector> camera_director_class(TEXT("Blueprint'/AirSim/Blueprints/BP_CameraDirector'"));
+    static ConstructorHelpers::FClassFinder<AAirSimCameraDirector> camera_director_class(TEXT("Blueprint'/AirSim/CosysAirSim/Blueprints/Camera/BP_CameraDirector'"));
     camera_director_class_ = camera_director_class.Succeeded() ? camera_director_class.Class : nullptr;
 
-    static ConstructorHelpers::FObjectFinder<UParticleSystem> collision_display(TEXT("ParticleSystem'/AirSim/StarterContent/Particles/P_Explosion.P_Explosion'"));
+    static ConstructorHelpers::FObjectFinder<UParticleSystem> collision_display(TEXT("ParticleSystem'/AirSim/CosysAirSim/Particles/Effects/PS_Explosion.PS_Explosion'"));
     if (!collision_display.Succeeded())
         collision_display_template = collision_display.Object;
     else
         collision_display_template = nullptr;
 
-    static ConstructorHelpers::FClassFinder<APIPCamera> pip_camera_class_val(TEXT("Blueprint'/AirSim/Blueprints/BP_PIPCamera'"));
+    static ConstructorHelpers::FClassFinder<APIPCamera> pip_camera_class_val(TEXT("Blueprint'/AirSim/CosysAirSim/Blueprints/Camera/BP_PIPCamera'"));
     pip_camera_class = pip_camera_class_val.Succeeded() ? pip_camera_class_val.Class : nullptr;
 
     PrimaryActorTick.bCanEverTick = true;
@@ -71,14 +71,14 @@ ASimModeBase::ASimModeBase()
     static ConstructorHelpers::FClassFinder<AActor> sky_sphere_class(TEXT("Blueprint'/Engine/EngineSky/BP_Sky_Sphere'"));
     sky_sphere_class_ = sky_sphere_class.Succeeded() ? sky_sphere_class.Class : nullptr;
 
-    static ConstructorHelpers::FClassFinder<UUserWidget> loading_screen_class_find(TEXT("WidgetBlueprint'/AirSim/Blueprints/BP_LoadingScreenWidget'"));
+    static ConstructorHelpers::FClassFinder<UUserWidget> loading_screen_class_find(TEXT("WidgetBlueprint'/AirSim/CosysAirSim/Widgets/HUD/WBP_LoadingScreen'"));
     if (loading_screen_class_find.Succeeded()) {
         auto loading_screen_class = loading_screen_class_find.Class;
         loading_screen_widget_ = CreateWidget<ULoadingScreenWidget>(this->GetWorld(), loading_screen_class);
     }
     else
         loading_screen_widget_ = nullptr;
-    static ConstructorHelpers::FObjectFinder<UMaterial> domain_rand_mat_finder(TEXT("Material'/AirSim/HUDAssets/DomainRandomizationMaterial.DomainRandomizationMaterial'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> domain_rand_mat_finder(TEXT("Material'/AirSim/CosysAirSim/Materials/Camera/M_DomainRandomization.M_DomainRandomization'"));
     if (domain_rand_mat_finder.Succeeded()) {
         domain_rand_material_ = domain_rand_mat_finder.Object;
     }

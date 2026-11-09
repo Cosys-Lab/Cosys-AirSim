@@ -304,7 +304,7 @@ UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectIniti
 	bTexture = false;
 	last_foliage_type_ = EFoliageComponentType::None;
 
-	FString MaterialPath = TEXT("Material'/AirSim/HUDAssets/AnnotationMaterial.AnnotationMaterial'");
+	FString MaterialPath = TEXT("Material'/AirSim/CosysAirSim/Materials/Annotation/M_Annotation.M_Annotation'");
 	static ConstructorHelpers::FObjectFinder<UMaterial> AnnotationMaterialObject(*MaterialPath);
 	if (AnnotationMaterialObject.Object == nullptr)
     {
@@ -315,7 +315,7 @@ UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectIniti
         AnnotationMaterial = AnnotationMaterialObject.Object;
 	}
 
-	FString MaterialPathSphere = TEXT("Material'/AirSim/HUDAssets/AnnotationMaterialSphere.AnnotationMaterialSphere'");
+	FString MaterialPathSphere = TEXT("Material'/AirSim/CosysAirSim/Materials/Annotation/M_AnnotationSphere.M_AnnotationSphere'");
 	static ConstructorHelpers::FObjectFinder<UMaterial> SphereMaterialObject(*MaterialPathSphere);
 	if (SphereMaterialObject.Object == nullptr)
 	{

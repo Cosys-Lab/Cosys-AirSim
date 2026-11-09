@@ -19,8 +19,8 @@ ADynamicRackBeacon::ADynamicRackBeacon()
 	//Mesh->SetupAttachment(GetRootComponent());
 	// set path for static mesh
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'"));
-	// check if path is validBlueprint'/AirSim/Beacons/DynamicRackBeacon.DynamicRackBeacon'
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/CosysAirSim/Meshes/Beacons/SM_DynamicRackBeacon.SM_DynamicRackBeacon'"));
+	// check if path is validBlueprint'/AirSim/CosysAirSim/Meshes/Beacons/SM_DynamicRackBeacon.SM_DynamicRackBeacon'
 	if (loadedMesh.Succeeded())
 	{
 		// mesh = valid path

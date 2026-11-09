@@ -19,7 +19,7 @@ AWifiBeacon::AWifiBeacon()
 	//Mesh->SetupAttachment(GetRootComponent());
 	// set path for static mesh
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/Beacons/wifiBeacon.wifiBeacon'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> loadedMesh(TEXT("StaticMesh'/AirSim/CosysAirSim/Meshes/Beacons/SM_WifiBeacon.SM_WifiBeacon'"));
 	// check if path is valid
 	if (loadedMesh.Succeeded())
 	{
