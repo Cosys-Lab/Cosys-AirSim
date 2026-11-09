@@ -418,3 +418,5 @@ Unreal/Environments/Blocks/Blocks.slnx
 Unreal/Environments/Blocks/Blocks.code-workspace
 Unreal/Environments/Blocks/.ignore
 *.code-workspace
+Unreal/issuelist
+airsim_segmentation_colormap_list_*
