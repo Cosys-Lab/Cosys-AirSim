@@ -200,18 +200,20 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 						component_name.Append("_");
 						component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
 						paintable_components_meshes->Emplace(component_name, component);
-						if (actor->Tags.Num() > 0)
-							paintable_components_tags->Emplace(component_name, actor->Tags);
-						paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
+						// actor tags and component tags both count (Emplace twice would drop the actor tags)
+						TArray<FName> merged_tags = actor->Tags;
+						merged_tags.Append(staticmesh_component->ComponentTags);
+						paintable_components_tags->Emplace(component_name, merged_tags);
 					}
 					else {
 						FString component_name = actor->GetName();
 						component_name.Append("_");
 						component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
 						paintable_components_meshes->Emplace(component_name, component);
-						if (actor->Tags.Num() > 0)
-							paintable_components_tags->Emplace(component_name, actor->Tags);
-						paintable_components_tags->Emplace(component_name, staticmesh_component->ComponentTags);
+						// actor tags and component tags both count (Emplace twice would drop the actor tags)
+						TArray<FName> merged_tags = actor->Tags;
+						merged_tags.Append(staticmesh_component->ComponentTags);
+						paintable_components_tags->Emplace(component_name, merged_tags);
 					}
 			
 				}
@@ -220,9 +222,10 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 				FString component_name = actor->GetName();
 				component_name.Append("_");
 				component_name.Append(FString::FromInt(PersistentPrimitiveIndex));
-				if (actor->Tags.Num() > 0)
-					paintable_components_tags->Emplace(component_name, actor->Tags);
-				paintable_components_tags->Emplace(component_name, SkinnedMeshComponent->ComponentTags);
+				// actor tags and component tags both count (Emplace twice would drop the actor tags)
+				TArray<FName> merged_tags = actor->Tags;
+				merged_tags.Append(SkinnedMeshComponent->ComponentTags);
+				paintable_components_tags->Emplace(component_name, merged_tags);
 				paintable_components_meshes->Emplace(component_name, component);
 			}
 		}
