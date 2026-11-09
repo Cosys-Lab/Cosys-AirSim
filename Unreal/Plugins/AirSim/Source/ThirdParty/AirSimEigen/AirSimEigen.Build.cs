@@ -4,9 +4,9 @@ using UnrealBuildTool;
 
 // Eigen (https://eigen.tuxfamily.org) - header-only linear algebra library used throughout
 // AirLib. See THIRD_PARTY_LICENSES.md at the repository root for license details.
-public class Eigen : ModuleRules
+public class AirSimEigen : ModuleRules
 {
-    public Eigen(ReadOnlyTargetRules Target) : base(Target)
+    public AirSimEigen(ReadOnlyTargetRules Target) : base(Target)
     {
         Type = ModuleType.External;
 

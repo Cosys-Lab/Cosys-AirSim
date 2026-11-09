@@ -6,9 +6,9 @@ using System.IO;
 // rpclib (https://github.com/rpclib/rpclib) - msgpack-rpc client/server library used for the
 // AirSim client<->simulator API transport. See THIRD_PARTY_LICENSES.md at the repository root
 // for license details (rpclib itself also bundles asio, {fmt}, and msgpack-c).
-public class rpclib : ModuleRules
+public class AirSimRpclib : ModuleRules
 {
-    public rpclib(ReadOnlyTargetRules Target) : base(Target)
+    public AirSimRpclib(ReadOnlyTargetRules Target) : base(Target)
     {
         Type = ModuleType.External;
 

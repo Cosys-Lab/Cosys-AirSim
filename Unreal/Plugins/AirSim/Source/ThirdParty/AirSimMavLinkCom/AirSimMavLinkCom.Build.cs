@@ -7,9 +7,9 @@ using System.IO;
 // support, consumed here as a prebuilt headers+library dependency (its own .cpp sources are built
 // separately, outside the Unreal plugin, via build.cmd/build.sh). Bundles the generated MAVLink
 // common.xml protocol headers - see THIRD_PARTY_LICENSES.md at the repository root.
-public class MavLinkCom : ModuleRules
+public class AirSimMavLinkCom : ModuleRules
 {
-    public MavLinkCom(ReadOnlyTargetRules Target) : base(Target)
+    public AirSimMavLinkCom(ReadOnlyTargetRules Target) : base(Target)
     {
         Type = ModuleType.External;
 

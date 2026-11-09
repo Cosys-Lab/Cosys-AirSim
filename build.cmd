@@ -221,14 +221,14 @@ robocopy /MIR AirLib\lib %AIRSIM_MODULE%\Lib\AirLib /XD temp *. /njh /njs /ndl /
 
 REM //ThirdParty dependencies
 set THIRDPARTY=Unreal\Plugins\AirSim\Source\ThirdParty
-if NOT exist %THIRDPARTY%\Eigen\Eigen mkdir %THIRDPARTY%\Eigen\Eigen
-robocopy /MIR AirLib\deps\eigen3\Eigen %THIRDPARTY%\Eigen\Eigen /XD temp *. /njh /njs /ndl /np
-if NOT exist %THIRDPARTY%\rpclib mkdir %THIRDPARTY%\rpclib
-robocopy /MIR AirLib\deps\rpclib\include %THIRDPARTY%\rpclib\include /XD temp *. /njh /njs /ndl /np
-robocopy /MIR AirLib\deps\rpclib\lib %THIRDPARTY%\rpclib\lib /XD temp *. /njh /njs /ndl /np
-if NOT exist %THIRDPARTY%\MavLinkCom mkdir %THIRDPARTY%\MavLinkCom
-robocopy /MIR AirLib\deps\MavLinkCom\include %THIRDPARTY%\MavLinkCom\include /XD temp *. /njh /njs /ndl /np
-robocopy /MIR AirLib\deps\MavLinkCom\lib %THIRDPARTY%\MavLinkCom\lib /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\AirSimEigen\Eigen mkdir %THIRDPARTY%\AirSimEigen\Eigen
+robocopy /MIR AirLib\deps\eigen3\Eigen %THIRDPARTY%\AirSimEigen\Eigen /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\AirSimRpclib mkdir %THIRDPARTY%\AirSimRpclib
+robocopy /MIR AirLib\deps\rpclib\include %THIRDPARTY%\AirSimRpclib\include /XD temp *. /njh /njs /ndl /np
+robocopy /MIR AirLib\deps\rpclib\lib %THIRDPARTY%\AirSimRpclib\lib /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\AirSimMavLinkCom mkdir %THIRDPARTY%\AirSimMavLinkCom
+robocopy /MIR AirLib\deps\MavLinkCom\include %THIRDPARTY%\AirSimMavLinkCom\include /XD temp *. /njh /njs /ndl /np
+robocopy /MIR AirLib\deps\MavLinkCom\lib %THIRDPARTY%\AirSimMavLinkCom\lib /XD temp *. /njh /njs /ndl /np
 
 REM //---------- done building ----------
 exit /b 0

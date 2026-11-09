@@ -174,12 +174,12 @@ rsync -a --delete AirLib/include/ "$AIRSIM_MODULE/Public/AirLib/"
 rsync -a --delete AirLib/lib/ "$AIRSIM_MODULE/Lib/AirLib/"
 
 THIRDPARTY=Unreal/Plugins/AirSim/Source/ThirdParty
-mkdir -p "$THIRDPARTY/Eigen/Eigen" "$THIRDPARTY/rpclib" "$THIRDPARTY/MavLinkCom"
-rsync -a --delete AirLib/deps/eigen3/Eigen/ "$THIRDPARTY/Eigen/Eigen/"
-rsync -a --delete AirLib/deps/rpclib/include "$THIRDPARTY/rpclib/"
-rsync -a --delete AirLib/deps/rpclib/lib "$THIRDPARTY/rpclib/"
-rsync -a --delete AirLib/deps/MavLinkCom/include "$THIRDPARTY/MavLinkCom/"
-rsync -a --delete AirLib/deps/MavLinkCom/lib "$THIRDPARTY/MavLinkCom/"
+mkdir -p "$THIRDPARTY/AirSimEigen/Eigen" "$THIRDPARTY/AirSimRpclib" "$THIRDPARTY/AirSimMavLinkCom"
+rsync -a --delete AirLib/deps/eigen3/Eigen/ "$THIRDPARTY/AirSimEigen/Eigen/"
+rsync -a --delete AirLib/deps/rpclib/include "$THIRDPARTY/AirSimRpclib/"
+rsync -a --delete AirLib/deps/rpclib/lib "$THIRDPARTY/AirSimRpclib/"
+rsync -a --delete AirLib/deps/MavLinkCom/include "$THIRDPARTY/AirSimMavLinkCom/"
+rsync -a --delete AirLib/deps/MavLinkCom/lib "$THIRDPARTY/AirSimMavLinkCom/"
 
 set +x
 

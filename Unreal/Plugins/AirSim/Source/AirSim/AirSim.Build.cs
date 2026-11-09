@@ -55,8 +55,10 @@ public class AirSim : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ImageWrapper", "RenderCore", "RHI", "AssetRegistry", "PhysicsCore", "ChaosVehicles", "Landscape", "CinematicCamera" });
         PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore", "RenderCore", "ChaosVehicles" });
 
-        // ThirdParty dependencies - see Source/ThirdParty/*/ (Eigen, rpclib, MavLinkCom)
-        PrivateDependencyModuleNames.AddRange(new string[] { "Eigen", "rpclib", "MavLinkCom" });
+        // ThirdParty dependencies - see Source/ThirdParty/*/ (Eigen, rpclib, MavLinkCom).
+        // Module names are prefixed with "AirSim" because UBT module names are global: the engine
+        // already ships its own "Eigen" module, and other AirSim-derived plugins may ship rpclib/MavLinkCom.
+        PrivateDependencyModuleNames.AddRange(new string[] { "AirSimEigen", "AirSimRpclib", "AirSimMavLinkCom" });
 
         //suppress VC++ proprietary warnings
         PublicDefinitions.Add("_SCL_SECURE_NO_WARNINGS=1");
@@ -98,19 +100,21 @@ public class AirSim : ModuleRules
     {
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
+            // OS libraries are resolved from the SDK's library paths, so they go in
+            // PublicSystemLibraries (PublicAdditionalLibraries expects full file paths).
             // for SHGetFolderPath.
-            PublicAdditionalLibraries.Add("Shell32.lib");
+            PublicSystemLibraries.Add("Shell32.lib");
 
             //for joystick support
-            PublicAdditionalLibraries.Add("dinput8.lib");
-            PublicAdditionalLibraries.Add("dxguid.lib");
+            PublicSystemLibraries.Add("dinput8.lib");
+            PublicSystemLibraries.Add("dxguid.lib");
         }
 
         if (Target.Platform == UnrealTargetPlatform.Linux)
         {
             // needed when packaging
-            PublicAdditionalLibraries.Add("stdc++");
-            PublicAdditionalLibraries.Add("supc++");
+            PublicSystemLibraries.Add("stdc++");
+            PublicSystemLibraries.Add("supc++");
         }
     }
 }
