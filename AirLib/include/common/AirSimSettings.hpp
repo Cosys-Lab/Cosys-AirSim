@@ -1309,8 +1309,6 @@ namespace airlib
         static void initializePawnPaths(std::map<std::string, PawnPath>& pawn_paths)
         {
             pawn_paths.clear();
-            pawn_paths.emplace("BareboneCar",
-                               PawnPath("Class'/AirSim/VehicleAdv/Vehicle/VehicleAdvPawn.VehicleAdvPawn_C'"));
             pawn_paths.emplace("DefaultCar",
                                PawnPath("Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"));
 		    pawn_paths.emplace("DefaultSkidVehicle",
