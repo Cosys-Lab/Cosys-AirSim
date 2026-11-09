@@ -8,7 +8,7 @@
 #include "CarWheelFront.generated.h"
 
 UCLASS()
-class UCarWheelFront : public UChaosVehicleWheel
+class AIRSIM_API UCarWheelFront : public UChaosVehicleWheel
 {
     GENERATED_BODY()
 

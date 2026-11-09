@@ -1,4 +1,5 @@
 ### Unreleased
+* Exported the main plugin classes (pawns, SimApis, Unreal sensors, UAirBlueprintLib, WorldSimApi, recording) with AIRSIM_API so other modules and plugins can link against them. Based on [#139 by kkartal-infodif](https://github.com/Cosys-Lab/Cosys-AirSim/pull/139).
 * Magnetometer now uses the World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. Select the old model with `"ReferenceSource": "Dipole"` (or `"Constant"`) in the magnetometer settings. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
 * Added option to enable GPU LiDAR scene capture/readback asynchronously for other simmodes outside the multirotor. This still disables debug drawing of pointclouds. 
 * Fixed several small issues with GPU LiDAR sampling algorithm to improve stability and physical accuracy of the simulation model. 

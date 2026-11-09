@@ -6,7 +6,7 @@
 #include "physics/Kinematics.hpp"
 #include "CarPawn.h"
 
-class CarPawnApi
+class AIRSIM_API CarPawnApi
 {
 public:
     typedef msr::airlib::ImageCaptureBase ImageCaptureBase;

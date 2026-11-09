@@ -10,7 +10,7 @@
 #include "common/Common.hpp"
 
 
-class RenderRequest
+class AIRSIM_API RenderRequest
 {
 public:
     struct RenderParams {

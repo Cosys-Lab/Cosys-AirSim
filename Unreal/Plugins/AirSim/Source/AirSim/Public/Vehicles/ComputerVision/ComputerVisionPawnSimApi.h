@@ -12,7 +12,7 @@
 #include "common/CommonStructs.hpp"
 #include "vehicles/computervision/api/ComputerVisionApi.hpp"
 
-class ComputerVisionPawnSimApi : public PawnSimApi
+class AIRSIM_API ComputerVisionPawnSimApi : public PawnSimApi
 {
 public:
     typedef msr::airlib::Utils Utils;

@@ -13,7 +13,7 @@
 #include "map"
 
 // UnrealMarLocUwbSensor implementation that uses Ray Tracing in Unreal.
-class UnrealMarLocUwbSensor : public msr::airlib::MarLocUwbSimple {
+class AIRSIM_API UnrealMarLocUwbSensor : public msr::airlib::MarLocUwbSimple {
 
 public:
 	typedef msr::airlib::AirSimSettings AirSimSettings;

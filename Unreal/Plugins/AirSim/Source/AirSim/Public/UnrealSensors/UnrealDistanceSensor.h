@@ -7,7 +7,7 @@
 #include "sensors/distance/DistanceSimple.hpp"
 #include "NedTransform.h"
 
-class UnrealDistanceSensor : public msr::airlib::DistanceSimple
+class AIRSIM_API UnrealDistanceSensor : public msr::airlib::DistanceSimple
 {
 public:
     typedef msr::airlib::AirSimSettings AirSimSettings;

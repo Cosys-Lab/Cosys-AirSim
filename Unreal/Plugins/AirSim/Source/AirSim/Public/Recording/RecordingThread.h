@@ -13,7 +13,7 @@
 #include "common/AirSimSettings.hpp"
 #include "common/WorkerThread.hpp"
 
-class FRecordingThread : public FRunnable
+class AIRSIM_API FRecordingThread : public FRunnable
 {
 public:
     typedef msr::airlib::AirSimSettings::RecordingSetting RecordingSetting;

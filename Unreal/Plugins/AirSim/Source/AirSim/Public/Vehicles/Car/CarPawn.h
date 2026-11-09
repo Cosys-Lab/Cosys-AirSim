@@ -28,7 +28,7 @@ class UInputComponent;
 class UAudioComponent;
 
 UCLASS(config = Game)
-class ACarPawn : public AWheeledVehiclePawn
+class AIRSIM_API ACarPawn : public AWheeledVehiclePawn
 {
     GENERATED_BODY()
 

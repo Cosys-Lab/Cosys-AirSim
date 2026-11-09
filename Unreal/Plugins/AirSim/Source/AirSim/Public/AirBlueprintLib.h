@@ -43,7 +43,7 @@ enum class LogDebugLevel : uint8
 *
 */
 UCLASS()
-class UAirBlueprintLib : public UBlueprintFunctionLibrary
+class AIRSIM_API UAirBlueprintLib : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
 

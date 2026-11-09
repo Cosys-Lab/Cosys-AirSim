@@ -8,7 +8,7 @@
 #include "SkidWheel.generated.h"
 
 UCLASS()
-class USkidWheel : public UChaosVehicleWheel
+class AIRSIM_API USkidWheel : public UChaosVehicleWheel
 {
     GENERATED_BODY()
 

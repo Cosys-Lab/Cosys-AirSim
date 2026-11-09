@@ -6,7 +6,7 @@
 
 #include "common/common_utils/Signal.hpp"
 
-class PawnEvents
+class AIRSIM_API PawnEvents
 {
 public: //types
     typedef common_utils::Signal<UPrimitiveComponent*, AActor*, UPrimitiveComponent*, bool, FVector,

@@ -11,7 +11,7 @@
 // UnrealLidarSensor implementation that uses Ray Tracing in Unreal.
 // The implementation uses a model similar to CARLA Lidar implementation.
 // Thanks to CARLA folks for this.
-class UnrealLidarSensor : public msr::airlib::LidarSimple
+class AIRSIM_API UnrealLidarSensor : public msr::airlib::LidarSimple
 {
 public:
     typedef msr::airlib::AirSimSettings AirSimSettings;

@@ -13,7 +13,7 @@
 #include "map"
 
 // UnrealWifiSensor implementation that uses Ray Tracing in Unreal.
-class UnrealWifiSensor : public msr::airlib::WifiSimple {
+class AIRSIM_API UnrealWifiSensor : public msr::airlib::WifiSimple {
 
 public:
 	typedef msr::airlib::AirSimSettings AirSimSettings;

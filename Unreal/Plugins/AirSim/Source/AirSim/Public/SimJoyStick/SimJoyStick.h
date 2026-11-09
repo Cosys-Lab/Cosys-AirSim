@@ -8,7 +8,7 @@
 
 #include "common/Common.hpp"
 
-class SimJoyStick
+class AIRSIM_API SimJoyStick
 {
 public:
     struct AxisMap

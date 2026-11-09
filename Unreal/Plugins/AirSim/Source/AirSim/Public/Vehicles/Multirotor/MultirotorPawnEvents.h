@@ -8,7 +8,7 @@
 #include "common/Common.hpp"
 #include "common/common_utils/Signal.hpp"
 
-class MultirotorPawnEvents : public PawnEvents
+class AIRSIM_API MultirotorPawnEvents : public PawnEvents
 {
 public: //types
     typedef msr::airlib::real_T real_T;

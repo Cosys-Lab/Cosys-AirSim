@@ -14,7 +14,7 @@
 #include "common/CommonStructs.hpp"
 #include "vehicles/car/CarApiFactory.hpp"
 
-class SkidVehiclePawnSimApi : public PawnSimApi
+class AIRSIM_API SkidVehiclePawnSimApi : public PawnSimApi
 {
 public:
 	typedef msr::airlib::Utils Utils;

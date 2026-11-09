@@ -8,7 +8,7 @@
 #include "SkidVehiclePawn.h"
 
 
-class SkidVehiclePawnApi {
+class AIRSIM_API SkidVehiclePawnApi {
 public:
 	typedef msr::airlib::ImageCaptureBase ImageCaptureBase;
 

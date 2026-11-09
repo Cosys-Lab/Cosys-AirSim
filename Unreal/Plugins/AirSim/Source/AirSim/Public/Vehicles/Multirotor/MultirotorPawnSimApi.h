@@ -13,7 +13,7 @@
 #include "MultirotorPawnEvents.h"
 #include <future>
 
-class MultirotorPawnSimApi : public PawnSimApi
+class AIRSIM_API MultirotorPawnSimApi : public PawnSimApi
 {
 public:
     typedef msr::airlib::real_T real_T;

@@ -13,7 +13,7 @@
 #include "map"
 
 // UnrealSensorTemplate implementation that uses Ray Tracing in Unreal.
-class UnrealSensorTemplate : public msr::airlib::SensorTemplateSimple {
+class AIRSIM_API UnrealSensorTemplate : public msr::airlib::SensorTemplateSimple {
 
 public:
 	typedef msr::airlib::AirSimSettings AirSimSettings;
