@@ -343,6 +343,8 @@ cmake_build/
 /PythonClient/**/cloud.txt
 /PythonClient/**/cloud.asc
 /Unreal/Plugins/AirSim/Content/VehicleAdv/SUV/
+# high-poly SUV after the Fab content reorg (downloaded by build.cmd/build.sh, not tracked)
+/Unreal/Plugins/AirSim/Content/CosysAirSim/*/Vehicles/SUV/
 /suv_download_tmp
 car_assets.zip
 __pycache__/
