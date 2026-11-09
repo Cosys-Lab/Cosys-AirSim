@@ -247,11 +247,17 @@ void ALidarCamera::InitializeSensor()
 	capture_2D_intensity_->bUseCustomProjectionMatrix = false;
 
 	// Generate the XYZ-coordinates LUT based on the LiDAR sensor laser configuration
-	GenerateLidarCoordinates();
-
-	// Calculate the angular distance delta between two samples for both the horizontal and vertical axis
+	// Calculate the angular distance delta between two samples for both the horizontal and vertical axis.
+	// This MUST happen before GenerateLidarCoordinates(), which uses h_delta_angle_ to place the last
+	// horizontal sample. With it still zero the table spanned the closed interval [min, max] instead of
+	// [min, max): on a 360 sweep the last sample duplicated the first (360 deg == 0 deg), and on a
+	// partial FOV the last sample landed exactly on the end angle, which sends getIndexLowerClosest
+	// down its "exact match" branch and permanently skips the final sample - so a partial-FOV sweep was
+	// always one azimuth short of a full point cloud and never reported a completed scan at all.
 	h_delta_angle_ = (horizontal_fov_max_ - horizontal_fov_min_) / float(horizontal_samples_ - 1);
 	v_delta_angle_ = (FMath::Abs(vertical_fov_min_) + vertical_fov_max_) / float(num_lasers_ - 1);
+
+	GenerateLidarCoordinates();
 
 	// Calculate the ideal virtual camera FOV based on the total vertical FOV of the LiDAR
 	target_fov_ = FMath::CeilToInt(FMath::Abs(vertical_fov_min_) + vertical_fov_max_);
@@ -287,6 +293,70 @@ void ALidarCamera::InitializeSensor()
 }
 
 // Method function to call each time the sensor needs to update
+// Largest angular span a single capture is allowed to cover. Each capture is centred on its
+// own span, so this directly bounds how far off the optical axis any sample can be (+/- half
+// of this). Range is reconstructed as depth/(cos(vertical)*cos(off-axis)), so a large off-axis
+// angle amplifies every depth/pixel-quantisation error - keeping the span moderate keeps the
+// reconstruction well conditioned. A tick that needs more rotation than this simply issues
+// several captures instead of one badly conditioned wide one.
+static constexpr float kMaxCaptureSpanDegrees = 60.0f;
+static constexpr int32 kMaxCapturesPerTick = 8;
+
+// Decode the 24-bit depth the depth material packs across R,G,B into centimetres.
+static float DecodeDepthCm(const FColor& c)
+{
+	return 100000.0f * ((c.R + c.G * 256 + c.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
+}
+
+// Sample the depth image at a fractional pixel position instead of snapping to one texel.
+// This matters enormously for shallow elevation rays: a laser 3 degrees below horizontal maps
+// the entire far half of the ground onto a handful of pixels, so half a pixel of snapping is
+// metres of range error (it is what makes far rings come out polygonal rather than round).
+// Interpolating across a real depth discontinuity would invent a point floating between two
+// surfaces, so only blend when the four neighbours are close enough to be the same surface.
+static float SampleDepthCm(const TArray<FColor>& buffer, int32 resolution, float px, float py)
+{
+	const float fx = FMath::Clamp(px - 0.5f, 0.0f, static_cast<float>(resolution - 1));
+	const float fy = FMath::Clamp(py - 0.5f, 0.0f, static_cast<float>(resolution - 1));
+	const int32 x0 = FMath::FloorToInt(fx);
+	const int32 y0 = FMath::FloorToInt(fy);
+	const int32 x1 = FMath::Min(x0 + 1, resolution - 1);
+	const int32 y1 = FMath::Min(y0 + 1, resolution - 1);
+	const float tx = fx - x0;
+	const float ty = fy - y0;
+
+	const float d00 = DecodeDepthCm(buffer[x0 + y0 * resolution]);
+	const float d10 = DecodeDepthCm(buffer[x1 + y0 * resolution]);
+	const float d01 = DecodeDepthCm(buffer[x0 + y1 * resolution]);
+	const float d11 = DecodeDepthCm(buffer[x1 + y1 * resolution]);
+
+	const float dmin = FMath::Min(FMath::Min(d00, d10), FMath::Min(d01, d11));
+	const float dmax = FMath::Max(FMath::Max(d00, d10), FMath::Max(d01, d11));
+	// A surface seen at a grazing angle legitimately changes several percent per pixel, while a
+	// silhouette jumps by far more, so this threshold separates the two cases.
+	if ((dmax - dmin) > 0.25f * FMath::Max(dmin, 1.0f)) {
+		const int32 nx = (tx < 0.5f) ? x0 : x1;
+		const int32 ny = (ty < 0.5f) ? y0 : y1;
+		return DecodeDepthCm(buffer[nx + ny * resolution]);
+	}
+	return FMath::Lerp(FMath::Lerp(d00, d10, tx), FMath::Lerp(d01, d11, tx), ty);
+}
+
+// Pick the smallest virtual-camera FOV that still fits the whole capture span horizontally and
+// all of the lidar's vertical rays. A ray at off-axis angle a and elevation e lands at image
+// y = -f*tan(e)/cos(a), so the vertical requirement grows as the span widens.
+static int32 ComputeCaptureFov(float capture_span, float vertical_fov_min, float vertical_fov_max)
+{
+	const float half_span = 0.5f * capture_span;
+	const float v_max = FMath::Max(FMath::Abs(vertical_fov_min), FMath::Abs(vertical_fov_max));
+	const float cos_half = FMath::Max(FMath::Cos(FMath::DegreesToRadians(half_span)), 0.05f);
+	const float needed_vertical = 2.0f * FMath::RadiansToDegrees(
+		FMath::Atan(FMath::Tan(FMath::DegreesToRadians(v_max)) / cos_half));
+	int32 fov = FMath::CeilToInt(FMath::Max(capture_span, needed_vertical)) + 4;
+	if (fov % 2 != 0) fov += 1;
+	return FMath::Clamp(fov, 10, 170);
+}
+
 bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud,
                           msr::airlib::vector<msr::airlib::real_T>& point_cloud_final)
 {
@@ -306,57 +376,69 @@ bool ALidarCamera::Update(float delta_time, msr::airlib::vector<msr::airlib::rea
 	float sensor_rotation_angle_ = hfov_ * delta_time * sensor_rotation_frequency_;
 	sensor_sum_rotation_angle_ += sensor_rotation_angle_;
 
-	// If the rotation in this frame is larger than the minimum horizontal FOV delta, a new calculation of points needs to be made
-	if (sensor_sum_rotation_angle_ > h_delta_angle_) {
+	// Let the render settle before sampling anything. Don't advance the sweep while waiting,
+	// otherwise the first real capture has to cover everything that was skipped and samples
+	// angles that were never actually rendered.
+	if (waited_frames_ < wait_frames_) {
+		waited_frames_++;
+		sensor_sum_rotation_angle_ = 0;
+		h_cur_atan2_index_ = -1;
+		return false;
+	}
 
-		// If the full horizontal fov was completed last frame, reset the starting angle again
-		if (reset_hfov_) {
-			sensor_cur_angle_ = FMath::Fmod(horizontal_fov_min_, 360);
-			sensor_prev_rotation_angle_ = 0;
-			completed_hfov_ = 0;
-			reset_hfov_ = false;
-		}
+	// Every sweep is split into the SAME fixed set of slices. This is what makes a static scene
+	// reproduce bit-identically rotation after rotation: a given laser is always captured from
+	// the same camera orientation, so it always lands on the same pixel. Letting the slice
+	// boundaries follow frame timing (as this used to) re-samples every laser at a different
+	// off-axis angle each rotation, which is why no two rotations ever looked the same.
+	const int32 slice_count = FMath::Max(1, FMath::CeilToInt(hfov_ / kMaxCaptureSpanDegrees));
+	const float slice_span = hfov_ / slice_count;
 
-		// The ideal virtual camera FOV is set based on the vertical FOV, but if it is a large rotation that has to be calculated, set it to be a even number that is equal to the
-		// rotation + 3 horizontal FOV deltas. However, to make the pixel to LiDAR laser coordinates work, the FOV needs to be a minimum of 90 degrees.
-		int32 cur_fov = target_fov_;
-		if (sensor_sum_rotation_angle_ > target_fov_) cur_fov = FMath::CeilToInt(FMath::Min(sensor_sum_rotation_angle_ + (3 * h_delta_angle_), 178.0f));
-		if (cur_fov % 2 != 0) cur_fov += 1;
-		if (cur_fov < 90) cur_fov = 90;
+	int32 captures_this_tick = 0;
+	while (sensor_sum_rotation_angle_ >= slice_span && captures_this_tick < kMaxCapturesPerTick) {
+
+		// Slice boundaries are derived from how much of this sweep is already done, so they sit
+		// on a fixed grid instead of drifting with the frame rate.
+		sensor_cur_angle_ = FMath::Fmod(horizontal_fov_min_ + completed_hfov_, 360);
+
+		const int32 cur_fov = ComputeCaptureFov(slice_span, vertical_fov_min_, vertical_fov_max_);
 		capture_2D_depth_->FOVAngle = cur_fov;
 		capture_2D_segmentation_->FOVAngle = cur_fov;
 		capture_2D_intensity_->FOVAngle = cur_fov;
 
-		// Rotate the physical cameras in the Unreal world to the new location based on what happened in previous frames
-		RotateCamera(FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_ + (cur_fov / 2), 360));
-		sensor_cur_angle_ = FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_, 360);
+		// Centre the camera on the slice being captured, so samples sit around the optical axis
+		// instead of all crowding onto one distorted edge of the image.
+		RotateCamera(FMath::Fmod(sensor_cur_angle_ + (0.5f * slice_span), 360));
 
-		// If the rotation is bigger than the allowed FOV, cap the rotation (it will be further completed in the next frame)
-		if (sensor_sum_rotation_angle_ > cur_fov)sensor_sum_rotation_angle_ = cur_fov;
-
-		// If the rotation will extend beyond the total horizontal FOV if it is not full 360, cap the rotation to the remaining FOV
-		// And also make sure to reset the start rotation next frame
-		if (sensor_sum_rotation_angle_ >= hfov_ - completed_hfov_ && hfov_ != 360) {
-			sensor_sum_rotation_angle_ = hfov_ - completed_hfov_;
-			reset_hfov_ = true;
-		}
-		completed_hfov_ += sensor_sum_rotation_angle_;
-
-		if (waited_frames_ < wait_frames_) {
-			waited_frames_++;
-		}
-		else {
-
-			capture_2D_depth_->CaptureScene();
+		// Only render what will actually be read back. The segmentation and intensity readbacks
+		// are already gated on these flags, so capturing them regardless was a whole wasted
+		// scene render per slice (six per sweep) whenever those outputs are disabled.
+		capture_2D_depth_->CaptureScene();
+		if (generate_groundtruth_) {
 			capture_2D_segmentation_->CaptureScene();
-			capture_2D_intensity_->CaptureScene();
-			refresh_pointcloud = SampleRenders(sensor_sum_rotation_angle_, cur_fov, point_cloud, point_cloud_final);
 		}
+		if (generate_intensity_) {
+			capture_2D_intensity_->CaptureScene();
+		}
+		refresh_pointcloud |= SampleRenders(slice_span, cur_fov, point_cloud, point_cloud_final);
 
-	
+		completed_hfov_ += slice_span;
+		if (completed_hfov_ >= hfov_ - 0.001f) {
+			completed_hfov_ = 0.0f;
+			// A partial FOV jumps the camera back to the start, so the running sample index has
+			// to restart with it. A full 360 sweep just wraps around and continues.
+			if (hfov_ != 360) {
+				h_cur_atan2_index_ = -1;
+			}
+		}
+		sensor_sum_rotation_angle_ -= slice_span;
+		captures_this_tick++;
+	}
 
-		// Set up the values for the next frame
-		sensor_prev_rotation_angle_ = sensor_sum_rotation_angle_;
+	// Normally the loop exits with less than one sample step left over, which is carried into
+	// the next tick. If it instead hit the per-tick capture budget the sensor simply can't keep
+	// up with the configured rotation rate, so drop the backlog rather than let it snowball.
+	if (captures_this_tick >= kMaxCapturesPerTick) {
 		sensor_sum_rotation_angle_ = 0;
 	}
 	return refresh_pointcloud;
@@ -374,46 +456,50 @@ bool ALidarCamera::UpdateAsync(float delta_time, msr::airlib::vector<msr::airlib
 
 	float sensor_rotation_angle_ = hfov_ * delta_time * sensor_rotation_frequency_;
 	sensor_sum_rotation_angle_ += sensor_rotation_angle_;
+	// Never let the backlog grow past a full sweep if captures can't keep up.
+	sensor_sum_rotation_angle_ = FMath::Min(sensor_sum_rotation_angle_, 360.0f);
 
-	if (sensor_sum_rotation_angle_ > h_delta_angle_) {
+	// Same fixed slice grid as the synchronous path - see the comment in Update().
+	const int32 slice_count = FMath::Max(1, FMath::CeilToInt(hfov_ / kMaxCaptureSpanDegrees));
+	const float slice_span = hfov_ / slice_count;
 
+	if (sensor_sum_rotation_angle_ >= slice_span) {
+
+		// Don't touch any sweep state while a capture is pending - the buffers being serviced
+		// still belong to the angles recorded for that job.
 		if (async_capture_in_flight_.load()) {
 			return refresh_pointcloud;
 		}
 
-		if (reset_hfov_) {
-			sensor_cur_angle_ = FMath::Fmod(horizontal_fov_min_, 360);
-			sensor_prev_rotation_angle_ = 0;
-			completed_hfov_ = 0;
-			reset_hfov_ = false;
+		if (waited_frames_ < wait_frames_) {
+			waited_frames_++;
+			sensor_sum_rotation_angle_ = 0;
+			h_cur_atan2_index_ = -1;
+			return refresh_pointcloud;
 		}
 
-		int32 cur_fov = target_fov_;
-		if (sensor_sum_rotation_angle_ > target_fov_) cur_fov = FMath::CeilToInt(FMath::Min(sensor_sum_rotation_angle_ + (3 * h_delta_angle_), 178.0f));
-		if (cur_fov % 2 != 0) cur_fov += 1;
-		if (cur_fov < 90) cur_fov = 90;
-
-		float capture_rotation = FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_ + (cur_fov / 2), 360);
-		sensor_cur_angle_ = FMath::Fmod(sensor_cur_angle_ + sensor_prev_rotation_angle_, 360);
-
-		if (sensor_sum_rotation_angle_ > cur_fov) sensor_sum_rotation_angle_ = cur_fov;
-
-		if (sensor_sum_rotation_angle_ >= hfov_ - completed_hfov_ && hfov_ != 360) {
-			sensor_sum_rotation_angle_ = hfov_ - completed_hfov_;
-			reset_hfov_ = true;
+		// The job processed above has already been consumed, so it is safe to restart the
+		// running sample index here when a partial FOV wraps back to its start.
+		if (hfov_ != 360 && completed_hfov_ == 0.0f) {
+			h_cur_atan2_index_ = -1;
 		}
-		completed_hfov_ += sensor_sum_rotation_angle_;
 
-		bool do_capture = waited_frames_ >= wait_frames_;
-		if (!do_capture) waited_frames_++;
+		sensor_cur_angle_ = FMath::Fmod(horizontal_fov_min_ + completed_hfov_, 360);
 
-		async_job_rotation_angle_ = sensor_sum_rotation_angle_;
+		const int32 cur_fov = ComputeCaptureFov(slice_span, vertical_fov_min_, vertical_fov_max_);
+		// Centre the camera on the slice being captured (see the matching comment in Update).
+		const float capture_rotation = FMath::Fmod(sensor_cur_angle_ + (0.5f * slice_span), 360);
+
+		completed_hfov_ += slice_span;
+		if (completed_hfov_ >= hfov_ - 0.001f) {
+			completed_hfov_ = 0.0f;
+		}
+
+		async_job_rotation_angle_ = slice_span;
 		async_job_fov_ = cur_fov;
-		StartAsyncCapture(capture_rotation, cur_fov, do_capture);
+		StartAsyncCapture(capture_rotation, cur_fov, true);
 
-		// Set up the values for the next frame
-		sensor_prev_rotation_angle_ = sensor_sum_rotation_angle_;
-		sensor_sum_rotation_angle_ = 0;
+		sensor_sum_rotation_angle_ -= slice_span;
 	}
 	return refresh_pointcloud;
 }
@@ -440,9 +526,14 @@ void ALidarCamera::ServiceAsyncCapture()
 	RotateCamera(pending_capture_rotation_);
 
 	if (pending_do_capture_ && capture_2D_depth_->TextureTarget && capture_2D_segmentation_->TextureTarget && capture_2D_intensity_->TextureTarget) {
+		// Only render what will actually be read back (see the matching comment in Update).
 		capture_2D_depth_->CaptureScene();
-		capture_2D_segmentation_->CaptureScene();
-		capture_2D_intensity_->CaptureScene();
+		if (generate_groundtruth_) {
+			capture_2D_segmentation_->CaptureScene();
+		}
+		if (generate_intensity_) {
+			capture_2D_intensity_->CaptureScene();
+		}
 
 		FTextureRenderTarget2DResource* render_target_2D_depth = (FTextureRenderTarget2DResource*)capture_2D_depth_->TextureTarget->GetResource();
 		render_target_2D_depth->ReadPixels(async_buffer_2D_depth_);
@@ -507,12 +598,17 @@ bool ALidarCamera::ProcessCapturedBuffers(float sensor_rotation_angle, float fov
 
 		// Get the current horizontal angle, also in Eucledian plane form (between 0 and 360 degrees)
 		float h_cur_angle = h_angles_[h_cur_atan2_index_];
-		float h_cur_atan2_angle = FMath::Fmod(FMath::Fmod(FMath::Fmod(h_cur_angle, 360) - sensor_cur_angle_, 360) - (fov / 2), 360);
+		// Angle of this laser away from the camera's optical axis. The camera is centred on the
+		// span being captured (sensor_cur_angle_ .. sensor_cur_angle_ + sensor_rotation_angle),
+		// so the axis sits half a span past the start - not half a FOV, which used to push every
+		// sample onto the distorted edge of the image.
+		float h_cur_atan2_angle = FMath::Fmod(FMath::Fmod(FMath::Fmod(h_cur_angle, 360) - sensor_cur_angle_, 360) - (sensor_rotation_angle / 2), 360);
 
 		// Calculate the cosine and sine of the horizontal angle and calculate the pixel index from the render texture target that matches this laser's horizontal angle
 		float h_cur_angle_cos = FMath::Cos(FMath::DegreesToRadians(h_cur_atan2_angle));
 		float h_cur_angle_sin = FMath::Sin(FMath::DegreesToRadians(h_cur_atan2_angle));
-		int32 h_pixel = FMath::FloorToInt(((h_cur_angle_sin * f_x) / h_cur_angle_cos) + c_x);
+		const float h_pixel_exact = ((h_cur_angle_sin * f_x) / h_cur_angle_cos) + c_x;
+		int32 h_pixel = FMath::FloorToInt(h_pixel_exact);
 		if (h_pixel == -1)h_pixel = 0; // for edge case avoiding
 		if (h_pixel == resolution_)h_pixel = resolution_ - 1;  // for edge case avoiding
 
@@ -544,14 +640,14 @@ bool ALidarCamera::ProcessCapturedBuffers(float sensor_rotation_angle, float fov
 			float v_cur_angle = v_angles_[v_cur_index];
 			float v_cur_angle_cos = FMath::Cos(FMath::DegreesToRadians(v_cur_angle));
 			float v_cur_angle_sin = FMath::Sin(FMath::DegreesToRadians(v_cur_angle));
-			int32 v_pixel = FMath::FloorToInt((v_cur_angle_sin * -f_y) / (v_cur_angle_cos * h_cur_angle_cos) + c_y);
+			const float v_pixel_exact = (v_cur_angle_sin * -f_y) / (v_cur_angle_cos * h_cur_angle_cos) + c_y;
+			int32 v_pixel = FMath::FloorToInt(v_pixel_exact);
 
 			// If the pixel coordinates are within bounds of the render target texture (should always be the case) we can proceed to read from it
 			if (h_pixel >= 0 && h_pixel < resolution_ && v_pixel >= 0 && v_pixel < resolution_) {
 
 				// Get the depth value in centimeters, the depth value is spread of the full 3 bytes to achieve three bytes unsigned precision
-				FColor value_depth = async_buffer_2D_depth_[h_pixel + (v_pixel * resolution_)];
-				float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
+				float depth = SampleDepthCm(async_buffer_2D_depth_, resolution_, h_pixel_exact, v_pixel_exact);
 
 			    // Added random distance based noise
 				if (generate_distance_noise_) {
@@ -799,12 +895,17 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 
 		// Get the current horizontal angle, also in Eucledian plane form (between 0 and 360 degrees)
 		float h_cur_angle = h_angles_[h_cur_atan2_index_];
-		float h_cur_atan2_angle = FMath::Fmod(FMath::Fmod(FMath::Fmod(h_cur_angle, 360) - sensor_cur_angle_, 360) - (fov / 2), 360);
+		// Angle of this laser away from the camera's optical axis. The camera is centred on the
+		// span being captured (sensor_cur_angle_ .. sensor_cur_angle_ + sensor_rotation_angle),
+		// so the axis sits half a span past the start - not half a FOV, which used to push every
+		// sample onto the distorted edge of the image.
+		float h_cur_atan2_angle = FMath::Fmod(FMath::Fmod(FMath::Fmod(h_cur_angle, 360) - sensor_cur_angle_, 360) - (sensor_rotation_angle / 2), 360);
 
 		// Calculate the cosine and sine of the horizontal angle and calculate the pixel index from the render texture target that matches this laser's horizontal angle
 		float h_cur_angle_cos = FMath::Cos(FMath::DegreesToRadians(h_cur_atan2_angle));
 		float h_cur_angle_sin = FMath::Sin(FMath::DegreesToRadians(h_cur_atan2_angle));
-		int32 h_pixel = FMath::FloorToInt(((h_cur_angle_sin * f_x) / h_cur_angle_cos) + c_x);
+		const float h_pixel_exact = ((h_cur_angle_sin * f_x) / h_cur_angle_cos) + c_x;
+		int32 h_pixel = FMath::FloorToInt(h_pixel_exact);
 		if (h_pixel == -1)h_pixel = 0; // for edge case avoiding
 		if (h_pixel == resolution_)h_pixel = resolution_ - 1;  // for edge case avoiding
 		
@@ -837,14 +938,14 @@ bool ALidarCamera::SampleRenders(float sensor_rotation_angle, float fov, msr::ai
 			float v_cur_angle = v_angles_[v_cur_index];
 			float v_cur_angle_cos = FMath::Cos(FMath::DegreesToRadians(v_cur_angle));
 			float v_cur_angle_sin = FMath::Sin(FMath::DegreesToRadians(v_cur_angle));
-			int32 v_pixel = FMath::FloorToInt((v_cur_angle_sin * -f_y) / (v_cur_angle_cos * h_cur_angle_cos) + c_y);
+			const float v_pixel_exact = (v_cur_angle_sin * -f_y) / (v_cur_angle_cos * h_cur_angle_cos) + c_y;
+			int32 v_pixel = FMath::FloorToInt(v_pixel_exact);
 
 			// If the pixel coordinates are within bounds of the render target texture (should always be the case) we can proceed to read from it
 			if (h_pixel >= 0 && h_pixel < resolution_ && v_pixel >= 0 && v_pixel < resolution_) {
 
 				// Get the depth value in centimeters, the depth value is spread of the full 3 bytes to achieve three bytes unsigned precision
-				FColor value_depth = buffer_2D_depth_[h_pixel + (v_pixel * resolution_)];
-				float depth = 100000 * ((value_depth.R + value_depth.G * 256 + value_depth.B * 256 * 256) / static_cast<float>(256 * 256 * 256 - 1));
+				float depth = SampleDepthCm(buffer_2D_depth_, resolution_, h_pixel_exact, v_pixel_exact);
 
 			    // Added random distance based noise
 				if (generate_distance_noise_) {

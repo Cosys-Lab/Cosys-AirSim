@@ -5,7 +5,9 @@ Cosys-AirSim supports a GPU accelerated Lidar for multirotors and cars. It uses 
 The enablement of a GPU lidar and the other lidar settings can be configured via AirSimSettings json.
 Please see [general sensors](sensors.md) for information on configuration of general/shared sensor settings.
 
-The sensor capture can optionally be dispatched asynchronously to the Unreal game thread by enabling `AsyncCaptureMode` (see the parameter table below). This defers reading the capture back by roughly one game frame instead of reading it back in the same frame it was requested, which avoids a synchronous CPU/GPU pipeline stall on every capture and can meaningfully speed up scan completion, especially on heavier scenes. `AsyncCaptureMode` defaults to enabled for Multirotor vehicles and disabled for all other vehicle types, but can be explicitly set either way for any vehicle type. Real-time debug point drawing (`DrawDebugPoints`) is not supported while `AsyncCaptureMode` is enabled, for any vehicle type.
+The sensor capture can optionally be dispatched asynchronously to the Unreal game thread by enabling `AsyncCaptureMode` (see the parameter table below).  `AsyncCaptureMode` defaults to enabled for Multirotor vehicles and disabled for all other vehicle types, but can be explicitly set either way for any vehicle type. Real-time debug point drawing (`DrawDebugPoints`) is not supported while `AsyncCaptureMode` is enabled, for any vehicle type. Experimenting with this setting can improve performance of the LiDAR model. 
+
+note that this LiDAR model is computationally expensive and measurement rates (RotationsPerSecond) above 5 Hz should not be expected. 
 
 ## Enabling GPU lidar on a vehicle
 * By default, GPU lidars are not enabled. To enable the sensor, set the SensorType and Enabled attributes in settings json.
