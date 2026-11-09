@@ -16,7 +16,8 @@ namespace airlib
         enum ReferenceSource
         {
             ReferenceSource_Constant,
-            ReferenceSource_DipoleModel
+            ReferenceSource_DipoleModel,
+            ReferenceSource_WMM // World Magnetic Model lookup tables, same as PX4 (see common/WorldMagneticModel.hpp)
         };
 
         Vector3r noise_sigma = Vector3r(0.005f, 0.005f, 0.005f); //5 mgauss as per specs sheet (RMS is same as stddev) https://goo.gl/UOz6FT
@@ -24,9 +25,9 @@ namespace airlib
         Vector3r noise_bias = Vector3r(0.0f, 0.0f, 0.0f); //no offset as per specsheet (zero gauss level) https://goo.gl/UOz6FT
         float ref_update_frequency = 0.2f; //Hz
 
-        //use dipole model if there is enough compute power available
+        //recompute the reference field as the vehicle moves (WMM is a cheap table lookup)
         bool dynamic_reference_source = true;
-        ReferenceSource ref_source = ReferenceSource::ReferenceSource_DipoleModel;
+        ReferenceSource ref_source = ReferenceSource::ReferenceSource_WMM;
         //bool dynamic_reference_source = false;
         //ReferenceSource ref_source = ReferenceSource::ReferenceSource_Constant;
 
@@ -46,6 +47,17 @@ namespace airlib
             update_latency = json.getFloat("UpdateLatency", update_latency);
             update_frequency = json.getFloat("UpdateFrequency", update_frequency);
             startup_delay = json.getFloat("StartupDelay", startup_delay);
+
+            // "WMM" (default), "Dipole" or "Constant"
+            const std::string ref = json.getString("ReferenceSource", "");
+            if (ref == "WMM")
+                ref_source = ReferenceSource::ReferenceSource_WMM;
+            else if (ref == "Dipole")
+                ref_source = ReferenceSource::ReferenceSource_DipoleModel;
+            else if (ref == "Constant")
+                ref_source = ReferenceSource::ReferenceSource_Constant;
+            else if (!ref.empty())
+                throw std::invalid_argument("Magnetometer ReferenceSource must be \"WMM\", \"Dipole\" or \"Constant\", got \"" + ref + "\"");
         }
     };
 }

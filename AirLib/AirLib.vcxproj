@@ -76,6 +76,8 @@
     <ClInclude Include="include\common\SteppableClock.hpp" />
     <ClInclude Include="include\common\DelayLine.hpp" />
     <ClInclude Include="include\common\EarthUtils.hpp" />
+    <ClInclude Include="include\common\WorldMagneticModel.hpp" />
+    <ClInclude Include="include\common\WorldMagneticModelTables.hpp" />
     <ClInclude Include="include\common\FirstOrderFilter.hpp" />
     <ClInclude Include="include\common\FrequencyLimiter.hpp" />
     <ClInclude Include="include\common\GaussianMarkov.hpp" />

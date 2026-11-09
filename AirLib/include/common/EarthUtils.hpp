@@ -8,6 +8,7 @@
 #include <exception>
 #include "common/CommonStructs.hpp"
 #include "common/Common.hpp"
+#include "common/WorldMagneticModel.hpp"
 
 namespace msr
 {
@@ -205,6 +206,30 @@ namespace airlib
         {
             double declination, inclination;
             return getMagField(geo_point, declination, inclination);
+        }
+
+        static Vector3r getMagFieldWMM(const GeoPoint& geo_point) //return Tesla
+        {
+            double declination, inclination;
+            return getMagFieldWMM(geo_point, declination, inclination);
+        }
+
+        // World Magnetic Model (see WorldMagneticModelTables.hpp for the model/epoch), using the same
+        // lookup tables as PX4 so the simulated magnetometer agrees with PX4's EKF expectations.
+        // Returns the field in Tesla in the local NED frame (z positive down); altitude is ignored,
+        // as in PX4. declination/inclination are returned in radians.
+        static Vector3r getMagFieldWMM(const GeoPoint& geo_point, double& declination, double& inclination) //return Tesla
+        {
+            const float lat = static_cast<float>(geo_point.latitude);
+            const float lon = static_cast<float>(geo_point.longitude);
+            declination = Utils::degreesToRadians(static_cast<double>(wmm::getDeclinationDegrees(lat, lon)));
+            inclination = Utils::degreesToRadians(static_cast<double>(wmm::getInclinationDegrees(lat, lon)));
+            const double strength = wmm::getStrengthTesla(lat, lon);
+            const double horizontal = strength * cos(inclination);
+
+            return Vector3r(static_cast<real_T>(horizontal * cos(declination)),
+                            static_cast<real_T>(horizontal * sin(declination)),
+                            static_cast<real_T>(strength * sin(inclination)));
         }
 
         static Vector3r getMagField(const GeoPoint& geo_point, double& declination, double& inclination) //return Tesla
