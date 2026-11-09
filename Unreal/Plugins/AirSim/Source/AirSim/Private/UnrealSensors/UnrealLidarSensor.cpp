@@ -288,7 +288,8 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
 	}
 	bool ignoreMaterial = false;
 	if (hit_result.PhysMaterial != nullptr) {
-		if (hit_result.PhysMaterial.Get()->GetFName().ToString().Contains("Lidar_Ignore_PhysicalMaterial"))
+		// matches the plugin's PM_Lidar_Ignore and the pre-Fab name Lidar_Ignore_PhysicalMaterial (and user copies)
+		if (hit_result.PhysMaterial.Get()->GetFName().ToString().Contains("Lidar_Ignore"))
 			ignoreMaterial = true;
 	}
 	if (is_hit && !ignoreMaterial)

@@ -64,7 +64,7 @@ class AIRSIM_API UWeatherLib : public UBlueprintFunctionLibrary
     // menu class name for finding and closing it
     static const FString getWeatherMenuClassName()
     {
-        return TEXT("OptionsMenu_C");
+        return TEXT("WBP_OptionsMenu_C");
     }
 
     // corresponding param name to set in Weather Params material collection

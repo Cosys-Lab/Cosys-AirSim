@@ -177,6 +177,8 @@ class WeatherParameter:
 
 Please note that `Roadwetness`, `RoadSnow` and `RoadLeaf` effects requires adding [materials](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/CosysAirSim/Materials/Weather) to your scene.
 
+The `Dust` and `Fog` effects are volumetric: your level needs an **Exponential Height Fog** actor with **Volumetric Fog** enabled, otherwise they are not visible.
+
 Please see [example code](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/environment/weather.py) for more details.
 
 ### Recording APIs
