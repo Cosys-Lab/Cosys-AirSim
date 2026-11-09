@@ -822,8 +822,7 @@ bool ASimModeBase::SetMeshInstanceSegmentationID(const std::string& mesh_name, i
 		std::regex name_regex;
 		name_regex.assign(mesh_name, std::regex_constants::icase);
 		int changes = 0;
-		const auto component_map = instance_segmentation_annotator_.GetNameToComponentMap();
-		for (auto It = component_map.CreateConstIterator(); It; ++It)
+		for (auto It = instance_segmentation_annotator_.GetNameToComponentMap().CreateConstIterator(); It; ++It)
 		{
 			if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
 				bool success;
@@ -917,8 +916,7 @@ bool ASimModeBase::SetMeshRGBAnnotationID(const std::string& annotation_name, co
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        const auto component_map = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
-        for (auto It = component_map.CreateConstIterator(); It; ++It)
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -966,8 +964,7 @@ bool ASimModeBase::SetMeshRGBAnnotationColor(const std::string& annotation_name,
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        const auto component_map = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
-        for (auto It = component_map.CreateConstIterator(); It; ++It)
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -1010,8 +1007,7 @@ bool ASimModeBase::SetMeshGreyscaleAnnotationValue(const std::string& annotation
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        const auto component_map = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
-        for (auto It = component_map.CreateConstIterator(); It; ++It)
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -1072,8 +1068,7 @@ bool ASimModeBase::SetMeshTextureAnnotationPath(const std::string& annotation_na
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        const auto component_map = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
-        for (auto It = component_map.CreateConstIterator(); It; ++It)
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -1120,8 +1115,7 @@ bool ASimModeBase::EnableMeshTextureAnnotationByPath(const std::string& annotati
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        const auto component_map = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
-        for (auto It = component_map.CreateConstIterator(); It; ++It)
+        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
