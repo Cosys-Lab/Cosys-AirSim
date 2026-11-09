@@ -1416,6 +1416,10 @@ void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
     annotators_.Empty();
 
+    // don't leave getSimMode() pointing at an actor whose world is being torn down
+    if (SIMMODE == this)
+        SIMMODE = nullptr;
+
     Super::EndPlay(EndPlayReason);
 }
 

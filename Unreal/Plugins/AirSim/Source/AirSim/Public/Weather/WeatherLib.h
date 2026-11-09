@@ -178,5 +178,7 @@ public:
     static void setWeatherFog(AExponentialHeightFog* fog);
 
 private:
-    static AExponentialHeightFog* weather_fog_;
+    // Weak: the fog actor belongs to a world that can be torn down (end of PIE, level change)
+    // while this static outlives it; a raw pointer would dangle and crash on the next weather change.
+    static TWeakObjectPtr<AExponentialHeightFog> weather_fog_;
 };
