@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "UnrealSensorTemplate.h"
+#include "UnrealSensors/UnrealSensorTemplate.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "NedTransform.h"

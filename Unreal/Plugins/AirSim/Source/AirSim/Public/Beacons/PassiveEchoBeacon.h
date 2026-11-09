@@ -8,7 +8,7 @@
 #include "NedTransform.h"
 #include "AirBlueprintLib.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "AirLib/include/common/AirSimSettings.hpp"
+#include "common/AirSimSettings.hpp"
 #include "UnrealSensors/UnrealEchoCommon.h"
 
 #include "PassiveEchoBeacon.generated.h"

@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "SkidVehiclePawn.h"
+#include "Vehicles/SkidSteer/SkidVehiclePawn.h"
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/Controller.h"
 #include "Components/TextRenderComponent.h"
@@ -8,7 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Sound/SoundCue.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
-#include "SkidWheel.h"
+#include "Vehicles/SkidSteer/SkidWheel.h"
 #include "AirBlueprintLib.h"
 #include <vector>
 #include "common/common_utils/Utils.hpp"

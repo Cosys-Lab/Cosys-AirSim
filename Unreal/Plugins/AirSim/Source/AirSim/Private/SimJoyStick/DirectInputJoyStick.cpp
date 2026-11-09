@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "DirectInputJoystick.h"
+#include "SimJoyStick/DirectInputJoystick.h"
 #include "Math/UnrealMathUtility.h"
 
 #if defined _WIN32 || defined _WIN64

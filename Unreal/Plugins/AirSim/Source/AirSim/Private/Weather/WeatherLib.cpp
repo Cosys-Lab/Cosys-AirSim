@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "WeatherLib.h"
+#include "Weather/WeatherLib.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"

@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "RecordingThread.h"
+#include "Recording/RecordingThread.h"
 #include "Async/TaskGraphInterfaces.h"
 #include "HAL/RunnableThread.h"
 

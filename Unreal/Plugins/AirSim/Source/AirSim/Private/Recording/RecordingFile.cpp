@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "RecordingFile.h"
+#include "Recording/RecordingFile.h"
 #include "HAL/PlatformFileManager.h"
 #include "Misc/FileHelper.h"
 #include <sstream>

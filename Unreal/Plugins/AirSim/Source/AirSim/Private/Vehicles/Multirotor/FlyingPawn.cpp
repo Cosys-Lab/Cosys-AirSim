@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "FlyingPawn.h"
+#include "Vehicles/Multirotor/FlyingPawn.h"
 #include "Components/StaticMeshComponent.h"
 #include "AirBlueprintLib.h"
 #include "common/CommonStructs.hpp"

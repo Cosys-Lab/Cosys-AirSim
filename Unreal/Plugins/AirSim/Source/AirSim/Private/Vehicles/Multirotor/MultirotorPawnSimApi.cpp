@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "MultirotorPawnSimApi.h"
+#include "Vehicles/Multirotor/MultirotorPawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "vehicles/multirotor/MultiRotorParamsFactory.hpp"
 #include "UnrealSensors/UnrealSensorFactory.h"

@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "SimHUDWidget.h"
+#include "SimHUD/SimHUDWidget.h"
 
 void USimHUDWidget::updateDebugReport(const std::string& text)
 {

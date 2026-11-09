@@ -2,12 +2,12 @@
 // Weichao Qiu @ 2017
 // This class and its functions are derivatives of the work of UnrealCV, https://unrealcv.org/
 // Licensed under the MIT License.
-#include "ObjectAnnotator.h"
+#include "Annotation/ObjectAnnotator.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 #include "SceneInterface.h"
 #include "../Private/ScenePrivate.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "AnnotationComponent.h"
+#include "Annotation/AnnotationComponent.h"
 #include "AirBlueprintLib.h"
 
 // For UE4 < 17

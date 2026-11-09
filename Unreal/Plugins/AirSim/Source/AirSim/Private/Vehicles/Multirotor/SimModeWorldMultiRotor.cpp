@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "SimModeWorldMultiRotor.h"
+#include "Vehicles/Multirotor/SimModeWorldMultiRotor.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Logging/MessageLog.h"
 #include "Engine/World.h"
@@ -8,7 +8,7 @@
 
 #include "AirBlueprintLib.h"
 #include "vehicles/multirotor/api/MultirotorApiBase.hpp"
-#include "MultirotorPawnSimApi.h"
+#include "Vehicles/Multirotor/MultirotorPawnSimApi.h"
 #include "physics/PhysicsBody.hpp"
 #include "common/ClockFactory.hpp"
 #include <memory>

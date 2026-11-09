@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "CarPawn.h"
+#include "Vehicles/Car/CarPawn.h"
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/Controller.h"
 #include "Components/TextRenderComponent.h"
@@ -7,8 +7,8 @@
 #include "Sound/SoundCue.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 
-#include "CarWheelFront.h"
-#include "CarWheelRear.h"
+#include "Vehicles/Car/CarWheelFront.h"
+#include "Vehicles/Car/CarWheelRear.h"
 #include "AirBlueprintLib.h"
 #include <vector>
 #include "common/common_utils/Utils.hpp"

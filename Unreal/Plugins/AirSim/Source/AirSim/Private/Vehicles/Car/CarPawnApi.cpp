@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "CarPawnApi.h"
+#include "Vehicles/Car/CarPawnApi.h"
 #include "AirBlueprintLib.h"
 
 #include "ChaosVehicleManager.h"

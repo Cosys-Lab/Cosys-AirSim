@@ -1,7 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
-#include "CarWheelRear.h"
+#include "Vehicles/Car/CarWheelRear.h"
 //#include "TireConfig.h"
 #include "UObject/ConstructorHelpers.h"
 

@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "MultirotorPawnEvents.h"
+#include "Vehicles/Multirotor/MultirotorPawnEvents.h"
 
 MultirotorPawnEvents::ActuatorsSignal& MultirotorPawnEvents::getActuatorSignal()
 {

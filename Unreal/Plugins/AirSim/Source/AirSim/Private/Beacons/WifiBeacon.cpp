@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "WifiBeacon.h"
+#include "Beacons/WifiBeacon.h"
 #include "AirBlueprintLib.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"

@@ -1,9 +1,9 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "SkidVehiclePawnSimApi.h"
+#include "Vehicles/SkidSteer/SkidVehiclePawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
-#include "SkidVehiclePawnApi.h"
+#include "Vehicles/SkidSteer/SkidVehiclePawnApi.h"
 #include <exception>
 
 using namespace msr::airlib;

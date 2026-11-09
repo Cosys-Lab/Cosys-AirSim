@@ -1,7 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
-#include "SkidWheel.h"
+#include "Vehicles/SkidSteer/SkidWheel.h"
 #include "UObject/ConstructorHelpers.h"
 
 USkidWheel::USkidWheel()

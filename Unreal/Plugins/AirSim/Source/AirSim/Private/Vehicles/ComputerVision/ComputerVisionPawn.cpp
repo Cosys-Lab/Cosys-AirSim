@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "ComputerVisionPawn.h"
+#include "Vehicles/ComputerVision/ComputerVisionPawn.h"
 #include "Engine/World.h"
 #include "ManualPoseController.h"
 

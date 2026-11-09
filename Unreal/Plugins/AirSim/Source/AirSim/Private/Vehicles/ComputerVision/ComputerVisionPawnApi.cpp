@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "ComputerVisionPawnApi.h"
+#include "Vehicles/ComputerVision/ComputerVisionPawnApi.h"
 #include "AirBlueprintLib.h"
 
 ComputerVisionPawnApi::ComputerVisionPawnApi(AComputerVisionPawn* pawn, const msr::airlib::Kinematics::State* pawn_kinematics,

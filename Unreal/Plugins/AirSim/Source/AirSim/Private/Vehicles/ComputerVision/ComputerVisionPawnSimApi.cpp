@@ -1,8 +1,8 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "ComputerVisionPawnSimApi.h"
+#include "Vehicles/ComputerVision/ComputerVisionPawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
-#include "ComputerVisionPawnApi.h"
+#include "Vehicles/ComputerVision/ComputerVisionPawnApi.h"
 #include "vehicles/computervision/api/ComputerVisionApiBase.hpp"
 #include "vehicles/computervision/api/ComputerVisionApi.hpp"
 #include <exception>

@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "SkidVehiclePawnApi.h"
+#include "Vehicles/SkidSteer/SkidVehiclePawnApi.h"
 #include "AirBlueprintLib.h"
 #include "ChaosVehicleManager.h"
 

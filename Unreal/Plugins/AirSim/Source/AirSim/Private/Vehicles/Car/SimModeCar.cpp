@@ -1,10 +1,10 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "SimModeCar.h"
+#include "Vehicles/Car/SimModeCar.h"
 #include "UObject/ConstructorHelpers.h"
 
 #include "AirBlueprintLib.h"
 #include "common/AirSimSettings.hpp"
-#include "CarPawnSimApi.h"
+#include "Vehicles/Car/CarPawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "common/EarthUtils.hpp"

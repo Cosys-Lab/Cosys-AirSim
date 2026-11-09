@@ -1,11 +1,11 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "SimModeSkidVehicle.h"
+#include "Vehicles/SkidSteer/SimModeSkidVehicle.h"
 #include "UObject/ConstructorHelpers.h"
 
 #include "AirBlueprintLib.h"
 #include "common/AirSimSettings.hpp"
-#include "SkidVehiclePawnSimApi.h"
+#include "Vehicles/SkidSteer/SkidVehiclePawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "common/EarthUtils.hpp"

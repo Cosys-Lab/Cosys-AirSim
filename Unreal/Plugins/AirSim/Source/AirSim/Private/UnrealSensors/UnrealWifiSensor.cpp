@@ -2,7 +2,7 @@
 
 #define DRAWDEBUGLINES
 
-#include "UnrealWifiSensor.h"
+#include "UnrealSensors/UnrealWifiSensor.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "NedTransform.h"

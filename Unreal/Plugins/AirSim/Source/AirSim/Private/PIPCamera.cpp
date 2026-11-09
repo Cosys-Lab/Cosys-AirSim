@@ -165,7 +165,7 @@ void APIPCamera::PostInitializeComponents()
         }
     }
     //set initial focal length
-    camera_->CurrentFocalLength = 11.9;
+    camera_->CurrentFocalLength = 11.9f;
 
     FObjectAnnotator::SetViewForAnnotationRender(captures_[Utils::toNumeric(ImageType::Segmentation)]->ShowFlags);
     captures_[Utils::toNumeric(ImageType::Segmentation)]->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
@@ -308,8 +308,8 @@ void APIPCamera::Tick(float DeltaTime)
         this->SetActorRotation(rotator);
     }
     if (sensor_params_.draw_sensor) {
-        UAirBlueprintLib::DrawPoint(this->GetWorld(), this->GetActorTransform().GetLocation(), 5, FColor::Black, false, 0.3);
-        UAirBlueprintLib::DrawCoordinateSystem(this->GetWorld(), this->GetActorLocation(), this->GetActorRotation(), 25, false, 0.3, 10);
+        UAirBlueprintLib::DrawPoint(this->GetWorld(), this->GetActorTransform().GetLocation(), 5, FColor::Black, false, 0.3f);
+        UAirBlueprintLib::DrawCoordinateSystem(this->GetWorld(), this->GetActorLocation(), this->GetActorRotation(), 25, false, 0.3f, 10);
     }
 }
 

@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "UnrealLidarSensor.h"
+#include "UnrealSensors/UnrealLidarSensor.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "Async/ParallelFor.h"

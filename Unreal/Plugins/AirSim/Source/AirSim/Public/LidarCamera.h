@@ -106,10 +106,10 @@ public:
 		float rain_max_intensity_ = 70;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LidarCamera|Sensor")
-		float rain_constant_a_ = 0.01;
+		float rain_constant_a_ = 0.01f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LidarCamera|Sensor")
-		float rain_constant_b_ = 0.6;
+		float rain_constant_b_ = 0.6f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LidarCamera|Sensor")
 		bool ignore_marked_ = false;

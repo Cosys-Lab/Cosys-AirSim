@@ -1,10 +1,10 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "SimModeComputerVision.h"
+#include "Vehicles/ComputerVision/SimModeComputerVision.h"
 #include "UObject/ConstructorHelpers.h"
 
 #include "AirBlueprintLib.h"
 #include "common/AirSimSettings.hpp"
-#include "ComputerVisionPawnSimApi.h"
+#include "Vehicles/ComputerVision/ComputerVisionPawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "common/EarthUtils.hpp"

@@ -1,7 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
-#include "CarWheelFront.h"
+#include "Vehicles/Car/CarWheelFront.h"
 #include "UObject/ConstructorHelpers.h"
 
 UCarWheelFront::UCarWheelFront()

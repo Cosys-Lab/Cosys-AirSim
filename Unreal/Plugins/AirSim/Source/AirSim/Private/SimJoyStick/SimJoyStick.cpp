@@ -1,9 +1,9 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "SimJoyStick.h"
+#include "SimJoyStick/SimJoyStick.h"
 
 #if defined _WIN32 || defined _WIN64
 
-#include "DirectInputJoystick.h"
+#include "SimJoyStick/DirectInputJoystick.h"
 
 struct SimJoyStick::impl
 {

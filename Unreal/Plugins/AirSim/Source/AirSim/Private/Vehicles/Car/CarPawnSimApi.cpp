@@ -1,8 +1,8 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "CarPawnSimApi.h"
+#include "Vehicles/Car/CarPawnSimApi.h"
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
-#include "CarPawnApi.h"
+#include "Vehicles/Car/CarPawnApi.h"
 #include <exception>
 
 using namespace msr::airlib;

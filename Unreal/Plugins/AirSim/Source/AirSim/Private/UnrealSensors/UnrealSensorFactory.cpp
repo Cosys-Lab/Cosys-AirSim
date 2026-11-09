@@ -1,5 +1,5 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
-#include "UnrealSensorFactory.h"
+#include "UnrealSensors/UnrealSensorFactory.h"
 #include "UnrealSensors/UnrealDistanceSensor.h"
 #include "UnrealSensors/UnrealLidarSensor.h"
 #include "UnrealSensors/UnrealGPULidarSensor.h"

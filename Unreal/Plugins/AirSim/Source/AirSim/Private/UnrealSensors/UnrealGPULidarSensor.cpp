@@ -1,6 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
-#include "UnrealGPULidarSensor.h"
+#include "UnrealSensors/UnrealGPULidarSensor.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "NedTransform.h"
