@@ -26,6 +26,8 @@
 #include "Modules/ModuleManager.h"
 #include "AssetRegistry/ARFilter.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "UObject/CoreRedirects.h"
+#include "Misc/PackageName.h"
 #include "DetectionComponent.h"
 #include "Components/LineBatchComponent.h"
 #include "CineCameraComponent.h"
@@ -1031,10 +1033,48 @@ void UAirBlueprintLib::EnableInput(AActor* actor)
     actor->EnableInput(actor->GetWorld()->GetFirstPlayerController());
 }
 
+// Pre-Fab asset paths (/AirSim/<OldFolder>/...) map to their new location through the CoreRedirects in the
+// plugin's Config/DefaultAirSim.ini. Loading by path does not apply class/object redirects for every path
+// form, so when a load fails AirSim applies them itself (e.g. old PawnBP paths in settings.json).
+// Returns the redirected object path, or an empty string when no redirect matches.
+static FString getRedirectedAssetPath(const FString& path)
+{
+    const FCoreRedirectObjectName old_name(FPackageName::ExportTextPathToObjectPath(path));
+
+    for (ECoreRedirectFlags type : { ECoreRedirectFlags::Type_Class, ECoreRedirectFlags::Type_Object }) {
+        const FCoreRedirectObjectName new_name = FCoreRedirects::GetRedirectedName(type, old_name);
+        if (!(new_name == old_name))
+            return new_name.ToString();
+    }
+
+    // package-only redirect: an asset (and its generated _C class) is named after its package
+    const FCoreRedirectObjectName old_package(NAME_None, NAME_None, old_name.PackageName);
+    const FCoreRedirectObjectName new_package = FCoreRedirects::GetRedirectedName(ECoreRedirectFlags::Type_Package, old_package);
+    if (!(new_package == old_package)) {
+        const FString old_short = FPackageName::GetShortName(old_name.PackageName);
+        const FString new_short = FPackageName::GetShortName(new_package.PackageName);
+        FString object = old_name.ObjectName.ToString();
+        if (object.StartsWith(old_short))
+            object = new_short + object.Mid(old_short.Len());
+        return new_package.PackageName.ToString() + TEXT(".") + object;
+    }
+    return FString();
+}
+
 UObject* UAirBlueprintLib::LoadObject(const std::string& name)
 {
     FString str(name.c_str());
     UObject* obj = StaticLoadObject(UObject::StaticClass(), nullptr, *str);
+    if (obj == nullptr) {
+        const FString redirected = getRedirectedAssetPath(str);
+        if (!redirected.IsEmpty()) {
+            obj = StaticLoadObject(UObject::StaticClass(), nullptr, *redirected);
+            UE_LOG(LogTemp, Log, TEXT("AirSim: old asset path %s redirected to %s (%s)"), *str, *redirected, obj ? TEXT("loaded") : TEXT("load failed"));
+        }
+        else {
+            UE_LOG(LogTemp, Warning, TEXT("AirSim: no CoreRedirect found for %s"), *str);
+        }
+    }
     if (obj == nullptr) {
         std::string msg = "Failed to load asset object - " + name;
         FString fmsg(msg.c_str());
@@ -1048,6 +1088,16 @@ UClass* UAirBlueprintLib::LoadClass(const std::string& name)
 {
     FString str(name.c_str());
     UClass* cls = StaticLoadClass(UObject::StaticClass(), nullptr, *str);
+    if (cls == nullptr) {
+        const FString redirected = getRedirectedAssetPath(str);
+        if (!redirected.IsEmpty()) {
+            cls = StaticLoadClass(UObject::StaticClass(), nullptr, *redirected);
+            UE_LOG(LogTemp, Log, TEXT("AirSim: old asset path %s redirected to %s (%s)"), *str, *redirected, cls ? TEXT("loaded") : TEXT("load failed"));
+        }
+        else {
+            UE_LOG(LogTemp, Warning, TEXT("AirSim: no CoreRedirect found for %s"), *str);
+        }
+    }
     if (cls == nullptr) {
         std::string msg = "Failed to load asset class - " + name;
         FString fmsg(msg.c_str());
