@@ -3,8 +3,6 @@
 // Licensed under the MIT License.
 #include "ObjectAnnotator.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
-#include "SceneInterface.h"
-#include "../Private/ScenePrivate.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "AnnotationComponent.h"
 #include "AirBlueprintLib.h"
@@ -74,16 +72,8 @@ void FObjectAnnotator::getPaintableComponentMeshes(AActor* actor, TMap<FString, 
 	int index = 0;
 	for (auto component : paintable_components)
 	{
-		int32 PersistentPrimitiveIndex = component->GetUniqueID();
-		if (const UPrimitiveComponent* PrimitiveComp = Cast<UPrimitiveComponent>(component))
-		{
-			if (const FPrimitiveSceneProxy* SceneProxy = PrimitiveComp->SceneProxy)
-			{
-				int32 PersistentPrimitiveIndexTemp = SceneProxy->GetPrimitiveSceneInfo()->GetPersistentIndex().Index;
-				if (PersistentPrimitiveIndexTemp != -1)
-					PersistentPrimitiveIndex = PersistentPrimitiveIndexTemp;
-			}
-		}
+        // UObject identity remains stable when the render state is recreated.
+        const uint32 PersistentPrimitiveIndex = component->GetUniqueID();
 		if (paintable_components.Num() == 1) {
 			if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
 				if (actor->GetParentActor()) {
@@ -174,16 +164,8 @@ void FObjectAnnotator::getPaintableComponentMeshesAndTags(AActor* actor, TMap<FS
 	int index = 0;
 	for (auto component : paintable_components)
 	{
-		int32 PersistentPrimitiveIndex = component->GetUniqueID();
-		if (const UPrimitiveComponent* PrimitiveComp = Cast<UPrimitiveComponent>(component))
-		{
-			if (const FPrimitiveSceneProxy* SceneProxy = PrimitiveComp->SceneProxy)
-			{
-				int32 PersistentPrimitiveIndexTemp = SceneProxy->GetPrimitiveSceneInfo()->GetPersistentIndex().Index;
-				if (PersistentPrimitiveIndexTemp != -1)
-					PersistentPrimitiveIndex = PersistentPrimitiveIndexTemp;
-			}
-		}
+        // UObject identity remains stable when the render state is recreated.
+        const uint32 PersistentPrimitiveIndex = component->GetUniqueID();
 		if (paintable_components.Num() == 1) {
 			if (UStaticMeshComponent* staticmesh_component = Cast<UStaticMeshComponent>(component)) {
 				if (actor->GetParentActor()) {
@@ -712,28 +694,23 @@ bool FObjectAnnotator::AnnotateNewActorTexture(AActor* actor) {
 
 bool FObjectAnnotator::DeleteActor(AActor* actor)
 {
-	if (actor && IsPaintable(actor)) {
-		TMap<FString, UMeshComponent*> paintable_components_meshes;
-		getPaintableComponentMeshes(actor, &paintable_components_meshes);
-		for (auto it = paintable_components_meshes.CreateConstIterator(); it; ++it)
-		{
-			if (name_to_component_map_.Contains(it.Key())) {
-				component_to_name_map_.Remove(it.Value());
-				check(DeleteComponent(it.Value()));
-				name_to_component_map_.Remove(it.Key());				
-				//UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Deleted object %s."), *name_, *it.Key());
-
-			}
-			else {
-				UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: could not delete object %s."), *name_, *it.Key());
-				return false;
-			}
-		}
-		return true;
-	}
-	else {
-		return false;
-	}
+    if (!IsValid(actor)) return false;
+    TArray<UMeshComponent*> components;
+    actor->GetComponents<UMeshComponent>(components);
+    for (UMeshComponent* component : components) {
+        // Resolve the original registration, not a freshly generated render index.
+        const FString* registered_name = component_to_name_map_.Find(component);
+        if (registered_name == nullptr) continue;
+        const FString component_name = *registered_name;
+        verify(DeleteComponent(component));
+        component_to_name_map_.Remove(component);
+        name_to_component_map_.Remove(component_name);
+        name_to_color_index_map_.Remove(component_name);
+        name_to_gammacorrected_color_map_.Remove(component_name);
+        name_to_value_map_.Remove(component_name);
+        name_to_texture_path_map_.Remove(component_name);
+    }
+    return true;
 }
 
 uint32 FObjectAnnotator::GetComponentIndex(FString component_id)
@@ -1216,7 +1193,7 @@ TArray<TWeakObjectPtr<UPrimitiveComponent>>  FObjectAnnotator::GetAnnotationComp
 
 std::vector<std::string> FObjectAnnotator::GetAllComponentNames() {
 	std::vector<std::string> retval;
-	TMap<FString, uint32> nameToColorIndexMapTemp = name_to_color_index_map_;
+	TMap<FString, UMeshComponent*> nameToColorIndexMapTemp = name_to_component_map_;
 	for (auto const& element : nameToColorIndexMapTemp) {
 		retval.emplace_back(std::string(TCHAR_TO_UTF8(*element.Key)));
 	}
