@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 /*
 // This subroutine has been coded by:
 // Mr. C. Domann

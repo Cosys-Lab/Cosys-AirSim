@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #ifndef air_RpcLibServerBase_hpp
 #define air_RpcLibServerBase_hpp

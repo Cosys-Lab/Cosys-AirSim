@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 /*
 Adopted from SunCalc by Vladimir Agafonkin
 https://github.com/mourner/suncalc

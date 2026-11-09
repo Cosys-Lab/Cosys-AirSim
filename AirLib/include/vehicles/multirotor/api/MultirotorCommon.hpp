@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #ifndef air_DroneCommon_hpp
 #define air_DroneCommon_hpp
 

@@ -208,10 +208,27 @@ if NOT exist %MAVLINK_TARGET_INCLUDE% mkdir %MAVLINK_TARGET_INCLUDE%
 robocopy /MIR MavLinkCom\include %MAVLINK_TARGET_INCLUDE%
 robocopy /MIR MavLinkCom\lib %MAVLINK_TARGET_LIB%
 
-REM //---------- all our output goes to Unreal/Plugin folder ----------
-if NOT exist Unreal\Plugins\AirSim\Source\AirLib mkdir Unreal\Plugins\AirSim\Source\AirLib
-robocopy /MIR AirLib Unreal\Plugins\AirSim\Source\AirLib  /XD temp *. /njh /njs /ndl /np
-copy /y AirSim.props Unreal\Plugins\AirSim\Source\AirLib
+REM //---------- stage everything into the Unreal plugin's Fab-compliant Source layout ----------
+REM //AirLib's own headers ship; its .cpp sources do NOT (the module links the precompiled
+REM //AirLib.lib instead - AIRLIB_HEADER_ONLY guards most of AirLib's own .cpp files down to
+REM //nothing when compiled as part of the UE module anyway, so there is nothing to gain and
+REM //only duplicate-symbol risk to lose by also shipping them).
+set AIRSIM_MODULE=Unreal\Plugins\AirSim\Source\AirSim
+if NOT exist %AIRSIM_MODULE%\Public\AirLib mkdir %AIRSIM_MODULE%\Public\AirLib
+robocopy /MIR AirLib\include %AIRSIM_MODULE%\Public\AirLib /XD temp *. /njh /njs /ndl /np
+if NOT exist %AIRSIM_MODULE%\Lib\AirLib mkdir %AIRSIM_MODULE%\Lib\AirLib
+robocopy /MIR AirLib\lib %AIRSIM_MODULE%\Lib\AirLib /XD temp *. /njh /njs /ndl /np
+
+REM //ThirdParty dependencies
+set THIRDPARTY=Unreal\Plugins\AirSim\Source\ThirdParty
+if NOT exist %THIRDPARTY%\Eigen\Eigen mkdir %THIRDPARTY%\Eigen\Eigen
+robocopy /MIR AirLib\deps\eigen3\Eigen %THIRDPARTY%\Eigen\Eigen /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\rpclib mkdir %THIRDPARTY%\rpclib
+robocopy /MIR AirLib\deps\rpclib\include %THIRDPARTY%\rpclib\include /XD temp *. /njh /njs /ndl /np
+robocopy /MIR AirLib\deps\rpclib\lib %THIRDPARTY%\rpclib\lib /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\MavLinkCom mkdir %THIRDPARTY%\MavLinkCom
+robocopy /MIR AirLib\deps\MavLinkCom\include %THIRDPARTY%\MavLinkCom\include /XD temp *. /njh /njs /ndl /np
+robocopy /MIR AirLib\deps\MavLinkCom\lib %THIRDPARTY%\MavLinkCom\lib /XD temp *. /njh /njs /ndl /np
 
 REM //---------- done building ----------
 exit /b 0

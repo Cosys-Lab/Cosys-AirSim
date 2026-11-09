@@ -158,12 +158,28 @@ cp $build_dir/output/lib/libAirLib.a AirLib/lib
 cp $build_dir/output/lib/libMavLinkCom.a AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/librpc.a AirLib/deps/rpclib/lib/librpc.a
 
-# Update AirLib/lib, AirLib/deps, Plugins folders with new binaries
+# Update AirLib/lib, AirLib/deps staging folders with new binaries
 rsync -a --delete $build_dir/output/lib/ AirLib/lib/x64/$folder_name
 rsync -a --delete external/rpclib/$RPC_VERSION_FOLDER/include AirLib/deps/rpclib
 rsync -a --delete MavLinkCom/include AirLib/deps/MavLinkCom
-rsync -a --delete AirLib Unreal/Plugins/AirSim/Source
-rm -rf Unreal/Plugins/AirSim/Source/AirLib/src
+
+# Stage everything into the Unreal plugin's Fab-compliant Source layout.
+# AirLib's own headers ship; its .cpp sources do NOT (the module links the precompiled
+# AirLib static lib instead - AIRLIB_HEADER_ONLY guards most of AirLib's own .cpp files
+# down to nothing when compiled as part of the UE module anyway, so there is nothing to
+# gain and only duplicate-symbol risk to lose by also shipping them).
+AIRSIM_MODULE=Unreal/Plugins/AirSim/Source/AirSim
+mkdir -p "$AIRSIM_MODULE/Public/AirLib" "$AIRSIM_MODULE/Lib/AirLib"
+rsync -a --delete AirLib/include/ "$AIRSIM_MODULE/Public/AirLib/"
+rsync -a --delete AirLib/lib/ "$AIRSIM_MODULE/Lib/AirLib/"
+
+THIRDPARTY=Unreal/Plugins/AirSim/Source/ThirdParty
+mkdir -p "$THIRDPARTY/Eigen/Eigen" "$THIRDPARTY/rpclib" "$THIRDPARTY/MavLinkCom"
+rsync -a --delete AirLib/deps/eigen3/Eigen/ "$THIRDPARTY/Eigen/Eigen/"
+rsync -a --delete AirLib/deps/rpclib/include "$THIRDPARTY/rpclib/"
+rsync -a --delete AirLib/deps/rpclib/lib "$THIRDPARTY/rpclib/"
+rsync -a --delete AirLib/deps/MavLinkCom/include "$THIRDPARTY/MavLinkCom/"
+rsync -a --delete AirLib/deps/MavLinkCom/lib "$THIRDPARTY/MavLinkCom/"
 
 set +x
 

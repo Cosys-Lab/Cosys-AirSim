@@ -1,4 +1,4 @@
-// Developed by Cosys-Lab, University of Antwerp
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #ifndef msr_airlib_MarLocUwb_hpp
 #define msr_airlib_MarLocUwb_hpp

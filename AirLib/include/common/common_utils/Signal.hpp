@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #ifndef common_utils_Signal_hpp
 #define common_utils_Signal_hpp
 
