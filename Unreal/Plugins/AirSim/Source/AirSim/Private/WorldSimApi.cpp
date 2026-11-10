@@ -10,6 +10,9 @@
 #include "Runtime/Engine/Classes/Engine/Engine.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Misc/FileHelper.h"
+#include "Misc/PackageName.h"
+#include "Engine/Blueprint.h"
+#include "Engine/BlueprintGeneratedClass.h"
 #include "ImageUtils.h"
 #include <cstdlib>
 #include <ctime>
@@ -95,6 +98,11 @@ std::string WorldSimApi::spawnObject(const std::string& object_name, const std::
 {
     FString asset_name(load_object.c_str());
     FAssetData* load_asset = simmode_->asset_map.Find(asset_name);
+    // blueprints can also be requested by their generated class name (MyBlueprint_C)
+    if (load_asset == nullptr && asset_name.EndsWith(TEXT("_C"))) {
+        asset_name.LeftChopInline(2);
+        load_asset = simmode_->asset_map.Find(asset_name);
+    }
 
     if (load_asset == nullptr || !load_asset->IsValid()) {
         throw std::invalid_argument("There were no objects with name " + load_object + " found in the Registry");
@@ -104,9 +112,28 @@ std::string WorldSimApi::spawnObject(const std::string& object_name, const std::
     FTransform actor_transform = simmode_->getGlobalNedTransform().fromGlobalNed(pose);
 
     bool spawned_object = false;
+    std::string load_error;
     std::string final_object_name = object_name;
 
-    UAirBlueprintLib::RunCommandOnGameThread([this, load_asset, &final_object_name, &spawned_object, &actor_transform, &scale, &physics_enabled, &is_blueprint]() {
+    UAirBlueprintLib::RunCommandOnGameThread([this, load_asset, &load_object, &load_error, &final_object_name, &spawned_object, &actor_transform, &scale, &physics_enabled, &is_blueprint]() {
+        // resolve the asset first, exceptions cannot be thrown from the game thread task
+        UClass* actor_class = nullptr;
+        UStaticMesh* static_mesh = nullptr;
+        if (is_blueprint) {
+            actor_class = resolveBlueprintClass(*load_asset);
+            if (actor_class == nullptr) {
+                load_error = "Asset " + load_object + " is not a blueprint actor that can be spawned (or it was not cooked into this build)";
+                return;
+            }
+        }
+        else {
+            static_mesh = Cast<UStaticMesh>(load_asset->GetAsset());
+            if (static_mesh == nullptr) {
+                load_error = "Asset " + load_object + " is not a static mesh, set is_blueprint to true to spawn a blueprint";
+                return;
+            }
+        }
+
         // Ensure new non-matching name for the object
         std::vector<std::string> matching_names = UAirBlueprintLib::ListMatchingActors(simmode_, ".*" + final_object_name + ".*");
         if (matching_names.size() > 0) {
@@ -125,12 +152,10 @@ std::string WorldSimApi::spawnObject(const std::string& object_name, const std::
 
         AActor* NewActor;
         if (is_blueprint) {
-            UBlueprint* LoadObject = Cast<UBlueprint>(load_asset->GetAsset());
-            NewActor = this->createNewBPActor(new_actor_spawn_params, actor_transform, scale, LoadObject);
+            NewActor = this->createNewBPActor(new_actor_spawn_params, actor_transform, scale, actor_class);
         }
         else {
-            UStaticMesh* LoadObject = dynamic_cast<UStaticMesh*>(load_asset->GetAsset());
-            NewActor = this->createNewStaticMeshActor(new_actor_spawn_params, actor_transform, scale, LoadObject);
+            NewActor = this->createNewStaticMeshActor(new_actor_spawn_params, actor_transform, scale, static_mesh);
         }
 
         if (IsValid(NewActor)) {
@@ -150,10 +175,14 @@ std::string WorldSimApi::spawnObject(const std::string& object_name, const std::
             }
         }
 
-        UAirBlueprintLib::setSimulatePhysics(NewActor, physics_enabled);
+        if (IsValid(NewActor))
+            UAirBlueprintLib::setSimulatePhysics(NewActor, physics_enabled);
     },
                                              true);
 
+    if (!load_error.empty()) {
+        throw std::invalid_argument(load_error);
+    }
     if (!spawned_object) {
         throw std::invalid_argument(
             "Engine could not spawn " + load_object + " because of a stale reference of same name");
@@ -178,10 +207,39 @@ AActor* WorldSimApi::createNewStaticMeshActor(const FActorSpawnParameters& spawn
     return NewActor;
 }
 
-AActor* WorldSimApi::createNewBPActor(const FActorSpawnParameters& spawn_params, const FTransform& actor_transform, const Vector3r& scale, UBlueprint* blueprint)
+UClass* WorldSimApi::resolveBlueprintClass(const FAssetData& asset)
 {
-    UClass* new_bp = static_cast<UClass*>(blueprint->GeneratedClass);
-    AActor* new_actor = simmode_->GetWorld()->SpawnActor<AActor>(new_bp, FVector::ZeroVector, FRotator::ZeroRotator, spawn_params);
+    // In packaged builds the UBlueprint asset itself is editor-only data and does not exist, only its
+    // generated class (MyBlueprint_C) does. So resolve the class instead of loading the blueprint.
+    UClass* actor_class = nullptr;
+    if (asset.IsInstanceOf(UBlueprintGeneratedClass::StaticClass())) {
+        actor_class = Cast<UClass>(asset.GetAsset());
+    }
+    if (actor_class == nullptr) {
+        FString generated_class_path;
+        if (asset.GetTagValue(FBlueprintTags::GeneratedClassPath, generated_class_path) && !generated_class_path.IsEmpty()) {
+            actor_class = FSoftClassPath(FPackageName::ExportTextPathToObjectPath(generated_class_path)).TryLoadClass<AActor>();
+        }
+    }
+    if (actor_class == nullptr) {
+        actor_class = StaticLoadClass(AActor::StaticClass(), nullptr, *(asset.GetObjectPathString() + TEXT("_C")), nullptr, LOAD_Quiet | LOAD_NoWarn);
+    }
+#if WITH_EDITOR
+    if (actor_class == nullptr) {
+        if (UBlueprint* blueprint = Cast<UBlueprint>(asset.GetAsset()))
+            actor_class = blueprint->GeneratedClass;
+    }
+#endif
+    if (actor_class != nullptr && !actor_class->IsChildOf(AActor::StaticClass()))
+        actor_class = nullptr;
+    return actor_class;
+}
+
+AActor* WorldSimApi::createNewBPActor(const FActorSpawnParameters& spawn_params, const FTransform& actor_transform, const Vector3r& scale, UClass* actor_class)
+{
+    if (actor_class == nullptr)
+        return nullptr;
+    AActor* new_actor = simmode_->GetWorld()->SpawnActor<AActor>(actor_class, FVector::ZeroVector, FRotator::ZeroRotator, spawn_params);
 
     if (new_actor) {
         new_actor->SetActorLocationAndRotation(actor_transform.GetLocation(), actor_transform.GetRotation(), false, nullptr, ETeleportType::TeleportPhysics);

@@ -767,11 +767,13 @@ class VehicleClient:
 
         Args:
             object_name (str): Desired name of the new object.
-            asset_name (str): Name of the asset (mesh) in the project database.
+            asset_name (str): Name of the asset (static mesh or blueprint) as listed by simListAssets(), for example 'BP_PointLight'.
+                For blueprints the generated class name ('BP_PointLight_C') is accepted as well.
             pose (Pose): Desired pose of the object.
             scale (Vector3r): Desired scale of the object.
             physics_enabled (bool, optional): Whether to enable physics for the object.
-            is_blueprint (bool, optional): Whether to spawn a blueprint or an actor.
+            is_blueprint (bool, optional): True to spawn a blueprint actor, False to spawn a static mesh.
+                In a packaged build the blueprint has to be cooked, see the API documentation.
 
         Returns:
             str: Name of the spawned object, in case it had to be modified.

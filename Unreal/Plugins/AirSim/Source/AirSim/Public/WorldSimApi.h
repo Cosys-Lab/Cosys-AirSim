@@ -148,7 +148,8 @@ public:
 
 private:
     AActor* createNewStaticMeshActor(const FActorSpawnParameters& spawn_params, const FTransform& actor_transform, const Vector3r& scale, UStaticMesh* static_mesh);
-    AActor* createNewBPActor(const FActorSpawnParameters& spawn_params, const FTransform& actor_transform, const Vector3r& scale, UBlueprint* blueprint);
+    AActor* createNewBPActor(const FActorSpawnParameters& spawn_params, const FTransform& actor_transform, const Vector3r& scale, UClass* actor_class);
+    static UClass* resolveBlueprintClass(const FAssetData& asset);
     void spawnPlayer();
 
 private:

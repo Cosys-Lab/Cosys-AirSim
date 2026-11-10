@@ -1,6 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #include "AirBlueprintLib.h"
+#include "Engine/BlueprintGeneratedClass.h"
 #include "GameFramework/WorldSettings.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkinnedMeshComponent.h"
@@ -407,6 +408,8 @@ void UAirBlueprintLib::GenerateAssetRegistryMap(const UObject* context, TMap<FSt
         FARFilter Filter;
         Filter.ClassPaths.Add(UStaticMesh::StaticClass()->GetClassPathName());
         Filter.ClassPaths.Add(UBlueprint::StaticClass()->GetClassPathName());
+        // cooked builds can list blueprints by their generated class
+        Filter.ClassPaths.Add(UBlueprintGeneratedClass::StaticClass()->GetClassPathName());
         Filter.bRecursivePaths = true;
 
         auto world = context->GetWorld();
@@ -419,6 +422,12 @@ void UAirBlueprintLib::GenerateAssetRegistryMap(const UObject* context, TMap<FSt
         UObject* LoadObject = NULL;
         for (const auto& asset : AssetData) {
             FString asset_name = asset.AssetName.ToString();
+            if (asset.IsInstanceOf(UBlueprintGeneratedClass::StaticClass())) {
+                // list the generated class under the blueprint name, unless the blueprint itself is listed
+                asset_name.RemoveFromEnd(TEXT("_C"));
+                if (asset_map.Contains(asset_name))
+                    continue;
+            }
             asset_map.Add(asset_name, asset);
         }
 

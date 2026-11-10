@@ -20,6 +20,7 @@
 * Fixed a crash in annotation system. [#174 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/174).
 * Fixed annotated mesh names changing during their lifetime. [#175 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/175).
 * Fixed a crash (IsInGameThread assertion) when calling the annotation and instance segmentation API, for example `simSetAnnotationObjectValue`, while the simulation runs. These calls now run on the game thread, which also makes calls with a regular expression much faster. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
+* Fixed `simSpawnObject` crashing with blueprints in packaged builds, it now loads the generated class of the blueprint. Blueprint names with the `_C` suffix are accepted as well and a wrong asset type now gives an error instead of a crash. [#124 by MACILLAS](https://github.com/Cosys-Lab/Cosys-AirSim/issues/124).
 
 ### September 2026 (version 3.5)
 * Added API functionality to change pose of several sensor types (LiDAR, GPULiDAR, Echo & DistanceSensor).
