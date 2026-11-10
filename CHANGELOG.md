@@ -11,6 +11,7 @@
 * Updated Magnetometer to now use World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. See the sensors documentation for more info. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
 * Updated LiDAR to improve performance by casting each tick's rays in one parallel batch. [#170 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/170).
 * Updated annotation system refresh speed for instance segmentation. [#172 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/172).
+* Updated the Python client to raise a `TypeError` when the `drivetrain` or `yaw_mode` argument of the `move*` APIs has the wrong type, for example a `YawMode` passed as `drivetrain`. Before, the simulator rejected the call without the error being shown by `join()`, so the command seemed to do nothing. [#125 by ZhengXinyue](https://github.com/Cosys-Lab/Cosys-AirSim/issues/125).
 * Fixed data races in the ROS2 node with multi-threaded callbacks. Based on work by [Krikler](https://github.com/Krikler).
 * Fixed a crash when applying weather settings after a previous play session, and the weather menu not closing.
 * Fixed Dust and Fog weather effects not showing in the Blocks environment.
