@@ -22,6 +22,7 @@
 * Fixed a crash (IsInGameThread assertion) when calling the annotation and instance segmentation API, for example `simSetAnnotationObjectValue`, while the simulation runs. These calls now run on the game thread, which also makes calls with a regular expression much faster. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
 * Fixed `simSpawnObject` crashing with blueprints in packaged builds, it now loads the generated class of the blueprint. Blueprint names with the `_C` suffix are accepted as well and a wrong asset type now gives an error instead of a crash. [#124 by MACILLAS](https://github.com/Cosys-Lab/Cosys-AirSim/issues/124).
 * Fixed annotation and instance segmentation updates not being applied, or applied to the wrong mesh, for meshes of child actors and for objects or layers with similar names. Also fixed the example scripts, the ROS1 ground truth map and the MATLAB `getInstanceSegmentationLUT` looking up the colormap by list position instead of by object ID. [#109 by ssaigarimella](https://github.com/Cosys-Lab/Cosys-AirSim/issues/109), [#107 by MahmoudAmer96](https://github.com/Cosys-Lab/Cosys-AirSim/issues/107).
+* Fixed PX4 lockstep never being enabled because the `LockStep` setting was cleared when the connection was opened. [#129 by yalindem](https://github.com/Cosys-Lab/Cosys-AirSim/issues/129).
 
 ### September 2026 (version 3.5)
 * Added API functionality to change pose of several sensor types (LiDAR, GPULiDAR, Echo & DistanceSensor).

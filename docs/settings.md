@@ -596,7 +596,7 @@ The defaults for PX4 is to enable hardware-in-loop setup. There are various othe
 "Vehicles": {
     "PX4": {
       "VehicleType": "PX4Multirotor",
-      "Lockstep": true,
+      "LockStep": true,
       "ControlIp": "127.0.0.1",
       "ControlPortLocal": 14540,
       "ControlPortRemote": 14580,
