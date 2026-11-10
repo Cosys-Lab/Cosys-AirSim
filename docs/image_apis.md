@@ -223,7 +223,7 @@ By default, every image requested through the API is copied from the GPU with a 
 airsim.AsyncCaptureReadback 1
 ```
 
-The image is then copied without stalling the render thread and the request completes once the copy is available, typically one frame later. This applies to uncompressed and compressed 8-bit images and to float images; other render target formats keep using the blocking path. If a copy does not complete within 600 frames (e.g. after a lost GPU device), the request returns an empty image (width and height 0) instead of blocking forever. Set it back to `0` for the default behavior.
+The image is then copied without stalling the render thread and the request completes once the copy is available, typically one frame later. This applies to uncompressed and compressed 8-bit images and to float images. If a copy does not complete within 600 frames (e.g. after a lost GPU device), the request returns an empty image (width and height 0) instead of blocking forever. Set it back to `0` for the default behavior.
 
 ## What Does Pixel Values Mean in Different Image Types?
 ### Available ImageType Values
