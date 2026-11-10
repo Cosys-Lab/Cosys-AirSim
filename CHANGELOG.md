@@ -19,6 +19,7 @@
 * Fixed `euler_to_rotation_matrix` in the Python client using half angles and the wrong composition order (it now matches `euler_to_quaternion`). [#173 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/173).
 * Fixed a crash in annotation system. [#174 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/174).
 * Fixed annotated mesh names changing during their lifetime. [#175 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/175).
+* Fixed a crash (IsInGameThread assertion) when calling the annotation and instance segmentation API, for example `simSetAnnotationObjectValue`, while the simulation runs. These calls now run on the game thread, which also makes calls with a regular expression much faster. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
 
 ### September 2026 (version 3.5)
 * Added API functionality to change pose of several sensor types (LiDAR, GPULiDAR, Echo & DistanceSensor).

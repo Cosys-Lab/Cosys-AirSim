@@ -1284,7 +1284,7 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
     UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
         UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
         }, true);
-    if (cameras_found.Num() >= 0) {
+    if (cameras_found.Num() > 0) {
         for (auto camera_actor : cameras_found) {
             APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
             cur_camera->updateInstanceSegmentationAnnotation(current_segmentation_components, new_segmentation_components, refresh_serial);
@@ -1294,7 +1294,7 @@ void ASimModeBase::updateInstanceSegmentationAnnotation() {
     UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
         UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
         }, true);
-    if (cameras_found.Num() >= 0) {
+    if (lidar_cameras_found.Num() > 0) {
         for (auto lidar_camera_actor : lidar_cameras_found) {
             ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
             if(cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_)
@@ -1324,8 +1324,7 @@ void ASimModeBase::updateAnnotation(FString annotation_name) {
         UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
             UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
             }, true);
-        UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
-        if (cameras_found.Num() >= 0) {
+        if (cameras_found.Num() > 0) {
             for (auto camera_actor : cameras_found) {
                 APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
                 cur_camera->updateAnnotation(current_annotation_components, annotation_name);
@@ -1335,8 +1334,7 @@ void ASimModeBase::updateAnnotation(FString annotation_name) {
         UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
             UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
             }, true);
-        UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
-        if (cameras_found.Num() >= 0) {
+        if (lidar_cameras_found.Num() > 0) {
             for (auto lidar_camera_actor : lidar_cameras_found) {
                 ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
                 if (!cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_ && cur_lidar_camera->annotation_name_ == annotation_name)

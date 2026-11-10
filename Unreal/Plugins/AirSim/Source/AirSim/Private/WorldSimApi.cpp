@@ -303,57 +303,101 @@ bool WorldSimApi::addVehicle(const std::string& vehicle_name, const std::string&
 
 bool WorldSimApi::setSegmentationObjectID(const std::string& mesh_name, int object_id, bool is_name_regex)
 {
-	return simmode_->SetMeshInstanceSegmentationID(mesh_name, object_id, is_name_regex);
+    bool result = false;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->SetMeshInstanceSegmentationID(mesh_name, object_id, is_name_regex);
+    }, true);
+    return result;
 }
 
 int WorldSimApi::getSegmentationObjectID(const std::string& mesh_name) const
 {
-	return simmode_->GetMeshInstanceSegmentationID(mesh_name);
+    int result = -1;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetMeshInstanceSegmentationID(mesh_name);
+    }, true);
+    return result;
 }
 
 bool WorldSimApi::setAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name, int object_id, bool is_name_regex)
 {
-    return simmode_->SetMeshRGBAnnotationID(annotation_name, mesh_name, object_id, is_name_regex);
+    bool result = false;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->SetMeshRGBAnnotationID(annotation_name, mesh_name, object_id, is_name_regex);
+    }, true);
+    return result;
 }
 
 int WorldSimApi::getAnnotationObjectID(const std::string& annotation_name, const std::string& mesh_name) const
 {
-    return simmode_->GetMeshRGBAnnotationID(annotation_name, mesh_name);
+    int result = -1;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetMeshRGBAnnotationID(annotation_name, mesh_name);
+    }, true);
+    return result;
 }
 
 bool WorldSimApi::setAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name, int r, int g, int b, bool is_name_regex)
 {
-    return simmode_->SetMeshRGBAnnotationColor(annotation_name, mesh_name, r, g, b, is_name_regex);
+    bool result = false;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->SetMeshRGBAnnotationColor(annotation_name, mesh_name, r, g, b, is_name_regex);
+    }, true);
+    return result;
 }
 
 std::string WorldSimApi::getAnnotationObjectColor(const std::string& annotation_name, const std::string& mesh_name) const
 {
-    return simmode_->GetMeshRGBAnnotationColor(annotation_name, mesh_name);
+    std::string result;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetMeshRGBAnnotationColor(annotation_name, mesh_name);
+    }, true);
+    return result;
 }
 
 bool WorldSimApi::setAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name, float greyscale_value, bool is_name_regex)
 {
-    return simmode_->SetMeshGreyscaleAnnotationValue(annotation_name, mesh_name, greyscale_value, is_name_regex);
+    bool result = false;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->SetMeshGreyscaleAnnotationValue(annotation_name, mesh_name, greyscale_value, is_name_regex);
+    }, true);
+    return result;
 }
 
 float WorldSimApi::getAnnotationObjectValue(const std::string& annotation_name, const std::string& mesh_name) const
 {
-    return simmode_->GetMeshGreyscaleAnnotationValue(annotation_name, mesh_name);
+    float result = 0.0f;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetMeshGreyscaleAnnotationValue(annotation_name, mesh_name);
+    }, true);
+    return result;
 }
 
 bool WorldSimApi::setAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, const std::string& texture_path, bool is_name_regex)
 {
-    return simmode_->SetMeshTextureAnnotationPath(annotation_name, mesh_name, texture_path, is_name_regex);
+    bool result = false;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->SetMeshTextureAnnotationPath(annotation_name, mesh_name, texture_path, is_name_regex);
+    }, true);
+    return result;
 }
 
 bool WorldSimApi::enableAnnotationObjectTextureByPath(const std::string& annotation_name, const std::string& mesh_name, bool is_name_regex)
 {
-    return simmode_->EnableMeshTextureAnnotationByPath(annotation_name, mesh_name, is_name_regex);
+    bool result = false;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->EnableMeshTextureAnnotationByPath(annotation_name, mesh_name, is_name_regex);
+    }, true);
+    return result;
 }
 
 std::string WorldSimApi::getAnnotationObjectTexturePath(const std::string& annotation_name, const std::string& mesh_name) const
 {
-    return simmode_->GetMeshTextureAnnotationPath(annotation_name, mesh_name);
+    std::string result;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetMeshTextureAnnotationPath(annotation_name, mesh_name);
+    }, true);
+    return result;
 }
 
 bool WorldSimApi::setWorldLightVisibility(const std::string& light_name, bool is_visible)
@@ -415,27 +459,47 @@ bool WorldSimApi::runConsoleCommand(const std::string& command)
 
 std::vector<std::string> WorldSimApi::listInstanceSegmentationObjects() const
 {
-    return simmode_->GetAllInstanceSegmentationMeshIDs();
+    std::vector<std::string> result;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetAllInstanceSegmentationMeshIDs();
+    }, true);
+    return result;
 }
 
 std::vector<msr::airlib::Vector3r> WorldSimApi::getInstanceSegmentationColorMap() const
 {
-    return simmode_->GetInstanceSegmentationColorMap();
+    std::vector<msr::airlib::Vector3r> result;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetInstanceSegmentationColorMap();
+    }, true);
+    return result;
 }
 
 std::vector <msr::airlib::Pose> WorldSimApi::listInstanceSegmentationPoses(bool ned, bool only_visible) const
 {
-    return simmode_->GetAllInstanceSegmentationMeshPoses(ned, only_visible);
+    std::vector <msr::airlib::Pose> result;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetAllInstanceSegmentationMeshPoses(ned, only_visible);
+    }, true);
+    return result;
 }
 
 std::vector<std::string> WorldSimApi::listAnnotationObjects(const std::string& annotation_name) const
 {
-    return simmode_->GetAllAnnotationMeshIDs(annotation_name);
+    std::vector<std::string> result;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetAllAnnotationMeshIDs(annotation_name);
+    }, true);
+    return result;
 }
 
 std::vector <msr::airlib::Pose> WorldSimApi::listAnnotationPoses(const std::string& annotation_name, bool ned, bool only_visible) const
 {
-    return simmode_->GetAllAnnotationMeshPoses(annotation_name, ned, only_visible);
+    std::vector <msr::airlib::Pose> result;
+    UAirBlueprintLib::RunCommandOnGameThread([&]() {
+        result = simmode_->GetAllAnnotationMeshPoses(annotation_name, ned, only_visible);
+    }, true);
+    return result;
 }
 
 WorldSimApi::Pose WorldSimApi::getObjectPose(const std::string& object_name, bool ned) const
@@ -1124,8 +1188,8 @@ std::vector<msr::airlib::DetectionInfo> WorldSimApi::getDetections(ImageCaptureB
 
     const APIPCamera* camera = simmode_->getCamera(camera_details);
     const NedTransform& ned_transform = simmode_->getVehicleSimApi(camera_details.vehicle_name)->getNedTransform();
-    TMap<UMeshComponent*, FString> component_to_name_map = simmode_->GetInstanceSegmentationComponentToNameMap();
-    UAirBlueprintLib::RunCommandOnGameThread([camera, image_type, component_to_name_map , &result, &ned_transform, annotation_name]() {
+    UAirBlueprintLib::RunCommandOnGameThread([this, camera, image_type, &result, &ned_transform, annotation_name]() {
+        const TMap<UMeshComponent*, FString> component_to_name_map = simmode_->GetInstanceSegmentationComponentToNameMap();
         const TArray<FDetectionInfo>& detections = camera->getDetectionComponent(image_type, false, annotation_name)->getDetections(component_to_name_map);
         result.resize(detections.Num());
 
