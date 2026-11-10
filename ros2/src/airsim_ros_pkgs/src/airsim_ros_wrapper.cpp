@@ -1265,15 +1265,19 @@ msr::airlib::GeoPoint AirsimROSWrapper::get_origin_geo_point() const
     return geo_point.home_geo_point;
 }
 
+// Velocity commands use the same ROS convention as the published odometry: the world frame is the NED frame with
+// y and z flipped (x north, y west, z up) and the body frame is x forward, y left, z up. Positive yaw rate turns
+// counterclockwise seen from above. AirSim itself uses NED/FRD, so y, z and the yaw rate are negated here.
 VelCmd AirsimROSWrapper::get_airlib_world_vel_cmd(const airsim_interfaces::msg::VelCmd& msg) const
 {
     VelCmd vel_cmd;
     vel_cmd.x = msg.twist.linear.x;
-    vel_cmd.y = msg.twist.linear.y;
-    vel_cmd.z = msg.twist.linear.z;
+    vel_cmd.y = -msg.twist.linear.y;
+    vel_cmd.z = -msg.twist.linear.z;
     vel_cmd.drivetrain = msr::airlib::DrivetrainType::MaxDegreeOfFreedom;
     vel_cmd.yaw_mode.is_rate = true;
-    vel_cmd.yaw_mode.yaw_or_rate = math_common::rad2deg(msg.twist.angular.z);
+    // airsim uses degrees
+    vel_cmd.yaw_mode.yaw_or_rate = -math_common::rad2deg(msg.twist.angular.z);
     return vel_cmd;
 }
 
@@ -1281,16 +1285,20 @@ VelCmd AirsimROSWrapper::get_airlib_body_vel_cmd(const airsim_interfaces::msg::V
 {
     VelCmd vel_cmd;
     double roll, pitch, yaw;
-    tf2::Matrix3x3(get_tf2_quat(airlib_quat)).getRPY(roll, pitch, yaw); // ros uses xyzw
+    tf2::Matrix3x3(get_tf2_quat(airlib_quat)).getRPY(roll, pitch, yaw); // ros uses xyzw, yaw is the NED heading
 
-    // todo do actual body frame?
-    vel_cmd.x = (msg.twist.linear.x * cos(yaw)) - (msg.twist.linear.y * sin(yaw)); //body frame assuming zero pitch roll
-    vel_cmd.y = (msg.twist.linear.x * sin(yaw)) + (msg.twist.linear.y * cos(yaw)); //body frame
-    vel_cmd.z = msg.twist.linear.z;
+    // body frame x forward, y left, z up to forward, right, down
+    const double forward = msg.twist.linear.x;
+    const double right = -msg.twist.linear.y;
+    const double down = -msg.twist.linear.z;
+    // rotate to NED assuming zero pitch and roll
+    vel_cmd.x = (forward * cos(yaw)) - (right * sin(yaw));
+    vel_cmd.y = (forward * sin(yaw)) + (right * cos(yaw));
+    vel_cmd.z = down;
     vel_cmd.drivetrain = msr::airlib::DrivetrainType::MaxDegreeOfFreedom;
     vel_cmd.yaw_mode.is_rate = true;
     // airsim uses degrees
-    vel_cmd.yaw_mode.yaw_or_rate = math_common::rad2deg(msg.twist.angular.z);
+    vel_cmd.yaw_mode.yaw_or_rate = -math_common::rad2deg(msg.twist.angular.z);
 
     return vel_cmd;
 }

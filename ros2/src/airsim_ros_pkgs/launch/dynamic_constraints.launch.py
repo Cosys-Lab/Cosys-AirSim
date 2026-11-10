@@ -34,11 +34,11 @@ def generate_launch_description():
         default_value='-320.0'),
 
         DeclareLaunchArgument(
-        "gimbal_front_center_min_yaw",
+        "gimbal_front_center_max_roll",
         default_value='20.0'),
 
         DeclareLaunchArgument(
-        "gimbal_front_center_min_yaw",
+        "gimbal_front_center_min_roll",
         default_value='-20.0')
 
     ])
