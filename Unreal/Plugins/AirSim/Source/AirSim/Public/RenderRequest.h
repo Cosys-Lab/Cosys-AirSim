@@ -6,6 +6,7 @@
 #include "common/WorkerThread.hpp"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/GameViewportClient.h"
+#include "RHIGPUReadback.h"
 #include <memory>
 #include "common/Common.hpp"
 
@@ -39,7 +40,23 @@ public:
     };
 
 private:
+    // One in-flight GPU->CPU copy of a capture (asynchronous readback, see airsim.AsyncCaptureReadback).
+    struct AsyncReadbackItem {
+        std::shared_ptr<RenderParams> params;
+        std::shared_ptr<RenderResult> result;
+        TUniquePtr<FRHIGPUTextureReadback> readback;
+        bool done = false;
+    };
+
     static FReadSurfaceDataFlags setupRenderResource(const FTextureRenderTargetResource* rt_resource, const RenderParams* params, RenderResult* result, FIntPoint& size);
+    static void copyReadbackToResult(AsyncReadbackItem& item);
+    void pollAsyncReadbacks_RenderThread();
+
+    // render thread only: readbacks of the current request still in flight, and the end-of-frame hook
+    // that polls them (registered only while readbacks are pending, removed before signalling)
+    TArray<AsyncReadbackItem> pending_readbacks_;
+    uint32 readback_frames_waited_ = 0;
+    FDelegateHandle readback_poll_handle_;
 
     std::shared_ptr<RenderParams>* params_;
     std::shared_ptr<RenderResult>* results_;
@@ -55,6 +72,10 @@ private:
 public:
     RenderRequest(UGameViewportClient * game_viewport, std::function<void()>&& query_camera_pose_cb);
     ~RenderRequest();
+    // not copyable: owns in-flight GPU readbacks and a viewport hook (and the exported class would
+    // otherwise get an implicitly generated copy constructor)
+    RenderRequest(const RenderRequest&) = delete;
+    RenderRequest& operator=(const RenderRequest&) = delete;
 
     // read pixels from render target using render thread, then compress the result into PNG
     // argument on the thread that calls this method.
