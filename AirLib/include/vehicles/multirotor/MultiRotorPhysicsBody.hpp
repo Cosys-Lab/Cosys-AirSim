@@ -194,8 +194,13 @@ namespace airlib
             //Drone is seen as central body that is connected to propellers via arm. We approximate central body as box of size x, y, z.
             //The drag depends on area exposed so we also add area of propellers to approximate drag they may introduce due to their area.
             //while moving along any axis, we find area that will be exposed in that direction
-            real_T propeller_area = M_PIf * params.rotor_params.propeller_diameter * params.rotor_params.propeller_diameter;
-            real_T propeller_xsection = M_PIf * params.rotor_params.propeller_diameter * params.rotor_params.propeller_height;
+            //The rotor disc area (pi*d^2/4) and side area (d*h) are scaled with rotor_disc_drag_factor and rotor_side_drag_factor,
+            //see MultiRotorParams. The multiplication order keeps the defaults bit-identical to the previous model.
+            const real_T propeller_diameter = params.rotor_params.propeller_diameter;
+            const real_T propeller_height = params.rotor_params.propeller_height;
+            const real_T propeller_disc_area = M_PIf * propeller_diameter * propeller_diameter / 4.0f;
+            real_T propeller_area = propeller_disc_area * params.rotor_disc_drag_factor;
+            real_T propeller_xsection = params.rotor_side_drag_factor * propeller_diameter * propeller_height;
 
             real_T top_bottom_area = params.body_box.x() * params.body_box.y();
             real_T left_right_area = params.body_box.x() * params.body_box.z();
