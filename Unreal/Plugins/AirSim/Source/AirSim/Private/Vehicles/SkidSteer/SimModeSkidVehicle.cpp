@@ -98,7 +98,8 @@ void ASimModeSkidVehicle::getExistingVehiclePawns(TArray<AActor*>& pawns) const
 bool ASimModeSkidVehicle::isVehicleTypeSupported(const std::string& vehicle_type) const
 {
 	return ((vehicle_type == AirSimSettings::kVehicleTypeCPHusky) ||
-		(vehicle_type == AirSimSettings::kVehicleTypePioneer));
+		(vehicle_type == AirSimSettings::kVehicleTypePioneer) ||
+		(vehicle_type == AirSimSettings::kVehicleTypeArduRover));
 }
 
 std::string ASimModeSkidVehicle::getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const
