@@ -22,6 +22,7 @@ import tf
 import tf2_msgs
 from multiprocessing import Queue
 import rosbag
+import json
 from datetime import datetime
 
 
@@ -512,6 +513,32 @@ def get_uwb_ros_message(c, cur_vehicle_name, cur_rospy, cur_timestamp):
     return range_arrays
 
 
+lidar_number_of_channels = {}
+
+fields_lidar_xyz_ring = [
+    PointField('x', 0, PointField.FLOAT32, 1),
+    PointField('y', 4, PointField.FLOAT32, 1),
+    PointField('z', 8, PointField.FLOAT32, 1),
+    PointField('ring', 12, PointField.UINT16, 1)
+]
+
+
+def get_lidar_number_of_channels(c, cur_sensor_name, cur_vehicle_name, default_channels):
+    # NumberOfChannels of a (GPU) lidar from the settings used by the simulator, needed for the ring field
+    key = cur_vehicle_name + "/" + cur_sensor_name
+    if key not in lidar_number_of_channels:
+        channels = default_channels
+        try:
+            settings = json.loads(c.getSettingsString())
+            sensors = settings.get("Vehicles", {}).get(cur_vehicle_name, {}).get("Sensors", {})
+            channels = int(sensors.get(cur_sensor_name, {}).get("NumberOfChannels", default_channels))
+        except (ValueError, TypeError, AttributeError, msgpackrpc.error.RPCError):
+            rospy.logwarn("Could not read NumberOfChannels of lidar " + key + " from the settings, using "
+                          + str(default_channels))
+        lidar_number_of_channels[key] = max(channels, 1)
+    return lidar_number_of_channels[key]
+
+
 def get_gpulidar_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timestamp, cur_fields_lidar,
                              cur_sensor_gpulidar_frame, cur_timestamp):
     cur_lidar_data = c.getGPULidarData(cur_sensor_name, cur_vehicle_name)
@@ -531,7 +558,11 @@ def get_gpulidar_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_time
             points_z = -points[:, 2]
             points_rgb = points[:, 3].astype('uint32')
             points_intensity = points[:, 4]
-            points_list = [points_x, points_y, points_z, points_rgb, points_intensity]
+            # laser (ring) of each point, 0 is the lowest laser: the GPU lidar gives one point per laser for each
+            # horizontal step, starting with the lowest laser
+            channels = get_lidar_number_of_channels(c, cur_sensor_name, cur_vehicle_name, 64)
+            points_ring = np.arange(points.shape[0]) % channels
+            points_list = [points_x, points_y, points_z, points_rgb, points_intensity, points_ring]
             points_list_transposed = [list(i) for i in zip(*points_list)]
             pcloud.header.frame_id = cur_sensor_gpulidar_frame
             pcloud.header.stamp = cur_timestamp
@@ -556,10 +587,14 @@ def get_lidar_ros_message(c, cur_sensor_name, cur_vehicle_name, cur_last_timesta
             points = np.array(cur_lidar_data.point_cloud, dtype=np.dtype('f4'))
             points = np.reshape(points, (int(points.shape[0] / 3), 3))
             points = points * np.array([1, -1, -1])
-            cloud = points.tolist()
+            # laser (ring) of each point, 0 is the lowest laser: the lidar gives one point per laser for each
+            # horizontal step, starting with the highest laser
+            channels = get_lidar_number_of_channels(c, cur_sensor_name, cur_vehicle_name, 16)
+            points_ring = channels - 1 - (np.arange(points.shape[0]) % channels)
+            cloud = [(float(p[0]), float(p[1]), float(p[2]), int(r)) for p, r in zip(points, points_ring)]
             pcloud.header.frame_id = cur_sensor_lidar_frame
             pcloud.header.stamp = cur_timestamp
-            pcloud = pc2.create_cloud_xyz32(pcloud.header, cloud)
+            pcloud = pc2.create_cloud(pcloud.header, fields_lidar_xyz_ring, cloud)
 
             if cur_sensor_lidar_toggle_segmentation == 1:
                 labels = np.array(cur_lidar_data.groundtruth, dtype=np.dtype('U'))
@@ -828,7 +863,8 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
         PointField('y', 4, PointField.FLOAT32, 1),
         PointField('z', 8, PointField.FLOAT32, 1),
         PointField('rgb', 12, PointField.UINT32, 1),
-        PointField('intensity', 16, PointField.FLOAT32, 1)
+        PointField('intensity', 16, PointField.FLOAT32, 1),
+        PointField('ring', 20, PointField.UINT16, 1)
     ]
 
     if use_route:

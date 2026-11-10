@@ -1,4 +1,5 @@
 #include <airsim_ros_wrapper.h>
+#include <cstring>
 #include "common/AirSimSettings.hpp"
 #include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
 
@@ -329,6 +330,7 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
                     msr::airlib::LidarSimpleParams params;
                     params.initializeFromSettings(lidar_setting);
                     append_static_lidar_tf(vehicle_ros.get(), sensor_name, params);
+                    lidar_num_channels_[curr_vehicle_name + "/" + sensor_setting->sensor_name] = static_cast<int>(params.number_of_channels);
 
                     SensorPublisher<sensor_msgs::msg::PointCloud2> sensor_publisher =
                         create_sensor_publisher<sensor_msgs::msg::PointCloud2>("Lidar sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/lidar/points/" + sensor_name, 10);
@@ -344,6 +346,7 @@ void AirsimROSWrapper::create_ros_pubs_from_settings_json()
                     msr::airlib::GPULidarSimpleParams params;
                     params.initializeFromSettings(gpulidar_setting);
                     append_static_gpulidar_tf(vehicle_ros.get(), sensor_name, params);
+                    gpulidar_num_channels_[curr_vehicle_name + "/" + sensor_setting->sensor_name] = static_cast<int>(params.number_of_channels);
 
                     SensorPublisher<sensor_msgs::msg::PointCloud2> sensor_publisher =
                         create_sensor_publisher<sensor_msgs::msg::PointCloud2>("GPULidar sensor", sensor_setting->sensor_name, sensor_setting->sensor_type, curr_vehicle_name + "/gpulidar/points/" + sensor_name, 10);
@@ -854,33 +857,47 @@ sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_lidar_msg_from_airsim(const 
     lidar_msg.header.frame_id = vehicle_name + "/" + sensor_name;
 
     if (lidar_data.point_cloud.size() > 3) {
+        const size_t num_points = lidar_data.point_cloud.size() / 3;
         lidar_msg.height = 1;
-        lidar_msg.width = lidar_data.point_cloud.size() / 3;
+        lidar_msg.width = static_cast<uint32_t>(num_points);
 
-        lidar_msg.fields.resize(3);
+        // x, y, z (float32) and the laser channel ring (uint16, 0 = lowest laser) as published by the Velodyne and Ouster drivers
+        lidar_msg.fields.resize(4);
         lidar_msg.fields[0].name = "x";
         lidar_msg.fields[1].name = "y";
         lidar_msg.fields[2].name = "z";
-
-        int offset = 0;
-
-        for (size_t d = 0; d < lidar_msg.fields.size(); ++d, offset += 4) {
-            lidar_msg.fields[d].offset = offset;
+        for (size_t d = 0; d < 3; ++d) {
+            lidar_msg.fields[d].offset = static_cast<uint32_t>(d * sizeof(float));
             lidar_msg.fields[d].datatype = sensor_msgs::msg::PointField::FLOAT32;
             lidar_msg.fields[d].count = 1;
         }
+        lidar_msg.fields[3].name = "ring";
+        lidar_msg.fields[3].offset = 3 * sizeof(float);
+        lidar_msg.fields[3].datatype = sensor_msgs::msg::PointField::UINT16;
+        lidar_msg.fields[3].count = 1;
 
         lidar_msg.is_bigendian = false;
-        lidar_msg.point_step = offset; // 4 * num fields
+        lidar_msg.point_step = 16; // 3 floats, ring and 2 bytes padding
         lidar_msg.row_step = lidar_msg.point_step * lidar_msg.width;
 
         lidar_msg.is_dense = true; // todo
         std::vector<float> data_std = lidar_data.point_cloud;
         fixPointCloud(data_std, 3, {1});
 
-        const unsigned char* bytes = reinterpret_cast<const unsigned char*>(data_std.data());
-        std::vector<unsigned char> lidar_msg_data(bytes, bytes + sizeof(float) * data_std.size());
-        lidar_msg.data = std::move(lidar_msg_data);   
+        // The lidar fills the point cloud per horizontal step with one point per laser, starting with the highest laser
+        // (see UnrealLidarSensor), so the ring of a point follows from its index.
+        int num_channels = 0;
+        const auto channels_it = lidar_num_channels_.find(vehicle_name + "/" + sensor_name);
+        if (channels_it != lidar_num_channels_.end())
+            num_channels = channels_it->second;
+
+        lidar_msg.data.assign(num_points * lidar_msg.point_step, 0);
+        for (size_t i = 0; i < num_points; ++i) {
+            unsigned char* point_data = lidar_msg.data.data() + i * lidar_msg.point_step;
+            std::memcpy(point_data, &data_std[i * 3], 3 * sizeof(float));
+            const std::uint16_t ring = num_channels > 0 ? static_cast<std::uint16_t>(num_channels - 1 - static_cast<int>(i % num_channels)) : 0;
+            std::memcpy(point_data + 3 * sizeof(float), &ring, sizeof(ring));
+        }
     }
     else {
         // msg = []
@@ -917,8 +934,15 @@ sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_gpulidar_msg_from_airsim(con
         fixPointCloud(data_std, 5, {1});
 
         size_t num_points = data_std.size() / 5;
-        pcl::PointCloud<PointXYZRGBI> cloud;   
-        cloud.points.resize(num_points); 
+        // The GPU lidar fills the point cloud per horizontal step with one point per laser, starting with the lowest laser
+        // (see LidarCamera), so the ring of a point follows from its index.
+        int num_channels = 0;
+        const auto channels_it = gpulidar_num_channels_.find(vehicle_name + "/" + sensor_name);
+        if (channels_it != gpulidar_num_channels_.end())
+            num_channels = channels_it->second;
+
+        pcl::PointCloud<PointXYZRGBIR> cloud;
+        cloud.points.resize(num_points);
         cloud.width = static_cast<uint32_t>(num_points);
         cloud.height = 1; 
         cloud.is_dense = true;
@@ -938,13 +962,14 @@ sensor_msgs::msg::PointCloud2 AirsimROSWrapper::get_gpulidar_msg_from_airsim(con
             uint8_t b = ((std::uint32_t)rgb_packed) & 0x0000ff;
 
             // Populate the point
-            PointXYZRGBI point;
+            PointXYZRGBIR point;
             point.x = x;
             point.y = y;
             point.z = z;
             std::uint32_t rgb = ((std::uint32_t)r << 16 | (std::uint32_t)g << 8 | (std::uint32_t)b);
             point.rgb = *reinterpret_cast<float*>(&rgb);
             point.intensity = intensity;
+            point.ring = num_channels > 0 ? static_cast<std::uint16_t>(i % num_channels) : 0;
             cloud.points[i] = point;
         }
 

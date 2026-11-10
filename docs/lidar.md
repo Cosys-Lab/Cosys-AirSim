@@ -103,6 +103,7 @@ By default, the lidar points are not drawn on the viewport. To enable the drawin
 Use `getLidarData(sensor name, vehicle name)` API to retrieve the Lidar data. The API returns a full scan Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
 
 * **Point-Cloud:** The floats represent [x,y,z] coordinate for each point hit within the range in the last scan in NED format. It will be [0,0,0] for a laser that didn't get any reflection (out of range).
+  The point cloud always holds `MeasurementsPerCycle` x `NumberOfChannels` points. It is ordered per horizontal step, and within each step it has one point per laser, starting with the highest laser (`VerticalFOVUpper`). So the laser (channel or ring) of point `i` is `ring = NumberOfChannels - 1 - (i % NumberOfChannels)`, with ring 0 the lowest laser. The ROS2 node publishes this as the `ring` field of the point cloud.
 * **Pose:** Default: Sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 * **Groundtruth:** For each point of the Point-Cloud a label string is kept that has the name of the object that the point belongs to a laser that didn't reflect anything will have label _out_of_range_.
 

@@ -84,13 +84,13 @@ The publishers will be automatically created based on the settings in the `setti
   Measurement of distance from an active ranger, such as infrared or IR
 
 - `/airsim_node/VEHICLE-NAME/lidar/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
-  LIDAR pointcloud 
+  LIDAR pointcloud with the fields `x`, `y`, `z` (float32) and `ring` (uint16). The `ring` field is the index of the laser (channel) that measured the point, with 0 being the lowest laser, the same as the Velodyne and Ouster ROS drivers publish.
 
 - `/airsim_node/VEHICLE-NAME/lidar/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/StringArray.msg)
   Custom message type with an array of string that are the labels for each point in the pointcloud of the lidar sensor
 
 - `/airsim_node/VEHICLE-NAME/gpulidar/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
-  GPU LIDAR pointcloud. The instance segmentation/annotation color data is stored in the rgb field of the pointcloud. The intensity data is stored as well in the intensity field
+  GPU LIDAR pointcloud with the fields `x`, `y`, `z`, `rgb`, `intensity` (float32) and `ring` (uint16). The instance segmentation/annotation color data is stored in the rgb field of the pointcloud. The intensity data is stored in the intensity field when `GenerateIntensity` is enabled for the sensor. The `ring` field is the index of the laser (channel) that measured the point, with 0 being the lowest laser, the same as the Velodyne and Ouster ROS drivers publish.
 
 - `/airsim_node/VEHICLE-NAME/echo/active/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
   Echo sensor pointcloud for active sensing

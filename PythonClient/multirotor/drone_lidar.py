@@ -20,6 +20,7 @@ class LidarTest:
         self.client = airsim.MultirotorClient()
         self.client.confirmConnection()
         self.client.enableApiControl(True)
+        self.number_of_channels = 16  # NumberOfChannels of the lidar in settings.json
 
     def execute(self):
 
@@ -49,10 +50,16 @@ class LidarTest:
                 print("\tNo points received from Lidar data")
             else:
                 points = self.parse_lidarData(lidarData)
-                print("\tReading %d: time_stamp: %d number_of_points: %d" % (i, lidarData.time_stamp, len(points)))
+                rings = self.lidar_rings(len(points), self.number_of_channels)
+                print("\tReading %d: time_stamp: %d number_of_points: %d rings: %d to %d" % (i, lidarData.time_stamp, len(points), rings.min(), rings.max()))
                 print("\t\tlidar position: %s" % (pprint.pformat(lidarData.pose.position)))
                 print("\t\tlidar orientation: %s" % (pprint.pformat(lidarData.pose.orientation)))
             time.sleep(5)
+
+    def lidar_rings(self, number_of_points, number_of_channels):
+        # Laser (ring) index of each point, 0 is the lowest laser. The lidar gives one point per laser for each
+        # horizontal step, starting with the highest laser. This matches the ring field of the ROS2 node point clouds.
+        return number_of_channels - 1 - (numpy.arange(number_of_points) % number_of_channels)
 
     def parse_lidarData(self, data):
 

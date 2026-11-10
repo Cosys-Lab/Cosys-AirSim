@@ -213,6 +213,12 @@ drawnow
 lidarSensorName = "lidar";
 enableLabels = true;
 [lidarPointCloud, lidarLabels, LidarTimestamp, LidarSensorPose] = airSimClient.getLidarData(lidarSensorName, enableLabels, vehicle_name);
+% Laser (ring) of each point, 0 is the lowest laser. The lidar gives one point per laser for
+% each horizontal step, starting with the highest laser.
+lidarNumberOfChannels = 16; % NumberOfChannels of the lidar in settings.json
+if ~isempty(lidarPointCloud)
+    lidarRings = lidarNumberOfChannels - 1 - mod((0:lidarPointCloud.Count - 1)', lidarNumberOfChannels);
+end
 
 figure;
 if ~isempty(lidarPointCloud)
@@ -237,6 +243,13 @@ drawnow
 gpuLidarSensorName = "gpulidar";
 enableLabels = true;
 [gpuLidarPointCloud, gpuLidarTimestamp, gpuLidarSensorPose] = airSimClient.getGPULidarData(gpuLidarSensorName, vehicle_name);
+% Laser (ring) of each point, 0 is the lowest laser. The GPU lidar gives one point per laser for
+% each horizontal step, starting with the lowest laser. The intensity is in gpuLidarPointCloud.Intensity
+% when GenerateIntensity is enabled.
+gpuLidarNumberOfChannels = 32; % NumberOfChannels of the GPU lidar in settings.json
+if ~isempty(gpuLidarPointCloud)
+    gpuLidarRings = mod((0:gpuLidarPointCloud.Count - 1)', gpuLidarNumberOfChannels);
+end
 
 figure;
 if ~isempty(gpuLidarPointCloud)
