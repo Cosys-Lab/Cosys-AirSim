@@ -287,6 +287,10 @@ To retrieve the color map to know which color is assign to each color index you 
 ```python
 colorMap = client.simGetSegmentationColorMap()
 ```
+The color map is an array with one RGB color per object ID. To get the color of an object, look it up with its object ID, not with its position in the list of `simListInstanceSegmentationObjects()`:
+```python
+objectColor = colorMap[client.simGetSegmentationObjectID("Ground"), :]
+```
 An example can be found in _segmentation_test.py_ (Cosys-AirSim/PythonClient/segmentation/segmentation_test.py).
 For a script that generates a full list of objects and their associated color, please see the script _segmentation_generate_list.py_ (Cosys-AirSim/PythonClient/segmentation/segmentation_generate_list.py).
 

@@ -112,6 +112,7 @@ private:
 	bool UpdatePaintTextureComponent(UMeshComponent* component, const FString& texture_path, const FString& component_name);
 
 	bool DeleteComponent(UMeshComponent* component);
+	class UAnnotationComponent* FindAnnotationComponent(UMeshComponent* component, const FString& component_name) const;
 
 	void getPaintableComponentMeshes(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes);
 	void getPaintableComponentMeshesAndTags(AActor* actor, TMap<FString, UMeshComponent*>* paintable_components_meshes, TMap<FString, TArray<FName>>* paintable_components_tags);

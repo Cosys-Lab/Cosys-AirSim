@@ -1015,7 +1015,8 @@ class VehicleClient:
         Gets the segmentation color map.
 
         Returns:
-            dict: Dictionary mapping object IDs to colors.
+            numpy.ndarray: Array of shape (N, 3) with the RGB color of each segmentation ID, so the color of an object
+            is colorMap[simGetSegmentationObjectID(object_name), :]. This also applies to the object IDs of RGB annotation layers in index mode.
         """
         return load_colormap()
 
