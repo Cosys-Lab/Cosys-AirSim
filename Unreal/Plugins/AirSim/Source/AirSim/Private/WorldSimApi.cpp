@@ -149,6 +149,9 @@ std::string WorldSimApi::spawnObject(const std::string& object_name, const std::
 
         FActorSpawnParameters new_actor_spawn_params;
         new_actor_spawn_params.Name = FName(final_object_name.c_str());
+        // The check above only sees actors with meshes, so the name can still be in use (for example by a spawned light).
+        // Let Unreal make the name unique then instead of the default fatal error, the actual name is returned below.
+        new_actor_spawn_params.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
 
         AActor* NewActor;
         if (is_blueprint) {
@@ -160,7 +163,8 @@ std::string WorldSimApi::spawnObject(const std::string& object_name, const std::
 
         if (IsValid(NewActor)) {
             spawned_object = true;
-            simmode_->scene_object_map.Add(FString(final_object_name.c_str()), NewActor);
+            final_object_name = std::string(TCHAR_TO_UTF8(*NewActor->GetName()));
+            simmode_->scene_object_map.Add(NewActor->GetName(), NewActor);
             // Dynamically spawned actors were missing UnrealCV RGB888 instance paint and
             // materials.csv custom-depth stencil (needed for GPU LiDAR intensity / GT).
             // Docs already require AddNewActorToSegmentation for runtime spawns.
