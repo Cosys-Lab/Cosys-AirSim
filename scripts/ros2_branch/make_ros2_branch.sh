@@ -70,5 +70,5 @@ else
 fi
 
 echo "Branch $branch is now $(git rev-parse --short "$commit") ($(git ls-tree -r --name-only "$commit" | wc -l) files)."
-echo "Check it with: git log --stat -1 $branch"
+echo "Check it with: git log --stat -1 $branch --"
 echo "Publish it with: git push origin $branch"
