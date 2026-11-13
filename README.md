@@ -27,7 +27,7 @@ Tested with ROS2 Jazzy on Ubuntu 24.04.
    sudo rosdep init
    rosdep update
    cd ros2
-   rosdep install --from-paths src -y --ignore-src --skip-keys pcl --skip-keys message_runtime --skip-keys message_generation
+   rosdep install --from-paths src -y --ignore-src
    ```
 5. Build the workspace (from `ros2/`):
    ```shell

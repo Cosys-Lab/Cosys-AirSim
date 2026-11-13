@@ -43,5 +43,5 @@ fi
 echo ""
 echo "Setup done. Build the ROS2 workspace:"
 echo "  cd ros2"
-echo "  rosdep install --from-paths src -y --ignore-src --skip-keys pcl --skip-keys message_runtime --skip-keys message_generation"
+echo "  rosdep install --from-paths src -y --ignore-src"
 echo "  colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release"
