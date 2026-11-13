@@ -159,15 +159,9 @@ cp $build_dir/output/lib/libMavLinkCom.a AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/librpc.a AirLib/deps/rpclib/lib/librpc.a
 
 # Update AirLib/lib, AirLib/deps staging folders with new binaries
-<<<<<<< HEAD
 rsync -rl --delete $build_dir/output/lib/ AirLib/lib/x64/$folder_name
 rsync -rl --delete external/rpclib/$RPC_VERSION_FOLDER/include AirLib/deps/rpclib
 rsync -rl --delete MavLinkCom/include AirLib/deps/MavLinkCom
-=======
-rsync -rlt --delete $build_dir/output/lib/ AirLib/lib/x64/$folder_name
-rsync -rlt --delete external/rpclib/$RPC_VERSION_FOLDER/include AirLib/deps/rpclib
-rsync -rlt --delete MavLinkCom/include AirLib/deps/MavLinkCom
->>>>>>> 896180faa49f42ce71cc7e5329f1cb95017c9b1a
 
 # Stage everything into the Unreal plugin's Fab-compliant Source layout.
 # AirLib's own headers ship; its .cpp sources do NOT (the module links the precompiled
@@ -177,11 +171,7 @@ rsync -rlt --delete MavLinkCom/include AirLib/deps/MavLinkCom
 AIRSIM_MODULE=Unreal/Plugins/AirSim/Source/AirSim
 mkdir -p "$AIRSIM_MODULE/Public/AirLib" "$AIRSIM_MODULE/Lib/AirLib"
 # the vendored third-party headers (json, ctpl) go to ThirdParty/AirSimVendor below instead
-<<<<<<< HEAD
 rsync -rl --delete --delete-excluded --exclude json.hpp --exclude ctpl_stl.h AirLib/include/ "$AIRSIM_MODULE/Public/AirLib/"
-=======
-rsync -rlt --delete --delete-excluded --exclude json.hpp --exclude ctpl_stl.h AirLib/include/ "$AIRSIM_MODULE/Public/AirLib/"
->>>>>>> 896180faa49f42ce71cc7e5329f1cb95017c9b1a
 # the static libraries go to a Linux or Mac subfolder, so one plugin can hold the libraries of every platform
 case "$(uname)" in Darwin) lib_platform=Mac ;; *) lib_platform=Linux ;; esac
 mkdir -p "$AIRSIM_MODULE/Lib/AirLib/$lib_platform"
@@ -190,21 +180,12 @@ cp AirLib/lib/libAirLib.a "$AIRSIM_MODULE/Lib/AirLib/$lib_platform/libAirLib.a"
 
 THIRDPARTY=Unreal/Plugins/AirSim/Source/ThirdParty
 mkdir -p "$THIRDPARTY/AirSimEigen/Eigen" "$THIRDPARTY/AirSimRpclib" "$THIRDPARTY/AirSimMavLinkCom"
-<<<<<<< HEAD
 rsync -rl --delete AirLib/deps/eigen3/Eigen/ "$THIRDPARTY/AirSimEigen/Eigen/"
 rsync -rl --delete AirLib/deps/rpclib/include "$THIRDPARTY/AirSimRpclib/"
 mkdir -p "$THIRDPARTY/AirSimRpclib/lib/$lib_platform"
 rm -f "$THIRDPARTY/AirSimRpclib/lib/librpc.a"
 cp AirLib/deps/rpclib/lib/librpc.a "$THIRDPARTY/AirSimRpclib/lib/$lib_platform/librpc.a"
 rsync -rl --delete AirLib/deps/MavLinkCom/include "$THIRDPARTY/AirSimMavLinkCom/"
-=======
-rsync -rlt --delete AirLib/deps/eigen3/Eigen/ "$THIRDPARTY/AirSimEigen/Eigen/"
-rsync -rlt --delete AirLib/deps/rpclib/include "$THIRDPARTY/AirSimRpclib/"
-mkdir -p "$THIRDPARTY/AirSimRpclib/lib/$lib_platform"
-rm -f "$THIRDPARTY/AirSimRpclib/lib/librpc.a"
-cp AirLib/deps/rpclib/lib/librpc.a "$THIRDPARTY/AirSimRpclib/lib/$lib_platform/librpc.a"
-rsync -rlt --delete AirLib/deps/MavLinkCom/include "$THIRDPARTY/AirSimMavLinkCom/"
->>>>>>> 896180faa49f42ce71cc7e5329f1cb95017c9b1a
 mkdir -p "$THIRDPARTY/AirSimMavLinkCom/lib/$lib_platform"
 rm -f "$THIRDPARTY/AirSimMavLinkCom/lib/libMavLinkCom.a"
 cp AirLib/deps/MavLinkCom/lib/libMavLinkCom.a "$THIRDPARTY/AirSimMavLinkCom/lib/$lib_platform/libMavLinkCom.a"
