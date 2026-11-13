@@ -289,6 +289,7 @@ ModelManifest.xml
 /Unreal/Plugins/AirSim/Source/ThirdParty/AirSimRpclib/lib/
 /Unreal/Plugins/AirSim/Source/ThirdParty/AirSimMavLinkCom/include/
 /Unreal/Plugins/AirSim/Source/ThirdParty/AirSimMavLinkCom/lib/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimVendor/include/
 /Unreal/Environments/Blocks/Plugins/AirSim/
 /enc_temp_folder
 /cmake/MavLinkCom/MavLinkTest/MavLinkTest

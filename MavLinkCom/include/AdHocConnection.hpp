@@ -1,3 +1,5 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
+
 #ifndef MavLinkCom_AdHocConnection_hpp
 #define MavLinkCom_AdHocConnection_hpp
 

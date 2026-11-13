@@ -24,7 +24,9 @@ public class AirSimRpclib : ModuleRules
         }
         else if (Target.Platform == UnrealTargetPlatform.Linux || Target.Platform == UnrealTargetPlatform.Mac)
         {
-            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "lib", "librpc.a"));
+            // build.sh puts the library in a Linux or Mac subfolder, older builds put it directly in lib
+            string platformLib = Path.Combine(ModuleDirectory, "lib", Target.Platform == UnrealTargetPlatform.Mac ? "Mac" : "Linux", "librpc.a");
+            PublicAdditionalLibraries.Add(File.Exists(platformLib) ? platformLib : Path.Combine(ModuleDirectory, "lib", "librpc.a"));
         }
     }
 }

@@ -170,16 +170,28 @@ rsync -a --delete MavLinkCom/include AirLib/deps/MavLinkCom
 # gain and only duplicate-symbol risk to lose by also shipping them).
 AIRSIM_MODULE=Unreal/Plugins/AirSim/Source/AirSim
 mkdir -p "$AIRSIM_MODULE/Public/AirLib" "$AIRSIM_MODULE/Lib/AirLib"
-rsync -a --delete AirLib/include/ "$AIRSIM_MODULE/Public/AirLib/"
-rsync -a --delete AirLib/lib/ "$AIRSIM_MODULE/Lib/AirLib/"
+# the vendored third-party headers (json, ctpl) go to ThirdParty/AirSimVendor below instead
+rsync -a --delete --delete-excluded --exclude json.hpp --exclude ctpl_stl.h AirLib/include/ "$AIRSIM_MODULE/Public/AirLib/"
+# the static libraries go to a Linux or Mac subfolder, so one plugin can hold the libraries of every platform
+case "$(uname)" in Darwin) lib_platform=Mac ;; *) lib_platform=Linux ;; esac
+mkdir -p "$AIRSIM_MODULE/Lib/AirLib/$lib_platform"
+rm -f "$AIRSIM_MODULE/Lib/AirLib/libAirLib.a"
+cp AirLib/lib/libAirLib.a "$AIRSIM_MODULE/Lib/AirLib/$lib_platform/libAirLib.a"
 
 THIRDPARTY=Unreal/Plugins/AirSim/Source/ThirdParty
 mkdir -p "$THIRDPARTY/AirSimEigen/Eigen" "$THIRDPARTY/AirSimRpclib" "$THIRDPARTY/AirSimMavLinkCom"
 rsync -a --delete AirLib/deps/eigen3/Eigen/ "$THIRDPARTY/AirSimEigen/Eigen/"
 rsync -a --delete AirLib/deps/rpclib/include "$THIRDPARTY/AirSimRpclib/"
-rsync -a --delete AirLib/deps/rpclib/lib "$THIRDPARTY/AirSimRpclib/"
+mkdir -p "$THIRDPARTY/AirSimRpclib/lib/$lib_platform"
+rm -f "$THIRDPARTY/AirSimRpclib/lib/librpc.a"
+cp AirLib/deps/rpclib/lib/librpc.a "$THIRDPARTY/AirSimRpclib/lib/$lib_platform/librpc.a"
 rsync -a --delete AirLib/deps/MavLinkCom/include "$THIRDPARTY/AirSimMavLinkCom/"
-rsync -a --delete AirLib/deps/MavLinkCom/lib "$THIRDPARTY/AirSimMavLinkCom/"
+mkdir -p "$THIRDPARTY/AirSimMavLinkCom/lib/$lib_platform"
+rm -f "$THIRDPARTY/AirSimMavLinkCom/lib/libMavLinkCom.a"
+cp AirLib/deps/MavLinkCom/lib/libMavLinkCom.a "$THIRDPARTY/AirSimMavLinkCom/lib/$lib_platform/libMavLinkCom.a"
+mkdir -p "$THIRDPARTY/AirSimVendor/include/common_utils"
+cp AirLib/include/common/common_utils/json.hpp "$THIRDPARTY/AirSimVendor/include/common_utils/json.hpp"
+cp AirLib/include/common/common_utils/ctpl_stl.h "$THIRDPARTY/AirSimVendor/include/ctpl_stl.h"
 
 set +x
 

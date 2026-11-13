@@ -218,7 +218,11 @@ REM //nothing when compiled as part of the UE module anyway, so there is nothing
 REM //only duplicate-symbol risk to lose by also shipping them).
 set AIRSIM_MODULE=Unreal\Plugins\AirSim\Source\AirSim
 if NOT exist %AIRSIM_MODULE%\Public\AirLib mkdir %AIRSIM_MODULE%\Public\AirLib
-robocopy /MIR AirLib\include %AIRSIM_MODULE%\Public\AirLib /XD temp *. /njh /njs /ndl /np
+REM //the vendored third-party headers (json, ctpl) go to ThirdParty\AirSimVendor below instead
+robocopy /MIR AirLib\include %AIRSIM_MODULE%\Public\AirLib /XD temp *. /XF json.hpp ctpl_stl.h /njh /njs /ndl /np
+REM //robocopy keeps excluded files that are already there, so remove copies from older builds
+if exist %AIRSIM_MODULE%\Public\AirLib\common\common_utils\json.hpp del /Q %AIRSIM_MODULE%\Public\AirLib\common\common_utils\json.hpp
+if exist %AIRSIM_MODULE%\Public\AirLib\common\common_utils\ctpl_stl.h del /Q %AIRSIM_MODULE%\Public\AirLib\common\common_utils\ctpl_stl.h
 if NOT exist %AIRSIM_MODULE%\Lib\AirLib mkdir %AIRSIM_MODULE%\Lib\AirLib
 robocopy /MIR AirLib\lib %AIRSIM_MODULE%\Lib\AirLib /XD temp *. /njh /njs /ndl /np
 
@@ -232,6 +236,9 @@ robocopy /MIR AirLib\deps\rpclib\lib %THIRDPARTY%\AirSimRpclib\lib /XD temp *. /
 if NOT exist %THIRDPARTY%\AirSimMavLinkCom mkdir %THIRDPARTY%\AirSimMavLinkCom
 robocopy /MIR AirLib\deps\MavLinkCom\include %THIRDPARTY%\AirSimMavLinkCom\include /XD temp *. /njh /njs /ndl /np
 robocopy /MIR AirLib\deps\MavLinkCom\lib %THIRDPARTY%\AirSimMavLinkCom\lib /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\AirSimVendor\include\common_utils mkdir %THIRDPARTY%\AirSimVendor\include\common_utils
+copy /Y AirLib\include\common\common_utils\json.hpp %THIRDPARTY%\AirSimVendor\include\common_utils\json.hpp
+copy /Y AirLib\include\common\common_utils\ctpl_stl.h %THIRDPARTY%\AirSimVendor\include\ctpl_stl.h
 
 REM //---------- done building ----------
 exit /b 0

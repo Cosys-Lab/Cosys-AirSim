@@ -30,12 +30,6 @@
     <ClInclude Include="include\common\common_utils\OnlineStats.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\common\common_utils\optional.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\common\common_utils\prettyprint.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\common\common_utils\ProsumerQueue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -454,9 +448,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\common\common_utils\WindowsApisCommonPost.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\common\common_utils\bitmap_image.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\common\common_utils\ColorUtils.hpp">

@@ -55,10 +55,11 @@ public class AirSim : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ImageWrapper", "RenderCore", "RHI", "AssetRegistry", "PhysicsCore", "ChaosVehicles", "Landscape", "CinematicCamera" });
         PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore", "RenderCore", "ChaosVehicles" });
 
-        // ThirdParty dependencies - see Source/ThirdParty/*/ (Eigen, rpclib, MavLinkCom).
+        // ThirdParty dependencies - see Source/ThirdParty/*/ (Eigen, rpclib, MavLinkCom, and the small
+        // header-only libraries AirLib uses in AirSimVendor: nlohmann/json and CTPL).
         // Module names are prefixed with "AirSim" because UBT module names are global: the engine
         // already ships its own "Eigen" module, and other AirSim-derived plugins may ship rpclib/MavLinkCom.
-        PrivateDependencyModuleNames.AddRange(new string[] { "AirSimEigen", "AirSimRpclib", "AirSimMavLinkCom" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "AirSimEigen", "AirSimRpclib", "AirSimMavLinkCom", "AirSimVendor" });
 
         //suppress VC++ proprietary warnings
         PublicDefinitions.Add("_SCL_SECURE_NO_WARNINGS=1");
@@ -92,7 +93,9 @@ public class AirSim : ModuleRules
         }
         else if (Target.Platform == UnrealTargetPlatform.Linux || Target.Platform == UnrealTargetPlatform.Mac)
         {
-            PublicAdditionalLibraries.Add(Path.Combine(AirLibLibPath, "libAirLib.a"));
+            // build.sh puts the library in a Linux or Mac subfolder, older builds put it directly in Lib/AirLib
+            string platformLib = Path.Combine(AirLibLibPath, Target.Platform == UnrealTargetPlatform.Mac ? "Mac" : "Linux", "libAirLib.a");
+            PublicAdditionalLibraries.Add(File.Exists(platformLib) ? platformLib : Path.Combine(AirLibLibPath, "libAirLib.a"));
         }
     }
 

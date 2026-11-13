@@ -2,10 +2,11 @@
   "FileVersion" : 3,
   "Version" : "4.0.0",
   "VersionName": "4.0.0",
-  "FriendlyName": "Cosys-AirSim",
+  "EngineVersion": "5.8.0",
+"FriendlyName": "Cosys-AirSim",
   "Description": "Cosys-AirSim - Simulator Plugin",
   "Category" : "Science",
-  "CreatedBy": "Shital Shah",
+  "CreatedBy": "Cosys-Lab, University of Antwerp",
   "CreatedByURL": "http://cosys-lab.uantwerpen.be/",
   "DocsURL" : "https://cosys-lab.github.io/Cosys-AirSim/",
   "MarketplaceURL" : "",
@@ -13,8 +14,7 @@
   "EnabledByDefault" : true,
   "CanContainContent": true,
   "IsBetaVersion" : false,
-  "Installed": true,
-  "Modules": [
+"Modules": [
     {
       "Name": "AirSim",
       "Type": "Runtime",

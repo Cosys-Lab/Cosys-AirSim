@@ -6,7 +6,7 @@
 #include "Engine/DirectionalLight.h"
 #include "GameFramework/Actor.h"
 #include "Components/MeshComponent.h"
-#include "ParticleDefinitions.h"
+#include "Particles/ParticleSystem.h"
 #include "Annotation/ObjectAnnotator.h"
 #include <string>
 #include "AirSimCameraDirector.h"
