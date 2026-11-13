@@ -5,6 +5,21 @@ The following was tested with ROS2 Jazzy.
 
 ## Build
 
+### From the ros2 branch (ROS2 only)
+
+If the machine only runs ROS2 and connects to a simulator running elsewhere (or on the same machine), use the `ros2` branch. It holds only the ROS2 packages and the C++ client library they build on (AirLib, MavLinkCom and their CMake files), without the Unreal Engine plugin, environments and Python client:
+
+```shell
+git clone -b ros2 --single-branch https://github.com/Cosys-Lab/Cosys-AirSim.git cosys-airsim-ros2
+cd cosys-airsim-ros2
+./setup.sh
+```
+`setup.sh` only downloads rpclib and Eigen. Then continue with the ROS environment, rosdep and colcon steps below, from the `ros2` folder of that clone. Its `README.md` lists the same steps.
+
+The `ros2` branch is generated from the main branches with `scripts/ros2_branch/make_ros2_branch.sh` (maintainers: run it from the branch to publish, for example `scripts/ros2_branch/make_ros2_branch.sh main`, then `git push origin ros2`). Do not commit to the `ros2` branch directly.
+
+### From the full repository
+
 - Build Cosys-AirSim as per the instructions.
 
 - Make sure that you have set up the environment variables for ROS. Add the `source` command to your `.bashrc` for convenience (replace `iron` with specific version name) -

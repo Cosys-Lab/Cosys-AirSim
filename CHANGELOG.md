@@ -7,6 +7,7 @@
 * Added option to enable GPU LiDAR scene capture/readback asynchronously for other simmodes outside the multirotor. This still disables debug drawing of pointclouds. 
 * Added a `ring` field to the LiDAR and GPU LiDAR point clouds of the ROS2 node and the ROS1 Python node. [#127 by deepConnectionism](https://github.com/Cosys-Lab/Cosys-AirSim/issues/127).
 * Added ArduPilot support for skid-steer vehicles in the SkidVehicle SimMode. See the skid steer vehicle documentation for the ArduPilot configuration. [#113 by serhiismoliak](https://github.com/Cosys-Lab/Cosys-AirSim/issues/113).
+* Added a `ros2` branch with only the ROS2 workspace and the C++ client library it builds on, to build the ROS2 node without the Unreal Engine parts. See the ROS2 documentation.
 * Updated annotation system to improve performance with many annotated objects by removing tick on all frames. [#169 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/169).
 * Updated Magnetometer to now use World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. See the sensors documentation for more info. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
 * Updated LiDAR to improve performance by casting each tick's rays in one parallel batch. [#170 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/170).
