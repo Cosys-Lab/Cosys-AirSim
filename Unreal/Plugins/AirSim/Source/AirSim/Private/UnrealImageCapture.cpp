@@ -180,7 +180,7 @@ void UnrealImageCapture::addScreenCaptureHandler(UWorld* world)
                     Color.A = 255;
 
                 TArray<uint8_t> last_compressed_png;
-                FImageUtils::CompressImageArray(SizeX, SizeY, RefBitmap, last_compressed_png);
+                FImageUtils::ThumbnailCompressImageArray(SizeX, SizeY, RefBitmap, last_compressed_png);
                 last_compressed_png_ = std::vector<uint8_t>(last_compressed_png.GetData(), last_compressed_png.GetData() + last_compressed_png.Num());
             });
 
