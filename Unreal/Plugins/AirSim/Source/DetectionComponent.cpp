@@ -27,7 +27,12 @@ UDetectionComponent::UDetectionComponent()
 void UDetectionComponent::BeginPlay()
 {
     Super::BeginPlay();
-    scene_capture_component_2D_ = CastChecked<USceneCaptureComponent2D>(GetAttachParent());
+    scene_capture_component_2D_ = Cast<USceneCaptureComponent2D>(GetAttachParent());
+    if (!scene_capture_component_2D_)
+    {
+        // we get re-parented to USceneComponent when saving Take Recorder videos
+        this->Deactivate();
+    }
     object_filter_ = FObjectFilter();
 }
 
