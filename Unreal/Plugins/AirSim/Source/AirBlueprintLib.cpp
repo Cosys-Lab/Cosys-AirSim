@@ -851,6 +851,7 @@ TArray<FName> UAirBlueprintLib::ListWorldsInRegistry()
 {
     FARFilter Filter;
     FTopLevelAssetPath UPath(UWorld::StaticClass()->GetPathName());
+    Filter.ClassPaths.Add(UPath);
     Filter.bRecursivePaths = true;
 
     TArray<FAssetData> AssetData;
@@ -867,6 +868,7 @@ UObject* UAirBlueprintLib::GetMeshFromRegistry(const std::string& load_object)
 {
     FARFilter Filter;
     FTopLevelAssetPath MPath(UStaticMesh::StaticClass()->GetPathName());
+    Filter.ClassPaths.Add(MPath);
     Filter.bRecursivePaths = true;
 
     TArray<FAssetData> AssetData;
