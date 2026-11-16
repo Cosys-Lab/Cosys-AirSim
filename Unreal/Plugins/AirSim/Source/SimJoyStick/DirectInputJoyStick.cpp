@@ -409,10 +409,10 @@ private:
                         // If it does, then get the VID/PID from var.bstrVal
                         DWORD dwPid = 0, dwVid = 0;
                         WCHAR* strVid = wcsstr(var.bstrVal, L"VID_");
-                        if (strVid && swscanf(strVid, L"VID_%lX", &dwVid) != 1)
+                        if (strVid && swscanf_s(strVid, L"VID_%lX", &dwVid) != 1)
                             dwVid = 0;
                         WCHAR* strPid = wcsstr(var.bstrVal, L"PID_");
-                        if (strPid && swscanf(strPid, L"PID_%lX", &dwPid) != 1)
+                        if (strPid && swscanf_s(strPid, L"PID_%lX", &dwPid) != 1)
                             dwPid = 0;
 
                         DWORD dwVidPid = MAKELONG(dwVid, dwPid);

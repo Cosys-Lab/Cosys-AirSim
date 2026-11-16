@@ -17,7 +17,7 @@ struct EchoSimpleParams {
 	real_T attenuation_limit = -100;				// Attenuation at which the signal is considered dissipated (dB)
 	real_T distance_limit = 10;					// Maximum distance the signal can travel.
 	int reflection_limit = 3;					// Maximum times the signal can reflect.
-	real_T reflection_distance_limit = 0.4;		// Maximum distance between reflection locations.
+	real_T reflection_distance_limit = 0.4f;		// Maximum distance between reflection locations.
 	real_T measurement_frequency = 10;			// The frequency of the sensor (measurements/s)
 	real_T sensor_diameter = 0.5;					// The diameter of the sensor plane used to capture the reflecting traces (meter)
 	float sensor_lower_azimuth_limit = -90;		// The lower azimuth limit of the sensor opening angle in degrees.
