@@ -38,8 +38,8 @@ namespace msr {
 			float rain_max_intensity = 70;               // Rain intensity maximum to scale from in mm/hour
 			std::string material_list_file = "";         // String holding all material data
 
-			float rain_constant_a = 0.01;                // Two constants to calculate the extinction coefficient in rain
-			float rain_constant_b = 0.6;
+			float rain_constant_a = 0.01f;                // Two constants to calculate the extinction coefficient in rain
+			float rain_constant_b = 0.6f;
 
 			bool external = false;                       // define if a sensor is attached to the vehicle itself(false), or to the world and is an external sensor (true)
 			bool external_ned = true;                    // define if the external sensor coordinates should be reported back by the API in local NED or Unreal coordinates
