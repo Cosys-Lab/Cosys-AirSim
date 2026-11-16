@@ -10,7 +10,13 @@
 * Fixed `euler_to_rotation_matrix` in the Python client using half angles and the wrong composition order (it now matches `euler_to_quaternion`). [#173 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/173).
 * Fixed a crash in annotation system. [#174 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/174).
 * Fixed annotated mesh names changing during their lifetime. [#175 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/175).
-* Fixed a crash (IsInGameThread assertion) when calling the annotation and instance segmentation API, for example `simSetAnnotationObjectValue`, while the simulation runs. These calls now run on the game thread, which also makes calls with a regular expression much faster. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
+* Fixed a crash when calling the annotation and instance segmentation API. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
+* Fixed `simSpawnObject` crashing with blueprints in packaged builds. [#124 by MACILLAS](https://github.com/Cosys-Lab/Cosys-AirSim/issues/124).
+* Fixed annotation and instance segmentation updates not being applied, or applied to the wrong mesh, for meshes of child actors and for objects or layers with similar names. [#109 by ssaigarimella](https://github.com/Cosys-Lab/Cosys-AirSim/issues/109), [#107 by MahmoudAmer96](https://github.com/Cosys-Lab/Cosys-AirSim/issues/107).
+* Fixed PX4 lockstep never being enabled because the `LockStep` setting was cleared when the connection was opened. [#129 by yalindem](https://github.com/Cosys-Lab/Cosys-AirSim/issues/129).
+* Fixed the rotor areas used for the multirotor drag. The difference is now set by two new drag factors in `MultiRotorParams`. [#126 by ykoshkin-kxp](https://github.com/Cosys-Lab/Cosys-AirSim/issues/126).
+* Fixed several issues related to the ROS2 PD position controller. [#132 by GiacomoVianello-1](https://github.com/Cosys-Lab/Cosys-AirSim/issues/132).
+* Fixed a crash in `simSpawnObject` when the requested object name was already used by an actor without meshes, for example a spawned light. The returned name is now always the name the new object got.
 
 ### September 2026 (version 3.5)
 * Added API functionality to change pose of several sensor types (LiDAR, GPULiDAR, Echo & DistanceSensor).
