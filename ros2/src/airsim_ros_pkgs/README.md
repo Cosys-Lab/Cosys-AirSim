@@ -20,7 +20,7 @@ apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
 cd <path-to-cosys-airsim>/ros2
-rosdep install --from-paths src -y --ignore-src --skip-keys pcl --skip-keys message_runtime --skip-keys message_generation
+rosdep install --from-paths src -y --ignore-src
 ```
 
 - Build ROS package
@@ -306,4 +306,4 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
   Maximum vertical velocity of the drone (meters/second)
 
     * `/max_yaw_rate_degree` [double]
-  Maximum yaw rate (degrees/second)
+  Maximum yaw rate (degrees/second)
