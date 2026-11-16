@@ -13,8 +13,6 @@ Please contact a Cosys-Lab researcher to get more in depth information on which 
 This [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) is for the latest supported Unreal Version v5.8, maintained for support, and is available for builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
 Unreal [5.2.1](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is also available for long term support.
 
-Installed Cosys-AirSim from Fab? Start with [Getting started with the Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/).
-
 ## Associated publications
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
@@ -79,6 +77,8 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
 
 ## How to Get It
+#### Install from FAB
+Installed Cosys-AirSim from Fab? Start with [Getting started with the Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/).
 #### Download and run from packaged binary - Windows/Linux
 * [Download and run it](https://cosys-lab.github.io/Cosys-AirSim/run_packaged)
 #### Download and install from precompiled plugin - Windows/Linux
