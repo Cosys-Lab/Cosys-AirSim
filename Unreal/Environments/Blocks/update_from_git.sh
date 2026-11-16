@@ -9,6 +9,6 @@ set -x
 
 ./clean.sh
 
-rsync -a  --exclude 'temp' --delete ../../Plugins/AirSim Plugins/
+rsync -rl --exclude 'temp' --delete ../../Plugins/AirSim Plugins/
 
 popd >/dev/null
