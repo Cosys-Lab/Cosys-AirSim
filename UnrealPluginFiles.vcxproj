@@ -101,7 +101,7 @@
     <ClCompile Include="unreal\plugins\airsim\source\AirBlueprintLib.cpp" />
     <ClCompile Include="unreal\plugins\airsim\source\AirSim.cpp" />
     <ClCompile Include="unreal\plugins\airsim\source\AirSimGameMode.cpp" />
-    <ClCompile Include="unreal\plugins\airsim\source\CameraDirector.cpp" />
+    <ClCompile Include="unreal\plugins\airsim\source\AirSimCameraDirector.cpp" />
     <ClCompile Include="unreal\plugins\airsim\source\car\CarPawn.cpp" />
     <ClCompile Include="unreal\plugins\airsim\source\car\CarWheelFront.cpp" />
     <ClCompile Include="unreal\plugins\airsim\source\car\CarWheelRear.cpp" />
@@ -135,7 +135,7 @@
     <ClInclude Include="unreal\plugins\airsim\source\AirBlueprintLib.h" />
     <ClInclude Include="unreal\plugins\airsim\source\AirSim.h" />
     <ClInclude Include="unreal\plugins\airsim\source\AirSimGameMode.h" />
-    <ClInclude Include="unreal\plugins\airsim\source\CameraDirector.h" />
+    <ClInclude Include="unreal\plugins\airsim\source\AirSimCameraDirector.h" />
     <ClInclude Include="unreal\plugins\airsim\source\car\CarPawn.h" />
     <ClInclude Include="unreal\plugins\airsim\source\car\CarWheelFront.h" />
     <ClInclude Include="unreal\plugins\airsim\source\car\CarWheelRear.h" />

@@ -2,7 +2,8 @@
   "FileVersion" : 3,
   "Version" : "4.0.0",
   "VersionName": "4.0.0",
-  "FriendlyName": "Cosys-AirSim",
+  "EngineVersion": "5.2.0",
+"FriendlyName": "Cosys-AirSim",
   "Description": "Cosys-AirSim - Simulator Plugin",
   "Category" : "Science",
   "CreatedBy": "Cosys-Lab, University of Antwerp",
@@ -13,11 +14,12 @@
   "EnabledByDefault" : true,
   "CanContainContent": true,
   "IsBetaVersion" : false,
-  "Modules": [
+"Modules": [
     {
       "Name": "AirSim",
       "Type": "Runtime",
-      "LoadingPhase": "PreDefault"
+      "LoadingPhase": "PreDefault",
+      "PlatformAllowList": [ "Win64", "Linux", "Mac" ]
     }
   ],
   "Plugins": [

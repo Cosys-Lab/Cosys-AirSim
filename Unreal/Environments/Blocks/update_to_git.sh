@@ -9,7 +9,6 @@ set -e
 set -x
 
 rsync -rl --exclude 'temp' --delete Plugins/AirSim ../../Plugins/
-rsync -rl --exclude 'temp' --delete Plugins/AirSim/Source/AirLib ../../../
 
 popd >/dev/null
 set +x

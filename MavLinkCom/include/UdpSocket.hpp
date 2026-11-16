@@ -1,3 +1,5 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
+
 #ifndef MavLinkCom_UdpSocket_hpp
 #define MavLinkCom_UdpSocket_hpp
 

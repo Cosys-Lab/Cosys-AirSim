@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #ifndef CommonUtils_UniqueValueMap_hpp
 #define CommonUtils_UniqueValueMap_hpp
 #include <chrono>

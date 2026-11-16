@@ -46,7 +46,6 @@
     <ClInclude Include="include\common\Common.hpp" />
     <ClInclude Include="include\common\CommonStructs.hpp" />
     <ClInclude Include="include\common\ClockFactory.hpp" />
-    <ClInclude Include="include\common\common_utils\bitmap_image.hpp" />
     <ClInclude Include="include\common\common_utils\ColorUtils.hpp" />
     <ClInclude Include="include\common\common_utils\ctpl_stl.h" />
     <ClInclude Include="include\common\common_utils\EnumFlags.hpp" />
@@ -58,8 +57,6 @@
     <ClInclude Include="include\common\common_utils\MedianFilter.hpp" />
     <ClInclude Include="include\common\common_utils\MinWinDefines.hpp" />
     <ClInclude Include="include\common\common_utils\OnlineStats.hpp" />
-    <ClInclude Include="include\common\common_utils\optional.hpp" />
-    <ClInclude Include="include\common\common_utils\prettyprint.hpp" />
     <ClInclude Include="include\common\common_utils\ProsumerQueue.hpp" />
     <ClInclude Include="include\common\common_utils\RandomGenerator.hpp" />
     <ClInclude Include="include\common\common_utils\ScheduledExecutor.hpp" />
