@@ -119,6 +119,7 @@ class FSkeletalAnnotationSceneProxy : public FSkeletalMeshSceneProxy
 public:
 	FSkeletalAnnotationSceneProxy(const USkinnedMeshComponent* Component, FSkeletalMeshRenderData* InSkeletalMeshRenderData, UMaterialInterface* AnnotationMID)
 	: FSkeletalMeshSceneProxy(Component, InSkeletalMeshRenderData)
+	, SourceComponent(Component)
 	{
 		// TODO: Update MaterialRelevance
 		this->bVerifyUsedMaterials = false;
@@ -147,6 +148,17 @@ public:
 		const FSceneViewFamily& ViewFamily,
 		uint32 VisibilityMap,
 		FMeshElementCollector& Collector) const;
+
+private:
+	// This proxy borrows its MeshObject from a component it does not own (the parent
+	// USkinnedMeshComponent, not the UAnnotationComponent). If the parent recreates its own render
+	// state (LOD/material/mesh change, re-registration) independently of the annotation component,
+	// this proxy can outlive that MeshObject: FSkeletalMeshSceneProxy's own recreation guarantees only
+	// cover the primitive that owns it, not a foreign proxy still holding the old pointer.
+	// SourceComponent (still alive here: sibling components share their owning actor's lifetime, and
+	// this proxy is destroyed before that actor can be GC'd) lets GetViewRelevance detect the swap
+	// and refuse to dereference a MeshObject that is no longer current, instead of crashing.
+	const USkinnedMeshComponent* SourceComponent;
 };
 
 
@@ -173,6 +185,16 @@ FPrimitiveViewRelevance FSkeletalAnnotationSceneProxy::GetViewRelevance(const FS
 	{
 		FPrimitiveViewRelevance ViewRelevance;
 		ViewRelevance.bDrawRelevance = 0; // This will make it gets ignored, when materials flag is enabled.
+		return ViewRelevance;
+	}
+	else if (!SourceComponent || SourceComponent->MeshObject != MeshObject)
+	{
+		// The parent component's MeshObject has been swapped since this proxy was created (or the
+		// component is gone) - the base class' GetViewRelevance dereferences MeshObject unconditionally,
+		// so calling it here would use a stale/dangling pointer. The proxy is recreated against the
+		// current MeshObject on the next render state update.
+		FPrimitiveViewRelevance ViewRelevance;
+		ViewRelevance.bDrawRelevance = 0;
 		return ViewRelevance;
 	}
 	else
