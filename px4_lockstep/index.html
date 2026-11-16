@@ -258,7 +258,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../run_packaged/" class="md-tabs__link">
+        <a href="../fab_getting_started/" class="md-tabs__link">
           
   
   
@@ -604,6 +604,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fab_getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started with the Fab plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3288,6 +3316,13 @@ tell AirSim to use a <code>SteppableClock</code>, and set <code>UseTcp</code> to
 <p>This causes AirSim to not use a "realtime" clock, but instead it advances the clock in step which
 each sensor update sent to PX4.  This way PX4 thinks time is progressing smoothly no matter how long
 it takes AirSim to really process that update loop.</p>
+<p><code>LockStep</code> is <code>true</code> by default. Lockstep mode becomes active once PX4 answers a sensor update with
+actuator controls carrying the same timestamp, the message <code>Enabling lockstep mode</code> is then shown.
+If PX4 does not answer for 1 second, lockstep mode is turned off again (<code>timeout on
+HilActuatorControlsMessage, resetting lock step mode</code>) and turned on again by the next matching answer.</p>
+<p>Messages you send to PX4 yourself, for example <code>OBSTACLE_DISTANCE</code> from a companion computer or ROS,
+must use the time of PX4 (the simulated time) and not the time of the computer, otherwise PX4 will
+consider them as too old or from the future.</p>
 <p>This has the following advantages:</p>
 <ul>
 <li>AirSim can be used on slow machines that cannot process updates quickly.</li>

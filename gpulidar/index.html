@@ -258,7 +258,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../run_packaged/" class="md-tabs__link">
+        <a href="../fab_getting_started/" class="md-tabs__link">
           
   
   
@@ -602,6 +602,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fab_getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started with the Fab plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3423,7 +3451,8 @@
 <p>Cosys-AirSim supports a GPU accelerated Lidar for multirotors and cars. It uses a depth camera that rotates around to simulate a Lidar while exploiting the GPU to do most of the work. Should allow for a large increase in amount of points that can be simulated.</p>
 <p>The enablement of a GPU lidar and the other lidar settings can be configured via AirSimSettings json.
 Please see <a href="../sensors/">general sensors</a> for information on configuration of general/shared sensor settings.</p>
-<p>Note that on Multirotor simmode, the sensor capture is dispatched asynchronously to the Unreal game thread , so its measurements lag by roughly one game frame compared to other simmodes. Real-time debug point drawing (<code>DrawDebugPoints</code>) is not supported on Multirotor for this reason.</p>
+<p>The sensor capture can optionally be dispatched asynchronously to the Unreal game thread by enabling <code>AsyncCaptureMode</code> (see the parameter table below).  <code>AsyncCaptureMode</code> defaults to enabled for Multirotor vehicles and disabled for all other vehicle types, but can be explicitly set either way for any vehicle type. Real-time debug point drawing (<code>DrawDebugPoints</code>) is not supported while <code>AsyncCaptureMode</code> is enabled, for any vehicle type. Experimenting with this setting can improve performance of the LiDAR model. </p>
+<p>note that this LiDAR model is computationally expensive and measurement rates (RotationsPerSecond) above 5 Hz should not be expected. </p>
 <h2 id="enabling-gpu-lidar-on-a-vehicle">Enabling GPU lidar on a vehicle<a class="headerlink" href="#enabling-gpu-lidar-on-a-vehicle" title="Permanent link">&para;</a></h2>
 <ul>
 <li>By default, GPU lidars are not enabled. To enable the sensor, set the SensorType and Enabled attributes in settings json.
@@ -3510,6 +3539,10 @@ Please see <a href="../sensors/">general sensors</a> for information on configur
 <td>Draw the physical sensor in the world on the vehicle with a 3D axes shown where the sensor is</td>
 </tr>
 <tr>
+<td>AsyncCaptureMode</td>
+<td>Defer the GPU capture readback by roughly one game frame instead of reading it back the same frame it was requested, avoiding a synchronous CPU/GPU pipeline stall on every capture. Noticeably faster, especially on heavier scenes, but disables <code>DrawDebugPoints</code>. Defaults to <code>true</code> for Multirotor vehicles and <code>false</code> for all other vehicle types; can be set explicitly for any vehicle type.</td>
+</tr>
+<tr>
 <td>External</td>
 <td>Uncouple the sensor from the vehicle. If enabled, the position and orientation will be relative to Unreal world coordinates in NED format from the settings file.</td>
 </tr>
@@ -3574,7 +3607,7 @@ Please see <a href="../sensors/">general sensors</a> for information on configur
 </span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>                    &quot;VerticalFOVLower&quot;: -20,
 </span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>                    &quot;HorizontalFOVStart&quot;: 0,
 </span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>                    &quot;HorizontalFOVEnd&quot;: 360,
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>                    &quot;DrawDebugPoints&quot;: true,
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>                    &quot;DrawDebugPoints&quot;: false,
 </span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>                    &quot;DrawMode&quot;: 1,
 </span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>                    &quot;Resolution&quot;: 1024,
 </span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>                    &quot;IgnoreMarked&quot;: true,
@@ -3586,12 +3619,13 @@ Please see <a href="../sensors/">general sensors</a> for information on configur
 </span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>                    &quot;rainMaxIntensity&quot;: 70,
 </span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>                    &quot;rainConstantA&quot;: 0.01,
 </span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>                    &quot;rainConstantB&quot;: 0.6,
-</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>                    &quot;DrawSensor&quot;: false
-</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>                }
-</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>            }
-</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>        }
-</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>    }
-</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>}
+</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>                    &quot;DrawSensor&quot;: false,
+</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>                    &quot;AsyncCaptureMode&quot;: true
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>                }
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>            }
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>        }
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>    }
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>}
 </span></code></pre></div></td>
 <td></td>
 </tr>
@@ -3622,7 +3656,7 @@ Please see <a href="../sensors/">general sensors</a> for information on configur
 </tbody>
 </table>
 <h2 id="server-side-visualization-for-debugging">Server side visualization for debugging<a class="headerlink" href="#server-side-visualization-for-debugging" title="Permanent link">&para;</a></h2>
-<p>By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. Note this does not work for Multirotor vehicles. <em>This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!</em></p>
+<p>By default, the lidar points are not drawn on the viewport. To enable the drawing of hit laser points on the viewport, please enable setting 'DrawDebugPoints' via settings json. Note this does not work while <code>AsyncCaptureMode</code> is enabled (which is the default for Multirotor vehicles, see above) for any vehicle type. <em>This is only for testing purposes and will affect the data slightly. It also needs to be disabled when using multiple Lidar sensors to avoid artifacts!!</em></p>
 <p>e.g.:
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>        &quot;Lidar1&quot;: { 
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>             ...
@@ -3645,7 +3679,8 @@ You can also tweak the variation of debugging with the 'DrawMode' parameter:
 <h2 id="client-api">Client API<a class="headerlink" href="#client-api" title="Permanent link">&para;</a></h2>
 <p>Use <code>getGPULidarData(sensor name, vehicle name)</code> API to retrieve the GPU Lidar data. The API returns a Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.</p>
 <ul>
-<li><strong>Point-Cloud:</strong> The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan in NED format.</li>
+<li><strong>Point-Cloud:</strong> The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan in NED format. The intensity is only calculated when <code>GenerateIntensity</code> is enabled.
+  The point cloud always holds <code>MeasurementsPerCycle</code> x <code>NumberOfChannels</code> points, a laser that didn't get any reflection gives [0,0,0,0,0]. It is ordered per horizontal step, and within each step it has one point per laser, starting with the lowest laser (<code>VerticalFOVLower</code>). So the laser (channel or ring) of point <code>i</code> is <code>ring = i % NumberOfChannels</code>, with ring 0 the lowest laser. The ROS2 node publishes this as the <code>ring</code> field of the point cloud.</li>
 <li><strong>Lidar Pose:</strong> Default: sensor pose in the vehicle frame / External: If set to <code>External</code>(see table) the coordinates will be in either Unreal NED when <code>ExternalLocal</code> is <code>false</code> or Local NED (from starting position from vehicle) when <code>ExternalLocal</code> is <code>true</code>.</li>
 </ul>
 <p>The <code>simSetGPULidarPose</code> API allows changing the pose of a GPU lidar sensor at runtime, taking an input pose as a combination of relative position and a quaternion in NED frame (relative to the vehicle, or absolute NED/local-NED per <code>ExternalLocal</code> if the lidar is configured as <code>External</code>). For example:
@@ -3665,6 +3700,9 @@ It can be retrieved from the API and converted back to RGB8 with for example the
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>  <span class="n">rgb</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb_value</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>  <span class="n">rgb</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb_value</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>  <span class="n">rgb</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgb_value</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">intensity</span> <span class="o">=</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="n">number_of_channels</span> <span class="o">=</span> <span class="mi">32</span>  <span class="c1"># NumberOfChannels of this GPU lidar in settings.json</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="n">ring</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="n">number_of_channels</span>  <span class="c1"># 0 is the lowest laser</span>
 </span></code></pre></div></p>
 
 

@@ -258,7 +258,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../run_packaged/" class="md-tabs__link">
+        <a href="../fab_getting_started/" class="md-tabs__link">
           
   
   
@@ -602,6 +602,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fab_getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started with the Fab plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1731,6 +1759,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-the-ros2-branch-ros2-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From the ros2 branch (ROS2 only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-the-full-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From the full repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3470,6 +3526,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-the-ros2-branch-ros2-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From the ros2 branch (ROS2 only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-the-full-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From the full repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3657,32 +3741,41 @@
 <p>A ROS2 wrapper over the Cosys-AirSim C++ client library. All coordinates and data are in the right-handed coordinate frame of the ROS standard and not in NED except for geo points.
 The following was tested with ROS2 Jazzy.</p>
 <h2 id="build">Build<a class="headerlink" href="#build" title="Permanent link">&para;</a></h2>
+<h3 id="from-the-ros2-branch-ros2-only">From the ros2 branch (ROS2 only)<a class="headerlink" href="#from-the-ros2-branch-ros2-only" title="Permanent link">&para;</a></h3>
+<p>If the machine only runs ROS2 and connects to a simulator running elsewhere (or on the same machine), use the <code>ros2</code> branch. It holds only the ROS2 packages and the C++ client library they build on (AirLib, MavLinkCom and their CMake files), without the Unreal Engine plugin, environments and Python client:</p>
+<p><div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>ros2<span class="w"> </span>--single-branch<span class="w"> </span>https://github.com/Cosys-Lab/Cosys-AirSim.git<span class="w"> </span>cosys-airsim-ros2
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>cosys-airsim-ros2
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>./setup.sh
+</span></code></pre></div>
+<code>setup.sh</code> only downloads rpclib and Eigen. Then continue with the ROS environment, rosdep and colcon steps below, from the <code>ros2</code> folder of that clone. Its <code>README.md</code> lists the same steps.</p>
+<p>The <code>ros2</code> branch is generated from the main branches with <code>scripts/ros2_branch/make_ros2_branch.sh</code> (maintainers: run it from the branch to publish, for example <code>scripts/ros2_branch/make_ros2_branch.sh main</code>, then <code>git push origin ros2</code>). Do not commit to the <code>ros2</code> branch directly.</p>
+<h3 id="from-the-full-repository">From the full repository<a class="headerlink" href="#from-the-full-repository" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Build Cosys-AirSim as per the instructions.</p>
 </li>
 <li>
 <p>Make sure that you have set up the environment variables for ROS. Add the <code>source</code> command to your <code>.bashrc</code> for convenience (replace <code>iron</code> with specific version name) -
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source /opt/ros/iron/setup.bash&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">source</span><span class="w"> </span>~/.bashrc
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source /opt/ros/iron/setup.bash&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">source</span><span class="w"> </span>~/.bashrc
 </span></code></pre></div></p>
 </li>
 </ul>
 <p>-- Install dependencies with rosdep, if not already installed -</p>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>apt-get<span class="w"> </span>install<span class="w"> </span>python3-rosdep
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>rosdep<span class="w"> </span>init
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>rosdep<span class="w"> </span>update
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">cd</span><span class="w"> </span>&lt;path-to-cosys-airsim&gt;/ros2
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>-y<span class="w"> </span>--ignore-src<span class="w"> </span>--skip-keys<span class="w"> </span>pcl<span class="w"> </span>--skip-keys<span class="w"> </span>message_runtime<span class="w"> </span>--skip-keys<span class="w"> </span>message_generation
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>apt-get<span class="w"> </span>install<span class="w"> </span>python3-rosdep
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>rosdep<span class="w"> </span>init
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>rosdep<span class="w"> </span>update
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">cd</span><span class="w"> </span>&lt;path-to-cosys-airsim&gt;/ros2
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>-y<span class="w"> </span>--ignore-src
 </span></code></pre></div>
 <ul>
 <li>Build ROS package</li>
 </ul>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>colcon<span class="w"> </span>build<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>colcon<span class="w"> </span>build<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
 </span></code></pre></div>
 <h2 id="running">Running<a class="headerlink" href="#running" title="Permanent link">&para;</a></h2>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">source</span><span class="w"> </span>install/setup.bash
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ros2<span class="w"> </span>launch<span class="w"> </span>airsim_ros_pkgs<span class="w"> </span>airsim_node.launch.py
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">source</span><span class="w"> </span>install/setup.bash
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>ros2<span class="w"> </span>launch<span class="w"> </span>airsim_ros_pkgs<span class="w"> </span>airsim_node.launch.py
 </span></code></pre></div>
 <h2 id="using-cosys-airsim-ros-wrapper">Using Cosys-Airsim ROS wrapper<a class="headerlink" href="#using-cosys-airsim-ros-wrapper" title="Permanent link">&para;</a></h2>
 <p>The ROS wrapper is composed of two ROS nodes - the first is a wrapper over Cosys-AirSim's multirotor C++ client library, and the second is a simple PD position controller.
@@ -3743,7 +3836,7 @@ Let's look at the ROS API for both nodes:</p>
 </li>
 <li>
 <p><code>/airsim_node/VEHICLE-NAME/lidar/points/SENSOR_NAME/</code> <a href="http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html">sensor_msgs::PointCloud2</a>
-  LIDAR pointcloud </p>
+  LIDAR pointcloud with the fields <code>x</code>, <code>y</code>, <code>z</code> (float32) and <code>ring</code> (uint16). The <code>ring</code> field is the index of the laser (channel) that measured the point, with 0 being the lowest laser, the same as the Velodyne and Ouster ROS drivers publish.</p>
 </li>
 <li>
 <p><code>/airsim_node/VEHICLE-NAME/lidar/labels/SENSOR_NAME/</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/StringArray.msg">airsim_interfaces::StringArray</a>
@@ -3751,7 +3844,7 @@ Let's look at the ROS API for both nodes:</p>
 </li>
 <li>
 <p><code>/airsim_node/VEHICLE-NAME/gpulidar/points/SENSOR_NAME/</code> <a href="http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html">sensor_msgs::PointCloud2</a>
-  GPU LIDAR pointcloud. The instance segmentation/annotation color data is stored in the rgb field of the pointcloud. The intensity data is stored as well in the intensity field</p>
+  GPU LIDAR pointcloud with the fields <code>x</code>, <code>y</code>, <code>z</code>, <code>rgb</code>, <code>intensity</code> (float32) and <code>ring</code> (uint16). The instance segmentation/annotation color data is stored in the rgb field of the pointcloud. The intensity data is stored in the intensity field when <code>GenerateIntensity</code> is enabled for the sensor. The <code>ring</code> field is the index of the laser (channel) that measured the point, with 0 being the lowest laser, the same as the Velodyne and Ouster ROS drivers publish.</p>
 </li>
 <li>
 <p><code>/airsim_node/VEHICLE-NAME/echo/active/points/SENSOR_NAME/</code> <a href="http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html">sensor_msgs::PointCloud2</a>
@@ -3781,10 +3874,13 @@ Let's look at the ROS API for both nodes:</p>
 <h4 id="subscribers">Subscribers:<a class="headerlink" href="#subscribers" title="Permanent link">&para;</a></h4>
 <ul>
 <li>
-<p><code>/airsim_node/VEHICLE-NAME/vel_cmd_body_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a></p>
+<p><code>/airsim_node/VEHICLE-NAME/vel_cmd_body_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a>
+  Velocity command in the body frame of the drone: x forward, y left, z up. <code>angular.z</code> is the yaw rate in radians per second, positive turns counterclockwise seen from above.</p>
 </li>
 <li>
-<p><code>/airsim_node/VEHICLE-NAME/vel_cmd_world_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a></p>
+<p><code>/airsim_node/VEHICLE-NAME/vel_cmd_world_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a>
+  Velocity command in the same frame as the published odometry (<code>odom_local</code>): x north, y west, z up. <code>angular.z</code> is the yaw rate in radians per second, positive turns counterclockwise seen from above.
+  Note that before version 4.0 the velocity commands were sent to AirSim unchanged and so used the NED convention of AirSim (y right/east, z down, positive yaw rate clockwise). Flip the sign of <code>linear.y</code>, <code>linear.z</code> and <code>angular.z</code> of existing code to keep the same motion.</p>
 </li>
 <li>
 <p><code>/airsim_node/all_robots/vel_cmd_body_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a>
@@ -3978,13 +4074,15 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 <h4 id="services_1">Services:<a class="headerlink" href="#services_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>
-<p><code>/airsim_node/VEHICLE-NAME/gps_goal</code> [Request: <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetGPSPosition.srv">airsim_interfaces::SetGPSPosition</a>]
+<p><code>/airsim_node/VEHICLE-NAME/gps_goal</code> [Request: <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/SetGPSPosition.srv">airsim_interfaces::SetGPSPosition</a>]
   Target gps position + yaw.
-  In <strong>absolute</strong> altitude.</p>
+  In <strong>absolute</strong> altitude. The goal is converted to the odometry frame, using the <code>origin_geo_point</code> as its origin.
+  Refused while a previous goal has not been reached yet, use <code>/airsim_node/VEHICLE-NAME/gps_goal/override</code> to replace the current goal.</p>
 </li>
 <li>
-<p><code>/airsim_node/VEHICLE-NAME/local_position_goal</code> [Request: <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetLocalPosition.srv">airsim_interfaces::SetLocalPosition</a>]
-  Target local position + yaw in global frame.</p>
+<p><code>/airsim_node/VEHICLE-NAME/local_position_goal</code> [Request: <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/SetLocalPosition.srv">airsim_interfaces::SetLocalPosition</a>]
+  Target local position + yaw (radians) in the odometry frame (<code>odom_local</code>: x north, y west, z up, from the take-off point).
+  Refused while a previous goal has not been reached yet, use <code>/airsim_node/VEHICLE-NAME/local_position_goal/override</code> to replace the current goal.</p>
 </li>
 </ul>
 <h4 id="subscribers_1">Subscribers:<a class="headerlink" href="#subscribers_1" title="Permanent link">&para;</a></h4>
@@ -4000,19 +4098,13 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 </ul>
 <h4 id="publishers_1">Publishers:<a class="headerlink" href="#publishers_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>
-<p><code>/vel_cmd_world_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a>
-  Sends velocity command to <code>airsim_node</code></p>
-</li>
-<li>
-<p><code>/vel_cmd_body_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a>
-  Sends velocity command to <code>airsim_node</code></p>
-</li>
+<li><code>/airsim_node/VEHICLE-NAME/vel_cmd_world_frame</code> <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg">airsim_interfaces::VelCmd</a>
+  Sends velocity command to <code>airsim_node</code></li>
 </ul>
 <h4 id="global-params">Global params<a class="headerlink" href="#global-params" title="Permanent link">&para;</a></h4>
 <ul>
 <li>
-<p>Dynamic constraints. These can be changed in <code>dynamic_constraints.launch</code>:</p>
+<p>Dynamic constraints. These can be changed in <code>dynamic_constraints.launch.py</code>, the PD position controller reads them from there:</p>
 <ul>
 <li>
 <p><code>/max_vel_horz_abs</code> [double]

@@ -258,7 +258,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../run_packaged/" class="md-tabs__link">
+        <a href="../fab_getting_started/" class="md-tabs__link">
           
   
   
@@ -602,6 +602,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fab_getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started with the Fab plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4281,6 +4309,7 @@ You can also install the AirSim python module to your Python environment by runn
 <li><code>simPrintLogMessage</code>: Prints the specified message in the simulator's window. If message_param is also supplied then its printed next to the message and in that case if this API is called with same message value but different message_param again then previous line is overwritten with new line (instead of API creating new line on display). For example, <code>simPrintLogMessage("Iteration: ", to_string(i))</code> keeps updating same line on display when API is called with different values of i. The valid values of severity parameter is 0 to 3 inclusive that corresponds to different colors.</li>
 <li><code>simGetObjectPose(ned=true)</code>, <code>simSetObjectPose</code>: Gets and sets the pose of specified object in Unreal environment. Here the object means "actor" in Unreal terminology. They are searched by tag as well as name. Please note that the names shown in UE Editor are <em>auto-generated</em> in each run and are not permanent. So if you want to refer to actor by name, you must change its auto-generated name in UE Editor. Alternatively you can add a tag to actor which can be done by clicking on that actor in Unreal Editor and then going to <a href="https://answers.unrealengine.com/questions/543807/whats-the-difference-between-tag-and-tag.html">Tags property</a>, click "+" sign and add some string value. If multiple actors have same tag then the first match is returned. If no matches are found then NaN pose is returned. The returned pose is in NED coordinates in SI units with its origin at Player Start by default or in Unreal NED frame if the <code>ned</code> boolean argument is set to <code>talse</code>. For <code>simSetObjectPose</code>, the specified actor must have <a href="https://docs.unrealengine.com/en-us/Engine/Actors/Mobility">Mobility</a> set to Movable or otherwise you will get undefined behavior. The <code>simSetObjectPose</code> has parameter <code>teleport</code> which means object is <a href="https://www.unrealengine.com/en-US/blog/moving-physical-objects">moved through other objects</a> in its way and it returns true if move was successful</li>
 <li><code>simListSceneObjects</code>:  Provides a list of all objects in the environment. You can also use regular expression to filter specific objects by name. For example, the code below sets all meshes which have names starting with "wall" you can use <code>simListSceneObjects("wall[\w]*")</code>.</li>
+<li><code>simListAssets</code>, <code>simSpawnObject(object_name, asset_name, pose, scale, physics_enabled=False, is_blueprint=False)</code> and <code>simDestroyObject(object_name)</code>: List the static meshes and blueprints that can be spawned, spawn one of them and remove it again. Use the asset name as listed by <code>simListAssets</code> (for example <code>BP_PointLight</code>). For blueprints set <code>is_blueprint</code> to <code>True</code>; the generated class name (<code>BP_PointLight_C</code>) is accepted as well. The returned name is the name of the new object, which can differ from the requested name if that name was already in use. In a packaged build only assets that were cooked are available: assets that are not referenced by any level are not cooked by default, so add their folder to <em>Project Settings &gt; Packaging &gt; Additional Asset Directories to Cook</em>.</li>
 </ul>
 <h3 id="imagecomputer-visioninstance-segmentation-apis">Image/Computer Vision/Instance segmentation APIs<a class="headerlink" href="#imagecomputer-visioninstance-segmentation-apis" title="Permanent link">&para;</a></h3>
 <p>AirSim offers comprehensive images APIs to retrieve synchronized images from multiple cameras along with ground truth including depth, disparity, surface normals and vision. You can set the resolution, FOV, motion blur etc parameters in <a href="../settings/">settings.json</a>. There is also API for detecting collision state. See also <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Examples/DataCollection/StereoImageGenerator.hpp">complete code</a> that generates specified number of stereo images and ground truth depth with normalization to camera plan, computation of disparity image and saving it to <a href="../pfm/">pfm format</a>.
@@ -4318,7 +4347,8 @@ The second parameter value is from 0 to 1. The first parameter provides followin
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    Dust = 6
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    Fog = 7
 </span></code></pre></div>
-<p>Please note that <code>Roadwetness</code>, <code>RoadSnow</code> and <code>RoadLeaf</code> effects requires adding <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/Weather/WeatherFX">materials</a> to your scene.</p>
+<p>Please note that <code>Roadwetness</code>, <code>RoadSnow</code> and <code>RoadLeaf</code> effects requires adding <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/CosysAirSim/Materials/Weather">materials</a> to your scene.</p>
+<p>The <code>Dust</code> and <code>Fog</code> effects are volumetric: your level needs an <strong>Exponential Height Fog</strong> actor with <strong>Volumetric Fog</strong> enabled, otherwise they are not visible.</p>
 <p>Please see <a href="https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient/environment/weather.py">example code</a> for more details.</p>
 <h3 id="recording-apis">Recording APIs<a class="headerlink" href="#recording-apis" title="Permanent link">&para;</a></h3>
 <p>Recording APIs can be used to start recording data through APIs. Data to be recorded can be specified using <a href="../settings/#recording">settings</a>. To start recording, use -</p>
@@ -4379,6 +4409,7 @@ If wanted, one can move the Unreal origin to the same location as the AirSim ori
 <p><code>yaw_mode</code> is a struct <code>YawMode</code> with two fields, <code>yaw_or_rate</code> and <code>is_rate</code>. If <code>is_rate</code> field is True then <code>yaw_or_rate</code> field is interpreted as angular velocity in degrees/sec which means you want vehicle to rotate continuously around its axis at that angular velocity while moving. If <code>is_rate</code> is False then <code>yaw_or_rate</code> is interpreted as angle in degrees which means you want vehicle to rotate to specific angle (i.e. yaw) and keep that angle while moving.</p>
 <p>You can probably see that when <code>yaw_mode.is_rate == true</code>, the <code>drivetrain</code> parameter shouldn't be set to <code>ForwardOnly</code> because you are contradicting by saying that keep front pointing ahead but also rotate continuously. However if you have <code>yaw_mode.is_rate = false</code> in <code>ForwardOnly</code> mode then you can do some funky stuff. For example, you can have drone do circles and have yaw_or_rate set to 90 so camera is always pointed to center ("super cool selfie mode"). In <code>MaxDegreeofFreedom</code> also you can get some funky stuff by setting <code>yaw_mode.is_rate = true</code> and say <code>yaw_mode.yaw_or_rate = 20</code>. This will cause drone to go in its path while rotating which may allow to do 360 scanning.</p>
 <p>In most cases, you just don't want yaw to change which you can do by setting yaw rate of 0. The shorthand for this is <code>airsim.YawMode.Zero()</code> (or in C++: <code>YawMode::Zero()</code>).</p>
+<p>In Python, <code>drivetrain</code> comes before <code>yaw_mode</code> in the argument list of the <code>move*</code> APIs. To only give a yaw mode, pass it as keyword argument, for example <code>client.moveByVelocityBodyFrameAsync(0, 0, -3, 5, yaw_mode=airsim.YawMode(True, 0))</code>. Passing a <code>YawMode</code> in the place of the <code>drivetrain</code> raises a <code>TypeError</code>.</p>
 <h4 id="lookahead-and-adaptive_lookahead">lookahead and adaptive_lookahead<a class="headerlink" href="#lookahead-and-adaptive_lookahead" title="Permanent link">&para;</a></h4>
 <p>When you ask vehicle to follow a path, AirSim uses "carrot following" algorithm. This algorithm operates by looking ahead on path and adjusting its velocity vector. The parameters for this algorithm is specified by <code>lookahead</code> and <code>adaptive_lookahead</code>. For most of the time you want algorithm to auto-decide the values by simply setting <code>lookahead = -1</code> and <code>adaptive_lookahead = 0</code>.</p>
 <h2 id="using-apis-on-real-vehicles">Using APIs on Real Vehicles<a class="headerlink" href="#using-apis-on-real-vehicles" title="Permanent link">&para;</a></h2>
