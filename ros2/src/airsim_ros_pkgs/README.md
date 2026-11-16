@@ -5,6 +5,21 @@ The following was tested on Ubuntu 22.04 with ROS2 Iron.
 
 ## Build
 
+### From the ros2 branch (ROS2 only)
+
+If the machine only runs ROS2 and connects to a simulator running elsewhere (or on the same machine), use the `ros2` branch. It holds only the ROS2 packages and the C++ client library they build on (AirLib, MavLinkCom and their CMake files), without the Unreal Engine plugin, environments and Python client:
+
+```shell
+git clone -b ros2 --single-branch https://github.com/Cosys-Lab/Cosys-AirSim.git cosys-airsim-ros2
+cd cosys-airsim-ros2
+./setup.sh
+```
+`setup.sh` only downloads rpclib and Eigen. Then continue with the ROS environment, rosdep and colcon steps below, from the `ros2` folder of that clone. Its `README.md` lists the same steps.
+
+The `ros2` branch is generated from the main branch with `scripts/ros2_branch/make_ros2_branch.sh` (that script is only on the main branch). Do not commit to the `ros2` branch directly. The ROS2 node of the `ros2` branch works with both the Unreal Engine 5.8 and 5.2.1 versions of the simulator, as they have the same API.
+
+### From the full repository
+
 - Build Cosys-AirSim as per the instructions.
 
 - Make sure that you have set up the environment variables for ROS. Add the `source` command to your `.bashrc` for convenience (replace `iron` with specific version name) -

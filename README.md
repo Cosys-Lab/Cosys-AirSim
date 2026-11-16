@@ -23,7 +23,7 @@ This branch has the same features, API and settings as the [main branch](https:/
 - The plugin source keeps its original layout (`Source/` instead of `Source/AirSim/{Public,Private}`).
 - Skeletal meshes (including skeletal foliage) are not well supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
 - A few settings need newer engine features and are ignored: light `IntensityUnit` `2` (EV, see [Lights](docs/lights.md)) and the camera setting `DepthOfFieldUseHairDepth` (see [Settings](docs/settings.md)).
-- The `ros2` branch, which holds only the ROS2 node, is made from the 5.8 branch. Build the ROS2 node from the `ros2` folder of this branch instead (see [ROS2](docs/ros2.md)).
+- The `ros2` branch, which holds only the ROS2 node, is made from the 5.8 branch, but works with this version as well. The ROS2 node can also be built from the `ros2` folder of this branch (see [ROS2](docs/ros2.md)).
 - No packaged binaries of Blocks are released for 5.2.1.
 
 ## Associated publications
