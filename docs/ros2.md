@@ -113,9 +113,12 @@ The publishers will be automatically created based on the settings in the `setti
 #### Subscribers:
 
 - `/airsim_node/VEHICLE-NAME/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
-  
+  Velocity command in the body frame of the drone: x forward, y left, z up. `angular.z` is the yaw rate in radians per second, positive turns counterclockwise seen from above.
+
 - `/airsim_node/VEHICLE-NAME/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
-  
+  Velocity command in the same frame as the published odometry (`odom_local`): x north, y west, z up. `angular.z` is the yaw rate in radians per second, positive turns counterclockwise seen from above.
+  Note that before version 4.0 the velocity commands were sent to AirSim unchanged and so used the NED convention of AirSim (y right/east, z down, positive yaw rate clockwise). Flip the sign of `linear.y`, `linear.z` and `angular.z` of existing code to keep the same motion.
+
 - `/airsim_node/all_robots/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   Set velocity command for all drones.
 
@@ -271,12 +274,14 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Services:
 
-- `/airsim_node/VEHICLE-NAME/gps_goal` [Request: [airsim_interfaces::SetGPSPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetGPSPosition.srv)]
+- `/airsim_node/VEHICLE-NAME/gps_goal` [Request: [airsim_interfaces::SetGPSPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/SetGPSPosition.srv)]
   Target gps position + yaw.
-  In **absolute** altitude.
+  In **absolute** altitude. The goal is converted to the odometry frame, using the `origin_geo_point` as its origin.
+  Refused while a previous goal has not been reached yet, use `/airsim_node/VEHICLE-NAME/gps_goal/override` to replace the current goal.
 
-- `/airsim_node/VEHICLE-NAME/local_position_goal` [Request: [airsim_interfaces::SetLocalPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetLocalPosition.srv)]
-  Target local position + yaw in global frame.
+- `/airsim_node/VEHICLE-NAME/local_position_goal` [Request: [airsim_interfaces::SetLocalPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/SetLocalPosition.srv)]
+  Target local position + yaw (radians) in the odometry frame (`odom_local`: x north, y west, z up, from the take-off point).
+  Refused while a previous goal has not been reached yet, use `/airsim_node/VEHICLE-NAME/local_position_goal/override` to replace the current goal.
 
 #### Subscribers:
 
@@ -288,15 +293,12 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Publishers:
 
-- `/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
-  Sends velocity command to `airsim_node`
-
-- `/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/airsim_node/VEHICLE-NAME/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   Sends velocity command to `airsim_node`
 
 #### Global params
 
-- Dynamic constraints. These can be changed in `dynamic_constraints.launch`:
+- Dynamic constraints. These can be changed in `dynamic_constraints.launch.py`, the PD position controller reads them from there:
     * `/max_vel_horz_abs` [double]
   Maximum horizontal velocity of the drone (meters/second)
 
