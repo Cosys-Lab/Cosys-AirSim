@@ -49,7 +49,14 @@ namespace airlib
             // for nice streamlined frame design and allow higher top speed which is more fun.
             //angular coefficient is usually 10X smaller than linear, however we should replace this with exact number
             //http://physics.stackexchange.com/q/304742/14061
+            //note: angular_drag_coefficient is currently not used by the physics model
             real_T angular_drag_coefficient = linear_drag_coefficient;
+            //The drag of the rotors uses the real rotor disc area (pi*d^2/4) and side area (d*h) multiplied with these factors.
+            //A spinning rotor has more drag than its geometric area (induced/momentum drag, which the thrust model does not include),
+            //and the default flight behaviour (top speed, terminal velocity and wind response) was tuned with these effective areas,
+            //so the defaults keep that behaviour identical. Set them to 1 to only use the geometric areas.
+            real_T rotor_disc_drag_factor = 4.0f;
+            real_T rotor_side_drag_factor = M_PIf;
             real_T restitution = 0.55f; // value of 1 would result in perfectly elastic collisions, 0 would be completely inelastic.
             real_T friction = 0.5f;
             RotorParams rotor_params;
