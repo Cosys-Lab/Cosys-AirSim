@@ -138,7 +138,8 @@ e.g.:
 
 Use `getGPULidarData(sensor name, vehicle name)` API to retrieve the GPU Lidar data. The API returns a Point-Cloud as a flat array of floats along with the timestamp of the capture and lidar pose.
 
-* **Point-Cloud:** The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan in NED format.
+* **Point-Cloud:** The floats represent [x,y,z, rgb, intensity] coordinate for each point hit within the range in the last scan in NED format. The intensity is only calculated when `GenerateIntensity` is enabled.
+  The point cloud always holds `MeasurementsPerCycle` x `NumberOfChannels` points, a laser that didn't get any reflection gives [0,0,0,0,0]. It is ordered per horizontal step, and within each step it has one point per laser, starting with the lowest laser (`VerticalFOVLower`). So the laser (channel or ring) of point `i` is `ring = i % NumberOfChannels`, with ring 0 the lowest laser. The ROS2 node publishes this as the `ring` field of the point cloud.
 * **Lidar Pose:** Default: sensor pose in the vehicle frame / External: If set to `External`(see table) the coordinates will be in either Unreal NED when `ExternalLocal` is `false` or Local NED (from starting position from vehicle) when `ExternalLocal` is `true`.
 
 The `simSetGPULidarPose` API allows changing the pose of a GPU lidar sensor at runtime, taking an input pose as a combination of relative position and a quaternion in NED frame (relative to the vehicle, or absolute NED/local-NED per `ExternalLocal` if the lidar is configured as `External`). For example:
@@ -161,4 +162,7 @@ for index, rgb_value in enumerate(rgb_values):
   rgb[index, 0] = (rgb_value >> 16) & 0xFF
   rgb[index, 1] = (rgb_value >> 8) & 0xFF
   rgb[index, 2] = rgb_value & 0xFF
+intensity = points[:, 4]
+number_of_channels = 32  # NumberOfChannels of this GPU lidar in settings.json
+ring = np.arange(points.shape[0]) % number_of_channels  # 0 is the lowest laser
 ```

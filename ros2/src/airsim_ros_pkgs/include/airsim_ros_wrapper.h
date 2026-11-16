@@ -104,6 +104,34 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZRGBI,
                                   (float, intensity, intensity)
 )
 
+// GPU LiDAR point with the laser channel (ring) of the point, like the Velodyne and Ouster ROS drivers publish
+struct PointXYZRGBIR
+{
+    PCL_ADD_POINT4D;
+    float intensity;
+    union
+    {
+        struct
+        {
+            uint8_t b;
+            uint8_t g;
+            uint8_t r;
+        };
+        float rgb;
+    };
+    std::uint16_t ring;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZRGBIR,
+                                  (float, x, x)
+                                  (float, y, y)
+                                  (float, z, z)
+                                  (float, rgb, rgb)
+                                  (float, intensity, intensity)
+                                  (std::uint16_t, ring, ring)
+)
+
 struct SimpleMatrix
 {
     int rows;
@@ -390,7 +418,10 @@ private:
 
     rclcpp::Service<airsim_interfaces::srv::Reset>::SharedPtr reset_srvr_;
     rclcpp::Publisher<airsim_interfaces::msg::GPSYaw>::SharedPtr origin_geo_point_pub_; // home geo coord of drones
-    msr::airlib::GeoPoint origin_geo_point_; // gps coord of unreal origin
+    // number of laser channels of each (GPU) LiDAR, key is vehicle_name/sensor_name. Filled at startup, read only afterwards
+    std::unordered_map<std::string, int> lidar_num_channels_;
+    std::unordered_map<std::string, int> gpulidar_num_channels_;
+msr::airlib::GeoPoint origin_geo_point_; // gps coord of unreal origin
     airsim_interfaces::msg::GPSYaw origin_geo_point_msg_; // todo duplicate
     rclcpp::Service<airsim_interfaces::srv::ListSceneObjectTags>::SharedPtr list_scene_object_tags_srvr_;
 
