@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #ifndef CommonUtils_Timer_hpp
 #define CommonUtils_Timer_hpp
 #include <chrono>

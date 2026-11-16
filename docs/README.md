@@ -10,8 +10,8 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
-This documentation is for the latest stable Unreal Version v5.8 on the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main), maintained for support, and is available for builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
-Unreal [5.2.1](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is also available for long term support but the documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1/docs).
+This [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) is for the latest supported Unreal Version v5.8, maintained for support, and is available for builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
+Unreal [5.2.1](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is also available for long term support.
 
 ## Associated publications
 
@@ -77,6 +77,8 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
 
 ## How to Get It
+#### Install from FAB
+Installed Cosys-AirSim from Fab? Start with [Getting started with the Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/).
 #### Download and run from packaged binary - Windows/Linux
 * [Download and run it](https://cosys-lab.github.io/Cosys-AirSim/run_packaged)
 #### Download and install from precompiled plugin - Windows/Linux
@@ -109,3 +111,5 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
 ## License
 
 This project is released under the MIT License. Please review the [License file](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE) for more details.
+
+Cosys-AirSim also bundles a number of third-party open-source components. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for the full list and their licenses.

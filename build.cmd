@@ -135,38 +135,41 @@ robocopy /MIR external\rpclib\%RPC_VERSION_FOLDER%\build\%buildMode% %RPCLIB_TAR
 )
 
 REM //---------- get High PolyCount SUV Car Model ------------
-IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv mkdir Unreal\Plugins\AirSim\Content\VehicleAdv
-IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV\v1.2.0 (
+REM //The SUV is not tracked in git; it lives in the CosysAirSim pack folder under */Vehicles/SUV
+set SUV_MARKER=Unreal\Plugins\AirSim\Content\CosysAirSim\Blueprints\Vehicles\SUV\BP_SuvCarPawn.uasset
+set SUV_URL=https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets_v2.zip
+IF NOT EXIST %SUV_MARKER% (
     IF NOT DEFINED noFullPolyCar (
         REM //leave some blank lines because %powershell% shows download banner at top of console
-        ECHO(   
-        ECHO(   
-        ECHO(   
+        ECHO(
+        ECHO(
+        ECHO(
         ECHO *****************************************************************************************
-        ECHO Downloading high-poly car assets.... The download is ~37MB and can take some time.
+        ECHO Downloading high-poly car assets.... The download is ~54MB and can take some time.
         ECHO To install without this assets, re-run build.cmd with the argument --no-full-poly-car
         ECHO *****************************************************************************************
-       
+
         IF EXIST suv_download_tmp rmdir suv_download_tmp /q /s
         mkdir suv_download_tmp
         @echo on
-        REM %powershell% -command "& { Start-BitsTransfer -Source https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip -Destination suv_download_tmp\car_assets.zip }"
-        REM %powershell% -command "& { (New-Object System.Net.WebClient).DownloadFile('https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip', 'suv_download_tmp\car_assets.zip') }"
         if "%PWSHV7%" == "" (
-            %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip -OutFile suv_download_tmp\car_assets.zip }"
+            %powershell% -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr %SUV_URL% -OutFile suv_download_tmp\car_assets.zip }"
         ) else (
-            %powershell% -command "iwr https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip -OutFile suv_download_tmp\car_assets.zip"
+            %powershell% -command "iwr %SUV_URL% -OutFile suv_download_tmp\car_assets.zip"
         )
         @echo off
-        rmdir /S /Q Unreal\Plugins\AirSim\Content\VehicleAdv\SUV
-        %powershell% -command "Expand-Archive -Path suv_download_tmp\car_assets.zip -DestinationPath Unreal\Plugins\AirSim\Content\VehicleAdv"
+        REM //remove stale SUV copies: the per-type SUV folders and the pre-Fab VehicleAdv\SUV location
+        IF EXIST Unreal\Plugins\AirSim\Content\CosysAirSim (
+            for /d %%D in (Unreal\Plugins\AirSim\Content\CosysAirSim\*) do IF EXIST "%%D\Vehicles\SUV" rmdir /s /q "%%D\Vehicles\SUV"
+        )
+        IF EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV rmdir /s /q Unreal\Plugins\AirSim\Content\VehicleAdv\SUV
+        %powershell% -command "Expand-Archive -Force -Path suv_download_tmp\car_assets.zip -DestinationPath Unreal\Plugins\AirSim\Content"
         rmdir suv_download_tmp /q /s
-        
+
         REM //Don't fail the build if the high-poly car is unable to be downloaded
-        REM //Instead, just notify users that the gokart will be used.
-        IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV ECHO Unable to download high-polycount SUV. Your AirSim build will use the default vehicle.
+        IF NOT EXIST %SUV_MARKER% ECHO Unable to download high-polycount SUV. The DefaultCar pawn will not be available.
     ) else (
-        ECHO Not downloading high-poly car asset. The default unreal vehicle will be used.
+        ECHO Not downloading high-poly car asset. The DefaultCar pawn will not be available.
     )
 )
 
@@ -208,10 +211,34 @@ if NOT exist %MAVLINK_TARGET_INCLUDE% mkdir %MAVLINK_TARGET_INCLUDE%
 robocopy /MIR MavLinkCom\include %MAVLINK_TARGET_INCLUDE%
 robocopy /MIR MavLinkCom\lib %MAVLINK_TARGET_LIB%
 
-REM //---------- all our output goes to Unreal/Plugin folder ----------
-if NOT exist Unreal\Plugins\AirSim\Source\AirLib mkdir Unreal\Plugins\AirSim\Source\AirLib
-robocopy /MIR AirLib Unreal\Plugins\AirSim\Source\AirLib  /XD temp *. /njh /njs /ndl /np
-copy /y AirSim.props Unreal\Plugins\AirSim\Source\AirLib
+REM //---------- stage everything into the Unreal plugin's Fab-compliant Source layout ----------
+REM //AirLib's own headers ship; its .cpp sources do NOT (the module links the precompiled
+REM //AirLib.lib instead - AIRLIB_HEADER_ONLY guards most of AirLib's own .cpp files down to
+REM //nothing when compiled as part of the UE module anyway, so there is nothing to gain and
+REM //only duplicate-symbol risk to lose by also shipping them).
+set AIRSIM_MODULE=Unreal\Plugins\AirSim\Source\AirSim
+if NOT exist %AIRSIM_MODULE%\Public\AirLib mkdir %AIRSIM_MODULE%\Public\AirLib
+REM //the vendored third-party headers (json, ctpl) go to ThirdParty\AirSimVendor below instead
+robocopy /MIR AirLib\include %AIRSIM_MODULE%\Public\AirLib /XD temp *. /XF json.hpp ctpl_stl.h /njh /njs /ndl /np
+REM //robocopy keeps excluded files that are already there, so remove copies from older builds
+if exist %AIRSIM_MODULE%\Public\AirLib\common\common_utils\json.hpp del /Q %AIRSIM_MODULE%\Public\AirLib\common\common_utils\json.hpp
+if exist %AIRSIM_MODULE%\Public\AirLib\common\common_utils\ctpl_stl.h del /Q %AIRSIM_MODULE%\Public\AirLib\common\common_utils\ctpl_stl.h
+if NOT exist %AIRSIM_MODULE%\Lib\AirLib mkdir %AIRSIM_MODULE%\Lib\AirLib
+robocopy /MIR AirLib\lib %AIRSIM_MODULE%\Lib\AirLib /XD temp *. /njh /njs /ndl /np
+
+REM //ThirdParty dependencies
+set THIRDPARTY=Unreal\Plugins\AirSim\Source\ThirdParty
+if NOT exist %THIRDPARTY%\AirSimEigen\Eigen mkdir %THIRDPARTY%\AirSimEigen\Eigen
+robocopy /MIR AirLib\deps\eigen3\Eigen %THIRDPARTY%\AirSimEigen\Eigen /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\AirSimRpclib mkdir %THIRDPARTY%\AirSimRpclib
+robocopy /MIR AirLib\deps\rpclib\include %THIRDPARTY%\AirSimRpclib\include /XD temp *. /njh /njs /ndl /np
+robocopy /MIR AirLib\deps\rpclib\lib %THIRDPARTY%\AirSimRpclib\lib /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\AirSimMavLinkCom mkdir %THIRDPARTY%\AirSimMavLinkCom
+robocopy /MIR AirLib\deps\MavLinkCom\include %THIRDPARTY%\AirSimMavLinkCom\include /XD temp *. /njh /njs /ndl /np
+robocopy /MIR AirLib\deps\MavLinkCom\lib %THIRDPARTY%\AirSimMavLinkCom\lib /XD temp *. /njh /njs /ndl /np
+if NOT exist %THIRDPARTY%\AirSimVendor\include\common_utils mkdir %THIRDPARTY%\AirSimVendor\include\common_utils
+copy /Y AirLib\include\common\common_utils\json.hpp %THIRDPARTY%\AirSimVendor\include\common_utils\json.hpp
+copy /Y AirLib\include\common\common_utils\ctpl_stl.h %THIRDPARTY%\AirSimVendor\include\ctpl_stl.h
 
 REM //---------- done building ----------
 exit /b 0

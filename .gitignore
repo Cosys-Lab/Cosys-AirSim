@@ -282,7 +282,14 @@ ModelManifest.xml
 /AirLib/CTestTestfile.cmake
 /AirLib/cmake_install.cmake
 /MavLinkCom/lib/libMavLinkCom.a
-/Unreal/Plugins/AirSim/Source/AirLib/
+/Unreal/Plugins/AirSim/Source/AirSim/Public/AirLib/
+/Unreal/Plugins/AirSim/Source/AirSim/Lib/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimEigen/Eigen/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimRpclib/include/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimRpclib/lib/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimMavLinkCom/include/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimMavLinkCom/lib/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimVendor/include/
 /Unreal/Environments/Blocks/Plugins/AirSim/
 /enc_temp_folder
 /cmake/MavLinkCom/MavLinkTest/MavLinkTest
@@ -337,6 +344,8 @@ cmake_build/
 /PythonClient/**/cloud.txt
 /PythonClient/**/cloud.asc
 /Unreal/Plugins/AirSim/Content/VehicleAdv/SUV/
+# high-poly SUV after the Fab content reorg (downloaded by build.cmd/build.sh, not tracked)
+/Unreal/Plugins/AirSim/Content/CosysAirSim/*/Vehicles/SUV/
 /suv_download_tmp
 car_assets.zip
 __pycache__/
@@ -410,3 +419,4 @@ Unreal/Environments/Blocks/Blocks.slnx
 Unreal/Environments/Blocks/Blocks.code-workspace
 Unreal/Environments/Blocks/.ignore
 *.code-workspace
+airsim_segmentation_colormap_list_*

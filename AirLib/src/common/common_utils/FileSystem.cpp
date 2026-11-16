@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 // in header only mode, control library is not available
 #ifndef AIRLIB_HEADER_ONLY
 
