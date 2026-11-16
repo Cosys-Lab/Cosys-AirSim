@@ -1,17 +1,21 @@
 ### Unreleased
+* MAJOR CHANGE: Plugin content moved into a single `CosysAirSim` folder with type-prefixed asset names. Old asset paths keep working through CoreRedirects, but `simSpawnObject` looks assets up by name, so use the new names there (e.g. `PointLightBP` is now `BP_PointLight`, `SpotLightBP` is now `BP_SpotLight`). The `[CoreRedirects]` in the plugin `Config/DefaultAirSim.ini` list every old and new name.
+* MAJOR CHANGE: Plugin source reorganised into the standard Unreal layout: `Source/AirSim/{Public,Private}` with the AirLib headers in `Public/AirLib`, and ThirdParty modules seperated as their own libraries. Code that includes AirSim headers may need updated include paths.
 * MAJOR CHANGE: The ROS2 node velocity commands now use the ROS convention, like the published odometry. Before, they were sent to AirSim unchanged in NED. Flip the sign of `linear.y`, `linear.z` and `angular.z` in existing code to keep the same motion. See the ROS2 documentation.
 * added AIRSIM_API to the main plugin classes so other modules and plugins can link against them. Based on [#139 by kkartal-infodif](https://github.com/Cosys-Lab/Cosys-AirSim/pull/139).
 * Added optional asynchronous GPU readback for camera images (`airsim.AsyncCaptureReadback 1`, off by default). See the image API documentation. Based on work by [minhquyminhquy](https://github.com/minhquyminhquy).
 * Added option to enable GPU LiDAR scene capture/readback asynchronously for other simmodes outside the multirotor. This still disables debug drawing of pointclouds. 
 * Added a `ring` field to the LiDAR and GPU LiDAR point clouds of the ROS2 node and the ROS1 Python node. [#127 by deepConnectionism](https://github.com/Cosys-Lab/Cosys-AirSim/issues/127).
 * Added ArduPilot support for skid-steer vehicles in the SkidVehicle SimMode. See the skid steer vehicle documentation for the ArduPilot configuration. [#113 by serhiismoliak](https://github.com/Cosys-Lab/Cosys-AirSim/issues/113).
+* Added a `ros2` branch with only the ROS2 workspace and the C++ client library it builds on, to build the ROS2 node without the Unreal Engine parts. See the ROS2 documentation.
 * Updated annotation system to improve performance with many annotated objects by removing tick on all frames. [#169 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/169).
 * Updated Magnetometer to now use World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. See the sensors documentation for more info. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
 * Updated LiDAR to improve performance by casting each tick's rays in one parallel batch. [#170 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/170).
 * Updated annotation system refresh speed for instance segmentation. [#172 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/172).
 * Updated the Python client to raise errors for certain undefined behaviour. [#125 by ZhengXinyue](https://github.com/Cosys-Lab/Cosys-AirSim/issues/125).
 * Fixed data races in the ROS2 node with multi-threaded callbacks. Based on work by [Krikler](https://github.com/Krikler).
-* Fixed a crash when applying weather settings after a previous play session.
+* Fixed a crash when applying weather settings after a previous play session, and the weather menu not closing.
+* Fixed Dust and Fog weather effects not showing in the Blocks environment.
 * Fixed a crash in `simSpawnObject` when the requested asset name does not exist.
 * Fixed annotation tags set on an actor being ignored for actors with a single mesh.
 * Fixed several small issues with GPU LiDAR sampling algorithm to improve stability and physical accuracy of the simulation model. 
