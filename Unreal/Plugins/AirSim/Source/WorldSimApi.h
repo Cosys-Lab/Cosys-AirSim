@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 
-class WorldSimApi : public msr::airlib::WorldSimApiBase
+class AIRSIM_API WorldSimApi : public msr::airlib::WorldSimApiBase
 {
 public:
     typedef msr::airlib::Pose Pose;

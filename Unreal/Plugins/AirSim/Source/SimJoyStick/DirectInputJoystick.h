@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-class DirectInputJoyStick
+class AIRSIM_API DirectInputJoyStick
 {
 public:
     struct DIGUID

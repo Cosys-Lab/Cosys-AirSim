@@ -9,7 +9,7 @@
 #include "NedTransform.h"
 #include "GameFramework/Actor.h"
 
-class UnrealSensorFactory : public msr::airlib::SensorFactory
+class AIRSIM_API UnrealSensorFactory : public msr::airlib::SensorFactory
 {
 public:
     typedef msr::airlib::AirSimSettings AirSimSettings;

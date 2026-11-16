@@ -7,7 +7,7 @@
 #include "HAL/FileManager.h"
 #include "PawnSimApi.h"
 
-class RecordingFile
+class AIRSIM_API RecordingFile
 {
 public:
     ~RecordingFile();

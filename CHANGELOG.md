@@ -1,4 +1,5 @@
 ### Unreleased
+* Exported the main plugin classes (pawns, SimApis, Unreal sensors, UAirBlueprintLib, WorldSimApi, recording) with AIRSIM_API so other modules and plugins can link against them. Based on [#139 by kkartal-infodif](https://github.com/Cosys-Lab/Cosys-AirSim/pull/139).
 * Added option to enable GPU LiDAR scene capture/readback asynchronously for other simmodes outside the multirotor. This still disables debug drawing of pointclouds. 
 * Fixed several small issues with GPU LiDAR sampling algorithm to improve stability and physical accuracy of the simulation model. 
 

@@ -12,7 +12,7 @@
 #include "AirBlueprintLib.h"
 
 // UnrealEchoSensor implementation that uses Ray Tracing in Unreal.
-class UnrealEchoSensor : public msr::airlib::EchoSimple {
+class AIRSIM_API UnrealEchoSensor : public msr::airlib::EchoSimple {
 
 public:
 	typedef msr::airlib::AirSimSettings AirSimSettings;

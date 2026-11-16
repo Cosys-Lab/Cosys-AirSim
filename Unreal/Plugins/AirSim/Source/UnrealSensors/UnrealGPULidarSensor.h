@@ -10,7 +10,7 @@
 #include <random>
 
 // Implementation of a LiDAR sensor that uses a rotating virtual cameras to accelerate the LiDAR Simulation on the GPU
-class UnrealGPULidarSensor : public msr::airlib::GPULidarSimple {
+class AIRSIM_API UnrealGPULidarSensor : public msr::airlib::GPULidarSimple {
 public:
 	typedef msr::airlib::AirSimSettings AirSimSettings;
 

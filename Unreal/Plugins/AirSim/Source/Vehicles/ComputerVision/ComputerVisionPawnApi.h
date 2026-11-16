@@ -6,7 +6,7 @@
 #include "ComputerVisionPawn.h"
 
 
-class ComputerVisionPawnApi{
+class AIRSIM_API ComputerVisionPawnApi{
 public:
     typedef msr::airlib::ImageCaptureBase ImageCaptureBase;
 
