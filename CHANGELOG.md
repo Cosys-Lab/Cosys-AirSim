@@ -4,6 +4,15 @@
 * Exported the main plugin classes (pawns, SimApis, Unreal sensors, UAirBlueprintLib, WorldSimApi, recording) with AIRSIM_API so other modules and plugins can link against them. Based on [#139 by kkartal-infodif](https://github.com/Cosys-Lab/Cosys-AirSim/pull/139).
 * Magnetometer now uses the World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. Select the old model with `"ReferenceSource": "Dipole"` (or `"Constant"`) in the magnetometer settings. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
 * Added option to enable GPU LiDAR scene capture/readback asynchronously for other simmodes outside the multirotor. This still disables debug drawing of pointclouds. 
+* Updated annotation system to improve performance with many annotated objects by removing tick on all frames. [#169 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/169).
+* Updated Magnetometer to now use World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. See the sensors documentation for more info. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
+* Updated LiDAR to improve performance by casting each tick's rays in one parallel batch. [#170 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/170).
+* Updated annotation system refresh speed for instance segmentation. [#172 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/172).
+* Fixed data races in the ROS2 node with multi-threaded callbacks. Based on work by [Krikler](https://github.com/Krikler).
+* Fixed a crash when applying weather settings after a previous play session, and the weather menu not closing.
+* Fixed Dust and Fog weather effects not showing in the Blocks environment.
+* Fixed a crash in `simSpawnObject` when the requested asset name does not exist.
+* Fixed annotation tags set on an actor being ignored for actors with a single mesh.
 * Fixed several small issues with GPU LiDAR sampling algorithm to improve stability and physical accuracy of the simulation model. 
 * Fixed cars and skid-steer vehicles being destroyed when they fall out of the world. [#166 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/166).
 * Fixed `moveOnPath` not reporting success when the drone reaches the end of the path. [#167 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/167).
