@@ -21,7 +21,8 @@ This branch has the same features, API and settings as the [main branch](https:/
 - It is not available on Fab. The [Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/) is only for Unreal Engine 5.8.
 - The plugin content keeps its original folder layout and asset names, for example `/AirSim/VehicleAdv/SUV/SuvCarPawn` and `PointLightBP`. On 5.8 they moved to a single `/AirSim/CosysAirSim` folder with type-prefixed names (`BP_SuvCarPawn`, `BP_PointLight`). Use the 5.2.1 names in `PawnPaths` and `simSpawnObject`; the documentation uses them as well.
 - The plugin source keeps its original layout (`Source/` instead of `Source/AirSim/{Public,Private}`).
-- Skeletal meshes are not well supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
+- Skeletal meshes (including skeletal foliage) are not well supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
+- A few settings need newer engine features and are ignored: light `IntensityUnit` `2` (EV, see [Lights](docs/lights.md)) and the camera setting `DepthOfFieldUseHairDepth` (see [Settings](docs/settings.md)).
 - The `ros2` branch, which holds only the ROS2 node, is made from the 5.8 branch. Build the ROS2 node from the `ros2` folder of this branch instead (see [ROS2](docs/ros2.md)).
 - No packaged binaries of Blocks are released for 5.2.1.
 
