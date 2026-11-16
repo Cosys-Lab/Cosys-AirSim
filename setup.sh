@@ -109,6 +109,8 @@ if $downloadHighPolySuv; then
                 rm -rf "../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV"
             fi
             unzip -q cosys_car_assets.zip -d ../Unreal/Plugins/AirSim/Content/VehicleAdv
+            # remove the unused PhysX-era SUV assets, they cannot be loaded in UE5
+            rm -f ../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV/{SuvAnim,SuvBackTireData,SuvBackWheel,SuvFrontTireData,SuvFrontWheel}.uasset
             cd ..
             rm -rf "suv_download_tmp"
     fi

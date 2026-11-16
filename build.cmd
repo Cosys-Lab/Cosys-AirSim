@@ -168,6 +168,8 @@ IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV\v1.2.0 (
         @echo off
         rmdir /S /Q Unreal\Plugins\AirSim\Content\VehicleAdv\SUV
         %powershell% -command "Expand-Archive -Path suv_download_tmp\car_assets.zip -DestinationPath Unreal\Plugins\AirSim\Content\VehicleAdv"
+        REM //remove the unused PhysX-era SUV assets, they cannot be loaded in UE5
+        for %%f in (SuvAnim SuvBackTireData SuvBackWheel SuvFrontTireData SuvFrontWheel) do IF EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV\%%f.uasset del /q Unreal\Plugins\AirSim\Content\VehicleAdv\SUV\%%f.uasset
         rmdir suv_download_tmp /q /s
         
         REM //Don't fail the build if the high-poly car is unable to be downloaded
