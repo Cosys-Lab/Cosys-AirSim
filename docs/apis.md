@@ -274,6 +274,8 @@ You can probably see that when `yaw_mode.is_rate == true`, the `drivetrain` para
 
 In most cases, you just don't want yaw to change which you can do by setting yaw rate of 0. The shorthand for this is `airsim.YawMode.Zero()` (or in C++: `YawMode::Zero()`).
 
+In Python, `drivetrain` comes before `yaw_mode` in the argument list of the `move*` APIs. To only give a yaw mode, pass it as keyword argument, for example `client.moveByVelocityBodyFrameAsync(0, 0, -3, 5, yaw_mode=airsim.YawMode(True, 0))`. Passing a `YawMode` in the place of the `drivetrain` raises a `TypeError`.
+
 #### lookahead and adaptive_lookahead
 When you ask vehicle to follow a path, AirSim uses "carrot following" algorithm. This algorithm operates by looking ahead on path and adjusting its velocity vector. The parameters for this algorithm is specified by `lookahead` and `adaptive_lookahead`. For most of the time you want algorithm to auto-decide the values by simply setting `lookahead = -1` and `adaptive_lookahead = 0`.
 
