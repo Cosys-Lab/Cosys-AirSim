@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #ifndef commn_utils_AsyncTasker_hpp
 #define commn_utils_AsyncTasker_hpp

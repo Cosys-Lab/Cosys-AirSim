@@ -77,6 +77,8 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
 
 ## How to Get It
+#### Install from FAB
+Installed Cosys-AirSim from Fab? Start with [Getting started with the Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/).
 #### Download and run from packaged binary - Windows/Linux
 * [Download and run it](https://cosys-lab.github.io/Cosys-AirSim/run_packaged)
 #### Download and install from precompiled plugin - Windows/Linux

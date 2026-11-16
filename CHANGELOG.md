@@ -1,6 +1,37 @@
 ### Unreleased
+* MAJOR CHANGE: Plugin content moved into a single `CosysAirSim` folder with type-prefixed asset names. Old asset paths keep working through CoreRedirects, but `simSpawnObject` looks assets up by name, so use the new names there (e.g. `PointLightBP` is now `BP_PointLight`, `SpotLightBP` is now `BP_SpotLight`). The `[CoreRedirects]` in the plugin `Config/DefaultAirSim.ini` list every old and new name.
+* MAJOR CHANGE: Plugin source reorganised into the standard Unreal layout: `Source/AirSim/{Public,Private}` with the AirLib headers in `Public/AirLib`, and ThirdParty modules seperated as their own libraries. Code that includes AirSim headers may need updated include paths.
+* MAJOR CHANGE: The ROS2 node velocity commands now use the ROS convention, like the published odometry. Before, they were sent to AirSim unchanged in NED. Flip the sign of `linear.y`, `linear.z` and `angular.z` in existing code to keep the same motion. See the ROS2 documentation.
+* added AIRSIM_API to the main plugin classes so other modules and plugins can link against them. Based on [#139 by kkartal-infodif](https://github.com/Cosys-Lab/Cosys-AirSim/pull/139).
+* Added optional asynchronous GPU readback for camera images (`airsim.AsyncCaptureReadback 1`, off by default). See the image API documentation. Based on work by [minhquyminhquy](https://github.com/minhquyminhquy).
 * Added option to enable GPU LiDAR scene capture/readback asynchronously for other simmodes outside the multirotor. This still disables debug drawing of pointclouds. 
+* Added a `ring` field to the LiDAR and GPU LiDAR point clouds of the ROS2 node and the ROS1 Python node. [#127 by deepConnectionism](https://github.com/Cosys-Lab/Cosys-AirSim/issues/127).
+* Added ArduPilot support for skid-steer vehicles in the SkidVehicle SimMode. See the skid steer vehicle documentation for the ArduPilot configuration. [#113 by serhiismoliak](https://github.com/Cosys-Lab/Cosys-AirSim/issues/113).
+* Added a `ros2` branch with only the ROS2 workspace and the C++ client library it builds on, to build the ROS2 node without the Unreal Engine parts. See the ROS2 documentation.
+* Updated annotation system to improve performance with many annotated objects by removing tick on all frames. [#169 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/169).
+* Updated Magnetometer to now use World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. See the sensors documentation for more info. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
+* Updated LiDAR to improve performance by casting each tick's rays in one parallel batch. [#170 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/170).
+* Updated annotation system refresh speed for instance segmentation. [#172 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/172).
+* Updated the Python client to raise errors for certain undefined behaviour. [#125 by ZhengXinyue](https://github.com/Cosys-Lab/Cosys-AirSim/issues/125).
+* Fixed data races in the ROS2 node with multi-threaded callbacks. Based on work by [Krikler](https://github.com/Krikler).
+* Fixed a crash when applying weather settings after a previous play session, and the weather menu not closing.
+* Fixed Dust and Fog weather effects not showing in the Blocks environment.
+* Fixed a crash in `simSpawnObject` when the requested asset name does not exist.
+* Fixed annotation tags set on an actor being ignored for actors with a single mesh.
 * Fixed several small issues with GPU LiDAR sampling algorithm to improve stability and physical accuracy of the simulation model. 
+* Fixed cars and skid-steer vehicles being destroyed when they fall out of the world. [#166 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/166).
+* Fixed `moveOnPath` not reporting success when the drone reaches the end of the path. [#167 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/167).
+* Fixed `euler_to_rotation_matrix` in the Python client using half angles and the wrong composition order (it now matches `euler_to_quaternion`). [#173 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/173).
+* Fixed a crash in annotation system. [#174 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/174).
+* Fixed annotated mesh names changing during their lifetime. [#175 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/175).
+* Fixed a crash when calling the annotation and instance segmentation API. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
+* Fixed `simSpawnObject` crashing with blueprints in packaged builds. [#124 by MACILLAS](https://github.com/Cosys-Lab/Cosys-AirSim/issues/124).
+* Fixed annotation and instance segmentation updates not being applied, or applied to the wrong mesh, for meshes of child actors and for objects or layers with similar names. [#109 by ssaigarimella](https://github.com/Cosys-Lab/Cosys-AirSim/issues/109), [#107 by MahmoudAmer96](https://github.com/Cosys-Lab/Cosys-AirSim/issues/107).
+* Fixed PX4 lockstep never being enabled because the `LockStep` setting was cleared when the connection was opened. [#129 by yalindem](https://github.com/Cosys-Lab/Cosys-AirSim/issues/129).
+* Fixed the rotor areas used for the multirotor drag. The difference is now set by two new drag factors in `MultiRotorParams`. [#126 by ykoshkin-kxp](https://github.com/Cosys-Lab/Cosys-AirSim/issues/126).
+* Fixed several issues related to the ROS2 PD position controller. [#132 by GiacomoVianello-1](https://github.com/Cosys-Lab/Cosys-AirSim/issues/132).
+* Fixed a crash in `simSpawnObject` when the requested object name was already used by an actor without meshes, for example a spawned light. The returned name is now always the name the new object got.
+* Fixed rosdep not installing all dependencies of the ROS2 node (`cv_bridge`, `std_srvs`, OpenCV, PCL, yaml-cpp were missing from its `package.xml`). The rosdep command no longer needs `--skip-keys`.
 
 ### September 2026 (version 3.5)
 * Added API functionality to change pose of several sensor types (LiDAR, GPULiDAR, Echo & DistanceSensor).

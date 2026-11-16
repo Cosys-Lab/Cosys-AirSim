@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #ifndef airsim_core_Environment_hpp
 #define airsim_core_Environment_hpp

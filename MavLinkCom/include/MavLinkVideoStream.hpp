@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 // Licensed under the MIT License.
 
 #ifndef MavLinkCom_MavLinkVideoStream_hpp

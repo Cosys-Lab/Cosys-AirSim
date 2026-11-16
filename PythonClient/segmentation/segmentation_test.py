@@ -28,8 +28,12 @@ if __name__ == '__main__':
     print("Generating list of all current objects...")
     with open('airsim_segmentation_colormap_list_' +  datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.csv', 'w') as f:
         f.write("ObjectName,R,G,B\n")
-        for index, item in enumerate(currentObjectList):
-            f.write("%s,%s\n" % (item, ','.join([str(x) for x in colorMap[index,:]])))
+        for item in currentObjectList:
+            # the colormap is indexed by the segmentation ID of the object, not by its position in the list
+            objectID = client.simGetSegmentationObjectID(item)
+            if objectID < 0:
+                continue
+            f.write("%s,%s\n" % (item, ','.join([str(x) for x in colorMap[objectID, :]])))
     print("Generated list of all current objects with their RGB value with a total of " + str(len(currentObjectList)) + ' objects\n')
 
     # Get names of all objects in simulation world in the instance segmentation format
