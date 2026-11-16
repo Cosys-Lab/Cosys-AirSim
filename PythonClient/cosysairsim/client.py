@@ -782,8 +782,8 @@ class VehicleClient:
 
         Args:
             object_name (str): Desired name of the new object.
-            asset_name (str): Name of the asset (static mesh or blueprint) as listed by simListAssets(), for example 'PointLightBP'.
-                For blueprints the generated class name ('PointLightBP_C') is accepted as well.
+            asset_name (str): Name of the asset (static mesh or blueprint) as listed by simListAssets(), for example 'BP_PointLight'.
+                For blueprints the generated class name ('BP_PointLight_C') is accepted as well.
             pose (Pose): Desired pose of the object.
             scale (Vector3r): Desired scale of the object.
             physics_enabled (bool, optional): Whether to enable physics for the object.

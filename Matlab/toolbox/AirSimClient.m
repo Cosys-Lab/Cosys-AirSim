@@ -2066,7 +2066,7 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   object_name - Name of the object to be spawned.
-            %   asset_name - Name of the asset (static mesh or blueprint) as listed by the simListAssets RPC call, for example 'PointLightBP'. For blueprints the generated class name ('PointLightBP_C') is accepted as well.
+            %   asset_name - Name of the asset (static mesh or blueprint) as listed by the simListAssets RPC call, for example 'BP_PointLight'. For blueprints the generated class name ('BP_PointLight_C') is accepted as well.
             %   position - 3-element vector [x, y, z] representing the spawn position.
             %   orientation - Quaternion [w, x, y, z] representing the spawn orientation.
             %   scale - 3-element vector [x, y, z] representing the scale of the object.
