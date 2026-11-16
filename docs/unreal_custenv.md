@@ -46,7 +46,6 @@ Alternatively, you can manage and download Epic Games assets on Linux using **[E
 6. Edit the `Config\DefaultGame.ini` to add the following lines at the end:
 
     ```
-    +MapsToCook=(FilePath="/AirSim/AirSimAssets")
     +DirectoriesToAlwaysCook=(Path="/AirSim/HUDAssets")
     +DirectoriesToAlwaysCook=(Path="/AirSim/Beacons")
     +DirectoriesToAlwaysCook=(Path="/AirSim/Blueprints")
@@ -132,7 +131,6 @@ Alternatively, you can manage and download Epic Games assets on Linux using **[E
 7. Edit the `Config\DefaultGame.ini` to add the following lines at the end:
 
     ```
-    +MapsToCook=(FilePath="/AirSim/AirSimAssets")
     +DirectoriesToAlwaysCook=(Path="/AirSim/HUDAssets")
     +DirectoriesToAlwaysCook=(Path="/AirSim/Beacons")
     +DirectoriesToAlwaysCook=(Path="/AirSim/Blueprints")

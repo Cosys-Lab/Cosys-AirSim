@@ -192,7 +192,6 @@ Note this does not include most sensor types.
     { "Name": "", "Type": 0, "Default": true, "SetDirect": false, "TexturePath": "", "TexturePrefix": "", "ViewDistance": -1 }
   ],
   "PawnPaths": {
-    "BareboneCar": {"PawnBP": "Class'/AirSim/VehicleAdv/Vehicle/VehicleAdvPawn.VehicleAdvPawn_C'"},
     "DefaultCar": {"PawnBP": "Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"},
     "DefaultSkidVehicle": {"PawnBP": "Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"},
     "DefaultQuadrotor": {"PawnBP": "Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"},
