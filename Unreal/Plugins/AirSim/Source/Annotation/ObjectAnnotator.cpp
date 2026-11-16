@@ -1034,26 +1034,32 @@ bool FObjectAnnotator::PaintRGBComponent(UMeshComponent* component, const FColor
 	return true;
 }
 
+UAnnotationComponent* FObjectAnnotator::FindAnnotationComponent(UMeshComponent* component, const FString& component_name) const
+{
+	// The annotation component of this layer is attached to the mesh component itself and named <layer>_<component name>.
+	// Look it up there with the exact name: searching the components of the attachment root actor misses meshes of child
+	// actors and partial name matches can hit the annotation component of another mesh or layer.
+	const FString annotation_component_name = name_ + "_" + component_name;
+	for (USceneComponent* child : component->GetAttachChildren())
+	{
+		UAnnotationComponent* annotation_component = Cast<UAnnotationComponent>(child);
+		if (IsValid(annotation_component) && annotation_component->GetName() == annotation_component_name)
+			return annotation_component;
+	}
+	return nullptr;
+}
+
 bool FObjectAnnotator::UpdatePaintRGBComponent(UMeshComponent* component, const FColor& color, const FString& component_name)
 {
 	if (!component) return false;
 
 	FLinearColor LinearColor = FLinearColor(color);
 	const FColor NewColor = LinearColor.ToFColor(false);
-	TArray<UActorComponent*> AnnotationComponents = component->GetAttachmentRootActor()->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
+	UAnnotationComponent* AnnotationComponent = FindAnnotationComponent(component, component_name);
+	if (AnnotationComponent == nullptr) return PaintRGBComponent(component, color, component_name);
 
-	if (AnnotationComponents.Num() == 0)return PaintRGBComponent(component, color, component_name);
-
-	for (UActorComponent* Component : AnnotationComponents)
-	{
-		UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(Component);
-		FName componentFName = *AnnotationComponent->GetName();
-		FString componentName = componentFName.ToString();
-		if (componentName.Contains(name_) && componentName.Contains(component_name)) {
-			AnnotationComponent->SetAnnotationColor(NewColor);
-			AnnotationComponent->MarkRenderStateDirty();
-		}		
-	}
+	AnnotationComponent->SetAnnotationColor(NewColor);
+	AnnotationComponent->MarkRenderStateDirty();
 	return true;
 }
 
@@ -1084,20 +1090,11 @@ bool FObjectAnnotator::UpdatePaintTextureComponent(UMeshComponent* component, co
 {
 	if (!component) return false;
 
-	TArray<UActorComponent*> AnnotationComponents = component->GetAttachmentRootActor()->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
+	UAnnotationComponent* AnnotationComponent = FindAnnotationComponent(component, component_name);
+	if (AnnotationComponent == nullptr) return PaintTextureComponent(component, texture_path, component_name);
 
-	if (AnnotationComponents.Num() == 0)return PaintTextureComponent(component, texture_path, component_name);
-
-	for (UActorComponent* Component : AnnotationComponents)
-	{
-		UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(Component);
-		FName componentFName = *AnnotationComponent->GetName();
-		FString componentName = componentFName.ToString();
-		if (componentName.Contains(name_) && componentName.Contains(component_name)) {
-			AnnotationComponent->SetAnnotationTexture(texture_path);
-			AnnotationComponent->MarkRenderStateDirty();
-		}
-	}
+	AnnotationComponent->SetAnnotationTexture(texture_path);
+	AnnotationComponent->MarkRenderStateDirty();
 	return true;
 }
 
@@ -1105,15 +1102,18 @@ bool FObjectAnnotator::DeleteComponent(UMeshComponent* component)
 {
 	if (!component) return false;
 
-	TArray<UActorComponent*> AnnotationComponents = component->GetAttachmentRootActor()->K2_GetComponentsByClass(UAnnotationComponent::StaticClass());
-	for (UActorComponent* Component : AnnotationComponents)
+	// only the annotation component of this layer that is attached to this mesh component
+	const FString layer_prefix = name_ + "_";
+	TArray<UAnnotationComponent*> to_destroy;
+	for (USceneComponent* child : component->GetAttachChildren())
 	{
-		FName componentFName = *Component->GetName();
-		FString componentName = componentFName.ToString();
-		if (componentName.Contains(name_)) {
-			Component->DestroyComponent();
-		}				
+		UAnnotationComponent* annotation_component = Cast<UAnnotationComponent>(child);
+		if (IsValid(annotation_component) && annotation_component->GetName().StartsWith(layer_prefix, ESearchCase::CaseSensitive)
+			&& name_to_component_map_.Contains(annotation_component->GetName().RightChop(layer_prefix.Len())))
+			to_destroy.Add(annotation_component);
 	}
+	for (UAnnotationComponent* annotation_component : to_destroy)
+		annotation_component->DestroyComponent();
 	return true;
 }
 
@@ -1172,12 +1172,12 @@ void FObjectAnnotator::UpdateAnnotationComponents(UWorld* World)
 		if (!IsValid(Object)) continue;
 		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Object);
 		if (!Component) continue;
-		FName componentFName = *Component->GetName();
-		FString componentName = componentFName.ToString();
+		FString componentName = Component->GetName();
+		// exact match on <layer>_<component name> so other layers whose name contains this one are not picked up
 		if (Component->GetWorld() == World
 			&& !listed.Contains(Component)
-			&& componentName.Contains(name_)
-			&& !componentName.Contains("annotation_sphere"))
+			&& componentName.StartsWith(name_ + "_", ESearchCase::CaseSensitive)
+			&& name_to_component_map_.Contains(componentName.RightChop(name_.Len() + 1)))
 		{
 			annotation_component_list_.Add(Component);
 			new_annotation_components_.Add(Component);

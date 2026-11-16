@@ -2132,9 +2132,16 @@ classdef AirSimClient < handle
 
             name = obj.getInstanceSegmentationObjectList();
             colorMap = obj.getInstanceSegmentationColormap();
-            r = colorMap(1:size(name, 1), 1);
-            g = colorMap(1:size(name, 1), 2);
-            b = colorMap(1:size(name, 1), 3);
+            % The colormap is indexed by the segmentation ID of each object (0-based), not by its position in the list
+            objectIDs = zeros(size(name, 1), 1);
+            for objectIndex = 1 : size(name, 1)
+                objectIDs(objectIndex) = double(obj.getSegmentationObjectID(name(objectIndex)));
+            end
+            valid = objectIDs >= 0;
+            name = name(valid);
+            r = colorMap(objectIDs(valid) + 1, 1);
+            g = colorMap(objectIDs(valid) + 1, 2);
+            b = colorMap(objectIDs(valid) + 1, 3);
             instanceSegmentationTable = table(name, r, g, b);
         end
 

@@ -93,7 +93,9 @@ airSimClient = AirSimClient(IsDrone=false, IP="127.0.0.1", port=41451);
 #### Groundtruth labels
 ```matlab
 % Get groundtruth look-up-table of all objects and their instance
-% segmentation colors for the cameras and GPU LiDAR
+% segmentation colors for the cameras and GPU LiDAR.
+% The color of each object is looked up with its segmentation ID, so the
+% table stays correct after changing IDs with setSegmentationObjectID.
 groundtruthLUT = airSimClient.getInstanceSegmentationLUT();
 
 ```

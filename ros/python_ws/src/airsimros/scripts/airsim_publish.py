@@ -1018,8 +1018,12 @@ def airsim_publish(client, use_route, route_rosbag, merged_rosbag, generate_gt_m
             rospy.loginfo("Generating list of all current objects...")
             with open('airsim_gt_map_' + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.csv', 'w') as f:
                 f.write("ObjectName,R,G,B\n")
-                for index, item in enumerate(currentObjectList):
-                    f.write("%s,%s\n" % (item, ','.join([str(x) for x in colorMap[index, :]])))
+                for item in currentObjectList:
+                    # the colormap is indexed by the segmentation ID of the object, not by its position in the list
+                    objectID = client.simGetSegmentationObjectID(item)
+                    if objectID < 0:
+                        continue
+                    f.write("%s,%s\n" % (item, ','.join([str(x) for x in colorMap[objectID, :]])))
             rospy.loginfo("Generated ground truth map of " + str(len(currentObjectList)) + ' objects.')
 
     else:

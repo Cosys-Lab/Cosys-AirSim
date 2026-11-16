@@ -17,6 +17,7 @@
 * Fixed the rotor areas used for the multirotor drag. The difference is now set by two new drag factors in `MultiRotorParams`. [#126 by ykoshkin-kxp](https://github.com/Cosys-Lab/Cosys-AirSim/issues/126).
 * Fixed several issues related to the ROS2 PD position controller. [#132 by GiacomoVianello-1](https://github.com/Cosys-Lab/Cosys-AirSim/issues/132).
 * Fixed a crash in `simSpawnObject` when the requested object name was already used by an actor without meshes, for example a spawned light. The returned name is now always the name the new object got.
+* Fixed annotation and instance segmentation updates not being applied, or applied to the wrong mesh, for meshes of child actors and for objects or layers with similar names. [#109 by ssaigarimella](https://github.com/Cosys-Lab/Cosys-AirSim/issues/109), [#107 by MahmoudAmer96](https://github.com/Cosys-Lab/Cosys-AirSim/issues/107).
 
 ### September 2026 (version 3.5)
 * Added API functionality to change pose of several sensor types (LiDAR, GPULiDAR, Echo & DistanceSensor).
