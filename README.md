@@ -17,7 +17,7 @@ For the latest stable and maintained build for a recent Unreal Engine see the [m
 
 This branch has the same features, API, settings, plugin layout and asset names as the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) for Unreal Engine 5.8, and the same documentation. The differences are:
 
-- It uses Unreal Engine 5.2.1, built with Visual Studio 2022 and the MSVC toolset 14.38 on Windows (see [Install from source - Windows](docs/install_windows.md)).
+- It uses Unreal Engine 5.2.1, built with Visual Studio 2022 and an MSVC toolset older than 14.40 on Windows (see [Install from source - Windows](docs/install_windows.md)).
 - It is not available on Fab. The [Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/) is only for Unreal Engine 5.8.
 - Nanite skeletal meshes are not supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
 - A few settings need newer engine features and are ignored: light `IntensityUnit` `2` (EV, see [Lights](docs/lights.md)) and the camera setting `DepthOfFieldUseHairDepth` (see [Settings](docs/settings.md)).

@@ -98,6 +98,19 @@ IF NOT EXIST external\rpclib\%RPC_VERSION_FOLDER% (
 REM //---------- Build rpclib ------------
 REM //optionally pin the exact MSVC toolset (e.g. if the latest installed one is newer than UE supports)
 REM //set AIRSIM_VCTOOLSVERSION=14.38.33130 before running this script, or see docs/install_windows.md FAQ
+REM //Unreal Engine 5.2 does not compile with MSVC 14.40 (VS 2022 17.10) or newer. Unless AIRSIM_VCTOOLSVERSION
+REM //is set, keep the toolset of this prompt if it is older than 14.40, else use the newest installed one that is.
+if NOT "%AIRSIM_VCTOOLSVERSION%" == "" goto :toolset_chosen
+set "AIRSIM_VC_MINOR="
+for /f "tokens=2 delims=." %%M in ("%VCToolsVersion%") do set "AIRSIM_VC_MINOR=%%M"
+if "%AIRSIM_VC_MINOR%" == "" goto :toolset_chosen
+if %AIRSIM_VC_MINOR% LSS 40 goto :toolset_chosen
+for /d %%D in ("%VCINSTALLDIR%Tools\MSVC\14.*") do for /f "tokens=2 delims=." %%N in ("%%~nxD") do if %%N LSS 40 set "AIRSIM_VCTOOLSVERSION=%%~nxD"
+if NOT "%AIRSIM_VCTOOLSVERSION%" == "" goto :toolset_chosen
+echo ERROR: Unreal Engine 5.2 does not compile with MSVC %VCToolsVersion%. In the Visual Studio Installer, add an older toolset under Individual Components, for example "MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.38-17.8)", or set AIRSIM_VCTOOLSVERSION.
+goto :buildfailed
+:toolset_chosen
+if NOT "%AIRSIM_VCTOOLSVERSION%" == "" echo Using MSVC toolset %AIRSIM_VCTOOLSVERSION%
 set "CMAKE_TOOLSET_ARG="
 set "MSBUILD_TOOLSET_ARG="
 if NOT "%AIRSIM_VCTOOLSVERSION%" == "" (
