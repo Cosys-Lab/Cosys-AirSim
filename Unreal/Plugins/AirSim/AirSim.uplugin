@@ -5,15 +5,14 @@
   "FriendlyName": "Cosys-AirSim",
   "Description": "Cosys-AirSim - Simulator Plugin",
   "Category" : "Science",
-  "CreatedBy": "Shital Shah",
+  "CreatedBy": "Cosys-Lab, University of Antwerp",
   "CreatedByURL": "http://cosys-lab.uantwerpen.be/",
   "DocsURL" : "https://cosys-lab.github.io/Cosys-AirSim/",
   "MarketplaceURL" : "",
   "SupportURL" : "https://cosys-lab.github.io/Cosys-AirSim/",
   "EnabledByDefault" : true,
   "CanContainContent": true,
-  "IsBetaVersion" : true,
-  "Installed": true,
+  "IsBetaVersion" : false,
   "Modules": [
     {
       "Name": "AirSim",
