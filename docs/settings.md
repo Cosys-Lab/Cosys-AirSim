@@ -192,12 +192,12 @@ Note this does not include most sensor types.
     { "Name": "", "Type": 0, "Default": true, "SetDirect": false, "TexturePath": "", "TexturePrefix": "", "ViewDistance": -1 }
   ],
   "PawnPaths": {
-    "DefaultCar": {"PawnBP": "Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"},
-    "DefaultSkidVehicle": {"PawnBP": "Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"},
-    "DefaultQuadrotor": {"PawnBP": "Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"},
-    "Pioneer": {"PawnBP": "Class'/AirSim/VehicleAdv/Pioneer/PioneerPawn.PioneerPawn_C'"},
-    "BoxCar": {"PawnBP": "Class'/AirSim/VehicleAdv/BoxCar/BoxCarPawn.BoxCarPawn_C'"},
-    "DefaultComputerVision": {"PawnBP": "Class'/AirSim/Blueprints/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"}
+    "DefaultCar": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/SUV/BP_SuvCarPawn.BP_SuvCarPawn_C'"},
+    "DefaultSkidVehicle": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/CPHusky/BP_CPHuskyPawn.BP_CPHuskyPawn_C'"},
+    "DefaultQuadrotor": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/Multirotor/BP_FlyingPawn.BP_FlyingPawn_C'"},
+    "Pioneer": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/Pioneer/BP_PioneerPawn.BP_PioneerPawn_C'"},
+    "BoxCar": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/BoxCar/BP_BoxCarPawn.BP_BoxCarPawn_C'"},
+    "DefaultComputerVision": {"PawnBP": "Class'/AirSim/CosysAirSim/Blueprints/Vehicles/ComputerVision/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"}
     // each entry can also set "SlipperyMat" and "NonSlipperyMat" (physical material paths)
   },
   "WorldLights": {

@@ -1,7 +1,7 @@
 # airsim_ros_pkgs
 
 A ROS2 wrapper over the Cosys-AirSim C++ client library. All coordinates and data are in the right-handed coordinate frame of the ROS standard and not in NED except for geo points.
-The following was tested on Ubuntu 22.04 with ROS2 Iron.
+The following was tested with ROS2 Jazzy.
 
 ## Build
 
@@ -16,7 +16,7 @@ cd cosys-airsim-ros2
 ```
 `setup.sh` only downloads rpclib and Eigen. Then continue with the ROS environment, rosdep and colcon steps below, from the `ros2` folder of that clone. Its `README.md` lists the same steps.
 
-The `ros2` branch is generated from the main branch with `scripts/ros2_branch/make_ros2_branch.sh` (that script is only on the main branch). Do not commit to the `ros2` branch directly. The ROS2 node of the `ros2` branch works with both the Unreal Engine 5.8 and 5.2.1 versions of the simulator, as they have the same API.
+The `ros2` branch is generated from the main branches with `scripts/ros2_branch/make_ros2_branch.sh` (maintainers: run it from the branch to publish, for example `scripts/ros2_branch/make_ros2_branch.sh main`, then `git push origin ros2`). Do not commit to the `ros2` branch directly. The ROS2 node of the `ros2` branch works with both the Unreal Engine 5.8 and 5.2.1 versions of the simulator, as they have the same API.
 
 ### From the full repository
 
@@ -321,4 +321,4 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
   Maximum vertical velocity of the drone (meters/second)
 
     * `/max_yaw_rate_degree` [double]
-  Maximum yaw rate (degrees/second)
+  Maximum yaw rate (degrees/second)

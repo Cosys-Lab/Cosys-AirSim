@@ -10,20 +10,17 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
-This [5.2.1 branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is for the development of Cosys-AirSim on Unreal Engine v5.2.1. The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1/docs).
+This [5.2.1 dev branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1dev) is for the development of Cosys-AirSim on Unreal Engine v5.2.1, the long term support version. The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1dev/docs).
 For the latest stable and maintained build for a recent Unreal Engine see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) and associated builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
 
 ## Differences with the Unreal Engine 5.8 version
 
-This branch has the same features, API and settings as the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) for Unreal Engine 5.8, and the same documentation. The differences are:
+This branch has the same features, API, settings, plugin layout and asset names as the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) for Unreal Engine 5.8, and the same documentation. The differences are:
 
 - It uses Unreal Engine 5.2.1, built with Visual Studio 2022 and the MSVC toolset 14.38 on Windows (see [Install from source - Windows](docs/install_windows.md)).
 - It is not available on Fab. The [Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/) is only for Unreal Engine 5.8.
-- The plugin content keeps its original folder layout and asset names, for example `/AirSim/VehicleAdv/SUV/SuvCarPawn` and `PointLightBP`. On 5.8 they moved to a single `/AirSim/CosysAirSim` folder with type-prefixed names (`BP_SuvCarPawn`, `BP_PointLight`). Use the 5.2.1 names in `PawnPaths` and `simSpawnObject`; the documentation uses them as well.
-- The plugin source keeps its original layout (`Source/` instead of `Source/AirSim/{Public,Private}`).
-- Skeletal meshes (including skeletal foliage) are not well supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
+- Nanite skeletal meshes are not supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
 - A few settings need newer engine features and are ignored: light `IntensityUnit` `2` (EV, see [Lights](docs/lights.md)) and the camera setting `DepthOfFieldUseHairDepth` (see [Settings](docs/settings.md)).
-- The `ros2` branch, which holds only the ROS2 node, is made from the 5.8 branch, but works with this version as well. The ROS2 node can also be built from the `ros2` folder of this branch (see [ROS2](docs/ros2.md)).
 - No packaged binaries of Blocks are released for 5.2.1.
 
 ## Associated publications
