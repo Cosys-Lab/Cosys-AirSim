@@ -270,6 +270,8 @@ success = client.simSetSegmentationObjectID("ground[\w]*", 21, True)
 
 The return value is true if at least one mesh was found using regular expression matching.
 
+All segmentation and annotation calls run on the game thread of the simulator, so it is safe to call them at any moment during the simulation. A regular expression call is done as one single update, so setting many objects at once with a regular expression is much faster than doing one call per object.
+
 When wanting to retrieve the segmentation image through the API, it is recommended that you request uncompressed image using this API to ensure you get precise RGB values for segmentation image:
 ```python
 responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
