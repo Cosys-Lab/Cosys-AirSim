@@ -502,6 +502,12 @@ void UAnnotationComponent::TickComponent(
 	{
 		MarkRenderStateDirty(); // Without it will break the SkeletalMeshComponent
 	}
+	else if (SceneProxy != nullptr)
+	{
+		// The annotation of a static mesh needs no per-tick updates once its proxy exists; stop
+		// ticking, as thousands of them cost milliseconds every frame
+		SetComponentTickEnabled(false);
+	}
 	/*
 	// if (ParentMeshInfo->RequiresUpdate()) 
 	// TODO: This sometimes miss a required update, see OWIMap. Not sure why.
