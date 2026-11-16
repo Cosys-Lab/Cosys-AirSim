@@ -1,23 +1,24 @@
 # Getting Started with the Fab Plugin
 
-This page is for users who installed Cosys-AirSim from [Fab](https://www.fab.com/). It takes you from installing the plugin to flying a drone with a Python script in your own Unreal Engine project, in about 15 minutes. The rest of this documentation describes every feature in detail; links are given at the end of each step.
+This page is for users who installed Cosys-AirSim from [Fab](https://www.fab.com/). It takes you from installing the plugin to flying a drone with a Python script in about 15 minutes. The rest of this documentation describes every feature in detail and links are given at the end of each step.
 
 ## What is Cosys-AirSim?
 
-Cosys-AirSim is a simulator for drones, cars, skid-steer robots and computer vision research, built as an Unreal Engine plugin. You place it in any Unreal level, press Play, and a simulated vehicle with sensors appears that you can control and read out from your own code (Python, C++, MATLAB or ROS2) over a network API. It is used for:
+Cosys-AirSim is a simulator for drones, cars, robots and computer vision research, built as an Unreal Engine plugin. You place it in any Unreal level, press Play, and a simulated vehicle with sensors appears that you can control and read out from your own code (Python, C++, MATLAB or ROS2) over a network API. It is used for:
 
 - generating synthetic datasets: RGB, depth, surface normals, instance segmentation and custom annotation masks, LiDAR point clouds with labels
 - testing perception, navigation and control algorithms before deploying them on real robots
 - software-in-the-loop and hardware-in-the-loop testing with the PX4 and ArduPilot flight controllers
 - reinforcement learning, with the simulator as environment
 
-It is the Cosys-Lab (University of Antwerp) fork of Microsoft AirSim, extended with GPU LiDAR, a multi-layer annotation system, pulse echo (sonar/radar) sensors, skid-steer vehicles, artificial lights and more.
+It is the Cosys-Lab (University of Antwerp) fork of Microsoft AirSim, extended with many features such as better LiDAR simulation, a multi-layer annotation system, pulse echo (sonar/radar) sensors, skid-steer vehicles and more.
 
 ## What is in the plugin?
+In your content browser: tick *Show Plugin Content* in the settings, then **Plugins > AirSim Content > CosysAirSim**
 
-| Folder in `/AirSim/CosysAirSim` (Content Browser: tick *Show Plugin Content* in the settings, then **Plugins > AirSim Content > CosysAirSim**) | Contents |
+| Folder in `/AirSim/CosysAirSim`  | Contents |
 |---|---|
-| `Blueprints/Vehicles` | The vehicles that are spawned by the simulator: quadrotor (`BP_FlyingPawn`), SUV car (`BP_SuvCarPawn`), small indoor car (`BP_BoxCarPawn`), Clearpath Husky and Pioneer P3DX skid-steer robots (`BP_CPHuskyPawn`, `BP_PioneerPawn`) and a free-flying computer vision camera (`BP_ComputerVisionPawn`) |
+| `Blueprints/Vehicles` | The vehicles that are spawned by the simulator |
 | `Blueprints/Camera`, `Blueprints/Sensors` | The camera and sensor actors the vehicles use |
 | `Blueprints/Weather` | Weather effects (rain, snow, fog, dust, leaves) and the in-game weather menu |
 | `Blueprints/Lights` | Point and spot lights that can be spawned and controlled through the API |
@@ -28,19 +29,15 @@ The simulation itself (vehicle physics, sensor models, the API server) is in the
 
 ## Requirements
 
-- Unreal Engine 5.8 on Windows 64-bit or Linux (see the supported platforms on the Fab page).
-- The engine plugin **Chaos Vehicles** (ships with Unreal Engine, enabled automatically with Cosys-AirSim).
+- Unreal Engine with the engine plugin **Chaos Vehicles** (ships with Unreal Engine, enabled automatically with Cosys-AirSim).
 - To control the simulation from code: Python 3.8 or newer (or C++, MATLAB or ROS2, see [Next steps](#next-steps)).
 - A dedicated GPU is recommended, especially for cameras and GPU LiDAR.
 
 ## Step 1: Install the plugin
 
-1. In the Epic Games Launcher, open **Fab Library**, find **Cosys-AirSim** and click **Install to Engine**. Choose Unreal Engine 5.8.
+1. In the Epic Games Launcher, open **Fab Library**, find **Cosys-AirSim** and click **Install to Engine**. 
 2. Open your project, or create a new one (any template works, Blueprint or C++, for example the *Blank* or *Third Person* template).
 3. Open **Edit > Plugins**, search for **Cosys-AirSim**, tick **Enabled** and restart the editor when asked. Chaos Vehicles is enabled with it.
-
-!!! note
-    On Linux there is no Epic Games Launcher. Download the plugin from your Fab library in the browser, or use the precompiled plugin from the [GitHub releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases) or [build it from source](install_linux.md), and place the `AirSim` plugin folder in the `Plugins` folder of your project.
 
 ## Step 2: Set up your level
 
@@ -122,17 +119,6 @@ client.enableApiControl(False)
 ```
 
 All positions are in meters in the NED frame (x north, y east, z down) with the Player Start as origin. The [API documentation](apis.md) lists all functions, and the [Python examples on GitHub](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main/PythonClient) cover cars, LiDAR, segmentation, annotation, weather and more.
-
-## Step 6 (optional): Package your project
-
-To package a project that uses Cosys-AirSim, make sure all plugin content is cooked, as the simulator loads most of it at runtime. Add this to `Config/DefaultGame.ini` of your project:
-
-```ini
-[/Script/UnrealEd.ProjectPackagingSettings]
-+DirectoriesToAlwaysCook=(Path="/AirSim/CosysAirSim")
-```
-
-The packaged game reads the same `settings.json` and serves the same API. See [Download and run](run_packaged.md) for the command line options of a packaged build.
 
 ## Next steps
 
