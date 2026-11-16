@@ -198,12 +198,12 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
           "Width": 256,
           "Height": 144,
           "FOV_Degrees": 90,
-          "AutoExposureBias": 1.3,
+          "AutoExposureCompensation": 1.3,
           "AutoExposureMaxBrightness": 0.64,
           "AutoExposureMinBrightness": 0.03,
           "MotionBlurAmount": 1,
           "MotionBlurMax": 10,
-          "ChromaticAberrationScale": 2,
+          "ChromaticAberrationIntensity": 2,
           "LumenGIEnable": true,
           "LumenReflectionEnable": true,
           "LumenFinalQuality": 1,
@@ -223,7 +223,7 @@ By default, every image requested through the API is copied from the GPU with a 
 airsim.AsyncCaptureReadback 1
 ```
 
-The image is then copied without stalling the render thread and the request completes once the copy is available, typically one frame later. This applies to uncompressed and compressed 8-bit images and to float images; other render target formats keep using the blocking path. If a copy does not complete within 600 frames (e.g. after a lost GPU device), the request returns an empty image (width and height 0) instead of blocking forever. Set it back to `0` for the default behavior.
+The image is then copied without stalling the render thread and the request completes once the copy is available, typically one frame later. This applies to uncompressed and compressed 8-bit images and to float images. If a copy does not complete within 600 frames (e.g. after a lost GPU device), the request returns an empty image (width and height 0) instead of blocking forever. Set it back to `0` for the default behavior.
 
 ## What Does Pixel Values Mean in Different Image Types?
 ### Available ImageType Values
@@ -307,7 +307,7 @@ An extension to `simListInstanceSegmentationObjects()` is `simListInstanceSegmen
 Once you decide on the meshes you are interested, note down their names and use above API to set their object IDs. T
 
 #### Changing Colors for Object IDs
-At present the color for each object ID is fixed as in [this pallet](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/HUDAssets/seg_color_palette.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
+At present the color for each object ID is fixed as in [this pallet](images/seg_color_palette.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
 
 #### Startup Object IDs
 At the start, AirSim assigns color indexes to each object found in environment of type `UStaticMeshComponent` or `USkinnedMeshComponent`. It then makes an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).

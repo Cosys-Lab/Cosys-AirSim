@@ -12,6 +12,19 @@ Please contact a Cosys-Lab researcher to get more in depth information on which 
 
 This [5.2.1 branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is for the development of Cosys-AirSim on Unreal Engine v5.2.1. The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1/docs).
 For the latest stable and maintained build for a recent Unreal Engine see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) and associated builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
+
+## Differences with the Unreal Engine 5.8 version
+
+This branch has the same features, API and settings as the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) for Unreal Engine 5.8, and the same documentation. The differences are:
+
+- It uses Unreal Engine 5.2.1, built with Visual Studio 2022 and the MSVC toolset 14.38 on Windows (see [Install from source - Windows](docs/install_windows.md)).
+- It is not available on Fab. The [Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/) is only for Unreal Engine 5.8.
+- The plugin content keeps its original folder layout and asset names, for example `/AirSim/VehicleAdv/SUV/SuvCarPawn` and `PointLightBP`. On 5.8 they moved to a single `/AirSim/CosysAirSim` folder with type-prefixed names (`BP_SuvCarPawn`, `BP_PointLight`). Use the 5.2.1 names in `PawnPaths` and `simSpawnObject`; the documentation uses them as well.
+- The plugin source keeps its original layout (`Source/` instead of `Source/AirSim/{Public,Private}`).
+- Skeletal meshes are not well supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
+- The `ros2` branch, which holds only the ROS2 node, is made from the 5.8 branch. Build the ROS2 node from the `ros2` folder of this branch instead (see [ROS2](docs/ros2.md)).
+- No packaged binaries of Blocks are released for 5.2.1.
+
 ## Associated publications
 
 - [Cosys-AirSim: A Real-Time Simulation Framework Expanded for Complex Industrial Applications](https://arxiv.org/abs/2303.13381)
@@ -76,6 +89,8 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
 
 ## How to Get It
+#### Install from FAB
+The Fab plugin is only available for Unreal Engine 5.8, see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) and [Getting started with the Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/).
 #### Download and run from packaged binary - Windows/Linux
 * [Download and run it](https://cosys-lab.github.io/Cosys-AirSim/run_packaged)
 #### Download and install from precompiled plugin - Windows/Linux
