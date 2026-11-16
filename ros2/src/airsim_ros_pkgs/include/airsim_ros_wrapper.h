@@ -286,7 +286,10 @@ private:
 
     // state, returns the simulation timestamp best guess based on drone state timestamp, airsim needs to return timestap for environment
     rclcpp::Time update_state();
-    void update_and_publish_static_transforms(VehicleROS* vehicle_ros);
+    void update_and_publish_static_transforms(VehicleROS* vehicle_ros, const rclcpp::Time& stamp);
+    // thread-safe reads of state written by update_state() (take vehicle_state_mutex_)
+    rclcpp::Time get_vehicle_stamp(VehicleROS* vehicle_ros);
+    msr::airlib::Quaternionr get_drone_orientation(MultiRotorROS* drone);
     void publish_vehicle_state();
 
     /// ROS service callbacks
@@ -419,6 +422,11 @@ private:
     // todo for multiple drones with multiple sensors, this won't scale. make it a part of VehicleROS?
 
     std::mutex control_mutex_;
+    // Guards the per-vehicle state written by update_state() (curr_*_state_, curr_odom_, gps_sensor_msg_,
+    // env_msg_, car/cv state msgs, stamp_, state_updated_, static_tf_published_). Callbacks run in a
+    // reentrant group on a MultiThreadedExecutor, so other callbacks (and the state timer itself) can run
+    // concurrently. Never held during RPC calls. Lock order: control_mutex_ before vehicle_state_mutex_.
+    std::mutex vehicle_state_mutex_;
 
     // gimbal control
     bool has_gimbal_cmd_;
