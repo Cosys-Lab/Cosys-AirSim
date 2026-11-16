@@ -10,6 +10,8 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
+**Installed Cosys-AirSim from Fab?** Start with [Getting started with the Fab plugin](fab_getting_started.md): it takes you from installing the plugin to flying a drone from Python in your own project, and answers the most common questions.
+
 This documentation is for the latest stable Unreal Version v5.8 on the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main), maintained for support, and is available for builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
 Unreal [5.2.1](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is also available for long term support but the documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1/docs).
 
