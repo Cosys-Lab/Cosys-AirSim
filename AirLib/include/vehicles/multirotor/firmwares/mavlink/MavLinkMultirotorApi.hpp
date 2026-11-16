@@ -1913,7 +1913,9 @@ namespace airlib
             was_reset_ = false;
             received_actuator_controls_ = false;
             lock_step_active_ = false;
-            lock_step_enabled_ = false;
+            // keep the LockStep setting: resetState() also runs when the connections are opened, after initialize()
+            // has read the setting, so clearing it here made lockstep impossible to enable
+            lock_step_enabled_ = connection_info_.lock_step;
             has_gps_lock_ = false;
             send_params_ = false;
             mocap_pose_ = Pose::nanPose();
