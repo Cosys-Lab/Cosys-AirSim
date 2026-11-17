@@ -178,6 +178,8 @@ By default, when the world loads, all meshes are checked for tags and the annota
 With the unreal blueprint and c++ functions however, you can also decide to update the annotation layer only when you want to with the `update_annotation` argument. 
 If you have many objects to update, this can save a lot of time by doing it only for the last object.
 
+Annotation RPC calls run on the Unreal game thread, so they can be called while the simulation is running. Regex-based setters update all matching objects in one game-thread operation.
+
 Some API functions exist for all types, for example in Python:
 
 * `simListAnnotationObjects(annotation_name)` to get a list of all objects within this annotation layer. 
