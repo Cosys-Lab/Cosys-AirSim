@@ -103,6 +103,13 @@ set "MSBUILD_TOOLSET_ARG="
 if NOT "%AIRSIM_VCTOOLSVERSION%" == "" (
     set "CMAKE_TOOLSET_ARG=-T version=%AIRSIM_VCTOOLSVERSION%"
     set "MSBUILD_TOOLSET_ARG=/p:VCToolsVersion=%AIRSIM_VCTOOLSVERSION%"
+    REM //CMake wants the name of the toolset folder in VC\Auxiliary\Build (e.g. 14.38.17.8), which can differ
+    REM //from the toolset version (e.g. 14.38.33130); find the folder whose version file names this version
+    for /d %%D in ("%VCINSTALLDIR%Auxiliary\Build\*") do (
+        if exist "%%D\Microsoft.VCToolsVersion.%%~nxD.txt" (
+            findstr /x /c:"%AIRSIM_VCTOOLSVERSION%" "%%D\Microsoft.VCToolsVersion.%%~nxD.txt" >nul && set "CMAKE_TOOLSET_ARG=-T version=%%~nxD"
+        )
+    )
 )
 
 ECHO Starting cmake to build rpclib...
@@ -110,11 +117,12 @@ IF NOT EXIST external\rpclib\%RPC_VERSION_FOLDER%\build mkdir external\rpclib\%R
 cd external\rpclib\%RPC_VERSION_FOLDER%\build
 cmake -G"Visual Studio 17 2022" %CMAKE_TOOLSET_ARG% ..
 
+REM //older CMake versions ignore "-T version=", so also pass the pinned toolset to MSBuild directly
 if "%buildMode%" == "" (
-cmake --build . 
-cmake --build . --config Release
+cmake --build . -- %MSBUILD_TOOLSET_ARG%
+cmake --build . --config Release -- %MSBUILD_TOOLSET_ARG%
 ) else (
-cmake --build . --config %buildMode%
+cmake --build . --config %buildMode% -- %MSBUILD_TOOLSET_ARG%
 )
 
 if ERRORLEVEL 1 goto :buildfailed
