@@ -14,8 +14,8 @@ We've two options for docker. You can either build an image for running [Cosys-A
    Defaults to `airsim_binary` with same tag as the base image.
 
 ```bash
-cd Airsim/docker;
-python build_airsim_image.py \
+cd Cosys-AirSim/docker
+python3 build_airsim_image.py \
    --base_image=ghcr.io/epicgames/unreal-engine:dev-slim-5.8.0 \
    --target_image=airsim_binary:dev-slim-5.8.0
 ```
@@ -29,7 +29,7 @@ Let's take the Blocks project binary as an example.
 You can download it by running
 
 ```bash
-cd Airsim/docker;
+cd Cosys-AirSim/docker
 ./download_blocks_env_binary.sh
 ```
 
@@ -48,7 +48,7 @@ xhost +local:docker
 
    * `DOCKER_IMAGE_NAME`: Same as `target_image` parameter in previous step. By default, enter `airsim_binary:dev-slim-5.8.0`
    * `UNREAL_BINARY_SHELL_SCRIPT`: for Blocks enviroment, it will be `LinuxBlocks/Linux/Blocks.sh`
-   * [`UNREAL_BINARY_ARGUMENTS`](https://docs.unrealengine.com/en-us/Programming/Basics/CommandLineArguments):
+   * [`UNREAL_BINARY_ARGUMENTS`](https://dev.epicgames.com/documentation/en-us/unreal-engine/command-line-arguments-in-unreal-engine?application_version=5.8):
       For airsim, most relevant would be `-windowed`, `-ResX`, `-ResY`. Click on link to see all options.
 
 [Click here for info on specifying a `settings.json`](#specifying-settingsjson)
@@ -65,8 +65,8 @@ xhost +local:docker
    Defaults to `airsim_source` with same tag as the base image
 
 ```bash
-$ cd Airsim/docker;
-$ python build_airsim_image.py \
+cd Cosys-AirSim/docker
+python3 build_airsim_image.py \
    --source \
    --base_image ghcr.io/epicgames/unreal-engine:dev-slim-5.8.0 \
    --target_image=airsim_source:dev-slim-5.8.0
@@ -109,7 +109,7 @@ You can test it by running `/home/ue4/Binaries/Blocks/Linux/Blocks.sh -windowed`
 
 ## Specifying settings.json
 #### `airsim_binary` docker image:
-  - We're mapping the host machine's `PATH/TO/Airsim/settings.json` to the docker container's `/home/airsim_user/Documents/airsim/settings.json`.
+  - We're mapping the host machine's `Cosys-AirSim/docker/settings.json` to the docker container's `/home/airsim_user/Documents/AirSim/settings.json`.
   - Hence, we can load any settings file by simply modifying `PATH_TO_YOUR/settings.json` by modifying the following snippets in [`run_airsim_image_binary.sh`](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docker/run_airsim_image_binary.sh) to link `$PATH_TO_YOUR` to the correct folder. 
 
 ```sh
@@ -123,7 +123,7 @@ $DOCKER_IMAGE_NAME \
 
 ####  `airsim_source` docker image:
 
-  * We're mapping the host machine's `PATH/TO/Cosys-AirSim/settings.json` to the docker container's `/home/ue4/Documents/airsim/settings.json`.
+  * We're mapping the host machine's `Cosys-AirSim/docker/settings.json` to the docker container's `/home/ue4/Documents/AirSim/settings.json`.
   * Hence, we can load any settings file by simply modifying `PATH_TO_YOUR/settings.json` by modifying the following snippets in [`run_airsim_image_source.sh`](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docker/run_airsim_image_source.sh):
 
 ```sh
