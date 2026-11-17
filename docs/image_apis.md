@@ -261,6 +261,8 @@ success = client.simSetSegmentationObjectID("ground[\w]*", 21, True)
 
 The return value is true if at least one mesh was found using regular expression matching.
 
+Annotation and instance-segmentation RPC calls run on the Unreal game thread, so they can be called while the simulation is running. Regex-based setters update all matching objects in one game-thread operation.
+
 When wanting to retrieve the segmentation image through the API, it is recommended that you request uncompressed image using this API to ensure you get precise RGB values for segmentation image:
 ```python
 responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])

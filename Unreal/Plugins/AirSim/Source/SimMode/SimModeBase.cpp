@@ -822,7 +822,8 @@ bool ASimModeBase::SetMeshInstanceSegmentationID(const std::string& mesh_name, i
 		std::regex name_regex;
 		name_regex.assign(mesh_name, std::regex_constants::icase);
 		int changes = 0;
-		for (auto It = instance_segmentation_annotator_.GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        TMap<FString, UMeshComponent*> nameToComponentMap = instance_segmentation_annotator_.GetNameToComponentMap();
+		for (auto It = nameToComponentMap.CreateConstIterator(); It; ++It)
 		{
 			if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
 				bool success;
@@ -916,7 +917,8 @@ bool ASimModeBase::SetMeshRGBAnnotationID(const std::string& annotation_name, co
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        TMap<FString, UMeshComponent*> nameToComponentMap = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
+        for (auto It = nameToComponentMap.CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -964,7 +966,8 @@ bool ASimModeBase::SetMeshRGBAnnotationColor(const std::string& annotation_name,
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        TMap<FString, UMeshComponent*> nameToComponentMap = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
+        for (auto It = nameToComponentMap.CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -1007,7 +1010,8 @@ bool ASimModeBase::SetMeshGreyscaleAnnotationValue(const std::string& annotation
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        TMap<FString, UMeshComponent*> nameToComponentMap = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
+        for (auto It = nameToComponentMap.CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -1068,7 +1072,8 @@ bool ASimModeBase::SetMeshTextureAnnotationPath(const std::string& annotation_na
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        TMap<FString, UMeshComponent*> nameToComponentMap = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
+        for (auto It = nameToComponentMap.CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -1115,7 +1120,8 @@ bool ASimModeBase::EnableMeshTextureAnnotationByPath(const std::string& annotati
         std::regex name_regex;
         name_regex.assign(mesh_name, std::regex_constants::icase);
         int changes = 0;
-        for (auto It = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap().CreateConstIterator(); It; ++It)
+        TMap<FString, UMeshComponent*> nameToComponentMap = annotators_[FString(annotation_name.c_str())].GetNameToComponentMap();
+        for (auto It = nameToComponentMap.CreateConstIterator(); It; ++It)
         {
             if (std::regex_match(TCHAR_TO_UTF8(*It.Key()), name_regex)) {
                 bool success;
@@ -1247,94 +1253,85 @@ void ASimModeBase::ForceUpdateAnnotation(FString annotation_name) {
 }
 
 void ASimModeBase::updateInstanceSegmentationAnnotation() {
-	instance_segmentation_annotator_.UpdateAnnotationComponents(this->GetWorld());
-    TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = instance_segmentation_annotator_.GetAnnotationComponents();
+    UAirBlueprintLib::RunCommandOnGameThread([this]() {
+        instance_segmentation_annotator_.UpdateAnnotationComponents(this->GetWorld());
+        TArray<TWeakObjectPtr<UPrimitiveComponent>> current_segmentation_components = instance_segmentation_annotator_.GetAnnotationComponents();
 
-    TArray<AActor*> cameras_found;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
+        TArray<AActor*> cameras_found;
         UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
-        }, true);
-    if (cameras_found.Num() >= 0) {
         for (auto camera_actor : cameras_found) {
             APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
             cur_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
         }
-    }
-    TArray<AActor*> lidar_cameras_found;
-    UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
+
+        TArray<AActor*> lidar_cameras_found;
         UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
-        }, true);
-    if (cameras_found.Num() >= 0) {
         for (auto lidar_camera_actor : lidar_cameras_found) {
             ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
-            if(cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_)
+            if (cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_)
                 cur_lidar_camera->updateInstanceSegmentationAnnotation(current_segmentation_components);
         }
-    }
-    if (CameraDirector != nullptr) {
-        if(CameraDirector->getFpvCamera() != nullptr)
-			CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
-        if (CameraDirector->getExternalCamera() != nullptr)
-            CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
-        if (CameraDirector->getBackupCamera() != nullptr)
-            CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
-        if (CameraDirector->getFrontCamera() != nullptr)
-            CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
-    }
+
+        if (CameraDirector != nullptr) {
+            if (CameraDirector->getFpvCamera() != nullptr)
+                CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+            if (CameraDirector->getExternalCamera() != nullptr)
+                CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+            if (CameraDirector->getBackupCamera() != nullptr)
+                CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+            if (CameraDirector->getFrontCamera() != nullptr)
+                CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_segmentation_components, true);
+        }
+    }, true);
 }
 
 void ASimModeBase::updateAnnotation(FString annotation_name) {
-    if (annotators_.Contains(annotation_name) == false) {
-        UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
-    }
-    else {
-		annotators_[annotation_name].UpdateAnnotationComponents(this->GetWorld());
+    UAirBlueprintLib::RunCommandOnGameThread([this, annotation_name]() {
+        if (annotators_.Contains(annotation_name) == false) {
+            UE_LOG(LogTemp, Log, TEXT("AirSim Annotation [%s]: Could not find annotation layer %s"), *annotation_name, *annotation_name);
+            return;
+        }
+
+        annotators_[annotation_name].UpdateAnnotationComponents(this->GetWorld());
         TArray<TWeakObjectPtr<UPrimitiveComponent>> current_annotation_components = annotators_[annotation_name].GetAnnotationComponents();
+
         TArray<AActor*> cameras_found;
-        UAirBlueprintLib::RunCommandOnGameThread([this, &cameras_found]() {
-            UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
-            }, true);
-        UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
-        if (cameras_found.Num() >= 0) {
-            for (auto camera_actor : cameras_found) {
-                APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
-                cur_camera->updateAnnotation(current_annotation_components, annotation_name);
-            }
+        UGameplayStatics::GetAllActorsOfClass(this, APIPCamera::StaticClass(), cameras_found);
+        for (auto camera_actor : cameras_found) {
+            APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
+            cur_camera->updateAnnotation(current_annotation_components, annotation_name);
         }
+
         TArray<AActor*> lidar_cameras_found;
-        UAirBlueprintLib::RunCommandOnGameThread([this, &lidar_cameras_found]() {
-            UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
-            }, true);
-        UAirBlueprintLib::FindAllActor<ALidarCamera>(this, lidar_cameras_found);
-        if (cameras_found.Num() >= 0) {
-            for (auto lidar_camera_actor : lidar_cameras_found) {
-                ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
-                if (!cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_ && cur_lidar_camera->annotation_name_ == annotation_name)
-                    cur_lidar_camera->updateAnnotation(current_annotation_components);
-            }
+        UGameplayStatics::GetAllActorsOfClass(this, ALidarCamera::StaticClass(), lidar_cameras_found);
+        for (auto lidar_camera_actor : lidar_cameras_found) {
+            ALidarCamera* cur_lidar_camera = static_cast<ALidarCamera*>(lidar_camera_actor);
+            if (!cur_lidar_camera->instance_segmentation_ && cur_lidar_camera->generate_groundtruth_ && cur_lidar_camera->annotation_name_ == annotation_name)
+                cur_lidar_camera->updateAnnotation(current_annotation_components);
         }
+
         if (CameraDirector != nullptr) {
             if (CameraDirector->getFpvCamera() != nullptr)
-        CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+                CameraDirector->getFpvCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
             if (CameraDirector->getExternalCamera() != nullptr)
-        CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+                CameraDirector->getExternalCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
             if (CameraDirector->getBackupCamera() != nullptr)
-        CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+                CameraDirector->getBackupCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
             if (CameraDirector->getFrontCamera() != nullptr)
-        CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
+                CameraDirector->getFrontCamera()->updateInstanceSegmentationAnnotation(current_annotation_components, true);
         }
-    }
+    }, true);
 }
 
 void ASimModeBase::AddAnnotatorCamera(FString name, FObjectAnnotator::AnnotatorType type, float max_view_distance) {
-    TArray<AActor*> cameras_found;
-    UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
-    if (cameras_found.Num() >= 0) {
+    UAirBlueprintLib::RunCommandOnGameThread([this, name, type, max_view_distance]() {
+        TArray<AActor*> cameras_found;
+        UAirBlueprintLib::FindAllActor<APIPCamera>(this, cameras_found);
         for (auto camera_actor : cameras_found) {
             APIPCamera* cur_camera = static_cast<APIPCamera*>(camera_actor);
             cur_camera->addAnnotationCamera(name, type, max_view_distance);
         }
-    }
+    }, true);
 }
 
 

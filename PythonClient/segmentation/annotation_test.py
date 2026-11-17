@@ -4,6 +4,7 @@ import setup_path
 import cosysairsim as airsim
 import csv
 import random
+import re
 import numpy as np
 from PIL import Image
 from datetime import datetime
@@ -12,6 +13,16 @@ if __name__ == '__main__':
 
     client = airsim.CarClient()
     client.confirmConnection()
+
+    annotation_name = "GreyscaleTest"
+    annotation_objects = client.simListAnnotationObjects(annotation_name)
+    assert annotation_objects, "GreyscaleTest has no annotated objects"
+    mesh_name = annotation_objects[0]
+    original_value = client.simGetAnnotationObjectValue(annotation_name, mesh_name)
+    assert client.simSetAnnotationObjectValue(annotation_name, mesh_name, original_value)
+    regex = "^" + re.escape(mesh_name) + "$"
+    assert client.simSetAnnotationObjectValue(annotation_name, regex, original_value, True)
+    assert abs(client.simGetAnnotationObjectValue(annotation_name, mesh_name) - original_value) < 1e-3
 
     responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
     img_rgb_string = responses[0].image_data_uint8
@@ -61,4 +72,3 @@ if __name__ == '__main__':
     img = Image.fromarray(rgbarray_shaped, 'RGB')
     img.show()
     img.save("TextureTestRelativePath.png", "PNG")
-

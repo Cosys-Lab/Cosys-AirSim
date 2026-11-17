@@ -6,6 +6,7 @@
 * Fixed issues related to object detection.
 * Fixed ROS2 node publishing the same duplicate messages (same timestamp and data) multiple times.
 * Fixed simSpawnObject argument count in the C++ client. [#151 by megavedl](https://github.com/Cosys-Lab/Cosys-AirSim/pull/151).
+* Fixed crashes in annotation and instance-segmentation API calls made while the simulation runs by dispatching those calls to the Unreal game thread. Regex-based updates now run as a single game-thread operation. [#176](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
 
 ### version 3.4.1
 * Fixed crash in annotation system. 
