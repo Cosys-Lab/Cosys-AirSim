@@ -2052,7 +2052,17 @@ void AirsimROSWrapper::process_and_publish_img_response(const std::vector<ImageR
     int img_response_idx_internal = img_response_idx;
 
     for (const auto& curr_img_response : img_response_vec) {
-   
+
+        // an image the simulator could not capture has no data and size 0x0, skip it instead of dividing by its height
+        if (curr_img_response.width == 0 || curr_img_response.height == 0) {
+            RCLCPP_WARN_THROTTLE(nh_->get_logger(), *nh_->get_clock(), 1000,
+                                 "empty image from camera '%s', skipped: %s",
+                                 curr_img_response.camera_name.c_str(),
+                                 curr_img_response.message.empty() ? "no reason given" : curr_img_response.message.c_str());
+            img_response_idx_internal++;
+            continue;
+        }
+
         // todo simGetCameraInfo is wrong + also it's only for image type -1.
         // msr::airlib::CameraInfo camera_info = airsim_client_.simGetCameraInfo(curr_img_response.camera_name);
 
