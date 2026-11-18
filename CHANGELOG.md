@@ -1,4 +1,4 @@
-### Unreleased
+### Version 4.0.0 (November 2026)
 * MAJOR CHANGE: Plugin content moved into a single `CosysAirSim` folder with type-prefixed asset names. Old asset paths keep working through CoreRedirects, but `simSpawnObject` looks assets up by name, so use the new names there (e.g. `PointLightBP` is now `BP_PointLight`, `SpotLightBP` is now `BP_SpotLight`). The `[CoreRedirects]` in the plugin `Config/DefaultAirSim.ini` list every old and new name.
 * MAJOR CHANGE: Plugin source reorganised into the standard Unreal layout: `Source/AirSim/{Public,Private}`, with AirLib (its headers and static library) and the other third-party libraries as their own modules in `Source/ThirdParty`. Code that includes AirSim headers may need updated include paths.
 
