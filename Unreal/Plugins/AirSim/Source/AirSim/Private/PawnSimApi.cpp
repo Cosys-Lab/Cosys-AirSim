@@ -1,5 +1,13 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "PawnSimApi.h"
+#include "Engine/Light.h"
+#include "Engine/PointLight.h"
+#include "Engine/SpotLight.h"
+#include "Engine/RectLight.h"
+#include "Components/RectLightComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"

@@ -1,5 +1,8 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "AirSimCameraDirector.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/Engine.h"
+#include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "AirBlueprintLib.h"
 

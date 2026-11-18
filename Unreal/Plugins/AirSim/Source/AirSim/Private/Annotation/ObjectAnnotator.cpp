@@ -3,6 +3,12 @@
 // This class and its functions are derivatives of the work of UnrealCV, https://unrealcv.org/
 // Licensed under the MIT License.
 #include "Annotation/ObjectAnnotator.h"
+#include "Components/MeshComponent.h"
+#include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
+#include "ShowFlags.h"
+#include "GameFramework/Actor.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "Annotation/AnnotationComponent.h"

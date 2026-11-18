@@ -3,6 +3,7 @@
 
 #if defined _WIN32 || defined _WIN64
 
+#include "HAL/Platform.h"
 #include <memory>
 #include <string>
 

@@ -1,5 +1,8 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "Vehicles/Car/CarPawn.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/Controller.h"
 #include "Components/TextRenderComponent.h"

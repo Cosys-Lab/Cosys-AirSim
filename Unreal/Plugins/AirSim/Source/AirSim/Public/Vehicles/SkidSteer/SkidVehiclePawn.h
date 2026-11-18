@@ -2,11 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ChaosWheeledVehicleMovementComponent.h"
 #include "WheeledVehiclePawn.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "PhysicalMaterials/PhysicalMaterial.h"
-#include "UObject/ConstructorHelpers.h"
 
 #include "physics/Kinematics.hpp"
 #include "vehicles/car/api/CarApiBase.hpp"
@@ -19,6 +15,9 @@
 #include "PIPCamera.h"
 
 #include "SkidVehiclePawn.generated.h"
+
+class UChaosVehicleMovementComponent;
+class USkeletalMeshComponent;
 
 class UPhysicalMaterial;
 class UCameraComponent;

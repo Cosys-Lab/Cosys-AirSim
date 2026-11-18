@@ -1,6 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #include "UnrealSensors/UnrealDistanceSensor.h"
+#include "Engine/HitResult.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "NedTransform.h"

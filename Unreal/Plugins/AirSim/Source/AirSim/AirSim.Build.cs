@@ -34,6 +34,8 @@ public class AirSim : ModuleRules
     {
         //bEnforceIWYU = true; //to support 4.16
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        // A small private PCH instead of the engine's shared PCH (see Private/AirSimPCH.h)
+        PrivatePCHHeaderFile = "Private/AirSimPCH.h";
 
         bEnableExceptions = true;
 

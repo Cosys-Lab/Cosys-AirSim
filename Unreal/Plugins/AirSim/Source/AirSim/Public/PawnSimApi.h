@@ -3,7 +3,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Particles/ParticleSystemComponent.h"
 #include "UnrealImageCapture.h"
 
 #include <vector>
@@ -19,14 +18,11 @@
 #include "SimJoyStick/SimJoyStick.h"
 #include "api/VehicleApiBase.hpp"
 #include "api/VehicleSimApiBase.hpp"
-#include "Components/RectLightComponent.h"
-#include "Components/SpotLightComponent.h"
-#include "Engine/PointLight.h"
-#include "Engine/RectLight.h"
-#include "Engine/SpotLight.h"
-#include "Engine/Light.h"
 
 #include "common/common_utils/UniqueValueMap.hpp"
+
+class ALight;
+class UParticleSystem;
 
 #include "PawnEvents.h"
 

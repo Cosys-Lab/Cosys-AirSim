@@ -1,5 +1,9 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "DetectionComponent.h"
+#include "TextureResource.h"
+#include "Components/SkinnedMeshComponent.h"
+#include "Components/MeshComponent.h"
+#include "GameFramework/Actor.h"
 
 #include <Components/SceneCaptureComponent2D.h>
 #include <Components/StaticMeshComponent.h>

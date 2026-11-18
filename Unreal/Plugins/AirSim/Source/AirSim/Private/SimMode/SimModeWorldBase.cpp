@@ -1,5 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "SimMode/SimModeWorldBase.h"
+#include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "physics/FastPhysicsEngine.hpp"
 #include "physics/ExternalPhysicsEngine.hpp"
 #include <exception>
