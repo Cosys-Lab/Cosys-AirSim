@@ -24,6 +24,7 @@
 * Fixed `moveOnPath` not reporting success when the drone reaches the end of the path. [#167 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/167).
 * Fixed `euler_to_rotation_matrix` in the Python client using half angles and the wrong composition order (it now matches `euler_to_quaternion`). [#173 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/173).
 * Fixed a crash in annotation system. [#174 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/174).
+* Fixed the ROS2 node crashing (SIGFPE) on an empty image response, and camera images coming back empty without a reason when the Unreal garbage collector runs during an image request. [#186](https://github.com/Cosys-Lab/Cosys-AirSim/issues/186) and [#187 by ulastanersoyak](https://github.com/Cosys-Lab/Cosys-AirSim/pull/187).
 * Fixed annotated mesh names changing during their lifetime. [#175 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/175).
 * Fixed a crash when calling the annotation and instance segmentation API. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
 * Fixed `simSpawnObject` crashing with blueprints in packaged builds. [#124 by MACILLAS](https://github.com/Cosys-Lab/Cosys-AirSim/issues/124).
