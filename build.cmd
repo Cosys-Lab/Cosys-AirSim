@@ -232,23 +232,25 @@ if NOT exist %MAVLINK_TARGET_INCLUDE% mkdir %MAVLINK_TARGET_INCLUDE%
 robocopy /MIR MavLinkCom\include %MAVLINK_TARGET_INCLUDE%
 robocopy /MIR MavLinkCom\lib %MAVLINK_TARGET_LIB%
 
-REM //---------- stage everything into the Unreal plugin's Fab-compliant Source layout ----------
-REM //AirLib's own headers ship; its .cpp sources do NOT (the module links the precompiled
-REM //AirLib.lib instead - AIRLIB_HEADER_ONLY guards most of AirLib's own .cpp files down to
-REM //nothing when compiled as part of the UE module anyway, so there is nothing to gain and
-REM //only duplicate-symbol risk to lose by also shipping them).
-set AIRSIM_MODULE=Unreal\Plugins\AirSim\Source\AirSim
-if NOT exist %AIRSIM_MODULE%\Public\AirLib mkdir %AIRSIM_MODULE%\Public\AirLib
-REM //the vendored third-party headers (json, ctpl) go to ThirdParty\AirSimVendor below instead
-robocopy /MIR AirLib\include %AIRSIM_MODULE%\Public\AirLib /XD temp *. /XF json.hpp ctpl_stl.h /njh /njs /ndl /np
-REM //robocopy keeps excluded files that are already there, so remove copies from older builds
-if exist %AIRSIM_MODULE%\Public\AirLib\common\common_utils\json.hpp del /Q %AIRSIM_MODULE%\Public\AirLib\common\common_utils\json.hpp
-if exist %AIRSIM_MODULE%\Public\AirLib\common\common_utils\ctpl_stl.h del /Q %AIRSIM_MODULE%\Public\AirLib\common\common_utils\ctpl_stl.h
-if NOT exist %AIRSIM_MODULE%\Lib\AirLib mkdir %AIRSIM_MODULE%\Lib\AirLib
-robocopy /MIR AirLib\lib %AIRSIM_MODULE%\Lib\AirLib /XD temp *. /njh /njs /ndl /np
-
-REM //ThirdParty dependencies
+REM //---------- stage everything into the Unreal plugin's Fab-compliant Source\ThirdParty layout ----------
 set THIRDPARTY=Unreal\Plugins\AirSim\Source\ThirdParty
+REM //AirLib's own headers and static library ship; its .cpp sources do NOT (AIRLIB_HEADER_ONLY guards
+REM //most of AirLib's own .cpp files down to nothing when compiled as part of the UE module anyway,
+REM //so there is nothing to gain and only duplicate-symbol risk to lose by also shipping them).
+REM //Older builds staged AirLib in the AirSim module itself (Public\AirLib and Lib\AirLib), remove that.
+set AIRSIM_MODULE=Unreal\Plugins\AirSim\Source\AirSim
+if exist %AIRSIM_MODULE%\Public\AirLib rd /s/q %AIRSIM_MODULE%\Public\AirLib
+if exist %AIRSIM_MODULE%\Lib rd /s/q %AIRSIM_MODULE%\Lib
+if NOT exist %THIRDPARTY%\AirSimAirLib\include mkdir %THIRDPARTY%\AirSimAirLib\include
+REM //the vendored third-party headers (json, ctpl) go to ThirdParty\AirSimVendor below instead
+robocopy /MIR AirLib\include %THIRDPARTY%\AirSimAirLib\include /XD temp *. /XF json.hpp ctpl_stl.h /njh /njs /ndl /np
+REM //robocopy keeps excluded files that are already there, so remove copies from older builds
+if exist %THIRDPARTY%\AirSimAirLib\include\common\common_utils\json.hpp del /Q %THIRDPARTY%\AirSimAirLib\include\common\common_utils\json.hpp
+if exist %THIRDPARTY%\AirSimAirLib\include\common\common_utils\ctpl_stl.h del /Q %THIRDPARTY%\AirSimAirLib\include\common\common_utils\ctpl_stl.h
+if NOT exist %THIRDPARTY%\AirSimAirLib\lib mkdir %THIRDPARTY%\AirSimAirLib\lib
+robocopy /MIR AirLib\lib %THIRDPARTY%\AirSimAirLib\lib /XD temp *. /njh /njs /ndl /np
+
+REM //the other ThirdParty dependencies
 if NOT exist %THIRDPARTY%\AirSimEigen\Eigen mkdir %THIRDPARTY%\AirSimEigen\Eigen
 robocopy /MIR AirLib\deps\eigen3\Eigen %THIRDPARTY%\AirSimEigen\Eigen /XD temp *. /njh /njs /ndl /np
 if NOT exist %THIRDPARTY%\AirSimRpclib mkdir %THIRDPARTY%\AirSimRpclib
