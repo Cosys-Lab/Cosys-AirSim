@@ -284,6 +284,8 @@ ModelManifest.xml
 /MavLinkCom/lib/libMavLinkCom.a
 /Unreal/Plugins/AirSim/Source/AirSim/Public/AirLib/
 /Unreal/Plugins/AirSim/Source/AirSim/Lib/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimAirLib/include/
+/Unreal/Plugins/AirSim/Source/ThirdParty/AirSimAirLib/lib/
 /Unreal/Plugins/AirSim/Source/ThirdParty/AirSimEigen/Eigen/
 /Unreal/Plugins/AirSim/Source/ThirdParty/AirSimRpclib/include/
 /Unreal/Plugins/AirSim/Source/ThirdParty/AirSimRpclib/lib/
