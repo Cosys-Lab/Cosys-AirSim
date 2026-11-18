@@ -12,6 +12,8 @@
 #include <string>
 #include <utility>
 
+struct FActorSpawnParameters;
+
 class AIRSIM_API WorldSimApi : public msr::airlib::WorldSimApiBase
 {
 public:

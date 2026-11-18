@@ -1,6 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #include "UnrealSensors/UnrealEchoSensor.h"
+#include "Kismet/GameplayStatics.h"
 #include "AirBlueprintLib.h"
 #include "common/Common.hpp"
 #include "Async/ParallelFor.h"

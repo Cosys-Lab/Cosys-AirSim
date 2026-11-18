@@ -1,5 +1,9 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "WorldSimApi.h"
+#include "Engine/World.h"
+#include "Engine/StaticMesh.h"
+#include "DetectionComponent.h"
+#include "EngineUtils.h"
 #include "common/common_utils/Utils.hpp"
 #include "AirBlueprintLib.h"
 #include "TextureShuffleActor.h"
