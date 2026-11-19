@@ -1,5 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "AirSimGameMode.h"
+#include "Modules/ModuleManager.h"
 #include "Misc/FileHelper.h"
 #include "IImageWrapperModule.h"
 #include "SimHUD/SimHUD.h"

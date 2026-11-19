@@ -2,27 +2,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SkyLightComponent.h"
-#include "Engine/DirectionalLight.h"
 #include "GameFramework/Actor.h"
-#include "Components/MeshComponent.h"
-#include "Particles/ParticleSystem.h"
 #include "Annotation/ObjectAnnotator.h"
 #include <string>
-#include "AirSimCameraDirector.h"
 #include "common/AirSimSettings.hpp"
 #include "AssetRegistry/AssetData.h"
 #include "common/ClockFactory.hpp"
-#include "Engine/Light.h"
 #include "api/ApiServerBase.hpp"
 #include "api/ApiProvider.hpp"
 #include "PawnSimApi.h"
 #include "common/StateReporterWrapper.hpp"
-#include "LoadingScreenWidget.h"
 #include "UnrealImageCapture.h"
-#include "Beacons/TemplateBeacon.h"
-#include "Beacons/FiducialBeacon.h"
 #include "SimModeBase.generated.h"
+
+class AAirSimCameraDirector;
+class ADirectionalLight;
+class ALight;
+class ULoadingScreenWidget;
+class UMeshComponent;
+class UParticleSystem;
+class UTexture;
+enum class ECameraDirectorMode : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoaded);
 

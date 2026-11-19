@@ -32,6 +32,21 @@
 #include "DetectionComponent.h"
 #include "Components/LineBatchComponent.h"
 #include "CineCameraComponent.h"
+#include "Components/MeshComponent.h"
+#include "Engine/Blueprint.h"
+#include "GameFramework/PlayerController.h"
+#include "HAL/FileManager.h"
+#include "IImageWrapperModule.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetStringLibrary.h"
+#include "LandscapeComponent.h"
+#include "LandscapeProxy.h"
+#include "Rendering/PositionVertexBuffer.h"
+#include "StaticMeshResources.h"
+#include "common/AirSimSettings.hpp"
+#include <map>
+#include <regex>
 
 /*
 //TODO: change naming conventions to same as other files?
@@ -525,6 +540,38 @@ void UAirBlueprintLib::RunCommandOnGameThread(TFunction<void()> InFunction, bool
     }
 }
 
+AActor* UAirBlueprintLib::FindActorOfClass(const UObject* context, UClass* actor_class, const FString& name)
+{
+    FName name_n = FName(*name);
+    for (TActorIterator<AActor> It(context->GetWorld(), actor_class); It; ++It) {
+        AActor* Actor = *It;
+        if (IsValid(Actor) && (Actor->ActorHasTag(name_n) || Actor->GetName().Compare(name) == 0)) {
+            return Actor;
+        }
+    }
+    return nullptr;
+}
+
+void UAirBlueprintLib::FindAllActorsOfClass(const UObject* context, UClass* actor_class, TArray<AActor*>& found_actors)
+{
+    UGameplayStatics::GetAllActorsOfClass(context, actor_class, found_actors);
+}
+
+void UAirBlueprintLib::AddActionMapping(AActor* actor, const FInputActionKeyMapping& action)
+{
+    actor->GetWorld()->GetFirstPlayerController()->PlayerInput->AddActionMapping(action);
+}
+
+void UAirBlueprintLib::AddAxisMapping(AActor* actor, const FInputAxisKeyMapping& axis)
+{
+    actor->GetWorld()->GetFirstPlayerController()->PlayerInput->AddAxisMapping(axis);
+}
+
+UInputComponent* UAirBlueprintLib::GetPlayerInputComponent(AActor* actor)
+{
+    return actor->GetWorld()->GetFirstPlayerController()->InputComponent;
+}
+
 template <>
 std::string UAirBlueprintLib::GetMeshName<USkinnedMeshComponent>(USkinnedMeshComponent* mesh)
 {
@@ -538,6 +585,91 @@ std::string UAirBlueprintLib::GetMeshName<USkinnedMeshComponent>(USkinnedMeshCom
 std::string UAirBlueprintLib::GetMeshName(ALandscapeProxy* mesh)
 {
     return std::string(TCHAR_TO_UTF8(*(mesh->GetName())));
+}
+
+// Stencil ID helpers of InitializeMeshStencilIDs and SetMeshStencilID (only used in this file)
+namespace
+{
+    template <typename T>
+    void SetObjectStencilID(T* mesh, int object_id)
+    {
+        if (object_id < 0)
+        {
+            mesh->SetRenderCustomDepth(false);
+        }
+        else
+        {
+            mesh->SetCustomDepthStencilValue(object_id);
+            mesh->SetRenderCustomDepth(true);
+        }
+    }
+
+    void SetObjectStencilID(ALandscapeProxy* mesh, int object_id)
+    {
+        if (object_id < 0)
+        {
+            mesh->bRenderCustomDepth = false;
+        }
+        else
+        {
+            mesh->CustomDepthStencilValue = object_id;
+            mesh->bRenderCustomDepth = true;
+        }
+
+        // Explicitly set the custom depth state on the components so the
+        // render state is marked dirty and the update actually takes effect
+        // immediately.
+        for (ULandscapeComponent* comp : mesh->LandscapeComponents)
+        {
+            if (object_id < 0)
+            {
+                comp->SetRenderCustomDepth(false);
+            }
+            else
+            {
+                comp->SetCustomDepthStencilValue(object_id);
+                comp->SetRenderCustomDepth(true);
+            }
+        }
+    }
+
+    template <typename T>
+    void InitializeObjectStencilID(T* mesh, std::map<std::string, int> materialMap, bool ignore_existing = true)
+    {
+        std::string mesh_name = common_utils::Utils::toLower(UAirBlueprintLib::GetMeshName(mesh));
+        bool painted = false;
+
+        for (std::map<std::string, int>::iterator iter = materialMap.begin(); iter != materialMap.end(); ++iter)
+        {
+            std::string materialName = iter->first;
+            if (common_utils::Utils::contains(mesh_name, "_material_" + materialName)) {
+                int value = iter->second;
+                if (ignore_existing || mesh->CustomDepthStencilValue == 0) {
+                    SetObjectStencilID(mesh, value);
+                }
+                painted = true;
+                break;
+            }
+        }
+        if (!painted) {
+            SetObjectStencilID(mesh, 0);
+        }
+    }
+
+    template <typename T>
+    void SetObjectStencilIDIfMatch(T* mesh, int object_id,
+        const std::string& mesh_name, bool is_name_regex, const std::regex& name_regex, int& changes)
+    {
+        std::string comp_mesh_name = UAirBlueprintLib::GetMeshName(mesh);
+        if (comp_mesh_name == "")
+            return;
+        bool is_match = (!is_name_regex && (comp_mesh_name == mesh_name))
+            || (is_name_regex && std::regex_match(comp_mesh_name, name_regex));
+        if (is_match) {
+            ++changes;
+            SetObjectStencilID(mesh, object_id);
+        }
+    }
 }
 
 void UAirBlueprintLib::InitializeMeshStencilIDs(bool ignore_existing, FString material_list)

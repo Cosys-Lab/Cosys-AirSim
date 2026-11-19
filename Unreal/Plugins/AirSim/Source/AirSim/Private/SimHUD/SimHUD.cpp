@@ -1,5 +1,6 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "SimHUD/SimHUD.h"
+#include "Misc/Paths.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/FileHelper.h"

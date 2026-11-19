@@ -1,5 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "Vehicles/Car/CarPawnApi.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 #include "AirBlueprintLib.h"
 
 #include "ChaosVehicleManager.h"

@@ -1,6 +1,8 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #include "Vehicles/SkidSteer/SkidVehiclePawnSimApi.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
 #include "Vehicles/SkidSteer/SkidVehiclePawnApi.h"

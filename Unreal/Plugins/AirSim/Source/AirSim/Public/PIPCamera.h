@@ -2,26 +2,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SceneCaptureComponent2D.h"
-#include "Camera/CameraActor.h"
-#include "Materials/Material.h"
-#include "Runtime/Core/Public/PixelFormat.h"
+#include "PixelFormat.h"
 #include "Annotation/ObjectAnnotator.h"
 #include "common/ImageCaptureBase.hpp"
 #include "common/common_utils/Utils.hpp"
-#include "Components/StaticMeshComponent.h"
-#include <Engine/StaticMesh.h>
 #include "common/AirSimSettings.hpp"
 #include "NedTransform.h"
-#include "DetectionComponent.h"
+#include "ObjectFilter.h"
 
 //CinemAirSim
 #include <CineCameraActor.h>
-#include <CineCameraComponent.h>
-#include "Materials/MaterialParameterCollection.h"
-#include "Materials/MaterialParameterCollectionInstance.h"
-#include "Materials/MaterialInstanceDynamic.h"
 #include "PIPCamera.generated.h"
+
+class UCameraComponent;
+class UCineCameraComponent;
+class UDetectionComponent;
+class UMaterial;
+class UMaterialInstanceDynamic;
+class UMaterialParameterCollection;
+class UMaterialParameterCollectionInstance;
+class UPrimitiveComponent;
+class USceneCaptureComponent2D;
+class UStaticMesh;
+class UTextureRenderTarget2D;
 
 UCLASS()
 class AIRSIM_API APIPCamera : public ACineCameraActor //CinemAirSim

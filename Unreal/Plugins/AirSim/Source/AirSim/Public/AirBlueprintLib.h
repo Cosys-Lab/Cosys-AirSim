@@ -2,33 +2,25 @@
 
 #pragma once
 
+// This header is included by almost every file of the module, so it only includes what its declarations need.
+// The implementation includes are in AirBlueprintLib.cpp.
 #include "CoreMinimal.h"
-#include "AssetRegistry/AssetRegistryModule.h"
 #include "GameFramework/Actor.h"
 #include "Components/InputComponent.h"
-#include "EngineUtils.h"
-#include "Engine/Blueprint.h"
 #include "GameFramework/PlayerInput.h"
-#include "IImageWrapperModule.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AssetRegistry/AssetData.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Components/MeshComponent.h"
-#include "StaticMeshResources.h"
-#include "Rendering/PositionVertexBuffer.h"
-#include "LandscapeProxy.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetStringLibrary.h"
-#include "Engine/World.h"
-#include "Runtime/Landscape/Classes/LandscapeComponent.h"
-#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
-#include "Runtime/Core/Public/HAL/FileManager.h"
-#include "common/AirSimSettings.hpp"
+#include "common/CommonStructs.hpp"
 #include "UObject/ObjectMacros.h"
 #include "UObject/ScriptMacros.h"
 #include <string>
-#include <regex>
+#include <utility>
+#include <vector>
 #include "AirBlueprintLib.generated.h"
+
+class ALandscapeProxy;
+class IImageWrapperModule;
+class UInputComponent;
 
 UENUM(BlueprintType)
 enum class LogDebugLevel : uint8
@@ -60,21 +52,18 @@ public:
     template <typename T>
     static T* FindActor(const UObject* context, FString name)
     {
-        FName name_n = FName(*name);
-        for (TActorIterator<AActor> It(context->GetWorld(), T::StaticClass()); It; ++It) {
-            AActor* Actor = *It;
-            if (IsValid(Actor) && (Actor->ActorHasTag(name_n) || Actor->GetName().Compare(name) == 0)) {
-                return static_cast<T*>(Actor);
-            }
-        }
-        return nullptr;
+        return static_cast<T*>(FindActorOfClass(context, T::StaticClass(), name));
     }
 
     template <typename T>
     static void FindAllActor(const UObject* context, TArray<AActor*>& foundActors)
     {
-        UGameplayStatics::GetAllActorsOfClass(context, T::StaticClass(), foundActors);
+        FindAllActorsOfClass(context, T::StaticClass(), foundActors);
     }
+
+    // first actor of this class with this tag or name (the non-template part of FindActor)
+    static AActor* FindActorOfClass(const UObject* context, UClass* actor_class, const FString& name);
+    static void FindAllActorsOfClass(const UObject* context, UClass* actor_class, TArray<AActor*>& found_actors);
 
     static std::vector<std::string> ListMatchingActorsOriginal(const UObject* context, const std::string& name_regex);
     static std::vector<std::pair<std::string, std::string>> ListMatchingActorsTags(const UObject* context, const std::string& name_regex);
@@ -146,10 +135,8 @@ public:
     {
         FInputActionKeyMapping action(action_name, in_key, shift_key, control_key, alt_key, command_key);
 
-        APlayerController* controller = actor->GetWorld()->GetFirstPlayerController();
-
-        controller->PlayerInput->AddActionMapping(action);
-        return controller->InputComponent->BindAction(action_name, on_press_or_release ? IE_Pressed : IE_Released, actor, func);
+        AddActionMapping(actor, action);
+        return GetPlayerInputComponent(actor)->BindAction(action_name, on_press_or_release ? IE_Pressed : IE_Released, actor, func);
     }
 
     template <class UserClass>
@@ -165,11 +152,14 @@ public:
     static FInputAxisBinding& BindAxisToKey(const FInputAxisKeyMapping& axis, AActor* actor, UserClass* obj,
                                             typename FInputAxisHandlerSignature::TMethodPtr<UserClass> func)
     {
-        APlayerController* controller = actor->GetWorld()->GetFirstPlayerController();
-
-        controller->PlayerInput->AddAxisMapping(axis);
-        return controller->InputComponent->BindAxis(axis.AxisName, obj, func);
+        AddAxisMapping(actor, axis);
+        return GetPlayerInputComponent(actor)->BindAxis(axis.AxisName, obj, func);
     }
+
+    // the player controller parts of the Bind*ToKey templates
+    static void AddActionMapping(AActor* actor, const FInputActionKeyMapping& action);
+    static void AddAxisMapping(AActor* actor, const FInputAxisKeyMapping& axis);
+    static UInputComponent* GetPlayerInputComponent(AActor* actor);
 
     static int RemoveAxisBinding(const FInputAxisKeyMapping& axis, FInputAxisBinding* axis_binding, AActor* actor);
 
@@ -208,105 +198,6 @@ public:
     static std::vector<msr::airlib::MeshPositionVertexBuffersResponse> GetStaticMeshComponents();
 
 private:
-    template<typename T>
-    static void InitializeObjectStencilID(T* mesh, std::map< std::string, int> materialMap, bool ignore_existing = true)
-    {
-        std::string mesh_name = common_utils::Utils::toLower(GetMeshName(mesh));
-        bool painted = false;
-
-        for (std::map<std::string, int>::iterator iter = materialMap.begin(); iter != materialMap.end(); ++iter)
-        {
-            std::string materialName = iter->first;
-            if (common_utils::Utils::contains(mesh_name, "_material_" + materialName)) {
-                int value = iter->second;
-                if (ignore_existing || mesh->CustomDepthStencilValue == 0) {
-                    SetObjectStencilID(mesh, value);
-                }
-                painted = true;
-                break;
-            }
-        }
-        if (!painted) {
-            SetObjectStencilID(mesh, 0);
-        }
-    }
-
-    template<typename T>
-    static void SetObjectStencilIDIfMatch(T* mesh, int object_id,
-        const std::string& mesh_name, bool is_name_regex, const std::regex& name_regex, int& changes)
-    {
-        std::string comp_mesh_name = GetMeshName(mesh);
-        if (comp_mesh_name == "")
-            return;
-        bool is_match = (!is_name_regex && (comp_mesh_name == mesh_name))
-            || (is_name_regex && std::regex_match(comp_mesh_name, name_regex));
-        if (is_match) {
-            ++changes;
-            SetObjectStencilID(mesh, object_id);
-        }
-    }
-
-    template<typename T>
-    static void SetObjectStencilID(T* mesh, int object_id)
-    {
-        if (object_id < 0)
-        {
-            mesh->SetRenderCustomDepth(false);
-        }
-        else
-        {
-            mesh->SetCustomDepthStencilValue(object_id);
-            mesh->SetRenderCustomDepth(true);
-        }
-        //mesh->SetVisibility(false);
-        //mesh->SetVisibility(true);
-    }
-
-    static void SetObjectStencilID(ALandscapeProxy* mesh, int object_id)
-    {
-        if (object_id < 0)
-        {
-            mesh->bRenderCustomDepth = false;
-        }
-        else
-        {
-            mesh->CustomDepthStencilValue = object_id;
-            mesh->bRenderCustomDepth = true;
-        }
-
-        // Explicitly set the custom depth state on the components so the
-        // render state is marked dirty and the update actually takes effect
-        // immediately.
-        for (ULandscapeComponent* comp : mesh->LandscapeComponents)
-        {
-            if (object_id < 0)
-            {
-                comp->SetRenderCustomDepth(false);
-            }
-            else
-            {
-                comp->SetCustomDepthStencilValue(object_id);
-                comp->SetRenderCustomDepth(true);
-            }
-        }
-    }
-
-
-    template <typename T>
-    static void SetRenderCustomDepth(T* mesh, bool enable)
-    {
-        mesh->SetRenderCustomDepth(enable);
-    }
-
-    static void SetRenderCustomDepth(ALandscapeProxy* mesh, bool enable)
-    {
-        mesh->bRenderCustomDepth = enable;
-
-        for (ULandscapeComponent* comp : mesh->LandscapeComponents) {
-            comp->SetRenderCustomDepth(enable);
-        }
-    }
-
     static bool CompressUsingImageWrapper(const TArray<uint8>& uncompressed, const int32 width, const int32 height, TArray<uint8>& compressed);
 
 private:

@@ -1,5 +1,7 @@
 // Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #include "UnrealImageCapture.h"
+#include "AirBlueprintLib.h"
+#include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
 #include "ImageUtils.h"
 
@@ -28,6 +30,20 @@ void UnrealImageCapture::getImages(const std::vector<msr::airlib::ImageCaptureBa
     }
     else
         getSceneCaptureImage(requests, responses, false);
+}
+
+UGameViewportClient* UnrealImageCapture::getGameViewport(APIPCamera* camera)
+{
+    // Image requests run on the RPC thread. While the garbage collector marks objects on the game thread,
+    // GetWorld() returns null there (the level is flagged unreachable for a moment), so look it up again on the
+    // game thread, which waits until the garbage collector is done (#186).
+    UWorld* world = camera->GetWorld();
+    if (world == nullptr && !IsInGameThread()) {
+        UAirBlueprintLib::RunCommandOnGameThread([camera, &world]() {
+            world = camera->GetWorld();
+        }, true);
+    }
+    return world != nullptr ? world->GetGameViewport() : nullptr;
 }
 
 void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::ImageCaptureBase::ImageRequest>& requests,
@@ -64,7 +80,7 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
         APIPCamera* camera = cameras_->at(requests.at(i).camera_name);
 
         if (gameViewport == nullptr) {
-            gameViewport = camera->GetWorld()->GetGameViewport();
+            gameViewport = getGameViewport(camera);
         }
 
         responses.push_back(ImageResponse());
@@ -105,6 +121,10 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
     }
 
     if (nullptr == gameViewport) {
+        for (unsigned int i = 0; i < requests.size(); ++i) {
+            responses.at(i).camera_name = requests.at(i).camera_name;
+            responses.at(i).message = "Can't take screenshot because the game viewport is not available";
+        }
         return;
     }
 

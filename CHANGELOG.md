@@ -1,6 +1,7 @@
-### Unreleased
+### Version 4.0.0 (November 2026)
 * MAJOR CHANGE: Plugin content moved into a single `CosysAirSim` folder with type-prefixed asset names. Old asset paths keep working through CoreRedirects, but `simSpawnObject` looks assets up by name, so use the new names there (e.g. `PointLightBP` is now `BP_PointLight`, `SpotLightBP` is now `BP_SpotLight`). The `[CoreRedirects]` in the plugin `Config/DefaultAirSim.ini` list every old and new name.
-* MAJOR CHANGE: Plugin source reorganised into the standard Unreal layout: `Source/AirSim/{Public,Private}` with the AirLib headers in `Public/AirLib`, and ThirdParty modules seperated as their own libraries. Code that includes AirSim headers may need updated include paths.
+* MAJOR CHANGE: Plugin source reorganised into the standard Unreal layout: `Source/AirSim/{Public,Private}`, with AirLib (its headers and static library) and the other third-party libraries as their own modules in `Source/ThirdParty`. Code that includes AirSim headers may need updated include paths.
+
 * MAJOR CHANGE: The ROS2 node velocity commands now use the ROS convention, like the published odometry. Before, they were sent to AirSim unchanged in NED. Flip the sign of `linear.y`, `linear.z` and `angular.z` in existing code to keep the same motion. See the ROS2 documentation.
 * added AIRSIM_API to the main plugin classes so other modules and plugins can link against them. Based on [#139 by kkartal-infodif](https://github.com/Cosys-Lab/Cosys-AirSim/pull/139).
 * Added optional asynchronous GPU readback for camera images (`airsim.AsyncCaptureReadback 1`, off by default). See the image API documentation. Based on work by [minhquyminhquy](https://github.com/minhquyminhquy).
@@ -9,6 +10,7 @@
 * Added ArduPilot support for skid-steer vehicles in the SkidVehicle SimMode. See the skid steer vehicle documentation for the ArduPilot configuration. [#113 by serhiismoliak](https://github.com/Cosys-Lab/Cosys-AirSim/issues/113).
 * Added a `ros2` branch with only the ROS2 workspace and the C++ client library it builds on, to build the ROS2 node without the Unreal Engine parts. See the ROS2 documentation.
 * Updated annotation system to improve performance with many annotated objects by removing tick on all frames. [#169 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/169).
+* Updated the memory needed to compile the plugin by more than half. Code that includes AirSim headers and relied on the engine headers they included may need to include those itself now.
 * Updated Magnetometer to now use World Magnetic Model (WMM-2025) by default, with the same lookup tables as PX4, so the simulated field matches PX4's EKF. See the sensors documentation for more info. Based on [#177 by lql2511](https://github.com/Cosys-Lab/Cosys-AirSim/pull/177).
 * Updated LiDAR to improve performance by casting each tick's rays in one parallel batch. [#170 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/170).
 * Updated annotation system refresh speed for instance segmentation. [#172 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/172).
@@ -23,6 +25,7 @@
 * Fixed `moveOnPath` not reporting success when the drone reaches the end of the path. [#167 by jcfurey](https://github.com/Cosys-Lab/Cosys-AirSim/pull/167).
 * Fixed `euler_to_rotation_matrix` in the Python client using half angles and the wrong composition order (it now matches `euler_to_quaternion`). [#173 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/173).
 * Fixed a crash in annotation system. [#174 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/174).
+* Fixed the ROS2 node crashing on an empty image response, and camera images coming back empty without a reason when the Unreal garbage collector runs during an image request. [#186](https://github.com/Cosys-Lab/Cosys-AirSim/issues/186) and [#187 by ulastanersoyak](https://github.com/Cosys-Lab/Cosys-AirSim/pull/187).
 * Fixed annotated mesh names changing during their lifetime. [#175 by LuuSir](https://github.com/Cosys-Lab/Cosys-AirSim/pull/175).
 * Fixed a crash when calling the annotation and instance segmentation API. [#176 by yankev07](https://github.com/Cosys-Lab/Cosys-AirSim/issues/176).
 * Fixed `simSpawnObject` crashing with blueprints in packaged builds. [#124 by MACILLAS](https://github.com/Cosys-Lab/Cosys-AirSim/issues/124).

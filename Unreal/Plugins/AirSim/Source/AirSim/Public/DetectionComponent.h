@@ -3,17 +3,15 @@
 
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
-#include "GameFramework/Actor.h"
-#include "Engine/TextureRenderTarget2D.h"
-#include "Components/MeshComponent.h"
-#include "Components/ActorComponent.h"
 #include "Components/SceneComponent.h"
-#include "TextureResource.h"
-#include "Components/SceneCaptureComponent2D.h"
-#include "Components/SkinnedMeshComponent.h"
 #include "ObjectFilter.h"
 #include <string>
 #include "DetectionComponent.generated.h"
+
+class AActor;
+class UMeshComponent;
+class USceneCaptureComponent2D;
+class UTextureRenderTarget2D;
 
 USTRUCT()
 struct FDetectionInfo
