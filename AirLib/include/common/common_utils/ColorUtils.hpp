@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #ifndef common_utils_OnlineStats_hpp
 #define common_utils_OnlineStats_hpp
 

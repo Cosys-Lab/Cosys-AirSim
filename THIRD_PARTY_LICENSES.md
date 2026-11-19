@@ -405,6 +405,8 @@ rpclib itself bundles the three further third-party components below.
 ## nlohmann/json
 
 - **Used for:** Parsing/writing `settings.json` and other JSON handling in `AirLib`
+  (vendored at `AirLib/include/common/common_utils/json.hpp`, shipped in the Unreal plugin under
+  `Source/ThirdParty/AirSimVendor`)
 - **Upstream project:** https://github.com/nlohmann/json
 - **License:** MIT License.
 
@@ -430,21 +432,11 @@ rpclib itself bundles the three further third-party components below.
 
 ---
 
-## Platform Independent Bitmap Image Reader Writer Library
-
-- **Used for:** Reading/writing `.bmp` files in `AirLib`
-- **License:** MIT License.
-
-> Free use of the Platform Independent Bitmap Image Reader Writer Library is
-> permitted under the guidelines and in accordance with the most current
-> version of the MIT License.
-> http://www.opensource.org/licenses/MIT
-
----
-
 ## CTPL
 
 - **Used for:** The thread pool backing `AsyncTasker` in `AirLib`
+  (vendored at `AirLib/include/common/common_utils/ctpl_stl.h`, shipped in the Unreal plugin under
+  `Source/ThirdParty/AirSimVendor`)
 - **Author:** Vitaliy Vitsentiy
 - **Upstream project:** https://github.com/vit-vit/CTPL
 - **License:** Apache License, Version 2.0.
@@ -467,7 +459,7 @@ rpclib itself bundles the three further third-party components below.
 
 ## cpp_pretty_print
 
-- **Used for:** Streaming STL containers to `std::ostream` for logging in `AirLib`
+- **Used for:** Streaming STL containers to `std::ostream` for logging in `MavLinkCom`
 - **Author:** Louis Delacroix
 - **Upstream project:** https://github.com/louisdx/cxx-prettyprint
 - **License:** Boost Software License 1.0. See the full license text under
@@ -477,8 +469,8 @@ rpclib itself bundles the three further third-party components below.
 
 ## Boost.Optional-style `optional<T>` backport
 
-- **Used for:** A pre-C++17 `optional<T>` implementation in `AirLib`
-  (vendored at `AirLib/include/common/common_utils/optional.hpp`).
+- **Used for:** A pre-C++17 `optional<T>` implementation in `MavLinkCom`
+  (vendored at `MavLinkCom/common_utils/optional.hpp`).
 - **Author:** Andrzej Krzemienski
 - **Upstream project:** https://github.com/akrzemi1/Optional
 - **License:** Boost Software License 1.0. See the full license text
@@ -495,6 +487,30 @@ rpclib itself bundles the three further third-party components below.
 - **License:** MIT License (per the upstream `mavlink/c_library_v2` project;
   no separate license file is bundled with the vendored, generated headers in
   this repository).
+
+---
+
+## PX4 World Magnetic Model lookup
+
+- **Used for:** The magnetometer's World Magnetic Model reference field
+  (`AirLib/include/common/WorldMagneticModel.hpp`): the bilinear table lookup is
+  ported from PX4 (`src/lib/world_magnetic_model/geo_mag_declination.cpp`) so the
+  simulated field matches what PX4's EKF expects.
+- **Upstream project:** https://github.com/PX4/PX4-Autopilot
+- **License:** BSD 3-Clause License, Copyright (c) 2020-2024 PX4 Development Team.
+  The full license text is reproduced in the header of `WorldMagneticModel.hpp`.
+
+---
+
+## World Magnetic Model (WMM) coefficients
+
+- **Used for:** Generating the magnetic declination/inclination/intensity tables in
+  `AirLib/include/common/WorldMagneticModelTables.hpp` (generator and coefficient
+  file in `scripts/wmm/`).
+- **Upstream project:** https://www.ncei.noaa.gov/products/world-magnetic-model
+  (NOAA NCEI and the British Geological Survey)
+- **License:** Public domain (a work of the United States Government); no license
+  restrictions apply.
 
 ---
 

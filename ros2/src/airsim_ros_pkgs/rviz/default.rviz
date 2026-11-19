@@ -54,7 +54,7 @@ Visualization Manager:
           Value: true
         SimpleFlight/LidarCustom:
           Value: true
-        SimpleFlight/odom_local_ned:
+        SimpleFlight/odom_local:
           Value: true
         front_camera_body:
           Value: true
@@ -76,7 +76,7 @@ Visualization Manager:
       Tree:
         world_ned:
           SimpleFlight:
-            SimpleFlight/odom_local_ned:
+            SimpleFlight/odom_local:
               SimpleFlight/LidarCustom:
                 {}
               front_camera_body/static:
@@ -160,7 +160,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /airsim_node/MyQuad/odom_local_ned
+        Value: /airsim_node/SimpleFlight/odom_local
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true

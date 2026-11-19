@@ -20,6 +20,10 @@ There are already two vehicle types implemented, the ClearPath Husky and Pioneer
 
 If you create a new vehicle using the Unreal skid steering vehicle model as described above, one can use the `PawnPaths` setting in the [Common Vehicle Settings in the settings.json file](settings.md#common-vehicle-setting) to link the custom vehicle pawn.
 
+### ArduPilot
+A skid steer vehicle can also be controlled by ArduPilot (ArduRover SITL) by setting `VehicleType` to `ArduRover` in the SkidVehicle SimMode. This uses the CPHusky pawn by default, use `PawnPath` to select another skid steer pawn. The connection settings are the same as for an ArduRover car.
+The vehicle model takes a steering and throttle input and converts it to the left and right wheel speeds itself. So configure ArduPilot as a normal rover with steering and throttle outputs (`SERVO1_FUNCTION = 26` (GroundSteering) and `SERVO3_FUNCTION = 70` (Throttle)), not with the skid steering outputs (ThrottleLeft/ThrottleRight).
+
 ![Flamewheel](images/skidsteer_vehicles.png)
 
 Note that due to a bug in the ChaosVehicles and setting raw YawInput values when rotating on its axis to the left will cause a small forward movement as well. 

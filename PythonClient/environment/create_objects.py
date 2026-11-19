@@ -22,11 +22,20 @@ obj_name = client.simSpawnObject(desired_name, asset_name, pose, scale, True)
 print(f"Created object {obj_name} from asset {asset_name} "
       f"at pose {pose}, scale {scale}")
 
+# Blueprints can be spawned as well by setting is_blueprint to True.
+# In a packaged build the blueprint has to be cooked, see the API documentation.
+blueprint_name = 'BP_PointLight'
+light_name = client.simSpawnObject(f"{blueprint_name}_spawn", blueprint_name,
+                                   airsim.Pose(position_val=airsim.Vector3r(5.0, 0.0, -2.0)), scale, False, True)
+print(f"Created object {light_name} from blueprint {blueprint_name}")
+
 all_objects = client.simListSceneObjects()
-if obj_name not in all_objects:
-    print(f"Object {obj_name} not present!")
+for name in [obj_name, light_name]:
+    if name not in all_objects:
+        print(f"Object {name} not present!")
 
 time.sleep(10.0)
 
-print(f"Destroying {obj_name}")
-client.simDestroyObject(obj_name)
+for name in [obj_name, light_name]:
+    print(f"Destroying {name}")
+    client.simDestroyObject(name)

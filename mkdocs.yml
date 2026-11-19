@@ -80,6 +80,7 @@ nav:
     - "Home": 'README.md'
   - "Changelog": 'https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md'
   - "Installing AirSim":
+    - "Getting started with the Fab plugin": 'fab_getting_started.md'
     - "Download and run": 'run_packaged.md'
     - "Download and install from precompiled plugin": 'install_precompiled.md'
     - "Install from Source on Windows": 'install_windows.md'

@@ -104,6 +104,34 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZRGBI,
                                   (float, intensity, intensity)
 )
 
+// GPU LiDAR point with the laser channel (ring) of the point, like the Velodyne and Ouster ROS drivers publish
+struct PointXYZRGBIR
+{
+    PCL_ADD_POINT4D;
+    float intensity;
+    union
+    {
+        struct
+        {
+            uint8_t b;
+            uint8_t g;
+            uint8_t r;
+        };
+        float rgb;
+    };
+    std::uint16_t ring;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZRGBIR,
+                                  (float, x, x)
+                                  (float, y, y)
+                                  (float, z, z)
+                                  (float, rgb, rgb)
+                                  (float, intensity, intensity)
+                                  (std::uint16_t, ring, ring)
+)
+
 struct SimpleMatrix
 {
     int rows;
@@ -286,7 +314,10 @@ private:
 
     // state, returns the simulation timestamp best guess based on drone state timestamp, airsim needs to return timestap for environment
     rclcpp::Time update_state();
-    void update_and_publish_static_transforms(VehicleROS* vehicle_ros);
+    void update_and_publish_static_transforms(VehicleROS* vehicle_ros, const rclcpp::Time& stamp);
+    // thread-safe reads of state written by update_state() (take vehicle_state_mutex_)
+    rclcpp::Time get_vehicle_stamp(VehicleROS* vehicle_ros);
+    msr::airlib::Quaternionr get_drone_orientation(MultiRotorROS* drone);
     void publish_vehicle_state();
 
     /// ROS service callbacks
@@ -387,7 +418,10 @@ private:
 
     rclcpp::Service<airsim_interfaces::srv::Reset>::SharedPtr reset_srvr_;
     rclcpp::Publisher<airsim_interfaces::msg::GPSYaw>::SharedPtr origin_geo_point_pub_; // home geo coord of drones
-    msr::airlib::GeoPoint origin_geo_point_; // gps coord of unreal origin
+    // number of laser channels of each (GPU) LiDAR, key is vehicle_name/sensor_name. Filled at startup, read only afterwards
+    std::unordered_map<std::string, int> lidar_num_channels_;
+    std::unordered_map<std::string, int> gpulidar_num_channels_;
+msr::airlib::GeoPoint origin_geo_point_; // gps coord of unreal origin
     airsim_interfaces::msg::GPSYaw origin_geo_point_msg_; // todo duplicate
     rclcpp::Service<airsim_interfaces::srv::ListSceneObjectTags>::SharedPtr list_scene_object_tags_srvr_;
 
@@ -419,6 +453,11 @@ private:
     // todo for multiple drones with multiple sensors, this won't scale. make it a part of VehicleROS?
 
     std::mutex control_mutex_;
+    // Guards the per-vehicle state written by update_state() (curr_*_state_, curr_odom_, gps_sensor_msg_,
+    // env_msg_, car/cv state msgs, stamp_, state_updated_, static_tf_published_). Callbacks run in a
+    // reentrant group on a MultiThreadedExecutor, so other callbacks (and the state timer itself) can run
+    // concurrently. Never held during RPC calls. Lock order: control_mutex_ before vehicle_state_mutex_.
+    std::mutex vehicle_state_mutex_;
 
     // gimbal control
     bool has_gimbal_cmd_;

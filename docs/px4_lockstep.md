@@ -26,6 +26,15 @@ This causes AirSim to not use a "realtime" clock, but instead it advances the cl
 each sensor update sent to PX4.  This way PX4 thinks time is progressing smoothly no matter how long
 it takes AirSim to really process that update loop.
 
+`LockStep` is `true` by default. Lockstep mode becomes active once PX4 answers a sensor update with
+actuator controls carrying the same timestamp, the message `Enabling lockstep mode` is then shown.
+If PX4 does not answer for 1 second, lockstep mode is turned off again (`timeout on
+HilActuatorControlsMessage, resetting lock step mode`) and turned on again by the next matching answer.
+
+Messages you send to PX4 yourself, for example `OBSTACLE_DISTANCE` from a companion computer or ROS,
+must use the time of PX4 (the simulated time) and not the time of the computer, otherwise PX4 will
+consider them as too old or from the future.
+
 This has the following advantages:
 
 - AirSim can be used on slow machines that cannot process updates quickly.
