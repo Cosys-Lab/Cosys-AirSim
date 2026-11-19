@@ -3646,8 +3646,8 @@
    <code>--target_image</code> is the desired name of your docker image.
    Defaults to <code>airsim_binary</code> with same tag as the base image.</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>Airsim/docker<span class="p">;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>build_airsim_image.py<span class="w"> </span><span class="se">\</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>Cosys-AirSim/docker
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python3<span class="w"> </span>build_airsim_image.py<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">   </span>--base_image<span class="o">=</span>ghcr.io/epicgames/unreal-engine:dev-slim-5.8.0<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">   </span>--target_image<span class="o">=</span>airsim_binary:dev-slim-5.8.0
 </span></code></pre></div>
@@ -3661,7 +3661,7 @@
 Let's take the Blocks project binary as an example.
 You can download it by running</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>Airsim/docker<span class="p">;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>Cosys-AirSim/docker
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>./download_blocks_env_binary.sh
 </span></code></pre></div>
 <p>Modify it to fetch the specific binary required.</p>
@@ -3677,7 +3677,7 @@ You can download it by running</li>
 <ul>
 <li><code>DOCKER_IMAGE_NAME</code>: Same as <code>target_image</code> parameter in previous step. By default, enter <code>airsim_binary:dev-slim-5.8.0</code></li>
 <li><code>UNREAL_BINARY_SHELL_SCRIPT</code>: for Blocks enviroment, it will be <code>LinuxBlocks/Linux/Blocks.sh</code></li>
-<li><a href="https://docs.unrealengine.com/en-us/Programming/Basics/CommandLineArguments"><code>UNREAL_BINARY_ARGUMENTS</code></a>:
+<li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/command-line-arguments-in-unreal-engine?application_version=5.8"><code>UNREAL_BINARY_ARGUMENTS</code></a>:
       For airsim, most relevant would be <code>-windowed</code>, <code>-ResX</code>, <code>-ResY</code>. Click on link to see all options.</li>
 </ul>
 <p><a href="#specifying-settingsjson">Click here for info on specifying a <code>settings.json</code></a></p>
@@ -3694,8 +3694,8 @@ You can download it by running</li>
    <code>--target_image</code> is the desired name of your docker image.
    Defaults to <code>airsim_source</code> with same tag as the base image</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>Airsim/docker<span class="p">;</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>$<span class="w"> </span>python<span class="w"> </span>build_airsim_image.py<span class="w"> </span><span class="se">\</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>Cosys-AirSim/docker
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python3<span class="w"> </span>build_airsim_image.py<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">   </span>--source<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">   </span>--base_image<span class="w"> </span>ghcr.io/epicgames/unreal-engine:dev-slim-5.8.0<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">   </span>--target_image<span class="o">=</span>airsim_source:dev-slim-5.8.0
@@ -3735,7 +3735,7 @@ You can test it by running <code>/home/ue4/Binaries/Blocks/Linux/Blocks.sh -wind
 <h2 id="specifying-settingsjson">Specifying settings.json<a class="headerlink" href="#specifying-settingsjson" title="Permanent link">&para;</a></h2>
 <h4 id="airsim_binary-docker-image"><code>airsim_binary</code> docker image:<a class="headerlink" href="#airsim_binary-docker-image" title="Permanent link">&para;</a></h4>
 <ul>
-<li>We're mapping the host machine's <code>PATH/TO/Airsim/settings.json</code> to the docker container's <code>/home/airsim_user/Documents/airsim/settings.json</code>.</li>
+<li>We're mapping the host machine's <code>Cosys-AirSim/docker/settings.json</code> to the docker container's <code>/home/airsim_user/Documents/AirSim/settings.json</code>.</li>
 <li>Hence, we can load any settings file by simply modifying <code>PATH_TO_YOUR/settings.json</code> by modifying the following snippets in <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docker/run_airsim_image_binary.sh"><code>run_airsim_image_binary.sh</code></a> to link <code>$PATH_TO_YOUR</code> to the correct folder. </li>
 </ul>
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">$DOCKER_CMD</span><span class="w"> </span>-it<span class="w"> </span><span class="se">\</span>
@@ -3747,7 +3747,7 @@ You can test it by running <code>/home/ue4/Binaries/Blocks/Linux/Blocks.sh -wind
 </span></code></pre></div>
 <h4 id="airsim_source-docker-image"><code>airsim_source</code> docker image:<a class="headerlink" href="#airsim_source-docker-image" title="Permanent link">&para;</a></h4>
 <ul>
-<li>We're mapping the host machine's <code>PATH/TO/Cosys-AirSim/settings.json</code> to the docker container's <code>/home/ue4/Documents/airsim/settings.json</code>.</li>
+<li>We're mapping the host machine's <code>Cosys-AirSim/docker/settings.json</code> to the docker container's <code>/home/ue4/Documents/AirSim/settings.json</code>.</li>
 <li>Hence, we can load any settings file by simply modifying <code>PATH_TO_YOUR/settings.json</code> by modifying the following snippets in <a href="https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/docker/run_airsim_image_source.sh"><code>run_airsim_image_source.sh</code></a>:</li>
 </ul>
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">$DOCKER_CMD</span><span class="w"> </span>-it<span class="w"> </span><span class="se">\</span>
