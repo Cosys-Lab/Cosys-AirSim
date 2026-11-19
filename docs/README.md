@@ -10,8 +10,15 @@ Please note that we use that same [MIT license](https://github.com/Cosys-Lab/Cos
 Do note that this repository is provided as is, will not be actively updated and comes without warranty or support. 
 Please contact a Cosys-Lab researcher to get more in depth information on which branch or version is best for your work.
 
-This [5.2.1 branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is for the LTS version of Cosys-AirSim on Unreal Engine v5.2.1. The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1/docs).
-For the latest stable and maintained build for a recent Unreal Engine, see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) and associated builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
+This [5.2.1 branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1) is for the long term support (LTS) version of Cosys-AirSim on Unreal Engine v5.2.1. The documentation is best read from [source](https://github.com/Cosys-Lab/Cosys-AirSim/tree/5.2.1/docs).
+For the latest stable and maintained build for a recent Unreal Engine see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) and associated builds in the [releases](https://github.com/Cosys-Lab/Cosys-AirSim/releases).
+This branch has the same features, API, settings, plugin layout and asset names as the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) for Unreal Engine , and the same documentation. The differences are:
+
+- It uses Unreal Engine 5.2.1, built with Visual Studio 2022 and an MSVC toolset older than 14.40 on Windows (see [Install from source - Windows](docs/install_windows.md)).
+- It is not available on Fab. The [Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/) is only for newer releases of UE.
+- Nanite skeletal meshes are not supported by the annotation and instance segmentation system (see [Annotation](docs/annotation.md)).
+- A few settings need newer engine features and are ignored: light `IntensityUnit` `2` (EV, see [Lights](docs/lights.md)) and the camera setting `DepthOfFieldUseHairDepth` (see [Settings](docs/settings.md)).
+- No packaged binaries of Blocks or the plugin are released for 5.2.1 and you have to build from source. 
 
 ## Associated publications
 
@@ -77,6 +84,8 @@ You can also find the presentation of the live tutorial of Cosys-AirSim at ANNSI
 Some more details on our changes can be found in the [changelog](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/CHANGELOG.md).
 
 ## How to Get It
+#### Install from FAB
+The Fab plugin is only available for Unreal Engine 5.8, see the [main branch](https://github.com/Cosys-Lab/Cosys-AirSim/tree/main) and [Getting started with the Fab plugin](https://cosys-lab.github.io/Cosys-AirSim/fab_getting_started/).
 #### Download and run from packaged binary - Windows/Linux
 * [Download and run it](https://cosys-lab.github.io/Cosys-AirSim/run_packaged)
 #### Download and install from precompiled plugin - Windows/Linux
@@ -109,3 +118,5 @@ More technical details are available in [AirSim paper (FSR 2017 Conference)](htt
 ## License
 
 This project is released under the MIT License. Please review the [License file](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/LICENSE) for more details.
+
+Cosys-AirSim also bundles a number of third-party open-source components. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for the full list and their licenses.

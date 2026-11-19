@@ -46,15 +46,7 @@ Alternatively, you can manage and download Epic Games assets on Linux using **[E
 6. Edit the `Config\DefaultGame.ini` to add the following lines at the end:
 
     ```
-    +MapsToCook=(FilePath="/AirSim/AirSimAssets")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/HUDAssets")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Beacons")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Blueprints")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Models")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Sensors")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/StarterContent")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/VehicleAdv")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Weather")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/CosysAirSim")
     ```
     
     Doing this forces Unreal to include all necessary AirSim content in packaged builds of your project.
@@ -132,15 +124,7 @@ Alternatively, you can manage and download Epic Games assets on Linux using **[E
 7. Edit the `Config\DefaultGame.ini` to add the following lines at the end:
 
     ```
-    +MapsToCook=(FilePath="/AirSim/AirSimAssets")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/HUDAssets")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Beacons")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Blueprints")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Models")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Sensors")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/StarterContent")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/VehicleAdv")
-    +DirectoriesToAlwaysCook=(Path="/AirSim/Weather")
+    +DirectoriesToAlwaysCook=(Path="/AirSim/CosysAirSim")
     ```
     
     Doing this forces Unreal to include all necessary AirSim content in packaged builds of your project.

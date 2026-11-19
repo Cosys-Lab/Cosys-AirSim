@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #ifndef airsim_core_AirSimSettings_hpp
 #define airsim_core_AirSimSettings_hpp
@@ -119,8 +119,8 @@ namespace airlib
             std::string non_slippery_mat;
 
             PawnPath(const std::string& pawn_bp_val = "",
-                     const std::string& slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/Slippery.Slippery",
-                     const std::string& non_slippery_mat_val = "/AirSim/VehicleAdv/PhysicsMaterials/NonSlippery.NonSlippery")
+                     const std::string& slippery_mat_val = "/AirSim/CosysAirSim/Physics/Vehicles/PM_Slippery.PM_Slippery",
+                     const std::string& non_slippery_mat_val = "/AirSim/CosysAirSim/Physics/Vehicles/PM_NonSlippery.PM_NonSlippery")
                 : pawn_bp(pawn_bp_val), slippery_mat(slippery_mat_val), non_slippery_mat(non_slippery_mat_val)
             {
             }
@@ -606,7 +606,7 @@ namespace airlib
         std::map<std::string, std::unique_ptr<PassiveEchoBeaconSetting>> passive_echo_beacons;
         std::map<std::string, std::unique_ptr<LightSetting>> world_lights;
         float speed_unit_factor = 1.0f;
-        std::string speed_unit_label = "m\\s";
+        std::string speed_unit_label = "m/s";
         std::map<std::string, std::shared_ptr<SensorSetting>> sensor_defaults;
         Vector3r wind = Vector3r::Zero();
         Vector3r ext_force = Vector3r::Zero();
@@ -1309,20 +1309,18 @@ namespace airlib
         static void initializePawnPaths(std::map<std::string, PawnPath>& pawn_paths)
         {
             pawn_paths.clear();
-            pawn_paths.emplace("BareboneCar",
-                               PawnPath("Class'/AirSim/VehicleAdv/Vehicle/VehicleAdvPawn.VehicleAdvPawn_C'"));
             pawn_paths.emplace("DefaultCar",
-                               PawnPath("Class'/AirSim/VehicleAdv/SUV/SuvCarPawn.SuvCarPawn_C'"));
+                               PawnPath("Class'/AirSim/CosysAirSim/Blueprints/Vehicles/SUV/BP_SuvCarPawn.BP_SuvCarPawn_C'"));
 		    pawn_paths.emplace("DefaultSkidVehicle",
-                                PawnPath("Class'/AirSim/VehicleAdv/CPHusky/CPHuskyPawn.CPHuskyPawn_C'"));
+                                PawnPath("Class'/AirSim/CosysAirSim/Blueprints/Vehicles/CPHusky/BP_CPHuskyPawn.BP_CPHuskyPawn_C'"));
             pawn_paths.emplace("DefaultQuadrotor",
-                               PawnPath("Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"));
+                               PawnPath("Class'/AirSim/CosysAirSim/Blueprints/Vehicles/Multirotor/BP_FlyingPawn.BP_FlyingPawn_C'"));
             pawn_paths.emplace("Pioneer",
-                PawnPath("Class'/AirSim/VehicleAdv/Pioneer/PioneerPawn.PioneerPawn_C'"));
+                PawnPath("Class'/AirSim/CosysAirSim/Blueprints/Vehicles/Pioneer/BP_PioneerPawn.BP_PioneerPawn_C'"));
             pawn_paths.emplace("BoxCar",
-                PawnPath("Class'/AirSim/VehicleAdv/BoxCar/BoxCarPawn.BoxCarPawn_C'"));
+                PawnPath("Class'/AirSim/CosysAirSim/Blueprints/Vehicles/BoxCar/BP_BoxCarPawn.BP_BoxCarPawn_C'"));
             pawn_paths.emplace("DefaultComputerVision",
-                               PawnPath("Class'/AirSim/Blueprints/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"));
+                               PawnPath("Class'/AirSim/CosysAirSim/Blueprints/Vehicles/ComputerVision/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"));
         }
 
         static void loadPawnPaths(const Settings& settings_json, std::map<std::string, PawnPath>& pawn_paths)
@@ -1657,7 +1655,7 @@ namespace airlib
             engine_sound = settings_json.getBool("EngineSound", false);
             enable_rpc = settings_json.getBool("EnableRpc", enable_rpc);
             speed_unit_factor = settings_json.getFloat("SpeedUnitFactor", 1.0f);
-            speed_unit_label = settings_json.getString("SpeedUnitLabel", "m\\s");
+            speed_unit_label = settings_json.getString("SpeedUnitLabel", "m/s");
             move_world_origin = settings_json.getBool("MoveWorldOrigin", false);
             initial_instance_segmentation = settings_json.getBool("InitialInstanceSegmentation", true);
             log_messages_visible = settings_json.getBool("LogMessagesVisible", true);

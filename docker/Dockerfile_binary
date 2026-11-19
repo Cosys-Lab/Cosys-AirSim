@@ -10,7 +10,7 @@ RUN apt-get install -y --no-install-recommends \
 	sudo
 
 RUN python3 -m pip install --upgrade pip && \
-    pip3 install cosysairsim
+    pip3 install cosysairsim==3.3.0
 
 RUN adduser --force-badname --disabled-password --gecos '' --shell /bin/bash airsim_user && \
 	echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \

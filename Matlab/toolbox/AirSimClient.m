@@ -2066,12 +2066,12 @@ classdef AirSimClient < handle
             %
             % Inputs:
             %   object_name - Name of the object to be spawned.
-            %   asset_name - Name of the asset for the object.
+            %   asset_name - Name of the asset (static mesh or blueprint) as listed by the simListAssets RPC call, for example 'BP_PointLight'. For blueprints the generated class name ('BP_PointLight_C') is accepted as well.
             %   position - 3-element vector [x, y, z] representing the spawn position.
             %   orientation - Quaternion [w, x, y, z] representing the spawn orientation.
             %   scale - 3-element vector [x, y, z] representing the scale of the object.
             %   physics_enabled - Logical indicating whether physics is enabled for the object (true/false).
-            %   is_blueprint - Logical indicating whether the object is a blueprint (true/false).
+            %   is_blueprint - Logical indicating whether the object is a blueprint actor (true) or a static mesh (false). In a packaged build the blueprint has to be cooked.
             %
             % Outputs:
             %   objectName - String representing the name of the spawned object.
@@ -2132,9 +2132,16 @@ classdef AirSimClient < handle
 
             name = obj.getInstanceSegmentationObjectList();
             colorMap = obj.getInstanceSegmentationColormap();
-            r = colorMap(1:size(name, 1), 1);
-            g = colorMap(1:size(name, 1), 2);
-            b = colorMap(1:size(name, 1), 3);
+            % The colormap is indexed by the segmentation ID of each object (0-based), not by its position in the list
+            objectIDs = zeros(size(name, 1), 1);
+            for objectIndex = 1 : size(name, 1)
+                objectIDs(objectIndex) = double(obj.getSegmentationObjectID(name(objectIndex)));
+            end
+            valid = objectIDs >= 0;
+            name = name(valid);
+            r = colorMap(objectIDs(valid) + 1, 1);
+            g = colorMap(objectIDs(valid) + 1, 2);
+            b = colorMap(objectIDs(valid) + 1, 3);
             instanceSegmentationTable = table(name, r, g, b);
         end
 

@@ -2,6 +2,21 @@ from .utils import *
 from .types import *
 import msgpackrpc  # install as admin: pip install rpc-msgpack
 import logging
+import numbers
+
+
+def _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode):
+    """
+    Raises a TypeError for a wrong drivetrain or yaw_mode argument. Otherwise the simulator rejects the call, which
+    is easily missed as join() on the returned future does not raise this error, so the command seems to do nothing.
+    For example moveByVelocityAsync(vx, vy, vz, duration, YawMode(...)) passes the YawMode as drivetrain.
+    """
+    if drivetrain is not None and (isinstance(drivetrain, bool) or not isinstance(drivetrain, numbers.Integral)):
+        raise TypeError("drivetrain must be a DrivetrainType (int), got %s. Pass the yaw mode as keyword argument "
+                        "yaw_mode=YawMode(...) if you do not want to give a drivetrain." % type(drivetrain).__name__)
+    if yaw_mode is not None and not isinstance(yaw_mode, (YawMode, dict)):
+        raise TypeError("yaw_mode must be a YawMode, got %s" % type(yaw_mode).__name__)
+
 
 
 class VehicleClient:
@@ -767,11 +782,13 @@ class VehicleClient:
 
         Args:
             object_name (str): Desired name of the new object.
-            asset_name (str): Name of the asset (mesh) in the project database.
+            asset_name (str): Name of the asset (static mesh or blueprint) as listed by simListAssets(), for example 'BP_PointLight'.
+                For blueprints the generated class name ('BP_PointLight_C') is accepted as well.
             pose (Pose): Desired pose of the object.
             scale (Vector3r): Desired scale of the object.
             physics_enabled (bool, optional): Whether to enable physics for the object.
-            is_blueprint (bool, optional): Whether to spawn a blueprint or an actor.
+            is_blueprint (bool, optional): True to spawn a blueprint actor, False to spawn a static mesh.
+                In a packaged build the blueprint has to be cooked, see the API documentation.
 
         Returns:
             str: Name of the spawned object, in case it had to be modified.
@@ -1013,7 +1030,8 @@ class VehicleClient:
         Gets the segmentation color map.
 
         Returns:
-            dict: Dictionary mapping object IDs to colors.
+            numpy.ndarray: Array of shape (N, 3) with the RGB color of each segmentation ID, so the color of an object
+            is colorMap[simGetSegmentationObjectID(object_name), :]. This also applies to the object IDs of RGB annotation layers in index mode.
         """
         return load_colormap()
 
@@ -1817,6 +1835,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveByVelocityBodyFrame', vx, vy, vz, duration, drivetrain,
                                       yaw_mode, vehicle_name)
 
@@ -1838,6 +1857,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveByVelocityZBodyFrame', vx, vy, z, duration, drivetrain,
                                       yaw_mode,  vehicle_name)
 
@@ -1901,6 +1921,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveByVelocity', vx, vy, vz, duration, drivetrain, yaw_mode,
                                       vehicle_name)
 
@@ -1921,6 +1942,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveByVelocityZ', vx, vy, z, duration, drivetrain, yaw_mode,
                                       vehicle_name)
 
@@ -1942,6 +1964,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveOnPath', path, velocity, timeout_sec, drivetrain, yaw_mode,
                                       lookahead, adaptive_lookahead, vehicle_name)
 
@@ -1965,6 +1988,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveToPosition', x, y, z, velocity, timeout_sec, drivetrain,
                                       yaw_mode, lookahead,
                                       adaptive_lookahead, vehicle_name)
@@ -1990,6 +2014,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveToGPS', latitude, longitude, altitude, velocity,
                                       timeout_sec, drivetrain,
                                       yaw_mode, lookahead, adaptive_lookahead, vehicle_name)
@@ -2011,6 +2036,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(None, yaw_mode)
         return self.client.call_async('moveToZ', z, velocity, timeout_sec, yaw_mode, lookahead,
                                       adaptive_lookahead,
                                       vehicle_name)
@@ -2037,6 +2063,7 @@ class MultirotorClient(VehicleClient, object):
         Returns:
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
+        _check_drivetrain_and_yaw_mode(drivetrain, yaw_mode)
         return self.client.call_async('moveByManual', vx_max, vy_max, z_min, duration, drivetrain, yaw_mode,
                                       vehicle_name)
 

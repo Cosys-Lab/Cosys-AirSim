@@ -6,6 +6,15 @@ import cosysairsim as airsim
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+def lidar_rings(number_of_points, number_of_channels, gpulidar):
+    # Laser (ring) index of each point, 0 is the lowest laser. Both lidars give one point per laser for each horizontal
+    # step, the GPU lidar starts with the lowest laser and the CPU lidar with the highest one.
+    # This matches the ring field of the point clouds published by the ROS2 node.
+    index = np.arange(number_of_points) % number_of_channels
+    return index if gpulidar else number_of_channels - 1 - index
+
+
 class lidarTest:
 
     def __init__(self, lidar_name, vehicle_name):
@@ -69,8 +78,11 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     gpulidar = True
+    number_of_channels = 32  # NumberOfChannels of the lidar in settings.json
 
     points = lidarTest.get_data(gpulidar)
+    rings = lidar_rings(points.shape[0], number_of_channels, gpulidar)
+    print("rings " + str(rings.min()) + " to " + str(rings.max()))
     ax.set_box_aspect((np.ptp(points[:, 0]), np.ptp(points[:, 1]), np.ptp(points[:, 2])))
     ax.scatter(points[:, 0], points[:, 1], points[:, 2])
     ax.set_xlabel('X Label')

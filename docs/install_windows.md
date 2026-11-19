@@ -9,6 +9,7 @@ Click on the `Install` button on the top right, which should show the option to 
 
 ## Build Cosys-AirSim
 * Install Visual Studio 2022. Make sure to select Desktop Development with C++ and Windows 10/11 SDK **10.0.X (choose latest)** and select the latest .NET Framework SDK under the 'Individual Components' tab while installing VS 2022. More info [here](https://dev.epicgames.com/documentation/en-us/unreal-engine/setting-up-visual-studio-development-environment-for-cplusplus-projects-in-unreal-engine?application_version=5.2).
+* Unreal Engine 5.2.1 does not compile with MSVC 14.40 (Visual Studio 2022 17.10) or newer. In the Visual Studio Installer, also select an older toolset under 'Individual Components', for example **MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.38-17.8)**. `build.cmd` and the Blocks project then use the newest installed toolset older than 14.40 automatically. To use a specific one, set the environment variable `AIRSIM_VCTOOLSVERSION` to its version (for example `14.38.33130`). For your own Unreal project, copy `FindMsvcForUE52` and its use from `Unreal/Environments/Blocks/Source/BlocksEditor.Target.cs` into your project's `Target.cs` files.
 * Start `Developer Command Prompt for VS 2022`. 
 * Clone the repo: `git clone https://github.com/Cosys-Lab/Cosys-AirSim.git`, and go the AirSim directory by `cd Cosys-AirSim`. 
 * Run `build.cmd` from the command line. This will create ready to use plugin bits in the `Unreal\Plugins` folder that can be dropped into any Unreal project.

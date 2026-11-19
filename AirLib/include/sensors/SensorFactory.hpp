@@ -1,3 +1,4 @@
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 #ifndef msr_airlib_SensorFactoryBase_hpp
 #define msr_airlib_SensorFactoryBase_hpp
 

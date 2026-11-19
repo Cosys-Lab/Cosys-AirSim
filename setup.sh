@@ -67,60 +67,58 @@ else #linux
     fi
 
     # install additional tools
-    sudo apt-get install -y build-essential unzip libunwind-dev
+    sudo apt-get install -y unzip
 
 fi # End USB setup
 
 
 # Download rpclib
-if [ ! -d "external/rpclib/rpclib-2.3.0" ]; then
+if [ ! -d "external/rpclib/rpclib-2.3.1" ]; then
     echo "*********************************************************************************************"
     echo "Downloading rpclib..."
     echo "*********************************************************************************************"
 
-    wget https://github.com/rpclib/rpclib/archive/v2.3.0.zip
+    wget https://github.com/WouterJansen/rpclib/archive/refs/tags/v2.3.1.zip
 
     # remove previous versions
     rm -rf "external/rpclib"
 
     mkdir -p "external/rpclib"
-    unzip -q v2.3.0.zip -d external/rpclib
-    rm v2.3.0.zip
+    unzip -q v2.3.1.zip -d external/rpclib
+    rm v2.3.1.zip
 fi
 
-# Download high-polycount SUV model
+# Download high-polycount SUV model (not tracked in git; lives in the CosysAirSim pack folder under */Vehicles/SUV)
+SUV_CONTENT="Unreal/Plugins/AirSim/Content"
+SUV_MARKER="$SUV_CONTENT/CosysAirSim/Blueprints/Vehicles/SUV/BP_SuvCarPawn.uasset"
+SUV_URL="https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets_v2_ue5.2.zip"
 if $downloadHighPolySuv; then
-    if [ ! -d "Unreal/Plugins/AirSim/Content/VehicleAdv" ]; then
-        mkdir -p "Unreal/Plugins/AirSim/Content/VehicleAdv"
-    fi
-    if [ ! -d "Unreal/Plugins/AirSim/Content/VehicleAdv/SUV/v1.2.0" ]; then
+    if [ ! -f "$SUV_MARKER" ]; then
             echo "*********************************************************************************************"
-            echo "Downloading high-poly car assets.... The download is ~37MB and can take some time."
+            echo "Downloading high-poly car assets.... The download is ~54MB and can take some time."
             echo "To install without this assets, re-run setup.sh with the argument --no-full-poly-car"
             echo "*********************************************************************************************"
 
-            if [ -d "suv_download_tmp" ]; then
-                rm -rf "suv_download_tmp"
-            fi
-            mkdir -p "suv_download_tmp"
-            cd suv_download_tmp
-            wget  https://github.com/Cosys-Lab/Cosys-AirSim/releases/download/carassets/cosys_car_assets.zip
-            if [ -d "../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV" ]; then
-                rm -rf "../Unreal/Plugins/AirSim/Content/VehicleAdv/SUV"
-            fi
-            unzip -q cosys_car_assets.zip -d ../Unreal/Plugins/AirSim/Content/VehicleAdv
-            cd ..
             rm -rf "suv_download_tmp"
+            mkdir -p "suv_download_tmp"
+            wget -O suv_download_tmp/car_assets.zip "$SUV_URL"
+            # remove stale SUV copies: the per-type SUV folders and the pre-Fab VehicleAdv/SUV location
+            rm -rf "$SUV_CONTENT"/CosysAirSim/*/Vehicles/SUV "$SUV_CONTENT/VehicleAdv/SUV"
+            unzip -q -o suv_download_tmp/car_assets.zip -d "$SUV_CONTENT"
+            rm -rf "suv_download_tmp"
+            if [ ! -f "$SUV_MARKER" ]; then
+                echo "Unable to download high-polycount SUV. The DefaultCar pawn will not be available."
+            fi
     fi
 else
-    echo "### Not downloading high-poly car asset (--no-full-poly-car). The default unreal vehicle will be used."
+    echo "### Not downloading high-poly car asset (--no-full-poly-car). The DefaultCar pawn will not be available."
 fi
 
 echo "Installing Eigen library..."
 
 if [ ! -d "AirLib/deps/eigen3" ]; then
     echo "Downloading Eigen..."
-    wget -O eigen3.zip https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip
+    wget -O eigen3.zip https://github.com/WouterJansen/eigen/archive/refs/tags/3.4.1r.zip
     unzip -q eigen3.zip -d temp_eigen
     mkdir -p AirLib/deps/eigen3
     mv temp_eigen/eigen*/Eigen AirLib/deps/eigen3
@@ -134,9 +132,6 @@ popd >/dev/null
 
 set +x
 echo ""
-echo ""
-echo "============================================"
-echo " Cosys-AirSim setup completed successfully! "
-echo "============================================"
-echo ""
-echo "Run ./build.sh to compile."
+echo "******************************************"
+echo "Cosys-AirSim setup completed successfully!"
+echo "******************************************"

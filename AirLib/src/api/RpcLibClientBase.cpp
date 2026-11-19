@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 //in header only mode, control library is not available
 #ifndef AIRLIB_HEADER_ONLY

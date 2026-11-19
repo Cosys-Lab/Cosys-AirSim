@@ -99,6 +99,7 @@ public:
     void enforce_dynamic_constraints();
     void publish_control_cmd();
     void check_reached_goal();
+    void set_target_from_gps(const airsim_interfaces::srv::SetGPSPosition::Request& request);
 
 private:
     geodetic_converter::GeodeticConverter geodetic_converter_;

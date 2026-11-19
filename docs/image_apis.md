@@ -198,12 +198,12 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
           "Width": 256,
           "Height": 144,
           "FOV_Degrees": 90,
-          "AutoExposureBias": 1.3,
+          "AutoExposureCompensation": 1.3,
           "AutoExposureMaxBrightness": 0.64,
           "AutoExposureMinBrightness": 0.03,
           "MotionBlurAmount": 1,
           "MotionBlurMax": 10,
-          "ChromaticAberrationScale": 2,
+          "ChromaticAberrationIntensity": 2,
           "LumenGIEnable": true,
           "LumenReflectionEnable": true,
           "LumenFinalQuality": 1,
@@ -215,6 +215,15 @@ To change resolution, FOV etc, you can use [settings.json](settings.md). For exa
   "SimMode": "ComputerVision"
 }
 ```
+
+## Asynchronous Image Readback
+By default, every image requested through the API is copied from the GPU with a blocking read, which stalls Unreal's render thread until the GPU has finished. With many cameras or high request rates this limits throughput. You can enable asynchronous GPU readback with the console command (press `~` in the simulator, or add it to your project's `DefaultEngine.ini` under `[ConsoleVariables]`):
+
+```
+airsim.AsyncCaptureReadback 1
+```
+
+The image is then copied without stalling the render thread and the request completes once the copy is available, typically one frame later. This applies to uncompressed and compressed 8-bit images and to float images. If a copy does not complete within 600 frames (e.g. after a lost GPU device), the request returns an empty image (width and height 0) instead of blocking forever. Set it back to `0` for the default behavior.
 
 ## What Does Pixel Values Mean in Different Image Types?
 ### Available ImageType Values
@@ -261,6 +270,8 @@ success = client.simSetSegmentationObjectID("ground[\w]*", 21, True)
 
 The return value is true if at least one mesh was found using regular expression matching.
 
+All segmentation and annotation calls run on the game thread of the simulator, so it is safe to call them at any moment during the simulation. A regular expression call is done as one single update, so setting many objects at once with a regular expression is much faster than doing one call per object.
+
 When wanting to retrieve the segmentation image through the API, it is recommended that you request uncompressed image using this API to ensure you get precise RGB values for segmentation image:
 ```python
 responses = client.simGetImages([airsim.ImageRequest( "front_center", airsim.ImageType.Segmentation, False, False)])
@@ -275,6 +286,10 @@ img.show()
 To retrieve the color map to know which color is assign to each color index you can use:
 ```python
 colorMap = client.simGetSegmentationColorMap()
+```
+The color map is an array with one RGB color per object ID. To get the color of an object, look it up with its object ID, not with its position in the list of `simListInstanceSegmentationObjects()`:
+```python
+objectColor = colorMap[client.simGetSegmentationObjectID("Ground"), :]
 ```
 An example can be found in _segmentation_test.py_ (Cosys-AirSim/PythonClient/segmentation/segmentation_test.py).
 For a script that generates a full list of objects and their associated color, please see the script _segmentation_generate_list.py_ (Cosys-AirSim/PythonClient/segmentation/segmentation_generate_list.py).
@@ -292,7 +307,7 @@ An extension to `simListInstanceSegmentationObjects()` is `simListInstanceSegmen
 Once you decide on the meshes you are interested, note down their names and use above API to set their object IDs. T
 
 #### Changing Colors for Object IDs
-At present the color for each object ID is fixed as in [this pallet](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/Unreal/Plugins/AirSim/Content/HUDAssets/seg_color_palette.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
+At present the color for each object ID is fixed as in [this pallet](images/seg_color_palette.png). We will be adding ability to change colors for object IDs to desired values shortly. In the meantime you can open the segmentation image in your favorite image editor and get the RGB values you are interested in.
 
 #### Startup Object IDs
 At the start, AirSim assigns color indexes to each object found in environment of type `UStaticMeshComponent` or `USkinnedMeshComponent`. It then makes an understandable naming depending on the hierarchy the object belong to in the Unreal World (example _box_2_fullpalletspawner_5_pallet_4_ or _door_window_door_38_ ).

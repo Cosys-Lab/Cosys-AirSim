@@ -5,6 +5,21 @@ The following was tested with ROS2 Jazzy.
 
 ## Build
 
+### From the ros2 branch (ROS2 only)
+
+If the machine only runs ROS2 and connects to a simulator running elsewhere (or on the same machine), use the `ros2` branch. It holds only the ROS2 packages and the C++ client library they build on (AirLib, MavLinkCom and their CMake files), without the Unreal Engine plugin, environments and Python client:
+
+```shell
+git clone -b ros2 --single-branch https://github.com/Cosys-Lab/Cosys-AirSim.git cosys-airsim-ros2
+cd cosys-airsim-ros2
+./setup.sh
+```
+`setup.sh` only downloads rpclib and Eigen. Then continue with the ROS environment, rosdep and colcon steps below, from the `ros2` folder of that clone. Its `README.md` lists the same steps.
+
+The `ros2` branch is generated from the main branches with `scripts/ros2_branch/make_ros2_branch.sh` (maintainers: run it from the branch to publish, for example `scripts/ros2_branch/make_ros2_branch.sh main`, then `git push origin ros2`). Do not commit to the `ros2` branch directly. The ROS2 node of the `ros2` branch works with both the Unreal Engine 5.8 and 5.2.1 versions of the simulator, as they have the same API.
+
+### From the full repository
+
 - Build Cosys-AirSim as per the instructions.
 
 - Make sure that you have set up the environment variables for ROS. Add the `source` command to your `.bashrc` for convenience (replace `iron` with specific version name) -
@@ -20,7 +35,7 @@ apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
 cd <path-to-cosys-airsim>/ros2
-rosdep install --from-paths src -y --ignore-src --skip-keys pcl --skip-keys message_runtime --skip-keys message_generation
+rosdep install --from-paths src -y --ignore-src
 ```
 
 - Build ROS package
@@ -84,13 +99,13 @@ The publishers will be automatically created based on the settings in the `setti
   Measurement of distance from an active ranger, such as infrared or IR
 
 - `/airsim_node/VEHICLE-NAME/lidar/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
-  LIDAR pointcloud 
+  LIDAR pointcloud with the fields `x`, `y`, `z` (float32) and `ring` (uint16). The `ring` field is the index of the laser (channel) that measured the point, with 0 being the lowest laser, the same as the Velodyne and Ouster ROS drivers publish.
 
 - `/airsim_node/VEHICLE-NAME/lidar/labels/SENSOR_NAME/` [airsim_interfaces::StringArray](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/StringArray.msg)
   Custom message type with an array of string that are the labels for each point in the pointcloud of the lidar sensor
 
 - `/airsim_node/VEHICLE-NAME/gpulidar/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
-  GPU LIDAR pointcloud. The instance segmentation/annotation color data is stored in the rgb field of the pointcloud. The intensity data is stored as well in the intensity field
+  GPU LIDAR pointcloud with the fields `x`, `y`, `z`, `rgb`, `intensity` (float32) and `ring` (uint16). The instance segmentation/annotation color data is stored in the rgb field of the pointcloud. The intensity data is stored in the intensity field when `GenerateIntensity` is enabled for the sensor. The `ring` field is the index of the laser (channel) that measured the point, with 0 being the lowest laser, the same as the Velodyne and Ouster ROS drivers publish.
 
 - `/airsim_node/VEHICLE-NAME/echo/active/points/SENSOR_NAME/` [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html)
   Echo sensor pointcloud for active sensing
@@ -113,9 +128,12 @@ The publishers will be automatically created based on the settings in the `setti
 #### Subscribers:
 
 - `/airsim_node/VEHICLE-NAME/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
-  
+  Velocity command in the body frame of the drone: x forward, y left, z up. `angular.z` is the yaw rate in radians per second, positive turns counterclockwise seen from above.
+
 - `/airsim_node/VEHICLE-NAME/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
-  
+  Velocity command in the same frame as the published odometry (`odom_local`): x north, y west, z up. `angular.z` is the yaw rate in radians per second, positive turns counterclockwise seen from above.
+  Note that before version 4.0 the velocity commands were sent to AirSim unchanged and so used the NED convention of AirSim (y right/east, z down, positive yaw rate clockwise). Flip the sign of `linear.y`, `linear.z` and `angular.z` of existing code to keep the same motion.
+
 - `/airsim_node/all_robots/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   Set velocity command for all drones.
 
@@ -271,12 +289,14 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Services:
 
-- `/airsim_node/VEHICLE-NAME/gps_goal` [Request: [airsim_interfaces::SetGPSPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetGPSPosition.srv)]
+- `/airsim_node/VEHICLE-NAME/gps_goal` [Request: [airsim_interfaces::SetGPSPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/SetGPSPosition.srv)]
   Target gps position + yaw.
-  In **absolute** altitude.
+  In **absolute** altitude. The goal is converted to the odometry frame, using the `origin_geo_point` as its origin.
+  Refused while a previous goal has not been reached yet, use `/airsim_node/VEHICLE-NAME/gps_goal/override` to replace the current goal.
 
-- `/airsim_node/VEHICLE-NAME/local_position_goal` [Request: [airsim_interfaces::SetLocalPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros/src/airsim_ros_pkgs/srv/SetLocalPosition.srv)]
-  Target local position + yaw in global frame.
+- `/airsim_node/VEHICLE-NAME/local_position_goal` [Request: [airsim_interfaces::SetLocalPosition](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/srv/SetLocalPosition.srv)]
+  Target local position + yaw (radians) in the odometry frame (`odom_local`: x north, y west, z up, from the take-off point).
+  Refused while a previous goal has not been reached yet, use `/airsim_node/VEHICLE-NAME/local_position_goal/override` to replace the current goal.
 
 #### Subscribers:
 
@@ -288,15 +308,12 @@ Throttle, brake, steering and gear selections for control. Both automatic and ma
 
 #### Publishers:
 
-- `/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
-  Sends velocity command to `airsim_node`
-
-- `/vel_cmd_body_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
+- `/airsim_node/VEHICLE-NAME/vel_cmd_world_frame` [airsim_interfaces::VelCmd](https://github.com/Cosys-Lab/Cosys-AirSim/blob/main/ros2/src/airsim_interfaces/msg/VelCmd.msg)
   Sends velocity command to `airsim_node`
 
 #### Global params
 
-- Dynamic constraints. These can be changed in `dynamic_constraints.launch`:
+- Dynamic constraints. These can be changed in `dynamic_constraints.launch.py`, the PD position controller reads them from there:
     * `/max_vel_horz_abs` [double]
   Maximum horizontal velocity of the drone (meters/second)
 

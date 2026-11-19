@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Copyright (c) Cosys-Lab, University of Antwerp. 2026
 
 #ifndef common_utils_Utils_hpp
 #define common_utils_Utils_hpp
